@@ -53,11 +53,12 @@ modules:
             serializer
             pickler
         
-    // ml/
-    //     // matmul
-    //     primitives
-    //     layers
-    //     backprop
+    ml/
+        matmul
+        test_linear
+        primitives
+        layers
+        // backprop
 
     game/
         holdem_old/

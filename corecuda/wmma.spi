@@ -25,8 +25,11 @@ nominal fragment use m n k layout t = `(
     )
 
 instance index fragment use m n k layout = fun f i => $"!f.x[!i]"
+inl fragment_index forall use m n k layout t. (f : ref (fragment use m n k layout t)) (i : int) : t = $"!f.x[!i]"
 instance set fragment use m n k layout = fun f i v => $"!f.x[!i] = !v"
+inl fragment_set forall use m n k layout t. (f : ref (fragment use m n k layout t)) (i : int) (v : t) : () = $"!f.x[!i] = !v"
 instance length fragment use m n k layout = fun f => $"!f.num_elements"
+inl fragment_length forall use m n k layout t. (f : ref (fragment use m n k layout t)) : int = $"!f.num_elements"
 
 open tensorm
 open tensor_cuda
