@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Watch TS Files",
+            "type": "shell",
+            "command": "npm",
+            "args": [
+                "run",
+                "watch"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "Start Flask Server",
+            "type": "shell",
+            "command": "poetry",
+            "args": [
+                "run",
+                "python", 
+                "ui/backend/main.py",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "Watch Frontend & Run Backend",
+            "dependsOn": [
+                "Watch TS Files",
+                "Start Flask Server"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+  }

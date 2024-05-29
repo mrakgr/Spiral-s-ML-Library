@@ -1,0 +1,301 @@
+open corebase
+open corepython
+
+union action = Raise | Call | Fold
+union card = King | Queen | Jack
+union player_type = Computer | Human
+union event = 
+    | StartGame
+    | PlayerChanged : sam.sa 2 player_type
+    | ActionSelected : action
+
+type table =
+    {
+        pot : sam.sa 2 int
+        community_card : option card
+        pl_card : sam.sa 2 card
+        raises_left : int
+        is_button_s_first_move : bool
+        player_turn : int
+    }
+
+union message =
+    | PlayerGotCard : int * card
+    | CommunityCardIs : card
+    | PlayerAction : int * action
+    | Showdown : {winner_id : int; chips_won : int; cards_shown : sam.sa 2 card}
+
+type deck = sa_listm.sa_list 6 card
+type player_types = sam.sa 2 player_type
+type messages = sa_listm.sa_list 32 message
+
+union ui_game_state =
+    | GameNotStarted
+    | WaitingForActionFromPlayerId : table
+    | GameOver : table
+
+union game_node =
+    | TerminalFold : table
+    | TerminalCall : table
+    | RoundWithAction : table * action
+    | Round : table
+    | ChanceCommunityCard : table
+    | ChanceInit
+
+type state_small = 
+    {
+        ui_game_state : ui_game_state
+        pl_type : player_types
+        game : option game_node
+    }
+
+type state_large =
+    {
+        deck : deck
+        messages : messages
+    }
+
+type state =
+    {
+        small : state_small
+        large : state_large
+    }
+
+type state_ui =
+    {
+        ui_game_state : ui_game_state
+        pl_type : player_types
+        messages : messages
+    }
+
+inl game_to_ui (x : state) : state_ui =
+    {
+        ui_game_state = x.small.ui_game_state
+        pl_type = x.small.pl_type
+        messages = x.large.messages
+    }
+
+let compare_hands (table : table) =
+    let tag = function King => 2 | Queen => 1 | Jack => 0 : int
+    match table.community_card with
+    | None => failwith "Expected the community card to be present in the table."
+    | Some community_card =>
+        let community_card = tag community_card
+        let a = tag (index table.pl_card 0), community_card
+        let b = tag (index table.pl_card 1), community_card
+        let order (a,b) = if a > b then a,b else b,a
+        let is_pair (a,b) = a = b
+        match is_pair a, is_pair b with
+        | true, true => comp (fst a) (fst b)
+        | true, false => gt()
+        | false, true => lt()
+        | _ => comp (order a) (order b)
+
+inl toggle (player_turn : int) : int = if player_turn = 0 then 1 else 0
+inl raiseBy (id : int) (amount : int) : sam.sa 2 int -> sam.sa 2 int = arraym.mapi (fun i pot => if i = id then pot + amount else pot)
+
+// Returns the max value of both pots in an static array.
+inl pot_call (pot : sam.sa 2 int) : sam.sa 2 int = sam.init (const (arraym.fold max 0 pot))
+
+inl game_round (table : table) action =
+    match table.community_card with
+    | Some community_card => // round two
+        match action with
+        | Fold => TerminalFold table
+        | Call when table.is_button_s_first_move => Round {table with is_button_s_first_move=false; player_turn#=toggle}
+        | Call => TerminalCall {table with pot#=pot_call}
+        | Raise when table.raises_left > 0 => Round {table with is_button_s_first_move=false; player_turn#=toggle; raises_left#=(+) -1; pot#=pot_call >> raiseBy table.player_turn 4}
+        | Raise => failwith "Invalid action. The number of raises left is not positive."
+    | None => // round one
+        match action with
+        | Fold => TerminalFold table
+        | Call when table.is_button_s_first_move => Round {table with is_button_s_first_move=false; player_turn#=toggle}
+        | Call => ChanceCommunityCard table 
+        | Raise when table.raises_left > 0 => Round {table with is_button_s_first_move=false; player_turn#=toggle; raises_left#=(+) -1; pot#=pot_call >> raiseBy table.player_turn 2}
+        | Raise => failwith "Invalid action. The number of raises left is not positive."
+inl game_chance_community_card (table : table) card = Round {table with is_button_s_first_move=true; player_turn=0; raises_left=dyn 2; community_card=Some card; pot#=pot_call}
+inl game_chance_init (c0,c1) = Round {is_button_s_first_move=true; player_turn=0; raises_left=dyn 2; community_card=None; pot=arraym.fromList [1;1]; pl_card=arraym.fromList [c0;c1]}
+inl game_init() = ChanceInit
+
+// Shuffles the array.
+inl shuffle forall dim el. (ar : sa_listm.sa_list dim el) : () =
+    backend_switch {
+        Cuda = fun _ => corecuda.random.shuffle ar
+        Python = fun _ => 
+            global "import random"
+            // Knuth shuffle
+            loop.for' {from=0; nearTo=length ar - 1} fun i =>
+                inl j = $"random.randrange(!i, !(length ar))"
+                inl tmp = index ar i
+                set ar i (index ar j)
+                set ar j tmp
+    }
+
+inl random_action (table : table) =
+    open sa_listm
+    inl actions : sa_list 3 _ =  arraym.fromList [Call]
+    if index table.pot 0 <> index table.pot 1 then push actions Fold
+    if table.raises_left > 0 then push actions Raise
+    shuffle actions
+    pop actions
+
+inl create_deck() =
+    open sa_listm
+    inl deck : sa_list 6 _ = arraym.fromList [King; King; Queen; Queen; Jack; Jack]
+    shuffle deck
+    deck
+
+inl pop_deck (deck : sa_listm.sa_list 6 card) : card =
+    open sa_listm
+    pop deck
+
+inl init() : state = 
+    {
+        small = {
+            ui_game_state = GameNotStarted
+            pl_type = arraym.fromList [Computer; Human]
+            game = None
+        }
+        large = {
+            deck = create_deck()
+            messages = sa_listm.create'
+        }
+    }
+
+open corecuda
+
+type state_large_ref =
+    {
+        deck : refm.ref deck
+        messages : refm.ref messages
+    }
+
+inl large_to_refs (large : state_large) : state_large_ref =
+    {large with
+        deck#=refm.from_local
+        messages#=refm.from_local
+    }
+    
+let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
+    inl push_message = sa_listm.push (refm.to_local state.messages)
+    inl pop_deck = 
+        inl deck = refm.to_local state.deck
+        fun () => pop_deck deck
+    inl done x = false, x
+    inl continue x = true, x
+
+    inl body node =
+        match node with
+        | TerminalFold table =>
+            inl msg = 
+                inl chips_won = index table.pot table.player_turn
+                Showdown{cards_shown=table.pl_card; chips_won winner_id=toggle table.player_turn}
+            push_message msg
+            done node
+        | TerminalCall table => 
+            inl msg =
+                inl chips_won, winner_id =
+                    inl chips_won = index table.pot table.player_turn
+                    match compare_hands table with
+                    | Gt => chips_won, 0
+                    | Eq => 0, -1
+                    | Lt => chips_won, 1
+                Showdown{cards_shown=table.pl_card; chips_won winner_id}
+            push_message msg
+            done node
+        | Round table => 
+            match index pl_type table.player_turn with
+            | Human => 
+                done node
+            | Computer =>
+                inl action = random_action table
+                inl msg = PlayerAction(table.player_turn, action)
+                push_message msg
+                continue (game_round table action)
+        | RoundWithAction(table,action) => 
+            inl msg = PlayerAction(table.player_turn, action)
+            push_message msg
+            continue (game_round table action)
+        | ChanceCommunityCard table => 
+            inl card = pop_deck()
+            inl msg = CommunityCardIs card
+            push_message msg
+            continue (game_chance_community_card table card)
+        | ChanceInit () => 
+            inl c0,c1 = pop_deck(), pop_deck()
+            push_message PlayerGotCard(0, c0)
+            push_message PlayerGotCard(1, c1)
+            continue (game_chance_init (c0,c1))
+    
+    loop.while fst (snd >> body) (continue node) |> snd
+
+let play_loop (small : state_small) (large : state_large_ref) node : state_small =
+    match play_loop_inner large small.pl_type node with
+    | Round table as game =>
+        {small with
+            ui_game_state = WaitingForActionFromPlayerId(table)
+            game = Some game
+            }
+    | TerminalCall table | TerminalFold table =>
+        {small with
+            ui_game_state = GameOver(table)
+            game = None
+            }
+    | game =>
+        failwith "Unexpected node received in play_loop."
+
+inl event_loop (msg, {small large} & state : event * state) : state =
+    inl large_refs = large_to_refs large
+    inl small =
+        match msg with
+        | StartGame =>
+            open refm
+            inl ({small large} as state) = init()
+            large_refs.deck <-# large.deck
+            large_refs.messages <-# large.messages
+            play_loop small large_refs game_init()
+        | PlayerChanged pl_type => {small with pl_type}
+        | ActionSelected action =>
+            match small.game with
+            | Some game => 
+                match game with
+                | Round table => play_loop small large_refs RoundWithAction(table, action)
+                | _ => failwith "Unexpected game node in ActionSelected."
+            | None => small
+    {small large}
+
+open corecuda
+open corepython
+inl main() =
+    named_tuple "Leduc_Game" {
+        init = fun () => 
+            inl x = init()
+            jsonm.serialize {
+                game_state = x
+                ui_state = game_to_ui x
+            }
+            
+        event_loop_gpu = fun (msg, game_state) =>
+            open serializer
+            inl seri = {
+                msg = create_serializer
+                game_state = create_serializer
+                ui_state = create_serializer
+            }
+            inl msg, game_state = jsonm.deserialize msg, jsonm.deserialize game_state
+            serialize seri.msg msg
+            serialize seri.game_state game_state
+
+            run fun () =>
+                inl from = rangem.threads_in_grid().from
+                if from = 0 then
+                    inl game_state = event_loop (deserialize seri.msg, deserialize seri.game_state)
+                    serialize seri.game_state game_state
+                    serialize seri.ui_state (game_to_ui game_state)
+
+            jsonm.serialize {
+                game_state = deserialize seri.game_state
+                ui_state = deserialize seri.ui_state
+            }
+            
+    }
