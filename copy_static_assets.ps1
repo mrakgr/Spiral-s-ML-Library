@@ -9,7 +9,7 @@ if (-not (Test-Path $destinationPath)) {
     Copy-Item -Path $sourcePath -Destination $destinationPath -Force -Recurse
 }
 
-# The following line, also works and would be more roboust, but its Windows only.
+# The following line also works and would be more roboust, but its Windows only.
 # Robocopy $sourcePath $destinationPath /mir
 
 # symlinks didn't work for me.
