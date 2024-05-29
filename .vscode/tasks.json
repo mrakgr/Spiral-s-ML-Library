@@ -21,8 +21,9 @@
             "command": "poetry",
             "args": [
                 "run",
-                "python", 
-                "ui/backend/main.py",
+                "python",
+                "-m",
+                "ui.backend.main",
             ],
             "options": {
                 "cwd": "${workspaceFolder}/"

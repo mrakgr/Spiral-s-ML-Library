@@ -1,8 +1,8 @@
-from core import socketio, app
-from routes import main_page
-from namespace.rps_game import RPS_Namespace
-from namespace.leduc_game import Leduc_Namespace
-from namespace.hu_nl_holdem_game import HU_NL_Holdem_Namespace
+from .core import socketio, app
+from .routes import main_page
+from .namespace.rps_game import RPS_Namespace
+from .namespace.leduc_game import Leduc_Namespace
+from .namespace.hu_nl_holdem_game import HU_NL_Holdem_Namespace
 
 def run_debug(): 
     """
