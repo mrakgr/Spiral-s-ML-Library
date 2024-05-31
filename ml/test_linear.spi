@@ -4,7 +4,7 @@ open corecuda
 inl main() =
     inl swap (a,b) x = if x then b,a else a,b
     inl m,n,k : int * int * int = 512, 512, 512
-    inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0f32; std=1} ([m, k; k, n; m, n])
-    
+    inl a_trans, b_trans = false, true
+    inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0 : float; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     
     ()

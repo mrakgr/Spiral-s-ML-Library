@@ -57,7 +57,8 @@ modules:
         matmul
         test_linear
         primitives
-        layers
+        layers_old
+        layers 
         // backprop
 
     game/
