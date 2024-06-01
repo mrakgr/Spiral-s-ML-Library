@@ -3,16 +3,28 @@ open tensorm
 
 type size = partitionm.size
 
-union comb (f : * -> * -> *) a c =
-    | Elem : f a c
-    | Pair : exists b. f a b * f b c
+union rec graph t =
+    | Matmul : graph t * graph t
+    | Map : graph t
+    | Map2 : graph t * graph t
+    | Input : {key : exists key. key}
+    | Weigth : {dim : int * int}
 
-union layer_descriptor a b =
-    | MatrixMultiplication : {output_size : int}
-    | Simple : {run : a -> b -> ()}
+// inl rec params forall t. (x : graph t) =
+//     inl f (s : size) = function
+//         | Matmul(a,b,{dim}) => 
+//     f 0 x
 
-nominal layer_params a b = {desc : layer_descriptor a b; offset : {param : size}}
-nominal layer a b = {desc : layer_descriptor a b; offset : {param : size; input : size; output : size}}
+// union comb (f : * -> * -> *) a c =
+//     | Elem : f a c
+//     | Pair : exists b. f a b * f b c
+
+// union layer_descriptor a b =
+//     | MatrixMultiplication : {output_size : int}
+//     | Simple : {run : a -> b -> ()}
+
+// nominal layer_params a b = {desc : layer_descriptor a b; offset : {param : size}}
+// nominal layer a b = {desc : layer_descriptor a b; offset : {param : size; input : size; output : size}}
 
 inl main() = 
     ()
