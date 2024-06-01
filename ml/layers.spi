@@ -7,24 +7,94 @@ union rec graph t =
     | Matmul : graph t * graph t
     | Map : graph t
     | Map2 : graph t * graph t
-    | Input : {key : exists key. key}
-    | Weigth : {dim : int * int}
+    | Input : {key : exists key{symbol}. key}
+    | Weight : {dim : int * int}
 
-// inl rec params forall t. (x : graph t) =
-//     inl f (s : size) = function
-//         | Matmul(a,b,{dim}) => 
-//     f 0 x
+type dim = int * int
 
-// union comb (f : * -> * -> *) a c =
-//     | Elem : f a c
-//     | Pair : exists b. f a b * f b c
+inl memoize (h : .hashmap) f k =
+    open compile_time
+    match hashmap.try_get h k with
+    | Some v => v
+    | None => inl v = f k in hashmap.add h k v . v
 
-// union layer_descriptor a b =
-//     | MatrixMultiplication : {output_size : int}
-//     | Simple : {run : a -> b -> ()}
+inl pass_dim forall t dims. (x : graph t) (dims : dims) =
+    open compile_time
+    inl h = hashmap.create()
+    inl get_dim forall k{symbol}. (k : k) : dim = real dims k : dim
+    inl rec f forall t'. :  graph t' -> dim =
+        memoize h function
+            | Weight {dim} => dim
+            | Input {key=(exists k. k)} => get_dim k
+            | Map(a) => f a
+            | Map2(a,b) =>
+                inl a,b = f a, f b
+                assert (a = b) "The dimensions of the two inputs to the Map2 node have to be equal."
+                a
+            | Matmul(a,b) =>
+                inl (m,k),(k',n) = f a, f b
+                assert (k = k') "The dimensions of the inner dimensions to the matrix multiplication node have to be equal."
+                m,n
+            
+    inl _ = f x
+    h
 
-// nominal layer_params a b = {desc : layer_descriptor a b; offset : {param : size}}
-// nominal layer a b = {desc : layer_descriptor a b; offset : {param : size; input : size; output : size}}
+inl pass_offset_param forall t. (x : graph t) (dims : .hashmap) =
+    open compile_time
+    inl offset = hashmap.create()
+    inl h = hashmap.create()
+    inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
+    inl rec f forall t'. (input : size) : graph t' -> size =
+        memoize h function
+            | Weight _ as k =>
+                inl dim = get_dim k
+                inl input = partitionm.align input
+                hashmap.add offset k input
+                input + conv (loop.prod dim * (sizeof : sizeof t').value)
+            | Input _ => input
+            | Map(a) => f input a
+            | Matmul(a,b) | Map2(a,b) => f (f input a) b
 
-inl main() = 
-    ()
+    inl _ = f 0 x
+    offset
+
+inl pass_offset_io forall t. (x : graph t) (dims : .hashmap) =
+    open compile_time
+    inl offset = hashmap.create()
+    inl h = hashmap.create()
+    inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
+    inl rec f forall t'. (input : size) : graph t' -> size =
+        memoize h fun k =>
+            inl g (input : size) =
+                inl dim = get_dim k
+                inl input = partitionm.align input
+                inl output = input + conv (loop.prod dim * (sizeof : sizeof t').value)
+                hashmap.add offset k {input output}
+                output
+            match k with
+            | Weight _ | Input _ => g input
+            | Map(a) => g (f input a)
+            | Matmul(a,b) | Map2(a,b) => g (f (f input a) b)
+
+    inl _ = f 0 x
+    offset
+
+inl test1() =
+    inl tanh x = Map x
+    inl matmul dim x = Matmul(x, Weight {dim})
+    inl input forall key{symbol}. (key : key) = Input {key = exists key}
+
+    inl layers : graph float =
+        input .input
+        |> matmul (64, 128)
+        |> tanh
+        |> matmul (128, 128)
+        |> tanh
+        |> matmul (128, 32)
+        |> tanh
+    
+    inl dims = {input = 1, 64 : int * int}
+    inl h = pass_dim layers dims
+    compile_time.hashmap.try_get h layers : option (int * int)
+
+inl main() = test1()

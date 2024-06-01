@@ -3,6 +3,7 @@
 type ptr = array u8
 type size = u64
 inl min_align() : size = 128
+inl align (s : size) = modup s min_align()
 
 nominal offset el = size
 nominal offsets d el = {
@@ -41,8 +42,6 @@ inl (~#) forall el. (partition x : _ el) : partition_offsets el =
     inl body,length = real
         open real_core
         open struct
-        inl sizeof forall t. = !!!!Conv(`size, !!!!SizeOf(`t))
-        inl align forall el. s = modup s (modup (sizeof `el) min_align())
         inl to_offsets s (dim d as z) =
             inl length = conv `size (prod d) 
             typecase `z with dim ~d ~el =>

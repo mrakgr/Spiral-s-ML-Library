@@ -1,151 +1,151 @@
-Error trace on line: 82, column: 5 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    inl b = split_b {n=n_tile; k=k_tile} b
+Error trace on line: 29, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+              ^
+Error trace on line: 29, column: 19 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+                  ^
+Error trace on line: 29, column: 25 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+                        ^
+Error trace on line: 17, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
+    match hashmap.try_get h k with
     ^
-Error trace on line: 83, column: 5 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    inl c = split_c {m=m_tile; n=n_tile} c
-    ^
-Error trace on line: 85, column: 5 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    inl padding =
-    ^
-Error trace on line: 92, column: 5 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    inl memory = 
-    ^
-Error trace on line: 100, column: 5 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    run' {shared_mem=conv memory.length} fun () =>
-    ^
-Error trace on line: 27, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
-    ^
-Error trace on line: 27, column: 9 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
-        ^
-Error trace on line: 29, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    global "options = []"
-    ^
-Error trace on line: 31, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    global "options.append('--diag-suppress=550,20012')" // suppresses some warnings related to unused vars
-    ^
-Error trace on line: 32, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    global "options.append('--dopt=on')" // turns on the device optimizations
-    ^
-Error trace on line: 33, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    global "options.append('--restrict')" // assumes all the pointers are restriced
-    ^
-Error trace on line: 35, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    match threads_per_block with
-    ^
-Error trace on line: 41, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    inl compiler = NVRTC
-    ^
-Error trace on line: 42, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    match compiler with
-    ^
-Error trace on line: 45, column: 5 in module: c:\Spiral's ML Library\corecuda\base.spi.
-    inl kernel_i, vars = join_backend Cuda
-    ^
-Error trace on line: 46, column: 9 in module: c:\Spiral's ML Library\corecuda\base.spi.
-        match compiler with
-        ^
-Error trace on line: 51, column: 9 in module: c:\Spiral's ML Library\corecuda\base.spi.
-        f () : ()
-        ^
-Error trace on line: 100, column: 46 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    run' {shared_mem=conv memory.length} fun () =>
-                                             ^
-Error trace on line: 101, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        global "#include <mma.h>"
-        ^
-Error trace on line: 102, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        global "using namespace nvcuda;"
-        ^
-Error trace on line: 107, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl a_shared_tile, b_shared_tile, c_shared_tile = 
-        ^
-Error trace on line: 107, column: 13 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl a_shared_tile, b_shared_tile, c_shared_tile = 
-            ^
-Error trace on line: 107, column: 28 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl a_shared_tile, b_shared_tile, c_shared_tile = 
-                           ^
-Error trace on line: 114, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl c_shared_frag = split_c {m=m_frag; n=n_frag} c_shared_tile
-        ^
-Error trace on line: 115, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} = 
-        ^
-Error trace on line: 115, column: 13 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} = 
-            ^
-Error trace on line: 115, column: 26 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} = 
-                         ^
-Error trace on line: 115, column: 63 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} = 
-                                                              ^
-Error trace on line: 115, column: 91 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} = 
-                                                                                          ^
-Error trace on line: 117, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl k_local = {k=k_tile / k_frag}
-        ^
-Error trace on line: 118, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl c_shared_frag = 
-        ^
-Error trace on line: 119, column: 13 in module: c:\Spiral's ML Library\ml\matmul.spi.
-            split_into_fst const((m_warp, n_warp),(m_local, n_local)) c_shared_frag
-            ^
-Error trace on line: 57, column: 16 in module: c:\Spiral's ML Library\corebase\core.spi.
-inl (|>) a b = b a
-               ^
-Error trace on line: 125, column: 31 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-inl apply_ptr forall dim el. (tensor {bodies dim} : tensor dim el) : tensor dim el =
-                              ^
-Error trace on line: 125, column: 38 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-inl apply_ptr forall dim el. (tensor {bodies dim} : tensor dim el) : tensor dim el =
-                                     ^
-Error trace on line: 126, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-    tensor {
-    ^
-Error trace on line: 126, column: 12 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-    tensor {
-           ^
-Error trace on line: 130, column: 13 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-            map (fun (tensor_body {array stride offset} as x) =>
-            ^
-Error trace on line: 54, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-    inl rec f = function
-                ^
-Error trace on line: 55, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | a, b => f a, f b
-          ^
-Error trace on line: 56, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | {} as ar => record_map (fun {value} => f value) ar
-          ^
-Error trace on line: 57, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar => index ar
-          ^
-Error trace on line: 57, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar => index ar
-                ^
-Error trace on line: 130, column: 23 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-            map (fun (tensor_body {array stride offset} as x) =>
+Error trace on line: 18, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 19, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+      ^
+Error trace on line: 19, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+              ^
+Error trace on line: 19, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
                       ^
-Error trace on line: 130, column: 35 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-            map (fun (tensor_body {array stride offset} as x) =>
-                                  ^
-Error trace on line: 130, column: 60 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-            map (fun (tensor_body {array stride offset} as x) =>
-                                                           ^
-Error trace on line: 131, column: 17 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-                typecase `x with
+Error trace on line: 27, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Weight {dim} => dim
+              ^
+Error trace on line: 28, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Input {key=(exists k. k)} => get_dim k
+              ^
+Error trace on line: 29, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+              ^
+Error trace on line: 30, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map2(a,b) =>
+              ^
+Error trace on line: 34, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Matmul(a,b) =>
+              ^
+Error trace on line: 34, column: 22 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Matmul(a,b) =>
+                     ^
+Error trace on line: 35, column: 17 in module: c:\Spiral's ML Library\ml\layers.spi.
+                inl (m,k),(k',n) = f a, f b
                 ^
-Error trace on line: 132, column: 42 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-                | tensor_body dim ~el => tensor_body `dim `el {
-                                         ^
-Error trace on line: 132, column: 63 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-                | tensor_body dim ~el => tensor_body `dim `el {
-                                                              ^
-Error trace on line: 133, column: 29 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
-                    array = backend_switch {
-                            ^
-Cannot apply a forall with a term.
+Error trace on line: 35, column: 36 in module: c:\Spiral's ML Library\ml\layers.spi.
+                inl (m,k),(k',n) = f a, f b
+                                   ^
+Error trace on line: 17, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
+    match hashmap.try_get h k with
+    ^
+Error trace on line: 18, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 19, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+      ^
+Error trace on line: 19, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+              ^
+Error trace on line: 19, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+                      ^
+Error trace on line: 27, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Weight {dim} => dim
+              ^
+Error trace on line: 28, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Input {key=(exists k. k)} => get_dim k
+              ^
+Error trace on line: 29, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+              ^
+Error trace on line: 29, column: 19 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+                  ^
+Error trace on line: 29, column: 25 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+                        ^
+Error trace on line: 17, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
+    match hashmap.try_get h k with
+    ^
+Error trace on line: 18, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 19, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+      ^
+Error trace on line: 19, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+              ^
+Error trace on line: 19, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+                      ^
+Error trace on line: 27, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Weight {dim} => dim
+              ^
+Error trace on line: 28, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Input {key=(exists k. k)} => get_dim k
+              ^
+Error trace on line: 29, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map(a) => f a
+              ^
+Error trace on line: 30, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Map2(a,b) =>
+              ^
+Error trace on line: 34, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Matmul(a,b) =>
+              ^
+Error trace on line: 34, column: 22 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Matmul(a,b) =>
+                     ^
+Error trace on line: 35, column: 17 in module: c:\Spiral's ML Library\ml\layers.spi.
+                inl (m,k),(k',n) = f a, f b
+                ^
+Error trace on line: 35, column: 36 in module: c:\Spiral's ML Library\ml\layers.spi.
+                inl (m,k),(k',n) = f a, f b
+                                   ^
+Error trace on line: 17, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
+    match hashmap.try_get h k with
+    ^
+Error trace on line: 18, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 19, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+      ^
+Error trace on line: 19, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+              ^
+Error trace on line: 19, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+                      ^
+Error trace on line: 27, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Weight {dim} => dim
+              ^
+Error trace on line: 28, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Input {key=(exists k. k)} => get_dim k
+              ^
+Error trace on line: 28, column: 21 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Input {key=(exists k. k)} => get_dim k
+                    ^
+Error trace on line: 28, column: 27 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Input {key=(exists k. k)} => get_dim k
+                          ^
+Error trace on line: 28, column: 44 in module: c:\Spiral's ML Library\ml\layers.spi.
+            | Input {key=(exists k. k)} => get_dim k
+                                           ^
+Error trace on line: 24, column: 56 in module: c:\Spiral's ML Library\ml\layers.spi.
+    inl get_dim forall k{symbol}. (k : k) : dim = real dims.k : dim
+                                                       ^
+Cannot find the key k inside the record.

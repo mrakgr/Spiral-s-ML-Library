@@ -11,4 +11,8 @@ inl remove forall key. (h : .hashmap) (k : key) : bool = !!!!HashMapRemove(h,k)
 // Returns the number of elements in the set.
 inl count (h : .hashmap) : int = conv (!!!!HashMapCount(h) : i32)
 // Returns the element if it is in the dictionary, or the symbol .null otherwise.
-inl try_get forall key value. (h : .hashmap) (k : key) : value = !!!!HashMapTryGet(h,k)
+inl try_get forall key value. (h : .hashmap) (k : key) : option value = real
+    match !!!!HashMapTryGet(h,k) with
+    | .null => None `value
+    | v => Some `value v
+    
