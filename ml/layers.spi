@@ -2,6 +2,7 @@ open corebase
 open tensorm
 open compile_time
 
+type ptr = partitionm.ptr
 type size = partitionm.size
 
 union rec graph t =
@@ -45,9 +46,11 @@ inl pass_offset_param forall t. (x : graph t) (dims : .hashmap) =
     inl rec f forall t'. (offset : size) : graph t' -> size =
         memoize h function
             | Weight _ as k =>
-                inl input = partitionm.align offset
-                hashmap.add h_offset_param k input
-                input + conv (loop.prod (get_dim k) * (sizeof : sizeof t').value)
+                inl partition_offsets : _ (_ _ t') = 
+                    partitionm.to_partition(get_dim k)
+                    |> partitionm.calculate_offsets offset 
+                hashmap.add h_offset_param k partition_offsets
+                partition_offsets.offset_end
             | Input _ => offset
             | Map(a) => f offset a
             | Matmul(a,b) | Map2(a,b) => f (f offset a) b
@@ -60,9 +63,11 @@ inl pass_offset_input forall t. (x : graph t) (dims : .hashmap) =
     inl rec f forall t'. (offset : size) : graph t' -> size =
         memoize h fun k =>
             inl g (offset : size) = // during graph execution we'll get the offsets for the input nodes from the `h_offset_input` hash map, no need to store them here
-                inl input = partitionm.align offset
-                hashmap.add h_offset_input k input
-                input + conv (loop.prod (get_dim k) * (sizeof : sizeof t').value)
+                inl partition_offsets : _ (_ _ t') = 
+                    partitionm.to_partition(get_dim k)
+                    |> partitionm.calculate_offsets offset 
+                hashmap.add h_offset_input k partition_offsets
+                partition_offsets.offset_end
             match k with
             | Weight _ => offset
             | Input _ => g offset
@@ -74,13 +79,24 @@ inl pass_offset_input forall t. (x : graph t) (dims : .hashmap) =
 type graph_env_param =
     {
         dims : .hashmap
-        pass_offset_param : .hashmap
+        pass_offset_param : .hashmap * size
     }
 
-inl weigth_init (x : graph float) (env : graph_env_param) =
-    inl size : size = hashmap.get env.pass_offset_param x
+inl weigth_init forall float. base_and_length (x : graph float) ({dims pass_offset_param=h,size} : graph_env_param) =
+    inl rec f forall t. (x : graph t) : () =
+        match x with
+        | Weight _ =>
+            inl x : tensor dim t = partitionm.from_partition_offsets base_and_length (hashmap.get h x)
 
-    ()
+            
+            // inl dim : int * int = hashmap.get dims x
+            // inl len = loop.prod dim
+            // inl i : size = hashmap.get h x
+            // inl ptr = $"reinterpret_cast<`t *>(&!base[!i])" : array t
+            
+            // inl te
+            ()
+    f x
 
 inl test1() =
     inl tanh x = Map x

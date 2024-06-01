@@ -27,19 +27,23 @@ nominal partition_offsets el = {
             | tensor ~d ~t => ``(offsets d t)
             )
         )
-    length : size
+    offset_end : size
     }
 
+
 // Takes in the tensor dimensions to create the partition.
-inl (~!) forall dim el. (d : dim) : partition (tensor dim el) = partition (real dim `dim `el d)
+inl to_partition forall dim el. (d : dim) : partition (tensor dim el) = partition (real dim `dim `el d)
+// Takes in the tensor dimensions to create the partition.
+inl (~!) forall dim el. (d : dim) : partition (tensor dim el) = to_partition d
 // Combines the two partitions into a single one in a non overlapping manner.
 inl (*.) forall a b. (partition a : partition a) (partition b : partition b) : partition (a * b) = partition (real a, b)
 // Combines the two partitions into a single one in an overlapping manner.
 inl (+.) forall a b. (partition_offsets a : partition_offsets a) (partition_offsets b : partition_offsets b) : partition_offsets (a * b) = 
-    partition_offsets {body=real a.body, b.body; length=max a.length b.length}
-// Transforms a partition into a structure that contains the relevant pointer offsets.
-inl (~#) forall el. (partition x : _ el) : partition_offsets el = 
-    inl body,length = real
+    partition_offsets {body=real a.body, b.body; offset_end=max a.offset_end b.offset_end}
+
+// Transforms a partition into a structure that contains the relevant pointer offsets. Takes in the starting offset as the first argument.
+inl calculate_offsets forall el. (offset : size) (partition x : _ el) : partition_offsets el = 
+    inl body,offset_end = real
         open real_core
         open struct
         inl to_offsets s (dim d as z) =
@@ -51,8 +55,11 @@ inl (~#) forall el. (partition x : _ el) : partition_offsets el =
                     offset `el s, s + length * sizeof `el
                     ) s
             offsets `d `el {dim=d; offsets=x}, s
-        mapFold to_offsets (conv `size 0) x
-    partition_offsets {body length}
+        mapFold to_offsets offset x
+    partition_offsets {body offset_end}
+
+// Transforms a partition into a structure that contains the relevant pointer offsets. The offset starts at 0.
+inl (~#) forall el. (x : partition el) : partition_offsets el = calculate_offsets 0 x
     
 // Internal function used to create the tensor from the offsets.
 inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d el) : tensor d el = 
@@ -79,14 +86,15 @@ inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d e
     tensor {dim bodies}
 
 // Given a base array and the partition offsets, it creates a compound structure containing the tensors.
-inl from_partition_offsets forall el. (base, length  : ptr * size) (partition_offsets p : _ el) : el = real
-    open real_core
-    open struct
-    assert (p.length <= length) "The length of the partition has to be less than the length of the base array."
-    map (fun x => 
-        typecase `x with
-        | offsets ~d ~el => tensor_from_offsets `d `el base x
-        ) p.body
+inl from_partition_offsets forall el. (base, length  : ptr * size) (partition_offsets p : _ el) : el =
+    assert (p.offset_end <= length) "The length of the partition has to be less than the length of the base array."
+    real
+        open real_core
+        open struct
+        map (fun x => 
+            typecase `x with
+            | offsets ~d ~el => tensor_from_offsets `d `el base x
+            ) p.body
 
 // Given a base array and a partition, it creates a compound structure containing the tensors.
 inl from_partition forall el. base (x : partition el) : el = from_partition_offsets base #x
