@@ -1,5 +1,6 @@
 open corebase
 open tensorm
+open compile_time
 
 type size = partitionm.size
 
@@ -13,13 +14,11 @@ union rec graph t =
 type dim = int * int
 
 inl memoize (h : .hashmap) f k =
-    open compile_time
     match hashmap.try_get h k with
     | Some v => v
     | None => inl v = f k in hashmap.add h k v . v
 
 inl pass_dim forall t dims. (x : graph t) (dims : dims) =
-    open compile_time
     inl h = hashmap.create()
     inl get_dim forall k{symbol}. (k : k) : dim = real dims k : dim
     inl rec f forall t'. :  graph t' -> dim =
@@ -40,44 +39,48 @@ inl pass_dim forall t dims. (x : graph t) (dims : dims) =
     h
 
 inl pass_offset_param forall t. (x : graph t) (dims : .hashmap) =
-    open compile_time
-    inl offset = hashmap.create()
+    inl h_offset_param = hashmap.create() // stores the offsets pointing to the start of the weight parameter array for each node
     inl h = hashmap.create()
     inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
-    inl rec f forall t'. (input : size) : graph t' -> size =
+    inl rec f forall t'. (offset : size) : graph t' -> size =
         memoize h function
             | Weight _ as k =>
-                inl dim = get_dim k
-                inl input = partitionm.align input
-                hashmap.add offset k input
-                input + conv (loop.prod dim * (sizeof : sizeof t').value)
-            | Input _ => input
-            | Map(a) => f input a
-            | Matmul(a,b) | Map2(a,b) => f (f input a) b
+                inl input = partitionm.align offset
+                hashmap.add h_offset_param k input
+                input + conv (loop.prod (get_dim k) * (sizeof : sizeof t').value)
+            | Input _ => offset
+            | Map(a) => f offset a
+            | Matmul(a,b) | Map2(a,b) => f (f offset a) b
+    h_offset_param, f 0 x
 
-    inl _ = f 0 x
-    offset
-
-inl pass_offset_io forall t. (x : graph t) (dims : .hashmap) =
-    open compile_time
-    inl offset = hashmap.create()
+inl pass_offset_input forall t. (x : graph t) (dims : .hashmap) =
+    inl h_offset_input = hashmap.create() // stores the offsets pointing to the start of the output array for each node
     inl h = hashmap.create()
     inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
-    inl rec f forall t'. (input : size) : graph t' -> size =
+    inl rec f forall t'. (offset : size) : graph t' -> size =
         memoize h fun k =>
-            inl g (input : size) =
-                inl dim = get_dim k
-                inl input = partitionm.align input
-                inl output = input + conv (loop.prod dim * (sizeof : sizeof t').value)
-                hashmap.add offset k {input output}
-                output
+            inl g (offset : size) = // during graph execution we'll get the offsets for the input nodes from the `h_offset_input` hash map, no need to store them here
+                inl input = partitionm.align offset
+                hashmap.add h_offset_input k input
+                input + conv (loop.prod (get_dim k) * (sizeof : sizeof t').value)
             match k with
-            | Weight _ | Input _ => g input
-            | Map(a) => g (f input a)
-            | Matmul(a,b) | Map2(a,b) => g (f (f input a) b)
+            | Weight _ => offset
+            | Input _ => g offset
+            | Map(a) => g (f offset a)
+            | Matmul(a,b) | Map2(a,b) => g (f (f offset a) b)
 
-    inl _ = f 0 x
-    offset
+    h_offset_input, f 0 x
+
+type graph_env_param =
+    {
+        dims : .hashmap
+        pass_offset_param : .hashmap
+    }
+
+inl weigth_init (x : graph float) (env : graph_env_param) =
+    inl size : size = hashmap.get env.pass_offset_param x
+
+    ()
 
 inl test1() =
     inl tanh x = Map x
