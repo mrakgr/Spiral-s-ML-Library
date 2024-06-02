@@ -79,23 +79,18 @@ inl pass_offset_input forall t. (x : graph t) (dims : .hashmap) =
 type graph_env_param =
     {
         dims : .hashmap
-        pass_offset_param : .hashmap * size
+        offset_param : .hashmap * size
     }
 
-inl weigth_init forall float. base_and_length (x : graph float) ({dims pass_offset_param=h,size} : graph_env_param) =
+inl weigth_init forall float. base_and_length (x : graph float) ({dims offset_param=h,size} : graph_env_param) =
     inl rec f forall t. (x : graph t) : () =
         match x with
         | Weight _ =>
             inl x : tensor dim t = partitionm.from_partition_offsets base_and_length (hashmap.get h x)
-
-            
-            // inl dim : int * int = hashmap.get dims x
-            // inl len = loop.prod dim
-            // inl i : size = hashmap.get h x
-            // inl ptr = $"reinterpret_cast<`t *>(&!base[!i])" : array t
-            
-            // inl te
             ()
+        | Input => ()
+        | Map(a) => f a
+        | Matmul(a,b) | Map2(a,b) => f a . f b
     f x
 
 inl test1() =

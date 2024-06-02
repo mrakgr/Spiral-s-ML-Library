@@ -1,0 +1,15 @@
+// Typed version of the hashset
+nominal hashset key = exists. .hashset
+
+// Creates a compile time HashSet. These data structures cannot be turned to types or passed through join
+// points. Their primary purpose is to allow lexicographic traversals and sorting of compile time data structures.
+// One usecase for this would be the layering of backpropagation operations without relying on monadic programming techniques.
+inl create forall key. : hashset key = hashset(exists !!!!HashSetCreate())
+// Adds a key to the HashSet. Returns true if the key was added to the set, and false if the key was already present.
+inl add forall key. (hashset (exists. h) : hashset key) (k : key) : bool = !!!!HashSetAdd(h,k)
+// Returns true if the key is present in the set.
+inl contains forall key. (hashset (exists. h) : hashset key) (k : key) : bool = !!!!HashSetContains(h,k)
+// Removes a key from the HashSet. Returns true if the key was found and removed from the set, and false if the key wasn't present.
+inl remove forall key. (hashset (exists. h) : hashset key) (k : key) : bool = !!!!HashSetRemove(h,k)
+// Returns the number of elements in the set.
+inl count forall key. (hashset (exists. h) : hashset key) : int = conv (!!!!HashSetCount(h) : i32)

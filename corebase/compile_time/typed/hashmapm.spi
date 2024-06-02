@@ -1,0 +1,24 @@
+nominal hashmap key value = exists. .hashmap
+
+// Creates a compile time HashMap. These data structures cannot be turned to types or passed through join
+// points. Their primary purpose is for type extensions.
+inl create forall key value. : hashmap key value = hashmap(exists !!!!HashMapCreate())
+// Adds a key to the HashMap.
+inl add forall key value. (hashmap (exists. h) : hashmap key value) (k : key) (v : value) : () = !!!!HashMapAdd(h,k,v)
+// Returns true if the key is present in the map.
+inl contains forall key value. (hashmap (exists. h) : hashmap key value) (k : key) : bool = !!!!HashMapContains(h,k)
+// Removes a key from the HashMap. Returns true if the key was found and removed from the map, and false if the key wasn't present.
+inl remove forall key value. (hashmap (exists. h) : hashmap key value) (k : key) : bool = !!!!HashMapRemove(h,k)
+// Returns the number of elements in the map.
+inl count forall key value. (hashmap (exists. h) : hashmap key value) : int = conv (!!!!HashMapCount(h) : i32)
+// Returns the element if it is in the map as an optional type.
+inl try_get forall key value. (hashmap (exists. h) : hashmap key value) (k : key) : option value = real
+    match !!!!HashMapTryGet(h,k) with
+    | .null => None `value
+    | v => Some `value v
+// Returns the element if it is in the map otherwise raises a type error.
+inl get forall key value. (hashmap (exists. h) : hashmap key value) (k : key) : value = real
+    match !!!!HashMapTryGet(h,k) with
+    | .null => error_type "The key is not present in the hash map."
+    | v => v
+    

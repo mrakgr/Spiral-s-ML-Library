@@ -11,6 +11,9 @@ modules:
         compile_time/
             hashset
             hashmap
+            typed/
+                hashsetm
+                hashmapm
         struct* 
         listm
         loop
