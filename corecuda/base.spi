@@ -14,6 +14,8 @@ inl blocks_per_grid() : int = 1
 // // Dereferences a pointer.
 // inl (~*) forall t. (x : ptr t) : t = $"`t \v = *!x"
 
+inl device_sync() : () = $"cp.cuda.get_current_stream().synchronize()"
+
 type run_config = {
     shared_mem : int
     }

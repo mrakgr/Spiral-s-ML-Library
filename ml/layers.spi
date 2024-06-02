@@ -94,22 +94,40 @@ inl weigth_init forall float. base_and_length (x : graph float) ({dims offset_pa
         | Matmul(a,b) | Map2(a,b) => f a . f b
     f x
 
+inl weigth_print forall float. base_and_length (x : graph float) ({dims offset_param=h,size} : graph_env_param) =
+    inl rec f forall t. (x : graph t) : () =
+        match x with
+        | Weight _ =>
+            open corecuda
+            inl x : tensor dim t = partitionm.from_partition_offsets base_and_length (hashmap.get h x)
+            console.write_ln x
+        | Input => ()
+        | Map(a) => f a
+        | Matmul(a,b) | Map2(a,b) => f a . f b
+    f x
+
 inl test1() =
     inl tanh x = Map x
     inl matmul dim x = Matmul(x, Weight {dim})
     inl input forall key{symbol}. (key : key) = Input {key = exists key}
 
-    inl layers : graph float =
+    inl graph : graph float =
         input .input
-        |> matmul (64, 128)
+        |> matmul (1, 4)
         |> tanh
-        |> matmul (128, 128)
+        |> matmul (4, 4)
         |> tanh
-        |> matmul (128, 32)
+        |> matmul (4, 2)
         |> tanh
     
-    inl dims = {input = 1, 64 : int * int}
-    inl h = pass_dim layers dims
-    compile_time.hashmap.try_get h layers : option (int * int)
+    inl dims = pass_dim graph {input = 1, 1 : int * int}
+    inl offset_param = pass_offset_param graph dims
+    inl ptr = partitionm.create_array (snd offset_param)
+    console.write_ln "---"
+    weigth_print ptr graph {dims offset_param} 
+    weigth_init ptr graph {dims offset_param}
+    console.write_ln "Done initing."
+    weigth_print ptr graph {dims offset_param}
+    ()
 
 inl main() = test1()

@@ -2,8 +2,13 @@
 
 type ptr = array u8
 type size = u64
-inl min_align() : size = 128
+inl min_align() : size = 16
 inl align (s : size) = modup s min_align()
+
+// The regular create takes in the default int, which could potentially limit the array sizes to 2gb.
+// This one uses the u64 type to create arrays of arbitrary size.
+// Returns the passed in size alongside the array.
+inl create_array forall el. (x : size) : array el * size = !!!!ArrayCreate(`el, x), x
 
 nominal offset el = size
 nominal offsets d el = {
@@ -13,7 +18,7 @@ nominal offsets d el = {
 nominal dim d el = d
 nominal partition el = `(
     open struct
-    infer_map `el (forall el. => 
+    infer_map `el (forall el. =>
         typecase el with
         | tensor ~d ~t => ``(dim d t)
         | _ => error_type "Partition can only be used on types containing tensors."
@@ -42,7 +47,7 @@ inl (+.) forall a b. (partition_offsets a : partition_offsets a) (partition_offs
     partition_offsets {body=real a.body, b.body; offset_end=max a.offset_end b.offset_end}
 
 // Transforms a partition into a structure that contains the relevant pointer offsets. Takes in the starting offset as the first argument.
-inl calculate_offsets forall el. (offset : size) (partition x : _ el) : partition_offsets el = 
+inl calculate_offsets forall el. (offset_start : size) (partition x : _ el) : partition_offsets el = 
     inl body,offset_end = real
         open real_core
         open struct
@@ -51,11 +56,11 @@ inl calculate_offsets forall el. (offset : size) (partition x : _ el) : partitio
             typecase `z with dim ~d ~el =>
             inl x,s = 
                 infer_mapFold `el (forall el. s => 
-                    inl s = align `el s
-                    offset `el s, s + length * sizeof `el
+                    inl s = align s
+                    offset `el s, s + length * conv `size (sizeof `el).value
                     ) s
             offsets `d `el {dim=d; offsets=x}, s
-        mapFold to_offsets offset x
+        mapFold to_offsets offset_start x
     partition_offsets {body offset_end}
 
 // Transforms a partition into a structure that contains the relevant pointer offsets. The offset starts at 0.

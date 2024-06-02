@@ -1,12 +1,12 @@
 open corebase
 open tensorm
 
-inl template dim (op : .fun) =
+inl template forall dim. (dim : dim) (op : .fun) =
     inl len : int = loop.prod dim
     tensor {
         dim = len
         bodies = real
-            struct.infer_map `float (forall float. => tensor_body dim `float { stride = 1; offset = 0; array = op `float len })
+            struct.infer_map `float (forall float. => tensor_body `int `float { stride = 1; offset = 0; array = op `float len })
     } |> reshape (const dim)
 
 // Can only be used to create single arrays.
@@ -32,6 +32,7 @@ inl copy forall dim float. (a : tensor dim float) : tensor dim float =
     tensor {
         dim = a.dim
         bodies = real
+            open real_core
             struct.map (fun (tensor_body {array stride offset} as x) =>
                 assert (contiguous_stride = stride) "In order for the tensor to be copiable, the stride must be contiguous."
                 typecase `x with
@@ -42,7 +43,8 @@ inl copy_to forall dim float. ({from to} : {from : tensor dim float; to : tensor
     assert (from.dim = to.dim) "The dimensions of the two tensors have to be equal."
     inl contiguous_stride, len = real utils.calculate_stride_len from.dim
     real struct.iter2 (fun (tensor_body from) (tensor_body to) =>
+        open real_core
         assert (contiguous_stride = from.stride) "In order for the tensor to be copiable, the stride must be contiguous for the input tensor."
         assert (contiguous_stride = to.stride) "In order for the tensor to be copiable, the stride must be contiguous for the output tensor."
-        $"cp.copyto(!(from.array)[!(from.offset):!(from.offset)+!len],!(to.array)[!(to.offset):!(to.offset)+!len])" : ()
-        ) from.bodies from.bodies
+        $"cp.copyto(!(to.array)[!(to.offset):!(to.offset)+!len],!(from.array)[!(from.offset):!(from.offset)+!len])" : ()
+        ) from.bodies to.bodies
