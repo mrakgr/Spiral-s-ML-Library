@@ -86,8 +86,9 @@ inl weigth_init forall float. base_and_length (x : graph float) ({dims offset_pa
     inl rec f forall t. (x : graph t) : () =
         match x with
         | Weight _ =>
+            open corecuda
             inl x : tensor dim t = partitionm.from_partition_offsets base_and_length (hashmap.get h x)
-            ()
+            cupy.copy_to {from=cupy.random_normal{mean=0; std=1} x.dim; to=x}
         | Input => ()
         | Map(a) => f a
         | Matmul(a,b) | Map2(a,b) => f a . f b

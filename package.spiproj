@@ -60,7 +60,6 @@ modules:
         
     ml/
         matmul
-        test_linear
         primitives
         layers_old
         layers 
