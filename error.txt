@@ -1,151 +1,23 @@
-Error trace on line: 92, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 93, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-          ^
-Error trace on line: 94, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-          ^
-Error trace on line: 94, column: 18 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-                 ^
-Error trace on line: 94, column: 38 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-                                     ^
-Error trace on line: 87, column: 9 in module: c:\Spiral's ML Library\ml\layers.spi.
-        match x with
-        ^
-Error trace on line: 88, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Weight _ =>
-          ^
-Error trace on line: 92, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 93, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-          ^
-Error trace on line: 93, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-              ^
-Error trace on line: 93, column: 21 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-                    ^
-Error trace on line: 87, column: 9 in module: c:\Spiral's ML Library\ml\layers.spi.
-        match x with
-        ^
-Error trace on line: 88, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Weight _ =>
-          ^
-Error trace on line: 92, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 93, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-          ^
-Error trace on line: 94, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-          ^
-Error trace on line: 94, column: 18 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-                 ^
-Error trace on line: 94, column: 38 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-                                     ^
-Error trace on line: 87, column: 9 in module: c:\Spiral's ML Library\ml\layers.spi.
-        match x with
-        ^
-Error trace on line: 88, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Weight _ =>
-          ^
-Error trace on line: 92, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 93, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-          ^
-Error trace on line: 93, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-              ^
-Error trace on line: 93, column: 21 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-                    ^
-Error trace on line: 87, column: 9 in module: c:\Spiral's ML Library\ml\layers.spi.
-        match x with
-        ^
-Error trace on line: 88, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Weight _ =>
-          ^
-Error trace on line: 92, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 93, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Map(a) => f a
-          ^
-Error trace on line: 94, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-          ^
-Error trace on line: 94, column: 18 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-                 ^
-Error trace on line: 94, column: 38 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-                                     ^
-Error trace on line: 94, column: 44 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-                                           ^
-Error trace on line: 87, column: 9 in module: c:\Spiral's ML Library\ml\layers.spi.
-        match x with
-        ^
-Error trace on line: 88, column: 11 in module: c:\Spiral's ML Library\ml\layers.spi.
-        | Weight _ =>
-          ^
-Error trace on line: 90, column: 13 in module: c:\Spiral's ML Library\ml\layers.spi.
-            inl x : tensor dim t = partitionm.from_partition_offsets base_and_length (hashmap.get h x)
-            ^
-Error trace on line: 91, column: 13 in module: c:\Spiral's ML Library\ml\layers.spi.
-            cupy.copy_to {from=cupy.random_normal{mean=0; std=1} x.dim; to=x}
-            ^
-Error trace on line: 41, column: 32 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-inl copy_to forall dim float. ({from to} : {from : tensor dim float; to : tensor dim float}) : () =
-                               ^
-Error trace on line: 42, column: 5 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-    assert (from.dim = to.dim) "The dimensions of the two tensors have to be equal."
-    ^
-Error trace on line: 43, column: 5 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-    inl contiguous_stride, len = real utils.calculate_stride_len from.dim
-    ^
-Error trace on line: 43, column: 9 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-    inl contiguous_stride, len = real utils.calculate_stride_len from.dim
-        ^
-Error trace on line: 44, column: 10 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-    real struct.iter2 (fun (tensor_body from) (tensor_body to) =>
-         ^
-Error trace on line: 126, column: 5 in module: c:\Spiral's ML Library\corebase\struct.spir.
-    f (ar, v)
-    ^
-Error trace on line: 122, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-    inl rec f = function
-                ^
-Error trace on line: 123, column: 12 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | (a, b), (va,vb) => f (a, va) . f (b, vb)
-           ^
-Error trace on line: 124, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
-          ^
-Error trace on line: 125, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar,v => set ar v
-          ^
-Error trace on line: 125, column: 19 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar,v => set ar v
-                  ^
-Error trace on line: 44, column: 48 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-    real struct.iter2 (fun (tensor_body from) (tensor_body to) =>
-                                               ^
-Error trace on line: 45, column: 9 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-        assert (contiguous_stride = from.stride) "In order for the tensor to be copiable, the stride must be contiguous for the input tensor."
-        ^
-Error trace on line: 45, column: 17 in module: c:\Spiral's ML Library\corecuda\cupy.spi.
-        assert (contiguous_stride = from.stride) "In order for the tensor to be copiable, the stride must be contiguous for the input tensor."
-                ^
-Cannot apply a forall with a term.
+Unhandled exception: System.ArgumentException: The lists had different lengths.
+list1 is 1 element shorter than list2 (Parameter 'list1')
+   at Microsoft.FSharp.Core.DetailedExceptions.invalidArgDifferentListLength[T](String arg1, String arg2, Int32 diff) in D:\a\_work\1\s\src\FSharp.Core\local.fs:line 26
+   at Microsoft.FSharp.Primitives.Basics.List.map2[T1,T2,TResult](FSharpFunc`2 mapping, FSharpList`1 xs1, FSharpList`1 xs2) in D:\a\_work\1\s\src\FSharp.Core\local.fs:line 280
+   at Spiral.Infer.loop@1423-113(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, Int32 scope, HashSet`1 is_first, FSharpRef`1 top_env, Int32 scope@1423-4, Env env, T s, Pattern x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1480
+   at Spiral.Infer.loop@1466-117.Invoke(Tuple`2 env, Tuple`2 tupledArg)
+   at Microsoft.FSharp.Collections.ListModule.Fold[T,TState](FSharpFunc`2 folder, TState state, FSharpList`1 list) in D:\a\_work\1\s\src\FSharp.Core\list.fs:line 295
+   at Spiral.Infer.pattern@1410-1(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Env env, T s, Pattern a) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1531
+   at Spiral.Infer.l@1226-4.Invoke(Tuple`2 tupledArg) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1226
+   at Microsoft.FSharp.Primitives.Basics.List.mapToFreshConsTail[a,b](FSharpList`1 cons, FSharpFunc`2 f, FSharpList`1 x) in D:\a\_work\1\s\src\FSharp.Core\local.fs:line 232
+   at Microsoft.FSharp.Primitives.Basics.List.map[T,TResult](FSharpFunc`2 mapping, FSharpList`1 x) in D:\a\_work\1\s\src\FSharp.Core\local.fs:line 241
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1227
+   at Spiral.Infer.term@1019-16.Invoke(T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1019
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1049
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1217
+   at Spiral.Infer.term@1285-17.Invoke(Env env) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1285
+   at Spiral.Infer.rec_block@1275(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Env env, FSharpList`1 l') in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1307
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1222
+   at Spiral.Infer.term@1019-16.Invoke(T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1019
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1049
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1217
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1217
+   at Spiral.Infer.term'@1020(List`1 errors, Dictionary`2 generalized_statements, Dictionary`2 type_apply_args, Dictionary`2 module_type_apply_args, Dictionary`2 annotations, Dictionary`2 exists_vars, FSharpRef`1 autogened_forallvar_count, List`1 hover_types, FSharpFunc`2 unify, FSharpFunc`2 assert_bound_vars, FSharpFunc`2 typevar_to_var, FSharpRef`1 top_env, Int32 scope, Boolean is_in_left_apply, Env env, T s, RawExpr x) in D:\Users\Marko\Source\Repos\The Spiral Language\The Spiral Language 2\Infer.fs:line 1217

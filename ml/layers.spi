@@ -109,17 +109,6 @@ inl param_print forall float. (x : graph float) (graph_array, graph_offset : gra
         | Matmul(a,b) | Map2(a,b) => f a . f b
     f x
 
-inl input_extract forall float key{symbol}. (x : graph float) (graph_array, graph_offset : graph_data) (key : key) =
-    assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-    inl rec f forall t. (x : graph t) : () =
-        match x with
-        | Weight _ => None
-        | Input {key=(exists. k)} =>
-            if k = key then Some()
-        | Map(a) => f a
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-    f x
-
 inl test1() =
     inl tanh x = Map x
     inl matmul dim x = Matmul(x, Weight {dim})
@@ -143,6 +132,17 @@ inl test1() =
     console.write_ln "Done initing."
     param_print graph (param_array, param_offset)
     ()
+
+inl input_extract forall float key{symbol}. (x : graph float) (graph_array, graph_offset : graph_data) (_ : key) =
+    assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    inl rec f forall t. (x : graph t) : () =
+        match x with
+        | Weight _ => None
+        | Input {key=(exists key'. _)} =>
+            if (real open real_core in `key `= `key') then Some()
+        | Map(a) => f a
+        | Matmul(a,b) | Map2(a,b) => f a . f b
+    f x
 
 inl test2() =
     inl tanh x = Map x
