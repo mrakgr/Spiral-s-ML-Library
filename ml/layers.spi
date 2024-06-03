@@ -9,13 +9,11 @@ type graph_offset = .hashmap * size
 type graph_data = graph_array * graph_offset
 type dim = int * int
 
-
-
 union rec graph t =
     | Matmul : graph t * graph t
-    | Map : graph t
-    | Map2 : graph t * graph t
-    | Input : {key : exists key{symbol}. key}
+    | Map : exists a. graph a
+    | Map2 : exists a b. graph a * graph b
+    | Input : exists key{symbol}. key
     | Weight : {dim : int * int}
 
 inl memoize (h : .hashmap) f k =
@@ -23,17 +21,20 @@ inl memoize (h : .hashmap) f k =
     | Some v => v
     | None => inl v = f k in hashmap.add h k v . v
 
+// TODO: Make a check to make sure that there aren't input nodes with the same key, but different
+// dimensions or type.
+
 // Propagates the dimensions for each of the nodes and returns a hash map of them pointing to each node.
 // Takes in a record of input dimensions as the last argument.
-inl pass_dim forall t dims. (x : graph t) (dims : dims) =
+inl pass_dim forall t_top dims. (x : graph t_top) (dims : dims) =
     inl h = hashmap.create()
     inl get_dim forall k{symbol}. (k : k) : dim = real dims k : dim
-    inl rec f forall t'. :  graph t' -> dim =
+    inl rec f forall t. :  graph t -> dim =
         memoize h function
             | Weight {dim} => dim
-            | Input {key=(exists k. k)} => get_dim k
-            | Map(a) => f a
-            | Map2(a,b) =>
+            | Input (exists key. k) => get_dim k
+            | Map(exists a. a) => f a
+            | Map2(exists a b. a,b) =>
                 inl a,b = f a, f b
                 assert (a = b) "The dimensions of the two inputs to the Map2 node have to be equal."
                 a
@@ -41,78 +42,80 @@ inl pass_dim forall t dims. (x : graph t) (dims : dims) =
                 inl (m,k),(k',n) = f a, f b
                 assert (k = k') "The dimensions of the inner dimensions to the matrix multiplication node have to be equal."
                 m,n
-            
     inl _ = f x
     h
 
 // Calculates the parameter offsets.
-inl pass_offset_param forall t. (x : graph t) (dims : .hashmap) : graph_offset =
+inl pass_offset_param forall t_top. (x : graph t_top) (dims : .hashmap) : graph_offset =
     inl h_offset_param = hashmap.create() // stores the offsets pointing to the start of the weight parameter array for each node
     inl h = hashmap.create()
     inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
-    inl rec f forall t'. (offset : size) : graph t' -> size =
+    inl rec f forall t. (offset : size) : graph t -> size =
         memoize h function
-            | Weight _ as k =>
-                inl partition_offsets : _ (_ _ t') = 
+            | Weight as k =>
+                inl partition_offsets : _ (_ _ t) = 
                     partitionm.to_partition(get_dim k)
                     |> partitionm.calculate_offsets offset 
                 hashmap.add h_offset_param k partition_offsets
                 partition_offsets.offset_end
-            | Input _ => offset
-            | Map(a) => f offset a
-            | Matmul(a,b) | Map2(a,b) => f (f offset a) b
+            | Input => offset
+            | Map(exists a. a) => f offset a
+            | Map2(exists a b. a,b) => f (f offset a) b
+            | Matmul(a,b) => f (f offset a) b
     h_offset_param, f 0 x
 
-inl pass_offset_input forall t. (x : graph t) (dims : .hashmap) : graph_offset =
-    inl h_offset_input = hashmap.create() // stores the offsets pointing to the start of the output array for each node
+inl pass_offset_output forall t_top. (x : graph t_top) (dims : .hashmap) : graph_offset =
+    inl h_offset_output = hashmap.create() // stores the offsets pointing to the start of the output array for each node
     inl h = hashmap.create()
     inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
-    inl rec f forall t'. (offset : size) : graph t' -> size =
+    inl rec f forall t. (offset : size) : graph t -> size =
         memoize h fun k =>
-            inl g (offset : size) = // during graph execution we'll get the offsets for the input nodes from the `h_offset_input` hash map, no need to store them here
-                inl partition_offsets : _ (_ _ t') = 
+            inl g (offset : size) =
+                inl partition_offsets : _ (_ _ t) = 
                     partitionm.to_partition(get_dim k)
                     |> partitionm.calculate_offsets offset 
-                hashmap.add h_offset_input k partition_offsets
+                hashmap.add h_offset_output k partition_offsets
                 partition_offsets.offset_end
             match k with
-            | Weight _ => offset
-            | Input _ => g offset
-            | Map(a) => g (f offset a)
-            | Matmul(a,b) | Map2(a,b) => g (f (f offset a) b)
+            | Weight => offset
+            | Input => g offset
+            | Map(exists a. a) => g (f offset a)
+            | Map2(exists a b. a,b) => g (f (f offset a) b)
+            | Matmul(a,b) => g (f (f offset a) b)
+    h_offset_output, f 0 x
 
-    h_offset_input, f 0 x
-
-inl param_init forall float.  (x : graph float) (graph_array, graph_offset : graph_data) =
+inl param_init forall t_top. (x : graph t_top) (graph_array, graph_offset : graph_data) =
     assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl rec f forall t. (x : graph t) : () =
         match x with
-        | Weight _ =>
+        | Weight =>
             open corecuda
             inl x : tensor dim t = partitionm.from_partition_offsets graph_array (hashmap.get (fst graph_offset) x)
             cupy.copy_to {from=cupy.random_normal{mean=0; std=1} x.dim; to=x}
         | Input => ()
-        | Map(a) => f a
-        | Matmul(a,b) | Map2(a,b) => f a . f b
+        | Map(exists a. a) => f a
+        | Map2(exists a b. a,b) => f a . f b
+        | Matmul(a,b) => f a . f b
     f x
 
-inl param_print forall float. (x : graph float) (graph_array, graph_offset : graph_data) =
+inl param_print forall t_top. (x : graph t_top) (graph_array, graph_offset : graph_data) =
     assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl rec f forall t. (x : graph t) : () =
         match x with
-        | Weight _ =>
+        | Weight =>
             open corecuda
             inl x : tensor dim t = partitionm.from_partition_offsets graph_array (hashmap.get (fst graph_offset) x)
             console.write_ln x
         | Input => ()
-        | Map(a) => f a
-        | Matmul(a,b) | Map2(a,b) => f a . f b
+        | Map(exists a. a) => f a
+        | Map2(exists a b. a,b) => f a . f b
+        | Matmul(a,b) => f a . f b
     f x
 
 inl test1() =
-    inl tanh x = Map x
+    inl tanh forall t. (x : graph t) : graph t = Map (exists x)
     inl matmul dim x = Matmul(x, Weight {dim})
-    inl input forall key{symbol}. (key : key) = Input {key = exists key}
+    inl input forall key{symbol}. (key : key) = Input (exists key)
 
     inl graph : graph float =
         input .input
@@ -133,41 +136,58 @@ inl test1() =
     param_print graph (param_array, param_offset)
     ()
 
-inl input_extract forall float key{symbol}. (x : graph float) (graph_array, graph_offset : graph_data) (_ : key) =
+inl input_extract forall float key{symbol} input. (x : graph float) (graph_array, graph_offset : graph_data) (_ : key) : tensor dim input =
     assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-    inl rec f forall t. (x : graph t) : () =
+    inl rec f forall t. (x : graph t) : option (tensor dim input) =
         match x with
         | Weight _ => None
-        | Input {key=(exists key'. _)} =>
-            if (real open real_core in `key `= `key') then Some()
-        | Map(a) => f a
-        | Matmul(a,b) | Map2(a,b) => f a . f b
-    f x
+        | Input (exists key'. _) =>
+            if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
+                open corecuda
+                inl x : tensor dim input = partitionm.from_partition_offsets graph_array (hashmap.get (fst graph_offset) x)
+                Some x
+            else None
+        | Map(exists a. a) => f a
+        | Map2(exists a b. a,b) => 
+            match f a with
+            | None => f b
+            | a => a
+        | Matmul(a,b) =>
+            match f a with
+            | None => f b
+            | a => a
+    match f x with
+    | Some x => x
+    | None => error_type "Cannot find the input tensor with the given key."
 
 inl test2() =
-    inl tanh x = Map x
+    inl tanh forall t. (x : graph t) : graph t = Map (exists x)
     inl matmul dim x = Matmul(x, Weight {dim})
-    inl input forall key{symbol}. (key : key) = Input {key = exists key}
+    inl input forall key{symbol}. (key : key) = Input (exists key)
 
     inl graph : graph float =
         input .input
-        |> matmul (1, 4)
+        |> matmul (2, 4)
         |> tanh
         |> matmul (4, 4)
         |> tanh
         |> matmul (4, 2)
         |> tanh
-    
-    inl dims = pass_dim graph {input = 1, 1 : int * int}
+
+    inl dims = pass_dim graph {input = 1, 2 : int * int}
     inl param_offset = pass_offset_param graph dims
     inl param_array = partitionm.create_array (snd param_offset)
-    inl input_offset = pass_offset_input graph dims
+    inl input_offset = pass_offset_output graph dims
     inl input_array = partitionm.create_array (snd input_offset)
     console.write_ln "---"
     param_print graph (param_array, param_offset)
     param_init graph (param_array, param_offset)
     console.write_ln "Done initing."
     param_print graph (param_array, param_offset)
+    console.write_ln "Here is the input tensor."
+    inl input : _ _ float = input_extract graph (input_array, input_offset) .input
+    console.write_ln input
     ()
 
-inl main() = test1()
+
+inl main() = test2()
