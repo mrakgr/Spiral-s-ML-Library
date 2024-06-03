@@ -140,15 +140,15 @@ def main():
     del v14, v15, v16, v17, v18, v19
     print()
     v20 = v0[0:0+4*4].view(cp.float32)
-    v21 = cp.random.normal(0.0,1.0,4,dtype=cp.float32)
+    v21 = cp.random.normal(0.0,1.0,4,dtype=cp.float32) # type: ignore
     cp.copyto(v20[0:0+4],v21[0:0+4])
     del v20, v21
     v22 = v0[16:16+4*16].view(cp.float32)
-    v23 = cp.random.normal(0.0,1.0,16,dtype=cp.float32)
+    v23 = cp.random.normal(0.0,1.0,16,dtype=cp.float32) # type: ignore
     cp.copyto(v22[0:0+16],v23[0:0+16])
     del v22, v23
     v24 = v0[80:80+4*8].view(cp.float32)
-    v25 = cp.random.normal(0.0,1.0,8,dtype=cp.float32)
+    v25 = cp.random.normal(0.0,1.0,8,dtype=cp.float32) # type: ignore
     cp.copyto(v24[0:0+8],v25[0:0+8])
     del v24, v25
     v26 = "Done initing."

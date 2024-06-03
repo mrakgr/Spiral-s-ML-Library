@@ -12,20 +12,20 @@ inl template forall dim. (dim : dim) (op : .fun) =
 // Can only be used to create single arrays.
 inl arange forall dim el. ({from nearTo by} : loop.range dim) : tensor dim el = 
     inl len : int = loop.prod nearTo * by
-    real $"cp.arange(!from,!len,!by,dtype=`(cupy_type float))" : array el
+    real $"cp.arange(!from,!len,!by,dtype=`(cupy_type float)) # type: ignore" : array el
     |> fromArray |> reshape (const nearTo)
     
 inl zeros forall dim float. (dim : dim) : tensor dim float =
-    template dim (real forall float. len => $"cp.zeros(!len,dtype=`(cupy_type float))" : array float)
+    template dim (real forall float. len => $"cp.zeros(!len,dtype=`(cupy_type float)) # type: ignore" : array float)
 
 inl ones forall dim float. dim : tensor dim float =
-    template dim (real forall float. len => $"cp.ones(!len,dtype=`(cupy_type float))" : array float)
+    template dim (real forall float. len => $"cp.ones(!len,dtype=`(cupy_type float)) # type: ignore" : array float)
     
 inl random_normal forall dim t. ({mean std} : {mean : float; std  : float}) dim : tensor dim t =
-    template dim (real forall float. len => $"cp.random.normal(!mean,!std,!len,dtype=`(cupy_type float))" : array float)
+    template dim (real forall float. len => $"cp.random.normal(!mean,!std,!len,dtype=`(cupy_type float)) # type: ignore" : array float)
 
 inl random_uniform forall dim float. dim : tensor dim float =
-    template dim (real forall float. len => $"cp.random.uniform(size=!len,dtype=`(cupy_type float))" : array float)
+    template dim (real forall float. len => $"cp.random.uniform(size=!len,dtype=`(cupy_type float)) # type: ignore" : array float)
 
 inl copy forall dim float. (a : tensor dim float) : tensor dim float =
     inl contiguous_stride, len = real utils.calculate_stride_len a.dim

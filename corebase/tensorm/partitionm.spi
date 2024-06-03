@@ -8,7 +8,7 @@ inl align (s : size) = modup s min_align()
 // The regular create takes in the default int, which could potentially limit the array sizes to 2gb.
 // This one uses the u64 type to create arrays of arbitrary size.
 // Returns the passed in size alongside the array.
-inl create_array forall el. (x : size) : array el * size = !!!!ArrayCreate(`el, x), x
+inl create_array (x : size) : ptr * size = !!!!ArrayCreate(`u8, x), x
 
 nominal offset el = size
 nominal offsets d el = {
