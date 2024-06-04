@@ -31,73 +31,72 @@ inl matmul_config forall m_frag n_frag k_frag frag_in a_layout b_layout float. {
         chunk_size
         }
 
-inl matmul_tf32 forall m_frag n_frag k_frag a_layout b_layout. 
+inl swap x (a,b) = if x then b,a else a,b
+inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout. 
         (matmul_config {m_skew n_skew k_skew m_frag n_frag k_frag m_tile n_tile k_tile a_trans b_trans chunk_size}
-         : matmul_config m_frag n_frag k_frag wmma.tf32 a_layout b_layout f32) 
-        (alpha : float) (a : tensor (int * int) f32) (b : tensor (int * int) f32) 
-        (beta : float) (c : tensor (int * int) f32) =
-    inl swap x (a,b) = if x then b,a else a,b
-    inl div x = loop.div x
-    inl _ =
-        inl a_dim = swap a_trans a.dim
-        inl b_dim = swap b_trans b.dim
-        inl c_dim = c.dim
-        assert (snd a_dim = fst b_dim) "The K dimension of the A and B tensors must match."
-        assert (fst a_dim = fst c_dim) "The M dimension of the A and C tensors must match."
-        assert (snd b_dim = snd c_dim) "The N dimension of the B and C tensors must match."
-        assert (alpha <> 0) "The alpha must not be zero."
-
-    inl split_a {m k} (a : tensor (int * int) float) =
-        if a_trans then
-            inl y = {k}, {m}
-            a |> reorder (fun k,m => {k},{m})
-            |> split_into (loop.div_fst_by y)
-            |> reorder_snd (fun {k},{m} => k,m)
-            |> reorder_fst (fun k,m => m,k)
-        else
-            inl y = {m}, {k}
-            a |> reorder (fun m,k => {m},{k})
-            |> split_into (loop.div_fst_by y)
-            |> reorder_snd (fun {m},{k} => m,k)
-        |> curry_fst
-    inl split_b {n k} (b : tensor (int * int) float) =
-        if b_trans then
-            inl y = {n}, {k}
-            b |> reorder (fun n,k => {n},{k})
-            |> split_into (loop.div_fst_by y)
-            |> reorder_snd (fun {n},{k} => n,k)
-        else
-            inl y = {k}, {n}
-            b |> reorder (fun k,n => {k},{n})
-            |> split_into (loop.div_fst_by y)
-            |> reorder_snd (fun {k},{n} => k,n)
-            |> reorder_fst (fun k,n => n,k)
-        |> curry_fst
-    inl split_c {m n} (c : tensor (int * int) float) =
-        inl y = {m}, {n}
-        c |> reorder (fun m,n => {m},{n})
-        |> split_into (loop.div_fst_by y)
-        |> reorder_snd (fun {m},{n} => m,n)
-    inl a = split_a {m=m_tile; k=k_tile} a    
-    inl b = split_b {n=n_tile; k=k_tile} b
-    inl c = split_c {m=m_tile; n=n_tile} c
-    
+         : matmul_config m_frag n_frag k_frag wmma.tf32 a_layout b_layout f32) =
+        
     inl padding =
         {
         a = swap a_trans (m_skew, k_skew) |> snd
         b = swap b_trans (k_skew, n_skew) |> snd
         c = n_skew
         }
-        
-    inl memory = 
+    inl memory =
         open partitionm
         inl pad p (a, b) = a, b + p 
         inl a : partition (tensor (i32 * i32) float) = !(swap a_trans (m_tile, k_tile) |> pad padding.a)
         inl b : partition (tensor (i32 * i32) float) = !(swap b_trans (k_tile, n_tile) |> pad padding.b)
         inl c : partition (tensor (i32 * i32) float) = !((m_tile, n_tile) |> pad padding.c)
         #(a *. b) +. #c
-    
-    run' {shared_mem=conv memory.offset_end} fun () =>
+        
+    // run' {shared_mem=conv memory.offset_end} fun () =>
+    memory, fun (alpha : float) (a : tensor (int * int) f32) (b : tensor (int * int) f32) (beta : float) (c : tensor (int * int) f32) =>
+        inl div x = loop.div x
+        inl _ =
+            inl a_dim = swap a_trans a.dim
+            inl b_dim = swap b_trans b.dim
+            inl c_dim = c.dim
+            assert (snd a_dim = fst b_dim) "The K dimension of the A and B tensors must match."
+            assert (fst a_dim = fst c_dim) "The M dimension of the A and C tensors must match."
+            assert (snd b_dim = snd c_dim) "The N dimension of the B and C tensors must match."
+            assert (alpha <> 0) "The alpha must not be zero."
+
+        inl split_a {m k} (a : tensor (int * int) float) =
+            if a_trans then
+                inl y = {k}, {m}
+                a |> reorder (fun k,m => {k},{m})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {k},{m} => k,m)
+                |> reorder_fst (fun k,m => m,k)
+            else
+                inl y = {m}, {k}
+                a |> reorder (fun m,k => {m},{k})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {m},{k} => m,k)
+            |> curry_fst
+        inl split_b {n k} (b : tensor (int * int) float) =
+            if b_trans then
+                inl y = {n}, {k}
+                b |> reorder (fun n,k => {n},{k})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {n},{k} => n,k)
+            else
+                inl y = {k}, {n}
+                b |> reorder (fun k,n => {k},{n})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {k},{n} => k,n)
+                |> reorder_fst (fun k,n => n,k)
+            |> curry_fst
+        inl split_c {m n} (c : tensor (int * int) float) =
+            inl y = {m}, {n}
+            c |> reorder (fun m,n => {m},{n})
+            |> split_into (loop.div_fst_by y)
+            |> reorder_snd (fun {m},{n} => m,n)
+        inl a = split_a {m=m_tile; k=k_tile} a    
+        inl b = split_b {n=n_tile; k=k_tile} b
+        inl c = split_c {m=m_tile; n=n_tile} c
+
         global "#include <mma.h>"
         global "using namespace nvcuda;"
 
@@ -237,12 +236,15 @@ inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf
     matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
 // inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
 //     matmul_config {m_tile=128; n_tile=128; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
-inl matmul_tf32 a_transpose b_transpose = 
+inl matmul_tf32 a_transpose b_transpose (alpha : float) (a : tensor (int * int) f32) (b : tensor (int * int) f32) (beta : float) (c : tensor (int * int) f32) =
+    inl run config =
+        inl memory, body = matmul_tf32_template config
+        run' {shared_mem=conv memory.offset_end} fun () => body alpha a b beta c
     match a_transpose, b_transpose with
-    | false, false => matmul_tf32 (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.row_major _) 
-    | false, true => matmul_tf32 (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.col_major _)
-    | true, false => matmul_tf32 (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.row_major _)
-    | true, true => matmul_tf32 (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.col_major _)
+    | false, false => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.row_major _) 
+    | false, true => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.col_major _)
+    | true, false => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.row_major _)
+    | true, true => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.col_major _)
 
 inl main() =
     inl get_body forall dim el. (x : tensor dim el) : array el =
