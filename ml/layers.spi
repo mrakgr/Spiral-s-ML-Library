@@ -1,4 +1,5 @@
 open corebase
+open corecuda
 open tensorm
 open compile_time
 
@@ -6,13 +7,13 @@ type ptr = partitionm.ptr
 type size = partitionm.size
 type graph_array = ptr * size
 type graph_offset = .hashmap * size
-type graph_data = graph_array * graph_offset
+type graph_data = {array : graph_array; offset : graph_offset}
 type dim = int * int
 
 union rec graph t =
+    | Map : exists a. (a -> t) * graph a
+    | Map2 : exists a b. (a -> b -> t) * graph a * graph b
     | Matmul : graph t * graph t
-    | Map : exists a. graph a
-    | Map2 : exists a b. graph a * graph b
     | Input : exists key{symbol}. key
     | Weight : {dim : int * int}
 
@@ -33,14 +34,14 @@ inl pass_dim forall t_top dims. (x : graph t_top) (dims : dims) =
         memoize h function
             | Weight {dim} => dim
             | Input (exists key. k) => get_dim k
-            | Map(exists a. a) => f a
-            | Map2(exists a b. a,b) =>
+            | Map(exists a. _, a) => f a
+            | Map2(exists a b. _,a,b) =>
                 inl a,b = f a, f b
                 assert (a = b) "The dimensions of the two inputs to the Map2 node have to be equal."
                 a
             | Matmul(a,b) =>
-                inl (m,k),(k',n) = f a, f b
-                assert (k = k') "The dimensions of the inner dimensions to the matrix multiplication node have to be equal."
+                inl (m,k),(n,k') = f a, f b
+                assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
                 m,n
     inl _ = f x
     h
@@ -59,8 +60,8 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : .hashmap) : graph_
                 hashmap.add h_offset_param k partition_offsets
                 partition_offsets.offset_end
             | Input => offset
-            | Map(exists a. a) => f offset a
-            | Map2(exists a b. a,b) => f (f offset a) b
+            | Map(exists a. _,a) => f offset a
+            | Map2(exists a b. _,a,b) => f (f offset a) b
             | Matmul(a,b) => f (f offset a) b
     h_offset_param, f 0 x
 
@@ -79,41 +80,44 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : .hashmap) : graph
             match k with
             | Weight => offset
             | Input => g offset
-            | Map(exists a. a) => g (f offset a)
-            | Map2(exists a b. a,b) => g (f (f offset a) b)
+            | Map(exists a. _,a) => g (f offset a)
+            | Map2(exists a b. _,a,b) => g (f (f offset a) b)
             | Matmul(a,b) => g (f (f offset a) b)
     h_offset_output, f 0 x
 
-inl param_init forall t_top. (x : graph t_top) (graph_array, graph_offset : graph_data) =
-    assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+inl param_init forall t_top. (x : graph t_top) (graph : graph_data) =
+    assert (snd graph.array = snd graph.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl rec f forall t. (x : graph t) : () =
         match x with
         | Weight =>
-            open corecuda
-            inl x : tensor dim t = partitionm.from_partition_offsets graph_array (hashmap.get (fst graph_offset) x)
+            inl x : tensor dim t = partitionm.from_partition_offsets graph.array (hashmap.get (fst graph.offset) x)
             cupy.copy_to {from=cupy.random_normal{mean=0; std=1} x.dim; to=x}
         | Input => ()
-        | Map(exists a. a) => f a
-        | Map2(exists a b. a,b) => f a . f b
+        | Map(exists a. _,a) => f a
+        | Map2(exists a b. _,a,b) => f a . f b
         | Matmul(a,b) => f a . f b
     f x
 
-inl param_print forall t_top. (x : graph t_top) (graph_array, graph_offset : graph_data) =
-    assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+inl param_print forall t_top. (x : graph t_top) (graph : graph_data) =
+    assert (snd graph.array = snd graph.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl rec f forall t. (x : graph t) : () =
         match x with
         | Weight =>
-            open corecuda
-            inl x : tensor dim t = partitionm.from_partition_offsets graph_array (hashmap.get (fst graph_offset) x)
+            inl x : tensor dim t = partitionm.from_partition_offsets graph.array (hashmap.get (fst graph.offset) x)
             console.write_ln x
         | Input => ()
-        | Map(exists a. a) => f a
-        | Map2(exists a b. a,b) => f a . f b
+        | Map(exists a. _,a) => f a
+        | Map2(exists a b. _,a,b) => f a . f b
         | Matmul(a,b) => f a . f b
     f x
 
+inl create_graph_data (offset : graph_offset) : graph_data =
+    inl array = partitionm.create_array (snd offset)
+    {array offset}
+
+// Tests whether randonmly initializing the params of the graph works.
 inl test1() =
-    inl tanh forall t. (x : graph t) : graph t = Map (exists x)
+    inl tanh forall t{float}. (x : graph t) : graph t = Map (exists tanh, x)
     inl matmul dim x = Matmul(x, Weight {dim})
     inl input forall key{symbol}. (key : key) = Input (exists key)
 
@@ -127,28 +131,26 @@ inl test1() =
         |> tanh
     
     inl dims = pass_dim graph {input = 1, 1 : int * int}
-    inl param_offset = pass_offset_param graph dims
-    inl param_array = partitionm.create_array (snd param_offset)
+    inl param = create_graph_data (pass_offset_param graph dims)
     console.write_ln "---"
-    param_print graph (param_array, param_offset)
-    param_init graph (param_array, param_offset)
+    param_print graph param
+    param_init graph param
     console.write_ln "Done initing."
-    param_print graph (param_array, param_offset)
+    param_print graph param
     ()
 
-inl input_extract forall float key{symbol} input. (x : graph float) (graph_array, graph_offset : graph_data) (_ : key) : tensor dim input =
-    assert (snd graph_array = snd graph_offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+inl input_extract forall float key{symbol} input. (x : graph float) (input : graph_data) (_ : key) : tensor dim input =
+    assert (snd input.array = snd input.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl rec f forall t. (x : graph t) : option (tensor dim input) =
         match x with
         | Weight _ => None
         | Input (exists key'. _) =>
             if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                open corecuda
-                inl x : tensor dim input = partitionm.from_partition_offsets graph_array (hashmap.get (fst graph_offset) x)
+                inl x : tensor dim input = partitionm.from_partition_offsets input.array (hashmap.get (fst input.offset) x)
                 Some x
             else None
-        | Map(exists a. a) => f a
-        | Map2(exists a b. a,b) => 
+        | Map(exists a. _,a) => f a
+        | Map2(exists a b. _,a,b) => 
             match f a with
             | None => f b
             | a => a
@@ -160,8 +162,9 @@ inl input_extract forall float key{symbol} input. (x : graph float) (graph_array
     | Some x => x
     | None => error_type "Cannot find the input tensor with the given key."
 
+// Tests whether extracting the inputs of the graph works. Also randomly inits them.
 inl test2() =
-    inl tanh forall t. (x : graph t) : graph t = Map (exists x)
+    inl tanh forall t{float}. (x : graph t) : graph t = Map (exists tanh, x)
     inl matmul dim x = Matmul(x, Weight {dim})
     inl input forall key{symbol}. (key : key) = Input (exists key)
 
@@ -174,20 +177,88 @@ inl test2() =
         |> matmul (4, 2)
         |> tanh
 
-    inl dims = pass_dim graph {input = 1, 2 : int * int}
-    inl param_offset = pass_offset_param graph dims
-    inl param_array = partitionm.create_array (snd param_offset)
-    inl input_offset = pass_offset_output graph dims
-    inl input_array = partitionm.create_array (snd input_offset)
-    console.write_ln "---"
-    param_print graph (param_array, param_offset)
-    param_init graph (param_array, param_offset)
-    console.write_ln "Done initing."
-    param_print graph (param_array, param_offset)
+    inl dims' = {input = 1, 2 : int * int}
+    inl dims = pass_dim graph dims'
+    inl param = create_graph_data (pass_offset_param graph dims)
+    inl input = create_graph_data (pass_offset_output graph dims)
+    param_init graph param
+    console.write_ln "Here are the weight matrices."
+    param_print graph param
     console.write_ln "Here is the input tensor."
-    inl input : _ _ float = input_extract graph (input_array, input_offset) .input
+    inl input : _ _ float = input_extract graph input .input
+    cupy.copy_to {
+        from = cupy.random_normal{mean=0; std=1} dims'.input
+        to = input
+    }
     console.write_ln input
     ()
 
+inl graph_tensor_extract forall t. (x : graph t) (param : graph_data) (output : graph_data) : tensor dim t =
+    match x with
+    | Weight => partitionm.from_partition_offsets param.array (hashmap.get (fst param.offset) x)
+    | _ => partitionm.from_partition_offsets output.array (hashmap.get (fst output.offset) x)
 
-inl main() = test2()
+inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : graph_data) =
+    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    open primitives
+    inl tensor_extract x = graph_tensor_extract x param output
+    inl rec f forall t. (x : graph t) : () =
+        match x with
+        | Weight => ()
+        | Input => ()
+        | Map(exists a. g,a) => 
+            f a
+            inl a,out = tensor_extract a, tensor_extract x
+            run fun _ =>
+                map g a out
+        | Map2(exists a b. g,a,b) => 
+            f a . f b
+            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+            run fun _ =>
+                map (fun a,b => g a b) (zip a b) out
+        | Matmul(a,b) => 
+            f a . f b
+            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+            inl alpha, beta : float * float = 1, 0
+            real
+                typecase t with
+                | f32 => matmul.matmul_tf32 false true alpha a b beta out
+                | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
+    f x
+
+// Tests whether extracting the graph can be executed.
+inl test3() =
+    inl tanh forall t{float}. (x : graph t) : graph t = Map (exists tanh, x)
+    inl matmul (a,b) x = Matmul(x, Weight {dim=b,a})
+    inl input forall key{symbol}. (key : key) = Input (exists key)
+
+    inl graph : graph float =
+        input .input
+        |> matmul (8, 16)
+        |> tanh
+        |> matmul (16, 16)
+        |> tanh
+        |> matmul (16, 16)
+        |> tanh
+
+    inl dims' = {input = 16, 8 : int * int}
+    inl dims = pass_dim graph dims'
+    inl param = create_graph_data (pass_offset_param graph dims)
+    inl input = create_graph_data (pass_offset_output graph dims)
+    param_init graph param
+    console.write_ln "Here are the weight matrices."
+    param_print graph param
+    inl tns_input : _ _ float = input_extract graph input .input
+    cupy.copy_to {
+        from = cupy.random_normal{mean=0; std=1} dims'.input
+        to = tns_input
+    }
+    console.write_ln tns_input
+    console.write_ln "Here is the output tensor."
+    graph_run graph param input
+    inl tns_output : _ _ float = graph_tensor_extract graph param input
+    console.write_ln tns_output
+    ()
+
+inl main() = test3()

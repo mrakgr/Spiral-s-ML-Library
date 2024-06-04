@@ -234,7 +234,9 @@ inl matmul_tf32 forall m_frag n_frag k_frag a_layout b_layout.
             __syncthreads()
 
 inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
-    matmul_config {m_tile=128; n_tile=128; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
+    matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
+// inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
+//     matmul_config {m_tile=128; n_tile=128; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
 inl matmul_tf32 a_transpose b_transpose = 
     match a_transpose, b_transpose with
     | false, false => matmul_tf32 (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.row_major _) 
@@ -258,8 +260,8 @@ inl main() =
         $"(cp.matmul(!a_body,!b_body) + !c_body).flatten()"
         |> fromArray |> reshape (const c.dim)
 
-    inl m,n,k : int * int * int = 512 * 16, 512 * 16, 512 * 8
-    // inl m,n,k : int * int * int = 512, 512, 512
+    // inl m,n,k : int * int * int = 512 * 16, 512 * 16, 512 * 8
+    inl m,n,k : int * int * int = 512, 512, 512
     // inl m,n,k : int * int * int = 16, 16, 8
 
     inl a_trans = false
