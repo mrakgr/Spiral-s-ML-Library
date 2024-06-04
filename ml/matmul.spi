@@ -104,6 +104,8 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
         open tensor_cuda
 
         inl a_shared_tile, b_shared_tile, c_shared_tile = 
+            // TODO: Put in an assert that the dynamic shared memory usage is valid.
+            // https://stackoverflow.com/questions/40021086/can-i-obtain-the-amount-of-allocated-dynamic-shared-memory-from-within-a-kernel
             inl extern = $"extern __shared__ unsigned char \v[]"
             inl (a, b), c = partitionm.from_partition_offsets (extern, memory.offset_end) memory
             a |> view_snd (fun nearTo => {from=0; nearTo=nearTo - padding.a}),
@@ -236,15 +238,15 @@ inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf
     matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
 // inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
 //     matmul_config {m_tile=128; n_tile=128; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
-inl matmul_tf32 a_transpose b_transpose (alpha : float) (a : tensor (int * int) f32) (b : tensor (int * int) f32) (beta : float) (c : tensor (int * int) f32) =
-    inl run config =
-        inl memory, body = matmul_tf32_template config
-        run' {shared_mem=conv memory.offset_end} fun () => body alpha a b beta c
+inl matmul_tf32' a_transpose b_transpose =
     match a_transpose, b_transpose with
-    | false, false => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.row_major _) 
-    | false, true => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.col_major _)
-    | true, false => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.row_major _)
-    | true, true => run (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.col_major _)
+    | false, false => matmul_tf32_template (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.row_major _) 
+    | false, true => matmul_tf32_template (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.col_major _)
+    | true, false => matmul_tf32_template (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.row_major _)
+    | true, true => matmul_tf32_template (matmul_config_tf32 : matmul_config _ _ _ _ wmma.col_major wmma.col_major _)
+inl matmul_tf32 a_transpose b_transpose (alpha : float) (a : tensor (int * int) f32) (b : tensor (int * int) f32) (beta : float) (c : tensor (int * int) f32) = 
+    inl memory, body = matmul_tf32' a_transpose b_transpose
+    run' {shared_mem=conv memory.offset_end} fun () => body alpha a b beta c
 
 inl main() =
     inl get_body forall dim el. (x : tensor dim el) : array el =

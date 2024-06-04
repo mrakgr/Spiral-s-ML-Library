@@ -198,34 +198,55 @@ inl graph_tensor_extract forall t. (x : graph t) (param : graph_data) (output : 
     | Weight => partitionm.from_partition_offsets param.array (hashmap.get (fst param.offset) x)
     | _ => partitionm.from_partition_offsets output.array (hashmap.get (fst output.offset) x)
 
+// Calculated the max of dynamic shared memory used for all the nodes.
+inl pass_shared_memory forall t_top. (x : graph t_top) =
+    inl rec f forall t. (x : graph t) : size =
+        match x with
+        | Weight | Input => 0
+        | Map(exists a. g,a) => f a
+        | Map2(exists a b. g,a,b) => max (f a) (f b)
+        | Matmul(a,b) => 
+            inl memory : size =
+                inl tf32 () : size = fst(matmul.matmul_tf32' false true).offset_end
+                real
+                    typecase t with
+                    | f32 => tf32()
+                    | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
+            inl s = max (f a) (f b)
+            max (f a) (f b) |> max memory
+    f x
+
 inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : graph_data) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-    open primitives
     inl tensor_extract x = graph_tensor_extract x param output
+    inl dynamic_shared_memory_used = pass_shared_memory x
     inl rec f forall t. (x : graph t) : () =
+        open primitives
         match x with
         | Weight => ()
         | Input => ()
-        | Map(exists a. g,a) => 
+        | Map(exists a. g,a) =>
             f a
             inl a,out = tensor_extract a, tensor_extract x
-            run fun _ =>
-                map g a out
-        | Map2(exists a b. g,a,b) => 
+            join map g a out
+        | Map2(exists a b. g,a,b) =>
             f a . f b
             inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
-            run fun _ =>
-                map (fun a,b => g a b) (zip a b) out
-        | Matmul(a,b) => 
+            join map (fun a,b => g a b) (zip a b) out
+        | Matmul(a,b) =>
             f a . f b
             inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
             inl alpha, beta : float * float = 1, 0
             real
+                open real_core
                 typecase t with
-                | f32 => matmul.matmul_tf32 false true alpha a b beta out
+                | f32 => 
+                    inl memory, body = matmul.matmul_tf32' false true
+                    assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
+                    join body alpha a b beta out
                 | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
-    f x
+    run' {shared_mem=conv dynamic_shared_memory_used} fun () => f x
 
 // Tests whether extracting the graph can be executed.
 inl test3() =
@@ -250,6 +271,8 @@ inl test3() =
     console.write_ln "Here are the weight matrices."
     param_print graph param
     inl tns_input : _ _ float = input_extract graph input .input
+    // Immitates the passing of data into the output vector.
+    // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
         from = cupy.random_normal{mean=0; std=1} dims'.input
         to = tns_input
