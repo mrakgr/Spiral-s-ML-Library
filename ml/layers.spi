@@ -64,8 +64,9 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : .hashmap) : graph_
             | Map(exists a. _,a) => f offset a
             | Map2(exists a b. _,a,b) => f (f offset a) b
             | Matmul(a,b) => f (f offset a) b
+    inl offset = f 0 x
     hashmap.set_immutable(h_offset_param)
-    h_offset_param, f 0 x
+    h_offset_param, offset
 
 inl pass_offset_output forall t_top. (x : graph t_top) (dims : .hashmap) : graph_offset =
     inl h_offset_output = hashmap.create() // stores the offsets pointing to the start of the output array for each node
@@ -85,8 +86,9 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : .hashmap) : graph
             | Map(exists a. _,a) => g (f offset a)
             | Map2(exists a b. _,a,b) => g (f (f offset a) b)
             | Matmul(a,b) => g (f (f offset a) b)
+    inl offset = f 0 x
     hashmap.set_immutable(h_offset_output)
-    h_offset_output, f 0 x
+    h_offset_output, offset
 
 inl param_init forall t_top. (x : graph t_top) (graph : graph_data) =
     assert (snd graph.array = snd graph.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."

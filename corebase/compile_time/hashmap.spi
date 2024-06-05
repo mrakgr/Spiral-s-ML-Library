@@ -2,8 +2,10 @@
 // points. Their primary purpose is for type extensions.
 // The symbol .hashmap here is a standin for its nonexistent type.
 inl create () : .hashmap = !!!!HashMapCreate()
-// Adds a key to the HashMap.
+// Adds a key to the HashMap. Raises a type error if the key is already present in it.
 inl add forall key value. (h : .hashmap) (k : key) (v : value) : () = !!!!HashMapAdd(h,k,v)
+// Adds a key to the HashMap. Returns true if the key was added successfully to it.
+inl try_add forall key value. (h : .hashmap) (k : key) (v : value) : bool = !!!!HashMapTryAdd(h,k,v)
 // Returns true if the key is present in the map.
 inl contains forall key. (h : .hashmap) (k : key) : bool = !!!!HashMapContains(h,k)
 // Removes a key from the HashMap. Returns true if the key was found and removed from the map, and false if the key wasn't present.
