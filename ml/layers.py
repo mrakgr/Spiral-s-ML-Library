@@ -3,9 +3,15 @@ template <typename el, int dim> struct static_array { el v[dim]; };
 template <typename el, int dim, typename default_int> struct static_array_list { el v[dim]; default_int length; };
 #include <mma.h>
 using namespace nvcuda;
-__device__ void method_0(float * v0, float * v1, float * v2);
-__device__ void method_1(float * v0, float * v1);
-__device__ void method_2(float * v0, float * v1, float * v2);
+__device__ void method_1(float * v0, float * v1, float * v2);
+__device__ void method_0(unsigned char * v0, unsigned char * v1);
+__device__ void method_3(float * v0, float * v1);
+__device__ void method_2(unsigned char * v0, unsigned char * v1);
+__device__ void method_5(float * v0, float * v1, float * v2);
+__device__ void method_4(unsigned char * v0, unsigned char * v1);
+__device__ void method_6(unsigned char * v0, unsigned char * v1);
+__device__ void method_7(unsigned char * v0, unsigned char * v1);
+__device__ void method_8(unsigned char * v0, unsigned char * v1);
 __device__ inline bool while_method_0(long v0){
     bool v1;
     v1 = v0 < 1l;
@@ -21,7 +27,7 @@ __device__ inline bool while_method_2(long v0){
     v1 = v0 < 2l;
     return v1;
 }
-__device__ void method_0(float * v0, float * v1, float * v2){
+__device__ void method_1(float * v0, float * v1, float * v2){
     extern __shared__ unsigned char v3[];
     float * v4;
     v4 = reinterpret_cast<float *>(&v3[0ull]);
@@ -678,12 +684,21 @@ __device__ void method_0(float * v0, float * v1, float * v2){
     }
     return ;
 }
+__device__ void method_0(unsigned char * v0, unsigned char * v1){
+    float * v2;
+    v2 = reinterpret_cast<float *>(&v1[0ull]);
+    float * v3;
+    v3 = reinterpret_cast<float *>(&v0[0ull]);
+    float * v4;
+    v4 = reinterpret_cast<float *>(&v1[512ull]);
+    return method_1(v4, v3, v2);
+}
 __device__ inline bool while_method_3(long v0){
     bool v1;
     v1 = v0 < 64l;
     return v1;
 }
-__device__ void method_1(float * v0, float * v1){
+__device__ void method_3(float * v0, float * v1){
     long v2;
     v2 = threadIdx.x;
     long v3;
@@ -753,7 +768,14 @@ __device__ void method_1(float * v0, float * v1){
     __syncthreads();
     return ;
 }
-__device__ void method_2(float * v0, float * v1, float * v2){
+__device__ void method_2(unsigned char * v0, unsigned char * v1){
+    float * v2;
+    v2 = reinterpret_cast<float *>(&v1[512ull]);
+    float * v3;
+    v3 = reinterpret_cast<float *>(&v1[1536ull]);
+    return method_3(v3, v2);
+}
+__device__ void method_5(float * v0, float * v1, float * v2){
     extern __shared__ unsigned char v3[];
     float * v4;
     v4 = reinterpret_cast<float *>(&v3[0ull]);
@@ -1408,14 +1430,45 @@ __device__ void method_2(float * v0, float * v1, float * v2){
     }
     return ;
 }
-extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
-    return method_0(v0, v1, v2);
+__device__ void method_4(unsigned char * v0, unsigned char * v1){
+    float * v2;
+    v2 = reinterpret_cast<float *>(&v1[1536ull]);
+    float * v3;
+    v3 = reinterpret_cast<float *>(&v0[512ull]);
+    float * v4;
+    v4 = reinterpret_cast<float *>(&v1[2560ull]);
+    return method_5(v4, v3, v2);
 }
-extern "C" __global__ void entry1(float * v0, float * v1) {
-    return method_1(v0, v1);
+__device__ void method_6(unsigned char * v0, unsigned char * v1){
+    float * v2;
+    v2 = reinterpret_cast<float *>(&v1[2560ull]);
+    float * v3;
+    v3 = reinterpret_cast<float *>(&v1[3584ull]);
+    return method_3(v3, v2);
 }
-extern "C" __global__ void entry2(float * v0, float * v1, float * v2) {
-    return method_2(v0, v1, v2);
+__device__ void method_7(unsigned char * v0, unsigned char * v1){
+    float * v2;
+    v2 = reinterpret_cast<float *>(&v1[3584ull]);
+    float * v3;
+    v3 = reinterpret_cast<float *>(&v0[1536ull]);
+    float * v4;
+    v4 = reinterpret_cast<float *>(&v1[4608ull]);
+    return method_5(v4, v3, v2);
+}
+__device__ void method_8(unsigned char * v0, unsigned char * v1){
+    float * v2;
+    v2 = reinterpret_cast<float *>(&v1[4608ull]);
+    float * v3;
+    v3 = reinterpret_cast<float *>(&v1[5632ull]);
+    return method_3(v3, v2);
+}
+extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
+    method_0(v0, v1);
+    method_2(v0, v1);
+    method_4(v0, v1);
+    method_6(v0, v1);
+    method_7(v0, v1);
+    return method_8(v0, v1);
 }
 """
 class static_array(list):
@@ -1589,67 +1642,21 @@ def main():
     method0(v34)
     del v34
     print()
-    v35 = v1[0:0+4*128].view(cp.float32)
-    v36 = v0[0:0+4*128].view(cp.float32)
-    v37 = v1[512:512+4*256].view(cp.float32)
-    v38 = 0
-    v39 = raw_module.get_function(f"entry{v38}")
-    del v38
-    v39.max_dynamic_shared_size_bytes = 1536 
-    v39((1,),(32,),(v37, v36, v35),shared_mem=1536)
-    del v35, v36, v37, v39
-    v40 = v1[512:512+4*256].view(cp.float32)
-    v41 = v1[1536:1536+4*256].view(cp.float32)
-    v42 = 1
-    v43 = raw_module.get_function(f"entry{v42}")
-    del v42
-    v43.max_dynamic_shared_size_bytes = 1536 
-    v43((1,),(32,),(v41, v40),shared_mem=1536)
-    del v40, v41, v43
-    v44 = v1[1536:1536+4*256].view(cp.float32)
-    v45 = v0[512:512+4*256].view(cp.float32)
-    v46 = v1[2560:2560+4*256].view(cp.float32)
-    v47 = 2
-    v48 = raw_module.get_function(f"entry{v47}")
-    del v47
-    v48.max_dynamic_shared_size_bytes = 1536 
-    v48((1,),(32,),(v46, v45, v44),shared_mem=1536)
-    del v44, v45, v46, v48
-    v49 = v1[2560:2560+4*256].view(cp.float32)
-    v50 = v1[3584:3584+4*256].view(cp.float32)
-    v51 = 1
-    v52 = raw_module.get_function(f"entry{v51}")
-    del v51
-    v52.max_dynamic_shared_size_bytes = 1536 
-    v52((1,),(32,),(v50, v49),shared_mem=1536)
-    del v49, v50, v52
-    v53 = v1[3584:3584+4*256].view(cp.float32)
-    v54 = v0[1536:1536+4*256].view(cp.float32)
-    del v0
-    v55 = v1[4608:4608+4*256].view(cp.float32)
-    v56 = 2
-    v57 = raw_module.get_function(f"entry{v56}")
-    del v56
-    v57.max_dynamic_shared_size_bytes = 1536 
-    v57((1,),(32,),(v55, v54, v53),shared_mem=1536)
-    del v53, v54, v55, v57
-    v58 = v1[4608:4608+4*256].view(cp.float32)
-    v59 = v1[5632:5632+4*256].view(cp.float32)
-    v60 = 1
-    v61 = raw_module.get_function(f"entry{v60}")
-    del v60
-    v61.max_dynamic_shared_size_bytes = 1536 
-    v61((1,),(32,),(v59, v58),shared_mem=1536)
-    del v58, v59, v61
-    v62 = v1[5632:5632+4*256].view(cp.float32)
+    v35 = 0
+    v36 = raw_module.get_function(f"entry{v35}")
+    del v35
+    v36.max_dynamic_shared_size_bytes = 1536 
+    v36((1,),(32,),(v0, v1),shared_mem=1536)
+    del v0, v36
+    v37 = v1[5632:5632+4*256].view(cp.float32)
     del v1
-    v63 = 0
-    v64 = 16
-    v65 = 1
-    v66 = 16
-    v67 = 16
-    method1(v62, v63, v64, v65, v66, v67)
-    del v62, v63, v64, v65, v66, v67
+    v38 = 0
+    v39 = 16
+    v40 = 1
+    v41 = 16
+    v42 = 16
+    method1(v37, v38, v39, v40, v41, v42)
+    del v37, v38, v39, v40, v41, v42
     print()
     return 
 

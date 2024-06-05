@@ -25,16 +25,3 @@ inl get forall key value. (h : .hashmap) (k : key) : value = real
 // Makes the hash map immutable, allowing it to be passed through join points.
 // After it's set to immutable, trying to add or remove from it will result in a type error.
 inl set_immutable (h : .hashmap) : () = !!!!HashMapSetImmutable(h)
-
-union t = Weight : {qwe : int * int}
-
-inl main() =
-    inl k,v = Weight {qwe=1,2 : int * int}, "sdf"
-    inl h = create()
-    add h k v
-    set_immutable h
-    inl _ =
-        join_backend Cuda
-            inl ~_ : string = get h k
-            ()
-    ()

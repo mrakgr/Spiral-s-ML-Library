@@ -224,6 +224,7 @@ inl pass_shared_memory forall t_top. (x : graph t_top) =
 inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : graph_data) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+
     inl tensor_extract x = graph_tensor_extract x param output
     inl dynamic_shared_memory_used = pass_shared_memory x
     inl rec f forall t. (x : graph t) : () =
@@ -233,29 +234,30 @@ inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : gra
         | Input => ()
         | Map(exists a. g,a) =>
             f a
-            inl a,out = tensor_extract a, tensor_extract x
-            // run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
-            join map g a out
+            join 
+                inl a,out = tensor_extract a, tensor_extract x
+                join
+                    map g a out
         | Map2(exists a b. g,a,b) =>
             f a . f b
-            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
-            // run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
-            join map (fun a,b => g a b) (zip a b) out
+            join 
+                inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+                join
+                    map (fun a,b => g a b) (zip a b) out
         | Matmul(a,b) =>
             f a . f b
-            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
             inl alpha, beta : float * float = 1, 0
-            // run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
-            real
-                open real_core
-                typecase t with
-                | f32 => 
-                    inl memory, body = matmul.matmul_tf32' false true
-                    assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
-                    join body alpha a b beta out
-                | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
-    run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
-    f x
+            join
+                inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+                real
+                    open real_core
+                    typecase t with
+                    | f32 => 
+                        inl memory, body = matmul.matmul_tf32' false true
+                        assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
+                        join body alpha a b beta out
+                    | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
+    run' {shared_mem=conv dynamic_shared_memory_used} fun () => f x
 
 // Tests whether extracting the graph can be executed.
 inl test3() =
