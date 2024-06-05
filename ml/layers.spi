@@ -44,6 +44,7 @@ inl pass_dim forall t_top dims. (x : graph t_top) (dims : dims) =
                 assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
                 m,n
     inl _ = f x
+    hashmap.set_immutable(h)
     h
 
 // Calculates the parameter offsets.
@@ -63,6 +64,7 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : .hashmap) : graph_
             | Map(exists a. _,a) => f offset a
             | Map2(exists a b. _,a,b) => f (f offset a) b
             | Matmul(a,b) => f (f offset a) b
+    hashmap.set_immutable(h_offset_param)
     h_offset_param, f 0 x
 
 inl pass_offset_output forall t_top. (x : graph t_top) (dims : .hashmap) : graph_offset =
@@ -83,6 +85,7 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : .hashmap) : graph
             | Map(exists a. _,a) => g (f offset a)
             | Map2(exists a b. _,a,b) => g (f (f offset a) b)
             | Matmul(a,b) => g (f (f offset a) b)
+    hashmap.set_immutable(h_offset_output)
     h_offset_output, f 0 x
 
 inl param_init forall t_top. (x : graph t_top) (graph : graph_data) =

@@ -21,4 +21,6 @@ inl get forall key value. (hashmap (exists. h) : hashmap key value) (k : key) : 
     match !!!!HashMapTryGet(h,k) with
     | .null => error_type "The key is not present in the hash map."
     | v => v
-    
+// Makes the hash map immutable, allowing it to be passed through join points.
+// After it's set to immutable, trying to add or remove from it will result in a type error.
+inl set_immutable forall key value. (hashmap (exists. h) : hashmap key value) : () = !!!!HashMapSetImmutable(h)
