@@ -3,6 +3,9 @@ template <typename el, int dim> struct static_array { el v[dim]; };
 template <typename el, int dim, typename default_int> struct static_array_list { el v[dim]; default_int length; };
 #include <mma.h>
 using namespace nvcuda;
+__device__ void method_0(float * v0, float * v1, float * v2);
+__device__ void method_1(float * v0, float * v1);
+__device__ void method_2(float * v0, float * v1, float * v2);
 __device__ inline bool while_method_0(long v0){
     bool v1;
     v1 = v0 < 1l;
@@ -18,12 +21,7 @@ __device__ inline bool while_method_2(long v0){
     v1 = v0 < 2l;
     return v1;
 }
-__device__ inline bool while_method_3(long v0){
-    bool v1;
-    v1 = v0 < 64l;
-    return v1;
-}
-extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
+__device__ void method_0(float * v0, float * v1, float * v2){
     extern __shared__ unsigned char v3[];
     float * v4;
     v4 = reinterpret_cast<float *>(&v3[0ull]);
@@ -153,7 +151,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
             long v51;
             v51 = v50 + v49;
             float * v52;
-            v52 = v2+v51;
+            v52 = v0+v51;
             // Pushing the loop unrolling to: 0
             long v53;
             v53 = 0l;
@@ -186,7 +184,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                 long v63;
                 v63 = v62 + v61;
                 float * v64;
-                v64 = v0+v63;
+                v64 = v2+v63;
                 assert("Tensor range check" && 0 <= v47 && v47 < 1l);
                 long v65;
                 v65 = 128l * v47;
@@ -680,7 +678,12 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
     }
     return ;
 }
-extern "C" __global__ void entry1(float * v0, float * v1) {
+__device__ inline bool while_method_3(long v0){
+    bool v1;
+    v1 = v0 < 64l;
+    return v1;
+}
+__device__ void method_1(float * v0, float * v1){
     long v2;
     v2 = threadIdx.x;
     long v3;
@@ -750,7 +753,7 @@ extern "C" __global__ void entry1(float * v0, float * v1) {
     __syncthreads();
     return ;
 }
-extern "C" __global__ void entry2(float * v0, float * v1, float * v2) {
+__device__ void method_2(float * v0, float * v1, float * v2){
     extern __shared__ unsigned char v3[];
     float * v4;
     v4 = reinterpret_cast<float *>(&v3[0ull]);
@@ -880,7 +883,7 @@ extern "C" __global__ void entry2(float * v0, float * v1, float * v2) {
             long v51;
             v51 = v50 + v49;
             float * v52;
-            v52 = v2+v51;
+            v52 = v0+v51;
             // Pushing the loop unrolling to: 0
             long v53;
             v53 = 0l;
@@ -911,7 +914,7 @@ extern "C" __global__ void entry2(float * v0, float * v1, float * v2) {
                 long v62;
                 v62 = v61 + v50;
                 float * v63;
-                v63 = v0+v62;
+                v63 = v2+v62;
                 assert("Tensor range check" && 0 <= v47 && v47 < 1l);
                 long v64;
                 v64 = 256l * v47;
@@ -1405,6 +1408,15 @@ extern "C" __global__ void entry2(float * v0, float * v1, float * v2) {
     }
     return ;
 }
+extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
+    return method_0(v0, v1, v2);
+}
+extern "C" __global__ void entry1(float * v0, float * v1) {
+    return method_1(v0, v1);
+}
+extern "C" __global__ void entry2(float * v0, float * v1, float * v2) {
+    return method_2(v0, v1, v2);
+}
 """
 class static_array(list):
     def __init__(self, length):
@@ -1584,15 +1596,15 @@ def main():
     v39 = raw_module.get_function(f"entry{v38}")
     del v38
     v39.max_dynamic_shared_size_bytes = 1536 
-    v39((1,),(32,),(v35, v36, v37),shared_mem=1536)
+    v39((1,),(32,),(v37, v36, v35),shared_mem=1536)
     del v35, v36, v37, v39
     v40 = v1[512:512+4*256].view(cp.float32)
     v41 = v1[1536:1536+4*256].view(cp.float32)
     v42 = 1
     v43 = raw_module.get_function(f"entry{v42}")
     del v42
-    v43.max_dynamic_shared_size_bytes = 0 
-    v43((1,),(32,),(v41, v40),shared_mem=0)
+    v43.max_dynamic_shared_size_bytes = 1536 
+    v43((1,),(32,),(v41, v40),shared_mem=1536)
     del v40, v41, v43
     v44 = v1[1536:1536+4*256].view(cp.float32)
     v45 = v0[512:512+4*256].view(cp.float32)
@@ -1601,15 +1613,15 @@ def main():
     v48 = raw_module.get_function(f"entry{v47}")
     del v47
     v48.max_dynamic_shared_size_bytes = 1536 
-    v48((1,),(32,),(v44, v45, v46),shared_mem=1536)
+    v48((1,),(32,),(v46, v45, v44),shared_mem=1536)
     del v44, v45, v46, v48
     v49 = v1[2560:2560+4*256].view(cp.float32)
     v50 = v1[3584:3584+4*256].view(cp.float32)
     v51 = 1
     v52 = raw_module.get_function(f"entry{v51}")
     del v51
-    v52.max_dynamic_shared_size_bytes = 0 
-    v52((1,),(32,),(v50, v49),shared_mem=0)
+    v52.max_dynamic_shared_size_bytes = 1536 
+    v52((1,),(32,),(v50, v49),shared_mem=1536)
     del v49, v50, v52
     v53 = v1[3584:3584+4*256].view(cp.float32)
     v54 = v0[1536:1536+4*256].view(cp.float32)
@@ -1619,15 +1631,15 @@ def main():
     v57 = raw_module.get_function(f"entry{v56}")
     del v56
     v57.max_dynamic_shared_size_bytes = 1536 
-    v57((1,),(32,),(v53, v54, v55),shared_mem=1536)
+    v57((1,),(32,),(v55, v54, v53),shared_mem=1536)
     del v53, v54, v55, v57
     v58 = v1[4608:4608+4*256].view(cp.float32)
     v59 = v1[5632:5632+4*256].view(cp.float32)
     v60 = 1
     v61 = raw_module.get_function(f"entry{v60}")
     del v60
-    v61.max_dynamic_shared_size_bytes = 0 
-    v61((1,),(32,),(v59, v58),shared_mem=0)
+    v61.max_dynamic_shared_size_bytes = 1536 
+    v61((1,),(32,),(v59, v58),shared_mem=1536)
     del v58, v59, v61
     v62 = v1[5632:5632+4*256].view(cp.float32)
     del v1

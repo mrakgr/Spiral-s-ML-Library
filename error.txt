@@ -1,152 +1,26 @@
-Error trace on line: 23, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-              ^
-Error trace on line: 23, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-                      ^
-Error trace on line: 35, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Weight {dim} => dim
-              ^
-Error trace on line: 36, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Input (exists key. k) => get_dim k
-              ^
-Error trace on line: 37, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-              ^
-Error trace on line: 37, column: 19 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-                  ^
-Error trace on line: 37, column: 29 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-                            ^
-Error trace on line: 37, column: 38 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-                                     ^
-Error trace on line: 21, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
-    match hashmap.try_get h k with
+Error trace on line: 29, column: 9 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+inl main() =
+        ^
+Error trace on line: 30, column: 5 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+    inl k,v = 1i32, "asd"
     ^
-Error trace on line: 22, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 23, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-      ^
-Error trace on line: 23, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-              ^
-Error trace on line: 23, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-                      ^
-Error trace on line: 35, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Weight {dim} => dim
-              ^
-Error trace on line: 36, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Input (exists key. k) => get_dim k
-              ^
-Error trace on line: 37, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-              ^
-Error trace on line: 38, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map2(exists a b. _,a,b) =>
-              ^
-Error trace on line: 42, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Matmul(a,b) =>
-              ^
-Error trace on line: 42, column: 22 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Matmul(a,b) =>
-                     ^
-Error trace on line: 43, column: 17 in module: c:\Spiral's ML Library\ml\layers.spi.
-                inl (m,k),(n,k') = f a, f b
-                ^
-Error trace on line: 43, column: 36 in module: c:\Spiral's ML Library\ml\layers.spi.
-                inl (m,k),(n,k') = f a, f b
-                                   ^
-Error trace on line: 21, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
-    match hashmap.try_get h k with
+Error trace on line: 30, column: 9 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+    inl k,v = 1i32, "asd"
+        ^
+Error trace on line: 31, column: 5 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+    inl h = create()
     ^
-Error trace on line: 22, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 23, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-      ^
-Error trace on line: 23, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-              ^
-Error trace on line: 23, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-                      ^
-Error trace on line: 35, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Weight {dim} => dim
-              ^
-Error trace on line: 36, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Input (exists key. k) => get_dim k
-              ^
-Error trace on line: 37, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-              ^
-Error trace on line: 37, column: 19 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-                  ^
-Error trace on line: 37, column: 29 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-                            ^
-Error trace on line: 37, column: 38 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-                                     ^
-Error trace on line: 21, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
-    match hashmap.try_get h k with
+Error trace on line: 32, column: 5 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+    add h k v
     ^
-Error trace on line: 22, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 23, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-      ^
-Error trace on line: 23, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-              ^
-Error trace on line: 23, column: 23 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-                      ^
-Error trace on line: 35, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Weight {dim} => dim
-              ^
-Error trace on line: 36, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Input (exists key. k) => get_dim k
-              ^
-Error trace on line: 37, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map(exists a. _, a) => f a
-              ^
-Error trace on line: 38, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Map2(exists a b. _,a,b) =>
-              ^
-Error trace on line: 42, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Matmul(a,b) =>
-              ^
-Error trace on line: 42, column: 22 in module: c:\Spiral's ML Library\ml\layers.spi.
-            | Matmul(a,b) =>
-                     ^
-Error trace on line: 43, column: 17 in module: c:\Spiral's ML Library\ml\layers.spi.
-                inl (m,k),(n,k') = f a, f b
-                ^
-Error trace on line: 43, column: 36 in module: c:\Spiral's ML Library\ml\layers.spi.
-                inl (m,k),(n,k') = f a, f b
-                                   ^
-Error trace on line: 21, column: 5 in module: c:\Spiral's ML Library\ml\layers.spi.
-    match hashmap.try_get h k with
+Error trace on line: 33, column: 5 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+    set_immutable h
     ^
-Error trace on line: 22, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 23, column: 7 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-      ^
-Error trace on line: 23, column: 15 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-              ^
-Error trace on line: 23, column: 30 in module: c:\Spiral's ML Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-                             ^
-Expected unit.
-Got: true
+Error trace on line: 35, column: 9 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+        inl ~_ : i32 * string = get h k v
+        ^
+Error trace on line: 35, column: 33 in module: c:\Spiral's ML Library\corebase\compile_time\hashmap.spi.
+        inl ~_ : i32 * string = get h k v
+                                ^
+Expected a function, closure, record or a layout type possibly inside a nominal.
+Got: asd

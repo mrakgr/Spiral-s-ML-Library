@@ -123,7 +123,7 @@ inl create_graph_data (offset : graph_offset) : graph_data =
 // Tests whether randonmly initializing the params of the graph works.
 inl test1() =
     inl tanh forall t{float}. (x : graph t) : graph t = Map (exists tanh, x)
-    inl matmul dim x = Matmul(x, Weight {dim})
+    inl matmul (a,b) x = Matmul(x, Weight {dim=b,a})
     inl input forall key{symbol}. (key : key) = Input (exists key)
 
     inl graph : graph float =
@@ -170,7 +170,7 @@ inl input_extract forall float key{symbol} input. (x : graph float) (input : gra
 // Tests whether extracting the inputs of the graph works. Also randomly inits them.
 inl test2() =
     inl tanh forall t{float}. (x : graph t) : graph t = Map (exists tanh, x)
-    inl matmul dim x = Matmul(x, Weight {dim})
+    inl matmul (a,b) x = Matmul(x, Weight {dim=b,a})
     inl input forall key{symbol}. (key : key) = Input (exists key)
 
     inl graph : graph float =
@@ -234,15 +234,18 @@ inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : gra
         | Map(exists a. g,a) =>
             f a
             inl a,out = tensor_extract a, tensor_extract x
+            // run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
             join map g a out
         | Map2(exists a b. g,a,b) =>
             f a . f b
             inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+            // run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
             join map (fun a,b => g a b) (zip a b) out
         | Matmul(a,b) =>
             f a . f b
             inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
             inl alpha, beta : float * float = 1, 0
+            // run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
             real
                 open real_core
                 typecase t with
@@ -251,7 +254,8 @@ inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : gra
                     assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
                     join body alpha a b beta out
                 | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
-    run' {shared_mem=conv dynamic_shared_memory_used} fun () => f x
+    run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
+    f x
 
 // Tests whether extracting the graph can be executed.
 inl test3() =
