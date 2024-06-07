@@ -1,0 +1,12 @@
+open corebase
+open corecuda
+
+inl main() : i32 =
+    run fun () =>
+        inl ~a = heap (1i32, true, "qwer")
+        inl ar : array f32 = create 10
+        inl add (a, b) = a + b
+        inl ~closure : int * int -> _ = add
+        inl ~list : list int = [1;2;3;4;5] 
+        ()
+    0

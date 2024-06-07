@@ -33,6 +33,7 @@ modules:
             utils*
             seriazer_main-
         pickler
+
         
     corepython/
         base-
@@ -57,6 +58,8 @@ modules:
         tests/
             serializer
             pickler
+            
+    refc_cuda_backend_demo
         
     ml/
         matmul
