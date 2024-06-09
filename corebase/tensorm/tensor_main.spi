@@ -2,7 +2,7 @@ open struct
 open utils
 
 nominal tensor_body dim el = {
-    array : array el
+    array : cupy_array el
     stride : dim
     offset : int
     }
@@ -13,11 +13,14 @@ nominal tensor dim el = {
     }
 
 // Create a tensor from an array.
-inl fromArray forall t. (x : array t) : tensor int t = tensor {dim = length x; bodies = real tensor_body `int `t {array = x; stride = 1; offset = 0}}
+inl fromArray forall t. (x : array t) : tensor int t = 
+    global "import cupy as cp"
+    inl array : cupy_array t = $"cp.array(!x,dtype=`(cupy_type t))"
+    tensor {dim = length x; bodies = real tensor_body `int `t {array = x; stride = 1; offset = 0}}
 
 // Create a tensor from a list.
 inl fromList forall t. (x : list t) : tensor int t = 
-    inl array : array t = arraym.fromList x
+    inl array : cupy_array t = arraym.fromList x
     tensor {dim = listm.length x; bodies = real tensor_body `int `t {array stride = 1; offset = 0}}
 
 // Overloads the ;[] array constructor.
@@ -130,9 +133,9 @@ inl apply_ptr forall dim el. (tensor {bodies dim} : tensor dim el) : tensor dim 
             map (fun (tensor_body {array stride offset} as x) =>
                 typecase `x with
                 | tensor_body dim ~el => tensor_body `dim `el {
-                    array = backend_switch `(array el) {
-                        Python = fun () => $"!array[!offset:]" : array el
-                        Cuda = fun () => $"!array+!offset" : array el
+                    array = backend_switch `(cupy_array el) {
+                        Python = fun () => $"!array[!offset:]" : cupy_array el
+                        Cuda = fun () => $"!array+!offset" : cupy_array el
                         }
                     offset = 0
                     stride
@@ -141,9 +144,9 @@ inl apply_ptr forall dim el. (tensor {bodies dim} : tensor dim el) : tensor dim 
         }
 
 // Returns the pointer at the specified index. The tensor must be a singleton.
-inl ptr_at_current_offset forall dim el. (t : tensor dim el) : array el = 
+inl ptr_at_current_offset forall dim el. (t : tensor dim el) : cupy_array el = 
     inl (tensor {dim bodies}) = apply_ptr t
-    real map (fun x => x.array) bodies : array el
+    real map (fun x => x.array) bodies : cupy_array el
 
 // Returns the leading stride. The tensor must be a singleton.
 inl stride_fst forall b el. (tensor {dim bodies} : tensor (int * b) el) : int = real

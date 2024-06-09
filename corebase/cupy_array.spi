@@ -1,0 +1,41 @@
+nominal cupy_type t = `(
+    typecase t with
+    | i8 =>   ``($"cp.int8")
+    | i16 =>  ``($"cp.int16")
+    | i32 =>  ``($"cp.int32")
+    | i64 =>  ``($"cp.int64")
+    | u8 =>   ``($"cp.uint8")
+    | u16 =>  ``($"cp.uint16")
+    | u32 =>  ``($"cp.uint32")
+    | u64 =>  ``($"cp.uint64")
+    | f32 =>  ``($"cp.float32")
+    | f64 =>  ``($"cp.float64")
+    | bool => ``($"cp.bool_")
+    | _ => error_type "Only stack allocated primitive types (i8,i16,i32,i64 and u8,u16,u32,u64 and f32,f64 and bool) are allowed in CuPy arrays."
+    )
+
+nominal cupy_array t = $"backend_switch `({Cuda : $"`t *"; Python : $"cp.ndarray"})"
+
+instance create cupy_array = fun size => 
+    backend_switch {
+        Python = fun () =>
+            global "import cupy as cp"
+            $"cp.empty(!size,dtype=`(cupy_type el))"
+        Cuda = fun () => $"`el \v[size]"
+    }
+instance index cupy_array = fun ar i => 
+    backend_switch {
+        Python = fun () => $"!ar[!i].item()" // `item()` retrieves the element from GPU memory to host.
+        Cuda = fun () => $"!ar[!i]"
+    }
+instance set cupy_array = fun ar i v => 
+    backend_switch {
+        Python = fun () => $"!ar[!i] = !v"
+        Cuda = fun () => $"!ar[!i] = !v"
+    }
+instance length cupy_array = fun ar => 
+    backend_switch {
+        Python = fun () => $"!ar.size"
+        Cuda = fun () => error_type "The length operation is not supported on the Cuda backend for pointer arrays."
+    }
+    

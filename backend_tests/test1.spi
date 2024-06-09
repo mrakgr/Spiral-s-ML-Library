@@ -1,0 +1,8 @@
+open corebase
+
+inl main() =
+    inl a : array int = ;[1;2;4;5]
+    inl b : array int = create 10
+    inl c = index a 1
+    set a 2 5
+    a
