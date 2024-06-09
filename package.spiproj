@@ -24,6 +24,9 @@ modules:
         arraym
         sam
         sa_listm
+        heap_sam
+        heap_sa_listm
+
         tensorm/
             utils*
             tensor_main-
@@ -35,7 +38,6 @@ modules:
             seriazer_main-
         pickler
 
-        
     corepython/
         base-
         python_listm

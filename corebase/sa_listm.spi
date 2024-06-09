@@ -4,7 +4,7 @@ nominal sa_list dim el = $"backend_switch `({Python : $"static_array_list"; Cuda
 
 // Creates an empty array.
 inl create' forall dim el. : sa_list dim el = 
-    assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
+    assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be non-negative."
     backend_switch {
         Python = fun () => $"static_array_list(@dim)"
         Cuda = fun () =>
