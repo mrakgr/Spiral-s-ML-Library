@@ -15,7 +15,7 @@ nominal tensor dim el = {
 // Create a tensor from an array.
 inl fromArray forall t. (x : array t) : tensor int t = 
     global "import cupy as cp"
-    inl array : cupy_array t = $"cp.array(!x,dtype=`(cupy_type t))"
+    inl x : cupy_array t = $"cp.array(!x,dtype=`(cupy_type t))"
     tensor {dim = length x; bodies = real tensor_body `int `t {array = x; stride = 1; offset = 0}}
 
 // Create a tensor from a list.
@@ -368,114 +368,114 @@ inl apply_proj forall a b el. ({from by nearTo=t} : loop.range (tensor (a * b) e
 
 // inl test2() =
 //     inl t : tensor _ float = ;[1; 2; 3]
-//     index -1 t
+//     tensor_index 0 t
 
 // inl test3() =
 //     inl t : tensor _ float = ;[1; 2; 3]
-//     set 2 10 t
+//     tensor_set 2 10 t
 //     t
 
 // inl test4() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t
-//     index (0,0) t, index (1,0) t
+//     inl t = reshape const(2i32,3i32) t
+//     tensor_index (0,0) t, tensor_index (1,0) t
 
-// inl test5() =
+// inl test5() = // error case
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,4i32) t
+//     inl t = reshape const(2i32,4i32) t
 //     t
 
 // inl test6() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t
-//     inl t = reshape (3i32, 2i32) t
+//     inl t = reshape const(2i32,3i32) t
+//     inl t = reshape const(3i32, 2i32) t
 //     t
     
 // inl test7() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t
-//     inl t = reshape (3i32, 2i32) t
+//     inl t = reshape const(2i32,3i32) t
+//     inl t = reshape const(3i32, 2i32) t
 //     inl t = apply_snd 1 t
-//     index 0 t, index 1 t, index 2 t
+//     tensor_index 0 t, tensor_index 1 t, tensor_index 2 t
 
 // inl test8() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t |> view {from=1,1; nearTo=2,3}
-//     index (0,0) t, index (0,1) t
+//     inl t = reshape const(2i32,3i32) t |> view const{from=1,1; nearTo=2,3}
+//     tensor_index (0,0) t, tensor_index (0,1) t
 
 // inl test9() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t |> apply 1
+//     inl t = reshape const(2i32,3i32) t |> apply 1
 //     t 
 //     |> split [1;1;1]
-//     |> listm.map (index 0)
+//     |> listm.map (tensor_index 0)
 
-// inl test10() =
+// inl test10() = // error case
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t |> reorder (fun a,b => b,b)
+//     inl t = reshape const(2i32,3i32) t |> reorder (fun a,b => b,b)
 //     t
 
 // inl test11() =
-//     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6] |> reshape (2i32,3i32)
-//     inl t' : tensor _ int = ;[1; 2; 3; 4; 5; 6] |> reshape (2i32,3i32)
+//     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6] |> reshape const(2i32,3i32)
+//     inl t' : tensor _ int = ;[1; 2; 3; 4; 5; 6] |> reshape const(2i32,3i32)
 //     inl x = zip t t' |> rezip (fun a,b => a,b,a,b)
 //     x
 
 // inl test12() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t
+//     inl t = reshape const(2i32,3i32) t
 //     t 
 //     |> split_snd [1;1;1]
-//     |> listm.map (index (1,0))
+//     |> listm.map (tensor_index (1,0))
 
 // inl test13() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t
+//     inl t = reshape const(2i32,3i32) t
 //     t 
 //     |> split_fst [1;1]
-//     |> listm.map (index (0,0))
+//     |> listm.map (tensor_index (0,0))
 
 // inl test14() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t |> view_snd {from=1; nearTo=3}
-//     index (1,0) t, index (1,1) t
+//     inl t = reshape const(2i32,3i32) t |> view_snd const{from=1; nearTo=3}
+//     tensor_index (1,0) t, tensor_index (1,1) t
 
 // inl test15() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (2i32,3i32) t |> view_fst {from=1; nearTo=2}
-//     index (0,1) t, index (0,2) t
+//     inl t = reshape const(2i32,3i32) t |> view_fst const{from=1; nearTo=2}
+//     tensor_index (0,1) t, tensor_index (0,2) t
 
 // inl test16() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape (dyn (2,3) : int * int) t
+//     inl t = reshape const(dyn (2,3) : int * int) t
 //     assert_len (2,3  : int * int) t
 
 // inl test17() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape ({x=2 : int; y=3 : int}) t
-//     index {x=1; y=1} t
+//     inl t = reshape const{x=2 : int; y=3 : int} t
+//     tensor_index {x=1; y=1} t
 
 // inl test18() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6]
-//     inl t = reshape ({x=2 : int; y=3 : int}) t
-//     set {x=1; y=1} 123 t
-//     index {x=1; y=1} t
+//     inl t = reshape const{x=2 : int; y=3 : int} t
+//     tensor_set {x=1; y=1} 123 t
+//     tensor_index {x=1; y=1} t
 
 // inl test19() =
-//     inl t : tensor _ float = create (2,3 : int * int)
-//     inl t : tensor _ float = create {x=2 : int; y=3 : int}
+//     inl t : tensor _ float = tensor_create (2,3 : int * int)
+//     inl t : tensor _ float = tensor_create {x=2 : int; y=3 : int}
 //     t
 
 // inl test20() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12]
-//     inl t = reshape (6, 2 : int * int) t
-//     inl t = reshape_fst (2,3 : int * int) t |> reorder (fun (a,b),c => a,b,c)
-//     index (0,0,0) t, index (1,0,0) t
+//     inl t = reshape const(6, 2 : int * int) t
+//     inl t = reshape_fst const(2,3 : int * int) t |> reorder (fun (a,b),c => a,b,c)
+//     tensor_index (0,0,0) t, tensor_index (1,0,0) t
 
 // inl test21() =
 //     inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12]
-//     inl t = reshape (2, 6 : int * int) t
-//     inl t = reshape_snd (2,3 : int * int) t |> reorder (fun a,(b,c) => a,b,c)
-//     index (1,0,0) t, index (0,1,0) t
+//     inl t = reshape const(2, 6 : int * int) t
+//     inl t = reshape_snd const(2,3 : int * int) t |> reorder (fun a,(b,c) => a,b,c)
+//     tensor_index (1,0,0) t, tensor_index (0,1,0) t
 
-// inl main() = test()
+// inl main() = test21()

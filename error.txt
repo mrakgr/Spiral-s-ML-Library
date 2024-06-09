@@ -1,13 +1,103 @@
-Error trace on line: 3, column: 9 in module: c:\Spiral's ML Library\c_backend_demo.spi.
-inl main() : i32 =
+Error trace on line: 424, column: 9 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
+inl main() = test11()
         ^
-Error trace on line: 4, column: 5 in module: c:\Spiral's ML Library\c_backend_demo.spi.
-    inl _ = join_backend Cuda
+Error trace on line: 424, column: 14 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
+inl main() = test11()
+             ^
+Error trace on line: 418, column: 11 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
+inl test11() =
+          ^
+Error trace on line: 419, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
+    inl t : tensor _ float = ;[1; 2; 3; 4; 5; 6] |> reshape const(2i32,3i32)
     ^
-Error trace on line: 5, column: 9 in module: c:\Spiral's ML Library\c_backend_demo.spi.
-        inl ~a = heap (1i32, true, "qwer")
+Error trace on line: 420, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
+    inl t' : tensor _ int = ;[1; 2; 3; 4; 5; 6] |> reshape const(2i32,3i32)
+    ^
+Error trace on line: 421, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
+    inl x = zip t t' |> rezip (fun a,b => a,b,a,b)
+    ^
+Error trace on line: 422, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\tensor_main.spi.
+    console.write_ln x
+    ^
+Error trace on line: 57, column: 5 in module: c:\Spiral's ML Library\corebase\console.spi.
+    write l
+    ^
+Error trace on line: 54, column: 5 in module: c:\Spiral's ML Library\corebase\console.spi.
+    write x
+    ^
+Error trace on line: 12, column: 19 in module: c:\Spiral's ML Library\corebase\console.spi.
+    let rec write x = 
+                  ^
+Error trace on line: 13, column: 9 in module: c:\Spiral's ML Library\corebase\console.spi.
+        open real_core
         ^
-Error trace on line: 5, column: 18 in module: c:\Spiral's ML Library\c_backend_demo.spi.
-        inl ~a = heap (1i32, true, "qwer")
+Error trace on line: 14, column: 9 in module: c:\Spiral's ML Library\corebase\console.spi.
+        inl p (a,b) = 
+        ^
+Error trace on line: 23, column: 9 in module: c:\Spiral's ML Library\corebase\console.spi.
+        match x with // According to Bing it shouldn't matter whether these are %d or %lld in printf.
+        ^
+Error trace on line: 24, column: 12 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
+           ^
+Error trace on line: 24, column: 23 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
+                      ^
+Error trace on line: 24, column: 35 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
+                                  ^
+Error trace on line: 24, column: 47 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
+                                              ^
+Error trace on line: 25, column: 12 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
+           ^
+Error trace on line: 25, column: 23 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
+                      ^
+Error trace on line: 25, column: 35 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
+                                  ^
+Error trace on line: 25, column: 47 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
+                                              ^
+Error trace on line: 26, column: 12 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : f32) | (x : f64) => p ("%f", x)
+           ^
+Error trace on line: 26, column: 24 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : f32) | (x : f64) => p ("%f", x)
+                       ^
+Error trace on line: 27, column: 12 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : string) => p ("%s", x)
+           ^
+Error trace on line: 28, column: 12 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : char) => p ("%c", x)
+           ^
+Error trace on line: 29, column: 12 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (x : bool) => p ("%s", if x then "true" else "false")
+           ^
+Error trace on line: 30, column: 12 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | (a,b) => write a . write ", " . write b
+           ^
+Error trace on line: 31, column: 11 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | {} as x =>
+          ^
+Error trace on line: 39, column: 11 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | () => ()
+          ^
+Error trace on line: 40, column: 11 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | x when symbol_is x => write (symbol_to_string x)
+          ^
+Error trace on line: 41, column: 11 in module: c:\Spiral's ML Library\corebase\console.spi.
+        | x => 
+          ^
+Error trace on line: 42, column: 13 in module: c:\Spiral's ML Library\corebase\console.spi.
+            if union_is x then
+            ^
+Error trace on line: 50, column: 13 in module: c:\Spiral's ML Library\corebase\console.spi.
+            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) x
+            ^
+Error trace on line: 52, column: 18 in module: c:\Spiral's ML Library\corebase\console.spi.
+            else error_type "Unsupported type."
                  ^
-Heap layout types aren't supported in the Cuda C++ backend due to them needing to be heap allocated.
+Unsupported type.
