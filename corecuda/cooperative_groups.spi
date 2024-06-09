@@ -56,30 +56,30 @@ inl create_coalesced_threads() : ref coalesced_group = $"auto \v = cooperative_g
 
 inl reduce_thread_block_tile' forall el. (tile : ref thread_block_tile') (f : el -> el -> el) (x : el) : el = 
     inl f (arg a), (arg b) = f a b 
-    $"cooperative_groups::reduce(!tile, !x, !f)"
+    $"cooperative_groups::reduce(!tile, !x, !(to_fun_ptr f))"
 inl reduce_coalesced forall el. (tile : ref coalesced_group) (f : el -> el -> el) (x : el) : el = 
     inl f (arg a), (arg b) = f a b 
-    $"cooperative_groups::reduce(!tile, !x, !f)"
+    $"cooperative_groups::reduce(!tile, !x, !(to_fun_ptr f))"
 inl inclusive_scan_coalesced forall el. (tile : ref coalesced_group) (f : el -> el -> el) (x : el) : el = 
     inl f (arg a), (arg b) = f a b 
-    $"cooperative_groups::inclusive_scan(!tile, !x, !f)"
+    $"cooperative_groups::inclusive_scan(!tile, !x, !(to_fun_ptr f))"
 inl shuffle_coalesced forall el. (tile : ref coalesced_group) (x : el) (i : int) : el = $"!tile.shfl(!x,!i)"
 inl exclusive_scan_thread_block_tile' forall el. (tile : ref thread_block_tile') neutral_element (f : el -> el -> el) (x : el) : el * el = 
     inl f (arg a), (arg b) = f a b 
-    inl inclusive : el = $"cooperative_groups::inclusive_scan(!tile, !x, !f)"
+    inl inclusive : el = $"cooperative_groups::inclusive_scan(!tile, !x, !(to_fun_ptr f))"
     inl sum = $"!tile.shfl(!inclusive,!tile.num_threads()-1)"
     assert $"!tile.num_threads() <= 32" "The thread block tile in the exclusive scan has to be less than or equal 32."
     inl exclusive = $"!tile.shfl_up(!inclusive,1)"
     (if $"!tile.thread_rank() == 0" then neutral_element else exclusive), sum
 inl exclusive_scan_coalesced' forall el. (tile : ref coalesced_group) neutral_element (f : el -> el -> el) (x : el) : el * el = 
     inl f (arg a), (arg b) = f a b 
-    inl inclusive : el = $"cooperative_groups::inclusive_scan(!tile, !x, !f)"
+    inl inclusive : el = $"cooperative_groups::inclusive_scan(!tile, !x, !(to_fun_ptr f))"
     inl sum = $"!tile.shfl(!inclusive,!tile.num_threads()-1)"
     inl exclusive = $"!tile.shfl_up(!inclusive,1)"
     (if $"!tile.thread_rank() == 0" then neutral_element else exclusive), sum
 inl exclusive_scan_coalesced forall el. (tile : ref coalesced_group) neutral_element (f : el -> el -> el) (x : el) : el = 
     inl f (arg a), (arg b) = f a b 
-    inl exclusive = $"cooperative_groups::exclusive_scan(!tile, !x, !f)"
+    inl exclusive = $"cooperative_groups::exclusive_scan(!tile, !x, !(to_fun_ptr f))"
     if $"!tile.thread_rank() == 0" then neutral_element else exclusive
 
 open tensorm

@@ -114,6 +114,12 @@ inl abs x = max x -x
 // Converts a symbol to a string literal.
 inl symbol_to_string forall t {symbol}. (x : t) : string = !!!!SymbolToString(x)
 
+// Turns a Spiral function into a function pointer. At the time of writing (6/9/2024), the regular Cuda backend already treats regular functions as such.
+// This feature is only supported on the reference counting Cuda backend where closures are garbage collected objects and hence function pointers 
+// are needed for interop with external Cuda libraries. In the future more support might be added for it, but for now only the parial evaluator 
+// can tell the difference between the regular functions and pointers of them. The type you see here is a lie.
+inl to_fun_ptr forall a b. (f : a -> b) : a -> b = !!!!ToFunPtr(f)
+
 open real_core
 // Structural polymorphic equality for every type in the language (apart from functions.)
 inl (=) forall t. (a : t) (b : t) : bool = real a = b

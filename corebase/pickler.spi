@@ -1,6 +1,6 @@
 // Pickler combinators for converting regular Spiral types to binary vectors of floating point values.
 
-type state = int * array float
+type state = int * cupy_array float
 nominal pu a = {
     pickle : a -> state -> ()
     size : int

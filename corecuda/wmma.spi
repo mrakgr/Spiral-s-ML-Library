@@ -52,7 +52,7 @@ inl fragment_dim forall use m n k layout t. (f : ref (fragment use m n k layout 
 inl assert_fragment_dimension forall use m n k layout t el. (f : ref (fragment use m n k layout t)) (t : tensor (int * int) el) : () =
     assert (fragment_dim f = t.dim) "The fragment's dimensions must match that of the tensor."
 
-inl load_matrix_sync_array forall use m n k layout t el. (f : ref (fragment use m n k layout t)) (ar : array el) (ldm : int) : () =
+inl load_matrix_sync_array forall use m n k layout t el. (f : ref (fragment use m n k layout t)) (ar : cupy_array el) (ldm : int) : () =
     real
         typecase use with
         | accumulator =>
@@ -84,7 +84,7 @@ inl load_matrix_sync_tf32 forall use m n k layout. (f : ref (fragment use m n k 
         // $"!f.x[!i] = wmma::__float_to_tf32(!x)"
         $"!f.x[!i] = !x"
 
-inl store_matrix_sync_array forall use m n k layout t. (ar : array t) (f : ref (fragment use m n k layout t)) (ldm : int) : () = 
+inl store_matrix_sync_array forall use m n k layout t. (ar : cupy_array t) (f : ref (fragment use m n k layout t)) (ldm : int) : () = 
     real
         typecase use with
         | accumulator =>
