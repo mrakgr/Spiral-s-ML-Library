@@ -7,9 +7,9 @@ open corebase
 
 nominal json t = obj
 
-let deserialize forall t. (json x : json t) : t = real
-    open real_core
-    let rec f forall t'. (x : obj) : t' = 
+let deserialize forall t. (json x : json t) : t =
+    let rec f forall t'. (x : obj) : t' = real
+        open real_core
         inl deserialize_sa forall array el. =
             $"assert isinstance(!x,list), f'The object needs to be a Python list. Got: {!x}'" : ()
             inl len : int = $"len(!x) # type: ignore"
@@ -58,17 +58,16 @@ let deserialize forall t. (json x : json t) : t = real
                 | _ =>
                     $"assert isinstance(!x,`t'), f'The object needs to be the right primitive type. Got: {!x}'" : ()
                     $"!x" : t'
-    and inl f_tuple forall t'. (i : int) x : t' =
+    and inl f_tuple forall t'. (i : int) (x : obj) : t' = real
+        open real_core
         typecase t' with
         | ~a * ~b => f `a ($"!x[!i] # type: ignore" : obj), f_tuple `b (i+1) x
         | _ => f `t' ($"!x[!i] # type: ignore" : obj)
-    f `t x
+    f x
 
-let serialize forall t. (x : t) : json t = json real
-    open real_core
-    let rec f forall t'. (x : t') : obj = 
-        print_static x
-
+let serialize forall t. (x : t) : json t =
+    let rec f forall t'. (x : t') : obj = real
+        open real_core
         inl serialize_sa forall array el. =
             inl ar : obj = $"[]"
             loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
@@ -94,7 +93,8 @@ let serialize forall t. (x : t) : json t = json real
                 f `t'' (nominal_strip x)
             else
                 $"!x" : obj
-    and inl f_tuple forall t'. (l : python_listm.python_list obj) (x : t') : obj =
+    and inl f_tuple forall t'. (l : python_listm.python_list obj) (x : t') : obj = real
+        open real_core
         typecase t' with
         | ~a * ~b => 
             python_listm.push `obj l (f `a (fst x))
@@ -102,7 +102,7 @@ let serialize forall t. (x : t) : json t = json real
         | _ => 
             python_listm.push `obj l (f `t' x)
             $"!l" : obj
-    f `t x
+    json (f x)
 
 type t = (int * int) * {a : option int; b : option int; c : int} * ((float * float) *  bool * bool) * list string * sa_listm.sa_list 16 (int * float)
 inl data() : t = (1, 2), {a=Some 1; b=None; c=3},((55.34,66.23), true, false), ["qwe"; "asd"], arraym.fromList [1,2;3,4;5,6]
