@@ -12,20 +12,20 @@ inl template forall dim. (dim : dim) (op : .fun) =
 // Can only be used to create single arrays.
 inl arange forall dim el. ({from nearTo by} : loop.range dim) : tensor dim el = 
     inl len : int = loop.prod nearTo * by
-    real $"cp.arange(!from,!len,!by,dtype=`(cupy_type float)) # type: ignore" : array el
+    real $"cp.arange(!from,!len,!by,dtype=`(cupy_type float)) # type: ignore" : cupy_array el
     |> fromArray |> reshape (const nearTo)
     
 inl zeros forall dim float. (dim : dim) : tensor dim float =
-    template dim (real forall float. len => $"cp.zeros(!len,dtype=`(cupy_type float)) # type: ignore" : array float)
+    template dim (real forall float. len => $"cp.zeros(!len,dtype=`(cupy_type float)) # type: ignore" : cupy_array float)
 
 inl ones forall dim float. dim : tensor dim float =
-    template dim (real forall float. len => $"cp.ones(!len,dtype=`(cupy_type float)) # type: ignore" : array float)
+    template dim (real forall float. len => $"cp.ones(!len,dtype=`(cupy_type float)) # type: ignore" : cupy_array float)
     
 inl random_normal forall dim t. ({mean std} : {mean : float; std  : float}) dim : tensor dim t =
-    template dim (real forall float. len => $"cp.random.normal(!mean,!std,!len,dtype=`(cupy_type float)) # type: ignore" : array float)
+    template dim (real forall float. len => $"cp.random.normal(!mean,!std,!len,dtype=`(cupy_type float)) # type: ignore" : cupy_array float)
 
 inl random_uniform forall dim float. dim : tensor dim float =
-    template dim (real forall float. len => $"cp.random.uniform(size=!len,dtype=`(cupy_type float)) # type: ignore" : array float)
+    template dim (real forall float. len => $"cp.random.uniform(size=!len,dtype=`(cupy_type float)) # type: ignore" : cupy_array float)
 
 inl copy forall dim float. (a : tensor dim float) : tensor dim float =
     inl contiguous_stride, len = real utils.calculate_stride_len a.dim
@@ -36,7 +36,7 @@ inl copy forall dim float. (a : tensor dim float) : tensor dim float =
             struct.map (fun (tensor_body {array stride offset} as x) =>
                 assert (contiguous_stride = stride) "In order for the tensor to be copiable, the stride must be contiguous."
                 typecase `x with
-                | tensor_body dim ~el => tensor_body `dim `el {stride offset = 0; array = $"cp.copy(!array[!offset:!offset+!len])" : array el}) a.bodies
+                | tensor_body dim ~el => tensor_body `dim `el {stride offset = 0; array = $"cp.copy(!array[!offset:!offset+!len])" : cupy_array el}) a.bodies
         }
 
 inl copy_to forall dim float. ({from to} : {from : tensor dim float; to : tensor dim float}) : () =

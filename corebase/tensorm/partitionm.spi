@@ -1,6 +1,6 @@
 // Functionality for a partitioning raw pointer arrays into tensors.
 
-type ptr = array u8
+type ptr = cupy_array u8
 type size = u64
 inl min_align() : size = 16
 inl align (s : size) = modup s min_align()
@@ -77,13 +77,13 @@ inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d e
             typecase `z with offset ~t =>
             tensor_body `d `t {
                 array = 
-                    real_core.backend_switch `(array t) {
+                    real_core.backend_switch `(cupy_array t) {
                         Python = fun () => 
                             inl s = !!!!SizeOf(`t) 
                             typecase cupy_type t with ~ct => 
-                            $"!base[!i:!i+!s*!len].view(`ct)" : array t
+                            $"!base[!i:!i+!s*!len].view(`ct)" : cupy_array t
                         Cuda = fun () => 
-                            $"reinterpret_cast<`t *>(&!base[!i])" : array t
+                            $"reinterpret_cast<`t *>(&!base[!i])" : cupy_array t
                         }
                 offset = 0
                 stride 
