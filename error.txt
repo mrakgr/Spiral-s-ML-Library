@@ -1,153 +1,27 @@
-Error trace on line: 53, column: 9 in module: c:\Spiral's ML Library\corecuda\base.spi.
-        match compiler with
-        ^
-Error trace on line: 58, column: 9 in module: c:\Spiral's ML Library\corecuda\base.spi.
-        f () : ()
-        ^
-Error trace on line: 249, column: 50 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    run' {shared_mem=conv memory.offset_end} fun () => body alpha a b beta c
-                                                 ^
-Error trace on line: 249, column: 56 in module: c:\Spiral's ML Library\ml\matmul.spi.
-    run' {shared_mem=conv memory.offset_end} fun () => body alpha a b beta c
-                                                       ^
-Error trace on line: 55, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl div x = loop.div x
-        ^
-Error trace on line: 56, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl _ =
-        ^
-Error trace on line: 65, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl split_a {m k} (a : tensor (int * int) float) =
-        ^
-Error trace on line: 78, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl split_b {n k} (b : tensor (int * int) float) =
-        ^
-Error trace on line: 91, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl split_c {m n} (c : tensor (int * int) float) =
-        ^
-Error trace on line: 96, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl a = split_a {m=m_tile; k=k_tile} a    
-        ^
-Error trace on line: 97, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl b = split_b {n=n_tile; k=k_tile} b
-        ^
-Error trace on line: 98, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl c = split_c {m=m_tile; n=n_tile} c
-        ^
-Error trace on line: 100, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        global "#include <mma.h>"
-        ^
-Error trace on line: 101, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        global "using namespace nvcuda;"
-        ^
-Error trace on line: 106, column: 9 in module: c:\Spiral's ML Library\ml\matmul.spi.
-        inl a_shared_tile, b_shared_tile, c_shared_tile = 
-        ^
-Error trace on line: 109, column: 13 in module: c:\Spiral's ML Library\ml\matmul.spi.
-            inl extern = $"extern __shared__ unsigned char \v[]"
-            ^
-Error trace on line: 110, column: 13 in module: c:\Spiral's ML Library\ml\matmul.spi.
-            inl (a, b), c = partitionm.from_partition_offsets (extern, memory.offset_end) memory
-            ^
-Error trace on line: 110, column: 29 in module: c:\Spiral's ML Library\ml\matmul.spi.
-            inl (a, b), c = partitionm.from_partition_offsets (extern, memory.offset_end) memory
-                            ^
-Error trace on line: 94, column: 69 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-inl from_partition_offsets forall el. (base, length  : ptr * size) (partition_offsets p : _ el) : el =
-                                                                    ^
-Error trace on line: 95, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-    assert (p.offset_end <= length) "The length of the partition has to be less than the length of the base array."
-    ^
-Error trace on line: 99, column: 9 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-        map (fun x => 
-        ^
-Error trace on line: 54, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-    inl rec f = function
-                ^
-Error trace on line: 55, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | a, b => f a, f b
-          ^
-Error trace on line: 55, column: 19 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | a, b => f a, f b
-                  ^
-Error trace on line: 54, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-    inl rec f = function
-                ^
-Error trace on line: 55, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | a, b => f a, f b
-          ^
-Error trace on line: 55, column: 19 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | a, b => f a, f b
-                  ^
-Error trace on line: 54, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-    inl rec f = function
-                ^
-Error trace on line: 55, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | a, b => f a, f b
-          ^
-Error trace on line: 56, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | {} as ar => record_map (fun {value} => f value) ar
-          ^
-Error trace on line: 57, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar => index ar
-          ^
-Error trace on line: 57, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar => index ar
-                ^
-Error trace on line: 100, column: 13 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-            typecase `x with
-            ^
-Error trace on line: 101, column: 33 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-            | offsets ~d ~el => tensor_from_offsets `d `el base x
-                                ^
-Error trace on line: 70, column: 52 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d el) : tensor d el = 
-                                                   ^
-Error trace on line: 70, column: 60 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d el) : tensor d el = 
-                                                           ^
-Error trace on line: 73, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-    inl stride, len = real calculate_stride_len dim
-    ^
-Error trace on line: 73, column: 9 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-    inl stride, len = real calculate_stride_len dim
-        ^
-Error trace on line: 74, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-    assert_long_length len dim
-    ^
-Error trace on line: 75, column: 5 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-    inl bodies = real 
-    ^
-Error trace on line: 76, column: 9 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-        map (fun (offset i as z) => 
-        ^
-Error trace on line: 54, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-    inl rec f = function
-                ^
-Error trace on line: 55, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | a, b => f a, f b
-          ^
-Error trace on line: 56, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | {} as ar => record_map (fun {value} => f value) ar
-          ^
-Error trace on line: 57, column: 11 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar => index ar
-          ^
-Error trace on line: 57, column: 17 in module: c:\Spiral's ML Library\corebase\struct.spir.
-        | ar => index ar
-                ^
-Error trace on line: 76, column: 19 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-        map (fun (offset i as z) => 
-                  ^
-Error trace on line: 76, column: 31 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-        map (fun (offset i as z) => 
-                              ^
-Error trace on line: 77, column: 13 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-            typecase `z with offset ~t =>
-            ^
-Error trace on line: 78, column: 13 in module: c:\Spiral's ML Library\corebase\tensorm\partitionm.spi.
-            tensor_body `d `t {
-            ^
-Type error in nominal constructor.
-Got: {array : array f32; offset : i32; stride : i32 * i32}
-Expected: {array : cupy_array f32; offset : i32; stride : i32 * i32}
+{game_state : {large : {deck : u64 : deck; messages : backend_switch {Cuda : static_array_list<message,128i32,i32>; Python : static_array_list} : sa_list 128i32 message}; small : {game : {None : () | Some : game_node} : option game_node; pl_type : backend_switch {Cuda : static_array<player_type,2i32>; Python : static_array} : sa 2i32 player_type; ui_game_state : {GameNotStarted : () | GameOver : {min_raise : i32; pl_card : sa 2i32 (sa 2i32 card); pot : sa 2i32 i32; round_turn : i32; stack : sa 2i32 i32; street : street} | WaitingForActionFromPlayerId : {min_raise : i32; pl_card : sa 2i32 (sa 2i32 card); pot : sa 2i32 i32; round_turn : i32; stack : sa 2i32 i32; street : street}} : ui_game_state}}}
+{large : {deck : u64 : deck; messages : backend_switch {Cuda : static_array_list<message,128i32,i32>; Python : static_array_list} : sa_list 128i32 message}; small : {game : {None : () | Some : game_node} : option game_node; pl_type : backend_switch {Cuda : static_array<player_type,2i32>; Python : static_array} : sa 2i32 player_type; ui_game_state : {GameNotStarted : () | GameOver : {min_raise : i32; pl_card : sa 2i32 (sa 2i32 card); pot : sa 2i32 i32; round_turn : i32; stack : sa 2i32 i32; street : street} | WaitingForActionFromPlayerId : {min_raise : i32; pl_card : sa 2i32 (sa 2i32 card); pot : sa 2i32 i32; round_turn : i32; stack : sa 2i32 i32; street : street}} : ui_game_state}}
+{deck : u64 : deck; messages : backend_switch {Cuda : static_array_list<message,128i32,i32>; Python : static_array_list} : sa_list 128i32 message}
+u64 : deck
+u64
+backend_switch {Cuda : static_array_list<message,128i32,i32>; Python : static_array_list} : sa_list 128i32 message
+{CommunityCardsAre : sa_list 5i32 card | Fold : {chips_won : i32; winner_id : i32} | PlayerAction : i32 * action | PlayerGotCards : i32 * sa 2i32 card | Showdown : {chips_won : i32; hands_shown : sa 2i32 hand_score; winner_id : i32}} : message
+backend_switch {Cuda : static_array_list<card,5i32,i32>; Python : static_array_list} : sa_list 5i32 card
+u8 : card
+u8
+{chips_won : i32; winner_id : i32}
+i32
+i32, ({A_All_In : () | A_Call : () | A_Fold : () | A_Raise : i32} : action)
+{A_All_In : () | A_Call : () | A_Fold : () | A_Raise : i32} : action
+()
+i32, (backend_switch {Cuda : static_array<card,2i32>; Python : static_array} : sa 2i32 card)
+backend_switch {Cuda : static_array<card,2i32>; Python : static_array} : sa 2i32 card
+{chips_won : i32; hands_shown : backend_switch {Cuda : static_array<hand_score,2i32>; Python : static_array} : sa 2i32 hand_score; winner_id : i32}
+backend_switch {Cuda : static_array<hand_score,2i32>; Python : static_array} : sa 2i32 hand_score
+{hand : backend_switch {Cuda : static_array<card,5i32>; Python : static_array} : sa 5i32 card; score : i8} : hand_score
+{hand : backend_switch {Cuda : static_array<card,5i32>; Python : static_array} : sa 5i32 card; score : i8}
+backend_switch {Cuda : static_array<card,5i32>; Python : static_array} : sa 5i32 card
+Stack overflow.
+Repeat 8 times:
+--------------------------------
+   at Spiral.PartEval.Main.term@732-66(TopEnv, System.Collections.Generic.Dictionary`2<System.Tuple`2<ConsedNode`1<System.String>,E>,System.Tuple`2<System.Collections.Generic.Dictionary`2<ConsedNode`1<System.Tuple`2<RData[],Ty[]>>,System.Tuple`3<Microsoft.FSharp.Core.FSharpOption`1<TypedBind[]>,Microsoft.FSharp.Core.FSharpOption`1<Ty>,Microsoft.FSharp.Core.FSharpOption`1<System.String>>>,HashConsTable>>, System.Collections.Generic.Dictionary`2<System.Tuple`2<ConsedNode`1<System.String>,E>,System.Tuple`2<System.Collections.Generic.Dictionary`2<ConsedNode`1<System.Tuple`3<RData[],Ty[],Ty>>,Microsoft.FSharp.Core.FSharpOption`1<System.Tuple`2<Data,TypedBind[]>>>,HashConsTable>>, System.Collections.Generic.Dictionary`2<T,System.Tuple`2<System.Collections.Generic.Dictionary`2<ConsedNode`1<Ty[]>,Microsoft.FSharp.Core.FSharpOption`1<Ty>>,HashConsTable>>, HashConsTable, LangEnv, E)
+--------------------------------

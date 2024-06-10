@@ -67,6 +67,8 @@ let deserialize forall t. (json x : json t) : t = real
 let serialize forall t. (x : t) : json t = json real
     open real_core
     let rec f forall t'. (x : t') : obj = 
+        print_static x
+
         inl serialize_sa forall array el. =
             inl ar : obj = $"[]"
             loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
