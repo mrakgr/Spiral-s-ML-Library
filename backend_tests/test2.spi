@@ -1,0 +1,11 @@
+open corebase
+open corecuda
+
+inl main() =
+    run fun () =>
+    // assert (dyn true) "Hi."
+    real
+    inl f forall hi. =
+        $"@hi" : ()
+    f `@"hi`"
+    ()

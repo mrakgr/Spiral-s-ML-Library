@@ -29,6 +29,7 @@ union compiler =
 inl run' ({shared_mem} : run_config) f =
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
     // Global statements only get executed once.
+    global "import cupy as cp"
     global "options = []"
     // global "options.append('--define-macro=NDEBUG')" // turns off the macros
 
