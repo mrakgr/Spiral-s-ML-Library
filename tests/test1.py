@@ -80,7 +80,7 @@ struct Closure0 {
         return v2;
     }
     Closure0(long _v0) : v0(_v0) { }
-}
+};
 extern "C" __global__ void entry0() {
     long v0;
     v0 = 2l;
