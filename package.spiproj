@@ -92,3 +92,6 @@ modules:
 
         leduc/
             main
+
+    tests/
+        test1
