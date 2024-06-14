@@ -5,5 +5,5 @@ inl main() =
     run fun () =>
         inl ~y = 2
         inl f (x : int) = x + y
-        inl ~_ = f
+        inl ~_ = to_closure f
         ()

@@ -1,8 +1,10 @@
 kernel = r"""
 #include "reference_counting.h"
-struct Closure0 {
+struct ClosureBase0 { virtual long operator()(long) = 0; void dispose() { call_destructor(*this); } };
+typedef sptr<ClosureBase0> Fun0;
+struct Closure0 : public ClosureBase0 {
     long v0;
-    __device__ long operator() (long tup0){
+    __device__ long operator() (long tup0) override {
         long & v0 = this->v0;
         long v1 = tup0;
         long v2;
@@ -14,7 +16,7 @@ struct Closure0 {
 extern "C" __global__ void entry0() {
     long v0;
     v0 = 2l;
-    Closure0 v1{v0};
+    Fun0 v1{Closure0{v0}};
     return ;
 }
 """
