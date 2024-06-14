@@ -98,6 +98,8 @@ inl conv forall a {number} b {number}. (x : a) : b = !!!!Conv(`b, x)
 inl divup forall t {number}. (a : t) (b : t) : t = real real_core.divup a b
 // Aligns the number on an upwards boundary.
 inl modup forall t {number}. (a : t) (b : t) : t = real real_core.modup a b
+// Returns the absolute value.
+inl abs x = max x -x
 
 // Creates a heap mutable layout type.
 inl mut forall t. (x : t): mut t = !!!!LayoutToHeapMutable(x)
@@ -108,11 +110,13 @@ inl heap forall t. (x : t): heap t = !!!!LayoutToHeap(x)
 // Unboxes a heap layout type.
 inl (~!) forall t. (x : heap t): t = !!!!LayoutIndex(x)
 
-// Returns the absolute value.
-inl abs x = max x -x
-
 // Converts a symbol to a string literal.
 inl symbol_to_string forall t {symbol}. (x : t) : string = !!!!SymbolToString(x)
+
+// C++ backend specific. Turns the function into a function pointer. This should be done before dyning.
+inl to_fptr forall a b. (x : a -> b) : fptr a b = !!!!ToFunPtr(x)
+// C++ backend specific. Turns the function into a heap allocated closure. This should be done before dyning.
+inl to_closure forall a b. (x : a -> b) : closure a b = !!!!ToFunClosure(x)
 
 open real_core
 // Structural polymorphic equality for every type in the language (apart from functions.)
