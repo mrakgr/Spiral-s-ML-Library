@@ -1,0 +1,8 @@
+open corebase
+open corecuda
+
+inl main() =
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            inl ~l : list int = [1;2;3]
+            ()
