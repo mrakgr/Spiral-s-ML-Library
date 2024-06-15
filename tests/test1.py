@@ -1,23 +1,44 @@
 kernel = r"""
 #include "reference_counting.h"
-struct ClosureBase0 { virtual long operator()(long) = 0; void dispose() { call_destructor(*this); } };
-typedef sptr<ClosureBase0> Fun0;
+struct ClosureBase0 { int refc = 0; virtual long operator()(long, long) = 0; virtual ~ClosureBase0() = default; };
+typedef csptr<ClosureBase0> Fun0;
+__device__ void write_0(long v0);
 struct Closure0 : public ClosureBase0 {
-    long v0;
-    __device__ long operator() (long tup0) override {
-        long & v0 = this->v0;
-        long v1 = tup0;
+    __device__ long operator()(long tup0, long tup1) override {
+        long v0 = tup0; long v1 = tup1;
         long v2;
-        v2 = v1 + v0;
+        v2 = v0 + v1;
         return v2;
     }
-    Closure0(long _v0) : v0(_v0) { }
+    ~Closure0() override = default;
 };
+__device__ void write_0(long v0){
+    const char * v1;
+    v1 = "%d";
+    printf(v1,v0);
+    return ;
+}
 extern "C" __global__ void entry0() {
     long v0;
-    v0 = 2l;
-    Fun0 v1{Closure0{v0}};
-    return ;
+    v0 = threadIdx.x;
+    long v1;
+    v1 = blockIdx.x;
+    long v2;
+    v2 = v1 * 32l;
+    long v3;
+    v3 = v0 + v2;
+    bool v4;
+    v4 = v3 == 0l;
+    if (v4){
+        Fun0 v5{new Closure0{}};
+        long v6;
+        v6 = v5(1l, 2l);
+        write_0(v6);
+        printf("\n");
+        return ;
+    } else {
+        return ;
+    }
 }
 """
 class static_array(list):

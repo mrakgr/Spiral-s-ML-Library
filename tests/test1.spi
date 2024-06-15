@@ -3,7 +3,11 @@ open corecuda
 
 inl main() =
     run fun () =>
-        inl ~y = 2
-        inl f (x : int) = x + y
-        inl ~_ = to_closure f
-        ()
+        if rangem.threads_in_grid().from = 0 then
+            // inl ~y = 2
+            // inl f (x : int) = x + y
+            inl f (x,y : int * int) = x + y
+            inl ~f = to_closure f
+            inl ~r = f(1,2)
+            console.write_ln r
+            ()

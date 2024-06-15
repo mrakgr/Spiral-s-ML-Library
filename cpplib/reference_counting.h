@@ -13,7 +13,7 @@ struct static_array_list
 };
 
 template <typename T>
-struct sptr
+struct sptr // Shared pointer for the Spiral datatypes. They have to have the refc field inside them to work.
 {
     T *base;
 
@@ -60,6 +60,17 @@ struct sptr
             x.base = nullptr;
         }
         return *this;
+    }
+};
+
+template <typename T>
+struct csptr : public sptr<T>
+{ // Shared pointer for closures specifically.
+    using sptr<T>::sptr;
+    template <typename... Args>
+    auto operator()(Args... args) -> decltype(this->base->operator()(args...))
+    {
+        return this->base->operator()(args...);
     }
 };
 
