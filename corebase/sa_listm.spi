@@ -14,7 +14,7 @@ inl create' forall dim el. : sa_list dim el =
 instance length sa_list dim = fun ar => $"!ar.length"
 
 // Sets the array to the specified length.
-inl unsafe_set_length forall dim el. (ar : sa_list dim el) (f : int) : () = $"!ar.set_unsafe_length(!f)"
+inl unsafe_set_length forall dim el. (ar : sa_list dim el) (f : int) : () = $"!ar.unsafe_set_length(!f)"
 
 instance create sa_list dim = fun dim =>
     assert ((real real_core.type_lit_to_lit `dim) >= dim) "The type level dimension has to equal the value passed at runtime into create."

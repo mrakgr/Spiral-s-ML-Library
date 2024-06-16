@@ -4,10 +4,11 @@ using default_uint = unsigned long;
 #include "reference_counting.cuh"
 #include <assert.h>
 #include <stdio.h>
-struct ClosureBase0 { int refc = 0; __device__ virtual void operator()() = 0; __device__ virtual ~ClosureBase0() = default; };
+struct ClosureBase0 { int refc{0}; __device__ virtual void operator()() = 0; __device__ virtual ~ClosureBase0() = default; };
 typedef csptr<ClosureBase0> Fun0;
 struct Union1;
 struct Union0;
+struct Mut0;
 __device__ void write_3(const char * v0);
 __device__ void write_2();
 __device__ void write_4();
@@ -34,9 +35,11 @@ struct Union1 {
         Union1_0 case0; // A_Done
         Union1_1 case1; // A_Rest
     };
+    int refc{0};
+    unsigned char tag{255};
+    __device__ Union1() {}
     __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // A_Done
     __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // A_Rest
-    __device__ Union1() = delete;
     __device__ Union1(Union1 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union1_0(x.case0); break; // A_Done
@@ -50,18 +53,26 @@ struct Union1 {
         }
     }
     __device__ Union1 & operator=(Union1 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // A_Done
-            case 1: this->case1 = x.case1; break; // A_Rest
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // A_Done
+                case 1: this->case1 = x.case1; break; // A_Rest
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{x};
         }
         return *this;
     }
     __device__ Union1 & operator=(Union1 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // A_Done
-            case 1: this->case1 = std::move(x.case1); break; // A_Rest
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // A_Done
+                case 1: this->case1 = std::move(x.case1); break; // A_Rest
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{std::move(x)};
         }
         return *this;
     }
@@ -70,9 +81,8 @@ struct Union1 {
             case 0: this->case0.~Union1_0(); break; // A_Done
             case 1: this->case1.~Union1_1(); break; // A_Rest
         }
+        this->tag = 255;
     }
-    int refc = 0;
-    unsigned char tag;
 };
 struct Union0_0 { // B_Done
 };
@@ -87,9 +97,11 @@ struct Union0 {
         Union0_0 case0; // B_Done
         Union0_1 case1; // B_Rest
     };
+    int refc{0};
+    unsigned char tag{255};
+    __device__ Union0() {}
     __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // B_Done
     __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // B_Rest
-    __device__ Union0() = delete;
     __device__ Union0(Union0 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union0_0(x.case0); break; // B_Done
@@ -103,18 +115,26 @@ struct Union0 {
         }
     }
     __device__ Union0 & operator=(Union0 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // B_Done
-            case 1: this->case1 = x.case1; break; // B_Rest
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // B_Done
+                case 1: this->case1 = x.case1; break; // B_Rest
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
         }
         return *this;
     }
     __device__ Union0 & operator=(Union0 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // B_Done
-            case 1: this->case1 = std::move(x.case1); break; // B_Rest
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // B_Done
+                case 1: this->case1 = std::move(x.case1); break; // B_Rest
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
         }
         return *this;
     }
@@ -123,13 +143,13 @@ struct Union0 {
             case 0: this->case0.~Union0_0(); break; // B_Done
             case 1: this->case1.~Union0_1(); break; // B_Rest
         }
+        this->tag = 255;
     }
-    int refc = 0;
-    unsigned char tag;
 };
 struct Mut0 {
     int refc = 0;
     sptr<Union1> v0;
+    __device__ Mut0() = default;
     __device__ Mut0(sptr<Union1> t0) : v0(t0) {}
 };
 struct Closure0 : public ClosureBase0 {
@@ -369,13 +389,16 @@ class static_array_list(static_array):
         self.length -= 1
         return self.ptr[self.length]
 
+    def unsafe_set_length(self,i):
+        assert 0 <= i <= len(self.ptr), "The new length has to be in range."
+        self.length = i
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
 i8 = i16 = i32 = i64 = u8 = u16 = u32 = u64 = int; f32 = f64 = float; char = string = str
 
 options = []
-options.append('--diag-suppress=550,20012')
+options.append('--diag-suppress=550,20012,68')
 options.append('--dopt=on')
 options.append('--restrict')
 options.append('-I C:/Spiral_s_ML_Library/cpplib')

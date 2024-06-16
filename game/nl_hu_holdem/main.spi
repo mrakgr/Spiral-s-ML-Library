@@ -8,8 +8,8 @@ union action =
     | A_Call
     | A_Fold
 
-union player_type = 
-    | Computer 
+union player_type =
+    | Computer
     | Human
 
 union street =

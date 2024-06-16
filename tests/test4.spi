@@ -1,0 +1,10 @@
+open corebase
+open corecuda
+
+inl main() =
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            inl x : sam.sa 1 _ = join arraym.fromList [true, Some(true, false)]
+            // inl x : _ = join true,  (true, false)
+            // console.write_ln x
+            ()

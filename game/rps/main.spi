@@ -12,7 +12,7 @@ union ui_game_state =
     | WaitingForActionFromPlayerId : int
     | GameOver : action * action
 union message =
-    | ShowdownResult : action * action 
+    | ShowdownResult : action * action
     | WaitingToStart
     | GameStarted
 

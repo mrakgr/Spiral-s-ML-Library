@@ -1,176 +1,825 @@
 kernel = r"""
-template <typename el, int dim> struct static_array { el v[dim]; };
-template <typename el, int dim, typename default_int> struct static_array_list { el v[dim]; default_int length; };
+using default_int = long;
+using default_uint = unsigned long;
+#include "reference_counting.cuh"
+#include <assert.h>
+#include <stdio.h>
 #include <curand_kernel.h>
-struct US1;
-struct US2;
-struct US0;
-struct US3;
-struct US4;
-struct US5;
+struct Union1;
+struct Union2;
+struct Union0;
+__device__ long f_1(unsigned char * v0);
+__device__ void f_3(unsigned char * v0);
+__device__ Union1 f_2(unsigned char * v0);
 struct Tuple0;
+__device__ long f_5(unsigned char * v0);
+__device__ Tuple0 f_4(unsigned char * v0);
+__device__ Union0 f_0(unsigned char * v0);
+struct Union3;
+struct Union4;
+struct Union5;
 struct Tuple1;
-__device__ long loop_4(static_array<float,3l> v0, float v1, long v2);
-__device__ long sample_discrete__3(static_array<float,3l> v0, curandStatePhilox4_32_10_t * v1);
-__device__ US1 sample_discrete_2(static_array<Tuple1,3l> v0, curandStatePhilox4_32_10_t * v1);
-__device__ Tuple0 method_1(curandStatePhilox4_32_10_t * v0, US3 v1, static_array<US3,2l> v2, US4 v3, US5 v4, US2 v5, US2 v6);
-__device__ Tuple0 method_0(curandStatePhilox4_32_10_t * v0, static_array<US3,2l> v1, US4 v2, US5 v3, US2 v4, US2 v5, US0 v6);
-struct US1 {
-    union {
-    } v;
-    unsigned long tag : 2;
+__device__ Union3 f_8(unsigned char * v0);
+__device__ long f_9(unsigned char * v0);
+struct Tuple2;
+__device__ Tuple2 f_10(unsigned char * v0);
+__device__ long f_11(unsigned char * v0);
+__device__ long f_12(unsigned char * v0);
+__device__ long f_13(unsigned char * v0);
+__device__ Tuple1 f_7(unsigned char * v0);
+__device__ Tuple1 f_6(unsigned char * v0);
+struct Tuple3;
+__device__ long loop_18(static_array<float,3l> v0, float v1, long v2);
+__device__ long sample_discrete__17(static_array<float,3l> v0, curandStatePhilox4_32_10_t & v1);
+__device__ Union1 sample_discrete_16(static_array<Tuple3,3l> v0, curandStatePhilox4_32_10_t & v1);
+__device__ Tuple1 method_15(curandStatePhilox4_32_10_t & v0, Union3 v1, static_array<Union3,2l> v2, Union4 v3, Union5 v4, Union2 v5, Union2 v6);
+__device__ Tuple1 method_14(curandStatePhilox4_32_10_t & v0, static_array<Union3,2l> v1, Union4 v2, Union5 v3, Union2 v4, Union2 v5, Union0 v6);
+__device__ void f_22(unsigned char * v0, long v1);
+__device__ void f_23(unsigned char * v0);
+__device__ void f_24(unsigned char * v0, Union1 v1);
+__device__ void f_21(unsigned char * v0, Union3 v1);
+__device__ void f_25(unsigned char * v0, long v1);
+__device__ void f_27(unsigned char * v0, long v1);
+__device__ void f_26(unsigned char * v0, Union1 v1, Union1 v2);
+__device__ void f_28(unsigned char * v0, long v1);
+__device__ void f_29(unsigned char * v0, long v1);
+__device__ void f_30(unsigned char * v0, long v1);
+__device__ void f_20(unsigned char * v0, static_array<Union3,2l> v1, Union4 v2, Union5 v3, Union2 v4, Union2 v5);
+__device__ void f_19(unsigned char * v0, static_array<Union3,2l> v1, Union4 v2, Union5 v3, Union2 v4, Union2 v5);
+struct Union1_0 { // Paper
 };
-struct US2 {
-    union {
-    } v;
-    unsigned long tag : 2;
+struct Union1_1 { // Rock
 };
-struct US0 {
-    union {
-        struct {
-            US1 v0;
-        } case0; // ActionSelected
-        struct {
-            US2 v0;
-            US2 v1;
-        } case1; // PlayerChanged
-    } v;
-    unsigned long tag : 2;
+struct Union1_2 { // Scissors
 };
-struct US3 {
+struct Union1 {
     union {
-        struct {
-            US1 v0;
-        } case1; // Some
-    } v;
-    unsigned long tag : 2;
+        Union1_0 case0; // Paper
+        Union1_1 case1; // Rock
+        Union1_2 case2; // Scissors
+    };
+    unsigned char tag{-1};
+    __device__ Union1() {}
+    __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Paper
+    __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // Rock
+    __device__ Union1(Union1_2 t) : tag(2), case2(t) {} // Scissors
+    __device__ Union1(Union1 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(x.case0); break; // Paper
+            case 1: new (&this->case1) Union1_1(x.case1); break; // Rock
+            case 2: new (&this->case2) Union1_2(x.case2); break; // Scissors
+        }
+    }
+    __device__ Union1(Union1 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Paper
+            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // Rock
+            case 2: new (&this->case2) Union1_2(std::move(x.case2)); break; // Scissors
+        }
+    }
+    __device__ Union1 & operator=(Union1 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Paper
+                case 1: this->case1 = x.case1; break; // Rock
+                case 2: this->case2 = x.case2; break; // Scissors
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{x};
+        }
+        return *this;
+    }
+    __device__ Union1 & operator=(Union1 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Paper
+                case 1: this->case1 = std::move(x.case1); break; // Rock
+                case 2: this->case2 = std::move(x.case2); break; // Scissors
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union1() {
+        switch(this->tag){
+            case 0: this->case0.~Union1_0(); break; // Paper
+            case 1: this->case1.~Union1_1(); break; // Rock
+            case 2: this->case2.~Union1_2(); break; // Scissors
+        }
+        this->tag = -1;
+    }
 };
-struct US4 {
-    union {
-        struct {
-            US1 v0;
-            US1 v1;
-        } case1; // GameOver
-        struct {
-            long v0;
-        } case2; // WaitingForActionFromPlayerId
-    } v;
-    unsigned long tag : 2;
+struct Union2_0 { // Computer
 };
-struct US5 {
+struct Union2_1 { // Human
+};
+struct Union2 {
     union {
-        struct {
-            US1 v0;
-            US1 v1;
-        } case1; // ShowdownResult
-    } v;
-    unsigned long tag : 2;
+        Union2_0 case0; // Computer
+        Union2_1 case1; // Human
+    };
+    unsigned char tag{-1};
+    __device__ Union2() {}
+    __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // Computer
+    __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Human
+    __device__ Union2(Union2 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(x.case0); break; // Computer
+            case 1: new (&this->case1) Union2_1(x.case1); break; // Human
+        }
+    }
+    __device__ Union2(Union2 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(std::move(x.case0)); break; // Computer
+            case 1: new (&this->case1) Union2_1(std::move(x.case1)); break; // Human
+        }
+    }
+    __device__ Union2 & operator=(Union2 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Computer
+                case 1: this->case1 = x.case1; break; // Human
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{x};
+        }
+        return *this;
+    }
+    __device__ Union2 & operator=(Union2 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Computer
+                case 1: this->case1 = std::move(x.case1); break; // Human
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union2() {
+        switch(this->tag){
+            case 0: this->case0.~Union2_0(); break; // Computer
+            case 1: this->case1.~Union2_1(); break; // Human
+        }
+        this->tag = -1;
+    }
+};
+struct Union0_0 { // ActionSelected
+    Union1 v0;
+    __device__ Union0_0(Union1 t0) : v0(t0) {}
+    __device__ Union0_0() = delete;
+};
+struct Union0_1 { // PlayerChanged
+    Union2 v0;
+    Union2 v1;
+    __device__ Union0_1(Union2 t0, Union2 t1) : v0(t0), v1(t1) {}
+    __device__ Union0_1() = delete;
+};
+struct Union0_2 { // StartGame
+};
+struct Union0 {
+    union {
+        Union0_0 case0; // ActionSelected
+        Union0_1 case1; // PlayerChanged
+        Union0_2 case2; // StartGame
+    };
+    unsigned char tag{-1};
+    __device__ Union0() {}
+    __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // ActionSelected
+    __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // PlayerChanged
+    __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // StartGame
+    __device__ Union0(Union0 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(x.case0); break; // ActionSelected
+            case 1: new (&this->case1) Union0_1(x.case1); break; // PlayerChanged
+            case 2: new (&this->case2) Union0_2(x.case2); break; // StartGame
+        }
+    }
+    __device__ Union0(Union0 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // ActionSelected
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // PlayerChanged
+            case 2: new (&this->case2) Union0_2(std::move(x.case2)); break; // StartGame
+        }
+    }
+    __device__ Union0 & operator=(Union0 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // ActionSelected
+                case 1: this->case1 = x.case1; break; // PlayerChanged
+                case 2: this->case2 = x.case2; break; // StartGame
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
+        }
+        return *this;
+    }
+    __device__ Union0 & operator=(Union0 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // ActionSelected
+                case 1: this->case1 = std::move(x.case1); break; // PlayerChanged
+                case 2: this->case2 = std::move(x.case2); break; // StartGame
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union0() {
+        switch(this->tag){
+            case 0: this->case0.~Union0_0(); break; // ActionSelected
+            case 1: this->case1.~Union0_1(); break; // PlayerChanged
+            case 2: this->case2.~Union0_2(); break; // StartGame
+        }
+        this->tag = -1;
+    }
 };
 struct Tuple0 {
-    static_array<US3,2l> v0;
-    US4 v1;
-    US5 v2;
-    US2 v3;
-    US2 v4;
-    __device__ Tuple0(static_array<US3,2l> t0, US4 t1, US5 t2, US2 t3, US2 t4) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4) {}
-    __device__ Tuple0() = default;
+    Union2 v0;
+    Union2 v1;
+    __device__ Tuple0(Union2 t0, Union2 t1) : v0(t0), v1(t1) {}
+};
+struct Union3_0 { // None
+};
+struct Union3_1 { // Some
+    Union1 v0;
+    __device__ Union3_1(Union1 t0) : v0(t0) {}
+    __device__ Union3_1() = delete;
+};
+struct Union3 {
+    union {
+        Union3_0 case0; // None
+        Union3_1 case1; // Some
+    };
+    unsigned char tag{-1};
+    __device__ Union3() {}
+    __device__ Union3(Union3_0 t) : tag(0), case0(t) {} // None
+    __device__ Union3(Union3_1 t) : tag(1), case1(t) {} // Some
+    __device__ Union3(Union3 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union3_0(x.case0); break; // None
+            case 1: new (&this->case1) Union3_1(x.case1); break; // Some
+        }
+    }
+    __device__ Union3(Union3 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union3_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union3_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __device__ Union3 & operator=(Union3 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union3();
+            new (this) Union3{x};
+        }
+        return *this;
+    }
+    __device__ Union3 & operator=(Union3 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union3();
+            new (this) Union3{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union3() {
+        switch(this->tag){
+            case 0: this->case0.~Union3_0(); break; // None
+            case 1: this->case1.~Union3_1(); break; // Some
+        }
+        this->tag = -1;
+    }
+};
+struct Union4_0 { // GameNotStarted
+};
+struct Union4_1 { // GameOver
+    Union1 v0;
+    Union1 v1;
+    __device__ Union4_1(Union1 t0, Union1 t1) : v0(t0), v1(t1) {}
+    __device__ Union4_1() = delete;
+};
+struct Union4_2 { // WaitingForActionFromPlayerId
+    long v0;
+    __device__ Union4_2(long t0) : v0(t0) {}
+    __device__ Union4_2() = delete;
+};
+struct Union4 {
+    union {
+        Union4_0 case0; // GameNotStarted
+        Union4_1 case1; // GameOver
+        Union4_2 case2; // WaitingForActionFromPlayerId
+    };
+    unsigned char tag{-1};
+    __device__ Union4() {}
+    __device__ Union4(Union4_0 t) : tag(0), case0(t) {} // GameNotStarted
+    __device__ Union4(Union4_1 t) : tag(1), case1(t) {} // GameOver
+    __device__ Union4(Union4_2 t) : tag(2), case2(t) {} // WaitingForActionFromPlayerId
+    __device__ Union4(Union4 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union4_0(x.case0); break; // GameNotStarted
+            case 1: new (&this->case1) Union4_1(x.case1); break; // GameOver
+            case 2: new (&this->case2) Union4_2(x.case2); break; // WaitingForActionFromPlayerId
+        }
+    }
+    __device__ Union4(Union4 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union4_0(std::move(x.case0)); break; // GameNotStarted
+            case 1: new (&this->case1) Union4_1(std::move(x.case1)); break; // GameOver
+            case 2: new (&this->case2) Union4_2(std::move(x.case2)); break; // WaitingForActionFromPlayerId
+        }
+    }
+    __device__ Union4 & operator=(Union4 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // GameNotStarted
+                case 1: this->case1 = x.case1; break; // GameOver
+                case 2: this->case2 = x.case2; break; // WaitingForActionFromPlayerId
+            }
+        } else {
+            this->~Union4();
+            new (this) Union4{x};
+        }
+        return *this;
+    }
+    __device__ Union4 & operator=(Union4 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // GameNotStarted
+                case 1: this->case1 = std::move(x.case1); break; // GameOver
+                case 2: this->case2 = std::move(x.case2); break; // WaitingForActionFromPlayerId
+            }
+        } else {
+            this->~Union4();
+            new (this) Union4{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union4() {
+        switch(this->tag){
+            case 0: this->case0.~Union4_0(); break; // GameNotStarted
+            case 1: this->case1.~Union4_1(); break; // GameOver
+            case 2: this->case2.~Union4_2(); break; // WaitingForActionFromPlayerId
+        }
+        this->tag = -1;
+    }
+};
+struct Union5_0 { // GameStarted
+};
+struct Union5_1 { // ShowdownResult
+    Union1 v0;
+    Union1 v1;
+    __device__ Union5_1(Union1 t0, Union1 t1) : v0(t0), v1(t1) {}
+    __device__ Union5_1() = delete;
+};
+struct Union5_2 { // WaitingToStart
+};
+struct Union5 {
+    union {
+        Union5_0 case0; // GameStarted
+        Union5_1 case1; // ShowdownResult
+        Union5_2 case2; // WaitingToStart
+    };
+    unsigned char tag{-1};
+    __device__ Union5() {}
+    __device__ Union5(Union5_0 t) : tag(0), case0(t) {} // GameStarted
+    __device__ Union5(Union5_1 t) : tag(1), case1(t) {} // ShowdownResult
+    __device__ Union5(Union5_2 t) : tag(2), case2(t) {} // WaitingToStart
+    __device__ Union5(Union5 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union5_0(x.case0); break; // GameStarted
+            case 1: new (&this->case1) Union5_1(x.case1); break; // ShowdownResult
+            case 2: new (&this->case2) Union5_2(x.case2); break; // WaitingToStart
+        }
+    }
+    __device__ Union5(Union5 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union5_0(std::move(x.case0)); break; // GameStarted
+            case 1: new (&this->case1) Union5_1(std::move(x.case1)); break; // ShowdownResult
+            case 2: new (&this->case2) Union5_2(std::move(x.case2)); break; // WaitingToStart
+        }
+    }
+    __device__ Union5 & operator=(Union5 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // GameStarted
+                case 1: this->case1 = x.case1; break; // ShowdownResult
+                case 2: this->case2 = x.case2; break; // WaitingToStart
+            }
+        } else {
+            this->~Union5();
+            new (this) Union5{x};
+        }
+        return *this;
+    }
+    __device__ Union5 & operator=(Union5 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // GameStarted
+                case 1: this->case1 = std::move(x.case1); break; // ShowdownResult
+                case 2: this->case2 = std::move(x.case2); break; // WaitingToStart
+            }
+        } else {
+            this->~Union5();
+            new (this) Union5{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union5() {
+        switch(this->tag){
+            case 0: this->case0.~Union5_0(); break; // GameStarted
+            case 1: this->case1.~Union5_1(); break; // ShowdownResult
+            case 2: this->case2.~Union5_2(); break; // WaitingToStart
+        }
+        this->tag = -1;
+    }
 };
 struct Tuple1 {
-    US1 v0;
-    float v1;
-    __device__ Tuple1(US1 t0, float t1) : v0(t0), v1(t1) {}
-    __device__ Tuple1() = default;
+    static_array<Union3,2l> v0;
+    Union4 v1;
+    Union5 v2;
+    Union2 v3;
+    Union2 v4;
+    __device__ Tuple1(static_array<Union3,2l> t0, Union4 t1, Union5 t2, Union2 t3, Union2 t4) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4) {}
 };
-__device__ US1 US1_0() { // Paper
-    US1 x;
-    x.tag = 0;
-    return x;
+struct Tuple2 {
+    Union1 v0;
+    Union1 v1;
+    __device__ Tuple2(Union1 t0, Union1 t1) : v0(t0), v1(t1) {}
+};
+struct Tuple3 {
+    Union1 v0;
+    float v1;
+    __device__ Tuple3(Union1 t0, float t1) : v0(t0), v1(t1) {}
+};
+__device__ long f_1(unsigned char * v0){
+    long * v1;
+    v1 = (long *)(v0+0ull);
+    long v2;
+    v2 = v1[0l];
+    return v2;
 }
-__device__ US1 US1_1() { // Rock
-    US1 x;
-    x.tag = 1;
-    return x;
+__device__ void f_3(unsigned char * v0){
+    return ;
 }
-__device__ US1 US1_2() { // Scissors
-    US1 x;
-    x.tag = 2;
-    return x;
+__device__ Union1 f_2(unsigned char * v0){
+    long v1;
+    v1 = f_1(v0);
+    unsigned char * v2;
+    v2 = (unsigned char *)(v0+4ull);
+    switch (v1) {
+        case 0: {
+            f_3(v2);
+            return Union1{Union1_0{}};
+            break;
+        }
+        case 1: {
+            f_3(v2);
+            return Union1{Union1_1{}};
+            break;
+        }
+        case 2: {
+            f_3(v2);
+            return Union1{Union1_2{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
 }
-__device__ US2 US2_0() { // Computer
-    US2 x;
-    x.tag = 0;
-    return x;
+__device__ long f_5(unsigned char * v0){
+    long * v1;
+    v1 = (long *)(v0+4ull);
+    long v2;
+    v2 = v1[0l];
+    return v2;
 }
-__device__ US2 US2_1() { // Human
-    US2 x;
-    x.tag = 1;
-    return x;
+__device__ Tuple0 f_4(unsigned char * v0){
+    long v1;
+    v1 = f_1(v0);
+    unsigned char * v2;
+    v2 = (unsigned char *)(v0+4ull);
+    Union2 v6;
+    switch (v1) {
+        case 0: {
+            f_3(v2);
+            v6 = Union2{Union2_0{}};
+            break;
+        }
+        case 1: {
+            f_3(v2);
+            v6 = Union2{Union2_1{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    long v7;
+    v7 = f_5(v0);
+    unsigned char * v8;
+    v8 = (unsigned char *)(v0+8ull);
+    Union2 v12;
+    switch (v7) {
+        case 0: {
+            f_3(v8);
+            v12 = Union2{Union2_0{}};
+            break;
+        }
+        case 1: {
+            f_3(v8);
+            v12 = Union2{Union2_1{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    return Tuple0{v6, v12};
 }
-__device__ US0 US0_0(US1 v0) { // ActionSelected
-    US0 x;
-    x.tag = 0;
-    x.v.case0.v0 = v0;
-    return x;
-}
-__device__ US0 US0_1(US2 v0, US2 v1) { // PlayerChanged
-    US0 x;
-    x.tag = 1;
-    x.v.case1.v0 = v0; x.v.case1.v1 = v1;
-    return x;
-}
-__device__ US0 US0_2() { // StartGame
-    US0 x;
-    x.tag = 2;
-    return x;
-}
-__device__ US3 US3_0() { // None
-    US3 x;
-    x.tag = 0;
-    return x;
-}
-__device__ US3 US3_1(US1 v0) { // Some
-    US3 x;
-    x.tag = 1;
-    x.v.case1.v0 = v0;
-    return x;
+__device__ Union0 f_0(unsigned char * v0){
+    long v1;
+    v1 = f_1(v0);
+    unsigned char * v2;
+    v2 = (unsigned char *)(v0+8ull);
+    switch (v1) {
+        case 0: {
+            Union1 v4;
+            v4 = f_2(v2);
+            return Union0{Union0_0{v4}};
+            break;
+        }
+        case 1: {
+            Union2 v6; Union2 v7;
+            Tuple0 tmp0 = f_4(v2);
+            v6 = tmp0.v0; v7 = tmp0.v1;
+            return Union0{Union0_1{v6, v7}};
+            break;
+        }
+        case 2: {
+            f_3(v2);
+            return Union0{Union0_2{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
 }
 __device__ inline bool while_method_0(long v0){
     bool v1;
     v1 = v0 < 2l;
     return v1;
 }
-__device__ US4 US4_0() { // GameNotStarted
-    US4 x;
-    x.tag = 0;
-    return x;
+__device__ Union3 f_8(unsigned char * v0){
+    long v1;
+    v1 = f_1(v0);
+    unsigned char * v2;
+    v2 = (unsigned char *)(v0+4ull);
+    switch (v1) {
+        case 0: {
+            f_3(v2);
+            return Union3{Union3_0{}};
+            break;
+        }
+        case 1: {
+            Union1 v5;
+            v5 = f_2(v2);
+            return Union3{Union3_1{v5}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
 }
-__device__ US4 US4_1(US1 v0, US1 v1) { // GameOver
-    US4 x;
-    x.tag = 1;
-    x.v.case1.v0 = v0; x.v.case1.v1 = v1;
-    return x;
+__device__ long f_9(unsigned char * v0){
+    long * v1;
+    v1 = (long *)(v0+16ull);
+    long v2;
+    v2 = v1[0l];
+    return v2;
 }
-__device__ US4 US4_2(long v0) { // WaitingForActionFromPlayerId
-    US4 x;
-    x.tag = 2;
-    x.v.case2.v0 = v0;
-    return x;
+__device__ Tuple2 f_10(unsigned char * v0){
+    long v1;
+    v1 = f_1(v0);
+    unsigned char * v2;
+    v2 = (unsigned char *)(v0+4ull);
+    Union1 v7;
+    switch (v1) {
+        case 0: {
+            f_3(v2);
+            v7 = Union1{Union1_0{}};
+            break;
+        }
+        case 1: {
+            f_3(v2);
+            v7 = Union1{Union1_1{}};
+            break;
+        }
+        case 2: {
+            f_3(v2);
+            v7 = Union1{Union1_2{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    long v8;
+    v8 = f_5(v0);
+    unsigned char * v9;
+    v9 = (unsigned char *)(v0+8ull);
+    Union1 v14;
+    switch (v8) {
+        case 0: {
+            f_3(v9);
+            v14 = Union1{Union1_0{}};
+            break;
+        }
+        case 1: {
+            f_3(v9);
+            v14 = Union1{Union1_1{}};
+            break;
+        }
+        case 2: {
+            f_3(v9);
+            v14 = Union1{Union1_2{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    return Tuple2{v7, v14};
 }
-__device__ US5 US5_0() { // GameStarted
-    US5 x;
-    x.tag = 0;
-    return x;
+__device__ long f_11(unsigned char * v0){
+    long * v1;
+    v1 = (long *)(v0+32ull);
+    long v2;
+    v2 = v1[0l];
+    return v2;
 }
-__device__ US5 US5_1(US1 v0, US1 v1) { // ShowdownResult
-    US5 x;
-    x.tag = 1;
-    x.v.case1.v0 = v0; x.v.case1.v1 = v1;
-    return x;
+__device__ long f_12(unsigned char * v0){
+    long * v1;
+    v1 = (long *)(v0+48ull);
+    long v2;
+    v2 = v1[0l];
+    return v2;
 }
-__device__ US5 US5_2() { // WaitingToStart
-    US5 x;
-    x.tag = 2;
-    return x;
+__device__ long f_13(unsigned char * v0){
+    long * v1;
+    v1 = (long *)(v0+52ull);
+    long v2;
+    v2 = v1[0l];
+    return v2;
+}
+__device__ Tuple1 f_7(unsigned char * v0){
+    static_array<Union3,2l> v1;
+    long v2;
+    v2 = 0l;
+    while (while_method_0(v2)){
+        unsigned long long v4;
+        v4 = (unsigned long long)v2;
+        unsigned long long v5;
+        v5 = v4 * 8ull;
+        unsigned char * v6;
+        v6 = (unsigned char *)(v0+v5);
+        Union3 v7;
+        v7 = f_8(v6);
+        v1[v2] = v7;
+        v2 += 1l ;
+    }
+    long v8;
+    v8 = f_9(v0);
+    unsigned char * v9;
+    v9 = (unsigned char *)(v0+24ull);
+    Union4 v17;
+    switch (v8) {
+        case 0: {
+            f_3(v9);
+            v17 = Union4{Union4_0{}};
+            break;
+        }
+        case 1: {
+            Union1 v12; Union1 v13;
+            Tuple2 tmp1 = f_10(v9);
+            v12 = tmp1.v0; v13 = tmp1.v1;
+            v17 = Union4{Union4_1{v12, v13}};
+            break;
+        }
+        case 2: {
+            long v15;
+            v15 = f_1(v9);
+            v17 = Union4{Union4_2{v15}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    long v18;
+    v18 = f_11(v0);
+    unsigned char * v19;
+    v19 = (unsigned char *)(v0+40ull);
+    Union5 v26;
+    switch (v18) {
+        case 0: {
+            f_3(v19);
+            v26 = Union5{Union5_0{}};
+            break;
+        }
+        case 1: {
+            Union1 v22; Union1 v23;
+            Tuple2 tmp2 = f_10(v19);
+            v22 = tmp2.v0; v23 = tmp2.v1;
+            v26 = Union5{Union5_1{v22, v23}};
+            break;
+        }
+        case 2: {
+            f_3(v19);
+            v26 = Union5{Union5_2{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    long v27;
+    v27 = f_12(v0);
+    unsigned char * v28;
+    v28 = (unsigned char *)(v0+52ull);
+    Union2 v32;
+    switch (v27) {
+        case 0: {
+            f_3(v28);
+            v32 = Union2{Union2_0{}};
+            break;
+        }
+        case 1: {
+            f_3(v28);
+            v32 = Union2{Union2_1{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    long v33;
+    v33 = f_13(v0);
+    unsigned char * v34;
+    v34 = (unsigned char *)(v0+56ull);
+    Union2 v38;
+    switch (v33) {
+        case 0: {
+            f_3(v34);
+            v38 = Union2{Union2_0{}};
+            break;
+        }
+        case 1: {
+            f_3(v34);
+            v38 = Union2{Union2_1{}};
+            break;
+        }
+        default: {
+            printf("%s\n", "Invalid tag.");
+            asm("exit;");
+        }
+    }
+    return Tuple1{v1, v17, v26, v32, v38};
+}
+__device__ Tuple1 f_6(unsigned char * v0){
+    static_array<Union3,2l> v1; Union4 v2; Union5 v3; Union2 v4; Union2 v5;
+    Tuple1 tmp3 = f_7(v0);
+    v1 = tmp3.v0; v2 = tmp3.v1; v3 = tmp3.v2; v4 = tmp3.v3; v5 = tmp3.v4;
+    return Tuple1{v1, v2, v3, v4, v5};
 }
 __device__ inline bool while_method_1(long v0){
     bool v1;
@@ -187,235 +836,103 @@ __device__ inline bool while_method_3(long v0, long v1){
     v2 = v1 > v0;
     return v2;
 }
-__device__ long loop_4(static_array<float,3l> v0, float v1, long v2){
+__device__ long loop_18(static_array<float,3l> v0, float v1, long v2){
     bool v3;
     v3 = v2 < 3l;
     if (v3){
-        bool v4;
-        v4 = 0l <= v2;
+        float v4;
+        v4 = v0[v2];
         bool v5;
-        v5 = v4 && v3;
-        bool v6;
-        v6 = v5 == false;
-        if (v6){
-            assert("The read index needs to be in range." && v5);
-        } else {
-        }
-        float v7;
-        v7 = v0.v[v2];
-        bool v8;
-        v8 = v1 <= v7;
-        if (v8){
+        v5 = v1 <= v4;
+        if (v5){
             return v2;
         } else {
-            long v9;
-            v9 = v2 + 1l;
-            return loop_4(v0, v1, v9);
+            long v6;
+            v6 = v2 + 1l;
+            return loop_18(v0, v1, v6);
         }
     } else {
         return 2l;
     }
 }
-__device__ long sample_discrete__3(static_array<float,3l> v0, curandStatePhilox4_32_10_t * v1){
+__device__ long sample_discrete__17(static_array<float,3l> v0, curandStatePhilox4_32_10_t & v1){
     static_array<float,3l> v2;
     long v3;
     v3 = 0l;
     while (while_method_1(v3)){
-        bool v5;
-        v5 = 0l <= v3;
-        bool v7;
-        if (v5){
-            bool v6;
-            v6 = v3 < 3l;
-            v7 = v6;
-        } else {
-            v7 = false;
-        }
-        bool v8;
-        v8 = v7 == false;
-        if (v8){
-            assert("The read index needs to be in range." && v7);
-        } else {
-        }
-        float v9;
-        v9 = v0.v[v3];
-        bool v11;
-        if (v5){
-            bool v10;
-            v10 = v3 < 3l;
-            v11 = v10;
-        } else {
-            v11 = false;
-        }
-        bool v12;
-        v12 = v11 == false;
-        if (v12){
-            assert("The read index needs to be in range." && v11);
-        } else {
-        }
-        v2.v[v3] = v9;
+        float v5;
+        v5 = v0[v3];
+        v2[v3] = v5;
         v3 += 1l ;
     }
-    long v13;
-    v13 = 1l;
-    while (while_method_2(v2, v13)){
-        long v15;
-        v15 = 3l;
-        while (while_method_3(v13, v15)){
-            v15 -= 1l ;
-            long v17;
-            v17 = v15 - v13;
-            bool v18;
-            v18 = 0l <= v17;
-            bool v20;
-            if (v18){
-                bool v19;
-                v19 = v17 < 3l;
-                v20 = v19;
-            } else {
-                v20 = false;
-            }
-            bool v21;
-            v21 = v20 == false;
-            if (v21){
-                assert("The read index needs to be in range." && v20);
-            } else {
-            }
-            float v22;
-            v22 = v2.v[v17];
-            bool v23;
-            v23 = 0l <= v15;
-            bool v25;
-            if (v23){
-                bool v24;
-                v24 = v15 < 3l;
-                v25 = v24;
-            } else {
-                v25 = false;
-            }
-            bool v26;
-            v26 = v25 == false;
-            if (v26){
-                assert("The read index needs to be in range." && v25);
-            } else {
-            }
-            float v27;
-            v27 = v2.v[v15];
-            float v28;
-            v28 = v22 + v27;
-            bool v30;
-            if (v23){
-                bool v29;
-                v29 = v15 < 3l;
-                v30 = v29;
-            } else {
-                v30 = false;
-            }
-            bool v31;
-            v31 = v30 == false;
-            if (v31){
-                assert("The read index needs to be in range." && v30);
-            } else {
-            }
-            v2.v[v15] = v28;
+    long v6;
+    v6 = 1l;
+    while (while_method_2(v2, v6)){
+        long v8;
+        v8 = 3l;
+        while (while_method_3(v6, v8)){
+            v8 -= 1l ;
+            long v10;
+            v10 = v8 - v6;
+            float v11;
+            v11 = v2[v10];
+            float v12;
+            v12 = v2[v8];
+            float v13;
+            v13 = v11 + v12;
+            v2[v8] = v13;
         }
-        long v32;
-        v32 = v13 * 2l;
-        v13 = v32;
+        long v14;
+        v14 = v6 * 2l;
+        v6 = v14;
     }
-    float v33;
-    v33 = v2.v[2l];
-    float v34;
-    v34 = curand_uniform(v1);
-    float v35;
-    v35 = v34 * v33;
-    long v36;
-    v36 = 0l;
-    return loop_4(v2, v35, v36);
+    float v15;
+    v15 = v2[2l];
+    float v16;
+    v16 = curand_uniform(&v1);
+    float v17;
+    v17 = v16 * v15;
+    long v18;
+    v18 = 0l;
+    return loop_18(v2, v17, v18);
 }
-__device__ US1 sample_discrete_2(static_array<Tuple1,3l> v0, curandStatePhilox4_32_10_t * v1){
+__device__ Union1 sample_discrete_16(static_array<Tuple3,3l> v0, curandStatePhilox4_32_10_t & v1){
     static_array<float,3l> v2;
     long v3;
     v3 = 0l;
     while (while_method_1(v3)){
-        bool v5;
-        v5 = 0l <= v3;
-        bool v7;
-        if (v5){
-            bool v6;
-            v6 = v3 < 3l;
-            v7 = v6;
-        } else {
-            v7 = false;
-        }
-        bool v8;
-        v8 = v7 == false;
-        if (v8){
-            assert("The read index needs to be in range." && v7);
-        } else {
-        }
-        US1 v9; float v10;
-        Tuple1 tmp0 = v0.v[v3];
-        v9 = tmp0.v0; v10 = tmp0.v1;
-        bool v12;
-        if (v5){
-            bool v11;
-            v11 = v3 < 3l;
-            v12 = v11;
-        } else {
-            v12 = false;
-        }
-        bool v13;
-        v13 = v12 == false;
-        if (v13){
-            assert("The read index needs to be in range." && v12);
-        } else {
-        }
-        v2.v[v3] = v10;
+        Union1 v5; float v6;
+        Tuple3 tmp5 = v0[v3];
+        v5 = tmp5.v0; v6 = tmp5.v1;
+        v2[v3] = v6;
         v3 += 1l ;
     }
-    long v14;
-    v14 = sample_discrete__3(v2, v1);
-    bool v15;
-    v15 = 0l <= v14;
-    bool v17;
-    if (v15){
-        bool v16;
-        v16 = v14 < 3l;
-        v17 = v16;
-    } else {
-        v17 = false;
-    }
-    bool v18;
-    v18 = v17 == false;
-    if (v18){
-        assert("The read index needs to be in range." && v17);
-    } else {
-    }
-    US1 v19; float v20;
-    Tuple1 tmp1 = v0.v[v14];
-    v19 = tmp1.v0; v20 = tmp1.v1;
-    return v19;
+    long v7;
+    v7 = sample_discrete__17(v2, v1);
+    Union1 v8; float v9;
+    Tuple3 tmp6 = v0[v7];
+    v8 = tmp6.v0; v9 = tmp6.v1;
+    return v8;
 }
-__device__ Tuple0 method_1(curandStatePhilox4_32_10_t * v0, US3 v1, static_array<US3,2l> v2, US4 v3, US5 v4, US2 v5, US2 v6){
+__device__ Tuple1 method_15(curandStatePhilox4_32_10_t & v0, Union3 v1, static_array<Union3,2l> v2, Union4 v3, Union5 v4, Union2 v5, Union2 v6){
     switch (v3.tag) {
         case 0: { // GameNotStarted
-            return Tuple0(v2, v3, v4, v5, v6);
+            return Tuple1{v2, v3, v4, v5, v6};
             break;
         }
         case 1: { // GameOver
-            US1 v7 = v3.v.case1.v0; US1 v8 = v3.v.case1.v1;
-            return Tuple0(v2, v3, v4, v5, v6);
+            Union1 v7 = v3.case1.v0; Union1 v8 = v3.case1.v1;
+            return Tuple1{v2, v3, v4, v5, v6};
             break;
         }
-        default: { // WaitingForActionFromPlayerId
-            long v9 = v3.v.case2.v0;
+        case 2: { // WaitingForActionFromPlayerId
+            long v9 = v3.case2.v0;
             bool v10;
             v10 = v9 < 2l;
             if (v10){
                 bool v11;
                 v11 = v9 == 0l;
-                US2 v12;
+                Union2 v12;
                 if (v11){
                     v12 = v5;
                 } else {
@@ -439,181 +956,113 @@ __device__ Tuple0 method_1(curandStatePhilox4_32_10_t * v0, US3 v1, static_array
                             assert("The computer player should never be receiving an action." && v14);
                         } else {
                         }
-                        static_array<Tuple1,3l> v16;
-                        US1 v17;
-                        v17 = US1_1();
-                        v16.v[0l] = Tuple1(v17, 1.0f);
-                        US1 v18;
-                        v18 = US1_0();
-                        v16.v[1l] = Tuple1(v18, 1.0f);
-                        US1 v19;
-                        v19 = US1_2();
-                        v16.v[2l] = Tuple1(v19, 1.0f);
-                        US1 v20;
-                        v20 = sample_discrete_2(v16, v0);
+                        static_array<Tuple3,3l> v16;
+                        Union1 v17;
+                        v17 = Union1{Union1_1{}};
+                        v16[0l] = Tuple3{v17, 1.0f};
+                        Union1 v18;
+                        v18 = Union1{Union1_0{}};
+                        v16[1l] = Tuple3{v18, 1.0f};
+                        Union1 v19;
+                        v19 = Union1{Union1_2{}};
+                        v16[2l] = Tuple3{v19, 1.0f};
+                        Union1 v20;
+                        v20 = sample_discrete_16(v16, v0);
                         long v21;
                         v21 = v9 + 1l;
-                        static_array<US3,2l> v22;
+                        static_array<Union3,2l> v22;
                         long v23;
                         v23 = 0l;
                         while (while_method_0(v23)){
-                            bool v25;
-                            v25 = 0l <= v23;
-                            bool v27;
-                            if (v25){
-                                bool v26;
-                                v26 = v23 < 2l;
-                                v27 = v26;
+                            Union3 v25;
+                            v25 = v2[v23];
+                            bool v26;
+                            v26 = v9 == v23;
+                            Union3 v28;
+                            if (v26){
+                                v28 = Union3{Union3_1{v20}};
                             } else {
-                                v27 = false;
+                                v28 = v25;
                             }
-                            bool v28;
-                            v28 = v27 == false;
-                            if (v28){
-                                assert("The read index needs to be in range." && v27);
-                            } else {
-                            }
-                            US3 v29;
-                            v29 = v2.v[v23];
-                            bool v30;
-                            v30 = v9 == v23;
-                            US3 v32;
-                            if (v30){
-                                v32 = US3_1(v20);
-                            } else {
-                                v32 = v29;
-                            }
-                            bool v34;
-                            if (v25){
-                                bool v33;
-                                v33 = v23 < 2l;
-                                v34 = v33;
-                            } else {
-                                v34 = false;
-                            }
-                            bool v35;
-                            v35 = v34 == false;
-                            if (v35){
-                                assert("The read index needs to be in range." && v34);
-                            } else {
-                            }
-                            v22.v[v23] = v32;
+                            v22[v23] = v28;
                             v23 += 1l ;
                         }
-                        US3 v36;
-                        v36 = US3_0();
-                        US4 v37;
-                        v37 = US4_2(v21);
-                        return method_1(v0, v36, v22, v37, v4, v5, v6);
+                        Union3 v29;
+                        v29 = Union3{Union3_0{}};
+                        Union4 v30;
+                        v30 = Union4{Union4_2{v21}};
+                        return method_15(v0, v29, v22, v30, v4, v5, v6);
                         break;
                     }
-                    default: { // Human
+                    case 1: { // Human
                         switch (v1.tag) {
                             case 0: { // None
-                                return Tuple0(v2, v3, v4, v5, v6);
+                                return Tuple1{v2, v3, v4, v5, v6};
                                 break;
                             }
-                            default: { // Some
-                                US1 v43 = v1.v.case1.v0;
-                                long v44;
-                                v44 = v9 + 1l;
-                                static_array<US3,2l> v45;
-                                long v46;
-                                v46 = 0l;
-                                while (while_method_0(v46)){
-                                    bool v48;
-                                    v48 = 0l <= v46;
-                                    bool v50;
-                                    if (v48){
-                                        bool v49;
-                                        v49 = v46 < 2l;
-                                        v50 = v49;
+                            case 1: { // Some
+                                Union1 v36 = v1.case1.v0;
+                                long v37;
+                                v37 = v9 + 1l;
+                                static_array<Union3,2l> v38;
+                                long v39;
+                                v39 = 0l;
+                                while (while_method_0(v39)){
+                                    Union3 v41;
+                                    v41 = v2[v39];
+                                    bool v42;
+                                    v42 = v9 == v39;
+                                    Union3 v44;
+                                    if (v42){
+                                        v44 = Union3{Union3_1{v36}};
                                     } else {
-                                        v50 = false;
+                                        v44 = v41;
                                     }
-                                    bool v51;
-                                    v51 = v50 == false;
-                                    if (v51){
-                                        assert("The read index needs to be in range." && v50);
-                                    } else {
-                                    }
-                                    US3 v52;
-                                    v52 = v2.v[v46];
-                                    bool v53;
-                                    v53 = v9 == v46;
-                                    US3 v55;
-                                    if (v53){
-                                        v55 = US3_1(v43);
-                                    } else {
-                                        v55 = v52;
-                                    }
-                                    bool v57;
-                                    if (v48){
-                                        bool v56;
-                                        v56 = v46 < 2l;
-                                        v57 = v56;
-                                    } else {
-                                        v57 = false;
-                                    }
-                                    bool v58;
-                                    v58 = v57 == false;
-                                    if (v58){
-                                        assert("The read index needs to be in range." && v57);
-                                    } else {
-                                    }
-                                    v45.v[v46] = v55;
-                                    v46 += 1l ;
+                                    v38[v39] = v44;
+                                    v39 += 1l ;
                                 }
-                                US3 v59;
-                                v59 = US3_0();
-                                US4 v60;
-                                v60 = US4_2(v44);
-                                return method_1(v0, v59, v45, v60, v4, v5, v6);
+                                Union3 v45;
+                                v45 = Union3{Union3_0{}};
+                                Union4 v46;
+                                v46 = Union4{Union4_2{v37}};
+                                return method_15(v0, v45, v38, v46, v4, v5, v6);
+                                break;
+                            }
+                            default: {
+                                assert("Invalid tag." && false);
                             }
                         }
+                        break;
+                    }
+                    default: {
+                        assert("Invalid tag." && false);
                     }
                 }
             } else {
-                US3 v86;
-                v86 = v2.v[0l];
-                US3 v87;
-                v87 = v2.v[1l];
-                switch (v86.tag) {
+                Union3 v72;
+                v72 = v2[0l];
+                Union3 v73;
+                v73 = v2[1l];
+                switch (v72.tag) {
                     case 1: { // Some
-                        US1 v88 = v86.v.case1.v0;
-                        switch (v87.tag) {
+                        Union1 v74 = v72.case1.v0;
+                        switch (v73.tag) {
                             case 1: { // Some
-                                US1 v89 = v87.v.case1.v0;
-                                static_array<US3,2l> v90;
-                                long v91;
-                                v91 = 0l;
-                                while (while_method_0(v91)){
-                                    bool v93;
-                                    v93 = 0l <= v91;
-                                    bool v95;
-                                    if (v93){
-                                        bool v94;
-                                        v94 = v91 < 2l;
-                                        v95 = v94;
-                                    } else {
-                                        v95 = false;
-                                    }
-                                    bool v96;
-                                    v96 = v95 == false;
-                                    if (v96){
-                                        assert("The read index needs to be in range." && v95);
-                                    } else {
-                                    }
-                                    US3 v97;
-                                    v97 = US3_0();
-                                    v90.v[v91] = v97;
-                                    v91 += 1l ;
+                                Union1 v75 = v73.case1.v0;
+                                static_array<Union3,2l> v76;
+                                long v77;
+                                v77 = 0l;
+                                while (while_method_0(v77)){
+                                    Union3 v79;
+                                    v79 = Union3{Union3_0{}};
+                                    v76[v77] = v79;
+                                    v77 += 1l ;
                                 }
-                                US4 v98;
-                                v98 = US4_1(v88, v89);
-                                US5 v99;
-                                v99 = US5_1(v88, v89);
-                                return Tuple0(v90, v98, v99, v5, v6);
+                                Union4 v80;
+                                v80 = Union4{Union4_1{v74, v75}};
+                                Union5 v81;
+                                v81 = Union5{Union5_1{v74, v75}};
+                                return Tuple1{v76, v80, v81, v5, v6};
                                 break;
                             }
                             default: {
@@ -629,67 +1078,291 @@ __device__ Tuple0 method_1(curandStatePhilox4_32_10_t * v0, US3 v1, static_array
                     }
                 }
             }
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
         }
     }
 }
-__device__ Tuple0 method_0(curandStatePhilox4_32_10_t * v0, static_array<US3,2l> v1, US4 v2, US5 v3, US2 v4, US2 v5, US0 v6){
-    static_array<US3,2l> v49; US4 v50; US5 v51; US2 v52; US2 v53;
+__device__ Tuple1 method_14(curandStatePhilox4_32_10_t & v0, static_array<Union3,2l> v1, Union4 v2, Union5 v3, Union2 v4, Union2 v5, Union0 v6){
+    static_array<Union3,2l> v45; Union4 v46; Union5 v47; Union2 v48; Union2 v49;
     switch (v6.tag) {
         case 0: { // ActionSelected
-            US1 v32 = v6.v.case0.v0;
-            US3 v33;
-            v33 = US3_1(v32);
-            Tuple0 tmp2 = method_1(v0, v33, v1, v2, v3, v4, v5);
-            v49 = tmp2.v0; v50 = tmp2.v1; v51 = tmp2.v2; v52 = tmp2.v3; v53 = tmp2.v4;
+            Union1 v28 = v6.case0.v0;
+            Union3 v29;
+            v29 = Union3{Union3_1{v28}};
+            Tuple1 tmp7 = method_15(v0, v29, v1, v2, v3, v4, v5);
+            v45 = tmp7.v0; v46 = tmp7.v1; v47 = tmp7.v2; v48 = tmp7.v3; v49 = tmp7.v4;
             break;
         }
         case 1: { // PlayerChanged
-            US2 v24 = v6.v.case1.v0; US2 v25 = v6.v.case1.v1;
-            US3 v26;
-            v26 = US3_0();
-            Tuple0 tmp3 = method_1(v0, v26, v1, v2, v3, v24, v25);
-            v49 = tmp3.v0; v50 = tmp3.v1; v51 = tmp3.v2; v52 = tmp3.v3; v53 = tmp3.v4;
+            Union2 v20 = v6.case1.v0; Union2 v21 = v6.case1.v1;
+            Union3 v22;
+            v22 = Union3{Union3_0{}};
+            Tuple1 tmp8 = method_15(v0, v22, v1, v2, v3, v20, v21);
+            v45 = tmp8.v0; v46 = tmp8.v1; v47 = tmp8.v2; v48 = tmp8.v3; v49 = tmp8.v4;
             break;
         }
-        default: { // StartGame
-            static_array<US3,2l> v7;
+        case 2: { // StartGame
+            static_array<Union3,2l> v7;
             long v8;
             v8 = 0l;
             while (while_method_0(v8)){
-                bool v10;
-                v10 = 0l <= v8;
-                bool v12;
-                if (v10){
-                    bool v11;
-                    v11 = v8 < 2l;
-                    v12 = v11;
-                } else {
-                    v12 = false;
-                }
-                bool v13;
-                v13 = v12 == false;
-                if (v13){
-                    assert("The read index needs to be in range." && v12);
-                } else {
-                }
-                US3 v14;
-                v14 = US3_0();
-                v7.v[v8] = v14;
+                Union3 v10;
+                v10 = Union3{Union3_0{}};
+                v7[v8] = v10;
                 v8 += 1l ;
             }
-            US3 v15;
-            v15 = US3_0();
-            long v16;
-            v16 = 0l;
-            US4 v17;
-            v17 = US4_2(v16);
-            US5 v18;
-            v18 = US5_0();
-            Tuple0 tmp4 = method_1(v0, v15, v7, v17, v18, v4, v5);
-            v49 = tmp4.v0; v50 = tmp4.v1; v51 = tmp4.v2; v52 = tmp4.v3; v53 = tmp4.v4;
+            Union3 v11;
+            v11 = Union3{Union3_0{}};
+            long v12;
+            v12 = 0l;
+            Union4 v13;
+            v13 = Union4{Union4_2{v12}};
+            Union5 v14;
+            v14 = Union5{Union5_0{}};
+            Tuple1 tmp9 = method_15(v0, v11, v7, v13, v14, v4, v5);
+            v45 = tmp9.v0; v46 = tmp9.v1; v47 = tmp9.v2; v48 = tmp9.v3; v49 = tmp9.v4;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
         }
     }
-    return Tuple0(v49, v50, v51, v52, v53);
+    return Tuple1{v45, v46, v47, v48, v49};
+}
+__device__ void f_22(unsigned char * v0, long v1){
+    long * v2;
+    v2 = (long *)(v0+0ull);
+    v2[0l] = v1;
+    return ;
+}
+__device__ void f_23(unsigned char * v0){
+    return ;
+}
+__device__ void f_24(unsigned char * v0, Union1 v1){
+    long v2;
+    v2 = v1.tag;
+    f_22(v0, v2);
+    unsigned char * v3;
+    v3 = (unsigned char *)(v0+4ull);
+    switch (v1.tag) {
+        case 0: { // Paper
+            return f_23(v3);
+            break;
+        }
+        case 1: { // Rock
+            return f_23(v3);
+            break;
+        }
+        case 2: { // Scissors
+            return f_23(v3);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+}
+__device__ void f_21(unsigned char * v0, Union3 v1){
+    long v2;
+    v2 = v1.tag;
+    f_22(v0, v2);
+    unsigned char * v3;
+    v3 = (unsigned char *)(v0+4ull);
+    switch (v1.tag) {
+        case 0: { // None
+            return f_23(v3);
+            break;
+        }
+        case 1: { // Some
+            Union1 v4 = v1.case1.v0;
+            return f_24(v3, v4);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+}
+__device__ void f_25(unsigned char * v0, long v1){
+    long * v2;
+    v2 = (long *)(v0+16ull);
+    v2[0l] = v1;
+    return ;
+}
+__device__ void f_27(unsigned char * v0, long v1){
+    long * v2;
+    v2 = (long *)(v0+4ull);
+    v2[0l] = v1;
+    return ;
+}
+__device__ void f_26(unsigned char * v0, Union1 v1, Union1 v2){
+    long v3;
+    v3 = v1.tag;
+    f_22(v0, v3);
+    unsigned char * v4;
+    v4 = (unsigned char *)(v0+4ull);
+    switch (v1.tag) {
+        case 0: { // Paper
+            f_23(v4);
+            break;
+        }
+        case 1: { // Rock
+            f_23(v4);
+            break;
+        }
+        case 2: { // Scissors
+            f_23(v4);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+    long v5;
+    v5 = v2.tag;
+    f_27(v0, v5);
+    unsigned char * v6;
+    v6 = (unsigned char *)(v0+8ull);
+    switch (v2.tag) {
+        case 0: { // Paper
+            return f_23(v6);
+            break;
+        }
+        case 1: { // Rock
+            return f_23(v6);
+            break;
+        }
+        case 2: { // Scissors
+            return f_23(v6);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+}
+__device__ void f_28(unsigned char * v0, long v1){
+    long * v2;
+    v2 = (long *)(v0+32ull);
+    v2[0l] = v1;
+    return ;
+}
+__device__ void f_29(unsigned char * v0, long v1){
+    long * v2;
+    v2 = (long *)(v0+48ull);
+    v2[0l] = v1;
+    return ;
+}
+__device__ void f_30(unsigned char * v0, long v1){
+    long * v2;
+    v2 = (long *)(v0+52ull);
+    v2[0l] = v1;
+    return ;
+}
+__device__ void f_20(unsigned char * v0, static_array<Union3,2l> v1, Union4 v2, Union5 v3, Union2 v4, Union2 v5){
+    long v6;
+    v6 = 0l;
+    while (while_method_0(v6)){
+        unsigned long long v8;
+        v8 = (unsigned long long)v6;
+        unsigned long long v9;
+        v9 = v8 * 8ull;
+        unsigned char * v10;
+        v10 = (unsigned char *)(v0+v9);
+        Union3 v11;
+        v11 = v1[v6];
+        f_21(v10, v11);
+        v6 += 1l ;
+    }
+    long v12;
+    v12 = v2.tag;
+    f_25(v0, v12);
+    unsigned char * v13;
+    v13 = (unsigned char *)(v0+24ull);
+    switch (v2.tag) {
+        case 0: { // GameNotStarted
+            f_23(v13);
+            break;
+        }
+        case 1: { // GameOver
+            Union1 v14 = v2.case1.v0; Union1 v15 = v2.case1.v1;
+            f_26(v13, v14, v15);
+            break;
+        }
+        case 2: { // WaitingForActionFromPlayerId
+            long v16 = v2.case2.v0;
+            f_22(v13, v16);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+    long v17;
+    v17 = v3.tag;
+    f_28(v0, v17);
+    unsigned char * v18;
+    v18 = (unsigned char *)(v0+40ull);
+    switch (v3.tag) {
+        case 0: { // GameStarted
+            f_23(v18);
+            break;
+        }
+        case 1: { // ShowdownResult
+            Union1 v19 = v3.case1.v0; Union1 v20 = v3.case1.v1;
+            f_26(v18, v19, v20);
+            break;
+        }
+        case 2: { // WaitingToStart
+            f_23(v18);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+    long v21;
+    v21 = v4.tag;
+    f_29(v0, v21);
+    unsigned char * v22;
+    v22 = (unsigned char *)(v0+52ull);
+    switch (v4.tag) {
+        case 0: { // Computer
+            f_23(v22);
+            break;
+        }
+        case 1: { // Human
+            f_23(v22);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+    long v23;
+    v23 = v5.tag;
+    f_30(v0, v23);
+    unsigned char * v24;
+    v24 = (unsigned char *)(v0+56ull);
+    switch (v5.tag) {
+        case 0: { // Computer
+            return f_23(v24);
+            break;
+        }
+        case 1: { // Human
+            return f_23(v24);
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+}
+__device__ void f_19(unsigned char * v0, static_array<Union3,2l> v1, Union4 v2, Union5 v3, Union2 v4, Union2 v5){
+    return f_20(v0, v1, v2, v3, v4, v5);
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
     long v2;
@@ -697,7 +1370,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
     long v3;
     v3 = blockIdx.x;
     long v4;
-    v4 = v3 * 512l;
+    v4 = v3 * 32l;
     long v5;
     v5 = v2 + v4;
     bool v6;
@@ -708,539 +1381,61 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
         unsigned long long v8;
         v8 = (unsigned long long)v5;
         curandStatePhilox4_32_10_t v9;
-        curandStatePhilox4_32_10_t * v10 = &v9;
-        curand_init(v7,v8,0ull,v10);
-        long * v11;
-        v11 = (long *)(v1+0ull);
-        long v12;
-        v12 = v11[0l];
-        US0 v36;
-        switch (v12) {
-            case 0: {
-                long * v14;
-                v14 = (long *)(v1+4ull);
-                long v15;
-                v15 = v14[0l];
-                US1 v20;
-                switch (v15) {
-                    case 0: {
-                        v20 = US1_0();
-                        break;
-                    }
-                    case 1: {
-                        v20 = US1_1();
-                        break;
-                    }
-                    case 2: {
-                        v20 = US1_2();
-                        break;
-                    }
-                    default: {
-                        printf("%s\n", "Invalid tag.");
-                        asm("exit;");
-                    }
-                }
-                v36 = US0_0(v20);
-                break;
-            }
-            case 1: {
-                long * v22;
-                v22 = (long *)(v1+4ull);
-                long v23;
-                v23 = v22[0l];
-                US2 v27;
-                switch (v23) {
-                    case 0: {
-                        v27 = US2_0();
-                        break;
-                    }
-                    case 1: {
-                        v27 = US2_1();
-                        break;
-                    }
-                    default: {
-                        printf("%s\n", "Invalid tag.");
-                        asm("exit;");
-                    }
-                }
-                long * v28;
-                v28 = (long *)(v1+8ull);
-                long v29;
-                v29 = v28[0l];
-                US2 v33;
-                switch (v29) {
-                    case 0: {
-                        v33 = US2_0();
-                        break;
-                    }
-                    case 1: {
-                        v33 = US2_1();
-                        break;
-                    }
-                    default: {
-                        printf("%s\n", "Invalid tag.");
-                        asm("exit;");
-                    }
-                }
-                v36 = US0_1(v27, v33);
-                break;
-            }
-            case 2: {
-                v36 = US0_2();
-                break;
-            }
-            default: {
-                printf("%s\n", "Invalid tag.");
-                asm("exit;");
-            }
-        }
-        static_array<US3,2l> v37;
-        long v38;
-        v38 = 0l;
-        while (while_method_0(v38)){
-            unsigned long long v40;
-            v40 = (unsigned long long)v38;
-            unsigned long long v41;
-            v41 = v40 * 8ull;
-            unsigned char * v42;
-            v42 = (unsigned char *)(v0+v41);
-            long * v43;
-            v43 = (long *)(v42+0ull);
-            long v44;
-            v44 = v43[0l];
-            US3 v55;
-            switch (v44) {
-                case 0: {
-                    v55 = US3_0();
-                    break;
-                }
-                case 1: {
-                    long * v47;
-                    v47 = (long *)(v42+4ull);
-                    long v48;
-                    v48 = v47[0l];
-                    US1 v53;
-                    switch (v48) {
-                        case 0: {
-                            v53 = US1_0();
-                            break;
-                        }
-                        case 1: {
-                            v53 = US1_1();
-                            break;
-                        }
-                        case 2: {
-                            v53 = US1_2();
-                            break;
-                        }
-                        default: {
-                            printf("%s\n", "Invalid tag.");
-                            asm("exit;");
-                        }
-                    }
-                    v55 = US3_1(v53);
-                    break;
-                }
-                default: {
-                    printf("%s\n", "Invalid tag.");
-                    asm("exit;");
-                }
-            }
-            bool v56;
-            v56 = 0l <= v38;
-            bool v58;
-            if (v56){
-                bool v57;
-                v57 = v38 < 2l;
-                v58 = v57;
-            } else {
-                v58 = false;
-            }
-            bool v59;
-            v59 = v58 == false;
-            if (v59){
-                assert("The read index needs to be in range." && v58);
-            } else {
-            }
-            v37.v[v38] = v55;
-            v38 += 1l ;
-        }
-        long * v60;
-        v60 = (long *)(v0+16ull);
-        long v61;
-        v61 = v60[0l];
-        US4 v82;
-        switch (v61) {
-            case 0: {
-                v82 = US4_0();
-                break;
-            }
-            case 1: {
-                long * v64;
-                v64 = (long *)(v0+20ull);
-                long v65;
-                v65 = v64[0l];
-                US1 v70;
-                switch (v65) {
-                    case 0: {
-                        v70 = US1_0();
-                        break;
-                    }
-                    case 1: {
-                        v70 = US1_1();
-                        break;
-                    }
-                    case 2: {
-                        v70 = US1_2();
-                        break;
-                    }
-                    default: {
-                        printf("%s\n", "Invalid tag.");
-                        asm("exit;");
-                    }
-                }
-                long * v71;
-                v71 = (long *)(v0+24ull);
-                long v72;
-                v72 = v71[0l];
-                US1 v77;
-                switch (v72) {
-                    case 0: {
-                        v77 = US1_0();
-                        break;
-                    }
-                    case 1: {
-                        v77 = US1_1();
-                        break;
-                    }
-                    case 2: {
-                        v77 = US1_2();
-                        break;
-                    }
-                    default: {
-                        printf("%s\n", "Invalid tag.");
-                        asm("exit;");
-                    }
-                }
-                v82 = US4_1(v70, v77);
-                break;
-            }
-            case 2: {
-                long * v79;
-                v79 = (long *)(v0+20ull);
-                long v80;
-                v80 = v79[0l];
-                v82 = US4_2(v80);
-                break;
-            }
-            default: {
-                printf("%s\n", "Invalid tag.");
-                asm("exit;");
-            }
-        }
-        long * v83;
-        v83 = (long *)(v0+28ull);
-        long v84;
-        v84 = v83[0l];
-        US5 v103;
-        switch (v84) {
-            case 0: {
-                v103 = US5_0();
-                break;
-            }
-            case 1: {
-                long * v87;
-                v87 = (long *)(v0+32ull);
-                long v88;
-                v88 = v87[0l];
-                US1 v93;
-                switch (v88) {
-                    case 0: {
-                        v93 = US1_0();
-                        break;
-                    }
-                    case 1: {
-                        v93 = US1_1();
-                        break;
-                    }
-                    case 2: {
-                        v93 = US1_2();
-                        break;
-                    }
-                    default: {
-                        printf("%s\n", "Invalid tag.");
-                        asm("exit;");
-                    }
-                }
-                long * v94;
-                v94 = (long *)(v0+36ull);
-                long v95;
-                v95 = v94[0l];
-                US1 v100;
-                switch (v95) {
-                    case 0: {
-                        v100 = US1_0();
-                        break;
-                    }
-                    case 1: {
-                        v100 = US1_1();
-                        break;
-                    }
-                    case 2: {
-                        v100 = US1_2();
-                        break;
-                    }
-                    default: {
-                        printf("%s\n", "Invalid tag.");
-                        asm("exit;");
-                    }
-                }
-                v103 = US5_1(v93, v100);
-                break;
-            }
-            case 2: {
-                v103 = US5_2();
-                break;
-            }
-            default: {
-                printf("%s\n", "Invalid tag.");
-                asm("exit;");
-            }
-        }
-        long * v104;
-        v104 = (long *)(v0+40ull);
-        long v105;
-        v105 = v104[0l];
-        US2 v109;
-        switch (v105) {
-            case 0: {
-                v109 = US2_0();
-                break;
-            }
-            case 1: {
-                v109 = US2_1();
-                break;
-            }
-            default: {
-                printf("%s\n", "Invalid tag.");
-                asm("exit;");
-            }
-        }
-        long * v110;
-        v110 = (long *)(v0+44ull);
-        long v111;
-        v111 = v110[0l];
-        US2 v115;
-        switch (v111) {
-            case 0: {
-                v115 = US2_0();
-                break;
-            }
-            case 1: {
-                v115 = US2_1();
-                break;
-            }
-            default: {
-                printf("%s\n", "Invalid tag.");
-                asm("exit;");
-            }
-        }
-        static_array<US3,2l> v116; US4 v117; US5 v118; US2 v119; US2 v120;
-        Tuple0 tmp5 = method_0(v10, v37, v82, v103, v109, v115, v36);
-        v116 = tmp5.v0; v117 = tmp5.v1; v118 = tmp5.v2; v119 = tmp5.v3; v120 = tmp5.v4;
-        long v121;
-        v121 = 0l;
-        while (while_method_0(v121)){
-            unsigned long long v123;
-            v123 = (unsigned long long)v121;
-            unsigned long long v124;
-            v124 = v123 * 8ull;
-            unsigned char * v125;
-            v125 = (unsigned char *)(v0+v124);
-            bool v126;
-            v126 = 0l <= v121;
-            bool v128;
-            if (v126){
-                bool v127;
-                v127 = v121 < 2l;
-                v128 = v127;
-            } else {
-                v128 = false;
-            }
-            bool v129;
-            v129 = v128 == false;
-            if (v129){
-                assert("The read index needs to be in range." && v128);
-            } else {
-            }
-            US3 v130;
-            v130 = v116.v[v121];
-            long v131;
-            v131 = v130.tag;
-            long * v132;
-            v132 = (long *)(v125+0ull);
-            v132[0l] = v131;
-            switch (v130.tag) {
-                case 0: { // None
-                    break;
-                }
-                default: { // Some
-                    US1 v133 = v130.v.case1.v0;
-                    long v134;
-                    v134 = v133.tag;
-                    long * v135;
-                    v135 = (long *)(v125+4ull);
-                    v135[0l] = v134;
-                    switch (v133.tag) {
-                        case 0: { // Paper
-                            break;
-                        }
-                        case 1: { // Rock
-                            break;
-                        }
-                        default: { // Scissors
-                        }
-                    }
-                }
-            }
-            v121 += 1l ;
-        }
-        long v136;
-        v136 = v117.tag;
-        long * v137;
-        v137 = (long *)(v0+16ull);
-        v137[0l] = v136;
-        switch (v117.tag) {
-            case 0: { // GameNotStarted
-                break;
-            }
-            case 1: { // GameOver
-                US1 v138 = v117.v.case1.v0; US1 v139 = v117.v.case1.v1;
-                long v140;
-                v140 = v138.tag;
-                long * v141;
-                v141 = (long *)(v0+20ull);
-                v141[0l] = v140;
-                switch (v138.tag) {
-                    case 0: { // Paper
-                        break;
-                    }
-                    case 1: { // Rock
-                        break;
-                    }
-                    default: { // Scissors
-                    }
-                }
-                long v142;
-                v142 = v139.tag;
-                long * v143;
-                v143 = (long *)(v0+24ull);
-                v143[0l] = v142;
-                switch (v139.tag) {
-                    case 0: { // Paper
-                        break;
-                    }
-                    case 1: { // Rock
-                        break;
-                    }
-                    default: { // Scissors
-                    }
-                }
-                break;
-            }
-            default: { // WaitingForActionFromPlayerId
-                long v144 = v117.v.case2.v0;
-                long * v145;
-                v145 = (long *)(v0+20ull);
-                v145[0l] = v144;
-            }
-        }
-        long v146;
-        v146 = v118.tag;
-        long * v147;
-        v147 = (long *)(v0+28ull);
-        v147[0l] = v146;
-        switch (v118.tag) {
-            case 0: { // GameStarted
-                break;
-            }
-            case 1: { // ShowdownResult
-                US1 v148 = v118.v.case1.v0; US1 v149 = v118.v.case1.v1;
-                long v150;
-                v150 = v148.tag;
-                long * v151;
-                v151 = (long *)(v0+32ull);
-                v151[0l] = v150;
-                switch (v148.tag) {
-                    case 0: { // Paper
-                        break;
-                    }
-                    case 1: { // Rock
-                        break;
-                    }
-                    default: { // Scissors
-                    }
-                }
-                long v152;
-                v152 = v149.tag;
-                long * v153;
-                v153 = (long *)(v0+36ull);
-                v153[0l] = v152;
-                switch (v149.tag) {
-                    case 0: { // Paper
-                        break;
-                    }
-                    case 1: { // Rock
-                        break;
-                    }
-                    default: { // Scissors
-                    }
-                }
-                break;
-            }
-            default: { // WaitingToStart
-            }
-        }
-        long v154;
-        v154 = v119.tag;
-        long * v155;
-        v155 = (long *)(v0+40ull);
-        v155[0l] = v154;
-        switch (v119.tag) {
-            case 0: { // Computer
-                break;
-            }
-            default: { // Human
-            }
-        }
-        long v156;
-        v156 = v120.tag;
-        long * v157;
-        v157 = (long *)(v0+44ull);
-        v157[0l] = v156;
-        switch (v120.tag) {
-            case 0: { // Computer
-                return ;
-                break;
-            }
-            default: { // Human
-                return ;
-            }
-        }
+        curand_init(v7,v8,0ull,&v9);
+        Union0 v10;
+        v10 = f_0(v0);
+        static_array<Union3,2l> v11; Union4 v12; Union5 v13; Union2 v14; Union2 v15;
+        Tuple1 tmp4 = f_6(v1);
+        v11 = tmp4.v0; v12 = tmp4.v1; v13 = tmp4.v2; v14 = tmp4.v3; v15 = tmp4.v4;
+        static_array<Union3,2l> v16; Union4 v17; Union5 v18; Union2 v19; Union2 v20;
+        Tuple1 tmp10 = method_14(v9, v11, v12, v13, v14, v15, v10);
+        v16 = tmp10.v0; v17 = tmp10.v1; v18 = tmp10.v2; v19 = tmp10.v3; v20 = tmp10.v4;
+        return f_19(v1, v16, v17, v18, v19, v20);
     } else {
         return ;
     }
 }
 """
-class static_array(list):
+class static_array():
     def __init__(self, length):
+        self.ptr = []
         for _ in range(length):
-            self.append(None)
+            self.ptr.append(None)
+
+    def __getitem__(self, index):
+        assert 0 <= index < len(self.ptr), "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < len(self.ptr), "The set index needs to be in range."
+        self.ptr[index] = value
 
 class static_array_list(static_array):
     def __init__(self, length):
         super().__init__(length)
-        self.length = length
+        self.length = 0
+
+    def __getitem__(self, index):
+        assert 0 <= index < self.length, "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < self.length, "The set index needs to be in range."
+        self.ptr[index] = value
+
+    def push(self,value):
+        assert (self.length < len(self.ptr)), "The length before pushing has to be less than the maximum length of the array."
+        self.ptr[self.length] = value
+        self.length += 1
+
+    def pop(self):
+        assert (0 < self.length), "The length before popping has to be greater than 0."
+        self.length -= 1
+        return self.ptr[self.length]
+
+    def unsafe_set_length(self,i):
+        assert 0 <= i <= len(self.ptr), "The new length has to be in range."
+        self.length = i
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
@@ -1248,12 +1443,11 @@ i8 = i16 = i32 = i64 = u8 = u16 = u32 = u64 = int; f32 = f64 = float; char = str
 
 import random
 options = []
-options.append('--define-macro=NDEBUG')
-options.append('--diag-suppress=550,20012')
+options.append('--diag-suppress=550,20012,68')
 options.append('--dopt=on')
 options.append('--restrict')
-options.append('--maxrregcount=128')
-raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))
+options.append('-I C:/Spiral_s_ML_Library/cpplib')
+raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
 import collections
 class US1_0(NamedTuple): # Paper
     tag = 0
@@ -1305,404 +1499,51 @@ US5 = Union[US5_0, US5_1]
 def Closure0():
     def inner(v0 : object, v1 : object) -> object:
         v2 = method0(v0)
-        v3, v4, v5, v6, v7 = method4(v1)
-        v8, v9, v10, v11, v12 = method9(v3, v4, v5, v6, v7, v2)
+        v3, v4, v5, v6, v7 = method6(v1)
+        v8, v9, v10, v11, v12 = method18(v3, v4, v5, v6, v7, v2)
         del v2, v3, v4, v5, v6, v7
-        return method12(v8, v9, v10, v11, v12)
+        return method21(v8, v9, v10, v11, v12)
     return inner
 def Closure1():
     def inner(v0 : object, v1 : object) -> object:
         v2 = cp.empty(16,dtype=cp.uint8)
-        v3 = cp.empty(48,dtype=cp.uint8)
+        v3 = cp.empty(64,dtype=cp.uint8)
         v4 = method0(v0)
-        v5, v6, v7, v8, v9 = method4(v1)
-        v10 = v4.tag
-        v11 = v2[0:].view(cp.int32)
-        v11[0] = v10
-        del v10, v11
-        match v4:
-            case US0_0(v12): # ActionSelected
-                v13 = v12.tag
-                v14 = v2[4:].view(cp.int32)
-                v14[0] = v13
-                del v13, v14
-                match v12:
-                    case US1_0(): # Paper
-                        del v12
-                    case US1_1(): # Rock
-                        del v12
-                    case US1_2(): # Scissors
-                        del v12
-                    case t:
-                        raise Exception(f'Pattern matching miss. Got: {t}')
-            case US0_1(v15, v16): # PlayerChanged
-                v17 = v15.tag
-                v18 = v2[4:].view(cp.int32)
-                v18[0] = v17
-                del v17, v18
-                match v15:
-                    case US2_0(): # Computer
-                        pass
-                    case US2_1(): # Human
-                        pass
-                    case t:
-                        raise Exception(f'Pattern matching miss. Got: {t}')
-                del v15
-                v19 = v16.tag
-                v20 = v2[8:].view(cp.int32)
-                v20[0] = v19
-                del v19, v20
-                match v16:
-                    case US2_0(): # Computer
-                        del v16
-                    case US2_1(): # Human
-                        del v16
-                    case t:
-                        raise Exception(f'Pattern matching miss. Got: {t}')
-            case US0_2(): # StartGame
-                pass
-            case t:
-                raise Exception(f'Pattern matching miss. Got: {t}')
+        v5, v6, v7, v8, v9 = method6(v1)
+        method36(v2, v4)
         del v4
-        v21 = 0
-        while method11(v21):
-            v23 = u64(v21)
-            v24 = v23 * 8
-            del v23
-            v25 = v3[v24:].view(cp.uint8)
-            del v24
-            v26 = 0 <= v21
-            if v26:
-                v27 = v21 < 2
-                v28 = v27
-            else:
-                v28 = False
-            del v26
-            v29 = v28 == False
-            if v29:
-                v30 = "The read index needs to be in range."
-                assert v28, v30
-                del v30
-            else:
-                pass
-            del v28, v29
-            v31 = v5[v21]
-            v32 = v31.tag
-            v33 = v25[0:].view(cp.int32)
-            v33[0] = v32
-            del v32, v33
-            match v31:
-                case US5_0(): # None
-                    pass
-                case US5_1(v34): # Some
-                    v35 = v34.tag
-                    v36 = v25[4:].view(cp.int32)
-                    v36[0] = v35
-                    del v35, v36
-                    match v34:
-                        case US1_0(): # Paper
-                            del v34
-                        case US1_1(): # Rock
-                            del v34
-                        case US1_2(): # Scissors
-                            del v34
-                        case t:
-                            raise Exception(f'Pattern matching miss. Got: {t}')
-                case t:
-                    raise Exception(f'Pattern matching miss. Got: {t}')
-            del v25, v31
-            v21 += 1 
-        del v5, v21
-        v37 = v6.tag
-        v38 = v3[16:].view(cp.int32)
-        v38[0] = v37
-        del v37, v38
-        match v6:
-            case US3_0(): # GameNotStarted
-                pass
-            case US3_1(v39, v40): # GameOver
-                v41 = v39.tag
-                v42 = v3[20:].view(cp.int32)
-                v42[0] = v41
-                del v41, v42
-                match v39:
-                    case US1_0(): # Paper
-                        pass
-                    case US1_1(): # Rock
-                        pass
-                    case US1_2(): # Scissors
-                        pass
-                    case t:
-                        raise Exception(f'Pattern matching miss. Got: {t}')
-                del v39
-                v43 = v40.tag
-                v44 = v3[24:].view(cp.int32)
-                v44[0] = v43
-                del v43, v44
-                match v40:
-                    case US1_0(): # Paper
-                        del v40
-                    case US1_1(): # Rock
-                        del v40
-                    case US1_2(): # Scissors
-                        del v40
-                    case t:
-                        raise Exception(f'Pattern matching miss. Got: {t}')
-            case US3_2(v45): # WaitingForActionFromPlayerId
-                v46 = v3[20:].view(cp.int32)
-                v46[0] = v45
-                del v45, v46
-            case t:
-                raise Exception(f'Pattern matching miss. Got: {t}')
-        del v6
-        v47 = v7.tag
-        v48 = v3[28:].view(cp.int32)
-        v48[0] = v47
-        del v47, v48
-        match v7:
-            case US4_0(): # GameStarted
-                pass
-            case US4_1(v49, v50): # ShowdownResult
-                v51 = v49.tag
-                v52 = v3[32:].view(cp.int32)
-                v52[0] = v51
-                del v51, v52
-                match v49:
-                    case US1_0(): # Paper
-                        pass
-                    case US1_1(): # Rock
-                        pass
-                    case US1_2(): # Scissors
-                        pass
-                    case t:
-                        raise Exception(f'Pattern matching miss. Got: {t}')
-                del v49
-                v53 = v50.tag
-                v54 = v3[36:].view(cp.int32)
-                v54[0] = v53
-                del v53, v54
-                match v50:
-                    case US1_0(): # Paper
-                        del v50
-                    case US1_1(): # Rock
-                        del v50
-                    case US1_2(): # Scissors
-                        del v50
-                    case t:
-                        raise Exception(f'Pattern matching miss. Got: {t}')
-            case US4_2(): # WaitingToStart
-                pass
-            case t:
-                raise Exception(f'Pattern matching miss. Got: {t}')
-        del v7
-        v55 = v8.tag
-        v56 = v3[40:].view(cp.int32)
-        v56[0] = v55
-        del v55, v56
-        match v8:
-            case US2_0(): # Computer
-                pass
-            case US2_1(): # Human
-                pass
-            case t:
-                raise Exception(f'Pattern matching miss. Got: {t}')
-        del v8
-        v57 = v9.tag
-        v58 = v3[44:].view(cp.int32)
-        v58[0] = v57
-        del v57, v58
-        match v9:
-            case US2_0(): # Computer
-                pass
-            case US2_1(): # Human
-                pass
-            case t:
-                raise Exception(f'Pattern matching miss. Got: {t}')
-        del v9
-        v59 = 0
-        v60 = raw_module.get_function(f"entry{v59}")
-        del v59
-        v60.max_dynamic_shared_size_bytes = 0 
-        v60((1,),(512,),(v3, v2),shared_mem=0)
-        del v2, v60
-        v61 = static_array(2)
-        v62 = 0
-        while method11(v62):
-            v64 = u64(v62)
-            v65 = v64 * 8
-            del v64
-            v66 = v3[v65:].view(cp.uint8)
-            del v65
-            v67 = v66[0:].view(cp.int32)
-            v68 = v67[0].item()
-            del v67
-            if v68 == 0:
-                v79 = US5_0()
-            elif v68 == 1:
-                v71 = v66[4:].view(cp.int32)
-                v72 = v71[0].item()
-                del v71
-                if v72 == 0:
-                    v77 = US1_0()
-                elif v72 == 1:
-                    v77 = US1_1()
-                elif v72 == 2:
-                    v77 = US1_2()
-                else:
-                    raise Exception("Invalid tag.")
-                del v72
-                v79 = US5_1(v77)
-            else:
-                raise Exception("Invalid tag.")
-            del v66, v68
-            v80 = 0 <= v62
-            if v80:
-                v81 = v62 < 2
-                v82 = v81
-            else:
-                v82 = False
-            del v80
-            v83 = v82 == False
-            if v83:
-                v84 = "The read index needs to be in range."
-                assert v82, v84
-                del v84
-            else:
-                pass
-            del v82, v83
-            v61[v62] = v79
-            del v79
-            v62 += 1 
-        del v62
-        v85 = v3[16:].view(cp.int32)
-        v86 = v85[0].item()
-        del v85
-        if v86 == 0:
-            v107 = US3_0()
-        elif v86 == 1:
-            v89 = v3[20:].view(cp.int32)
-            v90 = v89[0].item()
-            del v89
-            if v90 == 0:
-                v95 = US1_0()
-            elif v90 == 1:
-                v95 = US1_1()
-            elif v90 == 2:
-                v95 = US1_2()
-            else:
-                raise Exception("Invalid tag.")
-            del v90
-            v96 = v3[24:].view(cp.int32)
-            v97 = v96[0].item()
-            del v96
-            if v97 == 0:
-                v102 = US1_0()
-            elif v97 == 1:
-                v102 = US1_1()
-            elif v97 == 2:
-                v102 = US1_2()
-            else:
-                raise Exception("Invalid tag.")
-            del v97
-            v107 = US3_1(v95, v102)
-        elif v86 == 2:
-            v104 = v3[20:].view(cp.int32)
-            v105 = v104[0].item()
-            del v104
-            v107 = US3_2(v105)
-        else:
-            raise Exception("Invalid tag.")
-        del v86
-        v108 = v3[28:].view(cp.int32)
-        v109 = v108[0].item()
-        del v108
-        if v109 == 0:
-            v128 = US4_0()
-        elif v109 == 1:
-            v112 = v3[32:].view(cp.int32)
-            v113 = v112[0].item()
-            del v112
-            if v113 == 0:
-                v118 = US1_0()
-            elif v113 == 1:
-                v118 = US1_1()
-            elif v113 == 2:
-                v118 = US1_2()
-            else:
-                raise Exception("Invalid tag.")
-            del v113
-            v119 = v3[36:].view(cp.int32)
-            v120 = v119[0].item()
-            del v119
-            if v120 == 0:
-                v125 = US1_0()
-            elif v120 == 1:
-                v125 = US1_1()
-            elif v120 == 2:
-                v125 = US1_2()
-            else:
-                raise Exception("Invalid tag.")
-            del v120
-            v128 = US4_1(v118, v125)
-        elif v109 == 2:
-            v128 = US4_2()
-        else:
-            raise Exception("Invalid tag.")
-        del v109
-        v129 = v3[40:].view(cp.int32)
-        v130 = v129[0].item()
-        del v129
-        if v130 == 0:
-            v134 = US2_0()
-        elif v130 == 1:
-            v134 = US2_1()
-        else:
-            raise Exception("Invalid tag.")
-        del v130
-        v135 = v3[44:].view(cp.int32)
+        method42(v3, v5, v6, v7, v8, v9)
+        del v5, v6, v7, v8, v9
+        v10 = 0
+        v11 = raw_module.get_function(f"entry{v10}")
+        del v10
+        v11.max_dynamic_shared_size_bytes = 0 
+        v11((1,),(32,),(v2, v3),shared_mem=0)
+        del v2, v11
+        v12, v13, v14, v15, v16 = method50(v3)
         del v3
-        v136 = v135[0].item()
-        del v135
-        if v136 == 0:
-            v140 = US2_0()
-        elif v136 == 1:
-            v140 = US2_1()
-        else:
-            raise Exception("Invalid tag.")
-        del v136
-        return method12(v61, v107, v128, v134, v140)
+        return method21(v12, v13, v14, v15, v16)
     return inner
 def Closure2():
     def inner() -> object:
         v0 = static_array(2)
         v1 = 0
-        while method11(v1):
-            v3 = 0 <= v1
-            if v3:
-                v4 = v1 < 2
-                v5 = v4
-            else:
-                v5 = False
+        while method20(v1):
+            v3 = US5_0()
+            v0[v1] = v3
             del v3
-            v6 = v5 == False
-            if v6:
-                v7 = "The read index needs to be in range."
-                assert v5, v7
-                del v7
-            else:
-                pass
-            del v5, v6
-            v8 = US5_0()
-            v0[v1] = v8
-            del v8
             v1 += 1 
         del v1
-        v9 = US3_0()
-        v10 = US4_2()
-        v11 = US2_0()
-        v12 = US2_1()
-        return method18(v0, v9, v10, v11, v12)
+        v4 = US3_0()
+        v5 = US4_2()
+        v6 = US2_0()
+        v7 = US2_1()
+        return method62(v0, v4, v5, v6, v7)
     return inner
+def method3(v0 : object) -> None:
+    assert v0 == [], f'Expected an unit type. Got: {v0}'
+    del v0
+    return 
 def method2(v0 : object) -> US1:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
@@ -1710,7 +1551,7 @@ def method2(v0 : object) -> US1:
     v4 = "Paper" == v1
     if v4:
         del v1, v4
-        assert v2 == [], f'Expected an unit type. Got: {v2}'
+        method3(v2)
         del v2
         return US1_0()
     else:
@@ -1718,7 +1559,7 @@ def method2(v0 : object) -> US1:
         v7 = "Rock" == v1
         if v7:
             del v1, v7
-            assert v2 == [], f'Expected an unit type. Got: {v2}'
+            method3(v2)
             del v2
             return US1_1()
         else:
@@ -1726,7 +1567,7 @@ def method2(v0 : object) -> US1:
             v10 = "Scissors" == v1
             if v10:
                 del v1, v10
-                assert v2 == [], f'Expected an unit type. Got: {v2}'
+                method3(v2)
                 del v2
                 return US1_2()
             else:
@@ -1734,14 +1575,14 @@ def method2(v0 : object) -> US1:
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
-def method3(v0 : object) -> US2:
+def method5(v0 : object) -> US2:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v4 = "Computer" == v1
     if v4:
         del v1, v4
-        assert v2 == [], f'Expected an unit type. Got: {v2}'
+        method3(v2)
         del v2
         return US2_0()
     else:
@@ -1749,7 +1590,7 @@ def method3(v0 : object) -> US2:
         v7 = "Human" == v1
         if v7:
             del v1, v7
-            assert v2 == [], f'Expected an unit type. Got: {v2}'
+            method3(v2)
             del v2
             return US2_1()
         else:
@@ -1757,6 +1598,15 @@ def method3(v0 : object) -> US2:
             raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
             del v1
             raise Exception("Error")
+def method4(v0 : object) -> Tuple[US2, US2]:
+    v1 = v0[0] # type: ignore
+    v2 = method5(v1)
+    del v1
+    v3 = v0[1] # type: ignore
+    del v0
+    v4 = method5(v3)
+    del v3
+    return v2, v4
 def method1(v0 : object) -> US0:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
@@ -1772,41 +1622,36 @@ def method1(v0 : object) -> US0:
         v8 = "PlayerChanged" == v1
         if v8:
             del v1, v8
-            v9 = v2[0]
-            v10 = method3(v9)
-            del v9
-            v11 = v2[1]
+            v9, v10 = method4(v2)
             del v2
-            v12 = method3(v11)
-            del v11
-            return US0_1(v10, v12)
+            return US0_1(v9, v10)
         else:
             del v8
-            v15 = "StartGame" == v1
-            if v15:
-                del v1, v15
-                assert v2 == [], f'Expected an unit type. Got: {v2}'
+            v13 = "StartGame" == v1
+            if v13:
+                del v1, v13
+                method3(v2)
                 del v2
                 return US0_2()
             else:
-                del v2, v15
+                del v2, v13
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
 def method0(v0 : object) -> US0:
     return method1(v0)
-def method5(v0 : i32, v1 : i32) -> bool:
+def method11(v0 : i32, v1 : i32) -> bool:
     v2 = v1 < v0
     del v0, v1
     return v2
-def method6(v0 : object) -> US5:
+def method12(v0 : object) -> US5:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v4 = "None" == v1
     if v4:
         del v1, v4
-        assert v2 == [], f'Expected an unit type. Got: {v2}'
+        method3(v2)
         del v2
         return US5_0()
     else:
@@ -1822,14 +1667,57 @@ def method6(v0 : object) -> US5:
             raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
             del v1
             raise Exception("Error")
-def method7(v0 : object) -> US3:
+def method10(v0 : object) -> static_array:
+    assert isinstance(v0,list), f'The object needs to be a Python list. Got: {v0}'
+    v1 = len(v0) # type: ignore
+    v2 = 2 == v1
+    v3 = v2 == False
+    if v3:
+        v4 = "The type level dimension has to equal the value passed at runtime into create."
+        assert v2, v4
+        del v4
+    else:
+        pass
+    del v2, v3
+    v5 = static_array(2)
+    v6 = 0
+    while method11(v1, v6):
+        v8 = v0[v6]
+        v9 = method12(v8)
+        del v8
+        v5[v6] = v9
+        del v9
+        v6 += 1 
+    del v0, v1, v6
+    return v5
+def method9(v0 : object) -> static_array:
+    v1 = v0["past_actions"] # type: ignore
+    del v0
+    v2 = method10(v1)
+    del v1
+    return v2
+def method15(v0 : object) -> Tuple[US1, US1]:
+    v1 = v0[0] # type: ignore
+    v2 = method2(v1)
+    del v1
+    v3 = v0[1] # type: ignore
+    del v0
+    v4 = method2(v3)
+    del v3
+    return v2, v4
+def method16(v0 : object) -> i32:
+    assert isinstance(v0,i32), f'The object needs to be the right primitive type. Got: {v0}'
+    v1 = v0
+    del v0
+    return v1
+def method14(v0 : object) -> US3:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v4 = "GameNotStarted" == v1
     if v4:
         del v1, v4
-        assert v2 == [], f'Expected an unit type. Got: {v2}'
+        method3(v2)
         del v2
         return US3_0()
     else:
@@ -1837,36 +1725,30 @@ def method7(v0 : object) -> US3:
         v7 = "GameOver" == v1
         if v7:
             del v1, v7
-            v8 = v2[0]
-            v9 = method2(v8)
-            del v8
-            v10 = v2[1]
+            v8, v9 = method15(v2)
             del v2
-            v11 = method2(v10)
-            del v10
-            return US3_1(v9, v11)
+            return US3_1(v8, v9)
         else:
             del v7
-            v14 = "WaitingForActionFromPlayerId" == v1
-            if v14:
-                del v1, v14
-                assert isinstance(v2,i32), f'The object needs to be the right primitive type. Got: {v2}'
-                v15 = v2
+            v12 = "WaitingForActionFromPlayerId" == v1
+            if v12:
+                del v1, v12
+                v13 = method16(v2)
                 del v2
-                return US3_2(v15)
+                return US3_2(v13)
             else:
-                del v2, v14
+                del v2, v12
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
-def method8(v0 : object) -> US4:
+def method17(v0 : object) -> US4:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v4 = "GameStarted" == v1
     if v4:
         del v1, v4
-        assert v2 == [], f'Expected an unit type. Got: {v2}'
+        method3(v2)
         del v2
         return US4_0()
     else:
@@ -1874,90 +1756,54 @@ def method8(v0 : object) -> US4:
         v7 = "ShowdownResult" == v1
         if v7:
             del v1, v7
-            v8 = v2[0]
-            v9 = method2(v8)
-            del v8
-            v10 = v2[1]
+            v8, v9 = method15(v2)
             del v2
-            v11 = method2(v10)
-            del v10
-            return US4_1(v9, v11)
+            return US4_1(v8, v9)
         else:
             del v7
-            v14 = "WaitingToStart" == v1
-            if v14:
-                del v1, v14
-                assert v2 == [], f'Expected an unit type. Got: {v2}'
+            v12 = "WaitingToStart" == v1
+            if v12:
+                del v1, v12
+                method3(v2)
                 del v2
                 return US4_2()
             else:
-                del v2, v14
+                del v2, v12
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
-def method4(v0 : object) -> Tuple[static_array, US3, US4, US2, US2]:
+def method13(v0 : object) -> Tuple[US3, US4, US2, US2]:
     v1 = v0["game_state"] # type: ignore
-    v2 = v1["past_actions"] # type: ignore
+    v2 = method14(v1)
     del v1
-    assert isinstance(v2,list), f'The object needs to be a Python list. Got: {v2}'
-    v3 = len(v2)
-    v4 = 2 == v3
-    v5 = v4 == False
-    if v5:
-        v6 = "The type level dimension has to equal the value passed at runtime into create."
-        assert v4, v6
-        del v6
-    else:
-        pass
-    del v4, v5
-    v7 = static_array(2)
-    v8 = 0
-    while method5(v3, v8):
-        v10 = v2[v8]
-        v11 = method6(v10)
-        del v10
-        v12 = 0 <= v8
-        if v12:
-            v13 = v8 < 2
-            v14 = v13
-        else:
-            v14 = False
-        del v12
-        v15 = v14 == False
-        if v15:
-            v16 = "The read index needs to be in range."
-            assert v14, v16
-            del v16
-        else:
-            pass
-        del v14, v15
-        v7[v8] = v11
-        del v11
-        v8 += 1 
-    del v2, v3, v8
-    v17 = v0["ui_state"] # type: ignore
+    v3 = v0["messages"] # type: ignore
+    v4 = method17(v3)
+    del v3
+    v5 = v0["pl_type"] # type: ignore
     del v0
-    v18 = v17["game_state"] # type: ignore
-    v19 = method7(v18)
-    del v18
-    v20 = v17["messages"] # type: ignore
-    v21 = method8(v20)
-    del v20
-    v22 = v17["pl_type"] # type: ignore
-    del v17
-    v23 = v22[0]
-    v24 = method3(v23)
-    del v23
-    v25 = v22[1]
-    del v22
-    v26 = method3(v25)
-    del v25
-    return v7, v19, v21, v24, v26
-def method11(v0 : i32) -> bool:
+    v6, v7 = method4(v5)
+    del v5
+    return v2, v4, v6, v7
+def method8(v0 : object) -> Tuple[static_array, US3, US4, US2, US2]:
+    v1 = v0["game_state"] # type: ignore
+    v2 = method9(v1)
+    del v1
+    v3 = v0["ui_state"] # type: ignore
+    del v0
+    v4, v5, v6, v7 = method13(v3)
+    del v3
+    return v2, v4, v5, v6, v7
+def method7(v0 : object) -> Tuple[static_array, US3, US4, US2, US2]:
+    v1, v2, v3, v4, v5 = method8(v0)
+    del v0
+    return v1, v2, v3, v4, v5
+def method6(v0 : object) -> Tuple[static_array, US3, US4, US2, US2]:
+    return method7(v0)
+def method20(v0 : i32) -> bool:
     v1 = v0 < 2
     del v0
     return v1
-def method10(v0 : US5, v1 : static_array, v2 : US3, v3 : US4, v4 : US2, v5 : US2) -> Tuple[static_array, US3, US4, US2, US2]:
+def method19(v0 : US5, v1 : static_array, v2 : US3, v3 : US4, v4 : US2, v5 : US2) -> Tuple[static_array, US3, US4, US2, US2]:
     match v2:
         case US3_0(): # GameNotStarted
             del v0
@@ -2000,235 +1846,152 @@ def method10(v0 : US5, v1 : static_array, v2 : US3, v3 : US4, v4 : US2, v5 : US2
                         v20 = v8 + 1
                         v21 = static_array(2)
                         v22 = 0
-                        while method11(v22):
-                            v24 = 0 <= v22
-                            if v24:
-                                v25 = v22 < 2
-                                v26 = v25
+                        while method20(v22):
+                            v24 = v1[v22]
+                            v25 = v8 == v22
+                            if v25:
+                                v27 = US5_1(v19)
                             else:
-                                v26 = False
-                            v27 = v26 == False
-                            if v27:
-                                v28 = "The read index needs to be in range."
-                                assert v26, v28
-                                del v28
-                            else:
-                                pass
-                            del v26, v27
-                            v29 = v1[v22]
-                            v30 = v8 == v22
-                            if v30:
-                                v32 = US5_1(v19)
-                            else:
-                                v32 = v29
-                            del v29, v30
-                            if v24:
-                                v33 = v22 < 2
-                                v34 = v33
-                            else:
-                                v34 = False
-                            del v24
-                            v35 = v34 == False
-                            if v35:
-                                v36 = "The read index needs to be in range."
-                                assert v34, v36
-                                del v36
-                            else:
-                                pass
-                            del v34, v35
-                            v21[v22] = v32
-                            del v32
+                                v27 = v24
+                            del v24, v25
+                            v21[v22] = v27
+                            del v27
                             v22 += 1 
                         del v1, v8, v19, v22
-                        v37 = US5_0()
-                        v38 = US3_2(v20)
+                        v28 = US5_0()
+                        v29 = US3_2(v20)
                         del v20
-                        return method10(v37, v21, v38, v3, v4, v5)
+                        return method19(v28, v21, v29, v3, v4, v5)
                     case US2_1(): # Human
                         del v11
                         match v0:
                             case US5_0(): # None
                                 del v0, v8
                                 return v1, v2, v3, v4, v5
-                            case US5_1(v44): # Some
+                            case US5_1(v35): # Some
                                 del v0, v2
-                                v45 = v8 + 1
-                                v46 = static_array(2)
-                                v47 = 0
-                                while method11(v47):
-                                    v49 = 0 <= v47
-                                    if v49:
-                                        v50 = v47 < 2
-                                        v51 = v50
+                                v36 = v8 + 1
+                                v37 = static_array(2)
+                                v38 = 0
+                                while method20(v38):
+                                    v40 = v1[v38]
+                                    v41 = v8 == v38
+                                    if v41:
+                                        v43 = US5_1(v35)
                                     else:
-                                        v51 = False
-                                    v52 = v51 == False
-                                    if v52:
-                                        v53 = "The read index needs to be in range."
-                                        assert v51, v53
-                                        del v53
-                                    else:
-                                        pass
-                                    del v51, v52
-                                    v54 = v1[v47]
-                                    v55 = v8 == v47
-                                    if v55:
-                                        v57 = US5_1(v44)
-                                    else:
-                                        v57 = v54
-                                    del v54, v55
-                                    if v49:
-                                        v58 = v47 < 2
-                                        v59 = v58
-                                    else:
-                                        v59 = False
-                                    del v49
-                                    v60 = v59 == False
-                                    if v60:
-                                        v61 = "The read index needs to be in range."
-                                        assert v59, v61
-                                        del v61
-                                    else:
-                                        pass
-                                    del v59, v60
-                                    v46[v47] = v57
-                                    del v57
-                                    v47 += 1 
-                                del v1, v8, v44, v47
-                                v62 = US5_0()
-                                v63 = US3_2(v45)
-                                del v45
-                                return method10(v62, v46, v63, v3, v4, v5)
+                                        v43 = v40
+                                    del v40, v41
+                                    v37[v38] = v43
+                                    del v43
+                                    v38 += 1 
+                                del v1, v8, v35, v38
+                                v44 = US5_0()
+                                v45 = US3_2(v36)
+                                del v36
+                                return method19(v44, v37, v45, v3, v4, v5)
                             case t:
                                 raise Exception(f'Pattern matching miss. Got: {t}')
                     case t:
                         raise Exception(f'Pattern matching miss. Got: {t}')
             else:
                 del v0, v2, v3, v8, v9
-                v89 = v1[0]
-                v90 = v1[1]
+                v71 = v1[0]
+                v72 = v1[1]
                 del v1
-                match v89:
-                    case US5_1(v91): # Some
-                        del v89
-                        match v90:
-                            case US5_1(v92): # Some
-                                del v90
-                                v93 = static_array(2)
-                                v94 = 0
-                                while method11(v94):
-                                    v96 = 0 <= v94
-                                    if v96:
-                                        v97 = v94 < 2
-                                        v98 = v97
-                                    else:
-                                        v98 = False
-                                    del v96
-                                    v99 = v98 == False
-                                    if v99:
-                                        v100 = "The read index needs to be in range."
-                                        assert v98, v100
-                                        del v100
-                                    else:
-                                        pass
-                                    del v98, v99
-                                    v101 = US5_0()
-                                    v93[v94] = v101
-                                    del v101
-                                    v94 += 1 
-                                del v94
-                                v102 = US3_1(v91, v92)
-                                v103 = US4_1(v91, v92)
-                                del v91, v92
-                                return v93, v102, v103, v4, v5
+                match v71:
+                    case US5_1(v73): # Some
+                        del v71
+                        match v72:
+                            case US5_1(v74): # Some
+                                del v72
+                                v75 = static_array(2)
+                                v76 = 0
+                                while method20(v76):
+                                    v78 = US5_0()
+                                    v75[v76] = v78
+                                    del v78
+                                    v76 += 1 
+                                del v76
+                                v79 = US3_1(v73, v74)
+                                v80 = US4_1(v73, v74)
+                                del v73, v74
+                                return v75, v79, v80, v4, v5
                             case t:
-                                del v4, v5, v90, v91
+                                del v4, v5, v72, v73
                                 raise Exception("At showdown all the actions have to be selected.")
                     case t:
-                        del v4, v5, v89, v90
+                        del v4, v5, v71, v72
                         raise Exception("At showdown all the actions have to be selected.")
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method9(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2, v5 : US0) -> Tuple[static_array, US3, US4, US2, US2]:
+def method18(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2, v5 : US0) -> Tuple[static_array, US3, US4, US2, US2]:
     match v5:
-        case US0_0(v32): # ActionSelected
-            v33 = US5_1(v32)
-            del v32
-            v49, v50, v51, v52, v53 = method10(v33, v0, v1, v2, v3, v4)
-        case US0_1(v24, v25): # PlayerChanged
-            v26 = US5_0()
-            v49, v50, v51, v52, v53 = method10(v26, v0, v1, v2, v24, v25)
+        case US0_0(v27): # ActionSelected
+            v28 = US5_1(v27)
+            del v27
+            v44, v45, v46, v47, v48 = method19(v28, v0, v1, v2, v3, v4)
+        case US0_1(v19, v20): # PlayerChanged
+            v21 = US5_0()
+            v44, v45, v46, v47, v48 = method19(v21, v0, v1, v2, v19, v20)
         case US0_2(): # StartGame
             v6 = static_array(2)
             v7 = 0
-            while method11(v7):
-                v9 = 0 <= v7
-                if v9:
-                    v10 = v7 < 2
-                    v11 = v10
-                else:
-                    v11 = False
+            while method20(v7):
+                v9 = US5_0()
+                v6[v7] = v9
                 del v9
-                v12 = v11 == False
-                if v12:
-                    v13 = "The read index needs to be in range."
-                    assert v11, v13
-                    del v13
-                else:
-                    pass
-                del v11, v12
-                v14 = US5_0()
-                v6[v7] = v14
-                del v14
                 v7 += 1 
             del v7
-            v15 = US5_0()
-            v16 = 0
-            v17 = US3_2(v16)
-            del v16
-            v18 = US4_0()
-            v49, v50, v51, v52, v53 = method10(v15, v6, v17, v18, v3, v4)
+            v10 = US5_0()
+            v11 = 0
+            v12 = US3_2(v11)
+            del v11
+            v13 = US4_0()
+            v44, v45, v46, v47, v48 = method19(v10, v6, v12, v13, v3, v4)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
     del v0, v1, v2, v3, v4, v5
-    return v49, v50, v51, v52, v53
-def method14(v0 : US1) -> object:
+    return v44, v45, v46, v47, v48
+def method27() -> object:
+    v0 = []
+    return v0
+def method28(v0 : US1) -> object:
     match v0:
         case US1_0(): # Paper
             del v0
-            v1 = []
+            v1 = method27()
             v2 = "Paper"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US1_1(): # Rock
             del v0
-            v4 = []
+            v4 = method27()
             v5 = "Rock"
             v6 = [v5,v4]
             del v4, v5
             return v6
         case US1_2(): # Scissors
             del v0
-            v7 = []
+            v7 = method27()
             v8 = "Scissors"
             v9 = [v8,v7]
             del v7, v8
             return v9
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method13(v0 : US5) -> object:
+def method26(v0 : US5) -> object:
     match v0:
         case US5_0(): # None
             del v0
-            v1 = []
+            v1 = method27()
             v2 = "None"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US5_1(v4): # Some
             del v0
-            v5 = method14(v4)
+            v5 = method28(v4)
             del v4
             v6 = "Some"
             v7 = [v6,v5]
@@ -2236,191 +1999,551 @@ def method13(v0 : US5) -> object:
             return v7
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method15(v0 : US3) -> object:
+def method25(v0 : static_array) -> object:
+    v1 = []
+    v2 = 0
+    while method20(v2):
+        v4 = v0[v2]
+        v5 = method26(v4)
+        del v4
+        v1.append(v5)
+        del v5
+        v2 += 1 
+    del v0, v2
+    return v1
+def method24(v0 : static_array) -> object:
+    v1 = method25(v0)
+    del v0
+    v2 = {'past_actions': v1}
+    del v1
+    return v2
+def method31(v0 : US1, v1 : US1) -> object:
+    v2 = []
+    v3 = method28(v0)
+    del v0
+    v2.append(v3)
+    del v3
+    v4 = method28(v1)
+    del v1
+    v2.append(v4)
+    del v4
+    v5 = v2
+    del v2
+    return v5
+def method32(v0 : i32) -> object:
+    v1 = v0
+    del v0
+    return v1
+def method30(v0 : US3) -> object:
     match v0:
         case US3_0(): # GameNotStarted
             del v0
-            v1 = []
+            v1 = method27()
             v2 = "GameNotStarted"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US3_1(v4, v5): # GameOver
             del v0
-            v6 = []
-            v7 = method14(v4)
-            del v4
-            v6.append(v7)
-            del v7
-            v8 = method14(v5)
-            del v5
-            v6.append(v8)
-            del v8
-            v9 = v6
-            del v6
-            v10 = "GameOver"
-            v11 = [v10,v9]
-            del v9, v10
-            return v11
-        case US3_2(v12): # WaitingForActionFromPlayerId
+            v6 = method31(v4, v5)
+            del v4, v5
+            v7 = "GameOver"
+            v8 = [v7,v6]
+            del v6, v7
+            return v8
+        case US3_2(v9): # WaitingForActionFromPlayerId
             del v0
-            v13 = v12
-            del v12
-            v14 = "WaitingForActionFromPlayerId"
-            v15 = [v14,v13]
-            del v13, v14
-            return v15
+            v10 = method32(v9)
+            del v9
+            v11 = "WaitingForActionFromPlayerId"
+            v12 = [v11,v10]
+            del v10, v11
+            return v12
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method16(v0 : US4) -> object:
+def method33(v0 : US4) -> object:
     match v0:
         case US4_0(): # GameStarted
             del v0
-            v1 = []
+            v1 = method27()
             v2 = "GameStarted"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US4_1(v4, v5): # ShowdownResult
             del v0
-            v6 = []
-            v7 = method14(v4)
-            del v4
-            v6.append(v7)
-            del v7
-            v8 = method14(v5)
-            del v5
-            v6.append(v8)
-            del v8
-            v9 = v6
-            del v6
-            v10 = "ShowdownResult"
+            v6 = method31(v4, v5)
+            del v4, v5
+            v7 = "ShowdownResult"
+            v8 = [v7,v6]
+            del v6, v7
+            return v8
+        case US4_2(): # WaitingToStart
+            del v0
+            v9 = method27()
+            v10 = "WaitingToStart"
             v11 = [v10,v9]
             del v9, v10
             return v11
-        case US4_2(): # WaitingToStart
-            del v0
-            v12 = []
-            v13 = "WaitingToStart"
-            v14 = [v13,v12]
-            del v12, v13
-            return v14
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method17(v0 : US2) -> object:
+def method35(v0 : US2) -> object:
     match v0:
         case US2_0(): # Computer
             del v0
-            v1 = []
+            v1 = method27()
             v2 = "Computer"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US2_1(): # Human
             del v0
-            v4 = []
+            v4 = method27()
             v5 = "Human"
             v6 = [v5,v4]
             del v4, v5
             return v6
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method12(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2) -> object:
-    v5 = []
-    v6 = 0
-    while method11(v6):
-        v8 = 0 <= v6
-        if v8:
-            v9 = v6 < 2
-            v10 = v9
-        else:
-            v10 = False
-        del v8
-        v11 = v10 == False
-        if v11:
-            v12 = "The read index needs to be in range."
-            assert v10, v12
-            del v12
-        else:
-            pass
-        del v10, v11
-        v13 = v0[v6]
-        v14 = method13(v13)
-        del v13
-        v5.append(v14)
-        del v14
-        v6 += 1 
-    del v0, v6
-    v15 = {'past_actions': v5}
-    del v5
-    v16 = method15(v1)
-    del v1
-    v17 = method16(v2)
-    del v2
-    v18 = []
-    v19 = method17(v3)
+def method34(v0 : US2, v1 : US2) -> object:
+    v2 = []
+    v3 = method35(v0)
+    del v0
+    v2.append(v3)
     del v3
-    v18.append(v19)
-    del v19
-    v20 = method17(v4)
-    del v4
-    v18.append(v20)
-    del v20
-    v21 = v18
-    del v18
-    v22 = {'game_state': v16, 'messages': v17, 'pl_type': v21}
-    del v16, v17, v21
-    v23 = {'game_state': v15, 'ui_state': v22}
-    del v15, v22
-    return v23
-def method18(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2) -> object:
-    v5 = []
-    v6 = 0
-    while method11(v6):
-        v8 = 0 <= v6
-        if v8:
-            v9 = v6 < 2
-            v10 = v9
-        else:
-            v10 = False
-        del v8
-        v11 = v10 == False
-        if v11:
-            v12 = "The read index needs to be in range."
-            assert v10, v12
-            del v12
-        else:
-            pass
-        del v10, v11
-        v13 = v0[v6]
-        v14 = method13(v13)
-        del v13
-        v5.append(v14)
-        del v14
-        v6 += 1 
-    del v0, v6
-    v15 = {'past_actions': v5}
-    del v5
-    v16 = method15(v1)
+    v4 = method35(v1)
     del v1
-    v17 = method16(v2)
-    del v2
-    v18 = []
-    v19 = method17(v3)
-    del v3
-    v18.append(v19)
-    del v19
-    v20 = method17(v4)
+    v2.append(v4)
     del v4
-    v18.append(v20)
-    del v20
-    v21 = v18
-    del v18
-    v22 = {'game_state': v16, 'messages': v17, 'pl_type': v21}
-    del v16, v17, v21
-    v23 = {'game_state': v15, 'ui_state': v22}
-    del v15, v22
-    return v23
+    v5 = v2
+    del v2
+    return v5
+def method29(v0 : US3, v1 : US4, v2 : US2, v3 : US2) -> object:
+    v4 = method30(v0)
+    del v0
+    v5 = method33(v1)
+    del v1
+    v6 = method34(v2, v3)
+    del v2, v3
+    v7 = {'game_state': v4, 'messages': v5, 'pl_type': v6}
+    del v4, v5, v6
+    return v7
+def method23(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2) -> object:
+    v5 = method24(v0)
+    del v0
+    v6 = method29(v1, v2, v3, v4)
+    del v1, v2, v3, v4
+    v7 = {'game_state': v5, 'ui_state': v6}
+    del v5, v6
+    return v7
+def method22(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2) -> object:
+    return method23(v0, v1, v2, v3, v4)
+def method21(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2) -> object:
+    v5 = method22(v0, v1, v2, v3, v4)
+    del v0, v1, v2, v3, v4
+    return v5
+def method37(v0 : cp.ndarray, v1 : i32) -> None:
+    v2 = v0[0:].view(cp.int32)
+    del v0
+    v2[0] = v1
+    del v1, v2
+    return 
+def method39(v0 : cp.ndarray) -> None:
+    del v0
+    return 
+def method38(v0 : cp.ndarray, v1 : US1) -> None:
+    v2 = v1.tag
+    method37(v0, v2)
+    del v2
+    v3 = v0[4:].view(cp.uint8)
+    del v0
+    match v1:
+        case US1_0(): # Paper
+            del v1
+            return method39(v3)
+        case US1_1(): # Rock
+            del v1
+            return method39(v3)
+        case US1_2(): # Scissors
+            del v1
+            return method39(v3)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method41(v0 : cp.ndarray, v1 : i32) -> None:
+    v2 = v0[4:].view(cp.int32)
+    del v0
+    v2[0] = v1
+    del v1, v2
+    return 
+def method40(v0 : cp.ndarray, v1 : US2, v2 : US2) -> None:
+    v3 = v1.tag
+    method37(v0, v3)
+    del v3
+    v4 = v0[4:].view(cp.uint8)
+    match v1:
+        case US2_0(): # Computer
+            method39(v4)
+        case US2_1(): # Human
+            method39(v4)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+    del v1, v4
+    v5 = v2.tag
+    method41(v0, v5)
+    del v5
+    v6 = v0[8:].view(cp.uint8)
+    del v0
+    match v2:
+        case US2_0(): # Computer
+            del v2
+            return method39(v6)
+        case US2_1(): # Human
+            del v2
+            return method39(v6)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method36(v0 : cp.ndarray, v1 : US0) -> None:
+    v2 = v1.tag
+    method37(v0, v2)
+    del v2
+    v3 = v0[8:].view(cp.uint8)
+    del v0
+    match v1:
+        case US0_0(v4): # ActionSelected
+            del v1
+            return method38(v3, v4)
+        case US0_1(v5, v6): # PlayerChanged
+            del v1
+            return method40(v3, v5, v6)
+        case US0_2(): # StartGame
+            del v1
+            return method39(v3)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method44(v0 : cp.ndarray, v1 : US5) -> None:
+    v2 = v1.tag
+    method37(v0, v2)
+    del v2
+    v3 = v0[4:].view(cp.uint8)
+    del v0
+    match v1:
+        case US5_0(): # None
+            del v1
+            return method39(v3)
+        case US5_1(v4): # Some
+            del v1
+            return method38(v3, v4)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method45(v0 : cp.ndarray, v1 : i32) -> None:
+    v2 = v0[16:].view(cp.int32)
+    del v0
+    v2[0] = v1
+    del v1, v2
+    return 
+def method46(v0 : cp.ndarray, v1 : US1, v2 : US1) -> None:
+    v3 = v1.tag
+    method37(v0, v3)
+    del v3
+    v4 = v0[4:].view(cp.uint8)
+    match v1:
+        case US1_0(): # Paper
+            method39(v4)
+        case US1_1(): # Rock
+            method39(v4)
+        case US1_2(): # Scissors
+            method39(v4)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+    del v1, v4
+    v5 = v2.tag
+    method41(v0, v5)
+    del v5
+    v6 = v0[8:].view(cp.uint8)
+    del v0
+    match v2:
+        case US1_0(): # Paper
+            del v2
+            return method39(v6)
+        case US1_1(): # Rock
+            del v2
+            return method39(v6)
+        case US1_2(): # Scissors
+            del v2
+            return method39(v6)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method47(v0 : cp.ndarray, v1 : i32) -> None:
+    v2 = v0[32:].view(cp.int32)
+    del v0
+    v2[0] = v1
+    del v1, v2
+    return 
+def method48(v0 : cp.ndarray, v1 : i32) -> None:
+    v2 = v0[48:].view(cp.int32)
+    del v0
+    v2[0] = v1
+    del v1, v2
+    return 
+def method49(v0 : cp.ndarray, v1 : i32) -> None:
+    v2 = v0[52:].view(cp.int32)
+    del v0
+    v2[0] = v1
+    del v1, v2
+    return 
+def method43(v0 : cp.ndarray, v1 : static_array, v2 : US3, v3 : US4, v4 : US2, v5 : US2) -> None:
+    v6 = 0
+    while method20(v6):
+        v8 = u64(v6)
+        v9 = v8 * 8
+        del v8
+        v10 = v0[v9:].view(cp.uint8)
+        del v9
+        v11 = v1[v6]
+        method44(v10, v11)
+        del v10, v11
+        v6 += 1 
+    del v1, v6
+    v12 = v2.tag
+    method45(v0, v12)
+    del v12
+    v13 = v0[24:].view(cp.uint8)
+    match v2:
+        case US3_0(): # GameNotStarted
+            method39(v13)
+        case US3_1(v14, v15): # GameOver
+            method46(v13, v14, v15)
+        case US3_2(v16): # WaitingForActionFromPlayerId
+            method37(v13, v16)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+    del v2, v13
+    v17 = v3.tag
+    method47(v0, v17)
+    del v17
+    v18 = v0[40:].view(cp.uint8)
+    match v3:
+        case US4_0(): # GameStarted
+            method39(v18)
+        case US4_1(v19, v20): # ShowdownResult
+            method46(v18, v19, v20)
+        case US4_2(): # WaitingToStart
+            method39(v18)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+    del v3, v18
+    v21 = v4.tag
+    method48(v0, v21)
+    del v21
+    v22 = v0[52:].view(cp.uint8)
+    match v4:
+        case US2_0(): # Computer
+            method39(v22)
+        case US2_1(): # Human
+            method39(v22)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+    del v4, v22
+    v23 = v5.tag
+    method49(v0, v23)
+    del v23
+    v24 = v0[56:].view(cp.uint8)
+    del v0
+    match v5:
+        case US2_0(): # Computer
+            del v5
+            return method39(v24)
+        case US2_1(): # Human
+            del v5
+            return method39(v24)
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method42(v0 : cp.ndarray, v1 : static_array, v2 : US3, v3 : US4, v4 : US2, v5 : US2) -> None:
+    return method43(v0, v1, v2, v3, v4, v5)
+def method53(v0 : cp.ndarray) -> i32:
+    v1 = v0[0:].view(cp.int32)
+    del v0
+    v2 = v1[0].item()
+    del v1
+    return v2
+def method54(v0 : cp.ndarray) -> None:
+    del v0
+    return 
+def method55(v0 : cp.ndarray) -> US1:
+    v1 = method53(v0)
+    v2 = v0[4:].view(cp.uint8)
+    del v0
+    if v1 == 0:
+        del v1
+        method54(v2)
+        del v2
+        return US1_0()
+    elif v1 == 1:
+        del v1
+        method54(v2)
+        del v2
+        return US1_1()
+    elif v1 == 2:
+        del v1
+        method54(v2)
+        del v2
+        return US1_2()
+    else:
+        del v1, v2
+        raise Exception("Invalid tag.")
+def method52(v0 : cp.ndarray) -> US5:
+    v1 = method53(v0)
+    v2 = v0[4:].view(cp.uint8)
+    del v0
+    if v1 == 0:
+        del v1
+        method54(v2)
+        del v2
+        return US5_0()
+    elif v1 == 1:
+        del v1
+        v5 = method55(v2)
+        del v2
+        return US5_1(v5)
+    else:
+        del v1, v2
+        raise Exception("Invalid tag.")
+def method56(v0 : cp.ndarray) -> i32:
+    v1 = v0[16:].view(cp.int32)
+    del v0
+    v2 = v1[0].item()
+    del v1
+    return v2
+def method58(v0 : cp.ndarray) -> i32:
+    v1 = v0[4:].view(cp.int32)
+    del v0
+    v2 = v1[0].item()
+    del v1
+    return v2
+def method57(v0 : cp.ndarray) -> Tuple[US1, US1]:
+    v1 = method53(v0)
+    v2 = v0[4:].view(cp.uint8)
+    if v1 == 0:
+        method54(v2)
+        v7 = US1_0()
+    elif v1 == 1:
+        method54(v2)
+        v7 = US1_1()
+    elif v1 == 2:
+        method54(v2)
+        v7 = US1_2()
+    else:
+        raise Exception("Invalid tag.")
+    del v1, v2
+    v8 = method58(v0)
+    v9 = v0[8:].view(cp.uint8)
+    del v0
+    if v8 == 0:
+        method54(v9)
+        v14 = US1_0()
+    elif v8 == 1:
+        method54(v9)
+        v14 = US1_1()
+    elif v8 == 2:
+        method54(v9)
+        v14 = US1_2()
+    else:
+        raise Exception("Invalid tag.")
+    del v8, v9
+    return v7, v14
+def method59(v0 : cp.ndarray) -> i32:
+    v1 = v0[32:].view(cp.int32)
+    del v0
+    v2 = v1[0].item()
+    del v1
+    return v2
+def method60(v0 : cp.ndarray) -> i32:
+    v1 = v0[48:].view(cp.int32)
+    del v0
+    v2 = v1[0].item()
+    del v1
+    return v2
+def method61(v0 : cp.ndarray) -> i32:
+    v1 = v0[52:].view(cp.int32)
+    del v0
+    v2 = v1[0].item()
+    del v1
+    return v2
+def method51(v0 : cp.ndarray) -> Tuple[static_array, US3, US4, US2, US2]:
+    v1 = static_array(2)
+    v2 = 0
+    while method20(v2):
+        v4 = u64(v2)
+        v5 = v4 * 8
+        del v4
+        v6 = v0[v5:].view(cp.uint8)
+        del v5
+        v7 = method52(v6)
+        del v6
+        v1[v2] = v7
+        del v7
+        v2 += 1 
+    del v2
+    v8 = method56(v0)
+    v9 = v0[24:].view(cp.uint8)
+    if v8 == 0:
+        method54(v9)
+        v17 = US3_0()
+    elif v8 == 1:
+        v12, v13 = method57(v9)
+        v17 = US3_1(v12, v13)
+    elif v8 == 2:
+        v15 = method53(v9)
+        v17 = US3_2(v15)
+    else:
+        raise Exception("Invalid tag.")
+    del v8, v9
+    v18 = method59(v0)
+    v19 = v0[40:].view(cp.uint8)
+    if v18 == 0:
+        method54(v19)
+        v26 = US4_0()
+    elif v18 == 1:
+        v22, v23 = method57(v19)
+        v26 = US4_1(v22, v23)
+    elif v18 == 2:
+        method54(v19)
+        v26 = US4_2()
+    else:
+        raise Exception("Invalid tag.")
+    del v18, v19
+    v27 = method60(v0)
+    v28 = v0[52:].view(cp.uint8)
+    if v27 == 0:
+        method54(v28)
+        v32 = US2_0()
+    elif v27 == 1:
+        method54(v28)
+        v32 = US2_1()
+    else:
+        raise Exception("Invalid tag.")
+    del v27, v28
+    v33 = method61(v0)
+    v34 = v0[56:].view(cp.uint8)
+    del v0
+    if v33 == 0:
+        method54(v34)
+        v38 = US2_0()
+    elif v33 == 1:
+        method54(v34)
+        v38 = US2_1()
+    else:
+        raise Exception("Invalid tag.")
+    del v33, v34
+    return v1, v17, v26, v32, v38
+def method50(v0 : cp.ndarray) -> Tuple[static_array, US3, US4, US2, US2]:
+    v1, v2, v3, v4, v5 = method51(v0)
+    del v0
+    return v1, v2, v3, v4, v5
+def method62(v0 : static_array, v1 : US3, v2 : US4, v3 : US2, v4 : US2) -> object:
+    v5 = method23(v0, v1, v2, v3, v4)
+    del v0, v1, v2, v3, v4
+    return v5
 def main():
     v0 = Closure0()
     v1 = Closure1()
