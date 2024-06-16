@@ -8,8 +8,8 @@ inl prim x = real
 
 prototype printable t : t -> ()
 
-inl rec write forall t. (x : t) : () = real
-    let rec write x = 
+inl rec write forall t. (x : t) : () =
+    let rec write (x : .obj) : () = real
         open real_core
         inl p (a,b) = 
             backend_switch `(()) {
@@ -51,7 +51,7 @@ inl rec write forall t. (x : t) : () = real
             // elif layout_is x then write *x // TODO: Deal with all the layout type cases.
             else error_type "Unsupported type."
             
-    write x
+    real write x
 
 inl write_ln l = 
     write l
