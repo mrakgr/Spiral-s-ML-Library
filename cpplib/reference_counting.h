@@ -17,10 +17,10 @@ struct sptr // Shared pointer for the Spiral datatypes. They have to have the re
 {
     T *base;
 
-    sptr() : base(nullptr) {}
-    sptr(T *v) : base(v) { this->base->refc++; }
+    __device__ sptr() : base(nullptr) {}
+    __device__ sptr(T *v) : base(v) { this->base->refc++; }
 
-    ~sptr()
+    __device__ ~sptr()
     {
         if (this->base != nullptr && --this->base->refc == 0)
         {
@@ -28,19 +28,19 @@ struct sptr // Shared pointer for the Spiral datatypes. They have to have the re
         }
     }
 
-    sptr(sptr &x)
+    __device__ sptr(sptr &x)
     {
         this->base = x.base;
         this->base->refc++;
     }
 
-    sptr(sptr &&x)
+    __device__ sptr(sptr &&x)
     {
         this->base = x.base;
         x.base = nullptr;
     }
 
-    sptr &operator=(sptr &x)
+    __device__ sptr &operator=(sptr &x)
     {
         if (this->base != x.base)
         {
@@ -51,7 +51,7 @@ struct sptr // Shared pointer for the Spiral datatypes. They have to have the re
         return *this;
     }
 
-    sptr &operator=(sptr &&x)
+    __device__ sptr &operator=(sptr &&x)
     {
         if (this->base != x.base)
         {
@@ -68,7 +68,7 @@ struct csptr : public sptr<T>
 { // Shared pointer for closures specifically.
     using sptr<T>::sptr;
     template <typename... Args>
-    auto operator()(Args... args) -> decltype(this->base->operator()(args...))
+    __device__ auto operator()(Args... args) -> decltype(this->base->operator()(args...))
     {
         return this->base->operator()(args...);
     }
@@ -81,7 +81,7 @@ struct array
     default_int length;
     T *ptr;
 
-    array() = delete;
-    array(int l) : length(l), ptr(new T[l]) {}
-    ~array() { delete[] this->ptr; }
+    __device__ array() = delete;
+    __device__ array(int l) : length(l), ptr(new T[l]) {}
+    __device__ ~array() { delete[] this->ptr; }
 };
