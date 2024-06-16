@@ -332,15 +332,43 @@ extern "C" __global__ void entry0() {
     }
 }
 """
-class static_array(list):
+class static_array():
     def __init__(self, length):
+        self.ptr = []
         for _ in range(length):
-            self.append(None)
+            self.ptr.append(None)
+
+    def __getitem__(self, index):
+        assert 0 <= index < len(self.ptr), "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < len(self.ptr), "The set index needs to be in range."
+        self.ptr[index] = value
 
 class static_array_list(static_array):
     def __init__(self, length):
         super().__init__(length)
         self.length = 0
+
+    def __getitem__(self, index):
+        assert 0 <= index < self.length, "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < self.length, "The set index needs to be in range."
+        self.ptr[index] = value
+
+    def push(self,value):
+        assert (self.length < len(self.ptr)), "The length before pushing has to be less than the maximum length of the array."
+        self.ptr[self.length] = value
+        self.length += 1
+
+    def pop(self):
+        assert (0 < self.length), "The length before popping has to be greater than 0."
+        self.length -= 1
+        return self.ptr[self.length]
+
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
