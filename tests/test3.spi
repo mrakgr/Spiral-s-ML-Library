@@ -1,0 +1,23 @@
+open corebase
+open corecuda
+
+union rec a t =
+    | A_Done
+    | A_Rest : t * b t
+and union b t =
+    | B_Done
+    | B_Rest : t * a t
+
+inl main() =
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            inl f () = 
+                // inl ~l : list int = [1;2;3]
+                inl ~l : a int = A_Rest(1,B_Rest(2,A_Rest(3,B_Done)))
+                inl ~l' : a int = A_Rest(12,B_Rest(23,A_Rest(34,B_Done)))
+                inl q = mut l
+                q <- l'
+                console.write_ln *q
+            (join to_closure f)()
+            (join to_fptr f)()
+            ()
