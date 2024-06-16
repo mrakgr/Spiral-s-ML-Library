@@ -147,7 +147,7 @@ struct Union0 {
     }
 };
 struct Mut0 {
-    int refc = 0;
+    int refc{0};
     sptr<Union1> v0;
     __device__ Mut0() = default;
     __device__ Mut0(sptr<Union1> t0) : v0(t0) {}
