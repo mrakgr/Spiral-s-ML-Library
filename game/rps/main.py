@@ -58,7 +58,7 @@ struct Union1 {
         Union1_1 case1; // Rock
         Union1_2 case2; // Scissors
     };
-    unsigned char tag{-1};
+    unsigned char tag{255};
     __device__ Union1() {}
     __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Paper
     __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // Rock
@@ -109,7 +109,7 @@ struct Union1 {
             case 1: this->case1.~Union1_1(); break; // Rock
             case 2: this->case2.~Union1_2(); break; // Scissors
         }
-        this->tag = -1;
+        this->tag = 255;
     }
 };
 struct Union2_0 { // Computer
@@ -121,7 +121,7 @@ struct Union2 {
         Union2_0 case0; // Computer
         Union2_1 case1; // Human
     };
-    unsigned char tag{-1};
+    unsigned char tag{255};
     __device__ Union2() {}
     __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // Computer
     __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Human
@@ -166,7 +166,7 @@ struct Union2 {
             case 0: this->case0.~Union2_0(); break; // Computer
             case 1: this->case1.~Union2_1(); break; // Human
         }
-        this->tag = -1;
+        this->tag = 255;
     }
 };
 struct Union0_0 { // ActionSelected
@@ -188,7 +188,7 @@ struct Union0 {
         Union0_1 case1; // PlayerChanged
         Union0_2 case2; // StartGame
     };
-    unsigned char tag{-1};
+    unsigned char tag{255};
     __device__ Union0() {}
     __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // ActionSelected
     __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // PlayerChanged
@@ -239,12 +239,13 @@ struct Union0 {
             case 1: this->case1.~Union0_1(); break; // PlayerChanged
             case 2: this->case2.~Union0_2(); break; // StartGame
         }
-        this->tag = -1;
+        this->tag = 255;
     }
 };
 struct Tuple0 {
     Union2 v0;
     Union2 v1;
+    __device__ Tuple0() = default;
     __device__ Tuple0(Union2 t0, Union2 t1) : v0(t0), v1(t1) {}
 };
 struct Union3_0 { // None
@@ -259,7 +260,7 @@ struct Union3 {
         Union3_0 case0; // None
         Union3_1 case1; // Some
     };
-    unsigned char tag{-1};
+    unsigned char tag{255};
     __device__ Union3() {}
     __device__ Union3(Union3_0 t) : tag(0), case0(t) {} // None
     __device__ Union3(Union3_1 t) : tag(1), case1(t) {} // Some
@@ -304,7 +305,7 @@ struct Union3 {
             case 0: this->case0.~Union3_0(); break; // None
             case 1: this->case1.~Union3_1(); break; // Some
         }
-        this->tag = -1;
+        this->tag = 255;
     }
 };
 struct Union4_0 { // GameNotStarted
@@ -326,7 +327,7 @@ struct Union4 {
         Union4_1 case1; // GameOver
         Union4_2 case2; // WaitingForActionFromPlayerId
     };
-    unsigned char tag{-1};
+    unsigned char tag{255};
     __device__ Union4() {}
     __device__ Union4(Union4_0 t) : tag(0), case0(t) {} // GameNotStarted
     __device__ Union4(Union4_1 t) : tag(1), case1(t) {} // GameOver
@@ -377,7 +378,7 @@ struct Union4 {
             case 1: this->case1.~Union4_1(); break; // GameOver
             case 2: this->case2.~Union4_2(); break; // WaitingForActionFromPlayerId
         }
-        this->tag = -1;
+        this->tag = 255;
     }
 };
 struct Union5_0 { // GameStarted
@@ -396,7 +397,7 @@ struct Union5 {
         Union5_1 case1; // ShowdownResult
         Union5_2 case2; // WaitingToStart
     };
-    unsigned char tag{-1};
+    unsigned char tag{255};
     __device__ Union5() {}
     __device__ Union5(Union5_0 t) : tag(0), case0(t) {} // GameStarted
     __device__ Union5(Union5_1 t) : tag(1), case1(t) {} // ShowdownResult
@@ -447,7 +448,7 @@ struct Union5 {
             case 1: this->case1.~Union5_1(); break; // ShowdownResult
             case 2: this->case2.~Union5_2(); break; // WaitingToStart
         }
-        this->tag = -1;
+        this->tag = 255;
     }
 };
 struct Tuple1 {
@@ -456,16 +457,19 @@ struct Tuple1 {
     Union5 v2;
     Union2 v3;
     Union2 v4;
+    __device__ Tuple1() = default;
     __device__ Tuple1(static_array<Union3,2l> t0, Union4 t1, Union5 t2, Union2 t3, Union2 t4) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4) {}
 };
 struct Tuple2 {
     Union1 v0;
     Union1 v1;
+    __device__ Tuple2() = default;
     __device__ Tuple2(Union1 t0, Union1 t1) : v0(t0), v1(t1) {}
 };
 struct Tuple3 {
     Union1 v0;
     float v1;
+    __device__ Tuple3() = default;
     __device__ Tuple3(Union1 t0, float t1) : v0(t0), v1(t1) {}
 };
 __device__ long f_1(unsigned char * v0){

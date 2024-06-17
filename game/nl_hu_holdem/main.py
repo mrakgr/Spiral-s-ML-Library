@@ -14,36 +14,49 @@ __device__ Union1 f_2(unsigned char * v0);
 __device__ Union2 f_5(unsigned char * v0);
 __device__ static_array<Union2,2l> f_4(unsigned char * v0);
 __device__ Union0 f_0(unsigned char * v0);
+struct Tuple0;
 struct Union3;
 struct Union6;
 struct Union5;
 struct Union4;
 struct Union7;
+struct Tuple1;
 __device__ unsigned long long f_7(unsigned char * v0);
 __device__ long f_8(unsigned char * v0);
 __device__ unsigned char f_12(unsigned char * v0);
 __device__ unsigned char f_11(unsigned char * v0);
 __device__ static_array_list<unsigned char,5l> f_10(unsigned char * v0);
+struct Tuple2;
 __device__ Tuple2 f_13(unsigned char * v0);
+struct Tuple3;
 __device__ long f_15(unsigned char * v0);
 __device__ Tuple3 f_14(unsigned char * v0);
+struct Tuple4;
 __device__ Tuple4 f_16(unsigned char * v0);
+struct Tuple5;
 __device__ Tuple0 f_19(unsigned char * v0);
 __device__ Tuple0 f_18(unsigned char * v0);
 __device__ Tuple5 f_17(unsigned char * v0);
 __device__ Union3 f_9(unsigned char * v0);
 __device__ long f_20(unsigned char * v0);
+struct Tuple6;
 __device__ static_array<unsigned char,2l> f_23(unsigned char * v0);
 __device__ long f_24(unsigned char * v0);
 __device__ static_array<unsigned char,3l> f_25(unsigned char * v0);
 __device__ static_array<unsigned char,5l> f_26(unsigned char * v0);
 __device__ static_array<unsigned char,4l> f_27(unsigned char * v0);
 __device__ Tuple6 f_22(unsigned char * v0);
+struct Tuple7;
 __device__ long f_29(unsigned char * v0);
 __device__ Tuple7 f_28(unsigned char * v0);
 __device__ Union5 f_21(unsigned char * v0);
 __device__ long f_30(unsigned char * v0);
 __device__ Tuple1 f_6(unsigned char * v0);
+struct Tuple8;
+struct Tuple9;
+struct Tuple10;
+struct Tuple11;
+struct Tuple12;
 __device__ unsigned long loop_35(unsigned long v0, curandStatePhilox4_32_10_t & v1);
 __device__ Tuple12 draw_card_34(curandStatePhilox4_32_10_t & v0, unsigned long long v1);
 __device__ Tuple10 draw_cards_33(curandStatePhilox4_32_10_t & v0, unsigned long long v1);
@@ -51,14 +64,22 @@ __device__ static_array_list<unsigned char,5l> get_community_cards_36(Union6 v0,
 __device__ bool player_can_act_38(long v0, static_array<static_array<unsigned char,2l>,2l> v1, static_array<long,2l> v2, long v3, static_array<long,2l> v4, Union6 v5);
 __device__ Union5 go_next_street_39(long v0, static_array<static_array<unsigned char,2l>,2l> v1, static_array<long,2l> v2, long v3, static_array<long,2l> v4, Union6 v5);
 __device__ Union5 try_round_37(long v0, static_array<static_array<unsigned char,2l>,2l> v1, static_array<long,2l> v2, long v3, static_array<long,2l> v4, Union6 v5);
+struct Tuple13;
 __device__ Tuple13 draw_cards_40(curandStatePhilox4_32_10_t & v0, unsigned long long v1);
+struct Tuple14;
 __device__ Tuple14 draw_cards_41(curandStatePhilox4_32_10_t & v0, unsigned long long v1);
 __device__ static_array_list<unsigned char,5l> get_community_cards_42(Union6 v0, static_array<unsigned char,1l> v1);
+struct Tuple15;
 __device__ long loop_45(static_array<float,6l> v0, float v1, long v2);
 __device__ long sample_discrete__44(static_array<float,6l> v0, curandStatePhilox4_32_10_t & v1);
 __device__ Union1 sample_discrete_43(static_array<Tuple15,6l> v0, curandStatePhilox4_32_10_t & v1);
+struct Tuple16;
+struct Tuple17;
 struct Union8;
+struct Tuple18;
 struct Union9;
+struct Tuple19;
+struct Tuple20;
 struct Union10;
 struct Union11;
 struct Union12;
@@ -115,11 +136,12 @@ struct Union1 {
         Union1_2 case2; // A_Fold
         Union1_3 case3; // A_Raise
     };
+    unsigned char tag{255};
+    __device__ Union1() {}
     __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // A_All_In
     __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // A_Call
     __device__ Union1(Union1_2 t) : tag(2), case2(t) {} // A_Fold
     __device__ Union1(Union1_3 t) : tag(3), case3(t) {} // A_Raise
-    __device__ Union1() = delete;
     __device__ Union1(Union1 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union1_0(x.case0); break; // A_All_In
@@ -137,22 +159,30 @@ struct Union1 {
         }
     }
     __device__ Union1 & operator=(Union1 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // A_All_In
-            case 1: this->case1 = x.case1; break; // A_Call
-            case 2: this->case2 = x.case2; break; // A_Fold
-            case 3: this->case3 = x.case3; break; // A_Raise
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // A_All_In
+                case 1: this->case1 = x.case1; break; // A_Call
+                case 2: this->case2 = x.case2; break; // A_Fold
+                case 3: this->case3 = x.case3; break; // A_Raise
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{x};
         }
         return *this;
     }
     __device__ Union1 & operator=(Union1 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // A_All_In
-            case 1: this->case1 = std::move(x.case1); break; // A_Call
-            case 2: this->case2 = std::move(x.case2); break; // A_Fold
-            case 3: this->case3 = std::move(x.case3); break; // A_Raise
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // A_All_In
+                case 1: this->case1 = std::move(x.case1); break; // A_Call
+                case 2: this->case2 = std::move(x.case2); break; // A_Fold
+                case 3: this->case3 = std::move(x.case3); break; // A_Raise
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{std::move(x)};
         }
         return *this;
     }
@@ -163,8 +193,8 @@ struct Union1 {
             case 2: this->case2.~Union1_2(); break; // A_Fold
             case 3: this->case3.~Union1_3(); break; // A_Raise
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union2_0 { // Computer
 };
@@ -175,9 +205,10 @@ struct Union2 {
         Union2_0 case0; // Computer
         Union2_1 case1; // Human
     };
+    unsigned char tag{255};
+    __device__ Union2() {}
     __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // Computer
     __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Human
-    __device__ Union2() = delete;
     __device__ Union2(Union2 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union2_0(x.case0); break; // Computer
@@ -191,18 +222,26 @@ struct Union2 {
         }
     }
     __device__ Union2 & operator=(Union2 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // Computer
-            case 1: this->case1 = x.case1; break; // Human
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Computer
+                case 1: this->case1 = x.case1; break; // Human
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{x};
         }
         return *this;
     }
     __device__ Union2 & operator=(Union2 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // Computer
-            case 1: this->case1 = std::move(x.case1); break; // Human
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Computer
+                case 1: this->case1 = std::move(x.case1); break; // Human
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{std::move(x)};
         }
         return *this;
     }
@@ -211,8 +250,8 @@ struct Union2 {
             case 0: this->case0.~Union2_0(); break; // Computer
             case 1: this->case1.~Union2_1(); break; // Human
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union0_0 { // ActionSelected
     Union1 v0;
@@ -232,10 +271,11 @@ struct Union0 {
         Union0_1 case1; // PlayerChanged
         Union0_2 case2; // StartGame
     };
+    unsigned char tag{255};
+    __device__ Union0() {}
     __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // ActionSelected
     __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // PlayerChanged
     __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // StartGame
-    __device__ Union0() = delete;
     __device__ Union0(Union0 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union0_0(x.case0); break; // ActionSelected
@@ -251,20 +291,28 @@ struct Union0 {
         }
     }
     __device__ Union0 & operator=(Union0 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // ActionSelected
-            case 1: this->case1 = x.case1; break; // PlayerChanged
-            case 2: this->case2 = x.case2; break; // StartGame
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // ActionSelected
+                case 1: this->case1 = x.case1; break; // PlayerChanged
+                case 2: this->case2 = x.case2; break; // StartGame
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
         }
         return *this;
     }
     __device__ Union0 & operator=(Union0 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // ActionSelected
-            case 1: this->case1 = std::move(x.case1); break; // PlayerChanged
-            case 2: this->case2 = std::move(x.case2); break; // StartGame
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // ActionSelected
+                case 1: this->case1 = std::move(x.case1); break; // PlayerChanged
+                case 2: this->case2 = std::move(x.case2); break; // StartGame
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
         }
         return *this;
     }
@@ -274,12 +322,13 @@ struct Union0 {
             case 1: this->case1.~Union0_1(); break; // PlayerChanged
             case 2: this->case2.~Union0_2(); break; // StartGame
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Tuple0 {
     static_array<unsigned char,5l> v0;
     char v1;
+    __device__ Tuple0() = default;
     __device__ Tuple0(static_array<unsigned char,5l> t0, char t1) : v0(t0), v1(t1) {}
 };
 struct Union3_0 { // CommunityCardsAre
@@ -320,12 +369,13 @@ struct Union3 {
         Union3_3 case3; // PlayerGotCards
         Union3_4 case4; // Showdown
     };
+    unsigned char tag{255};
+    __device__ Union3() {}
     __device__ Union3(Union3_0 t) : tag(0), case0(t) {} // CommunityCardsAre
     __device__ Union3(Union3_1 t) : tag(1), case1(t) {} // Fold
     __device__ Union3(Union3_2 t) : tag(2), case2(t) {} // PlayerAction
     __device__ Union3(Union3_3 t) : tag(3), case3(t) {} // PlayerGotCards
     __device__ Union3(Union3_4 t) : tag(4), case4(t) {} // Showdown
-    __device__ Union3() = delete;
     __device__ Union3(Union3 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union3_0(x.case0); break; // CommunityCardsAre
@@ -345,24 +395,32 @@ struct Union3 {
         }
     }
     __device__ Union3 & operator=(Union3 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // CommunityCardsAre
-            case 1: this->case1 = x.case1; break; // Fold
-            case 2: this->case2 = x.case2; break; // PlayerAction
-            case 3: this->case3 = x.case3; break; // PlayerGotCards
-            case 4: this->case4 = x.case4; break; // Showdown
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // CommunityCardsAre
+                case 1: this->case1 = x.case1; break; // Fold
+                case 2: this->case2 = x.case2; break; // PlayerAction
+                case 3: this->case3 = x.case3; break; // PlayerGotCards
+                case 4: this->case4 = x.case4; break; // Showdown
+            }
+        } else {
+            this->~Union3();
+            new (this) Union3{x};
         }
         return *this;
     }
     __device__ Union3 & operator=(Union3 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // CommunityCardsAre
-            case 1: this->case1 = std::move(x.case1); break; // Fold
-            case 2: this->case2 = std::move(x.case2); break; // PlayerAction
-            case 3: this->case3 = std::move(x.case3); break; // PlayerGotCards
-            case 4: this->case4 = std::move(x.case4); break; // Showdown
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // CommunityCardsAre
+                case 1: this->case1 = std::move(x.case1); break; // Fold
+                case 2: this->case2 = std::move(x.case2); break; // PlayerAction
+                case 3: this->case3 = std::move(x.case3); break; // PlayerGotCards
+                case 4: this->case4 = std::move(x.case4); break; // Showdown
+            }
+        } else {
+            this->~Union3();
+            new (this) Union3{std::move(x)};
         }
         return *this;
     }
@@ -374,8 +432,8 @@ struct Union3 {
             case 3: this->case3.~Union3_3(); break; // PlayerGotCards
             case 4: this->case4.~Union3_4(); break; // Showdown
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union6_0 { // Flop
     static_array<unsigned char,3l> v0;
@@ -401,11 +459,12 @@ struct Union6 {
         Union6_2 case2; // River
         Union6_3 case3; // Turn
     };
+    unsigned char tag{255};
+    __device__ Union6() {}
     __device__ Union6(Union6_0 t) : tag(0), case0(t) {} // Flop
     __device__ Union6(Union6_1 t) : tag(1), case1(t) {} // Preflop
     __device__ Union6(Union6_2 t) : tag(2), case2(t) {} // River
     __device__ Union6(Union6_3 t) : tag(3), case3(t) {} // Turn
-    __device__ Union6() = delete;
     __device__ Union6(Union6 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union6_0(x.case0); break; // Flop
@@ -423,22 +482,30 @@ struct Union6 {
         }
     }
     __device__ Union6 & operator=(Union6 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // Flop
-            case 1: this->case1 = x.case1; break; // Preflop
-            case 2: this->case2 = x.case2; break; // River
-            case 3: this->case3 = x.case3; break; // Turn
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Flop
+                case 1: this->case1 = x.case1; break; // Preflop
+                case 2: this->case2 = x.case2; break; // River
+                case 3: this->case3 = x.case3; break; // Turn
+            }
+        } else {
+            this->~Union6();
+            new (this) Union6{x};
         }
         return *this;
     }
     __device__ Union6 & operator=(Union6 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // Flop
-            case 1: this->case1 = std::move(x.case1); break; // Preflop
-            case 2: this->case2 = std::move(x.case2); break; // River
-            case 3: this->case3 = std::move(x.case3); break; // Turn
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Flop
+                case 1: this->case1 = std::move(x.case1); break; // Preflop
+                case 2: this->case2 = std::move(x.case2); break; // River
+                case 3: this->case3 = std::move(x.case3); break; // Turn
+            }
+        } else {
+            this->~Union6();
+            new (this) Union6{std::move(x)};
         }
         return *this;
     }
@@ -449,8 +516,8 @@ struct Union6 {
             case 2: this->case2.~Union6_2(); break; // River
             case 3: this->case3.~Union6_3(); break; // Turn
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union5_0 { // G_Flop
     static_array<static_array<unsigned char,2l>,2l> v1;
@@ -536,6 +603,8 @@ struct Union5 {
         Union5_6 case6; // G_Showdown
         Union5_7 case7; // G_Turn
     };
+    unsigned char tag{255};
+    __device__ Union5() {}
     __device__ Union5(Union5_0 t) : tag(0), case0(t) {} // G_Flop
     __device__ Union5(Union5_1 t) : tag(1), case1(t) {} // G_Fold
     __device__ Union5(Union5_2 t) : tag(2), case2(t) {} // G_Preflop
@@ -544,7 +613,6 @@ struct Union5 {
     __device__ Union5(Union5_5 t) : tag(5), case5(t) {} // G_Round'
     __device__ Union5(Union5_6 t) : tag(6), case6(t) {} // G_Showdown
     __device__ Union5(Union5_7 t) : tag(7), case7(t) {} // G_Turn
-    __device__ Union5() = delete;
     __device__ Union5(Union5 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union5_0(x.case0); break; // G_Flop
@@ -570,30 +638,38 @@ struct Union5 {
         }
     }
     __device__ Union5 & operator=(Union5 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // G_Flop
-            case 1: this->case1 = x.case1; break; // G_Fold
-            case 2: this->case2 = x.case2; break; // G_Preflop
-            case 3: this->case3 = x.case3; break; // G_River
-            case 4: this->case4 = x.case4; break; // G_Round
-            case 5: this->case5 = x.case5; break; // G_Round'
-            case 6: this->case6 = x.case6; break; // G_Showdown
-            case 7: this->case7 = x.case7; break; // G_Turn
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // G_Flop
+                case 1: this->case1 = x.case1; break; // G_Fold
+                case 2: this->case2 = x.case2; break; // G_Preflop
+                case 3: this->case3 = x.case3; break; // G_River
+                case 4: this->case4 = x.case4; break; // G_Round
+                case 5: this->case5 = x.case5; break; // G_Round'
+                case 6: this->case6 = x.case6; break; // G_Showdown
+                case 7: this->case7 = x.case7; break; // G_Turn
+            }
+        } else {
+            this->~Union5();
+            new (this) Union5{x};
         }
         return *this;
     }
     __device__ Union5 & operator=(Union5 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // G_Flop
-            case 1: this->case1 = std::move(x.case1); break; // G_Fold
-            case 2: this->case2 = std::move(x.case2); break; // G_Preflop
-            case 3: this->case3 = std::move(x.case3); break; // G_River
-            case 4: this->case4 = std::move(x.case4); break; // G_Round
-            case 5: this->case5 = std::move(x.case5); break; // G_Round'
-            case 6: this->case6 = std::move(x.case6); break; // G_Showdown
-            case 7: this->case7 = std::move(x.case7); break; // G_Turn
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // G_Flop
+                case 1: this->case1 = std::move(x.case1); break; // G_Fold
+                case 2: this->case2 = std::move(x.case2); break; // G_Preflop
+                case 3: this->case3 = std::move(x.case3); break; // G_River
+                case 4: this->case4 = std::move(x.case4); break; // G_Round
+                case 5: this->case5 = std::move(x.case5); break; // G_Round'
+                case 6: this->case6 = std::move(x.case6); break; // G_Showdown
+                case 7: this->case7 = std::move(x.case7); break; // G_Turn
+            }
+        } else {
+            this->~Union5();
+            new (this) Union5{std::move(x)};
         }
         return *this;
     }
@@ -608,8 +684,8 @@ struct Union5 {
             case 6: this->case6.~Union5_6(); break; // G_Showdown
             case 7: this->case7.~Union5_7(); break; // G_Turn
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union4_0 { // None
 };
@@ -623,9 +699,10 @@ struct Union4 {
         Union4_0 case0; // None
         Union4_1 case1; // Some
     };
+    unsigned char tag{255};
+    __device__ Union4() {}
     __device__ Union4(Union4_0 t) : tag(0), case0(t) {} // None
     __device__ Union4(Union4_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union4() = delete;
     __device__ Union4(Union4 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union4_0(x.case0); break; // None
@@ -639,18 +716,26 @@ struct Union4 {
         }
     }
     __device__ Union4 & operator=(Union4 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // None
-            case 1: this->case1 = x.case1; break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union4();
+            new (this) Union4{x};
         }
         return *this;
     }
     __device__ Union4 & operator=(Union4 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // None
-            case 1: this->case1 = std::move(x.case1); break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union4();
+            new (this) Union4{std::move(x)};
         }
         return *this;
     }
@@ -659,8 +744,8 @@ struct Union4 {
             case 0: this->case0.~Union4_0(); break; // None
             case 1: this->case1.~Union4_1(); break; // Some
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union7_0 { // GameNotStarted
 };
@@ -690,10 +775,11 @@ struct Union7 {
         Union7_1 case1; // GameOver
         Union7_2 case2; // WaitingForActionFromPlayerId
     };
+    unsigned char tag{255};
+    __device__ Union7() {}
     __device__ Union7(Union7_0 t) : tag(0), case0(t) {} // GameNotStarted
     __device__ Union7(Union7_1 t) : tag(1), case1(t) {} // GameOver
     __device__ Union7(Union7_2 t) : tag(2), case2(t) {} // WaitingForActionFromPlayerId
-    __device__ Union7() = delete;
     __device__ Union7(Union7 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union7_0(x.case0); break; // GameNotStarted
@@ -709,20 +795,28 @@ struct Union7 {
         }
     }
     __device__ Union7 & operator=(Union7 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // GameNotStarted
-            case 1: this->case1 = x.case1; break; // GameOver
-            case 2: this->case2 = x.case2; break; // WaitingForActionFromPlayerId
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // GameNotStarted
+                case 1: this->case1 = x.case1; break; // GameOver
+                case 2: this->case2 = x.case2; break; // WaitingForActionFromPlayerId
+            }
+        } else {
+            this->~Union7();
+            new (this) Union7{x};
         }
         return *this;
     }
     __device__ Union7 & operator=(Union7 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // GameNotStarted
-            case 1: this->case1 = std::move(x.case1); break; // GameOver
-            case 2: this->case2 = std::move(x.case2); break; // WaitingForActionFromPlayerId
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // GameNotStarted
+                case 1: this->case1 = std::move(x.case1); break; // GameOver
+                case 2: this->case2 = std::move(x.case2); break; // WaitingForActionFromPlayerId
+            }
+        } else {
+            this->~Union7();
+            new (this) Union7{std::move(x)};
         }
         return *this;
     }
@@ -732,8 +826,8 @@ struct Union7 {
             case 1: this->case1.~Union7_1(); break; // GameOver
             case 2: this->case2.~Union7_2(); break; // WaitingForActionFromPlayerId
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Tuple1 {
     unsigned long long v0;
@@ -741,27 +835,32 @@ struct Tuple1 {
     Union4 v2;
     static_array<Union2,2l> v3;
     Union7 v4;
+    __device__ Tuple1() = default;
     __device__ Tuple1(unsigned long long t0, static_array_list<Union3,128l> t1, Union4 t2, static_array<Union2,2l> t3, Union7 t4) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4) {}
 };
 struct Tuple2 {
     long v0;
     long v1;
+    __device__ Tuple2() = default;
     __device__ Tuple2(long t0, long t1) : v0(t0), v1(t1) {}
 };
 struct Tuple3 {
     Union1 v1;
     long v0;
+    __device__ Tuple3() = default;
     __device__ Tuple3(long t0, Union1 t1) : v0(t0), v1(t1) {}
 };
 struct Tuple4 {
     static_array<unsigned char,2l> v1;
     long v0;
+    __device__ Tuple4() = default;
     __device__ Tuple4(long t0, static_array<unsigned char,2l> t1) : v0(t0), v1(t1) {}
 };
 struct Tuple5 {
     static_array<Tuple0,2l> v1;
     long v0;
     long v2;
+    __device__ Tuple5() = default;
     __device__ Tuple5(long t0, static_array<Tuple0,2l> t1, long t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Tuple6 {
@@ -771,6 +870,7 @@ struct Tuple6 {
     Union6 v5;
     long v0;
     long v3;
+    __device__ Tuple6() = default;
     __device__ Tuple6(long t0, static_array<static_array<unsigned char,2l>,2l> t1, static_array<long,2l> t2, long t3, static_array<long,2l> t4, Union6 t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
 };
 struct Tuple7 {
@@ -781,58 +881,69 @@ struct Tuple7 {
     Union1 v6;
     long v0;
     long v3;
+    __device__ Tuple7() = default;
     __device__ Tuple7(long t0, static_array<static_array<unsigned char,2l>,2l> t1, static_array<long,2l> t2, long t3, static_array<long,2l> t4, Union6 t5, Union1 t6) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5), v6(t6) {}
 };
 struct Tuple8 {
     Union4 v0;
     static_array<Union2,2l> v1;
     Union7 v2;
+    __device__ Tuple8() = default;
     __device__ Tuple8(Union4 t0, static_array<Union2,2l> t1, Union7 t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Tuple9 {
     Union5 v1;
     bool v0;
+    __device__ Tuple9() = default;
     __device__ Tuple9(bool t0, Union5 t1) : v0(t0), v1(t1) {}
 };
 struct Tuple10 {
     static_array<unsigned char,3l> v0;
     unsigned long long v1;
+    __device__ Tuple10() = default;
     __device__ Tuple10(static_array<unsigned char,3l> t0, unsigned long long t1) : v0(t0), v1(t1) {}
 };
 struct Tuple11 {
     unsigned long long v1;
     long v0;
+    __device__ Tuple11() = default;
     __device__ Tuple11(long t0, unsigned long long t1) : v0(t0), v1(t1) {}
 };
 struct Tuple12 {
     unsigned long long v1;
     unsigned char v0;
+    __device__ Tuple12() = default;
     __device__ Tuple12(unsigned char t0, unsigned long long t1) : v0(t0), v1(t1) {}
 };
 struct Tuple13 {
     static_array<unsigned char,2l> v0;
     unsigned long long v1;
+    __device__ Tuple13() = default;
     __device__ Tuple13(static_array<unsigned char,2l> t0, unsigned long long t1) : v0(t0), v1(t1) {}
 };
 struct Tuple14 {
     static_array<unsigned char,1l> v0;
     unsigned long long v1;
+    __device__ Tuple14() = default;
     __device__ Tuple14(static_array<unsigned char,1l> t0, unsigned long long t1) : v0(t0), v1(t1) {}
 };
 struct Tuple15 {
     Union1 v0;
     float v1;
+    __device__ Tuple15() = default;
     __device__ Tuple15(Union1 t0, float t1) : v0(t0), v1(t1) {}
 };
 struct Tuple16 {
     long v1;
     bool v0;
+    __device__ Tuple16() = default;
     __device__ Tuple16(bool t0, long t1) : v0(t0), v1(t1) {}
 };
 struct Tuple17 {
     long v0;
     long v1;
     long v2;
+    __device__ Tuple17() = default;
     __device__ Tuple17(long t0, long t1, long t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union8_0 { // Eq
@@ -847,10 +958,11 @@ struct Union8 {
         Union8_1 case1; // Gt
         Union8_2 case2; // Lt
     };
+    unsigned char tag{255};
+    __device__ Union8() {}
     __device__ Union8(Union8_0 t) : tag(0), case0(t) {} // Eq
     __device__ Union8(Union8_1 t) : tag(1), case1(t) {} // Gt
     __device__ Union8(Union8_2 t) : tag(2), case2(t) {} // Lt
-    __device__ Union8() = delete;
     __device__ Union8(Union8 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union8_0(x.case0); break; // Eq
@@ -866,20 +978,28 @@ struct Union8 {
         }
     }
     __device__ Union8 & operator=(Union8 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // Eq
-            case 1: this->case1 = x.case1; break; // Gt
-            case 2: this->case2 = x.case2; break; // Lt
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Eq
+                case 1: this->case1 = x.case1; break; // Gt
+                case 2: this->case2 = x.case2; break; // Lt
+            }
+        } else {
+            this->~Union8();
+            new (this) Union8{x};
         }
         return *this;
     }
     __device__ Union8 & operator=(Union8 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // Eq
-            case 1: this->case1 = std::move(x.case1); break; // Gt
-            case 2: this->case2 = std::move(x.case2); break; // Lt
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Eq
+                case 1: this->case1 = std::move(x.case1); break; // Gt
+                case 2: this->case2 = std::move(x.case2); break; // Lt
+            }
+        } else {
+            this->~Union8();
+            new (this) Union8{std::move(x)};
         }
         return *this;
     }
@@ -889,13 +1009,14 @@ struct Union8 {
             case 1: this->case1.~Union8_1(); break; // Gt
             case 2: this->case2.~Union8_2(); break; // Lt
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Tuple18 {
     long v0;
     long v1;
     unsigned char v2;
+    __device__ Tuple18() = default;
     __device__ Tuple18(long t0, long t1, unsigned char t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union9_0 { // None
@@ -910,9 +1031,10 @@ struct Union9 {
         Union9_0 case0; // None
         Union9_1 case1; // Some
     };
+    unsigned char tag{255};
+    __device__ Union9() {}
     __device__ Union9(Union9_0 t) : tag(0), case0(t) {} // None
     __device__ Union9(Union9_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union9() = delete;
     __device__ Union9(Union9 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union9_0(x.case0); break; // None
@@ -926,18 +1048,26 @@ struct Union9 {
         }
     }
     __device__ Union9 & operator=(Union9 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // None
-            case 1: this->case1 = x.case1; break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union9();
+            new (this) Union9{x};
         }
         return *this;
     }
     __device__ Union9 & operator=(Union9 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // None
-            case 1: this->case1 = std::move(x.case1); break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union9();
+            new (this) Union9{std::move(x)};
         }
         return *this;
     }
@@ -946,12 +1076,13 @@ struct Union9 {
             case 0: this->case0.~Union9_0(); break; // None
             case 1: this->case1.~Union9_1(); break; // Some
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Tuple19 {
     Union8 v1;
     long v0;
+    __device__ Tuple19() = default;
     __device__ Tuple19(long t0, Union8 t1) : v0(t0), v1(t1) {}
 };
 struct Tuple20 {
@@ -959,6 +1090,7 @@ struct Tuple20 {
     long v1;
     long v2;
     unsigned char v3;
+    __device__ Tuple20() = default;
     __device__ Tuple20(long t0, long t1, long t2, unsigned char t3) : v0(t0), v1(t1), v2(t2), v3(t3) {}
 };
 struct Union10_0 { // None
@@ -974,9 +1106,10 @@ struct Union10 {
         Union10_0 case0; // None
         Union10_1 case1; // Some
     };
+    unsigned char tag{255};
+    __device__ Union10() {}
     __device__ Union10(Union10_0 t) : tag(0), case0(t) {} // None
     __device__ Union10(Union10_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union10() = delete;
     __device__ Union10(Union10 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union10_0(x.case0); break; // None
@@ -990,18 +1123,26 @@ struct Union10 {
         }
     }
     __device__ Union10 & operator=(Union10 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // None
-            case 1: this->case1 = x.case1; break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union10();
+            new (this) Union10{x};
         }
         return *this;
     }
     __device__ Union10 & operator=(Union10 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // None
-            case 1: this->case1 = std::move(x.case1); break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union10();
+            new (this) Union10{std::move(x)};
         }
         return *this;
     }
@@ -1010,8 +1151,8 @@ struct Union10 {
             case 0: this->case0.~Union10_0(); break; // None
             case 1: this->case1.~Union10_1(); break; // Some
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union11_0 { // None
 };
@@ -1026,9 +1167,10 @@ struct Union11 {
         Union11_0 case0; // None
         Union11_1 case1; // Some
     };
+    unsigned char tag{255};
+    __device__ Union11() {}
     __device__ Union11(Union11_0 t) : tag(0), case0(t) {} // None
     __device__ Union11(Union11_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union11() = delete;
     __device__ Union11(Union11 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union11_0(x.case0); break; // None
@@ -1042,18 +1184,26 @@ struct Union11 {
         }
     }
     __device__ Union11 & operator=(Union11 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // None
-            case 1: this->case1 = x.case1; break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union11();
+            new (this) Union11{x};
         }
         return *this;
     }
     __device__ Union11 & operator=(Union11 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // None
-            case 1: this->case1 = std::move(x.case1); break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union11();
+            new (this) Union11{std::move(x)};
         }
         return *this;
     }
@@ -1062,8 +1212,8 @@ struct Union11 {
             case 0: this->case0.~Union11_0(); break; // None
             case 1: this->case1.~Union11_1(); break; // Some
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union12_0 { // None
 };
@@ -1078,9 +1228,10 @@ struct Union12 {
         Union12_0 case0; // None
         Union12_1 case1; // Some
     };
+    unsigned char tag{255};
+    __device__ Union12() {}
     __device__ Union12(Union12_0 t) : tag(0), case0(t) {} // None
     __device__ Union12(Union12_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union12() = delete;
     __device__ Union12(Union12 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union12_0(x.case0); break; // None
@@ -1094,18 +1245,26 @@ struct Union12 {
         }
     }
     __device__ Union12 & operator=(Union12 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // None
-            case 1: this->case1 = x.case1; break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union12();
+            new (this) Union12{x};
         }
         return *this;
     }
     __device__ Union12 & operator=(Union12 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // None
-            case 1: this->case1 = std::move(x.case1); break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union12();
+            new (this) Union12{std::move(x)};
         }
         return *this;
     }
@@ -1114,8 +1273,8 @@ struct Union12 {
             case 0: this->case0.~Union12_0(); break; // None
             case 1: this->case1.~Union12_1(); break; // Some
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union13_0 { // None
 };
@@ -1130,9 +1289,10 @@ struct Union13 {
         Union13_0 case0; // None
         Union13_1 case1; // Some
     };
+    unsigned char tag{255};
+    __device__ Union13() {}
     __device__ Union13(Union13_0 t) : tag(0), case0(t) {} // None
     __device__ Union13(Union13_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union13() = delete;
     __device__ Union13(Union13 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union13_0(x.case0); break; // None
@@ -1146,18 +1306,26 @@ struct Union13 {
         }
     }
     __device__ Union13 & operator=(Union13 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // None
-            case 1: this->case1 = x.case1; break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union13();
+            new (this) Union13{x};
         }
         return *this;
     }
     __device__ Union13 & operator=(Union13 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // None
-            case 1: this->case1 = std::move(x.case1); break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union13();
+            new (this) Union13{std::move(x)};
         }
         return *this;
     }
@@ -1166,8 +1334,8 @@ struct Union13 {
             case 0: this->case0.~Union13_0(); break; // None
             case 1: this->case1.~Union13_1(); break; // Some
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 struct Union14_0 { // None
 };
@@ -1182,9 +1350,10 @@ struct Union14 {
         Union14_0 case0; // None
         Union14_1 case1; // Some
     };
+    unsigned char tag{255};
+    __device__ Union14() {}
     __device__ Union14(Union14_0 t) : tag(0), case0(t) {} // None
     __device__ Union14(Union14_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union14() = delete;
     __device__ Union14(Union14 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union14_0(x.case0); break; // None
@@ -1198,18 +1367,26 @@ struct Union14 {
         }
     }
     __device__ Union14 & operator=(Union14 & x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = x.case0; break; // None
-            case 1: this->case1 = x.case1; break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union14();
+            new (this) Union14{x};
         }
         return *this;
     }
     __device__ Union14 & operator=(Union14 && x) {
-        this->tag = x.tag;
-        switch(x.tag){
-            case 0: this->case0 = std::move(x.case0); break; // None
-            case 1: this->case1 = std::move(x.case1); break; // Some
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union14();
+            new (this) Union14{std::move(x)};
         }
         return *this;
     }
@@ -1218,8 +1395,8 @@ struct Union14 {
             case 0: this->case0.~Union14_0(); break; // None
             case 1: this->case1.~Union14_1(); break; // Some
         }
+        this->tag = 255;
     }
-    unsigned char tag;
 };
 __device__ long f_1(unsigned char * v0){
     long * v1;
@@ -1402,7 +1579,7 @@ __device__ Tuple2 f_13(unsigned char * v0){
     v3 = (long *)(v0+4ull);
     long v4;
     v4 = v3[0l];
-    return Tuple2{{v2, v4}};
+    return Tuple2{v2, v4};
 }
 __device__ long f_15(unsigned char * v0){
     long * v1;
@@ -1448,7 +1625,7 @@ __device__ Tuple3 f_14(unsigned char * v0){
             asm("exit;");
         }
     }
-    return Tuple3{{v2, v11}};
+    return Tuple3{v2, v11};
 }
 __device__ Tuple4 f_16(unsigned char * v0){
     long * v1;
@@ -1470,7 +1647,7 @@ __device__ Tuple4 f_16(unsigned char * v0){
         v3[v4] = v9;
         v4 += 1l ;
     }
-    return Tuple4{{v2, v3}};
+    return Tuple4{v2, v3};
 }
 __device__ inline bool while_method_2(long v0){
     bool v1;
@@ -1495,13 +1672,13 @@ __device__ Tuple0 f_19(unsigned char * v0){
     v7 = (char *)(v0+5ull);
     char v8;
     v8 = v7[0l];
-    return Tuple0{{v1, v8}};
+    return Tuple0{v1, v8};
 }
 __device__ Tuple0 f_18(unsigned char * v0){
     static_array<unsigned char,5l> v1; char v2;
     Tuple0 tmp3 = f_19(v0);
     v1 = tmp3.v0; v2 = tmp3.v1;
-    return Tuple0{{v1, v2}};
+    return Tuple0{v1, v2};
 }
 __device__ Tuple5 f_17(unsigned char * v0){
     long * v1;
@@ -1523,14 +1700,14 @@ __device__ Tuple5 f_17(unsigned char * v0){
         static_array<unsigned char,5l> v10; char v11;
         Tuple0 tmp4 = f_18(v9);
         v10 = tmp4.v0; v11 = tmp4.v1;
-        v3[v4] = Tuple0{{v10, v11}};
+        v3[v4] = Tuple0{v10, v11};
         v4 += 1l ;
     }
     long * v12;
     v12 = (long *)(v0+24ull);
     long v13;
     v13 = v12[0l];
-    return Tuple5{{v2, v3, v13}};
+    return Tuple5{v2, v3, v13};
 }
 __device__ Union3 f_9(unsigned char * v0){
     long v1;
@@ -1760,7 +1937,7 @@ __device__ Tuple6 f_22(unsigned char * v0){
             asm("exit;");
         }
     }
-    return Tuple6{{v2, v3, v11, v20, v21, v39}};
+    return Tuple6{v2, v3, v11, v20, v21, v39};
 }
 __device__ long f_29(unsigned char * v0){
     long * v1;
@@ -1895,7 +2072,7 @@ __device__ Tuple7 f_28(unsigned char * v0){
             asm("exit;");
         }
     }
-    return Tuple7{{v2, v3, v11, v20, v21, v39, v48}};
+    return Tuple7{v2, v3, v11, v20, v21, v39, v48};
 }
 __device__ Union5 f_21(unsigned char * v0){
     long v1;
@@ -2065,7 +2242,7 @@ __device__ Tuple1 f_6(unsigned char * v0){
             asm("exit;");
         }
     }
-    return Tuple1{{v1, v2, v18, v19, v45}};
+    return Tuple1{v1, v2, v18, v19, v45};
 }
 __device__ inline bool while_method_5(bool v0, Union5 v1){
     return v0;
@@ -2132,12 +2309,12 @@ __device__ Tuple12 draw_card_34(curandStatePhilox4_32_10_t & v0, unsigned long l
     v20 = 1ull << v19;
     unsigned long long v21;
     v21 = v1 ^ v20;
-    return Tuple12{{v18, v21}};
+    return Tuple12{v18, v21};
 }
 __device__ Tuple10 draw_cards_33(curandStatePhilox4_32_10_t & v0, unsigned long long v1){
     static_array<unsigned char,3l> v2;
     long v3; unsigned long long v4;
-    Tuple11 tmp17 = Tuple11{{0l, v1}};
+    Tuple11 tmp17 = Tuple11{0l, v1};
     v3 = tmp17.v0; v4 = tmp17.v1;
     while (while_method_3(v3)){
         unsigned char v6; unsigned long long v7;
@@ -2147,7 +2324,7 @@ __device__ Tuple10 draw_cards_33(curandStatePhilox4_32_10_t & v0, unsigned long 
         v4 = v7;
         v3 += 1l ;
     }
-    return Tuple10{{v2, v4}};
+    return Tuple10{v2, v4};
 }
 __device__ static_array_list<unsigned char,5l> get_community_cards_36(Union6 v0, static_array<unsigned char,3l> v1){
     static_array_list<unsigned char,5l> v2;
@@ -2218,7 +2395,7 @@ __device__ bool player_can_act_38(long v0, static_array<static_array<unsigned ch
     long v10;
     v10 = v2[0l];
     long v11; long v12;
-    Tuple2 tmp20 = Tuple2{{1l, v10}};
+    Tuple2 tmp20 = Tuple2{1l, v10};
     v11 = tmp20.v0; v12 = tmp20.v1;
     while (while_method_0(v11)){
         long v14;
@@ -2237,7 +2414,7 @@ __device__ bool player_can_act_38(long v0, static_array<static_array<unsigned ch
     bool v17;
     v17 = v9 < v12;
     long v18; long v19;
-    Tuple2 tmp21 = Tuple2{{0l, 0l}};
+    Tuple2 tmp21 = Tuple2{0l, 0l};
     v18 = tmp21.v0; v19 = tmp21.v1;
     while (while_method_0(v18)){
         long v21;
@@ -2319,7 +2496,7 @@ __device__ Union5 try_round_37(long v0, static_array<static_array<unsigned char,
 __device__ Tuple13 draw_cards_40(curandStatePhilox4_32_10_t & v0, unsigned long long v1){
     static_array<unsigned char,2l> v2;
     long v3; unsigned long long v4;
-    Tuple11 tmp22 = Tuple11{{0l, v1}};
+    Tuple11 tmp22 = Tuple11{0l, v1};
     v3 = tmp22.v0; v4 = tmp22.v1;
     while (while_method_0(v3)){
         unsigned char v6; unsigned long long v7;
@@ -2329,7 +2506,7 @@ __device__ Tuple13 draw_cards_40(curandStatePhilox4_32_10_t & v0, unsigned long 
         v4 = v7;
         v3 += 1l ;
     }
-    return Tuple13{{v2, v4}};
+    return Tuple13{v2, v4};
 }
 __device__ inline bool while_method_6(long v0){
     bool v1;
@@ -2339,7 +2516,7 @@ __device__ inline bool while_method_6(long v0){
 __device__ Tuple14 draw_cards_41(curandStatePhilox4_32_10_t & v0, unsigned long long v1){
     static_array<unsigned char,1l> v2;
     long v3; unsigned long long v4;
-    Tuple11 tmp26 = Tuple11{{0l, v1}};
+    Tuple11 tmp26 = Tuple11{0l, v1};
     v3 = tmp26.v0; v4 = tmp26.v1;
     while (while_method_6(v3)){
         unsigned char v6; unsigned long long v7;
@@ -2349,7 +2526,7 @@ __device__ Tuple14 draw_cards_41(curandStatePhilox4_32_10_t & v0, unsigned long 
         v4 = v7;
         v3 += 1l ;
     }
-    return Tuple14{{v2, v4}};
+    return Tuple14{v2, v4};
 }
 __device__ static_array_list<unsigned char,5l> get_community_cards_42(Union6 v0, static_array<unsigned char,1l> v1){
     static_array_list<unsigned char,5l> v2;
@@ -2533,7 +2710,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,7l> v5;
     bool v6; long v7;
-    Tuple16 tmp39 = Tuple16{{true, 1l}};
+    Tuple16 tmp39 = Tuple16{true, 1l};
     v6 = tmp39.v0; v7 = tmp39.v1;
     while (while_method_11(v1, v6, v7)){
         long v9;
@@ -2562,7 +2739,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                 v17 = 7l;
             }
             long v18; long v19; long v20;
-            Tuple17 tmp40 = Tuple17{{v9, v13, v9}};
+            Tuple17 tmp40 = Tuple17{v9, v13, v9};
             v18 = tmp40.v0; v19 = tmp40.v1; v20 = tmp40.v2;
             while (while_method_13(v17, v18, v19, v20)){
                 bool v22;
@@ -2715,7 +2892,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v74;
     long v75; long v76; unsigned char v77;
-    Tuple18 tmp41 = Tuple18{{0l, 0l, 12u}};
+    Tuple18 tmp41 = Tuple18{0l, 0l, 12u};
     v75 = tmp41.v0; v76 = tmp41.v1; v77 = tmp41.v2;
     while (while_method_10(v75)){
         unsigned char v79;
@@ -2879,7 +3056,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v136;
     long v137; long v138; unsigned char v139;
-    Tuple18 tmp42 = Tuple18{{0l, 0l, 12u}};
+    Tuple18 tmp42 = Tuple18{0l, 0l, 12u};
     v137 = tmp42.v0; v138 = tmp42.v1; v139 = tmp42.v2;
     while (while_method_10(v137)){
         unsigned char v141;
@@ -3059,7 +3236,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                     Union8 v200;
                     v200 = Union8{Union8_0{}};
                     long v201; Union8 v202;
-                    Tuple19 tmp43 = Tuple19{{0l, v200}};
+                    Tuple19 tmp43 = Tuple19{0l, v200};
                     v201 = tmp43.v0; v202 = tmp43.v1;
                     while (while_method_2(v201)){
                         unsigned char v204;
@@ -3126,7 +3303,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v224;
     long v225; long v226; unsigned char v227;
-    Tuple18 tmp44 = Tuple18{{0l, 0l, 12u}};
+    Tuple18 tmp44 = Tuple18{0l, 0l, 12u};
     v225 = tmp44.v0; v226 = tmp44.v1; v227 = tmp44.v2;
     while (while_method_10(v225)){
         unsigned char v229;
@@ -3306,7 +3483,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                     Union8 v288;
                     v288 = Union8{Union8_0{}};
                     long v289; Union8 v290;
-                    Tuple19 tmp45 = Tuple19{{0l, v288}};
+                    Tuple19 tmp45 = Tuple19{0l, v288};
                     v289 = tmp45.v0; v290 = tmp45.v1;
                     while (while_method_2(v289)){
                         unsigned char v292;
@@ -3373,7 +3550,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v312;
     long v313; long v314; unsigned char v315;
-    Tuple18 tmp46 = Tuple18{{0l, 0l, 12u}};
+    Tuple18 tmp46 = Tuple18{0l, 0l, 12u};
     v313 = tmp46.v0; v314 = tmp46.v1; v315 = tmp46.v2;
     while (while_method_10(v313)){
         unsigned char v317;
@@ -3553,7 +3730,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                     Union8 v376;
                     v376 = Union8{Union8_0{}};
                     long v377; Union8 v378;
-                    Tuple19 tmp47 = Tuple19{{0l, v376}};
+                    Tuple19 tmp47 = Tuple19{0l, v376};
                     v377 = tmp47.v0; v378 = tmp47.v1;
                     while (while_method_2(v377)){
                         unsigned char v380;
@@ -3624,7 +3801,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
             static_array<unsigned char,4l> v401;
             static_array<unsigned char,3l> v402;
             long v403; long v404; long v405; unsigned char v406;
-            Tuple20 tmp48 = Tuple20{{0l, 0l, 0l, 12u}};
+            Tuple20 tmp48 = Tuple20{0l, 0l, 0l, 12u};
             v403 = tmp48.v0; v404 = tmp48.v1; v405 = tmp48.v2; v406 = tmp48.v3;
             while (while_method_10(v403)){
                 unsigned char v408;
@@ -3731,7 +3908,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                     static_array<unsigned char,3l> v450;
                     static_array<unsigned char,4l> v451;
                     long v452; long v453; long v454; unsigned char v455;
-                    Tuple20 tmp49 = Tuple20{{0l, 0l, 0l, 12u}};
+                    Tuple20 tmp49 = Tuple20{0l, 0l, 0l, 12u};
                     v452 = tmp49.v0; v453 = tmp49.v1; v454 = tmp49.v2; v455 = tmp49.v3;
                     while (while_method_10(v452)){
                         unsigned char v457;
@@ -3801,7 +3978,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                             static_array<unsigned char,2l> v482;
                             static_array<unsigned char,2l> v483;
                             long v484; long v485; long v486; unsigned char v487;
-                            Tuple20 tmp50 = Tuple20{{0l, 0l, 0l, 12u}};
+                            Tuple20 tmp50 = Tuple20{0l, 0l, 0l, 12u};
                             v484 = tmp50.v0; v485 = tmp50.v1; v486 = tmp50.v2; v487 = tmp50.v3;
                             while (while_method_4(v484)){
                                 unsigned char v489;
@@ -3903,7 +4080,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                         case 0: { // None
                             static_array<unsigned char,5l> v530;
                             long v531; long v532;
-                            Tuple2 tmp51 = Tuple2{{0l, 0l}};
+                            Tuple2 tmp51 = Tuple2{0l, 0l};
                             v531 = tmp51.v0; v532 = tmp51.v1;
                             while (while_method_10(v531)){
                                 unsigned char v534;
@@ -3942,7 +4119,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                             }
                             static_array<unsigned char,5l> v545;
                             long v546; long v547;
-                            Tuple2 tmp52 = Tuple2{{0l, 0l}};
+                            Tuple2 tmp52 = Tuple2{0l, 0l};
                             v546 = tmp52.v0; v547 = tmp52.v1;
                             while (while_method_10(v546)){
                                 unsigned char v549;
@@ -3997,7 +4174,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                             Union8 v562;
                                             v562 = Union8{Union8_0{}};
                                             long v563; Union8 v564;
-                                            Tuple19 tmp53 = Tuple19{{0l, v562}};
+                                            Tuple19 tmp53 = Tuple19{0l, v562};
                                             v563 = tmp53.v0; v564 = tmp53.v1;
                                             while (while_method_2(v563)){
                                                 unsigned char v566;
@@ -4064,7 +4241,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                             }
                             static_array<unsigned char,5l> v586;
                             long v587; long v588;
-                            Tuple2 tmp54 = Tuple2{{0l, 0l}};
+                            Tuple2 tmp54 = Tuple2{0l, 0l};
                             v587 = tmp54.v0; v588 = tmp54.v1;
                             while (while_method_10(v587)){
                                 unsigned char v590;
@@ -4119,7 +4296,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                             Union8 v603;
                                             v603 = Union8{Union8_0{}};
                                             long v604; Union8 v605;
-                                            Tuple19 tmp55 = Tuple19{{0l, v603}};
+                                            Tuple19 tmp55 = Tuple19{0l, v603};
                                             v604 = tmp55.v0; v605 = tmp55.v1;
                                             while (while_method_2(v604)){
                                                 unsigned char v607;
@@ -4186,7 +4363,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                             }
                             static_array<unsigned char,5l> v627;
                             long v628; long v629;
-                            Tuple2 tmp56 = Tuple2{{0l, 0l}};
+                            Tuple2 tmp56 = Tuple2{0l, 0l};
                             v628 = tmp56.v0; v629 = tmp56.v1;
                             while (while_method_10(v628)){
                                 unsigned char v631;
@@ -4241,7 +4418,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                             Union8 v644;
                                             v644 = Union8{Union8_0{}};
                                             long v645; Union8 v646;
-                                            Tuple19 tmp57 = Tuple19{{0l, v644}};
+                                            Tuple19 tmp57 = Tuple19{0l, v644};
                                             v645 = tmp57.v0; v646 = tmp57.v1;
                                             while (while_method_2(v645)){
                                                 unsigned char v648;
@@ -4310,7 +4487,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                 case 0: { // None
                                     static_array<unsigned char,5l> v669;
                                     long v670; long v671; unsigned char v672;
-                                    Tuple18 tmp58 = Tuple18{{0l, 0l, 12u}};
+                                    Tuple18 tmp58 = Tuple18{0l, 0l, 12u};
                                     v670 = tmp58.v0; v671 = tmp58.v1; v672 = tmp58.v2;
                                     while (while_method_10(v670)){
                                         unsigned char v674;
@@ -4394,7 +4571,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                             static_array<unsigned char,3l> v705;
                                             static_array<unsigned char,4l> v706;
                                             long v707; long v708; long v709; unsigned char v710;
-                                            Tuple20 tmp59 = Tuple20{{0l, 0l, 0l, 12u}};
+                                            Tuple20 tmp59 = Tuple20{0l, 0l, 0l, 12u};
                                             v707 = tmp59.v0; v708 = tmp59.v1; v709 = tmp59.v2; v710 = tmp59.v3;
                                             while (while_method_10(v707)){
                                                 unsigned char v712;
@@ -4501,7 +4678,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                                     static_array<unsigned char,2l> v754;
                                                     static_array<unsigned char,5l> v755;
                                                     long v756; long v757; long v758; unsigned char v759;
-                                                    Tuple20 tmp60 = Tuple20{{0l, 0l, 0l, 12u}};
+                                                    Tuple20 tmp60 = Tuple20{0l, 0l, 0l, 12u};
                                                     v756 = tmp60.v0; v757 = tmp60.v1; v758 = tmp60.v2; v759 = tmp60.v3;
                                                     while (while_method_10(v756)){
                                                         unsigned char v761;
@@ -4571,7 +4748,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                                             static_array<unsigned char,2l> v786;
                                                             static_array<unsigned char,3l> v787;
                                                             long v788; long v789; long v790; unsigned char v791;
-                                                            Tuple20 tmp61 = Tuple20{{0l, 0l, 0l, 12u}};
+                                                            Tuple20 tmp61 = Tuple20{0l, 0l, 0l, 12u};
                                                             v788 = tmp61.v0; v789 = tmp61.v1; v790 = tmp61.v2; v791 = tmp61.v3;
                                                             while (while_method_2(v788)){
                                                                 unsigned char v793;
@@ -4693,7 +4870,7 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
                                                             static_array<unsigned char,2l> v842;
                                                             static_array<unsigned char,5l> v843;
                                                             long v844; long v845; long v846; unsigned char v847;
-                                                            Tuple20 tmp62 = Tuple20{{0l, 0l, 0l, 12u}};
+                                                            Tuple20 tmp62 = Tuple20{0l, 0l, 0l, 12u};
                                                             v844 = tmp62.v0; v845 = tmp62.v1; v846 = tmp62.v2; v847 = tmp62.v3;
                                                             while (while_method_10(v844)){
                                                                 unsigned char v849;
@@ -4895,13 +5072,13 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
             assert("Invalid tag." && false);
         }
     }
-    return Tuple0{{v925, v926}};
+    return Tuple0{v925, v926};
 }
 __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<Union3,128l> & v1, curandStatePhilox4_32_10_t & v2, static_array<Union2,2l> v3, Union5 v4){
     static_array_list<Union3,128l> & v5 = v1;
     unsigned long long & v6 = v0;
     bool v7; Union5 v8;
-    Tuple9 tmp16 = Tuple9{{true, v4}};
+    Tuple9 tmp16 = Tuple9{true, v4};
     v7 = tmp16.v0; v8 = tmp16.v1;
     while (while_method_5(v7, v8)){
         bool v543; Union5 v544;
@@ -5071,7 +5248,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                         long v98;
                         v98 = v86[0l];
                         long v99; long v100;
-                        Tuple2 tmp29 = Tuple2{{1l, v98}};
+                        Tuple2 tmp29 = Tuple2{1l, v98};
                         v99 = tmp29.v0; v100 = tmp29.v1;
                         while (while_method_0(v99)){
                             long v102;
@@ -5130,7 +5307,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                         long v120;
                         v120 = v108[0l];
                         long v121; long v122;
-                        Tuple2 tmp30 = Tuple2{{1l, v120}};
+                        Tuple2 tmp30 = Tuple2{1l, v120};
                         v121 = tmp30.v0; v122 = tmp30.v1;
                         while (while_method_0(v121)){
                             long v124;
@@ -5211,22 +5388,22 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                         static_array<Tuple15,6l> v146;
                         Union1 v147;
                         v147 = Union1{Union1_2{}};
-                        v146[0l] = Tuple15{{v147, v128}};
+                        v146[0l] = Tuple15{v147, v128};
                         Union1 v148;
                         v148 = Union1{Union1_1{}};
-                        v146[1l] = Tuple15{{v148, 4.0f}};
+                        v146[1l] = Tuple15{v148, 4.0f};
                         Union1 v149;
                         v149 = Union1{Union1_3{v129}};
-                        v146[2l] = Tuple15{{v149, v134}};
+                        v146[2l] = Tuple15{v149, v134};
                         Union1 v150;
                         v150 = Union1{Union1_3{v135}};
-                        v146[3l] = Tuple15{{v150, v140}};
+                        v146[3l] = Tuple15{v150, v140};
                         Union1 v151;
                         v151 = Union1{Union1_3{v122}};
-                        v146[4l] = Tuple15{{v151, v145}};
+                        v146[4l] = Tuple15{v151, v145};
                         Union1 v152;
                         v152 = Union1{Union1_0{}};
-                        v146[5l] = Tuple15{{v152, 1.0f}};
+                        v146[5l] = Tuple15{v152, 1.0f};
                         Union1 v153;
                         v153 = sample_discrete_43(v146, v2);
                         Union3 v154;
@@ -5251,7 +5428,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                                 long v247;
                                 v247 = v86[0l];
                                 long v248; long v249;
-                                Tuple2 tmp33 = Tuple2{{1l, v247}};
+                                Tuple2 tmp33 = Tuple2{1l, v247};
                                 v248 = tmp33.v0; v249 = tmp33.v1;
                                 while (while_method_0(v248)){
                                     long v251;
@@ -5381,7 +5558,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                                 long v162;
                                 v162 = v86[0l];
                                 long v163; long v164;
-                                Tuple2 tmp34 = Tuple2{{1l, v162}};
+                                Tuple2 tmp34 = Tuple2{1l, v162};
                                 v163 = tmp34.v0; v164 = tmp34.v1;
                                 while (while_method_0(v163)){
                                     long v166;
@@ -5478,7 +5655,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                                 long v198;
                                 v198 = v86[0l];
                                 long v199; long v200;
-                                Tuple2 tmp35 = Tuple2{{1l, v198}};
+                                Tuple2 tmp35 = Tuple2{1l, v198};
                                 v199 = tmp35.v0; v200 = tmp35.v1;
                                 while (while_method_0(v199)){
                                     long v202;
@@ -5634,7 +5811,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                         long v399;
                         v399 = v300[0l];
                         long v400; long v401;
-                        Tuple2 tmp36 = Tuple2{{1l, v399}};
+                        Tuple2 tmp36 = Tuple2{1l, v399};
                         v400 = tmp36.v0; v401 = tmp36.v1;
                         while (while_method_0(v400)){
                             long v403;
@@ -5764,7 +5941,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                         long v314;
                         v314 = v300[0l];
                         long v315; long v316;
-                        Tuple2 tmp37 = Tuple2{{1l, v314}};
+                        Tuple2 tmp37 = Tuple2{1l, v314};
                         v315 = tmp37.v0; v316 = tmp37.v1;
                         while (while_method_0(v315)){
                             long v318;
@@ -5861,7 +6038,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                         long v350;
                         v350 = v300[0l];
                         long v351; long v352;
-                        Tuple2 tmp38 = Tuple2{{1l, v350}};
+                        Tuple2 tmp38 = Tuple2{1l, v350};
                         v351 = tmp38.v0; v352 = tmp38.v1;
                         while (while_method_0(v351)){
                             long v354;
@@ -6132,8 +6309,8 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
                     }
                 }
                 static_array<Tuple0,2l> v82;
-                v82[0l] = Tuple0{{v39, v40}};
-                v82[1l] = Tuple0{{v50, v51}};
+                v82[0l] = Tuple0{v39, v40};
+                v82[1l] = Tuple0{v50, v51};
                 Union3 v83;
                 v83 = Union3{Union3_4{v80, v82, v81}};
                 v5.push(v83);
@@ -6210,7 +6387,7 @@ __device__ Tuple8 play_loop_31(Union4 v0, static_array<Union2,2l> v1, Union7 v2,
             v30 = Union4{Union4_0{}};
             Union7 v31;
             v31 = Union7{Union7_1{v24, v25, v26, v27, v28, v29}};
-            return Tuple8{{v30, v1, v31}};
+            return Tuple8{v30, v1, v31};
             break;
         }
         case 4: { // G_Round
@@ -6219,7 +6396,7 @@ __device__ Tuple8 play_loop_31(Union4 v0, static_array<Union2,2l> v1, Union7 v2,
             v14 = Union4{Union4_1{v7}};
             Union7 v15;
             v15 = Union7{Union7_2{v8, v9, v10, v11, v12, v13}};
-            return Tuple8{{v14, v1, v15}};
+            return Tuple8{v14, v1, v15};
             break;
         }
         case 6: { // G_Showdown
@@ -6228,7 +6405,7 @@ __device__ Tuple8 play_loop_31(Union4 v0, static_array<Union2,2l> v1, Union7 v2,
             v22 = Union4{Union4_0{}};
             Union7 v23;
             v23 = Union7{Union7_1{v16, v17, v18, v19, v20, v21}};
-            return Tuple8{{v22, v1, v23}};
+            return Tuple8{v22, v1, v23};
             break;
         }
         default: {
@@ -7095,7 +7272,7 @@ i8 = i16 = i32 = i64 = u8 = u16 = u32 = u64 = int; f32 = f64 = float; char = str
 
 import time
 options = []
-options.append('--diag-suppress=550,20012')
+options.append('--diag-suppress=550,20012,68')
 options.append('--dopt=on')
 options.append('--restrict')
 options.append('-I C:/Spiral_s_ML_Library/cpplib')
