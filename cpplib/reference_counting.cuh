@@ -84,78 +84,74 @@ struct static_array_list
         return this->ptr[i];
     }
     __device__ void push(el & x) {
-        new (&ptr[this->length++]) el{x};
-        assert(this->length <= max_length);
+        ptr[this->length++] = x;
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
     }
     __device__ void push(el && x) {
-        new (&ptr[this->length++]) el{std::move(x)};
-        assert(this->length <= max_length);
+        ptr[this->length++] = std::move(x);
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
     }
     __device__ el pop() {
-        --this->length;
-        assert (0 <= this->length);
-        auto x = ptr[this->length];
+        assert ("The array before popping should be greater than 0." && 0 < this->length);
+        auto x = ptr[--this->length];
         ptr[this->length].~el();
+        new (&ptr[this->length]) el();
         return x;
     }
     // Should be used only during initialization.
     __device__ void unsafe_set_length(default_int i){
-        assert(0 <= i && i <= max_length);
+        assert("The new length should be in range." && 0 <= i && i <= max_length);
         this->length = i;
     }
 };
 
-// template <typename el>
-// struct dynamic_array
-// {
-//     int refc{0};
-//     default_int length;
-//     el *ptr;
+template <typename el, default_int max_length>
+struct dynamic_array
+{
+    int refc{0};
+    el *ptr;
 
-//     __device__ dynamic_array() = delete;
-//     __device__ dynamic_array(default_int l) : length(l), ptr(new el[l]) {}
-//     __device__ ~dynamic_array() { delete[] this->ptr; }
+    __device__ dynamic_array() : ptr(new el[max_length]) {}
+    __device__ ~dynamic_array() { delete[] this->ptr; }
 
-//     el & operator[](default_int i) {
-//         assert("The index has to be in range." && 0 <= i && i < this->length);
-//         return this->ptr[i];
-//     }
-// };
+    __device__ el & operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+};
 
-// template <typename el>
-// struct dynamic_array_list
-// {
-//     int refc{0};
-//     default_int length{0};
-//     default_int max_length;
-//     el *ptr;
+template <typename el, default_int max_length>
+struct dynamic_array_list
+{
+    int refc{0};
+    default_int length{0};
+    el *ptr;
 
-//     __device__ dynamic_array_list() = delete;
-//     __device__ dynamic_array_list(default_int l) : max_length(l), ptr(new el[l]) {}
-//     __device__ ~dynamic_array_list() { delete[] this->ptr; }
+    __device__ dynamic_array_list() : ptr(new el[max_length]) {}
+    __device__ ~dynamic_array_list() { delete[] this->ptr; }
 
-//     el & operator[](default_int i) {
-//         assert("The index has to be in range." && 0 <= i && i < this->length);
-//         return this->ptr[i];
-//     }
-//     void push(el & x) {
-//         new (&ptr[this->length++]) el{x};
-//         assert(this->length <= this->max_length);
-//     }
-//     void push(el && x) {
-//         new (&ptr[this->length++]) el{std::move(x)};
-//         assert(this->length <= this->max_length);
-//     }
-//     el pop() {
-//         --this->length;
-//         assert (0 <= this->length);
-//         auto x = ptr[this->length];
-//         ptr[this->length].~el();
-//         return x;
-//     }
-//     // Should be used only during initialization.
-//     void unsafe_set_length(default_int i){
-//         assert(0 <= i && i <= this->max_length);
-//         this->length = i;
-//     }
-// };
+    __device__ el & operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+    __device__ void push(el & x) {
+        ptr[this->length++] = x;
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ void push(el && x) {
+        ptr[this->length++] = std::move(x);
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ el pop() {
+        assert ("The array before popping should be greater than 0." && 0 < this->length);
+        auto x = ptr[--this->length];
+        ptr[this->length].~el();
+        new (&ptr[this->length]) el();
+        return x;
+    }
+    // Should be used only during initialization.
+    __device__ void unsafe_set_length(default_int i){
+        assert("The new length should be in range." && 0 <= i && i <= max_length);
+        this->length = i;
+    }
+};

@@ -36,7 +36,6 @@ inl run' ({shared_mem} : run_config) f =
     global "options.append('--restrict')" // assumes all the pointers are restricted
     global "options.append('-I C:/Spiral_s_ML_Library/cpplib')"
     
-
     match threads_per_block with
     | 1024 => global "options.append('--maxrregcount=64')"
     | 512 => global "options.append('--maxrregcount=128')"

@@ -22,7 +22,9 @@ modules:
         console
         arraym
         sam
+        dam
         sa_listm
+        da_listm
         tensorm/
             utils*
             tensor_main-

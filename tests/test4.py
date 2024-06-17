@@ -136,11 +136,17 @@ class static_array_list(static_array):
     def pop(self):
         assert (0 < self.length), "The length before popping has to be greater than 0."
         self.length -= 1
-        return self.ptr[self.length]
+        x = self.ptr[self.length]
+        self.ptr[self.length] = None
+        return x
 
     def unsafe_set_length(self,i):
         assert 0 <= i <= len(self.ptr), "The new length has to be in range."
         self.length = i
+
+class dynamic_array(static_array): pass
+class dynamic_array_list(static_array_list): pass
+        
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple

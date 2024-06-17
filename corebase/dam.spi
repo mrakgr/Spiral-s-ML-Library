@@ -1,0 +1,49 @@
+// The `da` is similar to `sa` except it is allocated using dynamic memory. The purpose of this is to both improve
+// compilation speed as well as not have the data be spread across all the threads in a block.
+// The reason it has a type literal for a dimension is so it can be easily serialized.
+nominal da dim el = $"backend_switch `({Cuda : $"dymanic_array<`el,@dim>"; Python : $"dynamic_array"})"
+
+// Creates an empty array.
+inl create' forall dim el. : da dim el = 
+    assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
+    backend_switch {
+        Cuda = fun () => $"dynamic_array<`el,@dim> \v"
+        Python = fun () => $"dynamic_array(@dim)" : da dim el
+    }
+    
+instance create da dim = fun dim =>
+    assert ((real real_core.type_lit_to_lit `dim) = dim) "The type level dimension has to equal the value passed at runtime into create."
+    create'
+
+// Returns the length of an array.
+instance length da dim = fun ar => real real_core.type_lit_to_lit `dim : int
+// Indexes into an array.
+instance index da dim = fun ar i => 
+    backend_switch {
+        Cuda = fun () => $"!ar[!i]"
+        Python = fun () => $"!ar[!i]"
+    }
+    
+// Sets the value of an array at the specified index.
+// Should be used with care. The static array should be used in an immutable fashion preferably.
+instance set da dim = fun ar i v => 
+    backend_switch {
+        Cuda = fun () => $"!ar[!i] = !v"
+        Python = fun () => $"!ar[!i] = !v"
+    }
+
+open arraym
+
+instance equable da dim el = generic_equable
+instance comparable da dim el = generic_comparable
+
+// Initializes array using the given function.
+inl init forall dim el. f : da dim el = init (real real_core.type_lit_to_lit `dim) f
+
+open console
+instance printable da dim el = array_print 100
+
+// inl main() =
+//     inl x : sa 3 i32 = fromList [1;2;3]
+//     update 1 (const 55) x
+//     |> console.write_ln

@@ -24,18 +24,22 @@ inl calculate_offsets forall el. =
     inl rec f forall el. =
         open struct
         infer_mapFold `el (forall el. s =>
-            typecase el with
-            | sam.sa ~dim ~el' =>
+            inl case_sa forall dim el'. =
                 inl el_offsets, el_size = f `el' (conv `size 0)
                 inl s, el_size = align_array s el_size
                 inl dim = conv `size (type_lit_to_lit `dim)
                 (exists [el] {base_offset=s; el_offsets el_size}), s + dim * el_size
-            | sa_listm.sa_list ~dim ~el' =>
+            inl case_sa_list forall dim el'. =
                 inl dim_offset, s = f `int s
                 inl el_offsets, el_size = f `el' (conv `size 0)
                 inl s, el_size = align_array s el_size
                 inl dim = conv `size (type_lit_to_lit `dim)
                 (exists [el] {base_offset=s; dim_offset el_offsets el_size}), s + dim * el_size
+            typecase el with
+            | sam.sa ~dim ~el' => case_sa `dim `el'
+            | dam.da ~dim ~el' => case_sa `dim `el'
+            | sa_listm.sa_list ~dim ~el' => case_sa_list `dim `el'
+            | da_listm.da_list ~dim ~el' => case_sa_list `dim `el'
             | _ =>
                 if singleton_type_is `el then (exists [el] s), s
                 elif union_type_is `el then
@@ -80,9 +84,13 @@ inl serialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) (v : el
                     f ptr el_offsets (index `array `el v i)
             typecase el with
             | sam.sa ~dim ~el' => serialize_sa `(sam.sa dim) `el'
+            | dam.da ~dim ~el' => serialize_sa `(dam.sa dim) `el'
             | sa_listm.sa_list ~dim ~el' => 
                 f ptr offset.dim_offset (length `(sa_listm.sa_list dim) `el v)
                 serialize_sa `(sa_listm.sa_list dim) `el'
+            | da_listm.da_list ~dim ~el' => 
+                f ptr offset.dim_offset (length `(da_listm.sa_list dim) `el v)
+                serialize_sa `(da_listm.da_list dim) `el'
             | _ =>
                 if singleton_type_is `el then ()
                 elif union_type_is `el then
@@ -118,6 +126,15 @@ inl deserialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) : el 
                 inl ar = sa_listm.create' `dim `el'
                 sa_listm.unsafe_set_length `dim `el' ar (f ptr offset.dim_offset)
                 deserialize_sa `(sa_listm.sa_list dim) `el' ar
+                ar
+            | dam.da ~dim ~el' => 
+                inl ar = dam.create' `dim `el'
+                deserialize_sa `(dam.da dim) `el' ar
+                ar
+            | da_listm.da_list ~dim ~el' =>
+                inl ar = da_listm.create' `dim `el'
+                da_listm.unsafe_set_length `dim `el' ar (f ptr offset.dim_offset)
+                deserialize_sa `(da_listm.da_list dim) `el' ar
                 ar
             | _ =>
                 if singleton_type_is `el then
