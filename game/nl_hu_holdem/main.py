@@ -1,10 +1,207 @@
 kernel = r"""
-using default_int = long;
-using default_uint = unsigned long;
-#include "reference_counting.cuh"
+#include <new>
 #include <assert.h>
 #include <stdio.h>
 #include <curand_kernel.h>
+using default_int = long;
+using default_uint = unsigned long;
+template <typename el>
+struct sptr // Shared pointer for the Spiral datatypes. They have to have the refc field inside them to work.
+{
+    el* base;
+
+    __device__ sptr() : base(nullptr) {}
+    __device__ sptr(el* ptr) : base(ptr) { this->base->refc++; }
+
+    __device__ ~sptr()
+    {
+        if (this->base != nullptr && --this->base->refc == 0)
+        {
+            delete this->base;
+            this->base = nullptr;
+        }
+    }
+
+    __device__ sptr(sptr& x)
+    {
+        this->base = x.base;
+        this->base->refc++;
+    }
+
+    __device__ sptr(sptr&& x)
+    {
+        this->base = x.base;
+        x.base = nullptr;
+    }
+
+    __device__ sptr& operator=(sptr& x)
+    {
+        if (this->base != x.base)
+        {
+            delete this->base;
+            this->base = x.base;
+            this->base->refc++;
+        }
+        return *this;
+    }
+
+    __device__ sptr& operator=(sptr&& x)
+    {
+        if (this->base != x.base)
+        {
+            delete this->base;
+            this->base = x.base;
+            x.base = nullptr;
+        }
+        return *this;
+    }
+};
+
+template <typename el>
+struct csptr : public sptr<el>
+{ // Shared pointer for closures specifically.
+    using sptr<el>::sptr;
+    template <typename... Args>
+    __device__ auto operator()(Args... args) -> decltype(this->base->operator()(args...))
+    {
+        return this->base->operator()(args...);
+    }
+};
+
+template <typename el, default_int max_length>
+struct static_array
+{
+    el ptr[max_length];
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < max_length);
+        return this->ptr[i];
+    }
+};
+
+template <typename el, default_int max_length>
+struct static_array_list
+{
+    default_int length{ 0 };
+    el ptr[max_length];
+
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+    __device__ void push(el& x) {
+        ptr[this->length++] = x;
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ void push(el&& x) {
+        ptr[this->length++] = std::move(x);
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ el pop() {
+        assert("The array before popping should be greater than 0." && 0 < this->length);
+        auto x = ptr[--this->length];
+        ptr[this->length].~el();
+        new (&ptr[this->length]) el();
+        return x;
+    }
+    // Should be used only during initialization.
+    __device__ void unsafe_set_length(default_int i) {
+        assert("The new length should be in range." && 0 <= i && i <= max_length);
+        this->length = i;
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array_base
+{
+    int refc{ 0 };
+    el* ptr;
+
+    __device__ dynamic_array_base() : ptr(new el[max_length]) {}
+    __device__ ~dynamic_array_base() { delete[] this->ptr; }
+
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array
+{
+    sptr<dynamic_array_base<el, max_length>> ptr;
+
+    __device__ dynamic_array() = default;
+    __device__ dynamic_array(bool t) : ptr(new dynamic_array_base<el, max_length>()) {}
+    __device__ el& operator[](default_int i) {
+        return this->ptr.base->operator[](i);
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array_list_base
+{
+    int refc{ 0 };
+    default_int length{ 0 };
+    el* ptr;
+
+    __device__ dynamic_array_list_base() : ptr(new el[max_length]) {}
+    __device__ dynamic_array_list_base(default_int l) : ptr(new el[max_length]) { this->unsafe_set_length(l); }
+    __device__ ~dynamic_array_list_base() { delete[] this->ptr; }
+
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+    __device__ void push(el& x) {
+        ptr[this->length++] = x;
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ void push(el&& x) {
+        ptr[this->length++] = std::move(x);
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ el pop() {
+        assert("The array before popping should be greater than 0." && 0 < this->length);
+        auto x = ptr[--this->length];
+        ptr[this->length].~el();
+        new (&ptr[this->length]) el();
+        return x;
+    }
+    // Should be used only during initialization.
+    __device__ void unsafe_set_length(default_int i) {
+        assert("The new length should be in range." && 0 <= i && i <= max_length);
+        this->length = i;
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array_list
+{
+    sptr<dynamic_array_list_base<el, max_length>> ptr;
+
+    __device__ dynamic_array_list() = default;
+    __device__ dynamic_array_list(default_int l) : ptr(new dynamic_array_list_base<el, max_length>(l)) {}
+
+    __device__ el& operator[](default_int i) {
+        return this->ptr.base->operator[](i);
+    }
+    __device__ void push(el& x) {
+        this->ptr.base->push(x);
+    }
+    __device__ void push(el&& x) {
+        this->ptr.base->push(std::move(x));
+    }
+    __device__ el pop() {
+        return this->ptr.base->pop();
+    }
+    // Should be used only during initialization.
+    __device__ void unsafe_set_length(default_int i) {
+        this->ptr.base->unsafe_set_length(i);
+    }
+    __device__ default_int length_() {
+        return this->ptr.base->length;
+    }
+};
 struct Union1;
 struct Union2;
 struct Union0;
@@ -86,8 +283,8 @@ struct Union12;
 struct Union13;
 struct Union14;
 __device__ Tuple0 score_46(static_array<unsigned char,7l> v0);
-__device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<Union3,128l> & v1, curandStatePhilox4_32_10_t & v2, static_array<Union2,2l> v3, Union5 v4);
-__device__ Tuple8 play_loop_31(Union4 v0, static_array<Union2,2l> v1, Union7 v2, unsigned long long & v3, static_array_list<Union3,128l> & v4, curandStatePhilox4_32_10_t & v5, Union5 v6);
+__device__ Union5 play_loop_inner_32(unsigned long long & v0, dynamic_array_list<Union3,128l> & v1, curandStatePhilox4_32_10_t & v2, static_array<Union2,2l> v3, Union5 v4);
+__device__ Tuple8 play_loop_31(Union4 v0, static_array<Union2,2l> v1, Union7 v2, unsigned long long & v3, dynamic_array_list<Union3,128l> & v4, curandStatePhilox4_32_10_t & v5, Union5 v6);
 __device__ void f_48(unsigned char * v0, unsigned long long v1);
 __device__ void f_49(unsigned char * v0, long v1);
 __device__ void f_51(unsigned char * v0, long v1);
@@ -115,9 +312,9 @@ __device__ void f_71(unsigned char * v0, long v1, static_array<static_array<unsi
 __device__ void f_64(unsigned char * v0, Union5 v1);
 __device__ void f_73(unsigned char * v0, Union2 v1);
 __device__ void f_74(unsigned char * v0, long v1);
-__device__ void f_47(unsigned char * v0, unsigned long long v1, static_array_list<Union3,128l> v2, Union4 v3, static_array<Union2,2l> v4, Union7 v5);
+__device__ void f_47(unsigned char * v0, unsigned long long v1, dynamic_array_list<Union3,128l> v2, Union4 v3, static_array<Union2,2l> v4, Union7 v5);
 __device__ void f_76(unsigned char * v0, long v1);
-__device__ void f_75(unsigned char * v0, static_array_list<Union3,128l> v1, static_array<Union2,2l> v2, Union7 v3);
+__device__ void f_75(unsigned char * v0, dynamic_array_list<Union3,128l> v1, static_array<Union2,2l> v2, Union7 v3);
 struct Union1_0 { // A_All_In
 };
 struct Union1_1 { // A_Call
@@ -831,12 +1028,12 @@ struct Union7 {
 };
 struct Tuple1 {
     unsigned long long v0;
-    static_array_list<Union3,128l> v1;
+    dynamic_array_list<Union3,128l> v1;
     Union4 v2;
     static_array<Union2,2l> v3;
     Union7 v4;
     __device__ Tuple1() = default;
-    __device__ Tuple1(unsigned long long t0, static_array_list<Union3,128l> t1, Union4 t2, static_array<Union2,2l> t3, Union7 t4) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4) {}
+    __device__ Tuple1(unsigned long long t0, dynamic_array_list<Union3,128l> t1, Union4 t2, static_array<Union2,2l> t3, Union7 t4) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4) {}
 };
 struct Tuple2 {
     long v0;
@@ -2150,13 +2347,12 @@ __device__ long f_30(unsigned char * v0){
 __device__ Tuple1 f_6(unsigned char * v0){
     unsigned long long v1;
     v1 = f_7(v0);
-    static_array_list<Union3,128l> v2;
-    v2 = static_array_list<Union3,128l>{};
+    dynamic_array_list<Union3,128l> v2{0};
     long v3;
     v3 = f_8(v0);
     v2.unsafe_set_length(v3);
     long v4;
-    v4 = v2.length;
+    v4 = v2.length_();
     long v5;
     v5 = 0l;
     while (while_method_1(v4, v5)){
@@ -5074,8 +5270,8 @@ __device__ Tuple0 score_46(static_array<unsigned char,7l> v0){
     }
     return Tuple0{v925, v926};
 }
-__device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<Union3,128l> & v1, curandStatePhilox4_32_10_t & v2, static_array<Union2,2l> v3, Union5 v4){
-    static_array_list<Union3,128l> & v5 = v1;
+__device__ Union5 play_loop_inner_32(unsigned long long & v0, dynamic_array_list<Union3,128l> & v1, curandStatePhilox4_32_10_t & v2, static_array<Union2,2l> v3, Union5 v4){
+    dynamic_array_list<Union3,128l> & v5 = v1;
     unsigned long long & v6 = v0;
     bool v7; Union5 v8;
     Tuple9 tmp16 = Tuple9{true, v4};
@@ -6377,7 +6573,7 @@ __device__ Union5 play_loop_inner_32(unsigned long long & v0, static_array_list<
     }
     return v8;
 }
-__device__ Tuple8 play_loop_31(Union4 v0, static_array<Union2,2l> v1, Union7 v2, unsigned long long & v3, static_array_list<Union3,128l> & v4, curandStatePhilox4_32_10_t & v5, Union5 v6){
+__device__ Tuple8 play_loop_31(Union4 v0, static_array<Union2,2l> v1, Union7 v2, unsigned long long & v3, dynamic_array_list<Union3,128l> & v4, curandStatePhilox4_32_10_t & v5, Union5 v6){
     Union5 v7;
     v7 = play_loop_inner_32(v3, v4, v5, v1, v6);
     switch (v7.tag) {
@@ -6969,13 +7165,13 @@ __device__ void f_74(unsigned char * v0, long v1){
     v2[0l] = v1;
     return ;
 }
-__device__ void f_47(unsigned char * v0, unsigned long long v1, static_array_list<Union3,128l> v2, Union4 v3, static_array<Union2,2l> v4, Union7 v5){
+__device__ void f_47(unsigned char * v0, unsigned long long v1, dynamic_array_list<Union3,128l> v2, Union4 v3, static_array<Union2,2l> v4, Union7 v5){
     f_48(v0, v1);
     long v6;
-    v6 = v2.length;
+    v6 = v2.length_();
     f_49(v0, v6);
     long v7;
-    v7 = v2.length;
+    v7 = v2.length_();
     long v8;
     v8 = 0l;
     while (while_method_1(v7, v8)){
@@ -7058,12 +7254,12 @@ __device__ void f_76(unsigned char * v0, long v1){
     v2[0l] = v1;
     return ;
 }
-__device__ void f_75(unsigned char * v0, static_array_list<Union3,128l> v1, static_array<Union2,2l> v2, Union7 v3){
+__device__ void f_75(unsigned char * v0, dynamic_array_list<Union3,128l> v1, static_array<Union2,2l> v2, Union7 v3){
     long v4;
-    v4 = v1.length;
+    v4 = v1.length_();
     f_51(v0, v4);
     long v5;
-    v5 = v1.length;
+    v5 = v1.length_();
     long v6;
     v6 = 0l;
     while (while_method_1(v5, v6)){
@@ -7135,11 +7331,11 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
     if (v7){
         Union0 v8;
         v8 = f_0(v1);
-        unsigned long long v9; static_array_list<Union3,128l> v10; Union4 v11; static_array<Union2,2l> v12; Union7 v13;
+        unsigned long long v9; dynamic_array_list<Union3,128l> v10; Union4 v11; static_array<Union2,2l> v12; Union7 v13;
         Tuple1 tmp15 = f_6(v0);
         v9 = tmp15.v0; v10 = tmp15.v1; v11 = tmp15.v2; v12 = tmp15.v3; v13 = tmp15.v4;
         unsigned long long & v14 = v9;
-        static_array_list<Union3,128l> & v15 = v10;
+        dynamic_array_list<Union3,128l> & v15 = v10;
         unsigned long long v16;
         v16 = clock64();
         long v17;
@@ -7200,8 +7396,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                 Union2 v25;
                 v25 = Union2{Union2_1{}};
                 v23[1l] = v25;
-                static_array_list<Union3,128l> v26;
-                v26 = static_array_list<Union3,128l>{};
+                dynamic_array_list<Union3,128l> v26{0};
                 v14 = 4503599627370495ull;
                 v15 = v26;
                 Union4 v27;
@@ -7265,6 +7460,10 @@ class static_array_list(static_array):
     def unsafe_set_length(self,i):
         assert 0 <= i <= len(self.ptr), "The new length has to be in range."
         self.length = i
+
+class dynamic_array(static_array): pass
+class dynamic_array_list(static_array_list):
+    def length_(self): return self.length
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
@@ -7466,7 +7665,7 @@ def Closure1():
         v2 = US2_1()
         v0[1] = v2
         del v2
-        v3 = static_array_list(128)
+        v3 = dynamic_array_list(128)
         v4 = 4503599627370495
         v5 = US3_0()
         v6 = US6_0()
@@ -7821,7 +8020,7 @@ def method14(v0 : object) -> US7:
                         raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                         del v1
                         raise Exception("Error")
-def method13(v0 : object) -> static_array_list:
+def method13(v0 : object) -> dynamic_array_list:
     v1 = len(v0) # type: ignore
     assert (128 >= v1), f'The length of the original object has to be greater than or equal to the static array dimension.\nExpected: 128\nGot: {v1} '
     del v1
@@ -7836,7 +8035,7 @@ def method13(v0 : object) -> static_array_list:
     else:
         pass
     del v3, v4
-    v6 = static_array_list(128)
+    v6 = dynamic_array_list(128)
     v6.unsafe_set_length(v2)
     v7 = 0
     while method6(v2, v7):
@@ -7848,7 +8047,7 @@ def method13(v0 : object) -> static_array_list:
         v7 += 1 
     del v0, v2, v7
     return v6
-def method10(v0 : object) -> Tuple[u64, static_array_list]:
+def method10(v0 : object) -> Tuple[u64, dynamic_array_list]:
     v1 = v0["deck"] # type: ignore
     v2 = method11(v1)
     del v1
@@ -8155,7 +8354,7 @@ def method28(v0 : object) -> Tuple[US3, static_array, US6]:
     v6 = method38(v5)
     del v5
     return v2, v4, v6
-def method9(v0 : object) -> Tuple[u64, static_array_list, US3, static_array, US6]:
+def method9(v0 : object) -> Tuple[u64, dynamic_array_list, US3, static_array, US6]:
     v1 = v0["large"] # type: ignore
     v2, v3 = method10(v1)
     del v1
@@ -8164,7 +8363,7 @@ def method9(v0 : object) -> Tuple[u64, static_array_list, US3, static_array, US6
     v5, v6, v7 = method28(v4)
     del v4
     return v2, v3, v5, v6, v7
-def method8(v0 : object) -> Tuple[u64, static_array_list, US3, static_array, US6]:
+def method8(v0 : object) -> Tuple[u64, dynamic_array_list, US3, static_array, US6]:
     return method9(v0)
 def method40(v0 : cp.ndarray, v1 : i32) -> None:
     v2 = v0[0:].view(cp.int32)
@@ -8677,13 +8876,13 @@ def method73(v0 : cp.ndarray, v1 : i32) -> None:
     v2[0] = v1
     del v1, v2
     return 
-def method46(v0 : cp.ndarray, v1 : u64, v2 : static_array_list, v3 : US3, v4 : static_array, v5 : US6) -> None:
+def method46(v0 : cp.ndarray, v1 : u64, v2 : dynamic_array_list, v3 : US3, v4 : static_array, v5 : US6) -> None:
     method47(v0, v1)
     del v1
-    v6 = v2.length
+    v6 = v2.length_()
     method48(v0, v6)
     del v6
-    v7 = v2.length
+    v7 = v2.length_()
     v8 = 0
     while method6(v7, v8):
         v10 = u64(v8)
@@ -9245,13 +9444,13 @@ def method103(v0 : cp.ndarray) -> i32:
     v2 = v1[0].item()
     del v1
     return v2
-def method76(v0 : cp.ndarray) -> Tuple[u64, static_array_list, US3, static_array, US6]:
+def method76(v0 : cp.ndarray) -> Tuple[u64, dynamic_array_list, US3, static_array, US6]:
     v1 = method77(v0)
-    v2 = static_array_list(128)
+    v2 = dynamic_array_list(128)
     v3 = method78(v0)
     v2.unsafe_set_length(v3)
     del v3
-    v4 = v2.length
+    v4 = v2.length_()
     v5 = 0
     while method6(v4, v5):
         v7 = u64(v5)
@@ -9316,12 +9515,12 @@ def method105(v0 : cp.ndarray) -> i32:
     v2 = v1[0].item()
     del v1
     return v2
-def method104(v0 : cp.ndarray) -> Tuple[static_array_list, static_array, US6]:
-    v1 = static_array_list(128)
+def method104(v0 : cp.ndarray) -> Tuple[dynamic_array_list, static_array, US6]:
+    v1 = dynamic_array_list(128)
     v2 = method80(v0)
     v1.unsafe_set_length(v2)
     del v2
-    v3 = v1.length
+    v3 = v1.length_()
     v4 = 0
     while method6(v3, v4):
         v6 = u64(v4)
@@ -9572,9 +9771,9 @@ def method113(v0 : US7) -> object:
             return v25
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method112(v0 : static_array_list) -> object:
+def method112(v0 : dynamic_array_list) -> object:
     v1 = []
-    v2 = v0.length
+    v2 = v0.length_()
     v3 = 0
     while method6(v2, v3):
         v5 = v0[v3]
@@ -9585,7 +9784,7 @@ def method112(v0 : static_array_list) -> object:
         v3 += 1 
     del v0, v2, v3
     return v1
-def method109(v0 : u64, v1 : static_array_list) -> object:
+def method109(v0 : u64, v1 : dynamic_array_list) -> object:
     v2 = method110(v0)
     del v0
     v3 = method112(v1)
@@ -9858,7 +10057,7 @@ def method130(v0 : US3, v1 : static_array, v2 : US6) -> object:
     v6 = {'game': v3, 'pl_type': v4, 'ui_game_state': v5}
     del v3, v4, v5
     return v6
-def method108(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 : US6) -> object:
+def method108(v0 : u64, v1 : dynamic_array_list, v2 : US3, v3 : static_array, v4 : US6) -> object:
     v5 = method109(v0, v1)
     del v0, v1
     v6 = method130(v2, v3, v4)
@@ -9866,7 +10065,7 @@ def method108(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 
     v7 = {'large': v5, 'small': v6}
     del v5, v6
     return v7
-def method143(v0 : static_array_list, v1 : static_array, v2 : US6) -> object:
+def method143(v0 : dynamic_array_list, v1 : static_array, v2 : US6) -> object:
     v3 = method112(v0)
     del v0
     v4 = method140(v1)
@@ -9876,7 +10075,7 @@ def method143(v0 : static_array_list, v1 : static_array, v2 : US6) -> object:
     v6 = {'messages': v3, 'pl_type': v4, 'ui_game_state': v5}
     del v3, v4, v5
     return v6
-def method107(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 : US6, v5 : static_array_list, v6 : static_array, v7 : US6) -> object:
+def method107(v0 : u64, v1 : dynamic_array_list, v2 : US3, v3 : static_array, v4 : US6, v5 : dynamic_array_list, v6 : static_array, v7 : US6) -> object:
     v8 = method108(v0, v1, v2, v3, v4)
     del v0, v1, v2, v3, v4
     v9 = method143(v5, v6, v7)
@@ -9884,11 +10083,11 @@ def method107(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 
     v10 = {'game_state': v8, 'ui_state': v9}
     del v8, v9
     return v10
-def method106(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 : US6, v5 : static_array_list, v6 : static_array, v7 : US6) -> object:
+def method106(v0 : u64, v1 : dynamic_array_list, v2 : US3, v3 : static_array, v4 : US6, v5 : dynamic_array_list, v6 : static_array, v7 : US6) -> object:
     v8 = method107(v0, v1, v2, v3, v4, v5, v6, v7)
     del v0, v1, v2, v3, v4, v5, v6, v7
     return v8
-def method145(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 : US6) -> object:
+def method145(v0 : u64, v1 : dynamic_array_list, v2 : US3, v3 : static_array, v4 : US6) -> object:
     v5 = method108(v0, v1, v2, v3, v4)
     del v0, v2
     v6 = method143(v1, v3, v4)
@@ -9896,7 +10095,7 @@ def method145(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 
     v7 = {'game_state': v5, 'ui_state': v6}
     del v5, v6
     return v7
-def method144(v0 : u64, v1 : static_array_list, v2 : US3, v3 : static_array, v4 : US6) -> object:
+def method144(v0 : u64, v1 : dynamic_array_list, v2 : US3, v3 : static_array, v4 : US6) -> object:
     v5 = method145(v0, v1, v2, v3, v4)
     del v0, v1, v2, v3, v4
     return v5

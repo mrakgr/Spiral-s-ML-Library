@@ -7,11 +7,11 @@ inl create' forall dim el. : da_list dim el =
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
     backend_switch {
         Python = fun () => $"dynamic_array_list(@dim)"
-        Cuda = fun () => $"dynamic_array_list<`el,@dim>{}"
+        Cuda = fun () => $"dynamic_array_list<`el,@dim> \v{0}"
     }
 
 // Returns the length of an array.
-instance length da_list dim = fun ar => $"!ar.length"
+instance length da_list dim = fun ar => $"!ar.length_()"
 
 // Sets the array to the specified length.
 inl unsafe_set_length forall dim el. (ar : da_list dim el) (f : int) : () = $"!ar.unsafe_set_length(!f)"

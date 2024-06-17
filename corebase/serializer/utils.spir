@@ -89,7 +89,7 @@ inl serialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) (v : el
                 f ptr offset.dim_offset (length `(sa_listm.sa_list dim) `el v)
                 serialize_sa `(sa_listm.sa_list dim) `el'
             | da_listm.da_list ~dim ~el' => 
-                f ptr offset.dim_offset (length `(da_listm.sa_list dim) `el v)
+                f ptr offset.dim_offset (length `(da_listm.da_list dim) `el v)
                 serialize_sa `(da_listm.da_list dim) `el'
             | _ =>
                 if singleton_type_is `el then ()

@@ -50,6 +50,7 @@ inl run' ({shared_mem} : run_config) f =
         match compiler with
         | NVRTC => ()
         | NVCC =>
+            global "#include <new>"
             global "#include <assert.h>"
             global "#include <stdio.h>"
         f () : ()

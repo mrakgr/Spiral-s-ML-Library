@@ -37,7 +37,7 @@ union message =
 
 type deck = lib.deckm.deck
 type player_types = sam.sa 2 player_type
-type messages = sa_listm.sa_list 128 message
+type messages = da_listm.da_list 128 message
 
 union ui_game_state =
     | GameNotStarted
@@ -205,7 +205,7 @@ inl init() : state =
         }
         large = {
             deck = lib.deckm.create()
-            messages = sa_listm.create'
+            messages = da_listm.create'
         }
     }
 
@@ -246,7 +246,7 @@ inl random_action = fun rng (table : table) =>
     random.sample_discrete actions rng
     
 let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
-    inl push_message = sa_listm.push (refm.to_local state.messages)
+    inl push_message = da_listm.push (refm.to_local state.messages)
     inl deck = refm.to_local state.deck
     inl pop_deck () = 
         open random

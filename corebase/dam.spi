@@ -7,8 +7,8 @@ nominal da dim el = $"backend_switch `({Cuda : $"dymanic_array<`el,@dim>"; Pytho
 inl create' forall dim el. : da dim el = 
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
     backend_switch {
-        Cuda = fun () => $"dynamic_array<`el,@dim> \v"
         Python = fun () => $"dynamic_array(@dim)" : da dim el
+        Cuda = fun () => $"dynamic_array<`el,@dim> \v{true}"
     }
     
 instance create da dim = fun dim =>

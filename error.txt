@@ -1,61 +1,139 @@
-Error trace on line: 11, column: 9 in module: c:\Spiral_s_ML_Library\tests\test3.spi.
+Error trace on line: 363, column: 9 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
 inl main() =
         ^
-Error trace on line: 12, column: 5 in module: c:\Spiral_s_ML_Library\tests\test3.spi.
-    run fun () =>
+Error trace on line: 364, column: 5 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+    named_tuple "HU_Holdem_Game" {
     ^
-Error trace on line: 67, column: 13 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-inl run f = run' {shared_mem = 0} f
+Error trace on line: 372, column: 31 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+        event_loop_gpu = fun (msg, game_state : jsonm.json event * jsonm.json state) =>
+                              ^
+Error trace on line: 374, column: 13 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+            inl seri = {
             ^
-Error trace on line: 30, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
-    ^
-Error trace on line: 30, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
-        ^
-Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options = []"
-    ^
-Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--diag-suppress=550,20012')" // suppresses some warnings related to unused vars
-    ^
-Error trace on line: 35, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--dopt=on')" // turns on the device optimizations
-    ^
-Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--restrict')" // assumes all the pointers are restricted
-    ^
-Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('-I C:/Spiral_s_ML_Library/cpplib')"
-    ^
-Error trace on line: 40, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    match threads_per_block with
-    ^
-Error trace on line: 46, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl compiler = NVCC
-    ^
-Error trace on line: 47, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    match compiler with
-    ^
-Error trace on line: 50, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl kernel_i, vars = join_backend Cuda
-    ^
-Error trace on line: 51, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-        match compiler with
-        ^
-Error trace on line: 56, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-        f () : ()
-        ^
-Error trace on line: 12, column: 13 in module: c:\Spiral_s_ML_Library\tests\test3.spi.
-    run fun () =>
+Error trace on line: 380, column: 13 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+            inl dup forall e. (jsonm.json x : jsonm.json e) : jsonm.json (e * e) = jsonm.json $"!x, !x"
             ^
-Error trace on line: 13, column: 9 in module: c:\Spiral_s_ML_Library\tests\test3.spi.
-        if rangem.threads_in_grid().from = 0 then
-        ^
-Error trace on line: 14, column: 13 in module: c:\Spiral_s_ML_Library\tests\test3.spi.
-            inl f () = 
+Error trace on line: 381, column: 13 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+            inl msg, game_state = jsonm.deserialize msg, jsonm.deserialize game_state
             ^
-Error trace on line: 21, column: 19 in module: c:\Spiral_s_ML_Library\tests\test3.spi.
-            (join to_closure f)()
+Error trace on line: 381, column: 17 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+            inl msg, game_state = jsonm.deserialize msg, jsonm.deserialize game_state
+                ^
+Error trace on line: 382, column: 13 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+            serialize seri.msg msg
+            ^
+Error trace on line: 383, column: 13 in module: c:\Spiral_s_ML_Library\game\nl_hu_holdem\main.spi.
+            serialize seri.game_state game_state
+            ^
+Error trace on line: 7, column: 81 in module: c:\Spiral_s_ML_Library\corebase\serializer\seriazer_main.spi.
+inl serialize forall el. (offsets, ptr : offsets el * ptr) (v : el) : () = real serialize `el offsets ptr v
+                                                                                ^
+Error trace on line: 76, column: 75 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+inl serialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) (v : el) : () = 
+                                                                          ^
+Error trace on line: 77, column: 5 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+    inl rec f ptr offsets ~v = join
+    ^
+Error trace on line: 109, column: 5 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+    f ptr offsets v
+    ^
+Error trace on line: 77, column: 27 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+    inl rec f ptr offsets ~v = join
+                          ^
+Error trace on line: 77, column: 28 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+    inl rec f ptr offsets ~v = join
+                           ^
+Error trace on line: 78, column: 9 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+        open struct
+        ^
+Error trace on line: 79, column: 9 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+        iter2 (fun (exists el. offset) v =>
+        ^
+Error trace on line: 126, column: 5 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    f (ar, v)
+    ^
+Error trace on line: 122, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 123, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+           ^
+Error trace on line: 124, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+          ^
+Error trace on line: 124, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+               ^
+Error trace on line: 124, column: 20 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                   ^
+Error trace on line: 124, column: 25 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                        ^
+Error trace on line: 124, column: 30 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                             ^
+Error trace on line: 124, column: 47 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                                              ^
+Error trace on line: 124, column: 62 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                                                             ^
+Error trace on line: 122, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 123, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+           ^
+Error trace on line: 124, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+          ^
+Error trace on line: 124, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+               ^
+Error trace on line: 124, column: 20 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                   ^
+Error trace on line: 124, column: 25 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                        ^
+Error trace on line: 124, column: 30 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                             ^
+Error trace on line: 124, column: 47 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                                              ^
+Error trace on line: 124, column: 62 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+                                                             ^
+Error trace on line: 122, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 123, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+           ^
+Error trace on line: 124, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+          ^
+Error trace on line: 125, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v => set ar v
+          ^
+Error trace on line: 125, column: 19 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v => set ar v
                   ^
-Void arguments in closures are not allowed.
+Error trace on line: 80, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            inl serialize_sa forall array el. =
+            ^
+Error trace on line: 85, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            typecase el with
+            ^
+Error trace on line: 92, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                f ptr offset.dim_offset (length `(da_listm.sa_list dim) `el v)
+                ^
+Error trace on line: 92, column: 42 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                f ptr offset.dim_offset (length `(da_listm.sa_list dim) `el v)
+                                         ^
+Error trace on line: 92, column: 51 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                f ptr offset.dim_offset (length `(da_listm.sa_list dim) `el v)
+                                                  ^
+Cannot find key sa_list in the record.
