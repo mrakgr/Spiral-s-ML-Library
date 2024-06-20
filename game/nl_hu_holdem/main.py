@@ -7461,7 +7461,9 @@ class static_array_list(static_array):
         assert 0 <= i <= len(self.ptr), "The new length has to be in range."
         self.length = i
 
-class dynamic_array(static_array): pass
+class dynamic_array(static_array): 
+    pass
+
 class dynamic_array_list(static_array_list):
     def length_(self): return self.length
 import cupy as cp
@@ -7474,7 +7476,6 @@ options = []
 options.append('--diag-suppress=550,20012,68')
 options.append('--dopt=on')
 options.append('--restrict')
-options.append('-I C:/Spiral_s_ML_Library/cpplib')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
 import collections
 class US1_0(NamedTuple): # A_All_In

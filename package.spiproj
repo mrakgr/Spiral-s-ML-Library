@@ -63,25 +63,9 @@ modules:
     ml/
         matmul
         primitives
-        layers_old
         layers 
-        // backprop
-
+        
     game/
-        holdem_old/
-            cardm
-            deck/
-                type- 
-                deck_utils
-                public-
-                deck_test
-
-            hand_score
-            hand_scorer_old
-            hand_scorer
-
-            main
-            
         nl_hu_holdem/
             lib/
                 cardm
