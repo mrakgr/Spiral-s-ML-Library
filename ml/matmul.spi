@@ -35,7 +35,6 @@ inl swap x (a,b) = if x then b,a else a,b
 inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout. 
         (matmul_config {m_skew n_skew k_skew m_frag n_frag k_frag m_tile n_tile k_tile a_trans b_trans chunk_size}
          : matmul_config m_frag n_frag k_frag wmma.tf32 a_layout b_layout f32) =
-        
     inl padding =
         {
         a = swap a_trans (m_skew, k_skew) |> snd

@@ -1,0 +1,5 @@
+open corebase
+
+inl main() =
+    
+    ()
