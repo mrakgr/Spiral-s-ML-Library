@@ -66,17 +66,17 @@ modules:
         layers 
         
     game/
+        rps/
+            main
+
+        leduc/
+            main
+            
         nl_hu_holdem/
             lib/
                 cardm
                 deckm
                 hand_rankerm
-            main
-            
-        rps/
-            main
-
-        leduc/
             main
 
     tests/
