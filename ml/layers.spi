@@ -6,10 +6,18 @@ open compile_time
 type ptr = partitionm.ptr
 type size = partitionm.size
 type graph_array = ptr * size
-type graph_dims = {body : .hashmap; head : .hashmap}
+type graph_dims = .hashmap
 type graph_offset = .hashmap * size
 type graph_data = {array : graph_array; offset : graph_offset}
 type dim = int * int * int
+
+union dims =
+    | Dims_Body : dim
+    | Dims_Head : int * dim
+
+union po t =
+    | Po_Body : partitionm.partition_offsets (tensor dim t)
+    | Po_Head : partitionm.partition_offsets (tensor (int * dim) t)
 
 union rec graph t =
     | Map : exists a. (a -> t) * graph a
@@ -29,11 +37,11 @@ inl memoize (h : .hashmap) f k =
 // Propagates the dimensions for each of the nodes and returns a hash map of them pointing to each node.
 // Takes in a record of input dimensions and the ensemble size as the last arguments.
 inl pass_dim forall t_top dims. (x : graph t_top) (dims : dims) ensemble_size : graph_dims =
-    inl h_body = hashmap.create()
-    inl h_head = hashmap.create()
+    inl h_dims = hashmap.create()
+    inl h = hashmap.create()
     inl get_dim forall k{symbol}. (k : k) : dim = real dims k : dim
     inl rec f forall t. (dim : option dim) : graph t -> dim =
-        memoize h_body function
+        inl body = function
             | Weight n => 
                 match dim with
                 | Some (_, m, k) => ensemble_size, n, k
@@ -50,18 +58,22 @@ inl pass_dim forall t_top dims. (x : graph t_top) (dims : dims) ensemble_size : 
                 inl (_,n,k') = f (Some a) b
                 assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
                 o,m,n
+        memoize h (fun k => body k |> fun dim => hashmap.add h_dims k (Dims_Body dim) . dim)
     inl dim = f None x
-    assert (hashmap.remove h_body x) "Has to work."
-    hashmap.add h_head x (ensemble_size, dim)
-    hashmap.set_immutable(h_body)
-    hashmap.set_immutable(h_head)
-    {body=h_body; head=h_head}
+    assert (hashmap.remove h_dims x) "Has to work."
+    hashmap.add h_dims x (Dims_Head (ensemble_size, dim))
+    hashmap.set_immutable(h_dims)
+    h_dims
 
 // Calculates the parameter offsets.
 inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
     inl h_offset_param = hashmap.create() // stores the offsets pointing to the start of the weight parameter array for each node
     inl h = hashmap.create()
-    inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims.body k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
+    inl get_dim forall k. (k : k) : dim = 
+        match hashmap.try_get dims k with 
+        | Some (Dims_Body v) => v 
+        | Some (Dims_Head v) => error_type "The weight layer cannot be in the top level."
+        | None => error_type "Cannot get the node dimension from the dictionary."
     inl rec f forall t. (offset : size) : graph t -> size =
         memoize h function
             | Weight as k =>
@@ -81,15 +93,19 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : grap
 inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
     inl h_offset_output = hashmap.create() // stores the offsets pointing to the start of the output array for each node
     inl h = hashmap.create()
-    inl get_dim forall k. (k : k) : dim = match hashmap.try_get dims.body k with Some v => v | None => error_type "Cannot get the node dimension from the dictionary."
     inl rec f forall t. (offset : size) : graph t -> size =
         memoize h fun k =>
             inl g (offset : size) =
-                inl partition_offsets : _ (_ _ t) = 
-                    partitionm.to_partition(get_dim k)
-                    |> partitionm.calculate_offsets offset 
-                hashmap.add h_offset_output k partition_offsets
-                partition_offsets.offset_end
+                match hashmap.try_get dims k with 
+                | Some (Dims_Body dim) => 
+                    inl partition_offsets : _ (_ _ t) = partitionm.to_partition dim |> partitionm.calculate_offsets offset
+                    hashmap.add h_offset_output k (Po_Body partition_offsets)
+                    partition_offsets.offset_end
+                | Some (Dims_Head dim) => 
+                    inl partition_offsets : _ (_ _ t) = partitionm.to_partition dim |> partitionm.calculate_offsets offset
+                    hashmap.add h_offset_output k (Po_Head partition_offsets)
+                    partition_offsets.offset_end
+                | None => error_type "Cannot get the node dimension from the dictionary."
             match k with
             | Weight => offset
             | Input => g offset
@@ -163,7 +179,10 @@ inl input_extract forall float key{symbol} input. (x : graph float) (input : gra
         | Weight _ => None
         | Input (exists key'. _) =>
             if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                inl x : tensor dim input = partitionm.from_partition_offsets input.array (hashmap.get (fst input.offset) x)
+                inl x : tensor dim input = 
+                    match hashmap.get (fst input.offset) x with
+                    | Po_Body v => partitionm.from_partition_offsets input.array v
+                    | Po_Head => error_type "The input layer shouldn't be in last position."
                 Some x
             else None
         | Map(exists a. _,a) => f a
@@ -212,16 +231,14 @@ inl test2() =
     console.write_ln input
     ()
 
-inl graph_tensor_extract forall t. (x : graph t) (param : graph_data) (output : graph_data) block_id ensemble_id : tensor (int * int) t =
+inl graph_tensor_extract forall t. (x : graph t) (param : graph_data) (output : graph_data) {ensemble_id block_id} : tensor (int * int) t =
     match hashmap.try_get (fst param.offset) x with
-    | Some (x : tensor dim t) => apply ensemble_id x
+    | Some x => partitionm.from_partition_offsets param.array x |> apply ensemble_id
     | None =>
-        match hashmap.try_get (fst param.offset) x with
-        | Some (x : tensor dim t) => apply block_id x
-        | None => ...0
-    // match x with
-    // | Weight => partitionm.from_partition_offsets param.array (hashmap.get (fst param.offset) x)
-    // | _ => partitionm.from_partition_offsets output.array (hashmap.get (fst output.offset) x)
+        match hashmap.try_get (fst output.offset) x with
+        | Some (Po_Body x) => partitionm.from_partition_offsets param.array x |> apply block_id
+        | Some (Po_Head x) => partitionm.from_partition_offsets param.array x |> apply ensemble_id |> apply block_id
+        | None => error_type "Cannot find the offset in the dictionaries"
 
 // Calculated the max of dynamic shared memory used for all the nodes.
 inl pass_shared_memory forall t_top. (x : graph t_top) =
@@ -240,14 +257,14 @@ inl pass_shared_memory forall t_top. (x : graph t_top) =
             max (f a) (f b) |> max memory
     f x
 
-inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : graph_data) ensemble_id =
+inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : graph_data) {ensemble_id} =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
 
     inl dynamic_shared_memory_used = pass_shared_memory x
     run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
         loop.projective rangem.blocks_in_grid(blocks_per_grid()) fun block_id =>
-            inl tensor_extract x = graph_tensor_extract x param output block_id ensemble_id
+            inl tensor_extract x = graph_tensor_extract x param output {ensemble_id block_id}
             inl rec f forall t. (x : graph t) : () =
                 open primitives
                 match x with
@@ -284,22 +301,22 @@ inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : gra
 // Tests whether extracting the graph can be executed.
 inl test3() =
     inl blocks = blocks_per_grid()
-    inl ensemble : int = 4 // The number of weight layers in the ensemble
+    inl ensemble_size : int = 4 // The number of weight layers in the ensemble
     inl tanh forall t{float}. (x : graph t) : graph t = Map (exists tanh, x)
-    inl matmul dim x = Matmul(x, Weight {dim=ensemble,dim})
+    inl matmul dim x = Matmul(x, Weight dim)
     inl input forall key{symbol}. (key : key) = Input (exists key)
 
     inl graph : graph float =
         input .input
-        |> matmul (8, 16)
+        |> matmul 16
         |> tanh
-        |> matmul (16, 16)
+        |> matmul 16
         |> tanh
-        |> matmul (16, 16)
+        |> matmul 16
         |> tanh
 
     inl dims' = {input = blocks, 16, 8 : dim}
-    inl dims = pass_dim graph dims'
+    inl dims = pass_dim graph dims' ensemble_size
     inl param = create_graph_data (pass_offset_param graph dims)
     inl input = create_graph_data (pass_offset_output graph dims)
     param_init graph param
@@ -314,9 +331,11 @@ inl test3() =
     }
     console.write_ln tns_input
     console.write_ln "Here is the output tensor."
-    graph_run graph param input 0
-    inl tns_output : _ _ float = graph_tensor_extract graph param input
-    console.write_ln tns_output
+    loop.linear ensemble_size fun ensemble_id =>
+        graph_run graph param input {ensemble_id}
+        inl tns_output : _ _ float = graph_tensor_extract graph param input {ensemble_id block_id=0}
+        console.write_ln tns_output
+        console.write_ln "==="
     ()
 
 inl main() = test3()
