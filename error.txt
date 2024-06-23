@@ -1,151 +1,124 @@
-Error trace on line: 237, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 238, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-          ^
-Error trace on line: 238, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-              ^
-Error trace on line: 238, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-                        ^
-Error trace on line: 239, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            f a
-            ^
-Error trace on line: 235, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match x with
+Error trace on line: 513, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+inl main() = test2()
         ^
-Error trace on line: 236, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Weight => ()
-          ^
-Error trace on line: 237, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 238, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-          ^
-Error trace on line: 244, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map2(exists a b. g,a,b) =>
-          ^
-Error trace on line: 250, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Matmul(a,b) =>
-          ^
-Error trace on line: 250, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Matmul(a,b) =>
-                 ^
-Error trace on line: 251, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            f a . f b
-            ^
-Error trace on line: 235, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match x with
+Error trace on line: 513, column: 14 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+inl main() = test2()
+             ^
+Error trace on line: 428, column: 10 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+inl test2() =
+         ^
+Error trace on line: 429, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl m,n : int * int = 128, 64
+    ^
+Error trace on line: 429, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl m,n : int * int = 128, 64
         ^
-Error trace on line: 236, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Weight => ()
-          ^
-Error trace on line: 237, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 238, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-          ^
-Error trace on line: 238, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-              ^
-Error trace on line: 238, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-                        ^
-Error trace on line: 239, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            f a
+Error trace on line: 432, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+    ^
+Error trace on line: 433, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
+    ^
+Error trace on line: 434, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl input_action : _ _ float = cupy.random_uniform m
+    ^
+Error trace on line: 436, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl output_reduce = tensor_create 1
+    ^
+Error trace on line: 442, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl output_identity = tensor_create (m,n)
+    ^
+Error trace on line: 445, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    run fun _ =>
+    ^
+Error trace on line: 70, column: 13 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+inl run f = run' {shared_mem = 0} f
             ^
-Error trace on line: 235, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match x with
+Error trace on line: 31, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+    ^
+Error trace on line: 31, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
         ^
-Error trace on line: 236, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Weight => ()
-          ^
-Error trace on line: 237, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Input => ()
-          ^
-Error trace on line: 238, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map(exists a. g,a) =>
-          ^
-Error trace on line: 244, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Map2(exists a b. g,a,b) =>
-          ^
-Error trace on line: 250, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Matmul(a,b) =>
-          ^
-Error trace on line: 250, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Matmul(a,b) =>
-                 ^
-Error trace on line: 251, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            f a . f b
-            ^
-Error trace on line: 252, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl alpha, beta : float * float = 1, 0
-            ^
-Error trace on line: 252, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl alpha, beta : float * float = 1, 0
-                ^
-Error trace on line: 254, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
-                ^
-Error trace on line: 254, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
-                    ^
-Error trace on line: 254, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
-                      ^
-Error trace on line: 257, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    typecase t with
-                    ^
-Error trace on line: 259, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        inl memory, body = matmul.matmul_tf32' false true
-                        ^
-Error trace on line: 259, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        inl memory, body = matmul.matmul_tf32' false true
-                            ^
-Error trace on line: 260, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
-                        ^
-Error trace on line: 261, column: 30 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        join body alpha a b beta out
-                             ^
-Error trace on line: 54, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-        inl div x = loop.div x
+Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options = []"
+    ^
+Error trace on line: 35, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--diag-suppress=550,20012,68')" // suppresses some warnings related to unused vars
+    ^
+Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--dopt=on')" // turns on the device optimizations
+    ^
+Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--restrict')" // assumes all the pointers are restricted
+    ^
+Error trace on line: 39, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match threads_per_block with
+    ^
+Error trace on line: 45, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl compiler = NVCC
+    ^
+Error trace on line: 46, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match compiler with
+    ^
+Error trace on line: 52, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl kernel_i, vars = join_backend Cuda
+    ^
+Error trace on line: 53, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+        match compiler with
         ^
-Error trace on line: 55, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-        inl _ =
+Error trace on line: 59, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+        f () : ()
         ^
-Error trace on line: 56, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-            inl a_dim = swap a_trans a.dim
-            ^
-Error trace on line: 57, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-            inl b_dim = swap b_trans b.dim
-            ^
-Error trace on line: 58, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-            inl c_dim = c.dim
-            ^
-Error trace on line: 59, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-            assert (snd a_dim = fst b_dim) "The K dimension of the A and B tensors must match."
-            ^
-Error trace on line: 60, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-            assert (fst a_dim = fst c_dim) "The M dimension of the A and C tensors must match."
-            ^
-Error trace on line: 61, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-            assert (snd b_dim = snd c_dim) "The N dimension of the B and C tensors must match."
-            ^
-Error trace on line: 61, column: 21 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
-            assert (snd b_dim = snd c_dim) "The N dimension of the B and C tensors must match."
-                    ^
-Error trace on line: 123, column: 49 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl (=) forall t. (a : t) (b : t) : bool = real a = b
-                                                ^
-Error trace on line: 296, column: 15 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-inl (=) a b = if `(`(a)) `= `(`(b)) then a = b else error_type "The variables compared for equality have to have the same type."
-              ^
-Error trace on line: 296, column: 53 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-inl (=) a b = if `(`(a)) `= `(`(b)) then a = b else error_type "The variables compared for equality have to have the same type."
-                                                    ^
-The variables compared for equality have to have the same type.
+Error trace on line: 446, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+        inl block = cooperative_groups.create_block()
+        ^
+Error trace on line: 448, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+        reduce 0 (+) input output_reduce
+        ^
+Error trace on line: 54, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl from = factorize_sizeof_16 from
+    ^
+Error trace on line: 55, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl result = loop._dup neutral_element
+    ^
+Error trace on line: 56, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    loop.projective threads_in_block(fst from.dim) fun i =>
+    ^
+Error trace on line: 63, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    block_reduce_store f result to
+    ^
+Error trace on line: 26, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    assert (1 = to.dim) "The output answer has to be of size 1."
+    ^
+Error trace on line: 27, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    global "#include <cooperative_groups.h>"
+    ^
+Error trace on line: 28, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    global "#include <cooperative_groups/reduce.h>"
+    ^
+Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl warp_result = reduce_coalesced create_coalesced_threads() f result
+    ^
+Error trace on line: 35, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl warps_in_block = warps_in_block()
+    ^
+Error trace on line: 35, column: 26 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl warps_in_block = warps_in_block()
+                         ^
+Error trace on line: 7, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\rangem.spi.
+    assert (threads_per_block() % threads_per_warp() = 0) "The number of threads in a block should be divisible by the number of threads in a warp."
+    ^
+Error trace on line: 129, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 266, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 266, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+The number of threads in a block should be divisible by the number of threads in a warp.
