@@ -356,7 +356,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
             float v33;
             v33 = v27[v30];
             float v34;
-            v34 = v33 + v31;
+            v34 = v31 + v33;
             v31 = v34;
             v30 += 1l ;
         }
@@ -1134,7 +1134,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v289;
                 v289 = v244[v288];
                 float v290;
-                v290 = v289 + v282;
+                v290 = v282 + v289;
                 v282 = v290;
                 v285 += 1l ;
             }
@@ -1188,7 +1188,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v311;
                 v311 = v294[v310];
                 float v312;
-                v312 = v311 + v304;
+                v312 = v304 + v311;
                 v304 = v312;
                 v307 += 1l ;
             }
@@ -1441,7 +1441,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v397;
                 v397 = v381[v396];
                 float v398;
-                v398 = v397 + v390;
+                v398 = v390 + v397;
                 v390 = v398;
                 v393 += 1l ;
             }
@@ -1672,12 +1672,12 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 long v477;
                 v477 = v431[v475];
                 bool v478;
-                v478 = v476 > v468;
+                v478 = v468 > v476;
                 float v479; long v480;
                 if (v478){
-                    v479 = v476; v480 = v477;
-                } else {
                     v479 = v468; v480 = v469;
+                } else {
+                    v479 = v476; v480 = v477;
                 }
                 v468 = v479;
                 v469 = v480;
@@ -1875,7 +1875,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v545;
                 v545 = v500[v544];
                 float v546;
-                v546 = v545 + v538;
+                v546 = v538 + v545;
                 v538 = v546;
                 v541 += 1l ;
             }
@@ -1929,7 +1929,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v567;
                 v567 = v550[v566];
                 float v568;
-                v568 = v567 + v560;
+                v568 = v560 + v567;
                 v560 = v568;
                 v563 += 1l ;
             }
@@ -1981,7 +1981,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v588;
                 v588 = v570[v587];
                 float v589;
-                v589 = v588 + v585;
+                v589 = v585 + v588;
                 v585 = v589;
                 v584 += 1l ;
             }
@@ -2019,10 +2019,10 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 v602 = v599 + v583;
                 float v603;
                 v603 = v570[v602];
-                assert("Tensor range check" && 0 <= v599 && v599 < 4l);
-                v579[v602] = v600;
                 float v604;
-                v604 = v603 + v600;
+                v604 = v600 + v603;
+                assert("Tensor range check" && 0 <= v599 && v599 < 4l);
+                v579[v602] = v604;
                 v600 = v604;
                 v599 += 1l ;
             }
@@ -2232,7 +2232,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v673;
                 v673 = v628[v672];
                 float v674;
-                v674 = v673 + v666;
+                v674 = v666 + v673;
                 v666 = v674;
                 v669 += 1l ;
             }
@@ -2286,7 +2286,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v695;
                 v695 = v678[v694];
                 float v696;
-                v696 = v695 + v688;
+                v696 = v688 + v695;
                 v688 = v696;
                 v691 += 1l ;
             }
@@ -2338,7 +2338,7 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v716;
                 v716 = v698[v715];
                 float v717;
-                v717 = v716 + v713;
+                v717 = v713 + v716;
                 v713 = v717;
                 v712 += 1l ;
             }
@@ -2376,10 +2376,10 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 v730 = v727 + v711;
                 float v731;
                 v731 = v698[v730];
-                assert("Tensor range check" && 0 <= v727 && v727 < 4l);
-                v707[v730] = v728;
                 float v732;
-                v732 = v731 + v728;
+                v732 = v728 + v731;
+                assert("Tensor range check" && 0 <= v727 && v727 < 4l);
+                v707[v730] = v732;
                 v728 = v732;
                 v727 += 1l ;
             }
@@ -2435,11 +2435,11 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 long v753;
                 v753 = v629[v751];
                 bool v754;
-                v754 = v752 >= 0.0f;
+                v754 = v744 >= 0.0f;
                 bool v756;
                 if (v754){
                     bool v755;
-                    v755 = v744 >= 0.0f;
+                    v755 = v752 >= 0.0f;
                     v756 = v755;
                 } else {
                     v756 = false;
@@ -2447,22 +2447,22 @@ extern "C" __global__ void entry0(long * v0, float * v1, float * v2, float * v3,
                 float v765; long v766;
                 if (v756){
                     bool v757;
-                    v757 = v752 <= v744;
+                    v757 = v744 <= v752;
                     if (v757){
-                        v765 = v752; v766 = v753;
-                    } else {
                         v765 = v744; v766 = v745;
+                    } else {
+                        v765 = v752; v766 = v753;
                     }
                 } else {
                     if (v754){
-                        v765 = v752; v766 = v753;
+                        v765 = v744; v766 = v745;
                     } else {
                         bool v760;
-                        v760 = v744 >= 0.0f;
+                        v760 = v752 >= 0.0f;
                         if (v760){
-                            v765 = v744; v766 = v745;
-                        } else {
                             v765 = v752; v766 = v753;
+                        } else {
+                            v765 = v744; v766 = v745;
                         }
                     }
                 }
@@ -2596,7 +2596,7 @@ def main():
     del v18
     v19.max_dynamic_shared_size_bytes = 0 
     v19((1,),(32,),(v0, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17),shared_mem=0)
-    del v0, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v19
+    del v0, v5, v6, v7, v8, v9, v10, v11, v12, v14, v15, v16, v17, v19
     v20 = 0
     v21 = '['
     method0(v21)
@@ -2604,7 +2604,7 @@ def main():
     v22 = 0
     while method1(v22):
         v24 = v20
-        v25 = v24 >= 128
+        v25 = v24 >= 1024
         del v24
         if v25:
             v26 = " ..."
@@ -2626,11 +2626,11 @@ def main():
         v30 = v20 + 1
         v20 = v30
         del v30
-        v31 = v17[v22].item()
+        v31 = v13[v22].item()
         method3(v31)
         del v31
         v22 += 1 
-    del v17, v20, v22
+    del v13, v20, v22
     v32 = ']'
     method0(v32)
     del v32

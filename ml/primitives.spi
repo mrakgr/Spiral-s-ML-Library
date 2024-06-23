@@ -58,7 +58,7 @@ inl reduce forall dim a. neutral_element (f : a -> a -> a) (from : tensor dim a)
         inl from = apply i from
         inl local = tensor_create from.dim
         memcpy_sync (local, from)
-        loop.for {from=0; nearTo=local.dim} (fun i => f (tensor_index i local)) result
+        loop.for {from=0; nearTo=local.dim} (fun i x => f x (tensor_index i local)) result
         |> loop._set result
 
     block_reduce_store f result to
@@ -163,20 +163,19 @@ inl local_scan forall a. is_inclusive config (neutral_element : a) f (from : ten
 
         inl block_prefix,block_sum = 
             // Reduces the individual thread elements.
-            loop.for {from=0; nearTo=from.dim} (fun i => f (tensor_index i from)) neutral_element
+            loop.for {from=0; nearTo=from.dim} (fun i x => f x (tensor_index i from)) neutral_element
             // Scans the blockwise results.
             |> block_exclusive_scan_2d config neutral_element f
 
         // Scans the individual thread elements with the calculated prefix.
         loop.for {from=0; nearTo=from.dim} (fun i s => 
             if is_inclusive then
-                inl s = f (tensor_index i from) s
+                inl s = f s (tensor_index i from)
                 tensor_set i s to
                 s
             else
-                inl x = tensor_index i from
                 tensor_set i s to
-                f x s
+                f s (tensor_index i from)
             ) (f previous_block_sum block_prefix)
         |> ignore
         loop._set previous_block_sum (f previous_block_sum block_sum)
@@ -184,17 +183,17 @@ inl local_scan forall a. is_inclusive config (neutral_element : a) f (from : ten
 
 // Local inclusive scan operation.
 inl local_inclusive_scan config = local_scan true config
+// Local inclusive scan sum operation. Useful for getting the cumulative probability distribution along a tensor's innermost dimension.
+inl local_inclusive_scan_sum config = local_inclusive_scan config 0 (+)
 // Local exclusive scan operation.
-// Local exclusive scan sum operation. Useful for getting the cumulative probability distribution along a tensor's innermost dimension.
 inl local_exclusive_scan config = local_scan false config
-inl local_exclusive_scan_sum config = local_exclusive_scan config 0 (+)
 
 // Does a local reduction operation. Takes in the config from `row_map` or `row_reduce` as its first argument and the neutral element as the second.
 inl local_reduce forall a. config (neutral_element : a) f (from : tensor (int * int) a) : a = 
     // Reduces the individual thread elements. 
     inl result = loop._dup neutral_element
     loop.linear from.dim fun i =>
-        f (tensor_index i from) result
+        f result (tensor_index i from)
         |> loop._set result
 
     // Reduces the blockwise results. Broadcasts the final result to all the threads.
@@ -368,7 +367,7 @@ inl reduce_2d forall dim a. neutral_element (f : a -> a -> a) (from : tensor (di
             inl from = apply i from
             inl l_from = tensor_create from.dim
             memcpy_sync (l_from, from)
-            loop.for {from=0; nearTo=l_from.dim} (fun i => f (tensor_index i l_from)) result
+            loop.for {from=0; nearTo=l_from.dim} (fun i x => f x (tensor_index i l_from)) result
             |> loop._set result
 
         tensor_set i (reduce_coalesced create_coalesced_threads() f result) to
@@ -398,18 +397,17 @@ inl scan_2d forall dim a. is_inclusive neutral_element (f : a -> a -> a) (from :
 
             memcpy_sync (l_from, from)
             inl prefix,sum = 
-                loop.for {from=0; nearTo=l_from.dim} (fun i => f (tensor_index i l_from)) neutral_element
+                loop.for {from=0; nearTo=l_from.dim} (fun i x => f x (tensor_index i l_from)) neutral_element
                 |> exclusive_scan_coalesced' group neutral_element f
             
             loop.for {from=0; nearTo=l_from.dim} (fun i s => 
                 if is_inclusive then
-                    inl s = f (tensor_index i l_from) s
+                    inl s = f s (tensor_index i l_from)
                     tensor_set i s l_from
                     s
                 else
-                    inl x = tensor_index i l_from
                     tensor_set i s l_from
-                    f x s
+                    f s (tensor_index i l_from)
                 ) (f result prefix)
             |> ignore
             memcpy_sync (to, l_from)
@@ -452,7 +450,7 @@ inl test1() =
     ()
 
 inl test2() =
-    inl m,n : int * int = 16, 4
+    inl m,n : int * int = 32, 4
     // inl m,n : int * int = 128, 16 
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
@@ -503,7 +501,7 @@ inl test2() =
         // numerically stable softmax (scan)
         row_map block (fun config x _ _ => 
             inl x' = local_softmax config x
-            inl x = local_exclusive_scan_sum config x'
+            inl x = local_inclusive_scan_sum config x'
             zip x' x
             ) input output_softmax_scan
         // discrete sampling
@@ -513,7 +511,7 @@ inl test2() =
             inl sum = local_sum config x
             inl x = 
                 local_map (fun x => x / sum) x
-                |> local_exclusive_scan_sum config
+                |> local_inclusive_scan_sum config
             inl probability = tensor_index j input_action
             inl x = local_map (fun x => x - probability) x
             local_reduce config (limit.min, 0) (fun a b =>
@@ -532,8 +530,8 @@ inl test2() =
     // printing.tensor_print_ln (m * n) output_softmax_scan
     // printing.tensor_print_ln (m * n) output_identity
     // printing.tensor_print_ln (m * n) output_indices_map
-    printing.tensor_print_ln (m * n) output_indices_reduction
-    // printing.tensor_print_ln 1024 output_sampling
+    // printing.tensor_print_ln (m * n) output_indices_reduction
+    printing.tensor_print_ln 1024 output_sampling
     ()
 
 inl main() = test2()
