@@ -22,6 +22,7 @@ inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) :
 
     __syncthreads()
 
+// Internal.
 inl block_reduce_store forall a. f result (to : tensor int a) = 
     assert (1 = to.dim) "The output answer has to be of size 1."
     global "#include <cooperative_groups.h>"
@@ -68,15 +69,17 @@ nominal row_config = {
     miniblock : ref cooperative_groups.thread_block_tile'
     }
 
-// Does an atomic add operation.
+// Adds the input tensor atomically to the output tensor.
 inl local_inplace_atomic_add forall a{number}. (from : tensor (int * int) a) (to : tensor (int * int) a) : () = 
     loop.linear from.dim fun i =>
         tensor_cuda.tensor_atomic_add i (tensor_index i from) to
 
+// Allows the user to specify the output for the map operation.
 inl local_inplace_map forall a b. f (from : tensor (int * int) a) (to : tensor (int * int) b) : () = 
     loop.linear from.dim fun i =>
         tensor_set i (f (tensor_index i from)) to
 
+// A local map function.
 inl local_map forall a b. f (from : tensor (int * int) a) : tensor (int * int) b = 
     inl to = tensor_create from.dim
     local_inplace_map f from to
@@ -150,6 +153,8 @@ inl block_exclusive_scan_2d forall b.
         inl block_prefix_in_thread,block_sum = exclusive_scan_coalesced' group neutral_element f warp_sum
         f (shuffle_coalesced group block_prefix_in_thread (snd index_warp)) warp_prefix, block_sum
 
+// Does a scan on a local tensor. The first boolean if true makes the scan an inclusive one. The second argument is the config
+// passed in by either `row_map` or `row_reduce` and the one after it is the neutral element.
 inl local_scan forall a. is_inclusive config (neutral_element : a) f (from : tensor (int * int) a) : tensor (int * int) a = 
     inl to = tensor_create from.dim
     inl previous_block_sum = loop._dup neutral_element
@@ -177,10 +182,14 @@ inl local_scan forall a. is_inclusive config (neutral_element : a) f (from : ten
         loop._set previous_block_sum (f previous_block_sum block_sum)
     to
 
+// Local inclusive scan operation.
 inl local_inclusive_scan config = local_scan true config
+// Local exclusive scan operation.
+// Local exclusive scan sum operation. Useful for getting the cumulative probability distribution along a tensor's innermost dimension.
 inl local_exclusive_scan config = local_scan false config
 inl local_exclusive_scan_sum config = local_exclusive_scan config 0 (+)
 
+// Does a local reduction operation. Takes in the config from `row_map` or `row_reduce` as its first argument and the neutral element as the second.
 inl local_reduce forall a. config (neutral_element : a) f (from : tensor (int * int) a) : a = 
     // Reduces the individual thread elements. 
     inl result = loop._dup neutral_element
@@ -191,30 +200,38 @@ inl local_reduce forall a. config (neutral_element : a) f (from : tensor (int * 
     // Reduces the blockwise results. Broadcasts the final result to all the threads.
     block_reduce_2d config neutral_element f result
 
+// Local sum. Useful for summing up the innermost dimension of a tensor.
 inl local_sum config = local_reduce config 0 (+)
 // Gets the actual length of the innermost dimension for the tensor projected into the local tensor in `row_reduce` and `row_map`.
 inl local_length (config : row_config) (x : tensor (int * int) _) = config.threads_per_miniblock * length x
-inl local_average config x = local_reduce config 0 (+) x / conv(local_length config x)
+// Local average.
+inl local_average config x = local_sum config x / conv(local_length config x)
+// Local product.
 inl local_prod config = local_reduce config 1 (*)
+// Local max. The neutral element is inferred based on the input type and is expected to be a primitive type.
 inl local_max config = local_reduce config limit.min max
+// Local min. The neutral element is inferred based on the input type and is expected to be a primitive type.
 inl local_min config = local_reduce config limit.max min
 
-// A very flexible version of the reduce_2d kernel that allows the user to chain arbitrary local operations inside the mapping function.
+// A very flexible version of the `map_2d` kernel that allows the user to chain arbitrary local operations inside the mapping function.
 // Using `local_map`, `local_reduce` and `local_scan` it's possible to implement most kinds of activation functions,
 // softmax, layer norm, discrete sampling and etc.
 // 
 // The mapping function receives the `row_config` as the first argument which is intended to be passed to local functions in the primitives
 // that require it. 
 // 
-// The second argument is a 2d tensor that holds the individial elements for a thread.
+// The second argument to the mapping function is a 2d tensor that holds the individial elements for a thread.
 // 
-// The third argument takes in the local index of the outermost dimension.
+// The third argument to the mapping function takes in the local index of the outermost dimension.
 // 
-// The last argument takes in the local index of the innermost dimension and can be zipped with the individial elements in the second tensor.
+// The last argument to the mapping function takes in the local index of the innermost dimension and can be zipped with the individial elements in the second tensor.
 // 
 // The reason why the thread-local tensors passed into the mapping funtion are 2d is because the innermost dimension is split twice. Because
-// of the aggressive factorization being done in this function each thread in a warp has to load at least 4 elements, meaning the entire warp,
-// needs at least 128 elements in the innermost dimension (assuming they are 32-bit in size.)
+// of the aggressive factorization being done in this function each thread in a warp has to load at least 4 elements assuming it's a 32 bit datatype.
+// And the total number of block elements has to be at least the number of threads per block times that factor.
+// 
+// If you get a `The integer length must be distributed in its entirety.` type error then there are not enough elements in the tensor to 
+// distribute the workload evenly across all the threads in the block.
 inl row_map forall dim a b.
         (block : ref cooperative_groups.thread_block)
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b)
@@ -266,18 +283,17 @@ inl row_map forall dim a b.
         inl local = 
             inl dim = fst dim_block, fst dim_local
             inl index = fst index_block, i
-            // semaphore.write_ln_device {dim index}
-            inl merge_index = loop.rigid_merge dim index
-            f row_config{threads_per_miniblock miniblock} local merge_index local_index
-            // ()
+            f row_config{threads_per_miniblock miniblock} local (loop.rigid_merge dim index) local_index
                 
         // Stores the result into global memory after mapping it.
         loop.linear (fst to.dim) fun i =>
             memcpy_sync (apply i to, apply i local)
-        ()
 
     __syncthreads()
 
+// A reduce version of the `row_map` function. It's very similar to it apart from having the mapping function expect a scalar
+// output which is intended to be returned from a `local_reduce` operation. Of course, it is possible to return any kind of
+// scalar output from it. See the documentation for `row_map` for more information.
 inl row_reduce forall dim a b.
         (block : ref cooperative_groups.thread_block)
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> b)
@@ -334,7 +350,9 @@ inl row_reduce forall dim a b.
     __syncthreads()
 
 
-// Reduces the innermost dimension of a given tensor.
+// Reduces the innermost dimension of a given tensor. Less flexible than `row_reduce` since it can only be used to do a single reduction, 
+// but can be used on smaller tensors than `row_reduce` allows.
+// 
 // The first argument is the neutral element.
 inl reduce_2d forall dim a. neutral_element (f : a -> a -> a) (from : tensor (dim * int) a) (to : tensor dim a) : () =
     assert (fst from.dim = to.dim) "The first dimension of the input has to equal the dimension of the output in the reduce_2d kernel."
@@ -357,8 +375,11 @@ inl reduce_2d forall dim a. neutral_element (f : a -> a -> a) (from : tensor (di
 
     __syncthreads()
 
-// Does a scan over the innermost element of a tensor.
-// The first argument determines whether the scan is exclusive or inclusive.
+// Does a scan over the innermost element of a tensor. Less flexible than `row_map` since it can only be used to do a single reduction, 
+// but can be used on smaller tensors than `row_map` allows.
+// 
+// The first argument if true makes the scan an inclusive one.
+// 
 // The second is the neutral element.
 inl scan_2d forall dim a. is_inclusive neutral_element (f : a -> a -> a) (from : tensor (dim * int) a) (to : tensor (dim * int) a) : () = 
     assert (from.dim = to.dim) "The dimensions of the two inputs to the inclusive scan kernel need to be the same."
@@ -408,7 +429,8 @@ inl local_softmax config x =
     inl sum = local_sum config x
     local_map (fun x => x / sum) x
 
-inl sigmoid x = 1 / (1 + exp -x)
+// Sigmoid operation. TODO: Move it elsewhere.
+// inl sigmoid x = 1 / (1 + exp -x)
 
 inl test1() =
     inl m,n : int * int = 3, 36*4
@@ -430,7 +452,7 @@ inl test1() =
     ()
 
 inl test2() =
-    inl m,n : int * int = 32, 64
+    inl m,n : int * int = 16, 4
     // inl m,n : int * int = 128, 16 
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
@@ -438,79 +460,79 @@ inl test2() =
     inl input_action : _ _ float = cupy.random_uniform m
     // inl input : _ _ int = cupy.ones (m,n)
     inl output_reduce = tensor_create 1
-    // inl output_softmax = tensor_create (m,n)
-    // inl output_softmax_scan = tensor_create (m,n)
-    // inl output_ln = tensor_create (m,n)
-    // inl output_argmax = tensor_create m
-    // inl output_sampling = tensor_create m
-    // inl output_identity = tensor_create (m,n)
+    inl output_softmax = tensor_create (m,n)
+    inl output_softmax_scan = tensor_create (m,n)
+    inl output_ln = tensor_create (m,n)
+    inl output_argmax = tensor_create m
+    inl output_sampling = tensor_create m
+    inl output_identity = tensor_create (m,n)
     inl output_indices_map = tensor_create (m,n)
-    // inl output_indices_reduction = tensor_create m
+    inl output_indices_reduction = tensor_create m
     run fun _ =>
         inl block = cooperative_groups.create_block()
         // map ((+) 1) input input
         reduce 0 (+) input output_reduce
         // indices (identity)
-        // row_map block (fun config x i j_tns =>
-        //     x
-        //     ) input_identity output_identity
+        row_map block (fun config x i j_tns =>
+            x
+            ) input_identity output_identity
         // // indices (map)
         row_map block (fun config x i j_tns =>
             local_map (fun j => i,j) j_tns
             ) input output_indices_map
         // // indices (reduction)
-        // row_reduce block (fun config x i j_tns => 
-        //     i
-        //     ) input output_indices_reduction
-        // // numerically stable softmax
-        // row_map block (fun config x _ _ => 
-        //     local_softmax config x
-        //     ) input output_softmax
-        // // layer normalization L2
-        // row_map block (fun config x _ _ => 
-        //     inl x = local_map (fun x => x * x) x
-        //     inl sum = local_sum config x
-        //     local_map (fun x => x / sum) x
-        //     ) input output_ln
-        // // argument maximum
-        // row_reduce block (fun config x _ i => 
-        //     inl x = zip x i
-        //     local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b) x
-        //     |> snd
-        //     ) input output_argmax
-        // // numerically stable softmax (scan)
-        // row_map block (fun config x _ _ => 
-        //     inl x' = local_softmax config x
-        //     inl x = local_exclusive_scan_sum config x'
-        //     zip x' x
-        //     ) input output_softmax_scan
-        // // discrete sampling
-        // row_reduce block (fun config x j i =>
-        //     inl average = local_sum config x / conv n
-        //     inl x = local_map (fun x => exp (x - average)) x
-        //     inl sum = local_sum config x
-        //     inl x = 
-        //         local_map (fun x => x / sum) x
-        //         |> local_exclusive_scan_sum config
-        //     inl probability = tensor_index j input_action
-        //     inl x = local_map (fun x => x - probability) x
-        //     local_reduce config (limit.min, 0) (fun a b =>
-        //         if fst a >= 0 && fst b >= 0 then
-        //             if fst a <= fst b then a else b
-        //         elif fst a >= 0 then a
-        //         elif fst b >= 0 then b
-        //         else a
-        //         ) (zip x i)
-        //     |> snd 
-        //    ) input output_sampling
+        row_reduce block (fun config x i j_tns => 
+            i
+            ) input output_indices_reduction
+        // numerically stable softmax
+        row_map block (fun config x _ _ => 
+            local_softmax config x
+            ) input output_softmax
+        // layer normalization L2
+        row_map block (fun config x _ _ => 
+            inl x = local_map (fun x => x * x) x
+            inl sum = local_sum config x
+            local_map (fun x => x / sum) x
+            ) input output_ln
+        // argument maximum
+        row_reduce block (fun config x _ i => 
+            inl x = zip x i
+            local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b) x
+            |> snd
+            ) input output_argmax
+        // numerically stable softmax (scan)
+        row_map block (fun config x _ _ => 
+            inl x' = local_softmax config x
+            inl x = local_exclusive_scan_sum config x'
+            zip x' x
+            ) input output_softmax_scan
+        // discrete sampling
+        row_reduce block (fun config x j i =>
+            inl average = local_sum config x / conv n
+            inl x = local_map (fun x => exp (x - average)) x
+            inl sum = local_sum config x
+            inl x = 
+                local_map (fun x => x / sum) x
+                |> local_exclusive_scan_sum config
+            inl probability = tensor_index j input_action
+            inl x = local_map (fun x => x - probability) x
+            local_reduce config (limit.min, 0) (fun a b =>
+                if fst a >= 0 && fst b >= 0 then
+                    if fst a <= fst b then a else b
+                elif fst a >= 0 then a
+                elif fst b >= 0 then b
+                else a
+                ) (zip x i)
+            |> snd 
+           ) input output_sampling
     // printing.tensor_print_ln 1024 input
     // printing.tensor_print_ln 1024 output_reduce
     // printing.tensor_print_ln 1024 output_softmax
     // printing.tensor_print_ln 1024 output_ln
     // printing.tensor_print_ln (m * n) output_softmax_scan
     // printing.tensor_print_ln (m * n) output_identity
-    printing.tensor_print_ln (m * n) output_indices_map
-    // printing.tensor_print_ln (m * n) output_indices_reduction
+    // printing.tensor_print_ln (m * n) output_indices_map
+    printing.tensor_print_ln (m * n) output_indices_reduction
     // printing.tensor_print_ln 1024 output_sampling
     ()
 
