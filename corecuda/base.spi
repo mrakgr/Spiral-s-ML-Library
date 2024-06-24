@@ -80,9 +80,8 @@ inl __syncthreads() : () = $"__syncthreads()"
 // __syncthreads does not cause an invalid instruction error. There are 16 barriers on Nvidia GPUs, and __syncthreads uses 0 by default hence it should
 // be reserved.
 inl barrier_sync {threads_per_miniblock miniblock_index} =
-    assert (threads_per_miniblock <= 512) "The number of threads per miniblock has to be <= 512."
-    assert (threads_per_block() % threads_per_miniblock = 0) "The number of threads per block has to be divisible by the number of threads per miniblock."
     assert (threads_per_miniblock % threads_per_warp() = 0) "The number of threads per miniblock has to be divisible by the warp size."
+    assert (threads_per_block() / threads_per_miniblock < 16) "The number of blocks divided by miniblock has be less than 16 otherwise the number of barriers would be insufficient."
     $'asm("bar.cta.sync %0, %1;" :: "r"(!(conv (dyn (miniblock_index+1)) : i32)), "r"(!(conv threads_per_miniblock : i32)))'
 // The index of a thread in a block.
 inl thread_index() : int = $"threadIdx.x"
