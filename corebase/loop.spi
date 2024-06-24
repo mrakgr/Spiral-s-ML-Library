@@ -122,7 +122,7 @@ inl rigid_split' forall dim. ({from nearTo by} : range dim) : {proj_small : dim;
 inl rigid_merge forall dim. (dim : dim * dim) (index : dim * dim) : dim = real
     open real_core
     struct.iter2 (fun i d =>
-        assert (0 <= i && i < d) "The rigid merge indices have to be non-zero and less than the dimensions."
+        assert (0 <= i && i < d) "The rigid merge indices have to be greater than or equal to 0 and less than the dimensions."
         ) index dim
     inl a = struct.map2 (*) (snd index) (fst dim)
     inl b = fst index

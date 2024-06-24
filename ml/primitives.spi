@@ -87,6 +87,8 @@ nominal row_config = {
 // Does a 2d reduction of the result across all the threads of the miniblock in shared memory
 // while taking care that the miniblock results are reduced separately from other miniblocks in the block.
 // Is intended to be used after the individual threads have done their local reductions.
+// 
+// Note: Its intended for internal use due to its utilization of `barrier_sync`.
 inl block_reduce_2d forall b. 
         (row_config {threads_per_miniblock})
         (neutral_element : b) 
@@ -96,6 +98,7 @@ inl block_reduce_2d forall b.
     inl group = create_coalesced_threads()
     // The final result for each of the warps.
     if threads_per_miniblock <= threads_per_warp() then
+        inl group = create_labeled_partition group miniblocks_in_block(threads_per_miniblock)().from
         cg_reduce group f result
     else
         inl warp_result = cg_reduce group f result
@@ -107,6 +110,7 @@ inl block_reduce_2d forall b.
         // All the warps in a block store their intermediate results into the shared tensor.
         tensor_set index_warp warp_result shared
 
+        // semaphore.write_ln_system (fst index_warp)
         barrier_sync {threads_per_miniblock miniblock_index=fst index_warp}
     
         inl threads_in_warp = threads_in_warp()
@@ -119,6 +123,8 @@ inl block_reduce_2d forall b.
 // Does a 2d exclusive scan of the result across all the threads of the miniblock in shared memory
 // while taking care that the miniblock results are reduced separately from other miniblocks in the block.
 // Is intended to be used after the individual threads have done their local reductions.
+// 
+// Note: Its intended for internal use due to its utilization of `barrier_sync`.
 inl block_exclusive_scan_2d forall b. 
         (row_config {threads_per_miniblock})
         (neutral_element : b) 
@@ -129,6 +135,7 @@ inl block_exclusive_scan_2d forall b.
     inl group = create_coalesced_threads()
     // Returns the actual block prefix as well as the final sum.
     if threads_per_miniblock <= threads_per_warp() then
+        inl group = create_labeled_partition group miniblocks_in_block(threads_per_miniblock)().from
         cg_exclusive_scan group neutral_element f result
     else
         inl warps_in_block = warps_in_block()
@@ -440,34 +447,34 @@ inl test1() =
     ()
 
 inl test2() =
-    inl m,n : int * int = 32, 256
+    inl m,n : int * int = (1 <<< 10), (1 <<< 8)
     // inl m,n : int * int = 128, 16 
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
     inl input_action : _ _ float = cupy.random_uniform m
-    // inl input : _ _ int = cupy.ones (m,n)
+    // inl input : _ _ float = cupy.ones (m,n)
     inl output_reduce = tensor_create 1
+    inl output_identity = tensor_create (m,n)
     inl output_softmax = tensor_create (m,n)
     inl output_softmax_scan = tensor_create (m,n)
     inl output_ln = tensor_create (m,n)
     inl output_argmax = tensor_create m
     inl output_sampling = tensor_create m
-    inl output_identity = tensor_create (m,n)
     inl output_indices_map = tensor_create (m,n)
     inl output_indices_reduction = tensor_create m
     run fun _ =>
-        // map ((+) 1) input input
+        map ((+) 1) input input
         reduce 0 (+) input output_reduce
         // indices (identity)
         row_map (fun config x i j_tns =>
             x
             ) input_identity output_identity
-        // // indices (map)
+        // indices (map)
         row_map (fun config x i j_tns =>
             local_map (fun j => i,j) j_tns
             ) input output_indices_map
-        // // indices (reduction)
+        // indices (reduction)
         row_reduce (fun config x i j_tns => 
             i
             ) input output_indices_reduction
@@ -477,13 +484,12 @@ inl test2() =
             ) input output_softmax
         // layer normalization L2
         row_map (fun config x _ _ => 
-            inl x = local_map (fun x => x * x) x
-            inl sum = local_sum config x
+            inl sum = local_map (fun x => x * x) x |> local_sum config
             local_map (fun x => x / sum) x
             ) input output_ln
         // argument maximum
-        row_reduce (fun config x _ i => 
-            inl x = zip x i
+        row_reduce (fun config x _ j_tns => 
+            inl x = zip x j_tns
             local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b) x
             |> snd
             ) input output_argmax
@@ -494,14 +500,14 @@ inl test2() =
             zip x' x
             ) input output_softmax_scan
         // discrete sampling
-        row_reduce (fun config x j i =>
+        row_reduce (fun config x i j_tns =>
             inl average = local_sum config x / conv n
             inl x = local_map (fun x => exp (x - average)) x
             inl sum = local_sum config x
             inl x = 
                 local_map (fun x => x / sum) x
                 |> local_inclusive_scan_sum config
-            inl probability = tensor_index j input_action
+            inl probability = tensor_index i input_action
             inl x = local_map (fun x => x - probability) x
             local_reduce config (limit.min, 0) (fun a b =>
                 if fst a >= 0 && fst b >= 0 then
@@ -509,13 +515,15 @@ inl test2() =
                 elif fst a >= 0 then a
                 elif fst b >= 0 then b
                 else a
-                ) (zip x i)
+                ) (zip x j_tns)
             |> snd 
            ) input output_sampling
     // printing.tensor_print_ln 1024 input
+    // printing.tensor_print_ln 1024 input_identity
     // printing.tensor_print_ln 1024 output_reduce
     // printing.tensor_print_ln 1024 output_softmax
     // printing.tensor_print_ln 1024 output_ln
+    // printing.tensor_print_ln 1024 output_argmax
     // printing.tensor_print_ln (m * n) output_softmax_scan
     // printing.tensor_print_ln (m * n) output_identity
     // printing.tensor_print_ln (m * n) output_indices_map

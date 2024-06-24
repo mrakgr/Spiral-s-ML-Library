@@ -1,0 +1,10 @@
+open corebase
+open corecuda
+open rangem
+
+inl main() =
+    run fun () =>
+        // inl threads_per_miniblock=64
+        // barrier_sync {threads_per_miniblock miniblock_index=miniblocks_in_block(threads_per_miniblock)().from}
+        if threads_in_grid().from = 0 then
+            console.write_ln (sizeof : _ int).value
