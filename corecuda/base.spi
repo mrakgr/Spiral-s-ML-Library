@@ -71,6 +71,14 @@ inl run f = run' {shared_mem = 0} f
 
 // Synchronizes all the threads in a block.
 inl __syncthreads() : () = $"__syncthreads()"
+// Synchronizes all the threads in the selected miniblock. Takes in the number of threads in the miniblock and index of the miniblock in the block.
+// The miniblock index should be a runtime value while the number of threads per miniblock is asserted to be a compile time literal.
+inl barrier_sync {threads_per_miniblock miniblock_index} =
+    assert (lit_is threads_per_miniblock) "The number of threads per miniblock has to be a compile time literal."
+    assert (threads_per_miniblock <= 1024) "The number of threads per miniblock has to be <= 1024."
+    assert (threads_per_block() % threads_per_miniblock = 0) "The number of threads per block has to be divisible by the number of threads per miniblock."
+    assert (threads_per_miniblock % threads_per_warp() = 0) "The number of threads per miniblock has to divisible by the warp size."
+    $'asm("bar.cta.sync %0, !threads_per_miniblock" : "r"(!miniblock_index))'
 // The index of a thread in a block.
 inl thread_index() : int = $"threadIdx.x"
 // The index of a block in the grid.
