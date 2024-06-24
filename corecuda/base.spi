@@ -81,7 +81,7 @@ inl __syncthreads() : () = $"__syncthreads()"
 // be reserved.
 inl barrier_sync {threads_per_miniblock miniblock_index} =
     assert (threads_per_miniblock % threads_per_warp() = 0) "The number of threads per miniblock has to be divisible by the warp size."
-    assert (threads_per_block() / threads_per_miniblock < 16) "The number of blocks divided by miniblock has be less than 16 otherwise the number of barriers would be insufficient."
+    assert (divup threads_per_block() threads_per_miniblock < 16) "The number of blocks divided by miniblock has be less than 16 otherwise the number of barriers would be insufficient."
     inl i = miniblock_index + 1
     assert (i < 16) "The miniblock_index + 1 has to be less than 16."
     $'asm("bar.cta.sync %0, %1;" :: "r"(!(conv (dyn i) : i32)), "r"(!(conv threads_per_miniblock : i32)))'
