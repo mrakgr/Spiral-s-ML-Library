@@ -92,7 +92,7 @@ inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d e
 
 // Given a base array and the partition offsets, it creates a compound structure containing the tensors.
 inl from_partition_offsets forall el. (base, length  : ptr * size) (partition_offsets p : _ el) : el =
-    assert (p.offset_end <= length) "The length of the partition has to be less than the length of the base array."
+    assert (p.offset_end <= length) "The length of the partition has to be less than or equal to the length of the base array."
     real
         open real_core
         open struct

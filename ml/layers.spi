@@ -206,8 +206,8 @@ inl rec graph_tensor_extract forall t. (param : graph_data) (output : graph_data
         | Some x => partitionm.from_partition_offsets param.array x |> apply ensemble_id
         | None =>
             match hashmap.try_get (fst output.offset) x with
-            | Some (Po_Body x) => partitionm.from_partition_offsets param.array x |> apply block_id
-            | Some (Po_Head x) => partitionm.from_partition_offsets param.array x |> apply ensemble_id |> apply block_id
+            | Some (Po_Body x) => partitionm.from_partition_offsets output.array x |> apply block_id
+            | Some (Po_Head x) => partitionm.from_partition_offsets output.array x |> apply ensemble_id |> apply block_id
             | None => error_type "Cannot find the offset in the dictionaries"
 
 // Calculated the max of dynamic shared memory used for all the nodes.
@@ -240,7 +240,7 @@ inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : gra
         inl ls : layer_state = 
             open random
             layer_state {
-                rng = init {seed = clock64(); subsequence=0; offset=0}
+                rng = init {seed = conv rangem.threads_in_grid().from; subsequence = conv ensemble_id; offset=0}
             }
 
         loop.projective rangem.blocks_in_grid(blocks_per_grid()) fun block_id =>
@@ -356,14 +356,16 @@ inl test3() =
     inl blocks = blocks_per_grid()
     inl ensemble_size : int = 4 // The number of weight layers in the ensemble
 
-    inl graph : graph float =
-        input .input
+    inl graph =
+        (input .input : _ float)
         |> matmul 16
-        |> tanh
+        |> ln_l2
+        |> relu
         |> matmul 16
-        |> tanh
+        |> ln_l2
+        |> relu
         |> matmul 16
-        |> tanh
+        |> discrete_sample
 
     inl dims' = {input = blocks, 16, 8 : dim}
     inl dims = pass_dim graph dims' ensemble_size
@@ -383,7 +385,7 @@ inl test3() =
     console.write_ln "Here is the output tensor."
     loop.linear ensemble_size fun ensemble_id =>
         graph_run graph param input {ensemble_id}
-        inl tns_output : _ _ float = graph_tensor_extract param input {ensemble_id block_id=0} graph
+        inl tns_output = graph_tensor_extract param input {ensemble_id block_id=0} graph
         console.write_ln tns_output
         console.write_ln "==="
     ()
