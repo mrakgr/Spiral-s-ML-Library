@@ -419,9 +419,6 @@ inl inclusive_scan_2d forall dim a. : a -> (a -> a -> a) -> tensor (dim * int) a
 // Scans the innermost dimension of a given tensor.
 inl exclusive_scan_2d forall dim a. : a -> (a -> a -> a) -> tensor (dim * int) a -> tensor (dim * int) a -> () = scan_2d false
 
-// Sigmoid operation. TODO: Move it elsewhere.
-// inl sigmoid x = 1 / (1 + exp -x)
-
 // Numerically stable softmax.
 inl local_softmax config x =
     inl average = local_average config x
@@ -430,18 +427,18 @@ inl local_softmax config x =
     inl len = 1 / conv (local_length config x)
     local_map (fun x => if sum <> 0 then x / sum else len) x
 
-inl local_ln_l2 config x (_ : int) (_ : tensor (int * int) int) =
+inl local_ln_l2 config x =
     inl sum = local_map (fun x => x * x) x |> local_sum config
     local_map (fun x => if sum <> 0 then x / sum else 0) x
 
-inl local_argmax config x (_ : int) (j_tns : tensor (int * int) int) =
+inl local_argmax config x (j_tns : tensor (int * int) int) =
     zip x j_tns
     |> local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b)
     |> snd
 
-inl local_discrete_sampling rng config x (i : int) j_tns =
+inl local_discrete_sampling rng config x (i : int) (j_tns : tensor (int * int) int) =
     inl x = local_softmax config x |> local_inclusive_scan_sum config
-    inl probability = random.uniform rng
+    inl probability = random.uniform rng |> conv
     inl x = local_map (fun x => x - probability) x
     local_reduce config (limit.min, 0) (fun a b =>
         if fst a >= 0 && fst b >= 0 then
@@ -503,9 +500,9 @@ inl test2() =
         // numerically stable softmax
         row_map (fun config x _ _ => local_softmax config x) input output_softmax
         // layer normalization L2
-        row_map local_ln_l2 input output_ln
+        row_map (fun config x _ _ => local_ln_l2 config x) input output_ln
         // argument maximum
-        row_reduce local_argmax input output_argmax
+        row_reduce (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
         // numerically stable softmax (scan)
         row_map (fun config x _ _ =>
             inl x' = local_softmax config x

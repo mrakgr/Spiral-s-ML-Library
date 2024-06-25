@@ -2,8 +2,8 @@ open corebase
 type warp_size = 32
 inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
 inl sms_per_gpu() : int = 24
-// inl threads_per_block() : int = 32
-inl threads_per_block() : int = 512
+inl threads_per_block() : int = 32
+// inl threads_per_block() : int = 512
 
 inl blocks_per_grid() : int = 1
 // inl blocks_per_grid() : int = sms_per_gpu()

@@ -1,36 +1,151 @@
-Error trace on line: 528, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl main() = test1()
+Error trace on line: 33, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 34, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+      ^
+Error trace on line: 34, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+              ^
+Error trace on line: 34, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmap.add h k v . v
+                      ^
+Error trace on line: 299, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    match x with
+                    ^
+Error trace on line: 300, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | Weight => ()
+                      ^
+Error trace on line: 301, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | Input => ()
+                      ^
+Error trace on line: 302, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | Map(exists a. g,a) =>
+                      ^
+Error trace on line: 307, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | RowMap(exists a. g,a) =>
+                      ^
+Error trace on line: 312, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | RowReduce(exists a. g,a) =>
+                      ^
+Error trace on line: 317, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | Zip(exists a b. g,a,b) => f a . f b
+                      ^
+Error trace on line: 318, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | Matmul(a,b) =>
+                      ^
+Error trace on line: 318, column: 30 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    | Matmul(a,b) =>
+                             ^
+Error trace on line: 319, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                        f a . f b
+                        ^
+Error trace on line: 320, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                        inl alpha, beta : float * float = 1, 0
+                        ^
+Error trace on line: 320, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                        inl alpha, beta : float * float = 1, 0
+                            ^
+Error trace on line: 322, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+                            ^
+Error trace on line: 322, column: 33 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+                                ^
+Error trace on line: 322, column: 35 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
+                                  ^
+Error trace on line: 325, column: 33 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                typecase t with
+                                ^
+Error trace on line: 327, column: 37 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    inl memory, body = matmul.matmul_tf32' false true
+                                    ^
+Error trace on line: 327, column: 41 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    inl memory, body = matmul.matmul_tf32' false true
+                                        ^
+Error trace on line: 328, column: 37 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
+                                    ^
+Error trace on line: 329, column: 42 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    join body alpha a b beta out
+                                         ^
+Error trace on line: 54, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl div x = loop.div x
         ^
-Error trace on line: 528, column: 14 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl main() = test1()
-             ^
-Error trace on line: 453, column: 10 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl test1() =
-         ^
-Error trace on line: 454, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl m,n : int * int = 3, 36*4
-    ^
-Error trace on line: 454, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl m,n : int * int = 3, 36*4
+Error trace on line: 55, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl _ =
         ^
-Error trace on line: 456, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl input : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+Error trace on line: 64, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_a {m k} (a : tensor (int * int) float) =
+        ^
+Error trace on line: 77, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_b {n k} (b : tensor (int * int) float) =
+        ^
+Error trace on line: 90, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_c {m n} (c : tensor (int * int) float) =
+        ^
+Error trace on line: 95, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a = split_a {m=m_tile; k=k_tile} a    
+        ^
+Error trace on line: 96, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl b = split_b {n=n_tile; k=k_tile} b
+        ^
+Error trace on line: 97, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl c = split_c {m=m_tile; n=n_tile} c
+        ^
+Error trace on line: 99, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        global "#include <mma.h>"
+        ^
+Error trace on line: 100, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        global "using namespace nvcuda;"
+        ^
+Error trace on line: 105, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+        ^
+Error trace on line: 105, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+            ^
+Error trace on line: 105, column: 28 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+                           ^
+Error trace on line: 114, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl c_shared_frag = split_c {m=m_frag; n=n_frag} c_shared_tile
+        ^
+Error trace on line: 115, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} = 
+        ^
+Error trace on line: 116, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+            loop.rigid_split' (warps_in_block (fst c_shared_frag.dim))
+            ^
+Error trace on line: 117, column: 31 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl rigid_split' forall dim. ({from nearTo by} : range dim) : {proj_small : dim; dim_small : dim; dim_linear : dim} =
+                              ^
+Error trace on line: 118, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_small, dim_linear = rigid_split by nearTo
     ^
-Error trace on line: 458, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_inclusive : _ _ int = cupy.zeros (m,n)
+Error trace on line: 118, column: 33 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_small, dim_linear = rigid_split by nearTo
+                                ^
+Error trace on line: 96, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl a, (i : int) = real
     ^
-Error trace on line: 458, column: 38 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_inclusive : _ _ int = cupy.zeros (m,n)
-                                     ^
-Error trace on line: 19, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\cupy.spi.
-    template dim (real forall float. len => $"cp.zeros(!len,dtype=`(cupy_type float)) # type: ignore" : array float)
+Error trace on line: 96, column: 9 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl a, (i : int) = real
+        ^
+Error trace on line: 102, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    assert (i = 1) "The integer length must be distributed in its entirety."
     ^
-Error trace on line: 5, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\cupy.spi.
-    inl len : int = loop.prod dim
+Error trace on line: 129, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+    if c = false then 
     ^
-Error trace on line: 6, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\cupy.spi.
-    tensor {
-    ^
-Type error in nominal constructor.
-Got: {bodies : tensor_body i32 f32; dim : i32}
-Expected: {bodies : tensor_body i32 i32; dim : i32}
+Error trace on line: 266, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 266, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+The integer length must be distributed in its entirety.
