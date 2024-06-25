@@ -1,7 +1,7 @@
 open corebase
 open tensorm
 
-inl template forall dim. (dim : dim) (op : .fun) =
+inl template forall dim float. (dim : dim) (op : .fun) : tensor dim float =
     inl len : int = loop.prod dim
     tensor {
         dim = len

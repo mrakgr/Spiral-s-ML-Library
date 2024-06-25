@@ -179,8 +179,9 @@ inl local_scan forall a. is_inclusive config (neutral_element : a) f (from : ten
                 tensor_set i s to
                 s
             else
+                inl x = tensor_index i from
                 tensor_set i s to
-                f s (tensor_index i from)
+                f s x
             ) (f previous_block_sum block_prefix)
         |> ignore
         loop._set previous_block_sum (f previous_block_sum block_sum)
@@ -403,8 +404,9 @@ inl scan_2d forall dim a. is_inclusive neutral_element (f : a -> a -> a) (from :
                     tensor_set i s l_from
                     s
                 else
+                    inl x = tensor_index i l_from
                     tensor_set i s l_from
-                    f s (tensor_index i l_from)
+                    f s x
                 ) (f result prefix)
             |> ignore
             memcpy_sync (to, l_from)
@@ -470,8 +472,8 @@ inl test1() =
     ()
 
 inl test2() =
-    inl m,n : int * int = (1 <<< 10), (1 <<< 8)
-    // inl m,n : int * int = 128, 16 
+    // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
+    inl m,n : int * int = (1 <<< 10), (1 <<< 2)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
@@ -486,6 +488,7 @@ inl test2() =
     inl output_sampling = tensor_create m
     inl output_indices_map = tensor_create (m,n)
     inl output_indices_reduction = tensor_create m
+    inl output_sum_exclusive = tensor_create (m,n)
     run fun _ =>
         open random
         inl rng : _ philox_state = init {seed = clock64(); subsequence=0; offset=0}
@@ -511,6 +514,11 @@ inl test2() =
             ) input output_softmax_scan
         // discrete sampling
         row_reduce (local_discrete_sampling rng) input output_sampling
+        // sum (exclusive scan)
+        row_map (fun config x _ _ =>
+            local_exclusive_scan config 0 (+) x
+            ) input_identity output_sum_exclusive
+
     // printing.tensor_print_ln 1024 input
     // printing.tensor_print_ln 1024 input_identity
     // printing.tensor_print_ln 1024 output_reduce
@@ -521,7 +529,8 @@ inl test2() =
     // printing.tensor_print_ln (m * n) output_identity
     // printing.tensor_print_ln (m * n) output_indices_map
     // printing.tensor_print_ln (m * n) output_indices_reduction
-    printing.tensor_print_ln 1024 output_sampling
+    // printing.tensor_print_ln 1024 output_sampling
+    printing.tensor_print_ln (m * n) output_sum_exclusive
     ()
 
 inl main() = test2()
