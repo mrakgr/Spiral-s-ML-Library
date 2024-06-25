@@ -417,15 +417,38 @@ inl inclusive_scan_2d forall dim a. : a -> (a -> a -> a) -> tensor (dim * int) a
 // Scans the innermost dimension of a given tensor.
 inl exclusive_scan_2d forall dim a. : a -> (a -> a -> a) -> tensor (dim * int) a -> tensor (dim * int) a -> () = scan_2d false
 
+// Sigmoid operation. TODO: Move it elsewhere.
+// inl sigmoid x = 1 / (1 + exp -x)
+
 // Numerically stable softmax.
 inl local_softmax config x =
     inl average = local_average config x
     inl x = local_map (fun x => exp (x - average)) x
     inl sum = local_sum config x
-    local_map (fun x => x / sum) x
+    inl len = 1 / conv (local_length config x)
+    local_map (fun x => if sum <> 0 then x / sum else len) x
 
-// Sigmoid operation. TODO: Move it elsewhere.
-// inl sigmoid x = 1 / (1 + exp -x)
+inl local_ln_l2 config x (_ : int) (_ : tensor (int * int) int) =
+    inl sum = local_map (fun x => x * x) x |> local_sum config
+    local_map (fun x => if sum <> 0 then x / sum else 0) x
+
+inl local_argmax config x (_ : int) (j_tns : tensor (int * int) int) =
+    zip x j_tns
+    |> local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b)
+    |> snd
+
+inl local_discrete_sampling rng config x (i : int) j_tns =
+    inl x = local_softmax config x |> local_inclusive_scan_sum config
+    inl probability = random.uniform rng
+    inl x = local_map (fun x => x - probability) x
+    local_reduce config (limit.min, 0) (fun a b =>
+        if fst a >= 0 && fst b >= 0 then
+            if fst a <= fst b then a else b
+        elif fst a >= 0 then a
+        elif fst b >= 0 then b
+        else a
+        ) (zip x j_tns)
+    |> snd 
 
 inl test1() =
     inl m,n : int * int = 3, 36*4
@@ -464,60 +487,30 @@ inl test2() =
     inl output_indices_map = tensor_create (m,n)
     inl output_indices_reduction = tensor_create m
     run fun _ =>
+        open random
+        inl rng : _ philox_state = init {seed = clock64(); subsequence=0; offset=0}
         map ((+) 1) input input
         reduce 0 (+) input output_reduce
         // indices (identity)
-        row_map (fun config x i j_tns =>
-            x
-            ) input_identity output_identity
+        row_map (fun config x i j_tns => x) input_identity output_identity
         // indices (map)
-        row_map (fun config x i j_tns =>
-            local_map (fun j => i,j) j_tns
-            ) input output_indices_map
+        row_map (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
         // indices (reduction)
-        row_reduce (fun config x i j_tns => 
-            i
-            ) input output_indices_reduction
+        row_reduce (fun config x i j_tns => i) input output_indices_reduction
         // numerically stable softmax
-        row_map (fun config x _ _ => 
-            local_softmax config x
-            ) input output_softmax
+        row_map (fun config x _ _ => local_softmax config x) input output_softmax
         // layer normalization L2
-        row_map (fun config x _ _ => 
-            inl sum = local_map (fun x => x * x) x |> local_sum config
-            local_map (fun x => x / sum) x
-            ) input output_ln
+        row_map local_ln_l2 input output_ln
         // argument maximum
-        row_reduce (fun config x _ j_tns => 
-            inl x = zip x j_tns
-            local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b) x
-            |> snd
-            ) input output_argmax
+        row_reduce local_argmax input output_argmax
         // numerically stable softmax (scan)
-        row_map (fun config x _ _ => 
+        row_map (fun config x _ _ =>
             inl x' = local_softmax config x
             inl x = local_inclusive_scan_sum config x'
             zip x' x
             ) input output_softmax_scan
         // discrete sampling
-        row_reduce (fun config x i j_tns =>
-            inl average = local_sum config x / conv n
-            inl x = local_map (fun x => exp (x - average)) x
-            inl sum = local_sum config x
-            inl x = 
-                local_map (fun x => x / sum) x
-                |> local_inclusive_scan_sum config
-            inl probability = tensor_index i input_action
-            inl x = local_map (fun x => x - probability) x
-            local_reduce config (limit.min, 0) (fun a b =>
-                if fst a >= 0 && fst b >= 0 then
-                    if fst a <= fst b then a else b
-                elif fst a >= 0 then a
-                elif fst b >= 0 then b
-                else a
-                ) (zip x j_tns)
-            |> snd 
-           ) input output_sampling
+        row_reduce (local_discrete_sampling rng) input output_sampling
     // printing.tensor_print_ln 1024 input
     // printing.tensor_print_ln 1024 input_identity
     // printing.tensor_print_ln 1024 output_reduce

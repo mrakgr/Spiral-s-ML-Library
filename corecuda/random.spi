@@ -3,9 +3,12 @@ open refm
 
 inl globals() = global "#include <curand_kernel.h>"
 
+// Returns the clock time in nanoseconds.
+inl clock64() : u64 = $"clock64()"
+
 nominal philox_state = $'curandStatePhilox4_32_10_t'
 
-prototype init' s : {seed : u64; subsequence : u64; offset : u64} -> ref s -> ()
+prototype init_rng s : {seed : u64; subsequence : u64; offset : u64} -> ref s -> ()
 prototype u32 s : ref s -> u32
 
 // Generates an uniform value in the (0,1] range.
@@ -16,12 +19,14 @@ prototype poisson s : {lambda : f32} -> ref s -> u32
 prototype skipahead s : {steps : u64} -> ref s -> ()
 prototype skipahead_sequence s : {steps : u64} -> ref s -> ()
 
-instance init' philox_state = fun {seed subsequence offset} s => 
+instance init_rng philox_state = fun {seed subsequence offset} s => 
     globals()
     $'curand_init(!seed,!subsequence,!offset,&!s)'
-inl init forall s {init'}. args : ref s =
+
+// Should be used to init the rng state.
+inl init forall s {init_rng}. args : ref s =
     inl s = $"`s \v"
-    init' args s
+    init_rng args s
     s
 
 instance u32 philox_state = fun s => $"curand(&!s)"
@@ -68,11 +73,10 @@ inl shuffle' forall (array : * -> *){index; set; length} el. rng (ar : array el)
         inl tmp = index ar i
         set ar i (index ar j)
         set ar j tmp
-        
+
 // Shuffles the array.
 inl shuffle forall (array : * -> *){index; set; length} el. (ar : array el) : () =
-    globals()
-    inl rng : _ philox_state = init {seed = $"clock64()"; subsequence=0; offset=0}
+    inl rng : _ philox_state = init {seed = clock64(); subsequence=0; offset=0}
     shuffle' rng ar
 
 instance uniform philox_state = fun s => $"curand_uniform(&!s)"

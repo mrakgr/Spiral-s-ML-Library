@@ -21,8 +21,8 @@
 
 // union rec graph t =
 //     | Map : exists a. (a -> t) * graph a
-//     | RowMap : exists a. (a -> t) * graph a
-//     | RowReduce : exists a. (a -> t) * graph a
+//     | RowMap : exists a. (primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) t) * graph a
+//     | RowReduce : exists a. (primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> t) * graph a
 //     | Zip : exists a b. (a * b -> t) * graph a * graph b
 //     | Matmul : graph t * graph t
 //     | Input : exists key{symbol}. key
@@ -291,8 +291,6 @@
 //     inl h = hashmap.create()
 //     inl dynamic_shared_memory_used = pass_shared_memory x
 //     run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
-//         inl block = cooperative_groups.create_block()
-
 //         loop.projective rangem.blocks_in_grid(blocks_per_grid()) fun block_id =>
 //             inl tensor_extract x = graph_tensor_extract param output {ensemble_id block_id} x
 //             inl rec f forall t. : graph t -> () =
@@ -305,14 +303,17 @@
 //                         f a
 //                         join 
 //                             inl a,out = tensor_extract a, tensor_extract x
-//                             join
-//                                 map g a out
+//                             join map g a out
 //                     | RowMap(exists a. g,a) =>
 //                         f a
-//                         // join
-//                         //     inl a,out = tensor_extract a, tensor_extract x
-//                         //     join
-//                         //         row_mae block (g) a out
+//                         join
+//                             inl a,out = tensor_extract a, tensor_extract x
+//                             join row_map g a out
+//                     | RowReduce(exists a. g,a) =>
+//                         f a
+//                         join
+//                             inl a,out = tensor_extract a, flatten (tensor_extract x)
+//                             join row_reduce g a out
 //                     | Zip(exists a b. g,a,b) => f a . f b
 //                     | Matmul(a,b) =>
 //                         f a . f b
