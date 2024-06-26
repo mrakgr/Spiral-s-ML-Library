@@ -205,7 +205,7 @@ inl init() : state =
         }
         large = {
             deck = lib.deckm.create()
-            messages = da_listm.create'
+            messages = sa_create
         }
     }
 
@@ -256,7 +256,7 @@ let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
     inl done x = false, x
     inl continue x = true, x
     let get_community_cards street new_cards = 
-        inl ar = sa_listm.create'
+        inl ar = sa_create
         inl push cards = arraym.iter (sa_listm.push ar) cards 
         match street with
         | Preflop => ()

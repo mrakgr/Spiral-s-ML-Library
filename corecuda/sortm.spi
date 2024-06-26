@@ -8,7 +8,7 @@ inl merge_sort forall dim el. f (inp : sa dim el) : sa dim el =
     
     if length inp = 1 then map id inp else
 
-    inl ~out = create'
+    inl ~out : sa _ _ = sa_create
     inl index switch i = if switch then index inp i else index out i
     inl set switch i v = if switch then set out i v else set inp i v
 

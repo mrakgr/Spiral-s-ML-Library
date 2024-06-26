@@ -1,0 +1,77 @@
+open corebase
+open corecuda
+
+// inl test2() =
+//     open ml.layers
+//     inl blocks = blocks_per_grid()
+//     inl ensemble_size : int = 4 // The number of weight layers in the ensemble
+
+//     inl graph =
+//         (input .input : _ float)
+//         |> matmul 16
+//         |> ln_l2
+//         |> relu
+//         |> matmul 16
+//         |> ln_l2
+//         |> relu
+//         |> matmul 16
+//         |> discrete_sample
+
+//     inl dims' = {input = blocks, 16, 8 : dim}
+//     inl dims = pass_dim graph dims' ensemble_size
+//     inl param = create_graph_data (pass_offset_param graph dims)
+//     inl input = create_graph_data (pass_offset_output graph dims)
+//     param_init graph param
+//     console.write_ln "Here are the weight matrices."
+//     param_print graph param
+//     inl tns_input : _ _ float = input_extract graph input .input
+//     // Immitates the passing of data into the output vector.
+//     // In the poker game the serialization function will be responsible for this.
+//     cupy.copy_to {
+//         from = cupy.random_normal{mean=0; std=1} dims'.input
+//         to = tns_input
+//     }
+//     console.write_ln tns_input
+//     console.write_ln "Here is the output tensor."
+//     loop.linear ensemble_size fun ensemble_id =>
+//         graph_run graph param input {ensemble_id}
+//         inl tns_output = graph_tensor_extract param input {ensemble_id block_id=0} graph
+//         console.write_ln tns_output
+//         console.write_ln "==="
+
+open main
+inl schema() =
+    open pickler
+    inl table : pu table =
+        inl pot : _ (sam.sa 2 int) = sa (int 14) // 0 - 13 range.
+        inl card : pu card = alt {
+            King = unit()
+            Queen = unit()
+            Jack = unit()
+        }
+        inl community_card = option card
+        inl pl_card : _ (sam.sa 2 card) = sa card
+        inl raises_left = int 3
+        inl is_button_s_first_move = bool()
+        inl player_turn = int 2
+        wrap {
+            inp = fun {pot community_card pl_card raises_left is_button_s_first_move player_turn} => pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn
+            out = fun pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn => {pot community_card pl_card raises_left is_button_s_first_move player_turn}
+        } (pot ** community_card ** pl_card ** raises_left ** is_button_s_first_move ** player_turn)
+    table
+
+inl test1() =
+    run fun () =>
+        inl data : table =
+            {
+                pot = arraym.fromList [2;2]
+                community_card = Some King
+                pl_card = arraym.fromList [Queen; Jack]
+                raises_left = 1
+                is_button_s_first_move = true
+                player_turn = 0
+            }
+        ()
+        
+
+inl main() = test1()

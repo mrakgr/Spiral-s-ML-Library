@@ -3,7 +3,7 @@
 nominal sa_list dim el = $"backend_switch `({Python : $"static_array_list"; Cuda : $"static_array_list<`el,@dim>"})"
 
 // Creates an empty array.
-inl create' forall dim el. : sa_list dim el = 
+instance sa_create sa_list =
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
     backend_switch {
         Python = fun () => $"static_array_list(@dim)"
@@ -18,7 +18,7 @@ inl unsafe_set_length forall dim el. (ar : sa_list dim el) (f : int) : () = $"!a
 
 instance create sa_list dim = fun dim =>
     assert ((real real_core.type_lit_to_lit `dim) >= dim) "The type level dimension has to equal the value passed at runtime into create."
-    inl ar = create'
+    inl ar = sa_create
     unsafe_set_length ar dim
     ar
 
@@ -38,6 +38,11 @@ instance set sa_list dim = fun ar i v =>
         Cuda = fun () => $"!ar[!i] = !v"
         Python = fun () => $"!ar[!i] = !v"
     }
+
+instance sa_list_unsafe_set_length sa_list = unsafe_set_length
+instance sa_length sa_list = length
+instance sa_index sa_list = index
+instance sa_set sa_list = set
 
 // Pushes a value into the array.
 inl push forall dim el. (ar : sa_list dim el) (x : el) = $"!ar.push(!x)"

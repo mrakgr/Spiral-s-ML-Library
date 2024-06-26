@@ -1,5 +1,0 @@
-open corebase
-
-inl main() =
-    
-    ()

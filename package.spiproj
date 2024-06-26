@@ -71,6 +71,7 @@ modules:
 
         leduc/
             main
+            learn
 
         nl_hu_holdem/
             lib/
@@ -78,9 +79,6 @@ modules:
                 deckm
                 hand_rankerm
             main
-
-    training/
-        leduc
 
     tests/
         test1

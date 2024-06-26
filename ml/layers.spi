@@ -235,9 +235,9 @@ inl graph_run forall t_top. (x : graph t_top) (param : graph_data) (output : gra
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
 
     inl dynamic_shared_memory_used = pass_shared_memory x
-    run' {shared_mem=conv dynamic_shared_memory_used} fun () => 
+    run' {shared_mem=conv dynamic_shared_memory_used} fun () =>
         inl h = hashmap.create()
-        inl ls : layer_state = 
+        inl ls : layer_state =
             open random
             layer_state {
                 rng = init {seed = conv rangem.threads_in_grid().from; subsequence = conv ensemble_id; offset=0}

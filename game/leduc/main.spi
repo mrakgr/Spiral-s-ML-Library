@@ -158,7 +158,7 @@ inl init() : state =
         }
         large = {
             deck = create_deck()
-            messages = sa_listm.create'
+            messages = sa_create
         }
     }
 

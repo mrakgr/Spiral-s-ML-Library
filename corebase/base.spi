@@ -32,6 +32,18 @@ prototype set ar el : ar el -> int -> el -> ()
 // Returns the length of an array.
 prototype length ar el : ar el -> int
 
+// Creates an array with a statically known dimension.
+prototype sa_create sa dim el : sa dim el
+// Indexes into an array.
+prototype sa_index sa dim el : sa dim el -> int -> el
+// Sets the value of an array at the specified index.
+prototype sa_set sa dim el : sa dim el -> int -> el -> ()
+// Returns the length of an array.
+prototype sa_length sa dim el : sa dim el -> int
+// Sets the length of the array to the specified value. Note that this should be used only during initialization as it will result in undefined values.
+prototype sa_list_unsafe_set_length sa dim el : sa dim el -> int -> ()
+
+
 instance create array = fun size => array !!!!ArrayCreate(`el,size)
 instance index array = fun (array ar) i => !!!!ArrayIndex(ar,i)
 instance set array = fun (array ar) i v => !!!!ArrayIndexSet(ar,i,v)
