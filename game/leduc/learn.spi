@@ -40,38 +40,91 @@ open corecuda
 //         console.write_ln "==="
 
 open main
-inl schema() =
+
+inl pu_table() : pickler.pu table =
     open pickler
-    inl table : pu table =
-        inl pot : _ (sam.sa 2 int) = sa (int 14) // 0 - 13 range.
-        inl card : pu card = alt {
-            King = unit()
-            Queen = unit()
-            Jack = unit()
-        }
-        inl community_card = option card
-        inl pl_card : _ (sam.sa 2 card) = sa card
-        inl raises_left = int 3
-        inl is_button_s_first_move = bool()
-        inl player_turn = int 2
-        wrap {
-            inp = fun {pot community_card pl_card raises_left is_button_s_first_move player_turn} => pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn
-            out = fun pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn => {pot community_card pl_card raises_left is_button_s_first_move player_turn}
-        } (pot ** community_card ** pl_card ** raises_left ** is_button_s_first_move ** player_turn)
-    table
+    inl pot : _ (sam.sa 2 int) = sa (int 14) // 0 - 13 range.
+    inl card : pu card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl community_card = option card
+    inl pl_card : _ (sam.sa 2 card) = sa card
+    inl raises_left = int 3
+    inl is_button_s_first_move = bool()
+    inl player_turn = int 2
+    wrap {
+        inp = fun {pot community_card pl_card raises_left is_button_s_first_move player_turn} => pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn
+        out = fun pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn => {pot community_card pl_card raises_left is_button_s_first_move player_turn}
+    } (pot ** community_card ** pl_card ** raises_left ** is_button_s_first_move ** player_turn)
 
 inl test1() =
     run fun () =>
-        inl data : table =
-            {
-                pot = arraym.fromList [2;2]
-                community_card = Some King
-                pl_card = arraym.fromList [Queen; Jack]
-                raises_left = 1
-                is_button_s_first_move = true
-                player_turn = 0
-            }
-        ()
-        
+        if rangem.threads_in_grid().from = 0 then
+            open pickler
+            inl data : table =
+                {
+                    pot = arraym.fromList [2;2]
+                    community_card = Some King
+                    pl_card = arraym.fromList [Queen; Jack]
+                    raises_left = 1
+                    is_button_s_first_move = true
+                    player_turn = 0
+                }
+            
+            inl p = pu_table()
 
-inl main() = test1()
+            serialize p data
+            // |> fun x => write_ln x . x
+            |> deserialize p
+            |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
+            |> console.write_ln
+
+inl pu_history() : pickler.pu history =
+    open pickler
+    inl card : pu card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl action : pu action = alt {
+        Fold = unit()
+        Call = unit()
+        Raise = unit()
+    }
+    inl action_or_card : pu (choice2 action card) = action ++ card
+    inl history : pu history = sa_list action_or_card
+    history
+
+inl test2() =
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            open pickler
+            inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+            
+            inl p = pu_history()
+
+            serialize p data
+            // |> fun x => write_ln x . x
+            |> deserialize p
+            |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
+            |> console.write_ln
+        
+inl test3() =
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            open pickler
+            inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+            
+            inl p = pu_history()
+
+            serialize p data
+            // |> fun x => write_ln x . x
+            |> deserialize p
+            |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
+            |> console.write_ln
+
+
+
+inl main() = test2()

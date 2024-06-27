@@ -967,17 +967,17 @@ __device__ void method_1(float * v0, int v1, float * v2, int v3, float * v4, int
 }
 __device__ void method_0(unsigned char * v0, unsigned char * v1, int v2, int v3){
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[0ull]);
+    v4 = reinterpret_cast<float *>(&v0[0ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v5;
     v5 = 128l * v3;
     float * v6;
-    v6 = reinterpret_cast<float *>(&v0[0ull]);
+    v6 = reinterpret_cast<float *>(&v1[0ull]);
     assert("Tensor range check" && 0 <= v2 && v2 < 4l);
     int v7;
     v7 = 128l * v2;
     float * v8;
-    v8 = reinterpret_cast<float *>(&v1[512ull]);
+    v8 = reinterpret_cast<float *>(&v0[512ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v9;
     v9 = 256l * v3;
@@ -1267,12 +1267,12 @@ __device__ void method_3(float * v0, int v1, float * v2){
 }
 __device__ void method_2(unsigned char * v0, unsigned char * v1, int v2, int v3){
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[512ull]);
+    v4 = reinterpret_cast<float *>(&v0[512ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v5;
     v5 = 256l * v3;
     float * v6;
-    v6 = reinterpret_cast<float *>(&v1[1536ull]);
+    v6 = reinterpret_cast<float *>(&v0[1536ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     return method_3(v6, v5, v4);
 }
@@ -1361,12 +1361,12 @@ __device__ void method_5(float * v0, int v1, float * v2){
 }
 __device__ void method_4(unsigned char * v0, unsigned char * v1, int v2, int v3){
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[1536ull]);
+    v4 = reinterpret_cast<float *>(&v0[1536ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v5;
     v5 = 256l * v3;
     float * v6;
-    v6 = reinterpret_cast<float *>(&v1[2560ull]);
+    v6 = reinterpret_cast<float *>(&v0[2560ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     return method_5(v6, v5, v4);
 }
@@ -2033,55 +2033,55 @@ __device__ void method_7(float * v0, int v1, float * v2, int v3, float * v4){
 }
 __device__ void method_6(unsigned char * v0, unsigned char * v1, int v2, int v3){
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[2560ull]);
+    v4 = reinterpret_cast<float *>(&v0[2560ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v5;
     v5 = 256l * v3;
     float * v6;
-    v6 = reinterpret_cast<float *>(&v0[2048ull]);
+    v6 = reinterpret_cast<float *>(&v1[2048ull]);
     assert("Tensor range check" && 0 <= v2 && v2 < 4l);
     int v7;
     v7 = 256l * v2;
     float * v8;
-    v8 = reinterpret_cast<float *>(&v1[3584ull]);
+    v8 = reinterpret_cast<float *>(&v0[3584ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     return method_7(v8, v5, v6, v7, v4);
 }
 __device__ void method_8(unsigned char * v0, unsigned char * v1, int v2, int v3){
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[3584ull]);
+    v4 = reinterpret_cast<float *>(&v0[3584ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v5;
     v5 = 256l * v3;
     float * v6;
-    v6 = reinterpret_cast<float *>(&v1[4608ull]);
+    v6 = reinterpret_cast<float *>(&v0[4608ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     return method_3(v6, v5, v4);
 }
 __device__ void method_9(unsigned char * v0, unsigned char * v1, int v2, int v3){
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[4608ull]);
+    v4 = reinterpret_cast<float *>(&v0[4608ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v5;
     v5 = 256l * v3;
     float * v6;
-    v6 = reinterpret_cast<float *>(&v1[5632ull]);
+    v6 = reinterpret_cast<float *>(&v0[5632ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     return method_5(v6, v5, v4);
 }
 __device__ void method_10(unsigned char * v0, unsigned char * v1, int v2, int v3){
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[5632ull]);
+    v4 = reinterpret_cast<float *>(&v0[5632ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v5;
     v5 = 256l * v3;
     float * v6;
-    v6 = reinterpret_cast<float *>(&v0[6144ull]);
+    v6 = reinterpret_cast<float *>(&v1[6144ull]);
     assert("Tensor range check" && 0 <= v2 && v2 < 4l);
     int v7;
     v7 = 256l * v2;
     float * v8;
-    v8 = reinterpret_cast<float *>(&v1[6656ull]);
+    v8 = reinterpret_cast<float *>(&v0[6656ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     return method_7(v8, v5, v6, v7, v4);
 }
@@ -2552,12 +2552,12 @@ __device__ void method_12(curandStatePhilox4_32_10_t & v0, int * v1, int v2, flo
 }
 __device__ void method_11(unsigned char * v0, unsigned char * v1, int v2, int v3, curandStatePhilox4_32_10_t & v4){
     float * v5;
-    v5 = reinterpret_cast<float *>(&v1[6656ull]);
+    v5 = reinterpret_cast<float *>(&v0[6656ull]);
     assert("Tensor range check" && 0 <= v3 && v3 < 1l);
     int v6;
     v6 = 256l * v3;
     int * v7;
-    v7 = reinterpret_cast<int *>(&v1[7680ull]);
+    v7 = reinterpret_cast<int *>(&v0[7680ull]);
     assert("Tensor range check" && 0 <= v2 && v2 < 4l);
     int v8;
     v8 = 16l * v2;
@@ -2957,7 +2957,7 @@ def main():
         v46 = raw_module.get_function(f"entry{v45}")
         del v45
         v46.max_dynamic_shared_size_bytes = 1536 
-        v46((1,),(32,),(v0, v1, v43),shared_mem=1536)
+        v46((1,),(32,),(v1, v0, v43),shared_mem=1536)
         del v46
         v47 = v1[7680:7680+4*64].view(cp.int32)
         assert 0 <= v43 < 4, 'Tensor range check'

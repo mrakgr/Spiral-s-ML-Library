@@ -9,8 +9,8 @@ modules:
         type_arith*
         core-
         compile_time/
-            hashset
-            hashmap
+            hashsetm
+            hashmapm
             typed/
                 hashsetm
                 hashmapm
@@ -29,7 +29,7 @@ modules:
             utils*
             tensor_main-
             printing
-            partitionm
+        partitionm
         serializer/
             types-
             utils*

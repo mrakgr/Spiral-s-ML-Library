@@ -8,7 +8,9 @@ inl align (s : size) = modup s min_align()
 // The regular create takes in the default int, which could potentially limit the array sizes to 2gb.
 // This one uses the u64 type to create arrays of arbitrary size.
 // Returns the passed in size alongside the array.
-inl create_array (x : size) : ptr * size = !!!!ArrayCreate(`u8, x), x
+inl create_array (x : size) : ptr * size = array !!!!ArrayCreate(`u8, x), x
+
+open tensorm
 
 nominal offset el = size
 nominal offsets d el = {
@@ -100,6 +102,7 @@ inl from_partition_offsets forall el. (base, length  : ptr * size) (partition_of
             typecase `x with
             | offsets ~d ~el => tensor_from_offsets `d `el base x
             ) p.body
+        : el // This check is for the sake of the ML library where compile time hashmaps are being used causing type erasure in the top down segment.
 
 // Given a base array and a partition, it creates a compound structure containing the tensors.
 inl from_partition forall el. base (x : partition el) : el = from_partition_offsets base #x

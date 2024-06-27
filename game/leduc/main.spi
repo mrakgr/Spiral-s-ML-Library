@@ -9,7 +9,7 @@ union event =
     | PlayerChanged : sam.sa 2 player_type
     | ActionSelected : action
 
-type table =
+type table = // The complete game state.
     {
         pot : sam.sa 2 int
         community_card : option card
@@ -18,6 +18,8 @@ type table =
         is_button_s_first_move : bool
         player_turn : int
     }
+
+type history = sa_listm.sa_list 10 (choice2 action card) // The game history. RL agents need this one.
 
 union message =
     | PlayerGotCard : int * card

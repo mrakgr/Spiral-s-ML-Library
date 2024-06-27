@@ -1,144 +1,144 @@
-Error trace on line: 24, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-    inl i, state = _dup (from, state)
-    ^
-Error trace on line: 24, column: 9 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-    inl i, state = _dup (from, state)
+Error trace on line: 294, column: 37 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    inl memory, body = matmul.matmul_tf32' false true
+                                    ^
+Error trace on line: 294, column: 41 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    inl memory, body = matmul.matmul_tf32' false true
+                                        ^
+Error trace on line: 295, column: 37 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
+                                    ^
+Error trace on line: 296, column: 42 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                                    join body alpha a b beta out
+                                         ^
+Error trace on line: 54, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl div x = loop.div x
         ^
-Error trace on line: 25, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
-    ^
-Error trace on line: 2, column: 82 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-inl while' (cond : () -> bool) (body : () -> ()) : () = !!!!While((join cond()),(body()))
-                                                                                 ^
-Error trace on line: 25, column: 39 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
-                                      ^
-Error trace on line: 25, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
-                                            ^
-Error trace on line: 25, column: 57 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
-                                                        ^
-Error trace on line: 28, column: 44 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-inl forBy' range body = forBy range (fun i () => body i) ()
-                                           ^
-Error trace on line: 28, column: 50 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
-inl forBy' range body = forBy range (fun i () => body i) ()
-                                                 ^
+Error trace on line: 55, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl _ =
+        ^
+Error trace on line: 64, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_a {m k} (a : tensor (int * int) float) =
+        ^
+Error trace on line: 77, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_b {n k} (b : tensor (int * int) float) =
+        ^
+Error trace on line: 90, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_c {m n} (c : tensor (int * int) float) =
+        ^
+Error trace on line: 95, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a = split_a {m=m_tile; k=k_tile} a    
+        ^
+Error trace on line: 95, column: 17 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a = split_a {m=m_tile; k=k_tile} a    
+                ^
+Error trace on line: 65, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+            if a_trans then
+            ^
+Error trace on line: 72, column: 17 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+                inl y = {m}, {k}
+                ^
+Error trace on line: 73, column: 17 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+                a |> reorder (fun m,k => {m},{k})
+                ^
+Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (|>) a b = b a
+               ^
 Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
 inl (>>) a b x = b (a x)
                  ^
-Error trace on line: 247, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl tensor_extract x = graph_tensor_extract param output {ensemble_id block_id} x
-            ^
-Error trace on line: 287, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            f x
-            ^
-Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match hashmap.try_get h k with
-    ^
-Error trace on line: 38, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 39, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-      ^
-Error trace on line: 39, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-              ^
-Error trace on line: 39, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmap.add h k v . v
-                      ^
-Error trace on line: 251, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    match x with
+Error trace on line: 61, column: 21 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
                     ^
-Error trace on line: 252, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | Weight => ()
-                      ^
-Error trace on line: 253, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | Input => ()
-                      ^
-Error trace on line: 254, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | Map(exists a. g,a) =>
-                      ^
-Error trace on line: 260, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | RowMap(exists a. g,a) =>
-                      ^
-Error trace on line: 266, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | RowReduce(exists a. g,a) =>
-                      ^
-Error trace on line: 272, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | Zip(exists a b. g,a,b) => f a . f b
-                      ^
-Error trace on line: 273, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | Matmul(a,b) =>
-                      ^
-Error trace on line: 273, column: 30 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | Matmul(a,b) =>
-                             ^
-Error trace on line: 274, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        f a . f b
-                        ^
-Error trace on line: 275, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        inl alpha, beta : float * float = 1, 0
-                        ^
-Error trace on line: 275, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        inl alpha, beta : float * float = 1, 0
-                            ^
-Error trace on line: 277, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
-                            ^
-Error trace on line: 277, column: 79 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                            inl a,b,out = tensor_extract a, tensor_extract b, tensor_extract x
-                                                                              ^
-Error trace on line: 247, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl tensor_extract x = graph_tensor_extract param output {ensemble_id block_id} x
-                                   ^
-Error trace on line: 200, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match x with
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
+                 ^
+Error trace on line: 274, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    inl dim = f (fst t.dim)
     ^
-Error trace on line: 201, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Zip(exists a b. f,a,b) =>
-      ^
-Error trace on line: 205, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match hashmap.try_get (fst param.offset) x with
-        ^
-Error trace on line: 206, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Some x => partitionm.from_partition_offsets param.array x |> apply ensemble_id
+Error trace on line: 274, column: 15 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    inl dim = f (fst t.dim)
+              ^
+Error trace on line: 84, column: 62 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl div_fst_by forall dim. (x : dim) (y : dim) : dim * dim = div y x, x
+                                                             ^
+Error trace on line: 77, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl b = map2 (/) dim a
+    ^
+Error trace on line: 78, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    iter3 (fun a b dim => assert (a*b = dim) "The elementwise product of the split dimensions has to equal the original.") a b dim
+    ^
+Error trace on line: 133, column: 5 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    f (ar, v, i)
+    ^
+Error trace on line: 129, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 130, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
+           ^
+Error trace on line: 130, column: 20 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
+                   ^
+Error trace on line: 130, column: 29 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
+                            ^
+Error trace on line: 130, column: 39 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
+                                      ^
+Error trace on line: 129, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 130, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
+           ^
+Error trace on line: 131, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
           ^
-Error trace on line: 207, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | None =>
+Error trace on line: 131, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+               ^
+Error trace on line: 131, column: 20 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+                   ^
+Error trace on line: 131, column: 25 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+                        ^
+Error trace on line: 131, column: 28 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+                           ^
+Error trace on line: 131, column: 33 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+                                ^
+Error trace on line: 131, column: 38 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+                                     ^
+Error trace on line: 131, column: 55 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+                                                      ^
+Error trace on line: 131, column: 70 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
+                                                                     ^
+Error trace on line: 129, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 130, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
+           ^
+Error trace on line: 131, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v, {} & i => record_iter (fun {key value} => f (ar key, value, i key)) v
           ^
-Error trace on line: 208, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            match hashmap.try_get (fst output.offset) x with
-            ^
-Error trace on line: 209, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some (Po_Body x) => partitionm.from_partition_offsets param.array x |> apply block_id
-              ^
-Error trace on line: 209, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some (Po_Body x) => partitionm.from_partition_offsets param.array x |> apply block_id
+Error trace on line: 132, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v,i => set ar v i
+          ^
+Error trace on line: 132, column: 14 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v,i => set ar v i
+             ^
+Error trace on line: 132, column: 21 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v,i => set ar v i
                     ^
-Error trace on line: 210, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some (Po_Head x) => partitionm.from_partition_offsets param.array x |> apply ensemble_id |> apply block_id
-              ^
-Error trace on line: 210, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some (Po_Head x) => partitionm.from_partition_offsets param.array x |> apply ensemble_id |> apply block_id
-                    ^
-Error trace on line: 210, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some (Po_Head x) => partitionm.from_partition_offsets param.array x |> apply ensemble_id |> apply block_id
-                            ^
-Error trace on line: 210, column: 35 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some (Po_Head x) => partitionm.from_partition_offsets param.array x |> apply ensemble_id |> apply block_id
-                                  ^
-Error trace on line: 94, column: 69 in module: c:\Spiral_s_ML_Library\corebase\tensorm\partitionm.spi.
-inl from_partition_offsets forall el. (base, length  : ptr * size) (partition_offsets p : _ el) : el =
-                                                                    ^
-Error trace on line: 95, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\partitionm.spi.
-    assert (p.offset_end <= length) "The length of the partition has to be less than or equal to the length of the base array."
-    ^
-Error trace on line: 131, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl assert (c : bool) (msg : string) : () = real assert c msg
-                                                 ^
+Error trace on line: 78, column: 27 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    iter3 (fun a b dim => assert (a*b = dim) "The elementwise product of the split dimensions has to equal the original.") a b dim
+                          ^
 Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
     if c = false then 
     ^
@@ -148,4 +148,4 @@ Error trace on line: 266, column: 9 in module: c:\Spiral_s_ML_Library\corebase\r
 Error trace on line: 266, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
         if lit_is c && lit_is msg then error_type msg
                                        ^
-The length of the partition has to be less than or equal to the length of the base array.
+The elementwise product of the split dimensions has to equal the original.
