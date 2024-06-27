@@ -242,7 +242,10 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
                 max (f a) (f b) |> max memory
     f x
 
-inl graph_run forall t_top. (model ({graph param output} & m) : model t_top) {ensemble_id} =
+inl graph_run_device forall t_top. (model ({graph param output} & m) : model t_top) {ensemble_id} =
+    ()
+
+inl graph_run_host forall t_top. (model ({graph param output} & m) : model t_top) {ensemble_id} =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
 
@@ -406,7 +409,7 @@ inl test3() =
     console.write_ln tns_input
     console.write_ln "Here is the output tensor."
     loop.linear size.ensemble fun ensemble_id =>
-        graph_run model {ensemble_id}
+        graph_run_host model {ensemble_id}
         inl tns_output = graph_tensor_extract model {ensemble_id block_id=0}
         console.write_ln tns_output
         console.write_ln "==="
