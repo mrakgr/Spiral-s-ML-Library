@@ -85,6 +85,11 @@ inl barrier_sync {threads_per_miniblock miniblock_index} =
     inl i = miniblock_index + 1
     assert (i < 16) "The miniblock_index + 1 has to be less than 16."
     $'asm("bar.cta.sync %0, %1;" :: "r"(!(conv (dyn i) : i32)), "r"(!(conv threads_per_miniblock : i32)))'
+
+inl dynamic_shared_memory_used() =
+    inl ~x : u32 = 0
+    $'asm("mov.u32 %0, %dynamic_smem_size;" : "=r"(!x))'
+    x
 // The index of a thread in a block.
 inl thread_index() : int = $"threadIdx.x"
 // The index of a block in the grid.

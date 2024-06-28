@@ -242,22 +242,19 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
                 max (f a) (f b) |> max memory
     f x
 
-inl graph_run_device forall t_top. (model ({graph param output} & m) : model t_top) {ensemble_id} =
-    ()
-
-inl graph_run_host forall t_top. (model ({graph param output} & m) : model t_top) {ensemble_id} =
+// Runs the kernel on the device.
+inl graph_run_device forall t_top. (model ({graph param output size} & m) : model t_top) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
 
-    inl dynamic_shared_memory_used = pass_calculate_dynamic_shared_memory graph
-    run' {shared_mem=conv dynamic_shared_memory_used} fun () =>
-        inl h = hashmapm.create()
-        inl ls : layer_state =
-            open random
-            layer_state {
-                rng = init {seed = conv rangem.threads_in_grid().from; subsequence = conv ensemble_id; offset=0}
-            }
+    inl h = hashmapm.create()
+    inl ls : layer_state =
+        open random
+        layer_state {
+            rng = init {seed = clock64(); subsequence = conv rangem.threads_in_grid().from; offset=0}
+        }
 
+    loop.linear size.ensemble fun ensemble_id =>
         loop.projective rangem.blocks_in_grid(blocks_per_grid()) fun block_id =>
             inl tensor_extract graph = graph_tensor_extract (model {m with graph}) {ensemble_id block_id}
             inl rec f forall t. : graph t -> () =
@@ -295,11 +292,15 @@ inl graph_run_host forall t_top. (model ({graph param output} & m) : model t_top
                                 typecase t with
                                 | f32 => 
                                     inl memory, body = matmul.matmul_tf32' false true
-                                    assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
                                     join body alpha a b beta out
                                 | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
             
             f graph
+
+// Launches a kernel to run the graph from the host. Calculates the needed dynamic shared memory.
+inl graph_run_host forall t_top. (model {graph} & m : model t_top) =
+    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+        graph_run_device m
 
 inl tanh forall t{float}. (x : graph t) : graph t = Map (exists const tanh, x)
 inl sigmoid forall t{float; number}. (x : graph t) : graph t = Map (exists const sigmoid, x)
@@ -408,8 +409,8 @@ inl test3() =
     }
     console.write_ln tns_input
     console.write_ln "Here is the output tensor."
+    graph_run_host model
     loop.linear size.ensemble fun ensemble_id =>
-        graph_run_host model {ensemble_id}
         inl tns_output = graph_tensor_extract model {ensemble_id block_id=0}
         console.write_ln tns_output
         console.write_ln "==="

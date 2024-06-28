@@ -103,10 +103,10 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
         open tensor_cuda
 
         inl a_shared_tile, b_shared_tile, c_shared_tile = 
-            // TODO: Put in an assert that the dynamic shared memory usage is valid.
-            // https://stackoverflow.com/questions/40021086/can-i-obtain-the-amount-of-allocated-dynamic-shared-memory-from-within-a-kernel
+            assert (memory.offset_end <= conv dynamic_shared_memory_used()) "The shared memory used in the matmult node is lower than the allocated amount."
             inl extern = $"extern __shared__ unsigned char \v[]"
             inl (a, b), c = partitionm.from_partition_offsets (extern, memory.offset_end) memory
+
             a |> view_snd (fun nearTo => {from=0; nearTo=nearTo - padding.a}),
             b |> view_snd (fun nearTo => {from=0; nearTo=nearTo - padding.b}),
             c |> view_snd (fun nearTo => {from=0; nearTo=nearTo - padding.c})
