@@ -1,44 +1,5 @@
 open corebase
 open corecuda
-
-// inl test2() =
-//     open ml.layers
-//     inl blocks = blocks_per_grid()
-//     inl ensemble_size : int = 4 // The number of weight layers in the ensemble
-
-//     inl graph =
-//         (input .input : _ float)
-//         |> matmul 16
-//         |> ln_l2
-//         |> relu
-//         |> matmul 16
-//         |> ln_l2
-//         |> relu
-//         |> matmul 16
-//         |> discrete_sample
-
-//     inl dims' = {input = blocks, 16, 8 : dim}
-//     inl dims = pass_dim graph dims' ensemble_size
-//     inl param = create_graph_data (pass_offset_param graph dims)
-//     inl input = create_graph_data (pass_offset_output graph dims)
-//     param_init graph param
-//     console.write_ln "Here are the weight matrices."
-//     param_print graph param
-//     inl tns_input : _ _ float = input_extract graph input .input
-//     // Immitates the passing of data into the output vector.
-//     // In the poker game the serialization function will be responsible for this.
-//     cupy.copy_to {
-//         from = cupy.random_normal{mean=0; std=1} dims'.input
-//         to = tns_input
-//     }
-//     console.write_ln tns_input
-//     console.write_ln "Here is the output tensor."
-//     loop.linear ensemble_size fun ensemble_id =>
-//         graph_run graph param input {ensemble_id}
-//         inl tns_output = graph_tensor_extract param input {ensemble_id block_id=0} graph
-//         console.write_ln tns_output
-//         console.write_ln "==="
-
 open main
 
 inl pu_table() : pickler.pu table =
@@ -112,19 +73,70 @@ inl test2() =
             |> console.write_ln
         
 inl test3() =
-    run fun () =>
-        if rangem.threads_in_grid().from = 0 then
-            open pickler
-            inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
-            
-            inl p = pu_history()
+    inl pu_history = pu_history()
+    open ml.layers
 
-            serialize p data
-            // |> fun x => write_ln x . x
-            |> deserialize p
-            |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
-            |> console.write_ln
+    inl size = {
+        ensemble = 4 // The third dimension of each weight layer.
+        block = blocks_per_grid()
+        minibatch = 16 // threads_per_block()
+    }
 
+    inl graph =
+        (input .input (modup pu_history.size 128) : _ float)
+        |> matmul 16
+        |> ln_l2
+        |> relu
+        |> matmul 16
+        |> ln_l2
+        |> relu
+        |> matmul 16
+        |> discrete_sample
 
+    inl model = create_model graph size
+    param_init model
 
-inl main() = test2()
+    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+        open tensorm
+        open rangem
+        inl tns_input : _ _ float = input_extract model .input
+
+        // Sets the input tensor to 0.
+        loop.projective threads_in_grid(tns_input.dim) fun i =>
+            tensor_set i 0 tns_input
+
+        __syncthreads()
+
+        inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+
+        // Serializes the data into the input tensor.
+        loop.projective blocks_in_grid(size.block) fun block_id =>
+            loop.projective threads_in_block(size.minibatch) fun minibatch_id =>
+                open pickler
+                inl tns_input = tns_input |> apply block_id |> apply minibatch_id
+                pu_history.pickle data (0,tns_input |> ptr_at_current_offset)
+
+        __syncthreads()
+
+        // Runs the model on the inputs.
+        graph_run_device model
+
+        // Deserialize the action and print it.
+        loop.projective blocks_in_grid(size.block) fun block_id =>
+            inl tns_output = graph_tensor_extract model {block_id ensemble_id=0} // Note how awkward this is.
+            loop.projective threads_in_block(tns_output.dim) fun i =>
+                match tensor_index i tns_output % 3 with
+                | 0 => Fold
+                | 1 => Call
+                | _ => Raise
+                |> semaphore.write_ln_system
+
+        ()
+
+    // loop.linear size.ensemble fun ensemble_id =>
+    //     inl tns_output = graph_tensor_extract model {ensemble_id block_id=0}
+    //     console.write_ln tns_output
+    //     console.write_ln "==="
+    ()
+
+inl main() = test3()

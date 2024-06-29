@@ -255,7 +255,7 @@ inl graph_run_device forall t_top. (model ({graph param output size} & m) : mode
         }
 
     loop.linear size.ensemble fun ensemble_id =>
-        loop.projective rangem.blocks_in_grid(blocks_per_grid()) fun block_id =>
+        loop.projective rangem.blocks_in_grid(size.block) fun block_id =>
             inl tensor_extract graph = graph_tensor_extract (model {m with graph}) {ensemble_id block_id}
             inl rec f forall t. : graph t -> () =
                 open primitives

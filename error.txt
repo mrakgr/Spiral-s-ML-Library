@@ -4,10 +4,7 @@ Error trace on line: 294, column: 37 in module: c:\Spiral_s_ML_Library\ml\layers
 Error trace on line: 294, column: 41 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
                                     inl memory, body = matmul.matmul_tf32' false true
                                         ^
-Error trace on line: 295, column: 37 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                                    assert (memory.offset_end <= dynamic_shared_memory_used) "The shared memory used in the matmult node is lower than the allocated amount."
-                                    ^
-Error trace on line: 296, column: 42 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+Error trace on line: 295, column: 42 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
                                     join body alpha a b beta out
                                          ^
 Error trace on line: 54, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
@@ -85,6 +82,9 @@ Error trace on line: 130, column: 29 in module: c:\Spiral_s_ML_Library\corebase\
 Error trace on line: 130, column: 39 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
         | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
                                       ^
+Error trace on line: 130, column: 55 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb), (ia,ib) => f (a, va, ia) . f (b, vb, ib)
+                                                      ^
 Error trace on line: 129, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
     inl rec f = function
                 ^
