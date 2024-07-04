@@ -63,7 +63,8 @@ modules:
     ml/
         matmul
         primitives
-        layers 
+        layers
+        // layers_gadt
         
     game/
         rps/
@@ -86,3 +87,4 @@ modules:
         test3
         test4
         test5
+        test6

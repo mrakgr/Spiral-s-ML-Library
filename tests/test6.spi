@@ -1,0 +1,7 @@
+union t x =
+    | A :: t int
+    | B :: t float
+
+inl main() : () = real
+    typecase int with
+    | ~a * ~a => ()

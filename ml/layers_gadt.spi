@@ -1,0 +1,25 @@
+open corebase
+open corecuda
+open tensorm
+open compile_time
+
+union rec graph t =
+    | Map :: forall dim t. exists a. (layer_state -> a -> t) * graph (tensor dim a) -> graph (tensor dim t)
+    | RowMap :: forall dim t. exists a. 
+        (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) t) * graph (tensor dim a)
+        -> graph (tensor dim t)
+    | RowReduce :: forall dim t. exists a. 
+        (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> t) * graph (tensor dim a)
+        -> graph (tensor dim t)
+    | Zip :: forall a b. graph a * graph b -> graph (a * b)
+    | Apply :: forall b el. graph (tensor (int * b) el) * graph int -> graph (tensor b el)
+    | Matmul :: forall dim t. graph (tensor dim t) * graph (tensor dim t) -> graph (tensor dim t)
+    | Weight :: forall dim t. graph (tensor dim t)
+    | Input :: forall dim t. (exists key{symbol}. key) * dim -> graph (tensor dim t)
+    | InputScalar :: (model_sizes -> graph int) -> graph int
+
+inl f forall a. (x : a) = 
+    inl g ((exists a. y) : exists a. a) =
+        ignore x
+        ()
+    ()

@@ -27,3 +27,22 @@ inl get forall key value. (exists. h : hashmap) (k : key) : value = real
 // Makes the hash map immutable, allowing it to be passed through join points.
 // After it's set to immutable, trying to add or remove from it will result in a type error.
 inl set_immutable (exists. h : hashmap) : () = !!!!HashMapSetImmutable(h)
+
+inl main() =
+    inl h = create()
+    inl obj = ()
+    // inl x : exists a. a = exists [float] 1234i32
+    backend_switch {
+        Python = fun () => 
+            inl h = create()
+            add h obj 1i32
+            ()
+        Cuda = fun () => 
+            add h obj 1f32
+            ()
+    }
+    real
+        // inl ((exists a. (exists a. 456))),(234) = ()
+        inl (exists t. a,_) = ()
+        ()
+    ()
