@@ -119,20 +119,20 @@ inl deserialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) : el 
                     set `array `el ar i (f ptr el_offsets)
             typecase el with
             | sam.sa ~dim ~el' => 
-                inl ar = sam.create' `dim `el'
+                inl ar = sa_create `(sam.sa) `dim `el'
                 deserialize_sa `(sam.sa dim) `el' ar
                 ar
             | sa_listm.sa_list ~dim ~el' =>
-                inl ar = sa_listm.create' `dim `el'
+                inl ar = sa_create `(sa_listm.sa_list) `dim `el'
                 sa_listm.unsafe_set_length `dim `el' ar (f ptr offset.dim_offset)
                 deserialize_sa `(sa_listm.sa_list dim) `el' ar
                 ar
             | dam.da ~dim ~el' => 
-                inl ar = dam.create' `dim `el'
+                inl ar = sa_create `(dam.da) `dim `el'
                 deserialize_sa `(dam.da dim) `el' ar
                 ar
             | da_listm.da_list ~dim ~el' =>
-                inl ar = da_listm.create' `dim `el'
+                inl ar = sa_create `(da_listm.da_list) `dim `el'
                 da_listm.unsafe_set_length `dim `el' ar (f ptr offset.dim_offset)
                 deserialize_sa `(da_listm.da_list dim) `el' ar
                 ar
