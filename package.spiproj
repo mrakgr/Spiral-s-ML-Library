@@ -64,7 +64,7 @@ modules:
         matmul
         primitives
         layers
-        // layers_gadt
+        layers_gadt
         
     game/
         rps/

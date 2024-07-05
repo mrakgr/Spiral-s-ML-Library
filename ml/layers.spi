@@ -421,7 +421,7 @@ inl test3() =
     loop.linear size.ensemble fun ensemble_id =>
         inl tns_output = graph_tensor_extract model {ensemble_id block_id=0}
         console.write_ln tns_output
-        console.write_ln "==="
+        console.write_ln "===="
     ()
 
 inl main() = test3()
