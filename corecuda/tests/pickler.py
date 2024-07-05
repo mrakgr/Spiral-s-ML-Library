@@ -1,83 +1,391 @@
 kernel = r"""
-template <typename el, int dim> struct array { el v[dim]; };
-struct US0;
-struct US1;
+#include <new>
+#include <assert.h>
+#include <stdio.h>
+using default_int = int;
+using default_uint = unsigned int;
+template <typename el>
+struct sptr // Shared pointer for the Spiral datatypes. They have to have the refc field inside them to work.
+{
+    el* base;
+
+    __device__ sptr() : base(nullptr) {}
+    __device__ sptr(el* ptr) : base(ptr) { this->base->refc++; }
+
+    __device__ ~sptr()
+    {
+        if (this->base != nullptr && --this->base->refc == 0)
+        {
+            delete this->base;
+            this->base = nullptr;
+        }
+    }
+
+    __device__ sptr(sptr& x)
+    {
+        this->base = x.base;
+        this->base->refc++;
+    }
+
+    __device__ sptr(sptr&& x)
+    {
+        this->base = x.base;
+        x.base = nullptr;
+    }
+
+    __device__ sptr& operator=(sptr& x)
+    {
+        if (this->base != x.base)
+        {
+            delete this->base;
+            this->base = x.base;
+            this->base->refc++;
+        }
+        return *this;
+    }
+
+    __device__ sptr& operator=(sptr&& x)
+    {
+        if (this->base != x.base)
+        {
+            delete this->base;
+            this->base = x.base;
+            x.base = nullptr;
+        }
+        return *this;
+    }
+};
+
+template <typename el>
+struct csptr : public sptr<el>
+{ // Shared pointer for closures specifically.
+    using sptr<el>::sptr;
+    template <typename... Args>
+    __device__ auto operator()(Args... args) -> decltype(this->base->operator()(args...))
+    {
+        return this->base->operator()(args...);
+    }
+};
+
+template <typename el, default_int max_length>
+struct static_array
+{
+    el ptr[max_length];
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < max_length);
+        return this->ptr[i];
+    }
+};
+
+template <typename el, default_int max_length>
+struct static_array_list
+{
+    default_int length{ 0 };
+    el ptr[max_length];
+
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+    __device__ void push(el& x) {
+        ptr[this->length++] = x;
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ void push(el&& x) {
+        ptr[this->length++] = std::move(x);
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ el pop() {
+        assert("The array before popping should be greater than 0." && 0 < this->length);
+        auto x = ptr[--this->length];
+        ptr[this->length].~el();
+        new (&ptr[this->length]) el();
+        return x;
+    }
+    // Should be used only during initialization.
+    __device__ void unsafe_set_length(default_int i) {
+        assert("The new length should be in range." && 0 <= i && i <= max_length);
+        this->length = i;
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array_base
+{
+    int refc{ 0 };
+    el* ptr;
+
+    __device__ dynamic_array_base() : ptr(new el[max_length]) {}
+    __device__ ~dynamic_array_base() { delete[] this->ptr; }
+
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array
+{
+    sptr<dynamic_array_base<el, max_length>> ptr;
+
+    __device__ dynamic_array() = default;
+    __device__ dynamic_array(bool t) : ptr(new dynamic_array_base<el, max_length>()) {}
+    __device__ el& operator[](default_int i) {
+        return this->ptr.base->operator[](i);
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array_list_base
+{
+    int refc{ 0 };
+    default_int length{ 0 };
+    el* ptr;
+
+    __device__ dynamic_array_list_base() : ptr(new el[max_length]) {}
+    __device__ dynamic_array_list_base(default_int l) : ptr(new el[max_length]) { this->unsafe_set_length(l); }
+    __device__ ~dynamic_array_list_base() { delete[] this->ptr; }
+
+    __device__ el& operator[](default_int i) {
+        assert("The index has to be in range." && 0 <= i && i < this->length);
+        return this->ptr[i];
+    }
+    __device__ void push(el& x) {
+        ptr[this->length++] = x;
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ void push(el&& x) {
+        ptr[this->length++] = std::move(x);
+        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
+    }
+    __device__ el pop() {
+        assert("The array before popping should be greater than 0." && 0 < this->length);
+        auto x = ptr[--this->length];
+        ptr[this->length].~el();
+        new (&ptr[this->length]) el();
+        return x;
+    }
+    // Should be used only during initialization.
+    __device__ void unsafe_set_length(default_int i) {
+        assert("The new length should be in range." && 0 <= i && i <= max_length);
+        this->length = i;
+    }
+};
+
+template <typename el, default_int max_length>
+struct dynamic_array_list
+{
+    sptr<dynamic_array_list_base<el, max_length>> ptr;
+
+    __device__ dynamic_array_list() = default;
+    __device__ dynamic_array_list(default_int l) : ptr(new dynamic_array_list_base<el, max_length>(l)) {}
+
+    __device__ el& operator[](default_int i) {
+        return this->ptr.base->operator[](i);
+    }
+    __device__ void push(el& x) {
+        this->ptr.base->push(x);
+    }
+    __device__ void push(el&& x) {
+        this->ptr.base->push(std::move(x));
+    }
+    __device__ el pop() {
+        return this->ptr.base->pop();
+    }
+    // Should be used only during initialization.
+    __device__ void unsafe_set_length(default_int i) {
+        this->ptr.base->unsafe_set_length(i);
+    }
+    __device__ default_int length_() {
+        return this->ptr.base->length;
+    }
+};
+
+struct Union0;
+struct Union1;
 struct Tuple0;
 struct Tuple1;
-__device__ Tuple0 method_0(float * v0, long v1, long v2);
+__device__ Tuple0 method_0(float * v0, int v1, int v2);
 struct Tuple2;
-struct US0 {
-    union {
-    } v;
-    unsigned long tag : 2;
+__device__ void write_2(char v0);
+__device__ void write_3();
+__device__ void write_4(const char * v0);
+__device__ void write_7();
+__device__ void write_8();
+__device__ void write_9();
+__device__ void write_6(Union0 v0);
+__device__ void write_5(static_array_list<Union0,5l> v0);
+__device__ void write_11();
+__device__ void write_12();
+__device__ void write_13();
+__device__ void write_10(Union1 v0);
+__device__ void write_14(int v0);
+__device__ void write_1(static_array_list<Union0,5l> v0, Union1 v1, int v2, int v3);
+struct Union0_0 { // Call
 };
-struct US1 {
+struct Union0_1 { // Fold
+};
+struct Union0_2 { // Raise
+};
+struct Union0 {
     union {
-    } v;
-    unsigned long tag : 2;
+        Union0_0 case0; // Call
+        Union0_1 case1; // Fold
+        Union0_2 case2; // Raise
+    };
+    unsigned char tag{255};
+    __device__ Union0() {}
+    __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // Call
+    __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // Fold
+    __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // Raise
+    __device__ Union0(Union0 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(x.case0); break; // Call
+            case 1: new (&this->case1) Union0_1(x.case1); break; // Fold
+            case 2: new (&this->case2) Union0_2(x.case2); break; // Raise
+        }
+    }
+    __device__ Union0(Union0 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // Call
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // Fold
+            case 2: new (&this->case2) Union0_2(std::move(x.case2)); break; // Raise
+        }
+    }
+    __device__ Union0 & operator=(Union0 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Call
+                case 1: this->case1 = x.case1; break; // Fold
+                case 2: this->case2 = x.case2; break; // Raise
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
+        }
+        return *this;
+    }
+    __device__ Union0 & operator=(Union0 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Call
+                case 1: this->case1 = std::move(x.case1); break; // Fold
+                case 2: this->case2 = std::move(x.case2); break; // Raise
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union0() {
+        switch(this->tag){
+            case 0: this->case0.~Union0_0(); break; // Call
+            case 1: this->case1.~Union0_1(); break; // Fold
+            case 2: this->case2.~Union0_2(); break; // Raise
+        }
+        this->tag = 255;
+    }
+};
+struct Union1_0 { // Jack
+};
+struct Union1_1 { // King
+};
+struct Union1_2 { // Queen
+};
+struct Union1 {
+    union {
+        Union1_0 case0; // Jack
+        Union1_1 case1; // King
+        Union1_2 case2; // Queen
+    };
+    unsigned char tag{255};
+    __device__ Union1() {}
+    __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Jack
+    __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // King
+    __device__ Union1(Union1_2 t) : tag(2), case2(t) {} // Queen
+    __device__ Union1(Union1 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(x.case0); break; // Jack
+            case 1: new (&this->case1) Union1_1(x.case1); break; // King
+            case 2: new (&this->case2) Union1_2(x.case2); break; // Queen
+        }
+    }
+    __device__ Union1(Union1 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Jack
+            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // King
+            case 2: new (&this->case2) Union1_2(std::move(x.case2)); break; // Queen
+        }
+    }
+    __device__ Union1 & operator=(Union1 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Jack
+                case 1: this->case1 = x.case1; break; // King
+                case 2: this->case2 = x.case2; break; // Queen
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{x};
+        }
+        return *this;
+    }
+    __device__ Union1 & operator=(Union1 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Jack
+                case 1: this->case1 = std::move(x.case1); break; // King
+                case 2: this->case2 = std::move(x.case2); break; // Queen
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union1() {
+        switch(this->tag){
+            case 0: this->case0.~Union1_0(); break; // Jack
+            case 1: this->case1.~Union1_1(); break; // King
+            case 2: this->case2.~Union1_2(); break; // Queen
+        }
+        this->tag = 255;
+    }
 };
 struct Tuple0 {
-    unsigned long v0;
-    long v1;
-    __device__ Tuple0(unsigned long t0, long t1) : v0(t0), v1(t1) {}
+    unsigned int v0;
+    int v1;
     __device__ Tuple0() = default;
+    __device__ Tuple0(unsigned int t0, int t1) : v0(t0), v1(t1) {}
 };
 struct Tuple1 {
-    long v0;
-    long v1;
-    long v2;
-    __device__ Tuple1(long t0, long t1, long t2) : v0(t0), v1(t1), v2(t2) {}
+    int v0;
+    int v1;
+    int v2;
     __device__ Tuple1() = default;
+    __device__ Tuple1(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Tuple2 {
-    long v0;
-    long v1;
-    __device__ Tuple2(long t0, long t1) : v0(t0), v1(t1) {}
+    int v0;
+    int v1;
     __device__ Tuple2() = default;
+    __device__ Tuple2(int t0, int t1) : v0(t0), v1(t1) {}
 };
-__device__ US0 US0_0() { // Call
-    US0 x;
-    x.tag = 0;
-    return x;
-}
-__device__ US0 US0_1() { // Fold
-    US0 x;
-    x.tag = 1;
-    return x;
-}
-__device__ US0 US0_2() { // Raise
-    US0 x;
-    x.tag = 2;
-    return x;
-}
-__device__ US1 US1_0() { // Jack
-    US1 x;
-    x.tag = 0;
-    return x;
-}
-__device__ US1 US1_1() { // King
-    US1 x;
-    x.tag = 1;
-    return x;
-}
-__device__ US1 US1_2() { // Queen
-    US1 x;
-    x.tag = 2;
-    return x;
-}
-__device__ inline bool while_method_0(long v0){
+__device__ inline bool while_method_0(int v0){
     bool v1;
     v1 = v0 < 39l;
     return v1;
 }
-__device__ inline bool while_method_1(long v0, long v1){
+__device__ inline bool while_method_1(int v0, int v1){
     bool v2;
     v2 = v1 < v0;
     return v2;
 }
-__device__ Tuple0 method_0(float * v0, long v1, long v2){
-    long v3; long v4; long v5;
-    Tuple1 tmp0 = Tuple1(v2, 0l, 0l);
+__device__ Tuple0 method_0(float * v0, int v1, int v2){
+    int v3; int v4; int v5;
+    Tuple1 tmp0 = Tuple1{v2, 0l, 0l};
     v3 = tmp0.v0; v4 = tmp0.v1; v5 = tmp0.v2;
     while (while_method_1(v1, v3)){
         float v7;
@@ -100,11 +408,11 @@ __device__ Tuple0 method_0(float * v0, long v1, long v2){
         }
         bool v13;
         v13 = v7 == 0.0f;
-        long v15; long v16;
+        int v15; int v16;
         if (v13){
             v15 = v4; v16 = v5;
         } else {
-            long v14;
+            int v14;
             v14 = v5 + 1l;
             v15 = v3; v16 = v14;
         }
@@ -128,67 +436,234 @@ __device__ Tuple0 method_0(float * v0, long v1, long v2){
         assert("Unpickling failure. Too many active indices in the one-hot vector." && v19);
     } else {
     }
-    long v22;
+    int v22;
     v22 = v4 - v2;
-    unsigned long v23;
-    v23 = (unsigned long)v22;
-    return Tuple0(v23, v5);
+    unsigned int v23;
+    v23 = (unsigned int)v22;
+    return Tuple0{v23, v5};
 }
-__device__ inline bool while_method_2(long v0){
+__device__ inline bool while_method_2(int v0){
     bool v1;
     v1 = v0 < 5l;
     return v1;
 }
+__device__ void write_2(char v0){
+    const char * v1;
+    v1 = "%c";
+    printf(v1,v0);
+    return ;
+}
+__device__ void write_3(){
+    return ;
+}
+__device__ void write_4(const char * v0){
+    const char * v1;
+    v1 = "%s";
+    printf(v1,v0);
+    return ;
+}
+__device__ void write_7(){
+    const char * v0;
+    v0 = "Call";
+    return write_4(v0);
+}
+__device__ void write_8(){
+    const char * v0;
+    v0 = "Fold";
+    return write_4(v0);
+}
+__device__ void write_9(){
+    const char * v0;
+    v0 = "Raise";
+    return write_4(v0);
+}
+__device__ void write_6(Union0 v0){
+    switch (v0.tag) {
+        case 0: { // Call
+            return write_7();
+            break;
+        }
+        case 1: { // Fold
+            return write_8();
+            break;
+        }
+        case 2: { // Raise
+            return write_9();
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+}
+__device__ void write_5(static_array_list<Union0,5l> v0){
+    const char * v1;
+    v1 = "[";
+    write_4(v1);
+    int v2;
+    v2 = v0.length;
+    bool v3;
+    v3 = 100l < v2;
+    int v4;
+    if (v3){
+        v4 = 100l;
+    } else {
+        v4 = v2;
+    }
+    int v5;
+    v5 = 0l;
+    while (while_method_1(v4, v5)){
+        Union0 v7;
+        v7 = v0[v5];
+        write_6(v7);
+        int v9;
+        v9 = v5 + 1l;
+        int v10;
+        v10 = v0.length;
+        bool v11;
+        v11 = v9 < v10;
+        if (v11){
+            const char * v12;
+            v12 = "; ";
+            write_4(v12);
+        } else {
+        }
+        v5 += 1l ;
+    }
+    int v13;
+    v13 = v0.length;
+    bool v14;
+    v14 = v13 > 100l;
+    if (v14){
+        const char * v15;
+        v15 = "; ...";
+        write_4(v15);
+    } else {
+    }
+    const char * v16;
+    v16 = "]";
+    return write_4(v16);
+}
+__device__ void write_11(){
+    const char * v0;
+    v0 = "Jack";
+    return write_4(v0);
+}
+__device__ void write_12(){
+    const char * v0;
+    v0 = "King";
+    return write_4(v0);
+}
+__device__ void write_13(){
+    const char * v0;
+    v0 = "Queen";
+    return write_4(v0);
+}
+__device__ void write_10(Union1 v0){
+    switch (v0.tag) {
+        case 0: { // Jack
+            return write_11();
+            break;
+        }
+        case 1: { // King
+            return write_12();
+            break;
+        }
+        case 2: { // Queen
+            return write_13();
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+}
+__device__ void write_14(int v0){
+    const char * v1;
+    v1 = "%d";
+    printf(v1,v0);
+    return ;
+}
+__device__ void write_1(static_array_list<Union0,5l> v0, Union1 v1, int v2, int v3){
+    char v4;
+    v4 = '{';
+    write_2(v4);
+    write_3();
+    const char * v5;
+    v5 = "action_history";
+    write_4(v5);
+    const char * v6;
+    v6 = " = ";
+    write_4(v6);
+    write_5(v0);
+    const char * v7;
+    v7 = "; ";
+    write_4(v7);
+    const char * v8;
+    v8 = "card";
+    write_4(v8);
+    write_4(v6);
+    write_10(v1);
+    write_4(v7);
+    const char * v9;
+    v9 = "pot";
+    write_4(v9);
+    write_4(v6);
+    write_14(v2);
+    write_4(v7);
+    const char * v10;
+    v10 = "stack";
+    write_4(v10);
+    write_4(v6);
+    write_14(v3);
+    char v11;
+    v11 = '}';
+    return write_2(v11);
+}
 extern "C" __global__ void entry0() {
-    long v0;
+    int v0;
     v0 = threadIdx.x;
-    long v1;
+    int v1;
     v1 = blockIdx.x;
-    long v2;
-    v2 = v1 * 512l;
-    long v3;
+    int v2;
+    v2 = v1 * 32l;
+    int v3;
     v3 = v0 + v2;
     bool v4;
     v4 = v3 == 0l;
     if (v4){
-        US0 v5[3l];
-        US0 v6;
-        v6 = US0_2();
-        v5[0l] = v6;
-        US0 v7;
-        v7 = US0_2();
-        v5[1l] = v7;
-        US0 v8;
-        v8 = US0_0();
-        v5[2l] = v8;
-        long v9;
-        v9 = 0l;
-        long v10;
-        v10 = 1l;
-        long v11;
-        v11 = 3l;
-        US1 v12;
-        v12 = US1_1();
-        long v13;
-        v13 = 8l;
-        long v14;
-        v14 = 5l;
-        float v15[39l];
-        long v16;
-        v16 = 0l;
-        while (while_method_0(v16)){
-            assert("Tensor range check" && 0 <= v16 && v16 < 39l);
-            v15[v16] = 0.0f;
-            v16 += 1l ;
+        static_array_list<Union0,5l> v5;
+        v5 = static_array_list<Union0,5l>{};
+        v5.unsafe_set_length(3l);
+        Union0 v7;
+        v7 = Union0{Union0_2{}};
+        v5[0l] = v7;
+        Union0 v9;
+        v9 = Union0{Union0_2{}};
+        v5[1l] = v9;
+        Union0 v11;
+        v11 = Union0{Union0_0{}};
+        v5[2l] = v11;
+        Union1 v13;
+        v13 = Union1{Union1_1{}};
+        int v14;
+        v14 = 8l;
+        int v15;
+        v15 = 5l;
+        float v16[39l];
+        int v17;
+        v17 = 0l;
+        while (while_method_0(v17)){
+            assert("Tensor range check" && 0 <= v17 && v17 < 39l);
+            v16[v17] = 0.0f;
+            v17 += 1l ;
         }
-        float * v20;
-        float * v18;
-        v18 = v15+0l;
-        v20 = v18;
-        unsigned long v21;
-        v21 = (unsigned long)v14;
-        long v22;
-        v22 = (long)v21;
+        float * v19;
+        v19 = v16+0l;
+        unsigned int v21;
+        v21 = (unsigned int)v15;
+        int v22;
+        v22 = (int)v21;
         bool v23;
         v23 = v22 < 10l;
         bool v24;
@@ -197,11 +672,11 @@ extern "C" __global__ void entry0() {
             assert("Pickle failure. Int value out of bounds." && v23);
         } else {
         }
-        v20[v22] = 1.0f;
-        unsigned long v26;
-        v26 = (unsigned long)v13;
-        long v27;
-        v27 = (long)v26;
+        v19[v22] = 1.0f;
+        unsigned int v26;
+        v26 = (unsigned int)v14;
+        int v27;
+        v27 = (int)v26;
         bool v28;
         v28 = v27 < 10l;
         bool v29;
@@ -210,634 +685,471 @@ extern "C" __global__ void entry0() {
             assert("Pickle failure. Int value out of bounds." && v28);
         } else {
         }
-        long v31;
+        int v31;
         v31 = 10l + v27;
-        v20[v31] = 1.0f;
-        switch (v12.tag) {
+        v19[v31] = 1.0f;
+        switch (v13.tag) {
             case 0: { // Jack
-                v20[20l] = 1.0f;
+                v19[20l] = 1.0f;
                 break;
             }
             case 1: { // King
-                v20[21l] = 1.0f;
+                v19[21l] = 1.0f;
                 break;
             }
-            default: { // Queen
-                v20[22l] = 1.0f;
+            case 2: { // Queen
+                v19[22l] = 1.0f;
+                break;
+            }
+            default: {
+                assert("Invalid tag." && false);
             }
         }
-        bool v32;
-        v32 = v11 <= 5l;
+        int v32;
+        v32 = v5.length;
         bool v33;
-        v33 = v32 == false;
+        v33 = v32 == 0l;
         if (v33){
-            assert("Pickle failure. The given array is too large." && v32);
+            v19[23l] = 1.0f;
         } else {
         }
-        bool v35;
-        v35 = v11 == 0l;
-        if (v35){
-            v20[23l] = 1.0f;
-        } else {
-        }
-        long v36;
-        v36 = 0l;
-        while (while_method_1(v11, v36)){
-            assert("Tensor range check" && 0 <= v36 && v36 < v11);
-            long v38;
-            v38 = v10 * v36;
-            long v39;
-            v39 = v38 + v9;
-            US0 v40;
-            v40 = v5[v39];
-            long v41;
-            v41 = v36 * 3l;
-            long v42;
-            v42 = 24l + v41;
-            switch (v40.tag) {
+        int v34;
+        v34 = v5.length;
+        int v35;
+        v35 = 0l;
+        while (while_method_1(v34, v35)){
+            Union0 v37;
+            v37 = v5[v35];
+            int v39;
+            v39 = v35 * 3l;
+            int v40;
+            v40 = 24l + v39;
+            switch (v37.tag) {
                 case 0: { // Call
-                    v20[v42] = 1.0f;
+                    v19[v40] = 1.0f;
                     break;
                 }
                 case 1: { // Fold
-                    long v43;
-                    v43 = v42 + 1l;
-                    v20[v43] = 1.0f;
+                    int v41;
+                    v41 = v40 + 1l;
+                    v19[v41] = 1.0f;
                     break;
                 }
-                default: { // Raise
-                    long v44;
-                    v44 = v42 + 2l;
-                    v20[v44] = 1.0f;
+                case 2: { // Raise
+                    int v42;
+                    v42 = v40 + 2l;
+                    v19[v42] = 1.0f;
+                    break;
+                }
+                default: {
+                    assert("Invalid tag." && false);
                 }
             }
-            v36 += 1l ;
+            v35 += 1l ;
         }
-        long v45;
-        v45 = 0l;
-        long v46;
-        v46 = 1l;
-        long v47;
-        v47 = 39l;
-        float * v50;
-        float * v48;
-        v48 = v15+v45;
-        v50 = v48;
-        long v51;
-        v51 = 0l;
-        long v52;
-        v52 = 10l;
-        unsigned long v53; long v54;
-        Tuple0 tmp1 = method_0(v50, v52, v51);
-        v53 = tmp1.v0; v54 = tmp1.v1;
-        long v55;
-        v55 = (long)v53;
-        long v56;
-        v56 = 10l;
-        long v57;
-        v57 = 20l;
-        unsigned long v58; long v59;
-        Tuple0 tmp2 = method_0(v50, v57, v56);
-        v58 = tmp2.v0; v59 = tmp2.v1;
-        long v60;
-        v60 = (long)v58;
-        float v61;
-        v61 = v50[20l];
+        int v43;
+        v43 = 0l;
+        int v44;
+        v44 = 1l;
+        int v45;
+        v45 = 39l;
+        float * v46;
+        v46 = v16+v43;
+        int v48;
+        v48 = 0l;
+        int v49;
+        v49 = 10l;
+        unsigned int v50; int v51;
+        Tuple0 tmp1 = method_0(v46, v49, v48);
+        v50 = tmp1.v0; v51 = tmp1.v1;
+        int v52;
+        v52 = (int)v50;
+        int v53;
+        v53 = 10l;
+        int v54;
+        v54 = 20l;
+        unsigned int v55; int v56;
+        Tuple0 tmp2 = method_0(v46, v54, v53);
+        v55 = tmp2.v0; v56 = tmp2.v1;
+        int v57;
+        v57 = (int)v55;
+        float v58;
+        v58 = v46[20l];
+        bool v59;
+        v59 = v58 == 1.0f;
+        bool v61;
+        if (v59){
+            v61 = true;
+        } else {
+            bool v60;
+            v60 = v58 == 0.0f;
+            v61 = v60;
+        }
         bool v62;
-        v62 = v61 == 1.0f;
-        bool v64;
+        v62 = v61 == false;
         if (v62){
-            v64 = true;
-        } else {
-            bool v63;
-            v63 = v61 == 0.0f;
-            v64 = v63;
-        }
-        bool v65;
-        v65 = v64 == false;
-        if (v65){
-            assert("Unpickling failure. The unit type should always be either be 1 or 0." && v64);
+            assert("Unpickling failure. The unit type should always be either be 1 or 0." && v61);
         } else {
         }
-        long v67;
-        if (v62){
-            v67 = 1l;
+        int v64;
+        if (v59){
+            v64 = 1l;
         } else {
-            v67 = 0l;
+            v64 = 0l;
         }
-        float v68;
-        v68 = v50[21l];
+        float v65;
+        v65 = v46[21l];
+        bool v66;
+        v66 = v65 == 1.0f;
+        bool v68;
+        if (v66){
+            v68 = true;
+        } else {
+            bool v67;
+            v67 = v65 == 0.0f;
+            v68 = v67;
+        }
         bool v69;
-        v69 = v68 == 1.0f;
-        bool v71;
+        v69 = v68 == false;
         if (v69){
-            v71 = true;
-        } else {
-            bool v70;
-            v70 = v68 == 0.0f;
-            v71 = v70;
-        }
-        bool v72;
-        v72 = v71 == false;
-        if (v72){
-            assert("Unpickling failure. The unit type should always be either be 1 or 0." && v71);
+            assert("Unpickling failure. The unit type should always be either be 1 or 0." && v68);
         } else {
         }
-        long v74;
-        if (v69){
-            v74 = 1l;
+        int v71;
+        if (v66){
+            v71 = 1l;
         } else {
-            v74 = 0l;
+            v71 = 0l;
         }
-        float v75;
-        v75 = v50[22l];
+        float v72;
+        v72 = v46[22l];
+        bool v73;
+        v73 = v72 == 1.0f;
+        bool v75;
+        if (v73){
+            v75 = true;
+        } else {
+            bool v74;
+            v74 = v72 == 0.0f;
+            v75 = v74;
+        }
         bool v76;
-        v76 = v75 == 1.0f;
-        bool v78;
+        v76 = v75 == false;
         if (v76){
-            v78 = true;
+            assert("Unpickling failure. The unit type should always be either be 1 or 0." && v75);
         } else {
-            bool v77;
-            v77 = v75 == 0.0f;
-            v78 = v77;
+        }
+        int v78;
+        if (v73){
+            v78 = 1l;
+        } else {
+            v78 = 0l;
         }
         bool v79;
-        v79 = v78 == false;
+        v79 = v71 == 1l;
+        Union1 v82;
         if (v79){
-            assert("Unpickling failure. The unit type should always be either be 1 or 0." && v78);
+            v82 = Union1{Union1_1{}};
         } else {
+            v82 = Union1{Union1_0{}};
         }
-        long v81;
-        if (v76){
-            v81 = 1l;
+        int v83;
+        v83 = v64 + v71;
+        bool v84;
+        v84 = v78 == 1l;
+        Union1 v86;
+        if (v84){
+            v86 = Union1{Union1_2{}};
         } else {
-            v81 = 0l;
+            v86 = v82;
         }
-        bool v82;
-        v82 = v74 == 1l;
-        US1 v85;
-        if (v82){
-            v85 = US1_1();
+        int v87;
+        v87 = v83 + v78;
+        bool v88;
+        v88 = v87 == 0l;
+        bool v90;
+        if (v88){
+            v90 = true;
         } else {
-            v85 = US1_0();
+            bool v89;
+            v89 = v87 == 1l;
+            v90 = v89;
         }
-        long v86;
-        v86 = v67 + v74;
-        bool v87;
-        v87 = v81 == 1l;
-        US1 v89;
-        if (v87){
-            v89 = US1_2();
-        } else {
-            v89 = v85;
-        }
-        long v90;
-        v90 = v86 + v81;
         bool v91;
-        v91 = v90 == 0l;
-        bool v93;
+        v91 = v90 == false;
         if (v91){
-            v93 = true;
-        } else {
-            bool v92;
-            v92 = v90 == 1l;
-            v93 = v92;
-        }
-        bool v94;
-        v94 = v93 == false;
-        if (v94){
-            assert("Unpickling failure. Only a single case of an union type should be active at most." && v93);
+            assert("Unpickling failure. Only a single case of an union type should be active at most." && v90);
         } else {
         }
-        long v96;
-        v96 = 23l;
-        US0 v97[5l];
-        float v98;
-        v98 = v50[v96];
+        int v93;
+        v93 = 23l;
+        static_array_list<Union0,5l> v94;
+        v94 = static_array_list<Union0,5l>{};
+        v94.unsafe_set_length(5l);
+        float v96;
+        v96 = v46[v93];
+        bool v97;
+        v97 = v96 == 0.0f;
         bool v99;
-        v99 = v98 == 0.0f;
-        bool v101;
-        if (v99){
-            v101 = true;
+        if (v97){
+            v99 = true;
         } else {
-            bool v100;
-            v100 = v98 == 1.0f;
-            v101 = v100;
+            bool v98;
+            v98 = v96 == 1.0f;
+            v99 = v98;
+        }
+        bool v100;
+        v100 = v99 == false;
+        if (v100){
+            assert("Unpickle failure. The static array list emptiness flag should be 1 or 0." && v99);
+        } else {
         }
         bool v102;
-        v102 = v101 == false;
-        if (v102){
-            assert("Unpickle failure. The array emptiness flag should be 1 or 0." && v101);
-        } else {
-        }
-        bool v104;
-        v104 = v98 == 1.0f;
-        long v105;
-        v105 = v96 + 1l;
-        long v106; long v107;
-        Tuple2 tmp3 = Tuple2(0l, 0l);
-        v106 = tmp3.v0; v107 = tmp3.v1;
-        while (while_method_2(v106)){
-            long v109;
-            v109 = v106 * 3l;
-            long v110;
-            v110 = v105 + v109;
-            float v111;
-            v111 = v50[v110];
+        v102 = v96 == 1.0f;
+        int v103;
+        v103 = v93 + 1l;
+        int v104; int v105;
+        Tuple2 tmp3 = Tuple2{0l, 0l};
+        v104 = tmp3.v0; v105 = tmp3.v1;
+        while (while_method_2(v104)){
+            int v107;
+            v107 = v104 * 3l;
+            int v108;
+            v108 = v103 + v107;
+            float v109;
+            v109 = v46[v108];
+            bool v110;
+            v110 = v109 == 1.0f;
             bool v112;
-            v112 = v111 == 1.0f;
-            bool v114;
-            if (v112){
-                v114 = true;
+            if (v110){
+                v112 = true;
             } else {
-                bool v113;
-                v113 = v111 == 0.0f;
-                v114 = v113;
+                bool v111;
+                v111 = v109 == 0.0f;
+                v112 = v111;
             }
-            bool v115;
-            v115 = v114 == false;
-            if (v115){
-                assert("Unpickling failure. The unit type should always be either be 1 or 0." && v114);
+            bool v113;
+            v113 = v112 == false;
+            if (v113){
+                assert("Unpickling failure. The unit type should always be either be 1 or 0." && v112);
             } else {
             }
-            long v117;
-            if (v112){
-                v117 = 1l;
+            int v115;
+            if (v110){
+                v115 = 1l;
             } else {
-                v117 = 0l;
+                v115 = 0l;
             }
-            long v118;
-            v118 = v110 + 1l;
-            float v119;
-            v119 = v50[v118];
+            int v116;
+            v116 = v108 + 1l;
+            float v117;
+            v117 = v46[v116];
+            bool v118;
+            v118 = v117 == 1.0f;
             bool v120;
-            v120 = v119 == 1.0f;
-            bool v122;
-            if (v120){
-                v122 = true;
+            if (v118){
+                v120 = true;
             } else {
-                bool v121;
-                v121 = v119 == 0.0f;
-                v122 = v121;
+                bool v119;
+                v119 = v117 == 0.0f;
+                v120 = v119;
             }
-            bool v123;
-            v123 = v122 == false;
-            if (v123){
-                assert("Unpickling failure. The unit type should always be either be 1 or 0." && v122);
+            bool v121;
+            v121 = v120 == false;
+            if (v121){
+                assert("Unpickling failure. The unit type should always be either be 1 or 0." && v120);
             } else {
             }
-            long v125;
-            if (v120){
-                v125 = 1l;
+            int v123;
+            if (v118){
+                v123 = 1l;
             } else {
-                v125 = 0l;
+                v123 = 0l;
             }
-            long v126;
-            v126 = v110 + 2l;
-            float v127;
-            v127 = v50[v126];
+            int v124;
+            v124 = v108 + 2l;
+            float v125;
+            v125 = v46[v124];
+            bool v126;
+            v126 = v125 == 1.0f;
             bool v128;
-            v128 = v127 == 1.0f;
-            bool v130;
-            if (v128){
-                v130 = true;
+            if (v126){
+                v128 = true;
             } else {
-                bool v129;
-                v129 = v127 == 0.0f;
-                v130 = v129;
+                bool v127;
+                v127 = v125 == 0.0f;
+                v128 = v127;
             }
-            bool v131;
-            v131 = v130 == false;
-            if (v131){
-                assert("Unpickling failure. The unit type should always be either be 1 or 0." && v130);
+            bool v129;
+            v129 = v128 == false;
+            if (v129){
+                assert("Unpickling failure. The unit type should always be either be 1 or 0." && v128);
             } else {
             }
-            long v133;
-            if (v128){
-                v133 = 1l;
+            int v131;
+            if (v126){
+                v131 = 1l;
             } else {
-                v133 = 0l;
+                v131 = 0l;
             }
-            bool v134;
-            v134 = v125 == 1l;
-            US0 v137;
-            if (v134){
-                v137 = US0_1();
+            bool v132;
+            v132 = v123 == 1l;
+            Union0 v135;
+            if (v132){
+                v135 = Union0{Union0_1{}};
             } else {
-                v137 = US0_0();
+                v135 = Union0{Union0_0{}};
             }
-            long v138;
-            v138 = v117 + v125;
-            bool v139;
-            v139 = v133 == 1l;
-            US0 v141;
-            if (v139){
-                v141 = US0_2();
+            int v136;
+            v136 = v115 + v123;
+            bool v137;
+            v137 = v131 == 1l;
+            Union0 v139;
+            if (v137){
+                v139 = Union0{Union0_2{}};
             } else {
-                v141 = v137;
+                v139 = v135;
             }
-            long v142;
-            v142 = v138 + v133;
+            int v140;
+            v140 = v136 + v131;
+            bool v141;
+            v141 = v140 == 0l;
             bool v143;
-            v143 = v142 == 0l;
-            bool v145;
-            if (v143){
-                v145 = true;
+            if (v141){
+                v143 = true;
             } else {
-                bool v144;
-                v144 = v142 == 1l;
-                v145 = v144;
+                bool v142;
+                v142 = v140 == 1l;
+                v143 = v142;
+            }
+            bool v144;
+            v144 = v143 == false;
+            if (v144){
+                assert("Unpickling failure. Only a single case of an union type should be active at most." && v143);
+            } else {
             }
             bool v146;
-            v146 = v145 == false;
+            v146 = v104 == v105;
+            int v151;
             if (v146){
-                assert("Unpickling failure. Only a single case of an union type should be active at most." && v145);
+                bool v147;
+                v147 = v140 == 1l;
+                if (v147){
+                    v94[v104] = v139;
+                } else {
+                }
+                int v148;
+                v148 = v105 + v140;
+                v151 = v148;
             } else {
-            }
-            bool v148;
-            v148 = v106 == v107;
-            long v154;
-            if (v148){
                 bool v149;
-                v149 = v142 == 1l;
+                v149 = v141 == false;
                 if (v149){
-                    assert("Tensor range check" && 0 <= v106 && v106 < 5l);
-                    v97[v106] = v141;
+                    assert("Unpickle failure. Expected an inactive subsequence in the static array list unpickler." && v141);
                 } else {
                 }
-                long v150;
-                v150 = v107 + v142;
-                v154 = v150;
-            } else {
-                bool v151;
-                v151 = v107 == 0l;
-                bool v152;
-                v152 = v151 == false;
-                if (v152){
-                    assert("Unpickle failure. Expected an inactive subsequence in the array unpickler." && v151);
-                } else {
-                }
-                v154 = v107;
+                v151 = v105;
             }
-            v107 = v154;
-            v106 += 1l ;
+            v105 = v151;
+            v104 += 1l ;
         }
-        if (v104){
-            bool v155;
-            v155 = v107 == 0l;
-            bool v156;
-            v156 = v155 == false;
-            if (v156){
-                assert("Unpickle failure. Empty arrays should not have active elements." && v155);
+        if (v102){
+            bool v152;
+            v152 = v105 == 0l;
+            bool v153;
+            v153 = v152 == false;
+            if (v153){
+                assert("Unpickle failure. Empty static array lists should not have active elements." && v152);
             } else {
             }
         } else {
         }
-        assert("Tensor view range check" && 0 <= 0l && 0l < v107 && 0l <= 5l);
-        long v158;
-        if (v104){
+        v94.unsafe_set_length(v105);
+        int v155;
+        if (v102){
+            v155 = 1l;
+        } else {
+            v155 = 0l;
+        }
+        int v156;
+        v156 = v155 + v105;
+        bool v157;
+        v157 = 1l < v156;
+        int v158;
+        if (v157){
             v158 = 1l;
         } else {
-            v158 = 0l;
+            v158 = v156;
         }
-        long v159;
-        v159 = v158 + v107;
+        int v159;
+        v159 = v87 + v158;
         bool v160;
-        v160 = 1l < v159;
-        long v161;
+        v160 = v159 == 0l;
+        bool v162;
         if (v160){
-            v161 = 1l;
+            v162 = true;
         } else {
-            v161 = v159;
+            bool v161;
+            v161 = v159 == 2l;
+            v162 = v161;
         }
-        long v162;
-        v162 = v90 + v161;
         bool v163;
-        v163 = v162 == 0l;
-        bool v165;
+        v163 = v162 == false;
         if (v163){
-            v165 = true;
-        } else {
-            bool v164;
-            v164 = v162 == 2l;
-            v165 = v164;
-        }
-        bool v166;
-        v166 = v165 == false;
-        if (v166){
-            assert("Unpickling failure. Two sides of a pair should either all be active or inactive." && v165);
+            assert("Unpickling failure. Two sides of a pair should either all be active or inactive." && v162);
         } else {
         }
-        long v168;
-        v168 = v162 / 2l;
-        long v169;
-        v169 = v59 + v168;
+        int v165;
+        v165 = v159 / 2l;
+        int v166;
+        v166 = v56 + v165;
+        bool v167;
+        v167 = v166 == 0l;
+        bool v169;
+        if (v167){
+            v169 = true;
+        } else {
+            bool v168;
+            v168 = v166 == 2l;
+            v169 = v168;
+        }
         bool v170;
-        v170 = v169 == 0l;
-        bool v172;
+        v170 = v169 == false;
         if (v170){
-            v172 = true;
-        } else {
-            bool v171;
-            v171 = v169 == 2l;
-            v172 = v171;
-        }
-        bool v173;
-        v173 = v172 == false;
-        if (v173){
-            assert("Unpickling failure. Two sides of a pair should either all be active or inactive." && v172);
+            assert("Unpickling failure. Two sides of a pair should either all be active or inactive." && v169);
         } else {
         }
-        long v175;
-        v175 = v169 / 2l;
-        long v176;
-        v176 = v54 + v175;
+        int v172;
+        v172 = v166 / 2l;
+        int v173;
+        v173 = v51 + v172;
+        bool v174;
+        v174 = v173 == 0l;
+        bool v176;
+        if (v174){
+            v176 = true;
+        } else {
+            bool v175;
+            v175 = v173 == 2l;
+            v176 = v175;
+        }
         bool v177;
-        v177 = v176 == 0l;
-        bool v179;
+        v177 = v176 == false;
         if (v177){
-            v179 = true;
+            assert("Unpickling failure. Two sides of a pair should either all be active or inactive." && v176);
         } else {
-            bool v178;
-            v178 = v176 == 2l;
-            v179 = v178;
         }
+        int v179;
+        v179 = v173 / 2l;
         bool v180;
-        v180 = v179 == false;
-        if (v180){
-            assert("Unpickling failure. Two sides of a pair should either all be active or inactive." && v179);
+        v180 = v179 == 1l;
+        bool v181;
+        v181 = v180 == false;
+        if (v181){
+            assert("Invalid format detected during deserialization." && v180);
         } else {
         }
-        long v182;
-        v182 = v176 / 2l;
-        bool v183;
-        v183 = v182 == 1l;
-        bool v184;
-        v184 = v183 == false;
-        if (v184){
-            assert("Invalid format detected during deserialization." && v183);
-        } else {
-        }
-        const char * v186;
-        v186 = "%c";
-        printf(v186,'{');
-        const char * v187;
-        v187 = "%s";
-        const char * v188;
-        v188 = "action_history";
-        printf(v187,v188);
-        const char * v190;
-        v190 = "%s";
-        const char * v191;
-        v191 = " = ";
-        printf(v190,v191);
-        long v193;
-        v193 = 0l;
-        const char * v194;
-        v194 = "%c";
-        printf(v194,'[');
-        long v195;
-        v195 = 0l;
-        while (while_method_1(v107, v195)){
-            long v197;
-            v197 = v193;
-            bool v198;
-            v198 = v197 >= 100l;
-            if (v198){
-                const char * v199;
-                v199 = "%s";
-                const char * v200;
-                v200 = " ...";
-                printf(v199,v200);
-                break;
-            } else {
-            }
-            bool v202;
-            v202 = v195 == 0l;
-            bool v203;
-            v203 = v202 != true;
-            if (v203){
-                const char * v204;
-                v204 = "%s";
-                const char * v205;
-                v205 = "; ";
-                printf(v204,v205);
-            } else {
-            }
-            long v207;
-            v207 = v193 + 1l;
-            v193 = v207;
-            US0 v208;
-            v208 = v97[v195];
-            switch (v208.tag) {
-                case 0: { // Call
-                    const char * v209;
-                    v209 = "%s";
-                    const char * v210;
-                    v210 = "Call";
-                    printf(v209,v210);
-                    break;
-                }
-                case 1: { // Fold
-                    const char * v212;
-                    v212 = "%s";
-                    const char * v213;
-                    v213 = "Fold";
-                    printf(v212,v213);
-                    break;
-                }
-                default: { // Raise
-                    const char * v215;
-                    v215 = "%s";
-                    const char * v216;
-                    v216 = "Raise";
-                    printf(v215,v216);
-                }
-            }
-            v195 += 1l ;
-        }
-        const char * v218;
-        v218 = "%c";
-        printf(v218,']');
-        const char * v219;
-        v219 = "%s";
-        const char * v220;
-        v220 = "; ";
-        printf(v219,v220);
-        const char * v222;
-        v222 = "%s";
-        const char * v223;
-        v223 = "card";
-        printf(v222,v223);
-        const char * v225;
-        v225 = "%s";
-        const char * v226;
-        v226 = " = ";
-        printf(v225,v226);
-        switch (v89.tag) {
-            case 0: { // Jack
-                const char * v228;
-                v228 = "%s";
-                const char * v229;
-                v229 = "Jack";
-                printf(v228,v229);
-                break;
-            }
-            case 1: { // King
-                const char * v231;
-                v231 = "%s";
-                const char * v232;
-                v232 = "King";
-                printf(v231,v232);
-                break;
-            }
-            default: { // Queen
-                const char * v234;
-                v234 = "%s";
-                const char * v235;
-                v235 = "Queen";
-                printf(v234,v235);
-            }
-        }
-        const char * v237;
-        v237 = "%s";
-        const char * v238;
-        v238 = "; ";
-        printf(v237,v238);
-        const char * v240;
-        v240 = "%s";
-        const char * v241;
-        v241 = "pot";
-        printf(v240,v241);
-        const char * v243;
-        v243 = "%s";
-        const char * v244;
-        v244 = " = ";
-        printf(v243,v244);
-        const char * v246;
-        v246 = "%d";
-        printf(v246,v60);
-        const char * v247;
-        v247 = "%s";
-        const char * v248;
-        v248 = "; ";
-        printf(v247,v248);
-        const char * v250;
-        v250 = "%s";
-        const char * v251;
-        v251 = "stack";
-        printf(v250,v251);
-        const char * v253;
-        v253 = "%s";
-        const char * v254;
-        v254 = " = ";
-        printf(v253,v254);
-        const char * v256;
-        v256 = "%d";
-        printf(v256,v55);
-        const char * v257;
-        v257 = "%c";
-        printf(v257,'}');
+        write_1(v94, v86, v57, v52);
         printf("\n");
         return ;
     } else {
@@ -845,24 +1157,71 @@ extern "C" __global__ void entry0() {
     }
 }
 """
+class static_array():
+    def __init__(self, length):
+        self.ptr = []
+        for _ in range(length):
+            self.ptr.append(None)
+
+    def __getitem__(self, index):
+        assert 0 <= index < len(self.ptr), "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < len(self.ptr), "The set index needs to be in range."
+        self.ptr[index] = value
+
+class static_array_list(static_array):
+    def __init__(self, length):
+        super().__init__(length)
+        self.length = 0
+
+    def __getitem__(self, index):
+        assert 0 <= index < self.length, "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < self.length, "The set index needs to be in range."
+        self.ptr[index] = value
+
+    def push(self,value):
+        assert (self.length < len(self.ptr)), "The length before pushing has to be less than the maximum length of the array."
+        self.ptr[self.length] = value
+        self.length += 1
+
+    def pop(self):
+        assert (0 < self.length), "The length before popping has to be greater than 0."
+        self.length -= 1
+        return self.ptr[self.length]
+
+    def unsafe_set_length(self,i):
+        assert 0 <= i <= len(self.ptr), "The new length has to be in range."
+        self.length = i
+
+class dynamic_array(static_array): 
+    pass
+
+class dynamic_array_list(static_array_list):
+    def length_(self): return self.length
+
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
 i8 = i16 = i32 = i64 = u8 = u16 = u32 = u64 = int; f32 = f64 = float; char = string = str
 
 options = []
-options.append('--define-macro=NDEBUG')
-options.append('--diag-suppress=550,20012')
+options.append('--diag-suppress=550,20012,68')
 options.append('--dopt=on')
 options.append('--restrict')
-options.append('--maxrregcount=128')
-raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))
+options.append('--std=c++20')
+options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
+raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
 def main():
     v0 = 0
     v1 = raw_module.get_function(f"entry{v0}")
     del v0
     v1.max_dynamic_shared_size_bytes = 0 
-    v1((1,),(512,),(),shared_mem=0)
+    v1((1,),(32,),(),shared_mem=0)
     del v1
     return 
 

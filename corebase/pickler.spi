@@ -101,7 +101,7 @@ inl sa_list forall (sa_list : * -> * -> * ) {sa_index; sa_set; sa_length; sa_cre
                     if c' = 1 then sa_set tmp i x
                     c + c'
                 else
-                    assert (c = 0) "Unpickle failure. Expected an inactive subsequence in the static array list unpickler."
+                    assert (c' = 0) "Unpickle failure. Expected an inactive subsequence in the static array list unpickler."
                     c
                 ) 0
         if is_empty then
@@ -135,7 +135,7 @@ inl sa forall (sa : * -> * -> * ) {sa_index; sa_set; sa_length; sa_create} dim t
                     if c' = 1 then sa_set tmp i x
                     c + c'
                 else
-                    assert (c = 0) "Unpickle failure. Expected an inactive subsequence in the static array unpickler."
+                    assert (c' = 0) "Unpickle failure. Expected an inactive subsequence in the static array unpickler."
                     c
                 ) 0
         if is_empty then
