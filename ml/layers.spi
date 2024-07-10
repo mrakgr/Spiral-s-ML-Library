@@ -25,15 +25,7 @@ union rec graph t =
     | Zip : exists a b. (a * b -> t) * graph a * graph b
     | Matmul : graph t * graph t
     | Input : exists key{symbol}. key * int // Takes in the innermost dim as an argument.
-    | Weight : int // Takes in the output dimension as the ergument.
-
-// inl zip forall a b. (a : graph a) (b : graph b) : graph (a * b) = Zip(exists id,a,b)
-// inl f forall t. (x : graph t) = 
-//     match x with
-//     | Zip(exists a b. id,a,b) => 
-//         typecase t with
-//         | ~a * ~b => 
-//             ()
+    | Weight : int // Takes in the output dimension as the argument.
 
 type ptr = partitionm.ptr
 type size = partitionm.size

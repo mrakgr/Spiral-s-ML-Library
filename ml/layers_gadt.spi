@@ -3,16 +3,16 @@ open corecuda
 open tensorm
 open compile_time
 
+type ptr = partitionm.ptr
+type size = partitionm.size
+type graph_array = ptr * size
+type graph_dims = hashmapm.hashmap
+type graph_offset = hashmapm.hashmap * size
+type graph_data = {array : graph_array; offset : graph_offset}
+
 nominal layer_state = 
     {
         rng : refm.ref random.philox_state
-    }
-
-type model_sizes =
-    {
-        ensemble : int
-        block : int
-        minibatch : int
     }
 
 union rec graph t =
@@ -20,12 +20,55 @@ union rec graph t =
     | RowMap :: forall dim t. 
         (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) t) * graph (tensor dim a))
         -> graph (tensor dim t)
-    | RowReduce :: forall dim t. 
-        (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> t) * graph (tensor dim a))
-        -> graph (tensor dim t)
-    | Zip :: forall a b. graph a * graph b -> graph (a * b)
-    | Apply :: forall b el. graph (tensor (int * b) el) * graph int -> graph (tensor b el)
-    | Matmul :: forall dim t. graph (tensor dim t) * graph (tensor dim t) -> graph (tensor dim t)
-    | Weight :: forall dim t. graph (tensor dim t)
+    | RowReduce :: forall dim_fst t. 
+        (exists dim_snd a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> t) * graph (tensor (dim_fst * dim_snd) a))
+        -> graph (tensor dim_fst t)
+    | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
+    | Matmul :: forall t. graph (tensor (int * int) t) * graph (tensor (int * int) t) -> graph (tensor (int * int) t)
+    | Weight :: forall dim t. dim -> graph (tensor dim t)
     | Input :: forall dim t. (exists key{symbol}. key) * dim -> graph (tensor dim t)
-    | InputScalar :: (model_sizes -> graph int) -> graph int
+    | Apply :: forall b el. (exists a. graph (tensor (a * b) el) * graph a) -> graph (tensor b el)
+    | InputScalar :: forall a. (exists key{symbol}. key) -> graph a
+
+nominal model t =
+    {
+        graph : graph t
+        dims : graph_dims
+        output : graph_data
+        param : graph_data
+    }
+
+
+inl memoize (h : hashmapm.hashmap) f k =
+    match hashmapm.try_get h k with
+    | Some v => v
+    | None => inl v = f k in hashmapm.add h k v . v
+
+// Propagates the dimensions for each of the nodes and returns a hash map of them pointing to each node.
+// Takes in a record of input dimensions and the ensemble size as the last arguments.
+inl pass_dim forall dim_top t_top. (x : graph (tensor dim_top t_top)) : graph_dims =
+    inl h = hashmapm.create()
+    inl rec f forall dim t. : graph (tensor dim t) -> dim =
+        memoize h (function
+            | Map(exists a. _, a) => f a
+            | RowMap(exists a. _, a) => f a
+            | RowReduce(exists dim_snd a. _, a) => fst (f a)
+            | Zip(a,b) =>
+                inl a = f a
+                inl b = f b
+                assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
+                a
+            | Matmul(a,b) =>
+                inl (m,k as a) = f a
+                inl (n,k') = f b
+                assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
+                m,n
+            | Weight dim => dim
+            | Input (_, dim) => dim
+            | Apply(exists a. a,b) => snd (f a)
+            | InputScalar => error_type "Not supposed to have this node in pass_dim."
+            )
+    inl _ = f x
+    hashmapm.set_immutable(h)
+    h
+
