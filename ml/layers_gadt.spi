@@ -129,11 +129,13 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
                     inl tf32 () : size = fst(matmul.matmul_tf32' false true).offset_end
                     real
                         typecase t with
-                        | f32 => tf32()
-                        | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
+                        | tensor (int * int) f32 => tf32()
+                        | _ => 
+                            !!!!PrintStatic(`t)
+                            error_type `(()) "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
                 max (f a) (f b) |> max memory
             | Apply(exists a. a,b) => max (f a) (f b)
-            | Weight | Input | InputScalar => 0
+            | InputScalar | Weight | Input => 0
     f x
 
 // Initializes the parameters of a NN on the host.
@@ -206,19 +208,26 @@ inl input_extract forall t_top key{symbol} dim input. (model {graph output} : mo
 
 // Extracts the tensor at the top level node.
 // Will give a type error on passthrough nodes like Zip and Apply.
-inl graph_tensor_extract forall dim t. (model {graph param output} : model (tensor dim t)) : tensor dim t =
-    match hashmapm.try_get (fst param.offset) graph with
-    | Some x => partitionm.from_partition_offsets param.array x
-    | None =>
-        match hashmapm.try_get (fst output.offset) graph with
-        | Some x => partitionm.from_partition_offsets output.array x
-        | None => error_type "Cannot find the offset in the dictionaries"
+inl graph_tensor_extract forall t' indices. (model {graph param output} : model t') (indices : indices) : t' =
+    inl rec loop forall t. (x : graph t) : t =
+        match x with
+        | Zip(a,b) => zip (loop a) (loop b)
+        | Apply(exists a. a,b) => apply (loop b) (loop a)
+        | InputScalar(exists k. k) => real indices k : t
+        | _ =>
+            match hashmapm.try_get (fst param.offset) graph with
+            | Some x => partitionm.from_partition_offsets param.array x
+            | None =>
+                match hashmapm.try_get (fst output.offset) graph with
+                | Some x => partitionm.from_partition_offsets output.array x
+                | None => error_type "Cannot find the offset in the dictionaries"
+    loop graph
 
 // Runs the graph and returns the result in the top level node. Is intended to be used in device code.
 // Does not do any safety checking and is intended for internal use in other graph_run functions.
 inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
     inl h = hashmapm.create()
-    inl tensor_extract graph = graph_tensor_extract (model {m with graph})
+    inl tensor_extract graph = graph_tensor_extract (model {m with graph}) indices
     inl rec f forall t. : graph t -> t =
         open primitives
         memoize h fun x =>
@@ -238,20 +247,26 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
                 inl g = g ls
                 join row_reduce g a out
                 out
-            | Zip(a,b) => zip (f a) (f b)
             | Matmul(a,b) =>
                 inl a,b,out = f a, f b, tensor_extract x
                 inl alpha, beta : float * float = 1, 0
                 real
                     open real_core
                     typecase t with
-                    | f32 => 
+                    | tensor (int * int) f32 =>
                         inl memory, body = matmul.matmul_tf32' false true
                         join body alpha a b beta out
-                    | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
+                    | _ => 
+                        !!!!PrintStatic(`t)
+                        error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
                 out
-            | Weight | Input  => tensor_extract x
-            | InputScalar(exists k. k) => real indices k : t
+            // These need to be separate otherwise the typecase inserted by the inference will be overly specific 
+            // and we'll get a typecase miss during partial evaluation.
+            | Zip => tensor_extract x
+            | Apply => tensor_extract x
+            | Weight => tensor_extract x
+            | Input => tensor_extract x
+            | InputScalar => tensor_extract x
     f graph
 
 // Runs the kernel on the device.
@@ -268,9 +283,10 @@ inl graph_run_device forall t_top indices. (model ({graph param output} & m) : m
     inl _ = graph_run (model m) ls indices
     ()
 
-// inl graph_run_host forall t_top. (model {graph} & m : model t_top) =
-//     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
-//         graph_run_device m
+// Just for testing purposes.
+inl graph_run_host forall t_top. (model {graph} & m : model t_top) =
+    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+        graph_run_device m {}
 
 inl tanh forall dim t{float}. (x : graph (tensor dim t)) : graph (tensor dim t) = Map (exists const tanh, x)
 inl sigmoid forall dim t{float;number}. (x : graph (tensor dim t)) : graph (tensor dim t) = Map (exists const sigmoid, x)
@@ -296,7 +312,7 @@ inl create_model forall t. (graph : graph t) =
 // Tests whether randonmly initializing the params of the graph works.
 inl test1() =
     inl graph : graph (tensor (int * int) float) =
-        (input .input (1,4))
+        input .input (1,4)
         |> matmul (4,4)
         |> tanh
         |> matmul (4,4)
@@ -313,4 +329,61 @@ inl test1() =
     param_print model
     ()
 
-inl main() = test1()
+// Tests whether extracting the inputs of the graph works. Also randomly inits them.
+inl test2() =
+    inl graph : graph (tensor (int * int) float) =
+        input .input (1,2)
+        |> matmul (2,4)
+        |> tanh
+        |> matmul (4,4)
+        |> tanh
+        |> matmul (4,2)
+        |> tanh
+
+    inl model = create_model graph
+    console.write_ln "---"
+    param_init model
+    console.write_ln "Here are the weight matrices."
+    param_print model
+    console.write_ln "Here is the input tensor."
+    inl input : tensor (int * int) float = input_extract model .input
+    cupy.copy_to {
+        from = cupy.random_normal{mean=0; std=1} input.dim
+        to = input
+    }
+    console.write_ln input
+    ()
+
+// Tests whether extracting the graph can be executed.
+inl test3() =
+    inl graph : graph (tensor int int) =
+        (input .input (16,8) : graph (tensor _ float))
+        |> matmul (8,16)
+        |> ln_l2
+        |> relu
+        |> matmul (16,16)
+        |> ln_l2
+        |> relu
+        |> matmul (16,16)
+        |> discrete_sample
+
+    inl model = create_model graph
+    param_init model
+    console.write_ln "Here are the weight matrices."
+    param_print model
+    inl input : tensor (int * int) float = input_extract model .input
+    // Immitates the passing of data into the output vector.
+    // In the poker game the serialization function will be responsible for this.
+    cupy.copy_to {
+        from = cupy.random_normal{mean=0; std=1} input.dim
+        to = input
+    }
+    console.write_ln input
+    console.write_ln "Here is the output tensor."
+    graph_run_host model
+    inl tns_output = graph_tensor_extract model {}
+    console.write_ln tns_output
+    console.write_ln "===="
+    ()
+
+inl main() = test3()
