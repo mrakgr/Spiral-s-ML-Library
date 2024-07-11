@@ -16,13 +16,14 @@ nominal layer_state =
     }
 
 union rec graph t =
+    // | Reduce :: forall t. (exists dim a. (layer_state -> a -> t) * graph (tensor dim a)) -> graph t
     | Map :: forall dim t. (exists a. (layer_state -> a -> t) * graph (tensor dim a)) -> graph (tensor dim t)
-    | RowMap :: forall dim t. 
-        (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) t) * graph (tensor dim a))
-        -> graph (tensor dim t)
-    | RowReduce :: forall dim_fst t. 
-        (exists dim_snd a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> t) * graph (tensor (dim_fst * dim_snd) a))
-        -> graph (tensor dim_fst t)
+    | RowMap :: forall t. 
+        (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) t) * graph (tensor (int * int) a))
+        -> graph (tensor (int * int) t)
+    | RowReduce :: forall t. 
+        (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> t) * graph (tensor (int * int) a))
+        -> graph (tensor int t)
     | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Matmul :: forall t. graph (tensor (int * int) t) * graph (tensor (int * int) t) -> graph (tensor (int * int) t)
     | Weight :: forall dim t. dim -> graph (tensor dim t)
@@ -38,37 +39,233 @@ nominal model t =
         param : graph_data
     }
 
-
 inl memoize (h : hashmapm.hashmap) f k =
     match hashmapm.try_get h k with
     | Some v => v
     | None => inl v = f k in hashmapm.add h k v . v
 
-// Propagates the dimensions for each of the nodes and returns a hash map of them pointing to each node.
-// Takes in a record of input dimensions and the ensemble size as the last arguments.
-inl pass_dim forall dim_top t_top. (x : graph (tensor dim_top t_top)) : graph_dims =
-    inl h = hashmapm.create()
-    inl rec f forall dim t. : graph (tensor dim t) -> dim =
-        memoize h (function
-            | Map(exists a. _, a) => f a
-            | RowMap(exists a. _, a) => f a
-            | RowReduce(exists dim_snd a. _, a) => fst (f a)
-            | Zip(a,b) =>
-                inl a = f a
-                inl b = f b
-                assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
-                a
-            | Matmul(a,b) =>
-                inl (m,k as a) = f a
-                inl (n,k') = f b
-                assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
-                m,n
-            | Weight dim => dim
-            | Input (_, dim) => dim
-            | Apply(exists a. a,b) => snd (f a)
-            | InputScalar => error_type "Not supposed to have this node in pass_dim."
-            )
-    inl _ = f x
-    hashmapm.set_immutable(h)
-    h
+// Returns the top level dimension. Takes in a hashmap for memoization purposes.
+inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t_top) -> dim_top =
+    inl f x = get_dim h x
+    memoize h (function
+        | Map(exists a. _, a) => f a
+        | RowMap(exists a. _, a) => f a
+        | RowReduce(exists a. _, a) => fst (f a)
+        | Zip(a,b) =>
+            inl a = f a
+            inl b = f b
+            assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
+            a
+        | Matmul(a,b) =>
+            inl (m,k as a) = f a
+            inl (n,k') = f b
+            assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
+            m,n
+        | Weight dim => dim
+        | Input (_, dim) => dim
+        | Apply(exists a. a,b) => snd (f a)
+        | InputScalar => error_type "Not supposed to have this node in pass_dim."
+        )
 
+// Calculates the parameter offsets.
+inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
+    inl h_offset_param = hashmapm.create() // stores the offsets pointing to the start of the weight parameter array for each node
+    inl h = hashmapm.create()
+    inl get_dim x = get_dim dims x
+    inl rec f forall t. (offset : size) : graph t -> size =
+        memoize h function
+            | Map(exists a. _,a) => f offset a
+            | RowMap(exists a. _,a) => f offset a
+            | RowReduce(exists a. _,a) => f offset a
+            | Zip(a,b) => f (f offset a) b
+            | Matmul(a,b) => f (f offset a) b
+            | Weight as k =>
+                inl dim = get_dim k
+                inl partition_offsets : _ t = partitionm.to_partition dim |> partitionm.calculate_offsets offset 
+                hashmapm.add h_offset_param k partition_offsets
+                partition_offsets.offset_end
+            | Apply(exists a. a,b) => f (f offset a) b
+            | InputScalar | Input => offset
+    inl offset = f 0 x
+    hashmapm.set_immutable(h_offset_param)
+    hashmapm.set_immutable(dims)
+    h_offset_param, offset
+
+// Calculates the output node offsets.
+inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
+    inl h_offset_output = hashmapm.create() // stores the offsets pointing to the start of the output array for each node
+    inl h = hashmapm.create()
+    inl get_dim x = get_dim dims x
+    inl g forall dim t. (offset : size) (k : graph (tensor dim t)) : size =
+        inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets offset
+        hashmapm.add h_offset_output k partition_offsets
+        partition_offsets.offset_end
+    inl rec f forall t. (offset : size) : graph t -> size =
+        memoize h fun k =>
+            match k with
+            | Map(exists a. _,a) => g (f offset a) k
+            | RowMap(exists a. _,a) => g (f offset a) k
+            | RowReduce(exists a. _,a) => g (f offset a) k
+            | Zip(a,b) => f (f offset a) b // passthrough
+            | Matmul(a,b) => g (f (f offset a) b) k
+            | Weight => offset
+            | Apply(exists a. a,b) => f (f offset a) b // passthrough
+            | Input => g offset k
+            | InputScalar => offset
+    inl offset = f 0 x
+    hashmapm.set_immutable(h_offset_output)
+    hashmapm.set_immutable(dims)
+    h_offset_output, offset
+
+// Calculates the max of dynamic shared memory used for all the nodes.
+inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
+    inl h = hashmapm.create()
+    inl rec f forall t. : graph t -> size =
+        memoize h function
+            | Map(exists a. _,a) => f a
+            | RowMap(exists a. _,a) => f a
+            | RowReduce(exists a. _,a) => f a
+            | Zip(a,b) => max (f a) (f b)
+            | Matmul(a,b) => 
+                inl memory : size =
+                    inl tf32 () : size = fst(matmul.matmul_tf32' false true).offset_end
+                    real
+                        typecase t with
+                        | f32 => tf32()
+                        | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
+                max (f a) (f b) |> max memory
+            | Apply(exists a. a,b) => max (f a) (f b)
+            | Weight | Input | InputScalar => 0
+    f x
+
+// Initializes the parameters of a NN on the host.
+inl param_init forall t_top. (model {graph param} : model t_top) =
+    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    inl h = hashmapm.create()
+    inl get_tensor forall dim t. (k : graph (tensor dim t)) : tensor dim t = partitionm.from_partition_offsets param.array (hashmapm.get (fst param.offset) k)
+    inl rec f forall t. : graph t -> () =
+        memoize h function
+            | Map(exists a. _,a)  => f a
+            | RowMap(exists a. _,a) => f a
+            | RowReduce(exists a. _,a) => f a
+            | Zip(a,b) => f a . f b
+            | Matmul(a,b) => f a . f b
+            | Weight as x =>
+                inl x = get_tensor x
+                cupy.copy_to {from=cupy.random_normal{mean=0; std=1} x.dim; to=x} // TODO: Don't forget to init the layers properly.
+            | Apply(exists a. a,b) => f a . f b
+            | InputScalar | Input => ()
+    f graph
+
+// Prints all the weight layers.
+inl param_print forall t_top. (model {graph param} : model t_top) =
+    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    inl h = hashmapm.create()
+    inl get_tensor forall dim t. (k : graph (tensor dim t)) : tensor dim t = partitionm.from_partition_offsets param.array (hashmapm.get (fst param.offset) k)
+    inl rec f forall t. : graph t -> () =
+        memoize h function
+            | Map(exists a. _,a)  => f a
+            | RowMap(exists a. _,a) => f a
+            | RowReduce(exists a. _,a) => f a
+            | Zip(a,b) => f a . f b
+            | Matmul(a,b) => f a . f b
+            | Weight as x => get_tensor x |> console.write_ln
+            | Apply(exists a. a,b) => f a . f b
+            | InputScalar | Input => ()
+    f graph
+
+// Allocates an array given the graph offset.
+inl create_graph_data (offset : graph_offset) : graph_data =
+    inl array = partitionm.create_array (snd offset)
+    {array offset}
+
+// Extracts the input tensor given the key.
+inl input_extract forall t_top key{symbol} dim input. (model {graph output} : model t_top) (_ : key) : tensor dim input =
+    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    inl h = hashmapm.create()
+    inl get_tensor forall dim' t'. (k : graph (tensor dim' t')) : tensor dim' t' = partitionm.from_partition_offsets output.array (hashmapm.get (fst output.offset) k)
+    inl rec f forall t. : graph t -> option (tensor dim input) =
+        memoize h function
+            | Map(exists a. _,a)  => f a
+            | RowMap(exists a. _,a) => f a
+            | RowReduce(exists a. _,a) => f a
+            | Zip(a,b) => 
+                match f a with
+                | None => f b
+                | a => a
+            | Matmul(a,b) =>
+                match f a with
+                | None => f b
+                | a => a
+            | Weight _ => None
+            | Input((exists key'. _), _) as x =>
+                if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
+                    Some (get_tensor x |> nominal_recreate)
+                else None
+    match f graph with
+    | Some x => x
+    | None => error_type "Cannot find the input tensor with the given key."
+
+// Extracts the tensor at the top level node.
+// Will give a type error on passthrough nodes like Zip and Apply.
+inl graph_tensor_extract forall dim t. (model {graph param output} : model (tensor dim t)) : tensor dim t =
+    match hashmapm.try_get (fst param.offset) graph with
+    | Some x => partitionm.from_partition_offsets param.array x
+    | None =>
+        match hashmapm.try_get (fst output.offset) graph with
+        | Some x => partitionm.from_partition_offsets output.array x
+        | None => error_type "Cannot find the offset in the dictionaries"
+
+// Runs the graph and returns the result in the top level node. Is intended to be used in device code.
+// Does not do any safety checking and is intended for internal use in other graph_run functions.
+inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
+    inl h = hashmapm.create()
+    inl tensor_extract graph = graph_tensor_extract (model {m with graph})
+    inl rec f forall t. : graph t -> t =
+        open primitives
+        memoize h fun x =>
+            match x with
+            | Map(exists a. g,a) =>
+                inl a, out = f a, tensor_extract x
+                inl g = g ls
+                join map g a out
+                out
+            | RowMap(exists a. g,a) =>
+                inl a, out = f a, tensor_extract x
+                inl g = g ls
+                join row_map g a out
+                out
+            | RowReduce(exists a. g,a) =>
+                inl a, out = f a, tensor_extract x
+                inl g = g ls
+                join row_reduce g a out
+                out
+            | Zip(a,b) => zip (f a) (f b)
+            | Matmul(a,b) =>
+                inl a,b,out = f a, f b, tensor_extract x
+                inl alpha, beta : float * float = 1, 0
+                real
+                    open real_core
+                    typecase t with
+                    | f32 => 
+                        inl memory, body = matmul.matmul_tf32' false true
+                        join body alpha a b beta out
+                    | _ => error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment."
+                out
+            | Weight | Input  => tensor_extract x
+            | InputScalar(exists k. k) => real indices k : t
+    f graph
+
+// Runs the kernel on the device.
+inl graph_run_device forall t_top indices. (model ({graph param output} & m) : model t_top) (indices : indices) =
+    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+
+    inl ls : layer_state =
+        open random
+        layer_state {
+            rng = init {seed = clock64(); subsequence = conv rangem.threads_in_grid().from; offset=0}
+        }
+
+    inl _ = graph_run (model m) ls indices
+    ()
