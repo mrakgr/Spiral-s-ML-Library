@@ -88,7 +88,6 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : grap
             | InputScalar | Input => offset
     inl offset = f 0 x
     hashmapm.set_immutable(h_offset_param)
-    hashmapm.set_immutable(dims)
     h_offset_param, offset
 
 // Calculates the output node offsets.
@@ -114,7 +113,6 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
             | InputScalar => offset
     inl offset = f 0 x
     hashmapm.set_immutable(h_offset_output)
-    hashmapm.set_immutable(dims)
     h_offset_output, offset
 
 // Calculates the max of dynamic shared memory used for all the nodes.
@@ -285,13 +283,14 @@ inl argmax forall t{number}. (x : graph (tensor (int * int) t)) : graph (tensor 
 inl discrete_sample forall t{float;number}. (x : graph (tensor (int * int) t)) : graph (tensor int int) = 
     inl f (layer_state {rng}) config x i j_tns = primitives.local_discrete_sampling rng config x i j_tns
     RowReduce (exists f, x)
-inl matmul dim x = Matmul(x, Weight dim)
+inl matmul (a,b) x = Matmul(x, Weight (b,a))
 inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = Input((exists key), dim)
 
 inl create_model forall t. (graph : graph t) =
     inl dims = hashmapm.create()
     inl param = create_graph_data (pass_offset_param graph dims)
     inl output = create_graph_data (pass_offset_output graph dims)
+    hashmapm.set_immutable(dims)
     model {graph param output dims}
 
 // Tests whether randonmly initializing the params of the graph works.
@@ -313,3 +312,5 @@ inl test1() =
     console.write_ln "Done initing."
     param_print model
     ()
+
+inl main() = test1()

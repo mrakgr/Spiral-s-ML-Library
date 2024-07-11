@@ -1,0 +1,151 @@
+Error trace on line: 114, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl offset = f 0 x
+                 ^
+Error trace on line: 43, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    match hashmapm.try_get h k with
+    ^
+Error trace on line: 44, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | Some v => v
+      ^
+Error trace on line: 45, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 45, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 45, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 104, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            match k with
+            ^
+Error trace on line: 105, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Map(exists a. _,a) => g (f offset a) k
+              ^
+Error trace on line: 105, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Map(exists a. _,a) => g (f offset a) k
+                  ^
+Error trace on line: 105, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Map(exists a. _,a) => g (f offset a) k
+                            ^
+Error trace on line: 105, column: 37 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Map(exists a. _,a) => g (f offset a) k
+                                    ^
+Error trace on line: 105, column: 40 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Map(exists a. _,a) => g (f offset a) k
+                                       ^
+Error trace on line: 43, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    match hashmapm.try_get h k with
+    ^
+Error trace on line: 44, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | Some v => v
+      ^
+Error trace on line: 45, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 45, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 45, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 104, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            match k with
+            ^
+Error trace on line: 105, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Map(exists a. _,a) => g (f offset a) k
+              ^
+Error trace on line: 106, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | RowMap(exists a. _,a) => g (f offset a) k
+              ^
+Error trace on line: 107, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | RowReduce(exists a. _,a) => g (f offset a) k
+              ^
+Error trace on line: 108, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Zip(a,b) => f (f offset a) b // passthrough
+              ^
+Error trace on line: 109, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Matmul(a,b) => g (f (f offset a) b) k
+              ^
+Error trace on line: 109, column: 22 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Matmul(a,b) => g (f (f offset a) b) k
+                     ^
+Error trace on line: 109, column: 30 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Matmul(a,b) => g (f (f offset a) b) k
+                             ^
+Error trace on line: 99, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets offset
+        ^
+Error trace on line: 99, column: 45 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets offset
+                                            ^
+Error trace on line: 99, column: 70 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets offset
+                                                                     ^
+Error trace on line: 97, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl get_dim x = get_dim dims x
+                    ^
+Error trace on line: 43, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    match hashmapm.try_get h k with
+    ^
+Error trace on line: 44, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | Some v => v
+      ^
+Error trace on line: 45, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 45, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 45, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 51, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        | Map(exists a. _, a) => f a
+          ^
+Error trace on line: 52, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        | RowMap(exists a. _, a) => f a
+          ^
+Error trace on line: 53, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        | RowReduce(exists a. _, a) => fst (f a)
+          ^
+Error trace on line: 54, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        | Zip(a,b) =>
+          ^
+Error trace on line: 59, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        | Matmul(a,b) =>
+          ^
+Error trace on line: 59, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+        | Matmul(a,b) =>
+                 ^
+Error trace on line: 60, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            inl (m,k as a) = f a
+            ^
+Error trace on line: 60, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            inl (m,k as a) = f a
+                 ^
+Error trace on line: 60, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            inl (m,k as a) = f a
+                        ^
+Error trace on line: 61, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            inl (n,k') = f b
+            ^
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            inl (n,k') = f b
+                 ^
+Error trace on line: 62, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
+            ^
+Error trace on line: 131, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 266, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 266, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+The inner dimensions of the matrix multiplication node have to be equal.
