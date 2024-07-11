@@ -269,3 +269,21 @@ inl graph_run_device forall t_top indices. (model ({graph param output} & m) : m
 
     inl _ = graph_run (model m) ls indices
     ()
+
+// inl graph_run_host forall t_top. (model {graph} & m : model t_top) =
+//     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+//         graph_run_device m
+
+inl tanh forall dim t{float}. (x : graph (tensor dim t)) : graph (tensor dim t) = Map (exists const tanh, x)
+inl sigmoid forall dim t{float;number}. (x : graph (tensor dim t)) : graph (tensor dim t) = Map (exists const sigmoid, x)
+inl relu forall dim t{float;number}. (x : graph (tensor dim t)) : graph (tensor dim t) = Map (exists const (max 0), x)
+inl softmax forall t{float;number}. (x : graph (tensor (int * int) t)) : graph (tensor (int * int) t) = 
+    RowMap (exists (fun _ config x _ _ => primitives.local_softmax config x), x)
+inl ln_l2 forall t{float;number}. (x : graph (tensor (int * int) t)) : graph (tensor (int * int) t) = 
+    RowMap (exists (fun _ config x _ _ => primitives.local_ln_l2 config x), x)
+inl argmax forall t{number}. (x : graph (tensor (int * int) t)) : graph (tensor int int) = RowReduce (exists (fun _ config x _ j_tns => primitives.local_argmax config x j_tns), x)
+inl discrete_sample forall t{float;number}. (x : graph (tensor (int * int) t)) : graph (tensor int int) = 
+    inl f (layer_state {rng}) config x i j_tns = primitives.local_discrete_sampling rng config x i j_tns
+    RowReduce (exists f, x)
+inl matmul dim x = Matmul(x, Weight dim)
+inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = Input((exists key), dim)
