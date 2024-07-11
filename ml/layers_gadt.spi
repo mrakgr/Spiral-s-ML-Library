@@ -18,14 +18,14 @@ nominal layer_state =
 union rec graph t =
     // | Reduce :: forall t. (exists dim a. (layer_state -> a -> t) * graph (tensor dim a)) -> graph t
     | Map :: forall dim t. (exists a. (layer_state -> a -> t) * graph (tensor dim a)) -> graph (tensor dim t)
-    | RowMap :: forall t. 
+    | RowMap :: forall t.
         (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) t) * graph (tensor (int * int) a))
         -> graph (tensor (int * int) t)
     | RowReduce :: forall t. 
         (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> t) * graph (tensor (int * int) a))
         -> graph (tensor int t)
-    | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Matmul :: forall t. graph (tensor (int * int) t) * graph (tensor (int * int) t) -> graph (tensor (int * int) t)
+    | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Weight :: forall dim t. dim -> graph (tensor dim t)
     | Input :: forall dim t. (exists key{symbol}. key) * dim -> graph (tensor dim t)
     | Apply :: forall b el. (exists a. graph (tensor (a * b) el) * graph a) -> graph (tensor b el)
@@ -85,7 +85,8 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : grap
                 hashmapm.add h_offset_param k partition_offsets
                 partition_offsets.offset_end
             | Apply(exists a. a,b) => f (f offset a) b
-            | InputScalar | Input => offset
+            | InputScalar => offset
+            | Input => offset
     inl offset = f 0 x
     hashmapm.set_immutable(h_offset_param)
     h_offset_param, offset
@@ -135,7 +136,9 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
                             error_type `(()) "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
                 max (f a) (f b) |> max memory
             | Apply(exists a. a,b) => max (f a) (f b)
-            | InputScalar | Weight | Input => 0
+            | InputScalar => 0
+            | Weight => 0
+            | Input => 0
     f x
 
 // Initializes the parameters of a NN on the host.
@@ -154,7 +157,8 @@ inl param_init forall t_top. (model {graph param} : model t_top) =
                 inl x = get_tensor x
                 cupy.copy_to {from=cupy.random_normal{mean=0; std=1} x.dim; to=x} // TODO: Don't forget to init the layers properly.
             | Apply(exists a. a,b) => f a . f b
-            | InputScalar | Input => ()
+            | InputScalar => ()
+            | Input => ()
     f graph
 
 // Prints all the weight layers.
@@ -171,7 +175,8 @@ inl param_print forall t_top. (model {graph param} : model t_top) =
             | Matmul(a,b) => f a . f b
             | Weight as x => get_tensor x |> console.write_ln
             | Apply(exists a. a,b) => f a . f b
-            | InputScalar | Input => ()
+            | InputScalar => ()
+            | Input => ()
     f graph
 
 // Allocates an array given the graph offset.
@@ -209,8 +214,8 @@ inl input_extract forall t_top key{symbol} dim input. (model {graph output} : mo
 // Extracts the tensor at the top level node.
 // Will give a type error on passthrough nodes like Zip and Apply.
 inl graph_tensor_extract forall t' indices. (model {graph param output} : model t') (indices : indices) : t' =
-    inl rec loop forall t. (x : graph t) : t =
-        match x with
+    inl rec loop forall t. (graph : graph t) : t =
+        match graph with
         | Zip(a,b) => zip (loop a) (loop b)
         | Apply(exists a. a,b) => apply (loop b) (loop a)
         | InputScalar(exists k. k) => real indices k : t
@@ -220,7 +225,9 @@ inl graph_tensor_extract forall t' indices. (model {graph param output} : model 
             | None =>
                 match hashmapm.try_get (fst output.offset) graph with
                 | Some x => partitionm.from_partition_offsets output.array x
-                | None => error_type "Cannot find the offset in the dictionaries"
+                | None => 
+                    print_static graph
+                    error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
     loop graph
 
 // Runs the graph and returns the result in the top level node. Is intended to be used in device code.
@@ -284,9 +291,10 @@ inl graph_run_device forall t_top indices. (model ({graph param output} & m) : m
     ()
 
 // Just for testing purposes.
-inl graph_run_host forall t_top. (model {graph} & m : model t_top) =
+inl graph_run_host forall t_top sizes. (model {graph} & m : model t_top) (sizes : sizes) =
     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
-        graph_run_device m {}
+        loop.linear sizes fun indices =>
+            graph_run_device m indices
 
 inl tanh forall dim t{float}. (x : graph (tensor dim t)) : graph (tensor dim t) = Map (exists const tanh, x)
 inl sigmoid forall dim t{float;number}. (x : graph (tensor dim t)) : graph (tensor dim t) = Map (exists const sigmoid, x)
@@ -299,7 +307,8 @@ inl argmax forall t{number}. (x : graph (tensor (int * int) t)) : graph (tensor 
 inl discrete_sample forall t{float;number}. (x : graph (tensor (int * int) t)) : graph (tensor int int) = 
     inl f (layer_state {rng}) config x i j_tns = primitives.local_discrete_sampling rng config x i j_tns
     RowReduce (exists f, x)
-inl matmul (a,b) x = Matmul(x, Weight (b,a))
+inl matmul (b,a) x = Matmul(x, Weight (a,b))
+inl matmul_ensemble (c,b,a : int * int * int) x = Matmul(x, Apply(exists Weight (c,a,b), InputScalar(exists .ensemble)))
 inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = Input((exists key), dim)
 
 inl create_model forall t. (graph : graph t) =
@@ -354,7 +363,7 @@ inl test2() =
     console.write_ln input
     ()
 
-// Tests whether extracting the graph can be executed.
+// Tests running a feedforward model.
 inl test3() =
     inl graph : graph (tensor int int) =
         (input .input (16,8) : graph (tensor _ float))
@@ -380,10 +389,43 @@ inl test3() =
     }
     console.write_ln input
     console.write_ln "Here is the output tensor."
-    graph_run_host model
+    graph_run_host model {}
     inl tns_output = graph_tensor_extract model {}
     console.write_ln tns_output
     console.write_ln "===="
     ()
 
-inl main() = test3()
+// Tests running a feedforward ensemble model.
+inl test4() =
+    inl ensemble = 16
+    inl graph : graph (tensor int int) =
+        (input .input (16,8) : graph (tensor _ float))
+        |> matmul_ensemble (ensemble,8,16)
+        |> ln_l2
+        |> relu
+        |> matmul_ensemble (ensemble,16,16)
+        |> ln_l2
+        |> relu
+        |> matmul_ensemble (ensemble,16,16)
+        |> discrete_sample
+
+    inl model = create_model graph
+    param_init model
+    console.write_ln "Here are the weight matrices."
+    param_print model
+    inl input : tensor (int * int) float = input_extract model .input
+    // Immitates the passing of data into the output vector.
+    // In the poker game the serialization function will be responsible for this.
+    cupy.copy_to {
+        from = cupy.random_normal{mean=0; std=1} input.dim
+        to = input
+    }
+    console.write_ln input
+    console.write_ln "Here is the output tensor."
+    graph_run_host model {ensemble}
+    loop.linear ensemble fun ensemble =>
+        inl tns_output = graph_tensor_extract model {ensemble}
+        console.write_ln tns_output
+        console.write_ln "===="
+    ()
+inl main() = test4()
