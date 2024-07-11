@@ -287,3 +287,29 @@ inl discrete_sample forall t{float;number}. (x : graph (tensor (int * int) t)) :
     RowReduce (exists f, x)
 inl matmul dim x = Matmul(x, Weight dim)
 inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = Input((exists key), dim)
+
+inl create_model forall t. (graph : graph t) =
+    inl dims = hashmapm.create()
+    inl param = create_graph_data (pass_offset_param graph dims)
+    inl output = create_graph_data (pass_offset_output graph dims)
+    model {graph param output dims}
+
+// Tests whether randonmly initializing the params of the graph works.
+inl test1() =
+    inl graph : graph (tensor (int * int) float) =
+        (input .input (1,4))
+        |> matmul (4,4)
+        |> tanh
+        |> matmul (4,4)
+        |> tanh
+        |> matmul (4,2)
+        |> tanh
+
+    inl model = create_model graph
+    
+    console.write_ln "---"
+    param_print model
+    param_init model
+    console.write_ln "Done initing."
+    param_print model
+    ()
