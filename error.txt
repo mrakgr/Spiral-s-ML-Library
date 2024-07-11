@@ -1,151 +1,92 @@
-Error trace on line: 245, column: 32 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | RowMap(exists a. g,a) =>
-                               ^
-Error trace on line: 246, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                inl a, out = f a, tensor_extract x
-                ^
-Error trace on line: 246, column: 30 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                inl a, out = f a, tensor_extract x
-                             ^
-Error trace on line: 43, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    match hashmapm.try_get h k with
+Error trace on line: 519, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+inl main() = test5()
+        ^
+Error trace on line: 519, column: 14 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+inl main() = test5()
+             ^
+Error trace on line: 485, column: 10 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+inl test5() =
+         ^
+Error trace on line: 486, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl ensemble = 16
     ^
-Error trace on line: 44, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | Some v => v
-      ^
-Error trace on line: 45, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-      ^
-Error trace on line: 45, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-              ^
-Error trace on line: 45, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-                      ^
-Error trace on line: 239, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            match x with
-            ^
-Error trace on line: 240, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Map(exists a. g,a) =>
-              ^
-Error trace on line: 245, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | RowMap(exists a. g,a) =>
-              ^
-Error trace on line: 250, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | RowReduce(exists a. g,a) =>
-              ^
-Error trace on line: 255, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Matmul(a,b) =>
-              ^
-Error trace on line: 255, column: 22 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Matmul(a,b) =>
-                     ^
-Error trace on line: 256, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                inl a,b,out = f a, f b, tensor_extract x
+Error trace on line: 487, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl graph : graph (tensor (i32 * i32) f32 * tensor i32 i32) =
+    ^
+Error trace on line: 500, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl model = create_model graph
+    ^
+Error trace on line: 500, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl model = create_model graph
                 ^
-Error trace on line: 256, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                inl a,b,out = f a, f b, tensor_extract x
+Error trace on line: 369, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl dims = hashmapm.create()
+    ^
+Error trace on line: 370, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl param = create_graph_data (pass_offset_param graph dims)
+    ^
+Error trace on line: 370, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl param = create_graph_data (pass_offset_param graph dims)
+                ^
+Error trace on line: 370, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl param = create_graph_data (pass_offset_param graph dims)
                                    ^
-Error trace on line: 43, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 80, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl h_offset_param = hashmapm.create() // stores the offsets pointing to the start of the weight parameter array for each node
+    ^
+Error trace on line: 81, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl h = hashmapm.create()
+    ^
+Error trace on line: 82, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl get_dim x = get_dim dims x
+    ^
+Error trace on line: 102, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl offset = f 0 x
+    ^
+Error trace on line: 102, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl offset = f 0 x
+                 ^
+Error trace on line: 48, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
     match hashmapm.try_get h k with
     ^
-Error trace on line: 44, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 49, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
     | Some v => v
       ^
-Error trace on line: 45, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 50, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
     | None => inl v = f k in hashmapm.add h k v . v
       ^
-Error trace on line: 45, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 50, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
     | None => inl v = f k in hashmapm.add h k v . v
               ^
-Error trace on line: 45, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 50, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
     | None => inl v = f k in hashmapm.add h k v . v
                       ^
-Error trace on line: 239, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            match x with
-            ^
-Error trace on line: 240, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Map(exists a. g,a) =>
+Error trace on line: 89, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Map(exists a. _,a,out) => g (f offset a) out
               ^
-Error trace on line: 245, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | RowMap(exists a. g,a) =>
+Error trace on line: 90, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | RowMap(exists a. _,a,out) => g (f offset a) out
               ^
-Error trace on line: 250, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | RowReduce(exists a. g,a) =>
+Error trace on line: 91, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | RowReduce(exists a. _,a,out) => g (f offset a) out
               ^
-Error trace on line: 255, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Matmul(a,b) =>
+Error trace on line: 92, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Zip(a,b) => f (f offset a) b
               ^
-Error trace on line: 270, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Zip => tensor_extract x
+Error trace on line: 93, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Matmul(a,b) => f (f offset a) b
               ^
-Error trace on line: 271, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Apply => tensor_extract x
+Error trace on line: 94, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Weight as k =>
               ^
-Error trace on line: 271, column: 24 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Apply => tensor_extract x
-                       ^
-Error trace on line: 235, column: 32 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl tensor_extract graph = graph_tensor_extract (model {m with graph}) indices
-                               ^
-Error trace on line: 229, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    loop graph
-    ^
-Error trace on line: 218, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        match x with
-        ^
-Error trace on line: 219, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Zip(a,b) => zip (loop a) (loop b)
-          ^
-Error trace on line: 220, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Apply(exists a. a,b) => apply (loop b) (loop a)
-          ^
-Error trace on line: 220, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Apply(exists a. a,b) => apply (loop b) (loop a)
-                ^
-Error trace on line: 220, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Apply(exists a. a,b) => apply (loop b) (loop a)
-                          ^
-Error trace on line: 220, column: 35 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Apply(exists a. a,b) => apply (loop b) (loop a)
-                                  ^
-Error trace on line: 220, column: 51 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Apply(exists a. a,b) => apply (loop b) (loop a)
-                                                  ^
-Error trace on line: 218, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        match x with
-        ^
-Error trace on line: 219, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Zip(a,b) => zip (loop a) (loop b)
-          ^
-Error trace on line: 220, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | Apply(exists a. a,b) => apply (loop b) (loop a)
-          ^
-Error trace on line: 221, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-        | InputScalar(exists k. k) => real indices k : t
-          ^
-Error trace on line: 223, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            match hashmapm.try_get (fst param.offset) graph with
-            ^
-Error trace on line: 224, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Some x => partitionm.from_partition_offsets param.array x
+Error trace on line: 99, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Apply(exists a. a,b) => f (f offset a) b
               ^
-Error trace on line: 225, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | None =>
+Error trace on line: 100, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | InputScalar => offset
               ^
-Error trace on line: 226, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                match hashmapm.try_get (fst output.offset) graph with
-                ^
-Error trace on line: 227, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                | Some x => partitionm.from_partition_offsets output.array x
-                  ^
-Error trace on line: 228, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                | None => error_type "Cannot find the offset in the dictionaries"
-                  ^
-Error trace on line: 228, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-                | None => error_type "Cannot find the offset in the dictionaries"
-                          ^
-Error trace on line: 149, column: 38 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl error_type (msg : string) = real error_type msg
-                                     ^
-Cannot find the offset in the dictionaries
+Error trace on line: 101, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+            | Input => offset
+              ^
+Pattern miss.
+Got: .Pair, (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Input, (exists (.input). .input), 16i32, 8i32 : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 8i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.Some, (.Apply, (exists (i32). (.Input, (exists (.output_probs). .output_probs), 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.RowReduce, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Input, (exists (.input). .input), 16i32, 8i32 : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 8i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.Some, (.Apply, (exists (i32). (.Input, (exists (.output_probs). .output_probs), 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Some, (.Apply, (exists (i32). (.Input, (exists (.output_indices). .output_indices), 16i32, 16i32 : graph (tensor (i32 * i32) i32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor i32 i32)) : option (graph (tensor i32 i32)))) : graph (tensor i32 i32)) : graph (tensor (i32 * i32) f32 * tensor i32 i32)

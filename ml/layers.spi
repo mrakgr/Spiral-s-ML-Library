@@ -309,7 +309,7 @@ inl softmax forall t{float; number}. (x : graph t) : graph t = RowMap (exists (f
 inl ln_l2 forall t{float; number}. (x : graph t) : graph t = RowMap (exists (fun _ config x _ _ => primitives.local_ln_l2 config x), x)
 inl argmax forall t{number}. (x : graph t) : graph int = RowReduce (exists (fun _ config x _ j_tns => primitives.local_argmax config x j_tns), x)
 inl discrete_sample forall t{float; number}. (x : graph t) : graph int = 
-    inl f (layer_state {rng}) config x i j_tns = primitives.local_discrete_sampling rng config x i j_tns
+    inl f (layer_state {rng}) config x i j_tns = primitives.local_softmax_and_discrete_sampling rng config x i j_tns
     RowReduce (exists f, x)
 inl matmul dim x = Matmul(x, Weight dim)
 inl input forall key{symbol}. (key : key) (dim : int) = Input (exists key, dim)

@@ -437,7 +437,7 @@ inl local_argmax config x (j_tns : tensor (int * int) int) =
     |> snd
 
 inl local_discrete_sampling rng config x (i : int) (j_tns : tensor (int * int) int) =
-    inl x = local_softmax config x |> local_inclusive_scan_sum config
+    inl x = local_inclusive_scan_sum config x
     inl probability = random.uniform rng |> conv
     inl x = local_map (fun x => x - probability) x
     local_reduce config (limit.min, 0) (fun a b =>
@@ -447,7 +447,10 @@ inl local_discrete_sampling rng config x (i : int) (j_tns : tensor (int * int) i
         elif fst b >= 0 then b
         else a
         ) (zip x j_tns)
-    |> snd 
+    |> snd
+
+inl local_softmax_and_discrete_sampling rng config x (i : int) (j_tns : tensor (int * int) int) =
+    local_discrete_sampling rng config (local_softmax config x) i j_tns
 
 inl test1() =
     inl m,n : int * int = 3, 36*4
@@ -510,7 +513,7 @@ inl test2() =
             zip x' x
             ) input output_softmax_scan
         // discrete sampling
-        row_reduce (local_discrete_sampling rng) input output_sampling
+        row_reduce (local_softmax_and_discrete_sampling rng) input output_sampling
         // sum (exclusive scan)
         row_map (fun config x _ _ =>
             local_exclusive_scan config 0 (+) x
