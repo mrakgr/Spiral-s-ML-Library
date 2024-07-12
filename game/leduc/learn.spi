@@ -72,71 +72,71 @@ inl test2() =
             |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
             |> console.write_ln
         
-inl test3() =
-    inl pu_history = pu_history()
-    open ml.layers
+// inl test3() =
+//     inl pu_history = pu_history()
+//     open ml.layers
 
-    inl size = {
-        ensemble = 4 // The third dimension of each weight layer.
-        block = blocks_per_grid()
-        minibatch = 16 // threads_per_block()
-    }
+//     inl size = {
+//         ensemble = 4 // The third dimension of each weight layer.
+//         block = blocks_per_grid()
+//         minibatch = 16 // threads_per_block()
+//     }
 
-    inl graph =
-        (input .input (modup pu_history.size 128) : _ float)
-        |> matmul 16
-        |> ln_l2
-        |> relu
-        |> matmul 16
-        |> ln_l2
-        |> relu
-        |> matmul 16
-        |> discrete_sample
+//     inl graph =
+//         (input .input (modup pu_history.size 128) : _ float)
+//         |> matmul 16
+//         |> ln_l2
+//         |> relu
+//         |> matmul 16
+//         |> ln_l2
+//         |> relu
+//         |> matmul 16
+//         |> discrete_sample
 
-    inl model = create_model graph size
-    param_init model
+//     inl model = create_model graph size
+//     param_init model
 
-    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
-        open tensorm
-        open rangem
-        inl tns_input : _ _ float = input_extract model .input
+//     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+//         open tensorm
+//         open rangem
+//         inl tns_input : _ _ float = input_extract model .input
 
-        // Sets the input tensor to 0.
-        loop.projective threads_in_grid(tns_input.dim) fun i =>
-            tensor_set i 0 tns_input
+//         // Sets the input tensor to 0.
+//         loop.projective threads_in_grid(tns_input.dim) fun i =>
+//             tensor_set i 0 tns_input
 
-        __syncthreads()
+//         __syncthreads()
 
-        inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+//         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
 
-        // Serializes the data into the input tensor.
-        loop.projective blocks_in_grid(size.block) fun block_id =>
-            loop.projective threads_in_block(size.minibatch) fun minibatch_id =>
-                open pickler
-                inl tns_input = tns_input |> apply block_id |> apply minibatch_id
-                pu_history.pickle data (0,tns_input |> ptr_at_current_offset)
+//         // Serializes the data into the input tensor.
+//         loop.projective blocks_in_grid(size.block) fun block_id =>
+//             loop.projective threads_in_block(size.minibatch) fun minibatch_id =>
+//                 open pickler
+//                 inl tns_input = tns_input |> apply block_id |> apply minibatch_id
+//                 pu_history.pickle data (0,tns_input |> ptr_at_current_offset)
 
-        __syncthreads()
+//         __syncthreads()
 
-        // Runs the model on the inputs.
-        graph_run_device model
+//         // Runs the model on the inputs.
+//         graph_run_device model
 
-        // Deserialize the action and print it.
-        loop.projective blocks_in_grid(size.block) fun block_id =>
-            inl tns_output = graph_tensor_extract model {block_id ensemble_id=0} // Note how awkward this is.
-            loop.projective threads_in_block(tns_output.dim) fun i =>
-                match tensor_index i tns_output % 3 with
-                | 0 => Fold
-                | 1 => Call
-                | _ => Raise
-                |> semaphore.write_ln_system
+//         // Deserialize the action and print it.
+//         loop.projective blocks_in_grid(size.block) fun block_id =>
+//             inl tns_output = graph_tensor_extract model {block_id ensemble_id=0} // Note how awkward this is.
+//             loop.projective threads_in_block(tns_output.dim) fun i =>
+//                 match tensor_index i tns_output % 3 with
+//                 | 0 => Fold
+//                 | 1 => Call
+//                 | _ => Raise
+//                 |> semaphore.write_ln_system
 
-        ()
+//         ()
 
-    // loop.linear size.ensemble fun ensemble_id =>
-    //     inl tns_output = graph_tensor_extract model {ensemble_id block_id=0}
-    //     console.write_ln tns_output
-    //     console.write_ln "==="
-    ()
+//     // loop.linear size.ensemble fun ensemble_id =>
+//     //     inl tns_output = graph_tensor_extract model {ensemble_id block_id=0}
+//     //     console.write_ln tns_output
+//     //     console.write_ln "==="
+//     ()
 
-inl main() = test3()
+// inl main() = test3()

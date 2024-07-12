@@ -275,7 +275,9 @@ inl graph_tensor_extract forall t' indices. (model {graph param output} : model 
 // Does not do any safety checking and is intended for internal use in other graph_run functions.
 inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
     inl h = hashmapm.create()
-    inl tensor_extract graph = graph_tensor_extract (model {m with graph}) indices
+    real match indices with {block} => real_core.error_type "The block will be automatically inserted in graph_run. It shouldn't be passed into it beforehand." | _ => ()
+    inl indices : .indices = real {indices with block=block_index()} // Lying about the type is fine here.
+    inl tensor_extract forall t. (graph : graph t) : t = graph_tensor_extract (model {m with graph}) indices
     inl rec f forall t. : graph t -> t =
         open primitives
         memoize h fun x =>
@@ -319,7 +321,7 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
     f graph
 
 // Runs the kernel on the device.
-inl graph_run_device forall t_top indices. (model ({graph param output} & m) : model t_top) (indices : indices) =
+inl graph_run_device forall t_top indices. (model {graph param output} & m : model t_top) (indices : indices) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
 
@@ -329,7 +331,7 @@ inl graph_run_device forall t_top indices. (model ({graph param output} & m) : m
             rng = init {seed = clock64(); subsequence = conv rangem.threads_in_grid().from; offset=0}
         }
 
-    inl _ = graph_run (model m) ls indices
+    inl _ = graph_run m ls indices
     ()
 
 // Just for testing purposes.
@@ -518,4 +520,41 @@ inl test5() =
     printing.tensor_print_ln (1 <<< 9) output
     inl output : tensor (int * int) int = input_extract model .output_indices
     printing.tensor_print_ln limit.max output
-inl main() = test5()
+
+// Tests running a feedforward ensemble model which keeps around the path probabilities. The inputs are spread across the block of a GPU.
+inl test6() =
+    inl block = blocks_per_grid()
+    inl ensemble : int = 16
+    inl graph : graph (tensor (i32 * i32) f32 * tensor i32 i32) =
+        inl x =
+            apply (input .input (block,16,8) : graph (tensor _ float)) (input_scalar .block) // The block index gets passed inside graph_run_device automatically.
+            |> matmul_ensemble (ensemble,8,16)
+            |> ln_l2
+            |> relu
+            |> matmul_ensemble (ensemble,16,16)
+            |> ln_l2
+            |> relu
+            |> matmul_ensemble (ensemble,16,16)
+            |> softmax' (apply (input .output_probs (ensemble,16,16)) (input_scalar .ensemble))
+        pair x (discrete_sample' (apply (input .output_indices (ensemble,16)) (input_scalar .ensemble)) x)
+
+    inl model = create_model graph
+    param_init model
+    console.write_ln "Here are the weight matrices."
+    param_print model
+    inl input : tensor (int * int * int) float = input_extract model .input
+    // Immitates the passing of data into the output vector.
+    // In the poker game the serialization function will be responsible for this.
+    cupy.copy_to {
+        from = cupy.random_normal{mean=0; std=1} input.dim
+        to = input
+    }
+    graph_run_host model {ensemble}
+    console.write_ln "Here is the input tensor."
+    console.write_ln input
+    console.write_ln "Here is the output tensor."
+    inl output : tensor (int * int * int) float = input_extract model .output_probs
+    printing.tensor_print_ln (1 <<< 9) output
+    inl output : tensor (int * int) int = input_extract model .output_indices
+    printing.tensor_print_ln limit.max output
+inl main() = test6()

@@ -1,73 +1,151 @@
-Error trace on line: 523, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-inl main() = test5()
-        ^
-Error trace on line: 523, column: 14 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-inl main() = test5()
-             ^
-Error trace on line: 487, column: 10 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-inl test5() =
-         ^
-Error trace on line: 488, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl ensemble : int = 16
+Error trace on line: 492, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl graph : graph (tensor (i32 * i32) f32 * tensor i32 i32) =
     ^
-Error trace on line: 490, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl graph : graph (tensor (i32 * i32) f32 * tensor (i32 * i32) f32) =
-    ^
-Error trace on line: 504, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 505, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     inl model = create_model graph
     ^
-Error trace on line: 505, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 506, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     param_init model
     ^
-Error trace on line: 506, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 507, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     console.write_ln "Here are the weight matrices."
     ^
-Error trace on line: 507, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 508, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     param_print model
     ^
-Error trace on line: 508, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 509, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     inl input : tensor (int * int) float = input_extract model .input
     ^
-Error trace on line: 511, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 512, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     cupy.copy_to {
     ^
-Error trace on line: 515, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    console.write_ln input
-    ^
-Error trace on line: 516, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    console.write_ln "Here is the output tensor."
-    ^
-Error trace on line: 517, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 516, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     graph_run_host model {ensemble}
     ^
-Error trace on line: 518, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl output : tensor (int * int * int) float = input_extract model .output_probs
+Error trace on line: 339, column: 10 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    real match sizes with {block} => real_core.error_type "The block will be automatically inserted in graph_run_device. It shouldn't be passed into graph_run_host." | _ => ()
+         ^
+Error trace on line: 340, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
     ^
-Error trace on line: 518, column: 51 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl output : tensor (int * int * int) float = input_extract model .output_probs
-                                                  ^
-Error trace on line: 218, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 31, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+    ^
+Error trace on line: 31, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+        ^
+Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options = []"
+    ^
+Error trace on line: 35, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--diag-suppress=550,20012,68')" // suppresses some warnings related to unused vars
+    ^
+Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--dopt=on')" // turns on the device optimizations
+    ^
+Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--restrict')" // assumes all the pointers are restricted
+    ^
+Error trace on line: 39, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match threads_per_block with
+    ^
+Error trace on line: 45, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl compiler = NVCC
+    ^
+Error trace on line: 46, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match compiler with
+    ^
+Error trace on line: 52, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl kernel_i, vars = join_backend Cuda
+    ^
+Error trace on line: 53, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+        match compiler with
+        ^
+Error trace on line: 59, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+        f () : ()
+        ^
+Error trace on line: 340, column: 77 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+                                                                            ^
+Error trace on line: 341, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        loop.linear sizes fun indices =>
+        ^
+Error trace on line: 145, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_to_list (dim : dim) : list int = real
+    ^
+Error trace on line: 148, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl list_to_dim (l : list int) : dim = real
+    ^
+Error trace on line: 151, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    listm.foldBack (fun nearTo on_success l => 
+    ^
+Error trace on line: 157, column: 13 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+            for' {from=0; nearTo} (fun i => on_success (i :: l))
+            ^
+Error trace on line: 32, column: 19 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                  ^
+Error trace on line: 30, column: 36 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for {from nearTo} body state = forBy {from nearTo by=1} body state
+                                   ^
+Error trace on line: 24, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl i, state = _dup (from, state)
+    ^
+Error trace on line: 24, column: 9 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl i, state = _dup (from, state)
+        ^
+Error trace on line: 25, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+    ^
+Error trace on line: 2, column: 82 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl while' (cond : () -> bool) (body : () -> ()) : () = !!!!While((join cond()),(body()))
+                                                                                 ^
+Error trace on line: 25, column: 39 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                      ^
+Error trace on line: 25, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                            ^
+Error trace on line: 25, column: 57 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                                        ^
+Error trace on line: 32, column: 32 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                               ^
+Error trace on line: 32, column: 38 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                                     ^
+Error trace on line: 157, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+            for' {from=0; nearTo} (fun i => on_success (i :: l))
+                                            ^
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
+                 ^
+Error trace on line: 342, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            graph_run_device m indices
+            ^
+Error trace on line: 323, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    ^
+Error trace on line: 324, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     ^
-Error trace on line: 219, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl h = hashmapm.create()
+Error trace on line: 326, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl ls : layer_state =
     ^
-Error trace on line: 220, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl get_tensor forall dim' t'. (k : graph (tensor dim' t')) : tensor dim' t' = partitionm.from_partition_offsets output.array (hashmapm.get (fst output.offset) k)
+Error trace on line: 332, column: 10 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    real match indices with {block} => real_core.error_type "The block will be automatically inserted in graph_run_device. It shouldn't be passed into graph_run_device." | _ => ()
+         ^
+Error trace on line: 333, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl indices = real {indices with block=block_index()}
     ^
-Error trace on line: 247, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    match f graph with
+Error trace on line: 334, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl _ : t_top = real graph_run `t_top `(`indices) (model m) ls indices
     ^
-Error trace on line: 248, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | Some x => x
-      ^
-Error trace on line: 249, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => error_type "Cannot find the input tensor with the given key."
-      ^
-Error trace on line: 249, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => error_type "Cannot find the input tensor with the given key."
-              ^
-Error trace on line: 149, column: 38 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl error_type (msg : string) = real error_type msg
-                                     ^
-Cannot find the input tensor with the given key.
+Error trace on line: 334, column: 26 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl _ : t_top = real graph_run `t_top `(`indices) (model m) ls indices
+                         ^
+Error trace on line: 334, column: 56 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl _ : t_top = real graph_run `t_top `(`indices) (model m) ls indices
+                                                       ^
+Cannot apply a forall with a term.

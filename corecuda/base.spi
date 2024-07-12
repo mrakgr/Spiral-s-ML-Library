@@ -1,7 +1,7 @@
 open corebase
 type warp_size = 32
 inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
-inl sms_per_gpu() : int = 24
+inl sms_per_gpu() : int = 24 // Marko Grdinic: My RTX 4060 has 24 SMs. A RTX 4090 for example would have 128.
 inl threads_per_block() : int = 32
 // inl threads_per_block() : int = 512
 
