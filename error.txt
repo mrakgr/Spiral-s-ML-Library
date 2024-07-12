@@ -1,92 +1,73 @@
-Error trace on line: 519, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 523, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
 inl main() = test5()
         ^
-Error trace on line: 519, column: 14 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 523, column: 14 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
 inl main() = test5()
              ^
-Error trace on line: 485, column: 10 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 487, column: 10 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
 inl test5() =
          ^
-Error trace on line: 486, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl ensemble = 16
+Error trace on line: 488, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl ensemble : int = 16
     ^
-Error trace on line: 487, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl graph : graph (tensor (i32 * i32) f32 * tensor i32 i32) =
+Error trace on line: 490, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl graph : graph (tensor (i32 * i32) f32 * tensor (i32 * i32) f32) =
     ^
-Error trace on line: 500, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 504, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
     inl model = create_model graph
     ^
-Error trace on line: 500, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl model = create_model graph
-                ^
-Error trace on line: 369, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl dims = hashmapm.create()
+Error trace on line: 505, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    param_init model
     ^
-Error trace on line: 370, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl param = create_graph_data (pass_offset_param graph dims)
+Error trace on line: 506, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    console.write_ln "Here are the weight matrices."
     ^
-Error trace on line: 370, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl param = create_graph_data (pass_offset_param graph dims)
-                ^
-Error trace on line: 370, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl param = create_graph_data (pass_offset_param graph dims)
-                                   ^
-Error trace on line: 80, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl h_offset_param = hashmapm.create() // stores the offsets pointing to the start of the weight parameter array for each node
+Error trace on line: 507, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    param_print model
     ^
-Error trace on line: 81, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+Error trace on line: 508, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl input : tensor (int * int) float = input_extract model .input
+    ^
+Error trace on line: 511, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    cupy.copy_to {
+    ^
+Error trace on line: 515, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    console.write_ln input
+    ^
+Error trace on line: 516, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    console.write_ln "Here is the output tensor."
+    ^
+Error trace on line: 517, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    graph_run_host model {ensemble}
+    ^
+Error trace on line: 518, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl output : tensor (int * int * int) float = input_extract model .output_probs
+    ^
+Error trace on line: 518, column: 51 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl output : tensor (int * int * int) float = input_extract model .output_probs
+                                                  ^
+Error trace on line: 218, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+    ^
+Error trace on line: 219, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
     inl h = hashmapm.create()
     ^
-Error trace on line: 82, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl get_dim x = get_dim dims x
+Error trace on line: 220, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    inl get_tensor forall dim' t'. (k : graph (tensor dim' t')) : tensor dim' t' = partitionm.from_partition_offsets output.array (hashmapm.get (fst output.offset) k)
     ^
-Error trace on line: 102, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl offset = f 0 x
+Error trace on line: 247, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    match f graph with
     ^
-Error trace on line: 102, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    inl offset = f 0 x
-                 ^
-Error trace on line: 48, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    match hashmapm.try_get h k with
-    ^
-Error trace on line: 49, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | Some v => v
+Error trace on line: 248, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | Some x => x
       ^
-Error trace on line: 50, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
+Error trace on line: 249, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => error_type "Cannot find the input tensor with the given key."
       ^
-Error trace on line: 50, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
+Error trace on line: 249, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
+    | None => error_type "Cannot find the input tensor with the given key."
               ^
-Error trace on line: 50, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-                      ^
-Error trace on line: 89, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Map(exists a. _,a,out) => g (f offset a) out
-              ^
-Error trace on line: 90, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | RowMap(exists a. _,a,out) => g (f offset a) out
-              ^
-Error trace on line: 91, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | RowReduce(exists a. _,a,out) => g (f offset a) out
-              ^
-Error trace on line: 92, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Zip(a,b) => f (f offset a) b
-              ^
-Error trace on line: 93, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Matmul(a,b) => f (f offset a) b
-              ^
-Error trace on line: 94, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Weight as k =>
-              ^
-Error trace on line: 99, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Apply(exists a. a,b) => f (f offset a) b
-              ^
-Error trace on line: 100, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | InputScalar => offset
-              ^
-Error trace on line: 101, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers_gadt.spi.
-            | Input => offset
-              ^
-Pattern miss.
-Got: .Pair, (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Input, (exists (.input). .input), 16i32, 8i32 : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 8i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.Some, (.Apply, (exists (i32). (.Input, (exists (.output_probs). .output_probs), 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.RowReduce, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Map, (exists (f32). (? -> ?), (.RowMap, (exists (f32). (? -> ?), (.Matmul, (.Input, (exists (.input). .input), 16i32, 8i32 : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 8i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.None, () : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Apply, (exists (i32). (.Weight, 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : graph (tensor (i32 * i32) f32)), (.Some, (.Apply, (exists (i32). (.Input, (exists (.output_probs). .output_probs), 16i32, 16i32, 16i32 : graph (tensor (i32 * i32 * i32) f32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor (i32 * i32) f32)) : option (graph (tensor (i32 * i32) f32)))) : graph (tensor (i32 * i32) f32)), (.Some, (.Apply, (exists (i32). (.Input, (exists (.output_indices). .output_indices), 16i32, 16i32 : graph (tensor (i32 * i32) i32)), (.InputScalar, (exists (.ensemble). .ensemble) : graph i32)) : graph (tensor i32 i32)) : option (graph (tensor i32 i32)))) : graph (tensor i32 i32)) : graph (tensor (i32 * i32) f32 * tensor i32 i32)
+Error trace on line: 149, column: 38 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl error_type (msg : string) = real error_type msg
+                                     ^
+Cannot find the input tensor with the given key.
