@@ -213,7 +213,7 @@ inl create_graph_data (offset : graph_offset) : graph_data =
     inl array = partitionm.create_array (snd offset)
     {array offset}
 
-// Extracts the input tensor given the key.
+// Extracts the input tensor from the Input node given the key.
 inl input_extract forall t_top key{symbol} dim input. (model {graph output} : model t_top) (_ : key) : tensor dim input =
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl h = hashmapm.create()
