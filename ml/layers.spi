@@ -273,11 +273,14 @@ inl graph_tensor_extract forall t' indices. (model {graph param output} : model 
 
 // Runs the graph and returns the result in the top level node. Is intended to be used in device code.
 // Does not do any safety checking and is intended for internal use in other graph_run functions.
+// Inserts the block index into the indices variable automatically.
 inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
     inl h = hashmapm.create()
     real match indices with {block} => real_core.error_type "The block will be automatically inserted in graph_run. It shouldn't be passed into it beforehand." | _ => ()
-    inl indices : .indices = real {indices with block=block_index()} // Lying about the type is fine here.
-    inl tensor_extract forall t. (graph : graph t) : t = graph_tensor_extract (model {m with graph}) indices
+    inl indices = real {indices with block=block_index()}
+    inl tensor_extract forall t. (graph : graph t) : t =
+        inl f forall indices'. (indices : indices') : t = graph_tensor_extract (model {m with graph}) indices
+        real f `(`indices) indices
     inl rec f forall t. : graph t -> t =
         open primitives
         memoize h fun x =>
@@ -366,7 +369,7 @@ inl matmul (b,a) x = Matmul(x, Weight (a,b))
 inl input_scalar forall t key{symbol}. (key : key) : graph t = InputScalar(exists key)
 inl matmul_ensemble (c,b,a : int * int * int) x = Matmul(x, Apply(exists Weight (c,a,b), input_scalar .ensemble))
 inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = Input((exists key), dim)
-inl apply forall a b t. (a : graph (tensor (a * b) t)) (b : graph a) : graph (tensor b t) = Apply(exists a,b)
+inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : graph (tensor b t) = Apply(exists a,input_scalar b)
 inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)
 
 inl create_model forall t. (graph : graph t) =
@@ -465,7 +468,7 @@ inl test4() =
         |> ln_l2
         |> relu
         |> matmul_ensemble (ensemble,16,16)
-        |> softmax_and_discrete_sample' (apply (input .output (ensemble,16)) (input_scalar .ensemble))
+        |> softmax_and_discrete_sample' (input .output (ensemble,16) |> apply .ensemble)
 
     inl model = create_model graph
     param_init model
@@ -498,8 +501,8 @@ inl test5() =
             |> ln_l2
             |> relu
             |> matmul_ensemble (ensemble,16,16)
-            |> softmax' (apply (input .output_probs (ensemble,16,16)) (input_scalar .ensemble))
-        pair x (discrete_sample' (apply (input .output_indices (ensemble,16)) (input_scalar .ensemble)) x)
+            |> softmax' (input .output_probs (ensemble,16,16) |> apply .ensemble)
+        pair x (discrete_sample' (input .output_indices (ensemble,16) |> apply .ensemble) x)
 
     inl model = create_model graph
     param_init model
@@ -527,7 +530,8 @@ inl test6() =
     inl ensemble : int = 16
     inl graph : graph (tensor (i32 * i32) f32 * tensor i32 i32) =
         inl x =
-            apply (input .input (block,16,8) : graph (tensor _ float)) (input_scalar .block) // The block index gets passed inside graph_run_device automatically.
+            (input .input (block,16,8) : graph (tensor _ float))
+            |> apply .block // The block index gets passed inside graph_run_device automatically.
             |> matmul_ensemble (ensemble,8,16)
             |> ln_l2
             |> relu
@@ -535,8 +539,8 @@ inl test6() =
             |> ln_l2
             |> relu
             |> matmul_ensemble (ensemble,16,16)
-            |> softmax' (apply (input .output_probs (ensemble,16,16)) (input_scalar .ensemble))
-        pair x (discrete_sample' (apply (input .output_indices (ensemble,16)) (input_scalar .ensemble)) x)
+            |> softmax' (input .output_probs (ensemble,16,16) |> apply .ensemble)
+        pair x (discrete_sample' (input .output_indices (ensemble,16) |> apply .ensemble) x)
 
     inl model = create_model graph
     param_init model
