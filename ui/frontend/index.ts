@@ -13,6 +13,7 @@ setBasePath('/bundles/shoelace/');
 
 import "./rps"; // Needed to import the rps web components.
 import "./leduc";
+import "./leduc_train";
 import "./hu_nl_holdem";
 import { LitElement, PropertyValueMap, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
@@ -50,12 +51,16 @@ class Games_UI extends LitElement {
             <sl-tab-group>
                 <sl-tab slot="nav" panel="rps">RPS</sl-tab>
                 <sl-tab slot="nav" panel="leduc">Leduc</sl-tab>
-                <sl-tab slot="nav" panel="nl-holdem" active>NL Holdem</sl-tab>
+                <sl-tab slot="nav" panel="leduc-train" active>Leduc (Train)</sl-tab>
+                <sl-tab slot="nav" panel="nl-holdem">NL Holdem</sl-tab>
                 <sl-tab-panel name="rps">
                     <rps-ui></rps-ui>
                 </sl-tab-panel>
                 <sl-tab-panel name="leduc">
                     <leduc-ui></leduc-ui>
+                </sl-tab-panel>
+                <sl-tab-panel name="leduc-train">
+                    <leduc-train-ui></leduc-train-ui>
                 </sl-tab-panel>
                 <sl-tab-panel name="nl-holdem">
                     <nl-holdem-ui></nl-holdem-ui>

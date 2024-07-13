@@ -143,4 +143,7 @@ inl test3() =
     console.write_ln tns_output
     console.write_ln "==="
 
-inl main() = test3()
+inl test4() =
+    ()
+
+inl main() = test4()
