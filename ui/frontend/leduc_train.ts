@@ -50,9 +50,24 @@ class Leduc_Train_UI extends LitElement {
     `
 
     inputRef: Ref<HTMLCanvasElement> = createRef();
+    chart? : Chart;
 
     render() {
-        return html`<div><canvas ${ref(this.inputRef)}></canvas></div>`
+        return html`
+            <div><canvas ${ref(this.inputRef)}></canvas></div>
+            <sl-button @click=${this.add_data}>Add data point</sl-button>
+            `
+    }
+
+    add_data() {
+        if (this.chart) {
+            this.chart.data.labels?.push("Data")
+            this.chart.data.datasets.forEach((x, index) => {
+                const l = Math.random()
+                x.data.push((this.chart?.data.labels?.length ?? 0) * 5 + 30 * l + 100 * (1 - l));
+            })
+            this.chart.update()
+        }
     }
 
     protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -65,50 +80,25 @@ class Leduc_Train_UI extends LitElement {
                     {
                         label: '1st Dataset',
                         data: [65, 59, 80, 81, 56, 55, 40],
-                        fill: false,
+                        fill: true,
                         borderColor: 'rgb(75, 192, 192)',
                         tension: 0.1
                     },
                     {
                         label: '2nd Dataset',
-                        data: [65, 59, 80, 81, 56, 55, 40].map(x => x + 5),
-                        fill: false,
+                        data: [65, 59, 50, 81, 56, 55, 40].map(x => x + 5),
+                        fill: true,
                         borderColor: 'rgb(155, 92, 92)',
                         tension: 0.1
                     },
             ]
             };
-            new Chart(
+            this.chart = new Chart(
                 chart_container, {
                     type: 'line',
                     data: data,
                 }
             );
-            // const data = [
-            //     { year: 2010, count: 10 },
-            //     { year: 2011, count: 20 },
-            //     { year: 2012, count: 15 },
-            //     { year: 2013, count: 25 },
-            //     { year: 2014, count: 22 },
-            //     { year: 2015, count: 30 },
-            //     { year: 2016, count: 28 },
-            // ];
-
-            // new Chart(
-            //     chart_container,
-            //     {
-            //         type: 'bar',
-            //         data: {
-            //             labels: data.map(row => row.year),
-            //             datasets: [
-            //                 {
-            //                     label: 'Acquisitions by year',
-            //                     data: data.map(row => row.count)
-            //                 }
-            //             ]
-            //         }
-            //     }
-            // );
         }
     }
 }
