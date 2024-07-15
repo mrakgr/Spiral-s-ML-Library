@@ -4,6 +4,7 @@ import { map } from 'lit/directives/map.js';
 import { createRef, Ref, ref } from 'lit/directives/ref.js';
 import { io } from 'socket.io-client'
 import * as echarts from 'echarts';
+import { assert } from './utils';
 
 type UI_State = {
 
@@ -60,8 +61,12 @@ type Leduc_Train_Serie = {
     data: number[]
 }
 
+
+const assert_chart_data = (labels: Leduc_Train_Label[], series: Leduc_Train_Serie[]) => {
+    assert(series.every(x => labels.length === x.data.length), "The length of the labels array does not match that of the series data.");
+}
 const update_chart = (chart: echarts.ECharts, labels: Leduc_Train_Label[], series: Leduc_Train_Serie[]) => {
-    if (series.every(x => labels.length === x.data.length) === false) { throw Error("The data sizes are not valid.") }
+    assert_chart_data(labels, series);
     chart.setOption({
         xAxis: { data: labels },
         series: series.map(x => ({ ...x, type: "line" }))
@@ -80,32 +85,64 @@ class Training_Chart extends LitElement {
 
     labels: Leduc_Train_Label[] = []
     series: Leduc_Train_Serie[] = [
-        { name: "Agent 1", data: [] },
-        { name: "Agent 2", data: [] },
-        { name: "Agent 3", data: [] },
+        {
+            name: "Agent 1",
+            data: []
+        },
+        {
+            name: "Agent 2",
+            data: []
+        },
+        {
+            name: "Agent 3",
+            data: []
+        },
     ]
 
     chart?: echarts.ECharts;
+
+    add_item(labels: Leduc_Train_Label[], series: Leduc_Train_Serie[]) {
+        assert_chart_data(labels, series);
+        if (
+            this.series.length === series.length
+            && this.series.every((x, i) => x.name === series[i].name)
+        ) {
+            this.labels.push(...labels);
+            this.series.forEach((x, i) => x.data.push(...series[i].data))
+        } else {
+            this.labels = labels;
+            this.series = series;
+        }
+        this.update_chart();
+    }
 
     render() {
         // The slot will put the chart which is in the light DOM into the shadow root.
         return html`
             <div>
                 <slot></slot>
-                <sl-button @click=${this.add_data}>Add Data</sl-button>
+                <sl-button @click=${this.add_test_data}>Add Data</sl-button>
             </div>
             `;
     }
 
-    add_data() {
-        const now = new Date();
-        this.labels.push(now.getSeconds().toString())
-        this.series.forEach(({ data }) => {
-            data.push((Math.random() - 0.4) * 10 + (data[data.length - 1] ?? 0));
-        })
+    update_chart() {
         if (this.chart) {
-            update_chart(this.chart, this.labels, this.series)
+            update_chart(this.chart, this.labels, this.series);
         }
+    }
+
+
+    add_test_data() {
+        const now = new Date();
+        this.add_item(
+            [now.getSeconds().toString()],
+            this.series.map(x => ({
+                name: x.name,
+                data: [(Math.random() - 0.4) * 10 + (x.data[x.data.length-1] ?? 0)],
+            }))
+        )
+        this.update_chart();
     }
 
 
@@ -121,7 +158,7 @@ class Training_Chart extends LitElement {
             yAxis: {
                 boundaryGap: [0, '50%'],
                 type: 'value'
-              },
+            },
             tooltip: {},
             xAxis: {
                 data: []
