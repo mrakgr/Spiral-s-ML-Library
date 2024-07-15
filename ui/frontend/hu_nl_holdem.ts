@@ -4,14 +4,8 @@ import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { io } from 'socket.io-client'
+import { assert_tag_is_never, min, max, clamp } from './utils'
 
-const assert_tag_is_never = (tag : never): never => { throw new Error(`Invalid tag. Got: ${tag}`)};
-const min = (a : number,b : number) => a < b ? a : b;
-const max = (a : number,b : number) => a >= b ? a : b;
-const clamp = (x : number, _min : number, _max : number) => 
-    _min <= _max && !isNaN(x) && !isNaN(_min) && !isNaN(_max) 
-    ? min(max(_min,x), _max)
-    : (() => {throw Error(`Invalid args in clamp. Got: ${[x,_min,_max]}`)})();
 
 enum Hand_Rank {
     High_Card,

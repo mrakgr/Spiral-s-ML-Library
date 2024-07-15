@@ -1,0 +1,36 @@
+
+
+open corecuda
+open corepython
+inl main() =
+    named_tuple "Leduc_Game" {
+        // init = fun () => 
+        //     jsonm.serialize {
+        //         game_state = x
+        //         ui_state = game_to_ui x
+        //     }
+            
+        // event_loop_gpu = fun (msg, game_state) =>
+        //     open serializer
+        //     inl seri = {
+        //         msg = create_serializer
+        //         game_state = create_serializer
+        //         ui_state = create_serializer
+        //     }
+        //     inl msg, game_state = jsonm.deserialize msg, jsonm.deserialize game_state
+        //     serialize seri.msg msg
+        //     serialize seri.game_state game_state
+
+        //     run fun () =>
+        //         inl from = rangem.threads_in_grid().from
+        //         if from = 0 then
+        //             inl game_state = event_loop (deserialize seri.msg, deserialize seri.game_state)
+        //             serialize seri.game_state game_state
+        //             serialize seri.ui_state (game_to_ui game_state)
+
+        //     jsonm.serialize {
+        //         game_state = deserialize seri.game_state
+        //         ui_state = deserialize seri.ui_state
+        //     }
+            
+    }

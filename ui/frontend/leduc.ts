@@ -62,7 +62,6 @@ class Leduc_UI extends LitElement {
         });
         this.addEventListener('game', (ev) => {
             ev.stopPropagation();
-            console.log(ev);
             this.socket.emit('update', (ev as CustomEvent<Game_Events>).detail);
         })
     }

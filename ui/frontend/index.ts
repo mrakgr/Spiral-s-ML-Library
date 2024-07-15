@@ -1,5 +1,6 @@
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import '@shoelace-style/shoelace/dist/components/button/button.js';
+import '@shoelace-style/shoelace/dist/components/input/input.js';
 import '@shoelace-style/shoelace/dist/components/tab/tab.js';
 import '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js';
 import '@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js';
@@ -36,6 +37,10 @@ class Games_UI extends LitElement {
             height: 100%;
         }
 
+        span.tab {
+            font-size: var(--sl-font-size-x-large);
+        }
+
         /* sl-tab-panel::part(base) {
             padding: 10px;
         }
@@ -49,10 +54,10 @@ class Games_UI extends LitElement {
     render() {
         return html`
             <sl-tab-group>
-                <sl-tab slot="nav" panel="rps">RPS</sl-tab>
-                <sl-tab slot="nav" panel="leduc">Leduc</sl-tab>
-                <sl-tab slot="nav" panel="leduc-train" active>Leduc (Train)</sl-tab>
-                <sl-tab slot="nav" panel="nl-holdem">NL Holdem</sl-tab>
+                <sl-tab slot="nav" panel="rps"><span class="tab">RPS</span></sl-tab>
+                <sl-tab slot="nav" panel="leduc"><span class="tab">Leduc</span></sl-tab>
+                <sl-tab slot="nav" panel="leduc-train" active><span class="tab">Leduc (Train)</span></sl-tab>
+                <sl-tab slot="nav" panel="nl-holdem"><span class="tab">NL Holdem</span></sl-tab>
                 <sl-tab-panel name="rps">
                     <rps-ui></rps-ui>
                 </sl-tab-panel>
