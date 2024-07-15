@@ -62,7 +62,6 @@ class Training_Chart extends LitElement {
             width: 100%;
         }
     `
-
     
     chart?: echarts.ECharts;
 
@@ -93,7 +92,7 @@ class Training_Chart extends LitElement {
             ]
         });
 
-        // Creates the resize observer for the div container. Without this the chart sizing wouldn't work properly.
+        // Without this the chart sizing wouldn't work properly.
         const chart_container_resize_observer = new ResizeObserver(() => this.chart?.resize());
         chart_container_resize_observer.observe(this)
     }
