@@ -12,28 +12,28 @@ type Leduc_Train_Serie = {
     name: string
     data: number[]
 }
-type UI_State = {
-    training_iterations : number
+type Public_State = {
+    training_iterations: number
 }
 type UI_Effect = ["GraphAddItem", [Leduc_Train_Label[], Leduc_Train_Serie[]]]
-type Train_Events = ["Train", UI_State]
+type Train_Events = ["Train", Public_State]
 
 class TrainElement extends LitElement {
-    dispatch_train_event = (detail : Train_Events) => {
-        this.dispatchEvent(new CustomEvent('train', {bubbles: true, composed: true, detail}))
+    dispatch_train_event = (detail: Train_Events) => {
+        this.dispatchEvent(new CustomEvent('train', { bubbles: true, composed: true, detail }))
     }
 }
 
 @customElement('leduc-train-ui')
 class Leduc_Train_UI extends TrainElement {
-    @property({ type: Object }) state: UI_State = {
+    @property({ type: Object }) state: Public_State = {
         training_iterations: 100
     }
 
     socket = io('/leduc_train')
     constructor() {
         super()
-        this.socket.on('update', (x : [UI_State, UI_Effect[]]) => {
+        this.socket.on('update', (x: [Public_State, UI_Effect[]]) => {
             this.state = x[0];
             this.process_effects(x[1])
         });
@@ -42,11 +42,11 @@ class Leduc_Train_UI extends TrainElement {
             this.socket.emit('update', (ev as CustomEvent<Train_Events>).detail);
         })
     }
-    
+
     graph_ref = createRef<Training_Chart>()
-    process_effects(l : UI_Effect[]){
+    process_effects(l: UI_Effect[]) {
         l.forEach(l => {
-            const [tag,data] = l
+            const [tag, data] = l
             switch (tag) {
                 case 'GraphAddItem': {
                     this.graph_ref.value?.add_item(...data)
@@ -79,17 +79,18 @@ class Leduc_Train_UI extends TrainElement {
     render() {
         return html`
             <training-chart ${ref(this.graph_ref)}></training-chart>
-            <sl-input 
+            <sl-input
                 type="number" name="iters" min="0" step="100" 
-                value=${this.state.training_iterations} 
-                @sl-input=${(x: any) => this.state = { ...this.state, training_iterations: parseInt(x.target.value) || this.state.training_iterations} }
-                label="Number of iterations:"></sl-input>
+                value=${this.state.training_iterations}
+                @sl-input=${(x: any) => this.state = { ...this.state, training_iterations: parseInt(x.target.value) || this.state.training_iterations }}
+                label="Number of iterations:"
+                ></sl-input>
             <br/>
             <sl-button variant="primary" @click=${this.on_train}>Train</sl-button>
             `
     }
 
-    on_train(){
+    on_train() {
         this.dispatch_train_event(["Train", this.state])
     }
 }
