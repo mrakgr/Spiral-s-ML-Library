@@ -1,0 +1,186 @@
+open main
+open corebase
+open corecuda
+
+union event =
+    | StartGame
+    | PlayerChanged : sam.sa 2 player_type
+    | ActionSelected : action
+
+union ui_game_state =
+    | GameNotStarted
+    | WaitingForActionFromPlayerId : table
+    | GameOver : table
+
+// Whether the state is public or private depends whether it is being sent over the wire.
+type state_public =
+    {
+        ui_game_state : ui_game_state
+        pl_type : player_types
+        messages : messages
+    }
+
+type state_private =
+    {
+        game : option game_node
+        deck : deck
+    }
+
+type state = {private : state_private; public : state_public}
+
+inl init() : state = 
+    {
+        public = {
+            ui_game_state = GameNotStarted
+            pl_type = arraym.fromList [Computer; Human]
+            messages = sa_create
+        }
+        private = {
+            deck = create_deck()
+            game = None
+        }
+    }
+
+type state_internal =
+    {
+        ui_game_state : refm.ref (ui_game_state)
+        pl_type : refm.ref player_types
+        game : refm.ref (option game_node)
+        deck : refm.ref deck
+        messages : refm.ref messages
+    }
+
+// Converts the given state to internal one.
+// The refs will point to the original locations.
+inl state_to_internal (state : state) : state_internal =
+    {
+        ui_game_state=refm.from_local state.public.ui_game_state
+        pl_type=refm.from_local state.public.pl_type
+        game=refm.from_local state.private.game
+        deck=refm.from_local state.private.deck
+        messages=refm.from_local state.public.messages
+    }
+
+// Sets the internal state to the values held by the regular one.
+inl internal_set_from (state_internal : state_internal) (state : state) =
+    open refm
+    state_internal.ui_game_state <-# state.public.ui_game_state
+    state_internal.pl_type <-# state.public.pl_type
+    state_internal.game <-# state.private.game
+    state_internal.deck <-# state.private.deck
+    state_internal.messages <-# state.public.messages
+
+// Converts the internal state to the regular one.
+// Note: It isn't necesary since the original's values will get mutated.
+// inl internal_to_state (state_internal : state_internal) : state =
+//     open refm
+//     {
+//         public = {
+//             ui_game_state = #state_internal.ui_game_state
+//             pl_type = #state_internal.pl_type
+//             messages = #state_internal.messages
+//         }
+//         private = {
+//             deck = #state_internal.deck
+//             game = #state_internal.game
+//         }
+//     }
+    
+let play_loop (state : state_internal) node =
+    inl push_message = sa_listm.push (refm.to_local state.messages)
+    inl pop_deck = 
+        inl deck = refm.to_local state.deck
+        fun () => pop_deck deck
+
+    inl body node =
+        open refm
+        match node with
+        | TerminalFold table =>
+            inl msg = 
+                inl chips_won = index table.pot table.player_turn
+                Showdown{cards_shown=table.pl_card; chips_won winner_id=toggle table.player_turn}
+            push_message msg
+            state.ui_game_state <-# GameOver(table)
+            state.game <-# None
+            None
+        | TerminalCall table =>
+            inl msg =
+                inl chips_won, winner_id =
+                    inl chips_won = index table.pot table.player_turn
+                    match compare_hands table with
+                    | Gt => chips_won, 0
+                    | Eq => 0, -1
+                    | Lt => chips_won, 1
+                Showdown{cards_shown=table.pl_card; chips_won winner_id}
+            push_message msg
+            state.ui_game_state <-# GameOver(table)
+            state.game <-# None
+            None
+        | Round table => 
+            match index #state.pl_type table.player_turn with
+            | Human => 
+                state.game <-# Some node
+                state.ui_game_state <-# WaitingForActionFromPlayerId(table)
+                None
+            | Computer =>
+                inl action = random_action table
+                inl msg = PlayerAction(table.player_turn, action)
+                push_message msg
+                Some (game_round table action)
+        | RoundWithAction(table,action) => 
+            inl msg = PlayerAction(table.player_turn, action)
+            push_message msg
+            Some (game_round table action)
+        | ChanceCommunityCard table =>
+            inl card = pop_deck()
+            inl msg = CommunityCardIs card
+            push_message msg
+            Some (game_chance_community_card table card)
+        | ChanceInit () => 
+            inl c0,c1 = pop_deck(), pop_deck()
+            push_message PlayerGotCard(0, c0)
+            push_message PlayerGotCard(1, c1)
+            Some (game_chance_init (c0,c1))
+    
+    loop.while (function Some _ => true | None => false) (optionm.bind body) (Some node) |> ignore
+
+inl event_loop (msg, state_internal : event * state_internal) : () =
+    open refm
+    match msg with
+    | StartGame =>
+        internal_set_from state_internal init()
+        play_loop state_internal game_init()
+    | PlayerChanged pl_type => 
+        state_internal.pl_type <-# pl_type
+    | ActionSelected action =>
+        match #state_internal.game with
+        | Some game => 
+            match game with
+            | Round table => play_loop state_internal RoundWithAction(table, action)
+            | _ => failwith "Unexpected game node in ActionSelected."
+        | None => failwith "The hasn't been started in ActionSelected."
+
+open corecuda
+open corepython
+inl main() =
+    named_tuple "Leduc_Game" {
+        init = fun () => jsonm.serialize init()
+        event_loop_gpu = fun (msg, state : _ event * _ state) =>
+            open serializer
+            inl seri = {
+                msg = create_serializer
+                state = create_serializer
+            }
+            serialize seri.msg (jsonm.deserialize msg)
+            serialize seri.state (jsonm.deserialize state)
+
+            run fun () =>
+                inl from = rangem.threads_in_grid().from
+                if from = 0 then
+                    inl msg, state = deserialize seri.msg, deserialize seri.state
+                    // When converting the state to internal form, the refs will point to the original.
+                    inl game_state = event_loop (msg, state_to_internal state)
+                    serialize seri.state state
+
+            jsonm.serialize (deserialize seri.state)
+    }

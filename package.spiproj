@@ -66,13 +66,17 @@ modules:
         layers
         
     game/
+        utils
+        
         rps/
             main
 
         leduc/
             main
-            learn
+            play
             train
+            tests/
+                train
 
         nl_hu_holdem/
             lib/
