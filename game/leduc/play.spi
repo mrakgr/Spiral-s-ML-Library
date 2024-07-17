@@ -43,7 +43,7 @@ inl init() : state =
 
 type state_internal =
     {
-        ui_game_state : refm.ref (ui_game_state)
+        ui_game_state : refm.ref ui_game_state
         pl_type : refm.ref player_types
         game : refm.ref (option game_node)
         deck : refm.ref deck
@@ -62,7 +62,7 @@ inl state_to_internal (state : state) : state_internal =
     }
 
 // Sets the internal state to the values held by the regular one.
-inl internal_set_from (state_internal : state_internal) (state : state) =
+inl internal_set (state_internal : state_internal) (state : state) =
     open refm
     state_internal.ui_game_state <-# state.public.ui_game_state
     state_internal.pl_type <-# state.public.pl_type
@@ -70,22 +70,6 @@ inl internal_set_from (state_internal : state_internal) (state : state) =
     state_internal.deck <-# state.private.deck
     state_internal.messages <-# state.public.messages
 
-// Converts the internal state to the regular one.
-// Note: It isn't necesary since the original's values will get mutated.
-// inl internal_to_state (state_internal : state_internal) : state =
-//     open refm
-//     {
-//         public = {
-//             ui_game_state = #state_internal.ui_game_state
-//             pl_type = #state_internal.pl_type
-//             messages = #state_internal.messages
-//         }
-//         private = {
-//             deck = #state_internal.deck
-//             game = #state_internal.game
-//         }
-//     }
-    
 let play_loop (state : state_internal) node =
     inl push_message = sa_listm.push (refm.to_local state.messages)
     inl pop_deck = 
@@ -142,13 +126,13 @@ let play_loop (state : state_internal) node =
             push_message PlayerGotCard(1, c1)
             Some (game_chance_init (c0,c1))
     
-    loop.while (function Some _ => true | None => false) (optionm.bind body) (Some node) |> ignore
+    loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
 
 inl event_loop (msg, state_internal : event * state_internal) : () =
     open refm
     match msg with
     | StartGame =>
-        internal_set_from state_internal init()
+        internal_set state_internal init()
         play_loop state_internal game_init()
     | PlayerChanged pl_type => 
         state_internal.pl_type <-# pl_type
@@ -174,13 +158,21 @@ inl main() =
             serialize seri.msg (jsonm.deserialize msg)
             serialize seri.state (jsonm.deserialize state)
 
+            console.write_ln "Going to run the kernel."
+            global "import time"
+            inl p : f64 = $"time.perf_counter()"
+
             run fun () =>
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
                     inl msg, state = deserialize seri.msg, deserialize seri.state
                     // When converting the state to internal form, the refs will point to the original.
-                    inl game_state = event_loop (msg, state_to_internal state)
+                    event_loop (msg, state_to_internal state)
                     serialize seri.state state
+
+            inl p2 : f64 = $"time.perf_counter()"
+            console.write "The time it took to run the kernel (in seconds) is: "
+            console.write_ln (p2 - p)
 
             jsonm.serialize (deserialize seri.state)
     }

@@ -3,8 +3,8 @@ from typing import Any, Callable, Never, TypedDict, Literal
 from flask import request
 from flask_socketio import Namespace, emit # type: ignore
 
-from game.leduc.main import main
-spiral_game = main()
+from game.leduc.play import main
+funs = main()
 
 class Leduc_Namespace(Namespace):
     user_state : dict[str, Any] = {}
@@ -14,9 +14,9 @@ class Leduc_Namespace(Namespace):
 
     def on_connect(self):
         print(f'Client connected to Leduc game: {self.sid()}')
-        state = spiral_game.init()
+        state = funs.init()
         Leduc_Namespace.user_state[self.sid()] = state
-        self.emit_update(state["ui_state"])
+        self.emit_update(state["public"])
 
     def on_disconnect(self):
         Leduc_Namespace.user_state.pop(self.sid())
@@ -24,6 +24,6 @@ class Leduc_Namespace(Namespace):
 
     def on_update(self, msg : Any):
         state = Leduc_Namespace.user_state[self.sid()]
-        state = spiral_game.event_loop_gpu(msg,state["game_state"])
+        state = funs.event_loop_gpu(msg,state)
         Leduc_Namespace.user_state[self.sid()] = state
-        self.emit_update(state["ui_state"])
+        self.emit_update(state["public"])
