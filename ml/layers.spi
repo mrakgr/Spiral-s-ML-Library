@@ -379,6 +379,21 @@ inl create_model forall t. (graph : graph t) =
     hashmapm.set_immutable(dims)
     model {graph param output dims}
 
+nominal model_data = {param : ptr * size; output : ptr * size}
+
+inl model_to_model_data (x : model _) = model_data {param=x.param.array; output=x.output.array}
+inl model_data_to_model (graph : graph _) (d : model_data) =
+    inl dims = hashmapm.create()
+    inl param = pass_offset_param graph dims
+    assert (snd param = snd d.param) "The params needs to have matching offsets."
+    inl output = pass_offset_output graph dims
+    assert (snd output = snd d.output) "The outputs needs to have matching offsets."
+    hashmapm.set_immutable(dims)
+    model { graph dims
+        param = { array = fst d.param, snd param; offset = param }
+        output = { array = fst d.output, snd output; offset = output }
+        }
+
 // Tests whether randonmly initializing the params of the graph works.
 inl test1() =
     inl graph : graph (tensor (int * int) float) =

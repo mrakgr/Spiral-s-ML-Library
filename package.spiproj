@@ -72,7 +72,8 @@ modules:
             main
 
         leduc/
-            main
+            game
+            model
             play
             train
             tests/

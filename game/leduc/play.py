@@ -1,5 +1,5 @@
 kernel = r"""
-#include <new>  
+#include <new>
 #include <assert.h>
 #include <stdio.h>
 #include <curand_kernel.h>

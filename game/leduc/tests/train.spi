@@ -1,6 +1,6 @@
 open corebase
 open corecuda
-open main
+open game
 
 inl pu_table() : pickler.pu table =
     open pickler

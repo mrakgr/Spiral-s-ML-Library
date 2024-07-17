@@ -1,4 +1,4 @@
-open main
+open game
 open corebase
 open corecuda
 
@@ -24,6 +24,7 @@ type state_private =
     {
         game : option game_node
         deck : deck
+        model_data : ml.layers.model_data
     }
 
 type state = {private : state_private; public : state_public}
@@ -38,6 +39,7 @@ inl init() : state =
         private = {
             deck = create_deck()
             game = None
+            model_data = model.graph() |> ml.layers.create_model |> ml.layers.model_to_model_data
         }
     }
 
@@ -48,6 +50,7 @@ type state_internal =
         game : refm.ref (option game_node)
         deck : refm.ref deck
         messages : refm.ref messages
+        model_data : ml.layers.model_data
     }
 
 // Converts the given state to internal one.
@@ -59,6 +62,7 @@ inl state_to_internal (state : state) : state_internal =
         game=refm.from_local state.private.game
         deck=refm.from_local state.private.deck
         messages=refm.from_local state.public.messages
+        model_data = state.private.model_data
     }
 
 // Sets the internal state to the values held by the regular one.
@@ -102,6 +106,8 @@ let play_loop (state : state_internal) node =
             None
         | Round table => 
             match index #state.pl_type table.player_turn with
+            | AI =>
+                ... // TODO
             | Human => 
                 state.game <-# Some node
                 state.ui_game_state <-# WaitingForActionFromPlayerId(table)
