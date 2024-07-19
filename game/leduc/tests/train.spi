@@ -130,8 +130,8 @@ inl test3() =
 
         inl tns_output = (input_extract model .output_indices : tensor (int * int * int) int) |> apply block_index()
         // Deserialize the action and print it.
-        loop.projective threads_in_block(tns_output.dim) fun i =>
-            match tensor_index i tns_output % 3 with
+        loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
+            match tensor_index minibatch_id tns_output % 3 with
             | 0 => Fold
             | 1 => Call
             | _ => Raise

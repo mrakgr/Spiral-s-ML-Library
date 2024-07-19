@@ -1,0 +1,32 @@
+open corebase
+open layers
+open tensorm
+
+type size = 
+    {
+        block : int
+        thread : int
+        linear : int // linear dimension represents the ensemble dimension
+    }
+
+nominal game_model inp out =
+    {
+        model : exists t. model t
+        // Sets the input for the given block and thread.
+        input : inp -> ()
+        // The output action and the sampling probability for it.
+        output : () -> out * float
+        // Sampling probabilities for every agent in the ensemble for the given output action.
+        // Tensor dimension is size.linear.
+        sampling_probs : () -> tensor int float
+        size : size
+    }
+
+inl create_game_model forall t input output.
+        (f : size -> graph t)
+        (input : input -> _) (output : _ -> output * float) (sampling_probs : _ -> tensor int float)
+        (size : size) =
+    game_model {
+        model = exists create_model(f size)
+        input output sampling_probs size
+    }

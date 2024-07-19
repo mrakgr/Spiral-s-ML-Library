@@ -3,7 +3,6 @@ open corepython
 
 union action = Raise | Call | Fold
 union card = King | Queen | Jack
-union player_type = Computer | Human
 
 type table = // The complete game state.
     {
@@ -24,7 +23,6 @@ union message =
     | Showdown : {winner_id : int; chips_won : int; cards_shown : sam.sa 2 card}
 
 type deck = sa_listm.sa_list 6 card
-type player_types = sam.sa 2 player_type
 type messages = sa_listm.sa_list 32 message
 
 union game_node =

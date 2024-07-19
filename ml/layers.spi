@@ -32,9 +32,10 @@ union rec graph t =
     | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Pair :: forall a b. graph a * graph b -> graph (a * b)
     | Weight :: forall dim t. dim -> graph (tensor dim t)
-    | Input :: forall dim t. (exists key{symbol}. key) * dim -> graph (tensor dim t)
+    | Input :: forall dim t. dim -> graph (tensor dim t)
     | Apply :: forall b el. (exists a. graph (tensor (a * b) el) * graph a) -> graph (tensor b el)
-    | InputScalar :: forall a. (exists key{symbol}. key) -> graph a
+    | KeyTensor :: forall dim t. (exists key{symbol}. key) * graph (tensor dim t) -> graph (tensor dim t)
+    | KeyScalar :: forall t. (exists key{symbol}. key) -> graph t
 
 nominal model t =
     {
@@ -70,7 +71,8 @@ inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t
             assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
             m,n
         | Weight dim => dim
-        | Input (_, dim) => dim
+        | Input dim => dim
+        | KeyTensor(_,x) => f x
         | Apply(exists a. a,b) => snd (f a)
         )
 
@@ -97,7 +99,8 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : grap
                 hashmapm.add h_offset_param k partition_offsets
                 partition_offsets.offset_end
             | Apply(exists a. a,b) => f (f offset a) b
-            | InputScalar => offset
+            | KeyTensor(_,x) => f offset x
+            | KeyScalar => offset
             | Input => offset
     inl offset = f 0 x
     hashmapm.set_immutable(h_offset_param)
@@ -127,7 +130,8 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
             | Weight => offset
             | Apply(exists a. a,b) => f (f offset a) b // passthrough
             | Input => g offset k None
-            | InputScalar => offset
+            | KeyTensor(_,x) => g (f offset x) k None // TODO: Should be passthrough.
+            | KeyScalar(_) => offset
     inl offset = f 0 x
     hashmapm.set_immutable(h_offset_output)
     h_offset_output, offset
@@ -157,7 +161,8 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
                             error_type `(()) "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
                 max (f a) (f b) |> max memory
             | Apply(exists a. a,b) => max (f a) (f b)
-            | InputScalar => 0
+            | KeyTensor(_,x) => f x
+            | KeyScalar => 0
             | Weight => 0
             | Input => 0
     f x
@@ -182,7 +187,8 @@ inl param_init forall t_top. (model {graph param} : model t_top) =
                 inl x = get_tensor x
                 cupy.copy_to {from=cupy.random_normal{mean=0; std=1} x.dim; to=x} // TODO: Don't forget to init the layers properly.
             | Apply(exists a. a,b) => f a . f b
-            | InputScalar => ()
+            | KeyTensor(_,x) => f x
+            | KeyScalar => ()
             | Input => ()
     f graph
 
@@ -204,7 +210,8 @@ inl param_print forall t_top. (model {graph param} : model t_top) =
             | Matmul(a,b) => f a . f b
             | Weight as x => get_tensor x |> console.write_ln
             | Apply(exists a. a,b) => f a . f b
-            | InputScalar => ()
+            | KeyTensor(_,x) => f x
+            | KeyScalar => ()
             | Input => ()
     f graph
 
@@ -213,11 +220,20 @@ inl create_graph_data (offset : graph_offset) : graph_data =
     inl array = partitionm.create_array (snd offset)
     {array offset}
 
-// Extracts the input tensor from the Input node given the key.
-inl input_extract forall t_top key{symbol} dim input. (model {graph output} : model t_top) (_ : key) : tensor dim input =
+// Extracts the input tensor from the Key node given the key.
+inl key_extract forall t_top key{symbol} dim input. (model {graph param output} : model t_top) (_ : key) : tensor dim input =
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl h = hashmapm.create()
-    inl get_tensor forall dim' t'. (k : graph (tensor dim' t')) : tensor dim' t' = partitionm.from_partition_offsets output.array (hashmapm.get (fst output.offset) k)
+    inl get_tensor forall dim' t'. (k : graph (tensor dim' t')) : tensor dim' t' = 
+        // partitionm.from_partition_offsets output.array (hashmapm.get (fst output.offset) k)
+        match hashmapm.try_get (fst param.offset) graph with
+        | Some x => partitionm.from_partition_offsets param.array x
+        | None =>
+            match hashmapm.try_get (fst output.offset) graph with
+            | Some x => partitionm.from_partition_offsets output.array x
+            | None => 
+                print_static graph
+                error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
     inl rec g forall t. (x : option (tensor dim input)) (out : option (graph t)) : option (tensor dim input) =
         match x with
         | Some => x
@@ -239,11 +255,11 @@ inl input_extract forall t_top key{symbol} dim input. (model {graph output} : mo
             | Zip(a,b) => pair a b
             | Pair(a,b) => pair a b
             | Weight _ => None
-            | Input((exists key'. _), _) as x =>
+            | KeyScalar => None
+            | KeyTensor((exists key'. _),x) => 
                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
                     Some (get_tensor x |> nominal_recreate)
-                else None
-            | InputScalar => None
+                else f x
     match f graph with
     | Some x => x
     | None => error_type "Cannot find the input tensor with the given key."

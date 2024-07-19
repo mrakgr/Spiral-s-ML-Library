@@ -2,6 +2,9 @@ open game
 open corebase
 open corecuda
 
+union player_type = Computer | Random | Human
+type player_types = sam.sa 2 player_type
+
 union event =
     | StartGame
     | PlayerChanged : sam.sa 2 player_type
@@ -106,13 +109,13 @@ let play_loop (state : state_internal) node =
             None
         | Round table => 
             match index #state.pl_type table.player_turn with
-            | AI =>
-                ... // TODO
+            // | Computer =>
+            //     ... // TODO
             | Human => 
                 state.game <-# Some node
                 state.ui_game_state <-# WaitingForActionFromPlayerId(table)
                 None
-            | Computer =>
+            | Random =>
                 inl action = random_action table
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
