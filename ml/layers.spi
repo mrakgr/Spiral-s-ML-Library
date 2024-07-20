@@ -61,8 +61,7 @@ inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t
         | RowMap(exists a. _, a, out) => check (f a) out
         | RowReduce(exists a. _, a, out) => check (fst (f a)) out
         | Zip(a,b) =>
-            inl a = f a
-            inl b = f b
+            inl a,b = f a,f b
             assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
             a
         | Matmul(a,b) =>
@@ -130,7 +129,7 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
             | Weight => offset
             | Apply(exists a. a,b) => f (f offset a) b // passthrough
             | Input => g offset k None
-            | KeyTensor(_,x) => g (f offset x) k None // TODO: Should be passthrough.
+            | KeyTensor(_,x) => f offset x // passthrough
             | KeyScalar(_) => offset
     inl offset = f 0 x
     hashmapm.set_immutable(h_offset_output)
@@ -220,20 +219,36 @@ inl create_graph_data (offset : graph_offset) : graph_data =
     inl array = partitionm.create_array (snd offset)
     {array offset}
 
+// Extracts the tensor at the top level node.
+inl graph_tensor_extract forall t' indices. (model {graph param output} : model t') (indices : indices) : t' =
+    inl rec loop forall t. (graph : graph t) : t =
+        match graph with
+        | Zip(a,b) => zip (loop a) (loop b)
+        | Pair(a,b) => loop a, loop b
+        | Apply(exists a. a,b) => apply (loop b) (loop a)
+        | KeyScalar(exists k. k) => real 
+            match indices with
+            | {$k=x} => x : t
+            | _ => real_core.error_type "Cannot extract the node for the graph due to the missing key."
+        | KeyTensor(_,x) => loop x
+        | Map(exists a. _,_,Some out) => loop out
+        | RowMap(exists a. _,_,Some out) => loop out
+        | RowReduce(exists a. _,_,Some out) => loop out
+        | _ =>
+            match hashmapm.try_get (fst param.offset) graph with
+            | Some x => partitionm.from_partition_offsets param.array x
+            | None =>
+                match hashmapm.try_get (fst output.offset) graph with
+                | Some x => partitionm.from_partition_offsets output.array x
+                | None => 
+                    print_static graph
+                    error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
+    loop graph
+
 // Extracts the input tensor from the Key node given the key.
-inl key_extract forall t_top key{symbol} dim input. (model {graph param output} : model t_top) (_ : key) : tensor dim input =
+inl key_extract forall t_top key{symbol} dim input. (model ({graph param output} & m) : model t_top) (_ : key) : tensor dim input =
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     inl h = hashmapm.create()
-    inl get_tensor forall dim' t'. (k : graph (tensor dim' t')) : tensor dim' t' = 
-        // partitionm.from_partition_offsets output.array (hashmapm.get (fst output.offset) k)
-        match hashmapm.try_get (fst param.offset) graph with
-        | Some x => partitionm.from_partition_offsets param.array x
-        | None =>
-            match hashmapm.try_get (fst output.offset) graph with
-            | Some x => partitionm.from_partition_offsets output.array x
-            | None => 
-                print_static graph
-                error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
     inl rec g forall t. (x : option (tensor dim input)) (out : option (graph t)) : option (tensor dim input) =
         match x with
         | Some => x
@@ -254,38 +269,16 @@ inl key_extract forall t_top key{symbol} dim input. (model {graph param output} 
             | Apply(exists a. a,b) => pair a b
             | Zip(a,b) => pair a b
             | Pair(a,b) => pair a b
-            | Weight _ => None
+            | Weight => None
+            | Input => None
             | KeyScalar => None
-            | KeyTensor((exists key'. _),x) => 
+            | KeyTensor((exists key'. _),graph) => 
                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                    Some (get_tensor x |> nominal_recreate)
-                else f x
+                    Some (graph_tensor_extract (model {m with graph}) {} |> nominal_recreate)
+                else f graph
     match f graph with
     | Some x => x
     | None => error_type "Cannot find the input tensor with the given key."
-
-// Extracts the tensor at the top level node.
-// Will give a type error on passthrough nodes like Zip and Apply.
-inl graph_tensor_extract forall t' indices. (model {graph param output} : model t') (indices : indices) : t' =
-    inl rec loop forall t. (graph : graph t) : t =
-        match graph with
-        | Zip(a,b) => zip (loop a) (loop b)
-        | Pair(a,b) => loop a, loop b
-        | Apply(exists a. a,b) => apply (loop b) (loop a)
-        | InputScalar(exists k. k) => real indices k : t
-        | Map(exists a. _,_,Some out) => loop out
-        | RowMap(exists a. _,_,Some out) => loop out
-        | RowReduce(exists a. _,_,Some out) => loop out
-        | _ =>
-            match hashmapm.try_get (fst param.offset) graph with
-            | Some x => partitionm.from_partition_offsets param.array x
-            | None =>
-                match hashmapm.try_get (fst output.offset) graph with
-                | Some x => partitionm.from_partition_offsets output.array x
-                | None => 
-                    print_static graph
-                    error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
-    loop graph
 
 // Runs the graph and returns the result in the top level node. Is intended to be used in device code.
 // Does not do any safety checking and is intended for internal use in other graph_run functions.
@@ -336,7 +329,8 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
             | Apply(exists a. a,b) => apply (f b) (f a)
             | Weight => tensor_extract x
             | Input => tensor_extract x
-            | InputScalar => tensor_extract x
+            | KeyTensor => tensor_extract x
+            | KeyScalar => tensor_extract x
     f graph
 
 // Runs the kernel on the device.
@@ -382,10 +376,10 @@ inl softmax_and_discrete_sample forall t{float;number}. (x : graph (tensor (int 
     inl f (layer_state {rng}) config x i j_tns = primitives.local_softmax_and_discrete_sampling rng config x i j_tns
     RowReduce (exists f, x, None)
 inl matmul (b,a) x = Matmul(x, Weight (a,b))
-inl input_scalar forall t key{symbol}. (key : key) : graph t = InputScalar(exists key)
-inl matmul_ensemble (c,b,a : int * int * int) x = Matmul(x, Apply(exists Weight (c,a,b), input_scalar .ensemble))
-inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = Input((exists key), dim)
-inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : graph (tensor b t) = Apply(exists a,input_scalar b)
+inl key_scalar forall t key{symbol}. (key : key) : graph t = KeyScalar(exists key)
+inl matmul_ensemble (c,b,a : int * int * int) x = Matmul(x, Apply(exists Weight (c,a,b), key_scalar .ensemble))
+inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = KeyTensor((exists key), Input(dim))
+inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : graph (tensor b t) = Apply(exists a, key_scalar b)
 inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)
 
 inl create_model forall t. (graph : graph t) =
@@ -447,7 +441,7 @@ inl test2() =
     console.write_ln "Here are the weight matrices."
     param_print model
     console.write_ln "Here is the input tensor."
-    inl input : tensor (int * int) float = input_extract model .input
+    inl input : tensor (int * int) float = key_extract model .input
     cupy.copy_to {
         from = cupy.random_normal{mean=0; std=1} input.dim
         to = input
@@ -472,7 +466,7 @@ inl test3() =
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int) float = input_extract model .input
+    inl input : tensor (int * int) float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -505,7 +499,7 @@ inl test4() =
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int) float = input_extract model .input
+    inl input : tensor (int * int) float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -515,7 +509,7 @@ inl test4() =
     console.write_ln input
     console.write_ln "Here is the output tensor."
     graph_run_host model {ensemble}
-    inl output : tensor (int * int) int = input_extract model .output
+    inl output : tensor (int * int) int = key_extract model .output
     printing.tensor_print_ln limit.max output
     ()
 
@@ -539,7 +533,7 @@ inl test5() =
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int) float = input_extract model .input
+    inl input : tensor (int * int) float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -550,9 +544,9 @@ inl test5() =
     console.write_ln "Here is the input tensor."
     console.write_ln input
     console.write_ln "Here is the output tensor."
-    inl output : tensor (int * int * int) float = input_extract model .output_probs
+    inl output : tensor (int * int * int) float = key_extract model .output_probs
     printing.tensor_print_ln (1 <<< 9) output
-    inl output : tensor (int * int) int = input_extract model .output_indices
+    inl output : tensor (int * int) int = key_extract model .output_indices
     printing.tensor_print_ln limit.max output
 
 // Tests running a feedforward ensemble model which keeps around the path probabilities. The inputs are spread across the block of a GPU.
@@ -577,7 +571,7 @@ inl test6() =
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int * int) float = input_extract model .input
+    inl input : tensor (int * int * int) float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -588,8 +582,8 @@ inl test6() =
     console.write_ln "Here is the input tensor."
     console.write_ln input
     console.write_ln "Here is the output tensor."
-    inl output : tensor (int * int * int) float = input_extract model .output_probs
+    inl output : tensor (int * int * int) float = key_extract model .output_probs
     printing.tensor_print_ln (1 <<< 9) output
-    inl output : tensor (int * int) int = input_extract model .output_indices
+    inl output : tensor (int * int) int = key_extract model .output_indices
     printing.tensor_print_ln limit.max output
 inl main() = test6()

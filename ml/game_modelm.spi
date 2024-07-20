@@ -12,6 +12,8 @@ type size =
 nominal game_model inp out =
     {
         model : exists t. model t
+        // Clears the input tensor. Should be run before passing in the input data.
+        input_clear : () -> ()
         // Sets the input for the given block and thread.
         input : inp -> ()
         // The output action and the sampling probability for it.
@@ -24,9 +26,14 @@ nominal game_model inp out =
 
 inl create_game_model forall t input output.
         (f : size -> graph t)
+        (input_clear : () -> ())
         (input : input -> _) (output : _ -> output * float) (sampling_probs : _ -> tensor int float)
         (size : size) =
     game_model {
+        input_clear input output sampling_probs size
         model = exists create_model(f size)
-        input output sampling_probs size
     }
+
+inl run_game_model model data =
+    // TODO:
+    ()

@@ -104,15 +104,15 @@ inl test3() =
     open tensorm
     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
         open rangem
-        inl tns_input = (input_extract model .input : tensor (int * int * int) float) |> apply block_index()
+        inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+
+        inl tns_input = (key_extract model .input : tensor (int * int * int) float) |> apply block_index()
 
         // Sets the input tensor to 0.
         loop.projective threads_in_block(tns_input.dim) fun i =>
             tensor_set i 0 tns_input
 
         __syncthreads()
-
-        inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
 
         // Serializes the data into the input tensor.
         loop.projective threads_in_block(size.minibatch) fun minibatch_id =>
@@ -128,7 +128,7 @@ inl test3() =
 
         __syncthreads()
 
-        inl tns_output = (input_extract model .output_indices : tensor (int * int * int) int) |> apply block_index()
+        inl tns_output = (key_extract model .output_indices : tensor (int * int * int) int) |> apply block_index()
         // Deserialize the action and print it.
         loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
             match tensor_index minibatch_id tns_output % 3 with
@@ -139,7 +139,7 @@ inl test3() =
 
     device_sync()
     console.write_ln "The output tensor is:"
-    inl tns_output = (input_extract model .output_indices : tensor (int * int * int) int)
+    inl tns_output = (key_extract model .output_indices : tensor (int * int * int) int)
     console.write_ln tns_output
     console.write_ln "==="
 
