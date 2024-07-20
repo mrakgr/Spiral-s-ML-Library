@@ -34,7 +34,7 @@ nominal game_model inp out =
         // size : size
     }
 
-inl run forall input. (model : exists r. model r) (pu : pickler.pu input) (data : input) =
+inl run forall input. (exists t. model : exists t. model t) (pu : pickler.pu input) (data : input) =
     // inl (exists t. model) = model
     ()
 
