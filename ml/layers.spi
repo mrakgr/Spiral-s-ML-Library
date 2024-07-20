@@ -554,7 +554,7 @@ inl test6() =
     inl block = blocks_per_grid()
     inl ensemble : int = 16
     inl graph : graph (tensor (i32 * i32) f32 * tensor i32 i32) =
-        inl x =
+        inl x = // Note: This example has a reasoning error. We shouldn't be applying the block dimension here.
             (input .input (block,16,8) : graph (tensor _ float))
             |> apply .block // The block index gets passed inside graph_run_device automatically.
             |> matmul_ensemble (ensemble,8,16)

@@ -34,9 +34,6 @@ nominal game_model inp out =
         // size : size
     }
 
-inl run forall input. (exists t. model : exists t. model t) (pu : pickler.pu input) (data : input) =
-    // inl (exists t. model) = model
-    ()
 
 
 
@@ -50,5 +47,44 @@ inl run forall input. (exists t. model : exists t. model t) (pu : pickler.pu inp
 //         model = exists create_model(f size)
 //     }
 
-// open corecuda
-// open rangem
+
+open corecuda
+open rangem
+inl run forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (size : size) (data : inp) =
+    inl x = key_extract model .input : tensor (int * int * int) float
+    assert (fst x.dim = blocks_per_grid()) "The first dimension of the input tensor has to equal blocks per grid."
+    inl x = x |> apply block_index()
+    assert (fst x.dim = threads_per_block()) "The second dimension of the input tensor has to equal threads per block."
+
+    // Sets the input tensor to 0.
+    loop.projective threads_in_block(x.dim) fun i =>
+        tensor_set i 0 x
+
+    __syncthreads()
+
+    // Serializes the data into the input tensor.
+    inl _ =
+        open pickler
+        inl tns_input = x |> apply thread_index()
+        input.pickle data (0,tns_input |> ptr_at_current_offset)
+
+    __syncthreads()
+
+    // Runs the model on the inputs.
+    loop.linear size.ensemble fun ensemble =>
+        graph_run_device model {ensemble}
+
+    __syncthreads()
+
+    (key_extract model .output_probs : tensor (int * int * int) int) 
+    |> apply block_index()
+    |> apply ensemble_id
+    |> apply thread_index()
+    
+    // Deserialize the action and print it.
+    loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
+        match tensor_index minibatch_id tns_output % 3 with
+        | 0 => Fold
+        | 1 => Call
+        | _ => Raise
+    ()
