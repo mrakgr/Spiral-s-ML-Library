@@ -2,38 +2,53 @@ open corebase
 open layers
 open tensorm
 
-type size = 
+type size = // The block and thread dimensions should match blocks_per_grid and threads_per_block
     {
-        block : int
-        thread : int
-        linear : int // linear dimension represents the ensemble dimension
+        ensemble : int
     }
 
+// nominal game_model inp out =
+//     {
+//         model : exists t. model t
+//         // Clears the input tensor. Should be run before passing in the input data.
+//         input_clear : () -> ()
+//         // Sets the input for the given block and thread.
+//         input : inp -> ()
+//         // The output action and the sampling probability for it.
+//         output : () -> out * float
+//         // Sampling probabilities for every agent in the ensemble for the given output action.
+//         // Tensor dimension is size.linear.
+//         sampling_probs : () -> tensor int float
+//         size : size
+//     }
 nominal game_model inp out =
     {
-        model : exists t. model t
-        // Clears the input tensor. Should be run before passing in the input data.
-        input_clear : () -> ()
-        // Sets the input for the given block and thread.
-        input : inp -> ()
-        // The output action and the sampling probability for it.
-        output : () -> out * float
-        // Sampling probabilities for every agent in the ensemble for the given output action.
-        // Tensor dimension is size.linear.
-        sampling_probs : () -> tensor int float
-        size : size
+        // model : exists t. model t
+        // Runs the model for a given input.
+        // Each thread in a block should participate in this blockwise operation.
+        // The output is the output value.
+        // Sampling probability is the probability of the output being generated.
+        // `ensemble_sampling_probabilities` are the probability that the output would have been selected for every individual in the ensemble.
+        // The size of the tensor in `ensemble_sampling_probabilities` equals size.linear.
+        run : inp -> {output : out; sampling_probability : float; ensemble_sampling_probabilities : tensor int float}
+        // size : size
     }
 
-inl create_game_model forall t input output.
-        (f : size -> graph t)
-        (input_clear : () -> ())
-        (input : input -> _) (output : _ -> output * float) (sampling_probs : _ -> tensor int float)
-        (size : size) =
-    game_model {
-        input_clear input output sampling_probs size
-        model = exists create_model(f size)
-    }
-
-inl run_game_model model data =
-    // TODO:
+inl run forall input. (model : exists r. model r) (pu : pickler.pu input) (data : input) =
+    // inl (exists t. model) = model
     ()
+
+
+
+// inl create_game_model forall t input output.
+//         (f : size -> graph t)
+//         (input_clear : () -> ())
+//         (input : input -> _) (output : _ -> output * float) (sampling_probs : _ -> tensor int float)
+//         (size : size) =
+//     game_model {
+//         input_clear input output sampling_probs size
+//         model = exists create_model(f size)
+//     }
+
+// open corecuda
+// open rangem
