@@ -161,7 +161,7 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
                     inl tf32 () : size = fst(matmul.matmul_tf32' false true).offset_end
                     real
                         typecase t with
-                        | tensor (int * int) f32 => tf32()
+                        | tensor _ f32 => tf32()
                         | _ => 
                             !!!!PrintStatic(`t)
                             error_type `(()) "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
@@ -281,9 +281,12 @@ inl key_extract forall t_top key{symbol} dim input. (model ({graph param output}
             | Weight => None
             | Input => None
             | KeyScalar => None
-            | KeyTensor((exists key'. _),graph) => 
+            | KeyTensor((exists key'. _),graph) =>
                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                    Some (graph_tensor_extract (model {m with graph}) {} |> nominal_recreate)
+                    inl recreate forall a t'. (a : tensor a t') : tensor dim input = 
+                        real open real_core in assert (`a `= `dim && `t' `= `input) "The tensor dimension and type in the key node need to equal the target one."
+                        nominal_recreate a
+                    Some (graph_tensor_extract (model {m with graph}) {} |> recreate)
                 else f graph
     match f graph with
     | Some x => x
@@ -294,12 +297,8 @@ inl key_extract forall t_top key{symbol} dim input. (model ({graph param output}
 // Inserts the block index into the indices variable automatically.
 inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
     inl h = hashmapm.create()
-    real match indices with {block} => real_core.error_type "The block will be automatically inserted in graph_run. It shouldn't be passed into it beforehand." | _ => ()
     inl abi t = apply block_index() t
-    inl indices = real {indices with block=block_index()}
-    inl tensor_extract forall t. (graph : graph t) : t =
-        inl f forall indices'. (indices : indices') : t = graph_tensor_extract (model {m with graph}) indices
-        real f `(`indices) indices
+    inl tensor_extract forall t. (graph : graph t) : t = graph_tensor_extract (model {m with graph}) indices
     inl rec f forall t. : graph t -> t =
         open primitives
         memoize h fun x =>
@@ -323,11 +322,11 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
                 inl a,b,out = f a, f b, tensor_extract x
                 inl alpha, beta : float * float = 1, 0
                 inl () =
-                    inl a,out = abi a,abi out
+                    inl a, out = abi a, abi out
                     real
                         open real_core
                         typecase t with
-                        | tensor (int * int) f32 =>
+                        | tensor _ f32 =>
                             inl memory, body = matmul.matmul_tf32' false true
                             join body alpha a b beta out
                         | _ => 
@@ -417,9 +416,13 @@ inl model_data_to_model (graph : graph _) (d : model_data) =
         output = { array = fst d.output, snd output; offset = output }
         }
 
+type d2 = int * int
+type d3 = int * int * int
+type d4 = int * int * int * int
+
 // Tests whether randonmly initializing the params of the graph works.
 inl test1() =
-    inl graph : graph (tensor (int * int * int) float) =
+    inl graph : graph (tensor d3 float) =
         input .input (blocks_per_grid(),1,4)
         |> matmul (4,4)
         |> tanh
@@ -439,7 +442,7 @@ inl test1() =
 
 // Tests whether extracting the inputs of the graph works. Also randomly inits them.
 inl test2() =
-    inl graph : graph (tensor (int * int * int) float) =
+    inl graph : graph (tensor d3 float) =
         input .input (blocks_per_grid(),1,2)
         |> matmul (2,4)
         |> tanh
@@ -454,7 +457,7 @@ inl test2() =
     console.write_ln "Here are the weight matrices."
     param_print model
     console.write_ln "Here is the input tensor."
-    inl input : tensor (int * int) float = key_extract model .input
+    inl input : tensor d3 float = key_extract model .input
     cupy.copy_to {
         from = cupy.random_normal{mean=0; std=1} input.dim
         to = input
@@ -464,7 +467,7 @@ inl test2() =
 
 // Tests running a feedforward model.
 inl test3() =
-    inl graph : graph (tensor (int * int) int) =
+    inl graph : graph (tensor d2 int) =
         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
         |> matmul (8,16)
         |> ln_l2
@@ -479,7 +482,7 @@ inl test3() =
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int) float = key_extract model .input
+    inl input : tensor (int * int * int) float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -497,7 +500,7 @@ inl test3() =
 // Tests running a feedforward ensemble model.
 inl test4() =
     inl ensemble = 16
-    inl graph : graph (tensor (int * int) int) =
+    inl graph : graph (tensor d2 int) =
         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
         |> matmul_ensemble (ensemble,8,16)
         |> ln_l2
@@ -506,13 +509,13 @@ inl test4() =
         |> ln_l2
         |> relu
         |> matmul_ensemble (ensemble,16,16)
-        |> softmax_and_discrete_sample' (input .output (ensemble,16) |> apply .ensemble)
+        |> softmax_and_discrete_sample' (input .output (ensemble,blocks_per_grid(),16) |> apply .ensemble)
 
     inl model = create_model graph
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int) float = key_extract model .input
+    inl input : tensor d3 float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -522,14 +525,14 @@ inl test4() =
     console.write_ln input
     console.write_ln "Here is the output tensor."
     graph_run_host model {ensemble}
-    inl output : tensor (int * int) int = key_extract model .output
+    inl output : tensor d3 int = key_extract model .output
     printing.tensor_print_ln limit.max output
     ()
 
 // Tests running a feedforward ensemble model which keeps around the path probabilities.
 inl test5() =
     inl ensemble : int = 16
-    inl graph : graph (tensor (i32 * i32 * i32) f32 * tensor (i32 * i32) i32) =
+    inl graph : graph (tensor d3 f32 * tensor d2 i32) =
         inl x =
             (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
             |> matmul_ensemble (ensemble,8,16)
@@ -546,7 +549,7 @@ inl test5() =
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int) float = key_extract model .input
+    inl input : tensor d3 float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -557,46 +560,9 @@ inl test5() =
     console.write_ln "Here is the input tensor."
     console.write_ln input
     console.write_ln "Here is the output tensor."
-    inl output : tensor (int * int * int) float = key_extract model .output_probs
+    inl output : tensor d4 float = key_extract model .output_probs
     printing.tensor_print_ln (1 <<< 9) output
-    inl output : tensor (int * int) int = key_extract model .output_indices
+    inl output : tensor d3 int = key_extract model .output_indices
     printing.tensor_print_ln limit.max output
 
-// Tests running a feedforward ensemble model which keeps around the path probabilities. The inputs are spread across the block of a GPU.
-inl test6() =
-    inl block = blocks_per_grid()
-    inl ensemble : int = 16
-    inl graph : graph (tensor (i32 * i32) f32 * tensor i32 i32) =
-        inl x = // Note: This example has a reasoning error. We shouldn't be applying the block dimension here.
-            (input .input (block,16,8) : graph (tensor _ float))
-            |> apply .block // The block index gets passed inside graph_run_device automatically.
-            |> matmul_ensemble (ensemble,8,16)
-            |> ln_l2
-            |> relu
-            |> matmul_ensemble (ensemble,16,16)
-            |> ln_l2
-            |> relu
-            |> matmul_ensemble (ensemble,16,16)
-            |> softmax' (input .output_probs (ensemble,16,16) |> apply .ensemble)
-        pair x (discrete_sample' (input .output_indices (ensemble,16) |> apply .ensemble) x)
-
-    inl model = create_model graph
-    param_init model
-    console.write_ln "Here are the weight matrices."
-    param_print model
-    inl input : tensor (int * int * int) float = key_extract model .input
-    // Immitates the passing of data into the output vector.
-    // In the poker game the serialization function will be responsible for this.
-    cupy.copy_to {
-        from = cupy.random_normal{mean=0; std=1} input.dim
-        to = input
-    }
-    graph_run_host model {ensemble}
-    console.write_ln "Here is the input tensor."
-    console.write_ln input
-    console.write_ln "Here is the output tensor."
-    inl output : tensor (int * int * int) float = key_extract model .output_probs
-    printing.tensor_print_ln (1 <<< 9) output
-    inl output : tensor (int * int) int = key_extract model .output_indices
-    printing.tensor_print_ln limit.max output
-inl main() = test6()
+inl main() = test5()
