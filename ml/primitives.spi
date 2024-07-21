@@ -259,7 +259,7 @@ inl row_map forall dim a b.
         |> curry_fst
 
     inl to =
-        to 
+        to
         |> factorize_sizeof_16
         |> split_into_swapped_fst (loop.rigid_split threads_per_block())
         |> curry_fst
@@ -436,7 +436,7 @@ inl local_argmax config x (j_tns : tensor (int * int) int) =
     |> local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b)
     |> snd
 
-inl local_discrete_sampling rng config x (i : int) (j_tns : tensor (int * int) int) =
+inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_inclusive_scan_sum config x
     inl probability = random.uniform rng |> conv
     inl x = local_map (fun x => x - probability) x
@@ -449,7 +449,7 @@ inl local_discrete_sampling rng config x (i : int) (j_tns : tensor (int * int) i
         ) (zip x j_tns)
     |> snd
 
-inl local_softmax_and_discrete_sampling rng config x (i : int) (j_tns : tensor (int * int) int) =
+inl local_softmax_and_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     local_discrete_sampling rng config (local_softmax config x) i j_tns
 
 inl test1() =

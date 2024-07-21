@@ -1,90 +1,90 @@
-open corebase
-open layers
-open tensorm
+// open corebase
+// open layers
+// open tensorm
 
-type size = // The block and thread dimensions should match blocks_per_grid and threads_per_block
-    {
-        ensemble : int
-    }
+// type size = // The block and thread dimensions should match blocks_per_grid and threads_per_block
+//     {
+//         ensemble : int
+//     }
 
+// // nominal game_model inp out =
+// //     {
+// //         model : exists t. model t
+// //         // Clears the input tensor. Should be run before passing in the input data.
+// //         input_clear : () -> ()
+// //         // Sets the input for the given block and thread.
+// //         input : inp -> ()
+// //         // The output action and the sampling probability for it.
+// //         output : () -> out * float
+// //         // Sampling probabilities for every agent in the ensemble for the given output action.
+// //         // Tensor dimension is size.linear.
+// //         sampling_probs : () -> tensor int float
+// //         size : size
+// //     }
 // nominal game_model inp out =
 //     {
-//         model : exists t. model t
-//         // Clears the input tensor. Should be run before passing in the input data.
-//         input_clear : () -> ()
-//         // Sets the input for the given block and thread.
-//         input : inp -> ()
-//         // The output action and the sampling probability for it.
-//         output : () -> out * float
-//         // Sampling probabilities for every agent in the ensemble for the given output action.
-//         // Tensor dimension is size.linear.
-//         sampling_probs : () -> tensor int float
-//         size : size
-//     }
-nominal game_model inp out =
-    {
-        // model : exists t. model t
-        // Runs the model for a given input.
-        // Each thread in a block should participate in this blockwise operation.
-        // The output is the output value.
-        // Sampling probability is the probability of the output being generated.
-        // `ensemble_sampling_probabilities` are the probability that the output would have been selected for every individual in the ensemble.
-        // The size of the tensor in `ensemble_sampling_probabilities` equals size.linear.
-        run : inp -> {output : out; sampling_probability : float; ensemble_sampling_probabilities : tensor int float}
-        // size : size
-    }
-
-
-
-
-// inl create_game_model forall t input output.
-//         (f : size -> graph t)
-//         (input_clear : () -> ())
-//         (input : input -> _) (output : _ -> output * float) (sampling_probs : _ -> tensor int float)
-//         (size : size) =
-//     game_model {
-//         input_clear input output sampling_probs size
-//         model = exists create_model(f size)
+//         // model : exists t. model t
+//         // Runs the model for a given input.
+//         // Each thread in a block should participate in this blockwise operation.
+//         // The output is the output value.
+//         // Sampling probability is the probability of the output being generated.
+//         // `ensemble_sampling_probabilities` are the probability that the output would have been selected for every individual in the ensemble.
+//         // The size of the tensor in `ensemble_sampling_probabilities` equals size.linear.
+//         run : inp -> {output : out; sampling_probability : float; ensemble_sampling_probabilities : tensor int float}
+//         // size : size
 //     }
 
 
-open corecuda
-open rangem
-inl run forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (size : size) (data : inp) =
-    inl x = key_extract model .input : tensor (int * int * int) float
-    assert (fst x.dim = blocks_per_grid()) "The first dimension of the input tensor has to equal blocks per grid."
-    inl x = x |> apply block_index()
-    assert (fst x.dim = threads_per_block()) "The second dimension of the input tensor has to equal threads per block."
 
-    // Sets the input tensor to 0.
-    loop.projective threads_in_block(x.dim) fun i =>
-        tensor_set i 0 x
 
-    __syncthreads()
+// // inl create_game_model forall t input output.
+// //         (f : size -> graph t)
+// //         (input_clear : () -> ())
+// //         (input : input -> _) (output : _ -> output * float) (sampling_probs : _ -> tensor int float)
+// //         (size : size) =
+// //     game_model {
+// //         input_clear input output sampling_probs size
+// //         model = exists create_model(f size)
+// //     }
 
-    // Serializes the data into the input tensor.
-    inl _ =
-        open pickler
-        inl tns_input = x |> apply thread_index()
-        input.pickle data (0,tns_input |> ptr_at_current_offset)
 
-    __syncthreads()
+// open corecuda
+// open rangem
+// inl run forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (size : size) (data : inp) =
+//     inl x = key_extract model .input : tensor (int * int * int) float
+//     assert (fst x.dim = blocks_per_grid()) "The first dimension of the input tensor has to equal blocks per grid."
+//     inl x = x |> apply block_index()
+//     assert (fst x.dim = threads_per_block()) "The second dimension of the input tensor has to equal threads per block."
 
-    // Runs the model on the inputs.
-    loop.linear size.ensemble fun ensemble =>
-        graph_run_device model {ensemble}
+//     // Sets the input tensor to 0.
+//     loop.projective threads_in_block(x.dim) fun i =>
+//         tensor_set i 0 x
 
-    __syncthreads()
+//     __syncthreads()
 
-    (key_extract model .output_probs : tensor (int * int * int) int) 
-    |> apply block_index()
-    |> apply ensemble_id
-    |> apply thread_index()
+//     // Serializes the data into the input tensor.
+//     inl _ =
+//         open pickler
+//         inl tns_input = x |> apply thread_index()
+//         input.pickle data (0,tns_input |> ptr_at_current_offset)
+
+//     __syncthreads()
+
+//     // Runs the model on the inputs.
+//     loop.linear size.ensemble fun ensemble =>
+//         graph_run_device model {ensemble}
+
+//     __syncthreads()
+
+//     (key_extract model .output_probs : tensor (int * int * int) int) 
+//     |> apply block_index()
+//     |> apply ensemble_id
+//     |> apply thread_index()
     
-    // Deserialize the action and print it.
-    loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
-        match tensor_index minibatch_id tns_output % 3 with
-        | 0 => Fold
-        | 1 => Call
-        | _ => Raise
-    ()
+//     // Deserialize the action and print it.
+//     loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
+//         match tensor_index minibatch_id tns_output % 3 with
+//         | 0 => Fold
+//         | 1 => Call
+//         | _ => Raise
+//     ()
