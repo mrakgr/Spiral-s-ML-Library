@@ -345,24 +345,25 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
     f graph
 
 // Runs the kernel on the device.
-inl graph_run_device forall t_top indices. (model {graph param output} & m : model t_top) (indices : indices) =
+inl graph_run_device forall t_top indices. (model {graph param output} & m : model t_top) (ls : layer_state) (indices : indices) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-
-    inl ls : layer_state =
-        open random
-        layer_state {
-            rng = init {seed = clock64(); subsequence = conv rangem.threads_in_grid().from; offset=0}
-        }
-
     inl _ = graph_run m ls indices
     ()
 
-// Just for testing purposes.
+// Creates the layer state.
+inl create_layer_state() =
+    open random
+    layer_state {
+        rng = init {seed = clock64(); subsequence = conv rangem.threads_in_grid().from; offset=0}
+    }
+
+// Runs the graph on the host.
 inl graph_run_host forall t_top sizes. (model {graph} & m : model t_top) (sizes : sizes) =
     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+        inl ls : layer_state = create_layer_state()
         loop.linear sizes fun indices =>
-            graph_run_device m indices
+            graph_run_device m ls indices
 
 inl tanh forall dim t{float}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const tanh, x, None)
 inl sigmoid forall dim t{float;number}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const sigmoid, x, None)

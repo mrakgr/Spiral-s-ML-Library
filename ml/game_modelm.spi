@@ -56,6 +56,8 @@ inl run forall inp out. (exists t. model : exists t. model t) (input : pickler.p
     inl x = x |> apply block_index()
     assert (fst x.dim = threads_per_block()) "The second dimension of the input tensor has to equal number threads per block."
 
+    inl ls = create_layer_state()
+
     // Sets the input tensor to 0.
     loop.projective threads_in_block(x.dim) fun i =>
         tensor_set i 0 x
@@ -72,14 +74,30 @@ inl run forall inp out. (exists t. model : exists t. model t) (input : pickler.p
 
     // Runs the model on the inputs.
     loop.linear size.ensemble fun ensemble =>
-        graph_run_device model {ensemble}
+        graph_run_device model ls {ensemble}
 
     __syncthreads()
 
-    (key_extract model .output_probs : tensor (int * int * int) int) 
-    |> apply block_index()
-    |> apply ensemble_id
-    |> apply thread_index()
+    // Randomly pick an ensemble and share it across all the threads in the block.
+    inl ensemble_id : int = $"__shared__ `int v$"
+    if thread_index() = 0 then
+        loop._set ensemble_id (random.int_range {from=0; nearTo=size.ensemble} ls.rng)
+
+    __syncthreads()
+
+    // Extract the output probabilities.
+    inl output_probs =
+        (key_extract model .output_probs : tensor d4 int) 
+        |> apply ensemble_id
+        |> apply block_index()
+
+    inl output_indices =
+        (key_extract model .output_probs : tensor d2 int) 
+        |> apply block_index()
+
+    inl () =
+        open primitives
+        row_reduce (local_discrete_sampling ls.rng) output_probs output_indices
     
     // Deserialize the action and print it.
     loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
