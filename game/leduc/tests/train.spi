@@ -95,7 +95,9 @@ inl test3() =
             |> relu
             |> matmul_ensemble (size.ensemble,size.inner,size.inner)
             |> softmax' (input .output_probs (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
-        pair x (input .output_indices (size.block,size.thread) : graph (tensor d2 int))
+        x 
+        |> pair (discrete_sample' ((input .output_indices (size.ensemble,size.block,size.thread) : graph (tensor d3 int)) |> apply .ensemble) x)
+        |> pair (input .output_max_probs (size.block,size.thread) : graph (tensor d2 float))
 
     inl model = create_model graph
     param_init model
@@ -131,4 +133,4 @@ inl test3() =
 inl test4() =
     ()
 
-inl main() = test2()
+inl main() = test3()

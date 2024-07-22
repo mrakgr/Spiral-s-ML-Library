@@ -56,10 +56,7 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
     inl ensemble_id : int = random.int_range {from=0; nearTo=ensemble} ls.rng
 
     // Extract the output probabilities (already calculated).
-    inl output_probs = 
-        (key_extract model .output_probs : tensor d4 float) 
-        |> apply ensemble_id
-        |> apply block_index()
+    inl output_probs = (key_extract model .output_probs : tensor d4 float) 
 
     // Extract the output indices tensor.
     inl output_indices =
@@ -68,14 +65,32 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
 
     inl () = // Calculate the output indices.
         open primitives
+        inl output_probs = output_probs |> apply ensemble_id |> apply block_index()
         row_reduce (local_discrete_sampling ls.rng) output_probs output_indices
     
     inl output_id = tensor_index thread_index() output_indices
-    inl sampling_prob_ensemble = apply thread_index() output_probs
     {
-        sampling_prob_ensemble
         action = output output_id
-        sampling_prob_selected = tensor_index output_id sampling_prob_ensemble
+        sampling_prob_ensemble =
+            output_probs
+            |> reorder (fun ensemble,block,thread,inner => block,thread,inner,ensemble)
+            |> apply block_index()
+            |> apply thread_index()
+            |> apply output_id
+        sampling_prob_selected = 
+            output_probs
+            |> apply ensemble_id 
+            |> apply block_index()
+            |> apply thread_index()
+            |> tensor_index output_id
+        ensemble_id
+        output_id
+        // output_max_probs_for_id =
+        //     open primitives
+        //     inl x = output_probs |> apply ensemble_id |> apply block_index()
+        //     inl y = (key_extract model .output_max_probs : tensor d2 float) |> apply block_index()
+        //     row_reduce (fun config x i tns_j => local_reduce config 0 max x) x y
+        //     y
     }
 
 nominal game_model inp out = 

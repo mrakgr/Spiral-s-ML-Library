@@ -370,6 +370,10 @@ inl sigmoid forall dim t{float;number}. (x : graph (tensor (int * dim) t)) : gra
 inl relu forall dim t{float;number}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const (max 0), x, None)
 inl softmax' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     BlockRowMap (exists (fun _ config x _ _ => primitives.local_softmax config x), x, Some out)
+inl max forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) t) = 
+    BlockRowReduce (exists (fun _ config x _ _ => primitives.local_max config x), x, None)
+inl max' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) t) = 
+    BlockRowReduce (exists (fun _ config x _ _ => primitives.local_max config x), x, Some out)
 inl softmax forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     BlockRowMap (exists (fun _ config x _ _ => primitives.local_softmax config x), x, None)
 inl ln_l2 forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
@@ -533,7 +537,7 @@ inl test4() =
 // Tests running a feedforward ensemble model which keeps around the path probabilities.
 inl test5() =
     inl ensemble : int = 16
-    inl graph : graph (tensor d3 f32 * tensor d2 i32) =
+    inl graph =
         inl x =
             (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
             |> matmul_ensemble (ensemble,8,16)
@@ -544,7 +548,9 @@ inl test5() =
             |> relu
             |> matmul_ensemble (ensemble,16,16)
             |> softmax' (input .output_probs (ensemble,blocks_per_grid(),16,16) |> apply .ensemble)
-        pair x (discrete_sample' (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble) x)
+        x 
+        |> pair (discrete_sample' (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble) x)
+        |> pair (max' (input .output_max_probs (ensemble,blocks_per_grid(),16) |> apply .ensemble) x)
 
     inl model = create_model graph
     param_init model

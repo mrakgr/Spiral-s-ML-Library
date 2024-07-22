@@ -1,151 +1,151 @@
-Error trace on line: 276, column: 52 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowReduce(exists a. _,a,out) => g (f a) out
-                                                   ^
-Error trace on line: 262, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match x with
+Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--restrict')" // assumes all the pointers are restricted
+    ^
+Error trace on line: 39, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match threads_per_block with
+    ^
+Error trace on line: 45, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl compiler = NVCC
+    ^
+Error trace on line: 46, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match compiler with
+    ^
+Error trace on line: 52, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl kernel_i, vars = join_backend Cuda
+    ^
+Error trace on line: 53, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+        match compiler with
         ^
-Error trace on line: 263, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Some => x
-          ^
-Error trace on line: 264, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | None =>
-          ^
-Error trace on line: 265, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            match out with
+Error trace on line: 59, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+        f () : ()
+        ^
+Error trace on line: 119, column: 77 in module: c:\Spiral_s_ML_Library\game\leduc\tests\train.spi.
+    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+                                                                            ^
+Error trace on line: 122, column: 9 in module: c:\Spiral_s_ML_Library\game\leduc\tests\train.spi.
+        inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+        ^
+Error trace on line: 124, column: 9 in module: c:\Spiral_s_ML_Library\game\leduc\tests\train.spi.
+        ml.game_modelm.run game_model data
+        ^
+Error trace on line: 14, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl ensemble,block,thread,_ = (key_extract model .output_probs : tensor d4 float).dim
+    ^
+Error trace on line: 14, column: 9 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl ensemble,block,thread,_ = (key_extract model .output_probs : tensor d4 float).dim
+        ^
+Error trace on line: 14, column: 18 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl ensemble,block,thread,_ = (key_extract model .output_probs : tensor d4 float).dim
+                 ^
+Error trace on line: 14, column: 24 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl ensemble,block,thread,_ = (key_extract model .output_probs : tensor d4 float).dim
+                       ^
+Error trace on line: 15, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl () = // Assert that all the dimensions are right.
+    ^
+Error trace on line: 15, column: 9 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl () = // Assert that all the dimensions are right.
+        ^
+Error trace on line: 24, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl ls = create_layer_state()
+    ^
+Error trace on line: 27, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl x = (key_extract model .input : tensor (int * int * int) float)
+    ^
+Error trace on line: 28, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    assert (block = fst x.dim) "The first dimension of the input tensor has to equal the number of blocks per grid."
+    ^
+Error trace on line: 29, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl x = x |> apply block_index()
+    ^
+Error trace on line: 30, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    assert (thread = fst x.dim) "The second dimension of the input tensor has to equal number threads per block."
+    ^
+Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl ls = create_layer_state()
+    ^
+Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    loop.projective threads_in_block(x.dim) fun i =>
+    ^
+Error trace on line: 39, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    __syncthreads()
+    ^
+Error trace on line: 42, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl _ =
+    ^
+Error trace on line: 47, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    __syncthreads()
+    ^
+Error trace on line: 50, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    loop.linear ensemble fun ensemble =>
+    ^
+Error trace on line: 53, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    __syncthreads()
+    ^
+Error trace on line: 56, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl ensemble_id : int = random.int_range {from=0; nearTo=ensemble} ls.rng
+    ^
+Error trace on line: 59, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl output_probs = (key_extract model .output_probs : tensor d4 float) 
+    ^
+Error trace on line: 62, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl output_indices =
+    ^
+Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl () = // Calculate the output indices.
+    ^
+Error trace on line: 66, column: 9 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl () = // Calculate the output indices.
+        ^
+Error trace on line: 71, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    inl output_id = tensor_index thread_index() output_indices
+    ^
+Error trace on line: 72, column: 5 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+    {
+    ^
+Error trace on line: 90, column: 13 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+            inl x = output_probs |> apply ensemble_id |> apply block
             ^
-Error trace on line: 266, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some x => f x
-              ^
-Error trace on line: 266, column: 20 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some x => f x
-                   ^
-Error trace on line: 266, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Some x => f x
-                        ^
-Error trace on line: 48, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match hashmapm.try_get h k with
-    ^
-Error trace on line: 49, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 50, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-      ^
-Error trace on line: 50, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-              ^
-Error trace on line: 50, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-                      ^
-Error trace on line: 274, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => g (f a) out
-              ^
-Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMap(exists a. _,a,out) => g (f a) out
-              ^
-Error trace on line: 276, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowReduce(exists a. _,a,out) => g (f a) out
-              ^
-Error trace on line: 277, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => pair a b
-              ^
-Error trace on line: 278, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => pair a b
-              ^
-Error trace on line: 278, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => pair a b
+Error trace on line: 90, column: 21 in module: c:\Spiral_s_ML_Library\ml\game_modelm.spi.
+            inl x = output_probs |> apply ensemble_id |> apply block
                     ^
-Error trace on line: 278, column: 31 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => pair a b
-                              ^
-Error trace on line: 278, column: 39 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => pair a b
-                                      ^
-Error trace on line: 269, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match f a with
-        ^
-Error trace on line: 269, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match f a with
-              ^
-Error trace on line: 48, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match hashmapm.try_get h k with
-    ^
-Error trace on line: 49, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 50, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-      ^
-Error trace on line: 50, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-              ^
-Error trace on line: 50, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-                      ^
-Error trace on line: 274, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => g (f a) out
-              ^
-Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMap(exists a. _,a,out) => g (f a) out
-              ^
-Error trace on line: 276, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowReduce(exists a. _,a,out) => g (f a) out
-              ^
-Error trace on line: 277, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => pair a b
-              ^
-Error trace on line: 278, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => pair a b
-              ^
-Error trace on line: 279, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Zip(a,b) => pair a b
-              ^
-Error trace on line: 280, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Pair(a,b) => pair a b
-              ^
-Error trace on line: 281, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Weight => None
-              ^
-Error trace on line: 282, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Input => None
-              ^
-Error trace on line: 283, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | KeyScalar => None
-              ^
-Error trace on line: 284, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | KeyTensor((exists key'. _),graph) =>
-              ^
-Error trace on line: 284, column: 26 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | KeyTensor((exists key'. _),graph) =>
-                         ^
-Error trace on line: 285, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                ^
-Error trace on line: 286, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    inl recreate forall a t'. (a : tensor a t') : tensor dim input = 
-                    ^
-Error trace on line: 289, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    Some (graph_tensor_extract (model {m with graph}) {} |> recreate)
-                    ^
-Error trace on line: 289, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    Some (graph_tensor_extract (model {m with graph}) {} |> recreate)
-                          ^
 Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
 inl (|>) a b = b a
                ^
-Error trace on line: 287, column: 30 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        real open real_core in assert (`a `= `dim && `t' `= `input) "The tensor dimension and type in the key node need to equal the target one."
-                             ^
-Error trace on line: 287, column: 48 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                        real open real_core in assert (`a `= `dim && `t' `= `input) "The tensor dimension and type in the key node need to equal the target one."
-                                               ^
-Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-    if c = false then 
+Error trace on line: 102, column: 79 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+inl apply_templ forall dim a b el. (fst : dim -> a) (snd : dim -> b) (i : a) (tensor {bodies dim} : tensor dim el) : tensor b el = real
+                                                                              ^
+Error trace on line: 102, column: 86 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+inl apply_templ forall dim a b el. (fst : dim -> a) (snd : dim -> b) (i : a) (tensor {bodies dim} : tensor dim el) : tensor b el = real
+                                                                                     ^
+Error trace on line: 103, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    assert_indices i (fst dim)
     ^
-Error trace on line: 266, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
+Error trace on line: 126, column: 5 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    f (ar, v)
+    ^
+Error trace on line: 122, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 123, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+           ^
+Error trace on line: 124, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
+          ^
+Error trace on line: 125, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v => set ar v
+          ^
+Error trace on line: 125, column: 19 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v => set ar v
+                  ^
+Error trace on line: 5, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\utils.spir.
+    if lit_is i && lit_is s then
+    ^
+Error trace on line: 6, column: 9 in module: c:\Spiral_s_ML_Library\corebase\tensorm\utils.spir.
+        if not (0 <= i && i < s ) then
         ^
-Error trace on line: 266, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-                                       ^
-The tensor dimension and type in the key node need to equal the target one.
+Error trace on line: 7, column: 13 in module: c:\Spiral_s_ML_Library\corebase\tensorm\utils.spir.
+            error_type "Tensor index out of bounds (detected at compile-time.)"
+            ^
+Tensor index out of bounds (detected at compile-time.)
