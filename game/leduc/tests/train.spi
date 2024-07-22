@@ -1,149 +1,134 @@
-// open corebase
-// open corecuda
-// open game
+open corebase
+open corecuda
+open game
 
-// inl pu_table() : pickler.pu table =
-//     open pickler
-//     inl pot : _ (sam.sa 2 int) = sa (int 14) // 0 - 13 range.
-//     inl card : pu card = alt {
-//         King = unit()
-//         Queen = unit()
-//         Jack = unit()
-//     }
-//     inl community_card = option card
-//     inl pl_card : _ (sam.sa 2 card) = sa card
-//     inl raises_left = int 3
-//     inl is_button_s_first_move = bool()
-//     inl player_turn = int 2
-//     wrap {
-//         inp = fun {pot community_card pl_card raises_left is_button_s_first_move player_turn} => pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn
-//         out = fun pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn => {pot community_card pl_card raises_left is_button_s_first_move player_turn}
-//     } (pot ** community_card ** pl_card ** raises_left ** is_button_s_first_move ** player_turn)
+inl pu_table() : pickler.pu table =
+    open pickler
+    inl pot : _ (sam.sa 2 int) = sa (int 14) // 0 - 13 range.
+    inl card : pu card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl community_card = option card
+    inl pl_card : _ (sam.sa 2 card) = sa card
+    inl raises_left = int 3
+    inl is_button_s_first_move = bool()
+    inl player_turn = int 2
+    wrap {
+        inp = fun {pot community_card pl_card raises_left is_button_s_first_move player_turn} => pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn
+        out = fun pot, community_card, pl_card, raises_left, is_button_s_first_move, player_turn => {pot community_card pl_card raises_left is_button_s_first_move player_turn}
+    } (pot ** community_card ** pl_card ** raises_left ** is_button_s_first_move ** player_turn)
 
-// inl test1() =
-//     run fun () =>
-//         if rangem.threads_in_grid().from = 0 then
-//             open pickler
-//             inl data : table =
-//                 {
-//                     pot = arraym.fromList [2;2]
-//                     community_card = Some King
-//                     pl_card = arraym.fromList [Queen; Jack]
-//                     raises_left = 1
-//                     is_button_s_first_move = true
-//                     player_turn = 0
-//                 }
+inl test1() =
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            open pickler
+            inl data : table =
+                {
+                    pot = arraym.fromList [2;2]
+                    community_card = Some King
+                    pl_card = arraym.fromList [Queen; Jack]
+                    raises_left = 1
+                    is_button_s_first_move = true
+                    player_turn = 0
+                }
             
-//             inl p = pu_table()
+            inl p = pu_table()
 
-//             serialize p data
-//             // |> fun x => write_ln x . x
-//             |> deserialize p
-//             |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
-//             |> console.write_ln
+            serialize p data
+            // |> fun x => write_ln x . x
+            |> deserialize p
+            |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
+            |> console.write_ln
 
-// inl pu_history() : pickler.pu history =
-//     open pickler
-//     inl card : pu card = alt {
-//         King = unit()
-//         Queen = unit()
-//         Jack = unit()
-//     }
-//     inl action : pu action = alt {
-//         Fold = unit()
-//         Call = unit()
-//         Raise = unit()
-//     }
-//     inl action_or_card : pu (choice2 action card) = action ++ card
-//     inl history : pu history = sa_list action_or_card
-//     history
+inl pu_history() : pickler.pu history =
+    open pickler
+    inl card : pu card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl action : pu action = alt {
+        Fold = unit()
+        Call = unit()
+        Raise = unit()
+    }
+    inl action_or_card : pu (choice2 action card) = action ++ card
+    inl history : pu history = sa_list action_or_card
+    history
 
-// inl test2() =
-//     run fun () =>
-//         if rangem.threads_in_grid().from = 0 then
-//             open pickler
-//             inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+inl test2() =
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            open pickler
+            inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
             
-//             inl p = pu_history()
+            inl p = pu_history()
 
-//             serialize p data
-//             // |> fun x => write_ln x . x
-//             |> deserialize p
-//             |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
-//             |> console.write_ln
+            serialize p data
+            // |> fun x => write_ln x . x
+            |> deserialize p
+            |> fun x => assert (data = x) "The round trip has to preserve equality with the original input." . x
+            |> console.write_ln
 
-// open tensorm
-// inl test3() =
-//     inl pu_history = pu_history()
-//     open ml.layers
+open tensorm
+inl test3() =
+    inl pu_history = pu_history()
+    open ml.layers
 
-//     inl size = {
-//         ensemble = 4 // The third dimension of each weight layer.
-//         block = blocks_per_grid()
-//         minibatch = 16 // threads_per_block()
-//         inner = modup pu_history.size 128
-//     }
+    inl size = {
+        ensemble = 4 // The third dimension of each weight layer.
+        block = blocks_per_grid()
+        thread = threads_per_block()
+        inner = modup pu_history.size 128
+    }
 
-//     inl graph =
-//         (input .input (size.block,size.minibatch,size.inner) : graph (tensor (int * int * int) float))
-//         |> apply .block
-//         |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-//         |> ln_l2
-//         |> relu
-//         |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-//         |> ln_l2
-//         |> relu
-//         |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-//         |> softmax_and_discrete_sample' (input .output_indices (size.block,size.ensemble,size.minibatch) |> apply .block |> apply .ensemble)
+    inl graph =
+        inl x =
+            (input .input (size.block,size.thread,size.inner) : graph (tensor d3 float))
+            |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+            |> ln_l2
+            |> relu
+            |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+            |> ln_l2
+            |> relu
+            |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+            |> softmax' (input .output_probs (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
+        pair x (input .output_indices (size.block,size.thread) : graph (tensor d2 int))
 
-//     inl model = create_model graph
-//     param_init model
+    inl model = create_model graph
+    param_init model
+    
+    inl game_model =
+        ml.game_modelm.game_model {
+            model = exists model
+            input = pu_history
+            output = fun x =>
+                match x % 3 with
+                | 0 => Fold
+                | 1 => Call
+                | _ => Raise
+        }
 
-//     console.write_ln "Running the kernel."
+    console.write_ln "Running the kernel."
 
-//     open tensorm
-//     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
-//         open rangem
-//         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+    open tensorm
+    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+        open rangem
 
-//         inl tns_input = (key_extract model .input : tensor (int * int * int) float) |> apply block_index()
+        inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
+        
+        ml.game_modelm.run game_model data
+        |> semaphore.write_ln_system
 
-//         // Sets the input tensor to 0.
-//         loop.projective threads_in_block(tns_input.dim) fun i =>
-//             tensor_set i 0 tns_input
+    device_sync()
+    console.write_ln "The output tensor is:"
+    inl tns_output = (key_extract model .output_indices : tensor d2 int)
+    console.write_ln tns_output
+    console.write_ln "==="
 
-//         __syncthreads()
+inl test4() =
+    ()
 
-//         // Serializes the data into the input tensor.
-//         loop.projective threads_in_block(size.minibatch) fun minibatch_id =>
-//             open pickler
-//             inl tns_input = tns_input |> apply minibatch_id
-//             pu_history.pickle data (0,tns_input |> ptr_at_current_offset)
-
-//         __syncthreads()
-
-//         // Runs the model on the inputs.
-//         loop.linear size.ensemble fun ensemble =>
-//             graph_run_device model {ensemble}
-
-//         __syncthreads()
-
-//         inl tns_output = (key_extract model .output_indices : tensor (int * int * int) int) |> apply block_index()
-//         // Deserialize the action and print it.
-//         loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
-//             match tensor_index minibatch_id tns_output % 3 with
-//             | 0 => Fold
-//             | 1 => Call
-//             | _ => Raise
-//             |> semaphore.write_ln_system
-
-//     device_sync()
-//     console.write_ln "The output tensor is:"
-//     inl tns_output = (key_extract model .output_indices : tensor (int * int * int) int)
-//     console.write_ln tns_output
-//     console.write_ln "==="
-
-// inl test4() =
-//     ()
-
-// inl main() = test2()
+inl main() = test2()

@@ -9,12 +9,27 @@ type size = // The block and thread dimensions should match blocks_per_grid and 
 
 open corecuda
 open rangem
-inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (size : size) (data : inp) =
-    inl x = key_extract model .input : tensor (int * int * int) float
-    assert (fst x.dim = blocks_per_grid()) "The first dimension of the input tensor has to equal the number of blocks per grid."
-    inl x = x |> apply block_index()
-    assert (fst x.dim = threads_per_block()) "The second dimension of the input tensor has to equal number threads per block."
+inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (data : inp) =
+    // Get the ensemble,block and thread dimensions based on the output tensor.
+    inl ensemble,block,thread,_ = (key_extract model .output_probs : tensor d4 float).dim
+    inl () = // Assert that all the dimensions are right.
+        assert (block = blocks_per_grid()) "The second dimension of the output tensor has to equal the number of blocks per grid."
+        assert (thread = threads_per_block()) "The third dimension of the output tensor has to equal number threads per block."
+        inl block',thread' = (key_extract model .output_indices : tensor d2 int).dim
+        assert ((block,thread) = (block',thread')) "The dimensions of the output indices tensor have to match."
+        inl block',thread',_ = (key_extract model .input : tensor d3 float).dim
+        assert ((block,thread) = (block',thread')) "The first two dimensions of the input tensor have to match number of blocks per grid and number of threads per block respectively."
 
+    // Creates the layer state.
+    inl ls = create_layer_state()
+
+    // Extract the input tensor.
+    inl x = (key_extract model .input : tensor (int * int * int) float)
+    assert (block = fst x.dim) "The first dimension of the input tensor has to equal the number of blocks per grid."
+    inl x = x |> apply block_index()
+    assert (thread = fst x.dim) "The second dimension of the input tensor has to equal number threads per block."
+
+    // Creates the layer state.
     inl ls = create_layer_state()
 
     // Sets the input tensor to 0.
@@ -32,16 +47,16 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
     __syncthreads()
 
     // Runs the model on the inputs.
-    loop.linear size.ensemble fun ensemble =>
+    loop.linear ensemble fun ensemble =>
         graph_run_device model ls {ensemble}
 
     __syncthreads()
 
     // Randomly pick an ensemble id for each thread.
-    inl ensemble_id : int = random.int_range {from=0; nearTo=size.ensemble} ls.rng
+    inl ensemble_id : int = random.int_range {from=0; nearTo=ensemble} ls.rng
 
     // Extract the output probabilities (already calculated).
-    inl output_probs =
+    inl output_probs = 
         (key_extract model .output_probs : tensor d4 float) 
         |> apply ensemble_id
         |> apply block_index()
@@ -68,7 +83,6 @@ nominal game_model inp out =
         model : exists t. model t
         input : pickler.pu inp
         output : int -> out
-        size : size
     }
 
-inl run forall inp out. (game_model {model input output size} : game_model inp out) = run' model input output size
+inl run forall inp out. (game_model {model input output} : game_model inp out) = run' model input output
