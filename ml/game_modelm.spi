@@ -7,50 +7,9 @@ type size = // The block and thread dimensions should match blocks_per_grid and 
         ensemble : int
     }
 
-// nominal game_model inp out =
-//     {
-//         model : exists t. model t
-//         // Clears the input tensor. Should be run before passing in the input data.
-//         input_clear : () -> ()
-//         // Sets the input for the given block and thread.
-//         input : inp -> ()
-//         // The output action and the sampling probability for it.
-//         output : () -> out * float
-//         // Sampling probabilities for every agent in the ensemble for the given output action.
-//         // Tensor dimension is size.linear.
-//         sampling_probs : () -> tensor int float
-//         size : size
-//     }
-nominal game_model inp out =
-    {
-        // model : exists t. model t
-        // Runs the model for a given input.
-        // Each thread in a block should participate in this blockwise operation.
-        // The output is the output value.
-        // Sampling probability is the probability of the output being generated.
-        // `ensemble_sampling_probabilities` are the probability that the output would have been selected for every individual in the ensemble.
-        // The size of the tensor in `ensemble_sampling_probabilities` equals size.linear.
-        run : inp -> {output : out; sampling_probability : float; ensemble_sampling_probabilities : tensor int float}
-        // size : size
-    }
-
-
-
-
-// inl create_game_model forall t input output.
-//         (f : size -> graph t)
-//         (input_clear : () -> ())
-//         (input : input -> _) (output : _ -> output * float) (sampling_probs : _ -> tensor int float)
-//         (size : size) =
-//     game_model {
-//         input_clear input output sampling_probs size
-//         model = exists create_model(f size)
-//     }
-
-
 open corecuda
 open rangem
-inl run forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (size : size) (data : inp) =
+inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (size : size) (data : inp) =
     inl x = key_extract model .input : tensor (int * int * int) float
     assert (fst x.dim = blocks_per_grid()) "The first dimension of the input tensor has to equal the number of blocks per grid."
     inl x = x |> apply block_index()
@@ -78,31 +37,38 @@ inl run forall inp out. (exists t. model : exists t. model t) (input : pickler.p
 
     __syncthreads()
 
-    // Randomly pick an ensemble and share it across all the threads in the block.
-    inl ensemble_id : int = $"__shared__ `int v$"
-    if thread_index() = 0 then
-        loop._set ensemble_id (random.int_range {from=0; nearTo=size.ensemble} ls.rng)
+    // Randomly pick an ensemble id for each thread.
+    inl ensemble_id : int = random.int_range {from=0; nearTo=size.ensemble} ls.rng
 
-    __syncthreads()
-
-    // Extract the output probabilities.
+    // Extract the output probabilities (already calculated).
     inl output_probs =
-        (key_extract model .output_probs : tensor d4 int) 
+        (key_extract model .output_probs : tensor d4 float) 
         |> apply ensemble_id
         |> apply block_index()
 
+    // Extract the output indices tensor.
     inl output_indices =
-        (key_extract model .output_probs : tensor d2 int) 
+        (key_extract model .output_indices : tensor d2 int) 
         |> apply block_index()
 
-    inl () =
+    inl () = // Calculate the output indices.
         open primitives
         row_reduce (local_discrete_sampling ls.rng) output_probs output_indices
     
-    // Deserialize the action and print it.
-    loop.projective threads_in_block(tns_output.dim) fun minibatch_id =>
-        match tensor_index minibatch_id tns_output % 3 with
-        | 0 => Fold
-        | 1 => Call
-        | _ => Raise
-    ()
+    inl output_id = tensor_index thread_index() output_indices
+    inl sampling_prob_ensemble = apply thread_index() output_probs
+    {
+        sampling_prob_ensemble
+        action = output output_id
+        sampling_prob_selected = tensor_index output_id sampling_prob_ensemble
+    }
+
+nominal game_model inp out = 
+    {
+        model : exists t. model t
+        input : pickler.pu inp
+        output : int -> out
+        size : size
+    }
+
+inl run forall inp out. (game_model {model input output size} : game_model inp out) = run' model input output size
