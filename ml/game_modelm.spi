@@ -81,9 +81,6 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
             |> apply block_index()
             |> apply thread_index()
             |> tensor_index output_id
-        ensemble_id
-        output_id
-        output_max_probs_for_id = (key_extract model .output_max_probs : tensor d3 float)
     }
 
 nominal game_model inp out = 

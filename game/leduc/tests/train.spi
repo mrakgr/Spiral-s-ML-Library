@@ -94,10 +94,14 @@ inl test3() =
             |> ln_l2
             |> relu
             |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+            |> mapi (fun x i j_tns => 
+                open ml.primitives
+                local_map conv j_tns
+                )
             |> softmax' (input .output_probs (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
         x 
         |> pair (discrete_sample' ((input .output_indices (size.ensemble,size.block,size.thread) : graph (tensor d3 int)) |> apply .ensemble) x)
-        |> pair (input .output_max_probs (size.block,size.thread) : graph (tensor d2 float))
+        |> pair (max' (input .output_max_probs (size.ensemble,blocks_per_grid(),size.thread) |> apply .ensemble) x)
 
     inl model = create_model graph
     param_init model
@@ -125,10 +129,10 @@ inl test3() =
         |> semaphore.write_ln_system
 
     device_sync()
-    console.write_ln "The output tensor is:"
-    inl tns_output = (key_extract model .output_indices : tensor d2 int)
-    console.write_ln tns_output
-    console.write_ln "==="
+    // console.write_ln "The output tensor is:"
+    // inl tns_output = (key_extract model .output_indices : tensor d2 int)
+    // console.write_ln tns_output
+    // console.write_ln "==="
 
 inl test4() =
     ()
