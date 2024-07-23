@@ -85,23 +85,16 @@ inl test3() =
     }
 
     inl graph =
-        inl x =
-            (input .input (size.block,size.thread,size.inner) : graph (tensor d3 float))
-            |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-            |> ln_l2
-            |> relu
-            |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-            |> ln_l2
-            |> relu
-            |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-            |> mapi (fun x i j_tns => 
-                open ml.primitives
-                local_map conv j_tns
-                )
-            |> softmax' (input .output_probs (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
-        x 
-        |> pair (discrete_sample' ((input .output_indices (size.ensemble,size.block,size.thread) : graph (tensor d3 int)) |> apply .ensemble) x)
-        |> pair (max' (input .output_max_probs (size.ensemble,blocks_per_grid(),size.thread) |> apply .ensemble) x)
+        (input .input (size.block,size.thread,size.inner) : graph (tensor d3 float))
+        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+        |> ln_l2
+        |> relu
+        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+        |> ln_l2
+        |> relu
+        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+        |> softmax' (input .output_probs (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
+        |> discrete_sample' ((input .output_indices (size.ensemble,size.block,size.thread) : graph (tensor d3 int)) |> apply .ensemble)
 
     inl model = create_model graph
     param_init model
@@ -110,11 +103,12 @@ inl test3() =
         ml.game_modelm.game_model {
             model = exists model
             input = pu_history
-            output = fun x =>
-                match x % 3 with
-                | 0 => Fold
-                | 1 => Call
-                | _ => Raise
+            output = fun r => 
+                [
+                    Fold, 1/3 
+                    Call, 1/3 
+                    Raise, 1/3
+                ] |> listm.pick_discrete r
         }
 
     console.write_ln "Running the kernel."

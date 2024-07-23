@@ -92,3 +92,20 @@ inl mapFoldBack forall state el el'. (f : el -> state -> el' * state) l s =
         if var_is l then inl ~s = s in join body s l
         else body s l 
     loop s l
+
+// Picks an element from a probability distribution represented as a list.
+// The second argument is a random number in the (0,1] range and is used to make the selection.
+inl pick_discrete forall t. (r : float) (l : list (t * float)) =
+    inl l,sum = mapFold (fun s x => inl s = s + snd x in (fst x, s), s) 0 l
+    assert (0 < r && r <= 1) "The random number needs to be in the given range."
+    inl r = sum * r
+    inl rec body = function
+        | x :: [] => fst x
+        | x :: xs =>
+            if r <= snd x then fst x
+            else loop xs
+        | [] => failwith "Cannot accept an empty list in pick_discrete."
+    and inl loop l =
+        if var_is l then join body l
+        else body l
+    loop l

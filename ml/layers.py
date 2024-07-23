@@ -3025,6 +3025,10 @@ def method6(v0 : i32) -> bool:
     return v1
 def method7() -> None:
     return 
+def method8(v0 : i32) -> None:
+    print(v0, end="")
+    del v0
+    return 
 def main():
     v0 = cp.empty(40960,dtype=cp.uint8)
     v1 = cp.empty(25088,dtype=cp.uint8)
@@ -3106,7 +3110,6 @@ def main():
     del v52
     print()
     v54 = v1[7680:7680+4*4096].view(cp.float32)
-    del v1
     v55 = 0
     v56 = '['
     method2(v56)
@@ -3244,6 +3247,114 @@ def main():
     v103 = ']'
     method2(v103)
     del v103
+    method7()
+    print()
+    v105 = v1[24064:24064+4*256].view(cp.int32)
+    del v1
+    v106 = 0
+    v107 = '['
+    method2(v107)
+    del v107
+    v108 = 0
+    while method5(v108):
+        v110 = v106
+        v111 = v110 >= 2147483647
+        del v110
+        if v111:
+            v112 = " ..."
+            method0(v112)
+            del v112
+            break
+        else:
+            pass
+        del v111
+        v113 = v108 == 0
+        v114 = v113 != True
+        del v113
+        if v114:
+            v115 = "; "
+            method0(v115)
+        else:
+            pass
+        del v114
+        v116 = '['
+        method2(v116)
+        del v116
+        v117 = 0
+        while method6(v117):
+            v119 = v106
+            v120 = v119 >= 2147483647
+            del v119
+            if v120:
+                v121 = " ..."
+                method0(v121)
+                del v121
+                break
+            else:
+                pass
+            del v120
+            v122 = v117 == 0
+            v123 = v122 != True
+            del v122
+            if v123:
+                v124 = "; "
+                method0(v124)
+            else:
+                pass
+            del v123
+            v125 = '['
+            method2(v125)
+            del v125
+            v126 = 0
+            while method5(v126):
+                v128 = v106
+                v129 = v128 >= 2147483647
+                del v128
+                if v129:
+                    v130 = " ..."
+                    method0(v130)
+                    del v130
+                    break
+                else:
+                    pass
+                del v129
+                v131 = v126 == 0
+                v132 = v131 != True
+                del v131
+                if v132:
+                    v133 = "; "
+                    method0(v133)
+                else:
+                    pass
+                del v132
+                v134 = v106 + 1
+                v106 = v134
+                del v134
+                v135 = v108 * 16
+                v136 = v117 * 16
+                v137 = v135 + v136
+                del v135, v136
+                v138 = v137 + v126
+                del v137
+                v139 = v105[v138].item()
+                del v138
+                method8(v139)
+                del v139
+                v126 += 1 
+            del v126
+            v140 = ']'
+            method2(v140)
+            del v140
+            v117 += 1 
+        del v117
+        v141 = ']'
+        method2(v141)
+        del v141
+        v108 += 1 
+    del v105, v106, v108
+    v142 = ']'
+    method2(v142)
+    del v142
     method7()
     print()
     return 

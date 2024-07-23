@@ -9,9 +9,9 @@ type size = // The block and thread dimensions should match blocks_per_grid and 
 
 open corecuda
 open rangem
-inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (data : inp) =
+inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : float -> out) (data : inp) =
     // Get the ensemble,block and thread dimensions based on the output tensor.
-    inl ensemble,block,thread,_ = (key_extract model .output_probs : tensor d4 float).dim
+    inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
     inl () = // Assert that all the dimensions are right.
         assert (block = blocks_per_grid()) "The second dimension of the output tensor has to equal the number of blocks per grid."
         assert (thread = threads_per_block()) "The third dimension of the output tensor has to equal number threads per block."
@@ -19,8 +19,6 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
         assert ((block,thread) = (block',thread')) "The first two dimensions of the input tensor have to match number of blocks per grid and number of threads per block respectively."
         inl ensemble',block',thread' = (key_extract model .output_indices : tensor d3 int).dim
         assert ((ensemble,block,thread) = (ensemble',block',thread')) "The dimensions of the output indices tensor have to match."
-        inl ensemble',block',thread' = (key_extract model .output_max_probs : tensor d3 float).dim
-        assert ((ensemble,block,thread) = (ensemble',block',thread')) "The dimensions of the output max probs tensor have to match."
 
     // Creates the layer state.
     inl ls = create_layer_state()
@@ -68,7 +66,7 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
         |> tensor_index thread_index()
 
     {
-        action = output output_id
+        action = output (conv (output_id + 1) / conv inner)
         sampling_prob_ensemble =
             output_probs
             |> reorder (fun ensemble,block,thread,inner => block,thread,inner,ensemble)
@@ -87,7 +85,7 @@ nominal game_model inp out =
     {
         model : exists t. model t
         input : pickler.pu inp
-        output : int -> out
+        output : float -> out
     }
 
 inl run forall inp out. (game_model {model input output} : game_model inp out) = run' model input output
