@@ -4,6 +4,8 @@ type hashmap = exists. .hashmap
 // points. Their primary purpose is for type extensions.
 // The symbol .hashmap here is a standin for its nonexistent type.
 inl create () : hashmap = exists !!!!HashMapCreate()
+// Set the HashMap key to the given value.
+inl set forall key value. (exists. h : hashmap) (k : key) (v : value) : () = !!!!HashMapSet(h,k,v)
 // Adds a key to the HashMap. Raises a type error if the key is already present in it.
 inl add forall key value. (exists. h : hashmap) (k : key) (v : value) : () = !!!!HashMapAdd(h,k,v)
 // Adds a key to the HashMap. Returns true if the key was added successfully to it.

@@ -88,74 +88,86 @@ inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t
 inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
     inl h_offset_param = hashmapm.create() // stores the offsets pointing to the start of the weight parameter array for each node
     inl h = hashmapm.create()
+    inl offset_key = ()
+    inl get_offset () : size = match hashmapm.try_get h offset_key with Some x => x | None => 0
+    inl set_offset (offset : size) : () = hashmapm.set h offset_key offset
     inl get_dim x = get_dim dims x
-    inl rec g forall t. (offset : size) (out : option (graph t)) : size =
+    inl rec g forall t. (out : option (graph t)) : () =
         match out with
-        | Some x' => f offset x'
-        | None => offset
-    and inl f forall t. (offset : size) : graph t -> size =
+        | Some x' => f x'
+        | None => ()
+    and inl f forall t. : graph t -> () =
         memoize h function
-            | BlockMap(exists a. _,a,out) => g (f offset a) out
-            | BlockRowMap(exists a. _,a,out) => g (f offset a) out
-            | BlockRowReduce(exists a. _,a,out) => g (f offset a) out
-            | BlockMatmul(a,b) => f (f offset a) b
-            | Zip(a,b) => f (f offset a) b
-            | Pair(a,b) => f (f offset a) b
+            | BlockMap(exists a. _,a,out) => f a . g out
+            | BlockRowMap(exists a. _,a,out) => f a . g out
+            | BlockRowReduce(exists a. _,a,out) => f a . g out
+            | BlockMatmul(a,b) => f a . f b
+            | Zip(a,b) => f a . f b
+            | Pair(a,b) => f a . f b
             | Weight as k =>
                 inl dim = get_dim k
-                inl partition_offsets : _ t = partitionm.to_partition dim |> partitionm.calculate_offsets offset 
+                inl partition_offsets : _ t = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset()
                 hashmapm.add h_offset_param k partition_offsets
-                partition_offsets.offset_end
-            | Apply(exists a. a,b) => f (f offset a) b
-            | KeyTensor(_,x) => f offset x
-            | KeyScalar => offset
-            | Input => offset
-    inl offset = f 0 x
+                set_offset partition_offsets.offset_end
+            | Apply(exists a. a,b) => f a . f b
+            | KeyTensor(_,x) => f x
+            | KeyScalar => ()
+            | Input => ()
+    inl offset = f x
     hashmapm.set_immutable(h_offset_param)
-    h_offset_param, offset
+    h_offset_param, get_offset()
 
 // Calculates the output node offsets.
 inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
     inl h_offset_output = hashmapm.create() // stores the offsets pointing to the start of the output array for each node
     inl h = hashmapm.create()
+    inl offset_key = ()
+    inl get_offset () : size = match hashmapm.try_get h offset_key with Some x => x | None => 0
+    inl set_offset (offset : size) : () = hashmapm.set h offset_key offset
     inl get_dim x = get_dim dims x
-    inl rec g forall dim t. (offset : size) (k : graph (tensor dim t)) (out : option (graph (tensor dim t))) : size =
+    inl rec g forall dim t. (k : graph (tensor dim t)) (out : option (graph (tensor dim t))) : () =
         match out with
-        | Some x => f offset x
+        | Some x => f x
         | None =>
-            inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets offset
+            inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets get_offset()
             hashmapm.add h_offset_output k partition_offsets
-            partition_offsets.offset_end
-    and inl f forall t. (offset : size) : graph t -> size =
+            set_offset partition_offsets.offset_end
+    and inl f forall t. : graph t -> () =
         memoize h fun k =>
             match k with
-            | BlockMap(exists a. _,a,out) => g (f offset a) k out
-            | BlockRowMap(exists a. _,a,out) => g (f offset a) k out
-            | BlockRowReduce(exists a. _,a,out) => g (f offset a) k out
-            | BlockMatmul(a,b) => g (f (f offset a) b) k None
-            | Zip(a,b) => f (f offset a) b // passthrough
-            | Pair(a,b) => f (f offset a) b // passthrough
-            | Weight => offset
-            | Apply(exists a. a,b) => f (f offset a) b // passthrough
-            | Input => g offset k None
-            | KeyTensor(_,x) => f offset x // passthrough
-            | KeyScalar(_) => offset
-    inl offset = f 0 x
+            | BlockMap(exists a. _,a,out) => f a . g k out
+            | BlockRowMap(exists a. _,a,out) => f a . g k out
+            | BlockRowReduce(exists a. _,a,out) => f a . g k out
+            | BlockMatmul(a,b) => f a . f b . g k None
+            | Zip(a,b) => f a . f b // passthrough
+            | Pair(a,b) => f a . f b // passthrough
+            | Weight => ()
+            | Apply(exists a. a,b) => f a . f b // passthrough
+            | Input => g k None
+            | KeyTensor(_,x) => f x // passthrough
+            | KeyScalar(_) => ()
+        
+    inl offset = f x
     hashmapm.set_immutable(h_offset_output)
-    h_offset_output, offset
+    h_offset_output, get_offset()
 
 // Calculates the max of dynamic shared memory used for all the nodes.
 inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
     inl h = hashmapm.create()
-    inl rec g forall t. (size : size) (x : option (graph t)) : size =
+    inl offset_key = ()
+    inl get_offset () : size = match hashmapm.try_get h offset_key with Some x => x | None => 0
+    inl set_offset (offset : size) : () = hashmapm.set h offset_key offset
+    // Sets the shared memory size to the new value if it's higher than the old one.
+    inl update (size : size) = set_offset (max size get_offset())
+    inl rec g forall t. (x : option (graph t)) : () =
         match x with
-        | None => size
-        | Some x => max size (f x)
-    and inl f forall t. : graph t -> size =
+        | None => ()
+        | Some x => f x
+    and inl f forall t. : graph t -> () =
         memoize h function
-            | BlockMap(exists a. _,a,out) => g (f a) out
-            | BlockRowMap(exists a. _,a,out) => g (f a) out
-            | BlockRowReduce(exists a. _,a,out) => g (f a) out
+            | BlockMap(exists a. _,a,out) => f a . g out
+            | BlockRowMap(exists a. _,a,out) => f a . g out
+            | BlockRowReduce(exists a. _,a,out) => f a . g out
             | BlockMatmul(a,b) => 
                 inl memory : size =
                     inl tf32 () : size = fst(matmul.matmul_tf32' false true).offset_end
@@ -165,15 +177,16 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
                         | _ => 
                             !!!!PrintStatic(`t)
                             error_type `(()) "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
-                max (f a) (f b) |> max memory
-            | Zip(a,b) => max (f a) (f b)
-            | Pair(a,b) => max (f a) (f b)
-            | Apply(exists a. a,b) => max (f a) (f b)
+                f a . f b . update memory
+            | Zip(a,b) => f a . f b
+            | Pair(a,b) => f a . f b
+            | Apply(exists a. a,b) => f a . f b
             | KeyTensor(_,x) => f x
-            | KeyScalar => 0
-            | Weight => 0
-            | Input => 0
+            | KeyScalar => ()
+            | Weight => ()
+            | Input => ()
     f x
+    get_offset()
 
 // Initializes the parameters of a NN on the host.
 inl param_init forall t_top. (model {graph param} : model t_top) =
@@ -249,7 +262,7 @@ inl graph_tensor_extract forall t' indices. (model {graph param output} : model 
             | None =>
                 match hashmapm.try_get (fst output.offset) graph with
                 | Some x => partitionm.from_partition_offsets output.array x
-                | None => 
+                | None =>
                     print_static graph
                     error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
     loop graph
@@ -548,9 +561,9 @@ inl test5() =
             |> relu
             |> matmul_ensemble (ensemble,16,16)
             |> softmax' (input .output_probs (ensemble,blocks_per_grid(),16,16) |> apply .ensemble)
-        x 
+        x
         |> pair (discrete_sample' (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble) x)
-        |> pair (max' (input .output_max_probs (ensemble,blocks_per_grid(),16) |> apply .ensemble) x)
+        // |> pair (max' (input .output_max_probs (ensemble,blocks_per_grid(),16) |> apply .ensemble) x)
 
     inl model = create_model graph
     param_init model
@@ -569,7 +582,7 @@ inl test5() =
     console.write_ln "Here is the output tensor."
     inl output : tensor d4 float = key_extract model .output_probs
     printing.tensor_print_ln (1 <<< 9) output
-    inl output : tensor d3 int = key_extract model .output_indices
-    printing.tensor_print_ln limit.max output
+    // inl output : tensor d3 int = key_extract model .output_indices
+    // printing.tensor_print_ln limit.max output
 
 inl main() = test5()

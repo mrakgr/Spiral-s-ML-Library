@@ -15,16 +15,18 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
     inl () = // Assert that all the dimensions are right.
         assert (block = blocks_per_grid()) "The second dimension of the output tensor has to equal the number of blocks per grid."
         assert (thread = threads_per_block()) "The third dimension of the output tensor has to equal number threads per block."
-        inl block',thread' = (key_extract model .output_indices : tensor d2 int).dim
-        assert ((block,thread) = (block',thread')) "The dimensions of the output indices tensor have to match."
         inl block',thread',_ = (key_extract model .input : tensor d3 float).dim
         assert ((block,thread) = (block',thread')) "The first two dimensions of the input tensor have to match number of blocks per grid and number of threads per block respectively."
+        inl ensemble',block',thread' = (key_extract model .output_indices : tensor d3 int).dim
+        assert ((ensemble,block,thread) = (ensemble',block',thread')) "The dimensions of the output indices tensor have to match."
+        inl ensemble',block',thread' = (key_extract model .output_max_probs : tensor d3 float).dim
+        assert ((ensemble,block,thread) = (ensemble',block',thread')) "The dimensions of the output max probs tensor have to match."
 
     // Creates the layer state.
     inl ls = create_layer_state()
 
     // Extract the input tensor.
-    inl x = (key_extract model .input : tensor (int * int * int) float)
+    inl x = (key_extract model .input : tensor d3 float)
     assert (block = fst x.dim) "The first dimension of the input tensor has to equal the number of blocks per grid."
     inl x = x |> apply block_index()
     assert (thread = fst x.dim) "The second dimension of the input tensor has to equal number threads per block."
@@ -58,17 +60,13 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
     // Extract the output probabilities (already calculated).
     inl output_probs = (key_extract model .output_probs : tensor d4 float) 
 
-    // Extract the output indices tensor.
-    inl output_indices =
-        (key_extract model .output_indices : tensor d2 int) 
+    // Extract the output index.
+    inl output_id =
+        (key_extract model .output_indices : tensor d3 int) 
+        |> apply ensemble_id
         |> apply block_index()
+        |> tensor_index thread_index()
 
-    inl () = // Calculate the output indices.
-        open primitives
-        inl output_probs = output_probs |> apply ensemble_id |> apply block_index()
-        row_reduce (local_discrete_sampling ls.rng) output_probs output_indices
-    
-    inl output_id = tensor_index thread_index() output_indices
     {
         action = output output_id
         sampling_prob_ensemble =
@@ -85,12 +83,7 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
             |> tensor_index output_id
         ensemble_id
         output_id
-        // output_max_probs_for_id =
-        //     open primitives
-        //     inl x = output_probs |> apply ensemble_id |> apply block_index()
-        //     inl y = (key_extract model .output_max_probs : tensor d2 float) |> apply block_index()
-        //     row_reduce (fun config x i tns_j => local_reduce config 0 max x) x y
-        //     y
+        output_max_probs_for_id = (key_extract model .output_max_probs : tensor d3 float)
     }
 
 nominal game_model inp out = 

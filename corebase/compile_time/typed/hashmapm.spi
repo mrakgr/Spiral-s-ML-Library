@@ -3,6 +3,8 @@ nominal hashmap key value = exists. .hashmap
 // Creates a compile time HashMap. These data structures cannot be turned to types or passed through join
 // points. Their primary purpose is for type extensions.
 inl create forall key value. : hashmap key value = hashmap(exists !!!!HashMapCreate())
+// Set the HashMap key to the given value.
+inl set forall key value. (hashmap (exists. h) : hashmap key value) (k : key) (v : value) : () = !!!!HashMapSet(h,k,v)
 // Adds a key to the HashMap. Raises a type error if the key is already present in it.
 inl add forall key value. (hashmap (exists. h) : hashmap key value) (k : key) (v : value) : () = !!!!HashMapAdd(h,k,v)
 // Adds a key to the HashMap. Returns true if the key was added successfully to it.
