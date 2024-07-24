@@ -378,6 +378,19 @@ inl graph_run_host forall t_top sizes. (model {graph} & m : model t_top) (sizes 
         loop.linear sizes fun indices =>
             graph_run_device m ls indices
 
+// TODO: Reimplement the rest of the functions so the use row_map and row_reduce instead of the graph nodes directly.
+inl row_map_ forall dim a b. f out (x : graph (tensor (int * dim * int) a)) : graph (tensor (int * dim * int) b) = 
+    BlockRowMap (exists f, x, out)
+
+inl row_reduce_ forall dim a b. f out (x : graph (tensor (int * dim * int) a)) : graph (tensor (int * dim) b) = 
+    BlockRowReduce (exists f, x, out)
+
+inl mask_ f =
+    row_reduce_ (fun ls config x i j_tns =>
+        inl c = zip x j_tns
+        ()
+        )
+
 inl tanh forall dim t{float}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const tanh, x, None)
 inl sigmoid forall dim t{float;number}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const sigmoid, x, None)
 inl relu forall dim t{float;number}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const (max 0), x, None)
@@ -398,8 +411,8 @@ inl softmax forall dim t{float;number}. (x : graph (tensor (int * dim * int) t))
 
 inl ln_l2 forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     BlockRowMap (exists (fun _ config x _ _ => primitives.local_ln_l2 config x), x, None)
-inl mapi forall dim t{float;number}. f (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
-    BlockRowMap (exists (fun _ config x i j_tns => f x i j_tns), x, None)
+
+
 inl argmax forall dim t{number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) =
     BlockRowReduce (exists (fun _ config x _ j_tns => primitives.local_argmax config x j_tns), x, None)
 
@@ -573,7 +586,8 @@ inl test5() =
         |> ln_l2
         |> relu
         |> matmul_ensemble (ensemble,16,16)
-        |> softmax' (input .output_probs (ensemble,blocks_per_grid(),16,16) |> apply .ensemble)
+        |> softmax 
+        |> mask' (input .output_probs (ensemble,blocks_per_grid(),16,16) |> apply .ensemble)
         |> discrete_sample' (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
 
     inl model = create_model graph

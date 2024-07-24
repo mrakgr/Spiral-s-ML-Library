@@ -75,7 +75,7 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
             |> apply output_id
         sampling_prob_selected = 
             output_probs
-            |> apply ensemble_id 
+            |> apply ensemble_id
             |> apply block_index()
             |> apply thread_index()
             |> tensor_index output_id
