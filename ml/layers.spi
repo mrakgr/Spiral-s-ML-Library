@@ -385,12 +385,6 @@ inl row_map_ forall dim a b. f out (x : graph (tensor (int * dim * int) a)) : gr
 inl row_reduce_ forall dim a b. f out (x : graph (tensor (int * dim * int) a)) : graph (tensor (int * dim) b) = 
     BlockRowReduce (exists f, x, out)
 
-inl mask_ f =
-    row_reduce_ (fun ls config x i j_tns =>
-        inl c = zip x j_tns
-        ()
-        )
-
 inl tanh forall dim t{float}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const tanh, x, None)
 inl sigmoid forall dim t{float;number}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const sigmoid, x, None)
 inl relu forall dim t{float;number}. (x : graph (tensor (int * dim) t)) : graph (tensor (int * dim) t) = BlockMap (exists const (max 0), x, None)
@@ -408,6 +402,13 @@ inl softmax' forall dim t{float;number}. out (x : graph (tensor (int * dim * int
     softmax_ (Some out) x
 inl softmax forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     softmax_ None x
+
+inl masked_softmax_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    BlockRowMap (exists (fun _ config x => primitives.local_masked_softmax (fun config x i j => j < size) config x), x, out)
+inl masked_softmax' forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    masked_softmax_ size (Some out) x
+inl masked_softmax forall dim t{float;number}. size (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    masked_softmax_ size None x
 
 inl ln_l2 forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     BlockRowMap (exists (fun _ config x _ _ => primitives.local_ln_l2 config x), x, None)
