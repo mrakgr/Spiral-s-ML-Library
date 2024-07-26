@@ -218,17 +218,32 @@ inl local_max config = local_reduce config limit.min max
 // Local min. The neutral element is inferred based on the input type and is expected to be a primitive type.
 inl local_min config = local_reduce config limit.max min
 
-union rec row_op dim to local =
-    | RowMap :: forall dim to. tensor (dim * int) to -> row_op dim (tensor (dim * int) to) (tensor (int * int) to)
-    | RowMapApplied :: forall dim to. tensor (dim * int * int) to -> row_op dim (tensor (dim * int) to) (tensor (int * int) to)
-    | RowReduce :: forall dim to. tensor dim to -> row_op dim (tensor dim to) to
-    | RowReduceApplied :: forall dim to. tensor dim to -> row_op dim (tensor dim to) to
-    | RowPair :: forall dim a b a' b'. row_op dim a a' * row_op dim b b' -> row_op dim (a * b) (a' * b')
+nominal map t = ()
+nominal reduce t = ()
 
-union rec row_op_local t =
-    | RowMap' :: forall dim t. tensor (int * int) t -> row_op_local (tensor (dim * int) t)
-    | RowReduce' :: forall t. t -> row_op_local t
-    | RowPair' :: forall a b. row_op_local a * row_op_local b -> row_op_local (a * b)
+union rec comp (f : * -> *) t =
+    | Sin : f t
+    | Comp :: forall (f : * -> *) a b. comp f a * comp f b -> comp f (a * b)
+
+// So close, but so far away...
+inl rec comp_map forall (f : * -> *) (g : * -> *). (map : forall t. f t -> g t) : comp f t -> comp g t = function
+    | Sin a => Sin (map a)
+    | Comp(a,b) => Comp(comp_map map a,comp_map map b)
+
+union rec row_op dim to =
+    | RowMap :: forall dim to. tensor (dim * int) to -> row_op dim (map to)
+    | RowReduce :: forall dim to. tensor dim to -> row_op dim (reduce to)
+    | RowPair :: forall dim a b. row_op dim a * row_op dim b -> row_op dim (a * b)
+
+union rec row_op_applied dim to =
+    | RowMapApplied :: forall dim to. tensor (dim * int * int) to -> row_op_applied dim (map to)
+    | RowReduceApplied :: forall dim to. tensor dim to -> row_op_applied dim (reduce to)
+    | RowPairApplied :: forall dim a b. row_op dim a * row_op dim b -> row_op_applied dim (a * b)
+    
+union rec row_op_local dim t =
+    | RowMap' :: forall dim t. tensor (int * int) t -> row_op_local dim (map t)
+    | RowReduce' :: forall dim t. t -> row_op_local dim (reduce t)
+    | RowPair' :: forall dim a b. row_op_local dim a * row_op_local dim b -> row_op_local dim (a * b)
 
 inl row_ forall dim a b local.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> row_op_local local)
@@ -257,14 +272,8 @@ inl row_ forall dim a b local.
         |> apply index_block
         |> curry_fst
 
-    inl rec e forall b' local'. (to : row_op dim b' local') : row_op dim b' local' =
+    inl rec apply_outer_index forall b' local'. (to : row_op dim b' local') : row_op dim b' local' =
         match to with
-        | RowMapApplied | RowReduceApplied => error_type "Not expected"
-        | RowReduce to =>
-            to 
-            |> split_into_swapped const(fst dim_block, fst dim_local)
-            |> apply (fst index_block)
-            |> RowReduceApplied
         | RowMap to =>
             to
             |> factorize_sizeof_16
@@ -273,7 +282,14 @@ inl row_ forall dim a b local.
             |> apply index_block
             |> curry_fst
             |> RowMapApplied
-        | RowPair(a,b) => RowPair(e a, e b)
+        | RowReduce to =>
+            to 
+            |> split_into_swapped const(fst dim_block, fst dim_local)
+            |> apply (fst index_block)
+            |> RowReduceApplied
+        | RowPair(a,b) => RowPair(apply_outer_index a, apply_outer_index b)
+
+    inl to = apply_outer_index to
 
     loop.linear (fst from.dim) fun i =>
         inl from = apply i from
@@ -296,24 +312,21 @@ inl row_ forall dim a b local.
             inl index = fst index_block, i
             f row_config{threads_per_miniblock} local (loop.rigid_merge dim index) local_index
 
-        inl e forall dim' b' local'. (local : row_op_local local') (to : row_op dim' b' local') : () =
+        inl rec store forall b' local'. (local : row_op_local local') (to : row_op dim b' local') : () =
             match local, to with 
-            | RowMap' local, RowMap to =>
-                inl to =
-                    to
-                    |> factorize_sizeof_16
-                    |> split_into_swapped_fst (loop.rigid_split threads_per_block())
-                    |> curry_fst
-                    |> apply index_block
-                    |> curry_fst
-
+            | RowMap' local, RowMapApplied to =>
+                inl to = apply i to
                 // Stores the result into global memory after mapping it.
                 loop.linear (fst to.dim) fun i =>
                     memcpy_sync (apply i to, apply i local)
+            | RowReduce' result, RowReduceApplied to =>
+                // Stores the result into global memory after reducing it.
+                tensor_set i result to
+            | RowPair'(a,b), RowPair(a',b') =>
+                store a a' . store b b'
 
-        e local to
+        store local to
                 
-
     __syncthreads()
 
 
