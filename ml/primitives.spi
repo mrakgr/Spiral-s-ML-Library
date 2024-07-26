@@ -479,7 +479,12 @@ inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     |> snd
 
 inl local_softmax_and_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
-    local_discrete_sampling rng config (local_softmax config x) i j_tns
+    inl x = local_softmax config x
+    x, local_discrete_sampling rng config x i j_tns
+
+inl local_masked_softmax_and_discrete_sampling mask rng config x i (j_tns : tensor (int * int) int) =
+    inl x = local_masked_softmax mask config x i j_tns
+    x, local_discrete_sampling rng config x i j_tns
 
 inl test1() =
     inl m,n : int * int = 3, 36*4

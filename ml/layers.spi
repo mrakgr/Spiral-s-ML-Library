@@ -27,6 +27,11 @@ union rec graph t =
             * graph (tensor (int * dim * int) a)
             * option (graph (tensor (int * dim) t)))
         -> graph (tensor (int * dim) t)
+    | BlockRowMapReduce :: forall dim a b.
+        (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) a * b) 
+            * graph (tensor (int * dim * int) a)
+            * option (graph (tensor (int * dim * int) a * tensor (int * dim) b)))
+        -> graph (tensor (int * dim * int) a * tensor (int * dim) b)
     | BlockMatmul :: forall t. graph (tensor (int * int * int) t) * graph (tensor (int * int) t) -> graph (tensor (int * int * int) t)
     | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Pair :: forall a b. graph a * graph b -> graph (a * b)
@@ -48,6 +53,10 @@ inl memoize (h : hashmapm.hashmap) f k =
     match hashmapm.try_get h k with
     | Some v => v
     | None => inl v = f k in hashmapm.add h k v . v
+
+union rec tensor_dim t =
+    | D :: forall dim t. dim -> tensor_dim (tensor dim t)
+    | P :: forall dim_a dim_b a b. dim_a * dim_b -> tensor_dim (tensor dim_a a * tensor dim_b b)
 
 // Returns the top level dimension. Takes in a hashmap for memoization purposes.
 inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t_top) -> dim_top =
@@ -82,6 +91,12 @@ inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t
         | Input dim => dim
         | KeyTensor(_,x) => f x
         | Apply(exists a. a,b) => snd (f a)
+        // | BlockRowMapReduce(exists a. _, a, out) => 
+        //     inl a = f a
+        //     assert (fst a = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
+        //     // check (a |> fun a,b,_ => a,b) out
+        //     ()
+        // | Pair TODO
         )
 
 // Calculates the parameter offsets.
