@@ -533,7 +533,6 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         v92 = 256l * v90;
         int v93;
         v93 = v92 + v89;
-        assert("Tensor range check" && 0 <= v90 && v90 < 16l);
         int v94[8l];
         int v95[8l];
         int v96;
@@ -656,6 +655,7 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         }
         int v137;
         v137 = v90 + v83;
+        assert("Tensor range check" && 0 <= v90 && v90 < 16l);
         int v138;
         v138 = 0l;
         while (while_method_3(v138)){
@@ -718,7 +718,6 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         v159 = 256l * v157;
         int v160;
         v160 = v159 + v156;
-        assert("Tensor range check" && 0 <= v157 && v157 < 16l);
         float v161[8l];
         int v162[8l];
         int v163;
@@ -865,6 +864,7 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
             }
             v207 += 1l ;
         }
+        assert("Tensor range check" && 0 <= v157 && v157 < 16l);
         int v214;
         v214 = 0l;
         while (while_method_3(v214)){
@@ -1099,7 +1099,6 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         v297 = 256l * v295;
         int v298;
         v298 = v297 + v294;
-        assert("Tensor range check" && 0 <= v295 && v295 < 16l);
         float v299[8l];
         int v300[8l];
         int v301;
@@ -1346,6 +1345,7 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
             }
             v383 += 1l ;
         }
+        assert("Tensor range check" && 0 <= v295 && v295 < 16l);
         int v394;
         v394 = 0l;
         while (while_method_3(v394)){
@@ -1408,7 +1408,6 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         v415 = 256l * v413;
         int v416;
         v416 = v415 + v412;
-        assert("Tensor range check" && 0 <= v413 && v413 < 16l);
         float v417[8l];
         int v418[8l];
         int v419;
@@ -1620,6 +1619,7 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
             }
             v485 += 1l ;
         }
+        assert("Tensor range check" && 0 <= v413 && v413 < 16l);
         int v496;
         v496 = 0l;
         while (while_method_3(v496)){
@@ -1891,7 +1891,6 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         v597 = 256l * v595;
         int v598;
         v598 = v597 + v594;
-        assert("Tensor range check" && 0 <= v595 && v595 < 16l);
         float v599[8l];
         int v600[8l];
         int v601;
@@ -2206,6 +2205,7 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
             v695 = v722;
             v696 += 1l ;
         }
+        assert("Tensor range check" && 0 <= v595 && v595 < 16l);
         int v723;
         v723 = 0l;
         while (while_method_3(v723)){
@@ -2725,7 +2725,6 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         v926 = 256l * v924;
         int v927;
         v927 = v926 + v923;
-        assert("Tensor range check" && 0 <= v924 && v924 < 16l);
         int v928[8l];
         int v929[8l];
         int v930;
@@ -2916,6 +2915,7 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
             v973 = v1000;
             v974 += 1l ;
         }
+        assert("Tensor range check" && 0 <= v924 && v924 < 16l);
         int v1001;
         v1001 = 0l;
         while (while_method_3(v1001)){
@@ -2978,7 +2978,6 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
         v1022 = 256l * v1020;
         int v1023;
         v1023 = v1022 + v1019;
-        assert("Tensor range check" && 0 <= v1020 && v1020 < 16l);
         float v1024[8l];
         int v1025[8l];
         int v1026;
@@ -3351,6 +3350,7 @@ extern "C" __global__ void entry0(int * v0, float * v1, float * v2, int * v3, fl
             }
             v1155 += 1l ;
         }
+        assert("Tensor range check" && 0 <= v1020 && v1020 < 16l);
         int v1166;
         v1166 = 0l;
         while (while_method_3(v1166)){
@@ -3440,22 +3440,18 @@ def method0(v0 : char) -> None:
     del v0
     return 
 def method1(v0 : i32) -> bool:
-    v1 = v0 < 16
+    v1 = v0 < 1
     del v0
     return v1
 def method2(v0 : string) -> None:
     print(v0, end="")
     del v0
     return 
-def method3(v0 : i32) -> bool:
-    v1 = v0 < 256
-    del v0
-    return v1
-def method4(v0 : f32) -> None:
+def method3(v0 : f32) -> None:
     print("{:.6f}".format(v0), end="")
     del v0
     return 
-def method5() -> None:
+def method4() -> None:
     return 
 def main():
     v0 = cp.arange(0,4096,1,dtype=cp.int32) # type: ignore
@@ -3491,7 +3487,7 @@ def main():
     del v20
     v21.max_dynamic_shared_size_bytes = 0 
     v21((1,),(32,),(v0, v5, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19),shared_mem=0)
-    del v0, v5, v7, v8, v9, v11, v12, v13, v14, v15, v16, v17, v18, v19, v21
+    del v0, v5, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v21
     v22 = 0
     v23 = '['
     method0(v23)
@@ -3518,52 +3514,18 @@ def main():
         else:
             pass
         del v30
-        v32 = '['
-        method0(v32)
+        v32 = v22 + 1
+        v22 = v32
         del v32
-        v33 = 0
-        while method3(v33):
-            v35 = v22
-            v36 = v35 >= 1024
-            del v35
-            if v36:
-                v37 = " ..."
-                method2(v37)
-                del v37
-                break
-            else:
-                pass
-            del v36
-            v38 = v33 == 0
-            v39 = v38 != True
-            del v38
-            if v39:
-                v40 = "; "
-                method2(v40)
-            else:
-                pass
-            del v39
-            v41 = v22 + 1
-            v22 = v41
-            del v41
-            v42 = v24 * 256
-            v43 = v42 + v33
-            del v42
-            v44 = v10[v43].item()
-            del v43
-            method4(v44)
-            del v44
-            v33 += 1 
+        v33 = v7[v24].item()
+        method3(v33)
         del v33
-        v45 = ']'
-        method0(v45)
-        del v45
         v24 += 1 
-    del v10, v22, v24
-    v46 = ']'
-    method0(v46)
-    del v46
-    method5()
+    del v7, v22, v24
+    v34 = ']'
+    method0(v34)
+    del v34
+    method4()
     print()
     return 
 

@@ -552,9 +552,9 @@ inl test2() =
 
     // printing.tensor_print_ln 1024 input
     // printing.tensor_print_ln 1024 input_identity
-    // printing.tensor_print_ln 1024 output_reduce
+    printing.tensor_print_ln 1024 output_reduce
     // printing.tensor_print_ln 1024 output_softmax
-    printing.tensor_print_ln 1024 output_masked_softmax
+    // printing.tensor_print_ln 1024 output_masked_softmax
     // printing.tensor_print_ln 1024 output_ln
     // printing.tensor_print_ln 1024 output_argmax
     // printing.tensor_print_ln (m * n) output_softmax_scan
