@@ -7,9 +7,11 @@ open tensorm
 // Used in `row_`.
 nominal map t = ()
 nominal reduce t = ()
+nominal singleton t = ()
+nominal pair t = ()
 
 union rec compound (f : * -> *) t =
-    | Singleton : f t
+    | Singleton :: forall (f : * -> *) t. f t -> compound f (singleton t)
     | Pair :: forall (f : * -> *) a b. compound f a * compound f b -> compound f (a * b)
 
 inl rec compound_map forall (f : * -> *) (g : * -> *) t. (f : forall t. f t -> g t) : compound f t -> compound g t = function
@@ -23,7 +25,6 @@ inl rec compound_iter forall (f : * -> *) t. (f : forall t. f t -> ()) : compoun
 inl rec compound_iter2 forall (f : * -> *) (g : * -> *) t. (f : forall t. f t -> g t -> ()) : compound f t * compound g t -> () = function
     | Singleton a, Singleton b => f a b
     | Pair(a,b), Pair(a',b') => compound_iter2 `$f (a, a') . compound_iter2 `$f (b, b')
-    | Pair(a,b), Singleton a' => ()
 
 union rec row_op dim t =
     | RowMap :: forall dim t. tensor (dim * int) t -> row_op dim (map t)
@@ -325,10 +326,9 @@ inl row_ forall dim a b.
             | RowReduceLocal result, RowReduceApplied to =>
                 // Stores the result into global memory after reducing it.
                 tensor_set i result to
-        compound_iter2 `$store local to
+        compound_iter2 `$store (local, to)
                 
     __syncthreads()
-
 
 // A very flexible version of the `map_2d` kernel that allows the user to chain arbitrary local operations inside the mapping function.
 // Using `local_map`, `local_reduce` and `local_scan` it's possible to implement most kinds of activation functions,
@@ -352,7 +352,7 @@ inl row_ forall dim a b.
 inl row_map forall dim a b.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b)
         (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
-    row_ (fun config x i j_tns => RowMapLocal(f config x i j_tns)) from (RowMap to)
+    row_ (fun config x i j_tns => Singleton RowMapLocal(f config x i j_tns)) from Singleton(RowMap to)
 
 // A reduce version of the `row_map` function. It's very similar to it apart from having the mapping function expect a scalar
 // output which is intended to be returned from a `local_reduce` operation. Of course, it is possible to return any kind of
@@ -360,16 +360,16 @@ inl row_map forall dim a b.
 inl row_reduce forall dim a b.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> b)
         (from : tensor (dim * int) a) (to : tensor dim b) : () =
-    row_ (fun config x i j_tns => RowReduceLocal(f config x i j_tns)) from (RowReduce to)
+    row_ (fun config x i j_tns => Singleton RowReduceLocal(f config x i j_tns)) from Singleton(RowReduce to)
 
 // A combined version of row_map and row_reduce that returns two outputs.
 inl row_map_reduce forall dim a b c.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b * c)
-        (from : tensor (dim * int) a) (to_map, to_reduce : tensor (dim * int) b * tensor dim c) : () =
+        (from : tensor (dim * int) a) (to_map : tensor (dim * int) b) (to_reduce : tensor dim c) : () =
     row_ (fun config x i j_tns => 
         inl a,b = f config x i j_tns
-        RowPairLocal(RowMapLocal a, RowReduceLocal b)
-        ) from (RowPair(RowMap to_map, RowReduce to_reduce))
+        Pair(Singleton (RowMapLocal a), Singleton (RowReduceLocal b))
+        ) from (Pair(Singleton (RowMap to_map), Singleton (RowReduce to_reduce)))
 
 // Reduces the innermost dimension of a given tensor. Less flexible than `row_reduce` since it can only be used to do a single reduction, 
 // but can be used on smaller tensors than `row_reduce` allows.
@@ -525,6 +525,7 @@ inl test2() =
     inl output_reduce = tensor_create 1
     inl output_identity = tensor_create (m,n)
     inl output_softmax = tensor_create (m,n)
+    inl output_softmax' = tensor_create (m,n)
     inl output_masked_softmax = tensor_create (m,n)
     inl output_softmax_scan = tensor_create (m,n)
     inl output_ln = tensor_create (m,n)
@@ -556,26 +557,27 @@ inl test2() =
             inl x = local_inclusive_scan_sum config x'
             zip x' x
             ) input output_softmax_scan
-        // discrete sampling
-        row_reduce (local_softmax_and_discrete_sampling rng) input output_sampling
         // sum (exclusive scan)
         row_map (fun config x _ _ =>
             local_exclusive_scan config 0 (+) x
             ) input_identity output_sum_exclusive
         row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
+        // discrete sampling
+        row_map_reduce (local_softmax_and_discrete_sampling rng) input output_softmax' output_sampling
 
     // printing.tensor_print_ln 1024 input
     // printing.tensor_print_ln 1024 input_identity
-    printing.tensor_print_ln 1024 output_reduce
+    // printing.tensor_print_ln 1024 output_reduce
     // printing.tensor_print_ln 1024 output_softmax
-    // printing.tensor_print_ln 1024 output_masked_softmax
+    printing.tensor_print_ln 1024 output_masked_softmax
     // printing.tensor_print_ln 1024 output_ln
     // printing.tensor_print_ln 1024 output_argmax
     // printing.tensor_print_ln (m * n) output_softmax_scan
     // printing.tensor_print_ln (m * n) output_identity
     // printing.tensor_print_ln (m * n) output_indices_map
     // printing.tensor_print_ln (m * n) output_indices_reduction
-    // printing.tensor_print_ln 1024 output_sampling
+    printing.tensor_print_ln 1024 output_softmax'
+    printing.tensor_print_ln 1024 output_sampling
     // printing.tensor_print_ln (m * n) output_sum_exclusive
     ()
 
