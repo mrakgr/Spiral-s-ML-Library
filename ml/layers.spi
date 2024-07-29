@@ -16,7 +16,11 @@ nominal layer_state =
     }
 
 union rec graph t =
-    | BlockMap :: forall dim t. (exists a. (layer_state -> a -> t) * graph (tensor (int * dim) a) * option (graph (tensor (int * dim) t))) -> graph (tensor (int * dim) t)
+    | BlockMap :: forall dim t. 
+        (exists a. (layer_state -> a -> t) 
+            * graph (tensor (int * dim) a) 
+            * option (graph (tensor (int * dim) t))) 
+        -> graph (tensor (int * dim) t)
     | BlockRowMap :: forall dim t.
         (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) t) 
             * graph (tensor (int * dim * int) a)
@@ -27,12 +31,14 @@ union rec graph t =
             * graph (tensor (int * dim * int) a)
             * option (graph (tensor (int * dim) t)))
         -> graph (tensor (int * dim) t)
-    | BlockRowMapReduce :: forall dim a b.
-        (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) a * b) 
+    | BlockRowMapReduce :: forall dim out_a out_b.
+        (exists a. (layer_state -> primitives.row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) out_a * out_b) 
             * graph (tensor (int * dim * int) a)
-            * option (graph (tensor (int * dim * int) a * tensor (int * dim) b)))
-        -> graph (tensor (int * dim * int) a * tensor (int * dim) b)
-    | BlockMatmul :: forall t. graph (tensor (int * int * int) t) * graph (tensor (int * int) t) -> graph (tensor (int * int * int) t)
+            * option (graph (tensor (int * dim * int) out_a * tensor (int * dim) out_b)))
+        -> graph (tensor (int * dim * int) out_a * tensor (int * dim) out_b)
+    | BlockMatmul :: forall t. 
+        graph (tensor (int * int * int) t) * graph (tensor (int * int) t) 
+        -> graph (tensor (int * int * int) t)
     | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Pair :: forall a b. graph a * graph b -> graph (a * b)
     | Weight :: forall dim t. dim -> graph (tensor dim t)
@@ -40,6 +46,9 @@ union rec graph t =
     | Apply :: forall b el. (exists a. graph (tensor (a * b) el) * graph a) -> graph (tensor b el)
     | KeyTensor :: forall dim t. (exists key{symbol}. key) * graph (tensor dim t) -> graph (tensor dim t)
     | KeyScalar :: forall t. (exists key{symbol}. key) -> graph t
+union rec dim_of t =
+    | D :: forall dim t. dim -> dim_of (tensor dim t)
+    | P :: forall a b. dim_of a * dim_of b -> dim_of (a * b)
 
 nominal model t =
     {
@@ -54,29 +63,27 @@ inl memoize (h : hashmapm.hashmap) f k =
     | Some v => v
     | None => inl v = f k in hashmapm.add h k v . v
 
-union rec tensor_dim t =
-    | D :: forall dim t. dim -> tensor_dim (tensor dim t)
-    | P :: forall dim_a dim_b a b. dim_a * dim_b -> tensor_dim (tensor dim_a a * tensor dim_b b)
-
 // Returns the top level dimension. Takes in a hashmap for memoization purposes.
 inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t_top) -> dim_top =
     inl f x = get_dim h x
-    inl check x out =
-        optionm.iter (fun x' => assert (x = f x') "The dimensions coming from the input and the dimensions of the output have to match.") out
-        x
+    inl f' x = get_dim_pair h x
+    inl check x = optionm.iter (fun x' => assert (D x = f' x') "The dimensions coming from the input and the dimensions of the output have to match.")
     memoize h (function
         | BlockMap(exists a. _, a, out) => 
             inl a = f a
             assert (fst a = blocks_per_grid()) "The batch dimension in the map node needs to equal the number of blocks per grid."
             check a out
+            a
         | BlockRowMap(exists a. _, a, out) => 
             inl a = f a
             assert (fst a = blocks_per_grid()) "The batch dimension in the row map node needs to equal the number of blocks per grid."
             check a out
+            a
         | BlockRowReduce(exists a. _, a, out) => 
-            inl a = f a
-            assert (fst a = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
-            check (a |> fun a,b,_ => a,b) out
+            inl q,w,_ = f a
+            assert (q = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
+            check (q,w) out
+            q,w
         | BlockMatmul(a,b) =>
             inl (q,m,k as a) = f a
             assert (q = blocks_per_grid()) "The batch dimension in the matmul node needs to equal the number of blocks per grid."
@@ -91,12 +98,34 @@ inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t
         | Input dim => dim
         | KeyTensor(_,x) => f x
         | Apply(exists a. a,b) => snd (f a)
-        // | BlockRowMapReduce(exists a. _, a, out) => 
-        //     inl a = f a
-        //     assert (fst a = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
-        //     // check (a |> fun a,b,_ => a,b) out
-        //     ()
-        // | Pair TODO
+        )
+
+
+// Returns the top level dimension for an arbitrary graph type. Takes in a hashmap for memoization purposes.
+// Results in a type errors error on the KeyScalar node.
+and inl get_dim_pair forall t. (h : graph_dims) : graph t -> dim_of t =
+    inl f x = get_dim h x
+    inl f' x = get_dim_pair h x
+    memoize h (function
+        | BlockRowMapReduce(exists a. _, a, out) =>
+            inl q,w,e = f a
+            assert (q = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
+            out |> optionm.iter (fun out => 
+                inl (P(D a, D b)) = f' out
+                assert ((q,w,e) = a) "The dimensions coming from the input and the dimensions of the first output have to match."
+                assert ((q,w) = b) "The dimensions coming from the input and the dimensions of the second output have to match."
+                )
+            P(D(q,w,e),D(q,w))
+        | Pair(a,b) => P(f' a, f' b)
+        | BlockMap as x => D(f x)
+        | BlockRowMap as x => D(f x)
+        | BlockRowReduce as x => D(f x)
+        | BlockMatmul as x => D(f x)
+        | Zip as x => D(f x)
+        | Weight as x => D(f x)
+        | Input as x => D(f x)
+        | KeyTensor as x => D(f x)
+        | Apply as x => D(f x)
         )
 
 // Calculates the parameter offsets.
@@ -116,12 +145,12 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : grap
             | BlockMap(exists a. _,a,out) => f a . g out
             | BlockRowMap(exists a. _,a,out) => f a . g out
             | BlockRowReduce(exists a. _,a,out) => f a . g out
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
             | BlockMatmul(a,b) => f a . f b
             | Zip(a,b) => f a . f b
             | Pair(a,b) => f a . f b
             | Weight as k =>
-                inl dim = get_dim k
-                inl partition_offsets : _ t = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset()
+                inl partition_offsets : _ t = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets get_offset()
                 hashmapm.add h_offset_param k partition_offsets
                 set_offset partition_offsets.offset_end
             | Apply(exists a. a,b) => f a . f b
@@ -140,27 +169,39 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
     inl get_offset () : size = match hashmapm.try_get h offset_key with Some x => x | None => 0
     inl set_offset (offset : size) : () = hashmapm.set h offset_key offset
     inl get_dim x = get_dim dims x
-    inl rec g forall dim t. (k : graph (tensor dim t)) (out : option (graph (tensor dim t))) : () =
+    inl get_dim_pair x = get_dim_pair dims x
+    inl rec g forall t. (k : graph t) (out : option (graph t)) : () =
         match out with
-        | Some x => f x
+        | Some x => f' x
         | None =>
-            inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets get_offset()
-            hashmapm.add h_offset_output k partition_offsets
-            set_offset partition_offsets.offset_end
+            inl body forall t'. (k : graph t') =
+                inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets get_offset()
+                hashmapm.add h_offset_output k partition_offsets
+                set_offset partition_offsets.offset_end
+            inl rec loop forall t'. (x : graph_pair t') : () =
+                match x with
+                | GP_D x => body x
+                | GP_P(a,b) => loop a . loop b
+            loop k
     and inl f forall t. : graph t -> () =
         memoize h fun k =>
             match k with
             | BlockMap(exists a. _,a,out) => f a . g k out
             | BlockRowMap(exists a. _,a,out) => f a . g k out
             | BlockRowReduce(exists a. _,a,out) => f a . g k out
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
             | BlockMatmul(a,b) => f a . f b . g k None
             | Zip(a,b) => f a . f b // passthrough
-            | Pair(a,b) => f a . f b // passthrough
+            | Pair x => f' x // passthrough
             | Weight => ()
             | Apply(exists a. a,b) => f a . f b // passthrough
             | Input => g k None
             | KeyTensor(_,x) => f x // passthrough
             | KeyScalar(_) => ()
+    and inl f' forall t. : graph_pair t -> () =
+        memoize h function
+            | GP_Single x => f x
+            | GP_Pair(a,b) => f' a . f' b
         
     inl offset = f x
     hashmapm.set_immutable(h_offset_output)

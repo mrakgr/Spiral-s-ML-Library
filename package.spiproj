@@ -63,34 +63,34 @@ modules:
     ml/
         matmul
         primitives
-    //     layers
-    //     game_modelm
+        layers
+        game_modelm
         
-    // game/
-    //     utils
+    game/
+        utils
         
-    //     rps/
-    //         main
+        rps/
+            main
 
-    //     leduc/
-    //         game
-    //         model
-    //         play
-    //         train
-    //         tests/
-    //             train
+        leduc/
+            game
+            model
+            play
+            train
+            tests/
+                train
 
-    //     nl_hu_holdem/
-    //         lib/
-    //             cardm
-    //             deckm
-    //             hand_rankerm
-    //         main
+        nl_hu_holdem/
+            lib/
+                cardm
+                deckm
+                hand_rankerm
+            main
 
-    // tests/
-    //     test1
-    //     test2
-    //     test3
-    //     test4
-    //     test5
-    //     test6
+    tests/
+        test1
+        test2
+        test3
+        test4
+        test5
+        test6
