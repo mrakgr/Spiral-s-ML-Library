@@ -666,8 +666,8 @@ inl test5() =
 
     inl model = create_model graph
     param_init model
-    console.write_ln "Here are the weight matrices."
-    param_print model
+    // console.write_ln "Here are the weight matrices."
+    // param_print model
     inl input : tensor d3 float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
@@ -676,11 +676,11 @@ inl test5() =
         to = input
     }
     graph_run_host model {ensemble}
-    console.write_ln "Here is the input tensor."
-    console.write_ln input
+    // console.write_ln "Here is the input tensor."
+    // console.write_ln input
     console.write_ln "Here is the output tensor."
     inl output : tensor d4 float = key_extract model .output_probs
-    printing.tensor_print_ln (1 <<< 9) output
+    printing.tensor_print_ln limit.max output
     inl output : tensor d3 int = key_extract model .output_indices
     printing.tensor_print_ln limit.max output
 

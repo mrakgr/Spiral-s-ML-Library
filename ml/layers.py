@@ -8,6 +8,7 @@ using namespace nvcuda;
 #include <cooperative_groups.h>
 #include <cooperative_groups/reduce.h>
 #include <cooperative_groups/scan.h>
+#include <cuda/semaphore>
 using default_int = int;
 using default_uint = unsigned int;
 template <typename el>
@@ -214,12 +215,23 @@ __device__ void method_2(float * v0, float * v1);
 __device__ void method_3(float * v0, int v1, float * v2, int v3, float * v4, int v5);
 struct Tuple0;
 struct Tuple1;
+struct Tuple2;
+__device__ void write_7(char v0);
+__device__ void write_8();
+__device__ void write_9(const char * v0);
+__device__ void write_11(float v0);
+__device__ void write_12(int v0);
+__device__ void write_10(float v0, int v1);
+__device__ void write_6(float v0, int v1, float v2, int v3, int v4, int v5);
+__device__ void method_5(float v0, int v1, float v2, int v3);
+__device__ void write_14(float * v0, int v1, int v2, int v3, int * v4, int v5, int v6, int v7);
+__device__ void write_13(int v0, float v1, float * v2, int v3, int v4, int v5, int * v6, int v7, int v8, int v9, int v10);
 __device__ void method_4(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5);
 struct Closure0 {
     __device__ float operator()(float tup0, float tup1){
         float v0 = tup0; float v1 = tup1;
         float v2;
-        v2 = v0 + v1;
+        v2 = v1 + v0;
         return v2;
     }
 };
@@ -227,7 +239,7 @@ struct Closure1 {
     __device__ int operator()(int tup0, int tup1){
         int v0 = tup0; int v1 = tup1;
         int v2;
-        v2 = v0 + v1;
+        v2 = v1 + v0;
         return v2;
     }
 };
@@ -241,7 +253,7 @@ struct Closure2 {
     __device__ float operator()(float tup0, float tup1){
         float v0 = tup0; float v1 = tup1;
         float v2;
-        v2 = v0 + v1;
+        v2 = v1 + v0;
         return v2;
     }
 };
@@ -255,33 +267,90 @@ struct Closure3 {
     __device__ Tuple1 operator()(Tuple1 tup0, Tuple1 tup1){
         float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
         bool v4;
-        v4 = v0 >= 0.0f;
+        v4 = v3 < v1;
+        if (v4){
+            return Tuple1{v2, v3};
+        } else {
+            return Tuple1{v0, v1};
+        }
+    }
+};
+struct Tuple2 {
+    int v0;
+    float v1;
+    int v2;
+    __device__ Tuple2() = default;
+    __device__ Tuple2(int t0, float t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+};
+struct Closure4 {
+    __device__ Tuple1 operator()(Tuple1 tup0, Tuple1 tup1){
+        float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
+        // wtf;
+        method_5(v2, v3, v0, v1);
+        bool v4;
+        v4 = v2 >= 0.0f;
         bool v6;
         if (v4){
             bool v5;
-            v5 = v2 >= 0.0f;
+            v5 = v0 >= 0.0f;
             v6 = v5;
         } else {
             v6 = false;
         }
         if (v6){
             bool v7;
-            v7 = v0 <= v2;
+            v7 = v2 <= v0;
             if (v7){
-                return Tuple1{v0, v1};
-            } else {
                 return Tuple1{v2, v3};
+            } else {
+                return Tuple1{v0, v1};
             }
         } else {
             if (v4){
-                return Tuple1{v0, v1};
+                return Tuple1{v2, v3};
             } else {
                 bool v10;
-                v10 = v2 >= 0.0f;
+                v10 = v0 >= 0.0f;
                 if (v10){
-                    return Tuple1{v2, v3};
-                } else {
                     return Tuple1{v0, v1};
+                } else {
+                    return Tuple1{v2, v3};
+                }
+            }
+        }
+    }
+};
+struct Closure5 {
+    __device__ Tuple1 operator()(Tuple1 tup0, Tuple1 tup1){
+        float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
+        bool v4;
+        v4 = v2 >= 0.0f;
+        bool v6;
+        if (v4){
+            bool v5;
+            v5 = v0 >= 0.0f;
+            v6 = v5;
+        } else {
+            v6 = false;
+        }
+        if (v6){
+            bool v7;
+            v7 = v2 <= v0;
+            if (v7){
+                return Tuple1{v2, v3};
+            } else {
+                return Tuple1{v0, v1};
+            }
+        } else {
+            if (v4){
+                return Tuple1{v2, v3};
+            } else {
+                bool v10;
+                v10 = v0 >= 0.0f;
+                if (v10){
+                    return Tuple1{v0, v1};
+                } else {
+                    return Tuple1{v2, v3};
                 }
             }
         }
@@ -2052,6 +2121,217 @@ __device__ void method_3(float * v0, int v1, float * v2, int v3, float * v4, int
     }
     return ;
 }
+__device__ void write_7(char v0){
+    const char * v1;
+    v1 = "%c";
+    printf(v1,v0);
+    return ;
+}
+__device__ void write_8(){
+    return ;
+}
+__device__ void write_9(const char * v0){
+    const char * v1;
+    v1 = "%s";
+    printf(v1,v0);
+    return ;
+}
+__device__ void write_11(float v0){
+    const char * v1;
+    v1 = "%f";
+    printf(v1,v0);
+    return ;
+}
+__device__ void write_12(int v0){
+    const char * v1;
+    v1 = "%d";
+    printf(v1,v0);
+    return ;
+}
+__device__ void write_10(float v0, int v1){
+    write_11(v0);
+    const char * v2;
+    v2 = ", ";
+    write_9(v2);
+    return write_12(v1);
+}
+__device__ void write_6(float v0, int v1, float v2, int v3, int v4, int v5){
+    char v6;
+    v6 = '{';
+    write_7(v6);
+    write_8();
+    const char * v7;
+    v7 = "a";
+    write_9(v7);
+    const char * v8;
+    v8 = " = ";
+    write_9(v8);
+    write_10(v0, v1);
+    const char * v9;
+    v9 = "; ";
+    write_9(v9);
+    const char * v10;
+    v10 = "b";
+    write_9(v10);
+    write_9(v8);
+    write_10(v2, v3);
+    write_9(v9);
+    const char * v11;
+    v11 = "bid";
+    write_9(v11);
+    write_9(v8);
+    write_12(v4);
+    write_9(v9);
+    const char * v12;
+    v12 = "tid";
+    write_9(v12);
+    write_9(v8);
+    write_12(v5);
+    char v13;
+    v13 = '}';
+    return write_7(v13);
+}
+__device__ void method_5(float v0, int v1, float v2, int v3){
+    int v4;
+    v4 = threadIdx.x;
+    int v5;
+    v5 = blockIdx.x;
+    static cuda::binary_semaphore<cuda::thread_scope_system> v6(1l);
+    v6.acquire();
+    write_6(v0, v1, v2, v3, v5, v4);
+    printf("\n");
+    v6.release();
+    return ;
+}
+__device__ inline bool while_method_5(int v0, int v1){
+    bool v2;
+    v2 = v1 < v0;
+    return v2;
+}
+__device__ void write_14(float * v0, int v1, int v2, int v3, int * v4, int v5, int v6, int v7){
+    int v8;
+    v8 = 0l;
+    char v9;
+    v9 = '[';
+    write_7(v9);
+    int v10;
+    v10 = 0l;
+    while (while_method_5(v6, v10)){
+        int v12;
+        v12 = v8;
+        bool v13;
+        v13 = v12 >= 100l;
+        if (v13){
+            const char * v14;
+            v14 = " ...";
+            write_9(v14);
+            break;
+        } else {
+        }
+        bool v15;
+        v15 = v10 == 0l;
+        bool v16;
+        v16 = v15 != true;
+        if (v16){
+            const char * v17;
+            v17 = "; ";
+            write_9(v17);
+        } else {
+        }
+        char v18;
+        v18 = '[';
+        write_7(v18);
+        int v19;
+        v19 = 0l;
+        while (while_method_5(v7, v19)){
+            int v21;
+            v21 = v8;
+            bool v22;
+            v22 = v21 >= 100l;
+            if (v22){
+                const char * v23;
+                v23 = " ...";
+                write_9(v23);
+                break;
+            } else {
+            }
+            bool v24;
+            v24 = v19 == 0l;
+            bool v25;
+            v25 = v24 != true;
+            if (v25){
+                const char * v26;
+                v26 = "; ";
+                write_9(v26);
+            } else {
+            }
+            int v27;
+            v27 = v8 + 1l;
+            v8 = v27;
+            int v28;
+            v28 = v10 * v2;
+            int v29;
+            v29 = v1 + v28;
+            int v30;
+            v30 = v19 * v3;
+            int v31;
+            v31 = v29 + v30;
+            float v32;
+            v32 = v0[v31];
+            int v33;
+            v33 = v5 + v28;
+            int v34;
+            v34 = v33 + v30;
+            int v35;
+            v35 = v4[v34];
+            write_10(v32, v35);
+            v19 += 1l ;
+        }
+        char v36;
+        v36 = ']';
+        write_7(v36);
+        v10 += 1l ;
+    }
+    char v37;
+    v37 = ']';
+    return write_7(v37);
+}
+__device__ void write_13(int v0, float v1, float * v2, int v3, int v4, int v5, int * v6, int v7, int v8, int v9, int v10){
+    char v11;
+    v11 = '{';
+    write_7(v11);
+    write_8();
+    const char * v12;
+    v12 = "bid";
+    write_9(v12);
+    const char * v13;
+    v13 = " = ";
+    write_9(v13);
+    write_12(v0);
+    const char * v14;
+    v14 = "; ";
+    write_9(v14);
+    const char * v15;
+    v15 = "probability";
+    write_9(v15);
+    write_9(v13);
+    write_11(v1);
+    write_9(v14);
+    const char * v16;
+    v16 = "q";
+    write_9(v16);
+    write_9(v13);
+    write_14(v2, v3, v4, v5, v6, v7, v8, v9);
+    write_9(v14);
+    const char * v17;
+    v17 = "tid";
+    write_9(v17);
+    write_9(v13);
+    write_12(v10);
+    char v18;
+    v18 = '}';
+    return write_7(v18);
+}
 __device__ void method_4(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5){
     int v6;
     v6 = blockIdx.x;
@@ -2567,31 +2847,31 @@ __device__ void method_4(int * v0, int v1, float * v2, int v3, float * v4, curan
         float v207;
         v207 = curand_uniform(&v5);
         float v208[4l];
-        int v209;
-        v209 = 0l;
-        while (while_method_1(v209)){
-            int v211;
-            v211 = 0l;
-            while (while_method_2(v211)){
-                assert("Tensor range check" && 0 <= v209 && v209 < 1l);
-                assert("Tensor range check" && 0 <= v211 && v211 < 4l);
-                int v213;
-                v213 = 4l * v209;
+        int v209[4l];
+        int v210;
+        v210 = 0l;
+        while (while_method_1(v210)){
+            int v212;
+            v212 = 0l;
+            while (while_method_2(v212)){
+                assert("Tensor range check" && 0 <= v210 && v210 < 1l);
+                assert("Tensor range check" && 0 <= v212 && v212 < 4l);
                 int v214;
-                v214 = v213 + v211;
-                float v215;
-                v215 = v178[v214];
-                float v216;
-                v216 = v215 - v207;
-                assert("Tensor range check" && 0 <= v209 && v209 < 1l);
-                assert("Tensor range check" && 0 <= v211 && v211 < 4l);
-                v208[v214] = v216;
-                v211 += 1l ;
+                v214 = 4l * v210;
+                int v215;
+                v215 = v214 + v212;
+                int v216;
+                v216 = v35[v215];
+                assert("Tensor range check" && 0 <= v210 && v210 < 1l);
+                assert("Tensor range check" && 0 <= v212 && v212 < 4l);
+                v208[v215] = v207;
+                v209[v215] = v216;
+                v212 += 1l ;
             }
-            v209 += 1l ;
+            v210 += 1l ;
         }
         float v217; int v218;
-        Tuple1 tmp2 = Tuple1{-1.0f / 0.0f, 0l};
+        Tuple1 tmp2 = Tuple1{0.0f, 2147483647l};
         v217 = tmp2.v0; v218 = tmp2.v1;
         int v219;
         v219 = 0l;
@@ -2608,83 +2888,375 @@ __device__ void method_4(int * v0, int v1, float * v2, int v3, float * v4, curan
                 float v225;
                 v225 = v208[v224];
                 int v226;
-                v226 = v35[v224];
+                v226 = v209[v224];
                 bool v227;
-                v227 = v217 >= 0.0f;
-                bool v229;
+                v227 = v218 < v226;
+                float v228; int v229;
                 if (v227){
-                    bool v228;
-                    v228 = v225 >= 0.0f;
-                    v229 = v228;
+                    v228 = v217; v229 = v218;
                 } else {
-                    v229 = false;
+                    v228 = v225; v229 = v226;
                 }
-                float v238; int v239;
-                if (v229){
-                    bool v230;
-                    v230 = v217 <= v225;
-                    if (v230){
-                        v238 = v217; v239 = v218;
-                    } else {
-                        v238 = v225; v239 = v226;
-                    }
-                } else {
-                    if (v227){
-                        v238 = v217; v239 = v218;
-                    } else {
-                        bool v233;
-                        v233 = v225 >= 0.0f;
-                        if (v233){
-                            v238 = v225; v239 = v226;
-                        } else {
-                            v238 = v217; v239 = v218;
-                        }
-                    }
-                }
-                v217 = v238;
-                v218 = v239;
+                v217 = v228;
+                v218 = v229;
                 v221 += 1l ;
             }
             v219 += 1l ;
         }
-        auto v240 = cooperative_groups::coalesced_threads();
-        int v241;
-        v241 = threadIdx.x;
-        int v242;
-        v242 = v241 / 4l;
-        auto v243 = cooperative_groups::labeled_partition(v240,v242);
-        Closure3 v244{};
-        float v245; int v246;
-        Tuple1 tmp3 = cooperative_groups::reduce(v243, Tuple1{v217, v218}, v244);
-        v245 = tmp3.v0; v246 = tmp3.v1;
-        assert("Tensor range check" && 0 <= v30 && v30 < 2l);
-        int v247;
-        v247 = v32 + v28;
-        int v248;
-        v248 = 0l;
-        while (while_method_1(v248)){
-            assert("Tensor range check" && 0 <= v248 && v248 < 1l);
-            int v250;
-            v250 = 16l * v248;
-            int v251;
-            v251 = v250 + v247;
-            assert("Tensor range check" && 0 <= v248 && v248 < 1l);
+        auto v230 = cooperative_groups::coalesced_threads();
+        int v231;
+        v231 = threadIdx.x;
+        int v232;
+        v232 = v231 / 4l;
+        auto v233 = cooperative_groups::labeled_partition(v230,v232);
+        Closure3 v234{};
+        float v235; int v236;
+        Tuple1 tmp3 = cooperative_groups::reduce(v233, Tuple1{v217, v218}, v234);
+        v235 = tmp3.v0; v236 = tmp3.v1;
+        float v237[4l];
+        int v238;
+        v238 = 0l;
+        while (while_method_1(v238)){
+            int v240;
+            v240 = 0l;
+            while (while_method_2(v240)){
+                assert("Tensor range check" && 0 <= v238 && v238 < 1l);
+                assert("Tensor range check" && 0 <= v240 && v240 < 4l);
+                int v242;
+                v242 = 4l * v238;
+                int v243;
+                v243 = v242 + v240;
+                float v244;
+                v244 = v178[v243];
+                float v245;
+                v245 = v244 - v235;
+                assert("Tensor range check" && 0 <= v238 && v238 < 1l);
+                assert("Tensor range check" && 0 <= v240 && v240 < 4l);
+                v237[v243] = v245;
+                v240 += 1l ;
+            }
+            v238 += 1l ;
+        }
+        float v246[4l];
+        int v247[4l];
+        float v248; int v249;
+        Tuple1 tmp4 = Tuple1{-1.0f / 0.0f, 0l};
+        v248 = tmp4.v0; v249 = tmp4.v1;
+        int v250;
+        v250 = 0l;
+        while (while_method_1(v250)){
+            assert("Tensor range check" && 0 <= v250 && v250 < 1l);
             int v252;
-            v252 = 4l * v248;
-            int4* v253;
-            v253 = reinterpret_cast<int4*>(v166 + v252);
-            int4* v254;
-            v254 = reinterpret_cast<int4*>(v2 + v251);
-            assert("Pointer alignment check" && (unsigned long long)(v253) % 4l == 0 && (unsigned long long)(v254) % 4l == 0);
-            *v254 = *v253;
-            v248 += 1l ;
+            v252 = 4l * v250;
+            assert("Tensor range check" && 0 <= v250 && v250 < 1l);
+            int v253; float v254; int v255;
+            Tuple2 tmp5 = Tuple2{0l, -1.0f / 0.0f, 0l};
+            v253 = tmp5.v0; v254 = tmp5.v1; v255 = tmp5.v2;
+            while (while_method_2(v253)){
+                assert("Tensor range check" && 0 <= v253 && v253 < 4l);
+                int v257;
+                v257 = v253 + v252;
+                float v258;
+                v258 = v237[v257];
+                int v259;
+                v259 = v35[v257];
+                // wtf;
+                bool v260;
+                v260 = v254 >= 0.0f;
+                bool v262;
+                if (v260){
+                    bool v261;
+                    v261 = v258 >= 0.0f;
+                    v262 = v261;
+                } else {
+                    v262 = false;
+                }
+                float v271; int v272;
+                if (v262){
+                    bool v263;
+                    v263 = v254 <= v258;
+                    if (v263){
+                        v271 = v254; v272 = v255;
+                    } else {
+                        v271 = v258; v272 = v259;
+                    }
+                } else {
+                    if (v260){
+                        v271 = v254; v272 = v255;
+                    } else {
+                        bool v266;
+                        v266 = v258 >= 0.0f;
+                        if (v266){
+                            v271 = v258; v272 = v259;
+                        } else {
+                            v271 = v254; v272 = v255;
+                        }
+                    }
+                }
+                v254 = v271;
+                v255 = v272;
+                v253 += 1l ;
+            }
+            auto v273 = cooperative_groups::coalesced_threads();
+            int v274;
+            v274 = threadIdx.x;
+            int v275;
+            v275 = v274 / 4l;
+            auto v276 = cooperative_groups::labeled_partition(v273,v275);
+            Closure4 v277{};
+            float v278; int v279;
+            Tuple1 tmp6 = cooperative_groups::inclusive_scan(v276, Tuple1{v254, v255}, v277);
+            v278 = tmp6.v0; v279 = tmp6.v1;
+            float v280; int v281;
+            Tuple1 tmp7 = v276.shfl_up(Tuple1{v278, v279},1);
+            v280 = tmp7.v0; v281 = tmp7.v1;
+            bool v282;
+            v282 = v276.thread_rank() == 0;
+            float v283; int v284;
+            if (v282){
+                v283 = -1.0f / 0.0f; v284 = 0l;
+            } else {
+                v283 = v280; v284 = v281;
+            }
+            float v285; int v286;
+            Tuple1 tmp8 = v276.shfl(Tuple1{v278, v279},v276.num_threads()-1);
+            v285 = tmp8.v0; v286 = tmp8.v1;
+            // wtf;
+            bool v287;
+            v287 = v248 >= 0.0f;
+            bool v289;
+            if (v287){
+                bool v288;
+                v288 = v283 >= 0.0f;
+                v289 = v288;
+            } else {
+                v289 = false;
+            }
+            float v298; int v299;
+            if (v289){
+                bool v290;
+                v290 = v248 <= v283;
+                if (v290){
+                    v298 = v248; v299 = v249;
+                } else {
+                    v298 = v283; v299 = v284;
+                }
+            } else {
+                if (v287){
+                    v298 = v248; v299 = v249;
+                } else {
+                    bool v293;
+                    v293 = v283 >= 0.0f;
+                    if (v293){
+                        v298 = v283; v299 = v284;
+                    } else {
+                        v298 = v248; v299 = v249;
+                    }
+                }
+            }
+            int v300; float v301; int v302;
+            Tuple2 tmp9 = Tuple2{0l, v298, v299};
+            v300 = tmp9.v0; v301 = tmp9.v1; v302 = tmp9.v2;
+            while (while_method_2(v300)){
+                assert("Tensor range check" && 0 <= v300 && v300 < 4l);
+                int v304;
+                v304 = v300 + v252;
+                float v305;
+                v305 = v237[v304];
+                int v306;
+                v306 = v35[v304];
+                // wtf;
+                bool v307;
+                v307 = v301 >= 0.0f;
+                bool v309;
+                if (v307){
+                    bool v308;
+                    v308 = v305 >= 0.0f;
+                    v309 = v308;
+                } else {
+                    v309 = false;
+                }
+                float v318; int v319;
+                if (v309){
+                    bool v310;
+                    v310 = v301 <= v305;
+                    if (v310){
+                        v318 = v301; v319 = v302;
+                    } else {
+                        v318 = v305; v319 = v306;
+                    }
+                } else {
+                    if (v307){
+                        v318 = v301; v319 = v302;
+                    } else {
+                        bool v313;
+                        v313 = v305 >= 0.0f;
+                        if (v313){
+                            v318 = v305; v319 = v306;
+                        } else {
+                            v318 = v301; v319 = v302;
+                        }
+                    }
+                }
+                assert("Tensor range check" && 0 <= v300 && v300 < 4l);
+                v246[v304] = v318;
+                v247[v304] = v319;
+                v301 = v318;
+                v302 = v319;
+                v300 += 1l ;
+            }
+            // wtf;
+            bool v321;
+            if (v287){
+                bool v320;
+                v320 = v285 >= 0.0f;
+                v321 = v320;
+            } else {
+                v321 = false;
+            }
+            float v330; int v331;
+            if (v321){
+                bool v322;
+                v322 = v248 <= v285;
+                if (v322){
+                    v330 = v248; v331 = v249;
+                } else {
+                    v330 = v285; v331 = v286;
+                }
+            } else {
+                if (v287){
+                    v330 = v248; v331 = v249;
+                } else {
+                    bool v325;
+                    v325 = v285 >= 0.0f;
+                    if (v325){
+                        v330 = v285; v331 = v286;
+                    } else {
+                        v330 = v248; v331 = v249;
+                    }
+                }
+            }
+            v248 = v330;
+            v249 = v331;
+            v250 += 1l ;
+        }
+        int v332;
+        v332 = threadIdx.x;
+        int v333;
+        v333 = blockIdx.x;
+        static cuda::binary_semaphore<cuda::thread_scope_system> v334(1l);
+        v334.acquire();
+        int v335;
+        v335 = 0l;
+        int v336;
+        v336 = 4l;
+        int v337;
+        v337 = 1l;
+        int v338;
+        v338 = 0l;
+        int v339;
+        v339 = 1l;
+        int v340;
+        v340 = 4l;
+        write_13(v333, v235, v246, v335, v336, v337, v247, v338, v339, v340, v332);
+        printf("\n");
+        v334.release();
+        __syncthreads();
+        float v341; int v342;
+        Tuple1 tmp10 = Tuple1{-1.0f / 0.0f, 0l};
+        v341 = tmp10.v0; v342 = tmp10.v1;
+        int v343;
+        v343 = 0l;
+        while (while_method_1(v343)){
+            int v345;
+            v345 = 0l;
+            while (while_method_2(v345)){
+                assert("Tensor range check" && 0 <= v343 && v343 < 1l);
+                assert("Tensor range check" && 0 <= v345 && v345 < 4l);
+                int v347;
+                v347 = 4l * v343;
+                int v348;
+                v348 = v347 + v345;
+                float v349;
+                v349 = v237[v348];
+                int v350;
+                v350 = v35[v348];
+                bool v351;
+                v351 = v341 >= 0.0f;
+                bool v353;
+                if (v351){
+                    bool v352;
+                    v352 = v349 >= 0.0f;
+                    v353 = v352;
+                } else {
+                    v353 = false;
+                }
+                float v362; int v363;
+                if (v353){
+                    bool v354;
+                    v354 = v341 <= v349;
+                    if (v354){
+                        v362 = v341; v363 = v342;
+                    } else {
+                        v362 = v349; v363 = v350;
+                    }
+                } else {
+                    if (v351){
+                        v362 = v341; v363 = v342;
+                    } else {
+                        bool v357;
+                        v357 = v349 >= 0.0f;
+                        if (v357){
+                            v362 = v349; v363 = v350;
+                        } else {
+                            v362 = v341; v363 = v342;
+                        }
+                    }
+                }
+                v341 = v362;
+                v342 = v363;
+                v345 += 1l ;
+            }
+            v343 += 1l ;
+        }
+        auto v364 = cooperative_groups::coalesced_threads();
+        int v365;
+        v365 = threadIdx.x;
+        int v366;
+        v366 = v365 / 4l;
+        auto v367 = cooperative_groups::labeled_partition(v364,v366);
+        Closure5 v368{};
+        float v369; int v370;
+        Tuple1 tmp11 = cooperative_groups::reduce(v367, Tuple1{v341, v342}, v368);
+        v369 = tmp11.v0; v370 = tmp11.v1;
+        assert("Tensor range check" && 0 <= v30 && v30 < 2l);
+        int v371;
+        v371 = v32 + v28;
+        int v372;
+        v372 = 0l;
+        while (while_method_1(v372)){
+            assert("Tensor range check" && 0 <= v372 && v372 < 1l);
+            int v374;
+            v374 = 16l * v372;
+            int v375;
+            v375 = v374 + v371;
+            assert("Tensor range check" && 0 <= v372 && v372 < 1l);
+            int v376;
+            v376 = 4l * v372;
+            int4* v377;
+            v377 = reinterpret_cast<int4*>(v166 + v376);
+            int4* v378;
+            v378 = reinterpret_cast<int4*>(v2 + v375);
+            assert("Pointer alignment check" && (unsigned long long)(v377) % 4l == 0 && (unsigned long long)(v378) % 4l == 0);
+            *v378 = *v377;
+            v372 += 1l ;
         }
         assert("Tensor range check" && 0 <= v30 && v30 < 2l);
-        int v255;
-        v255 = 8l * v30;
-        int v256;
-        v256 = v255 + v29;
-        v0[v256] = v246;
+        int v379;
+        v379 = 8l * v30;
+        int v380;
+        v380 = v379 + v29;
+        v0[v380] = v370;
         v30 += 1l ;
     }
     __syncthreads();
@@ -2851,136 +3423,25 @@ def method0(v0 : string) -> None:
     print(v0, end="")
     del v0
     return 
-def method2(v0 : char) -> None:
+def method1(v0 : char) -> None:
     print(v0, end="")
     del v0
     return 
-def method3(v0 : i32, v1 : i32) -> bool:
-    v2 = v1 < v0
-    del v0, v1
-    return v2
+def method2(v0 : i32) -> bool:
+    v1 = v0 < 16
+    del v0
+    return v1
+def method3(v0 : i32) -> bool:
+    v1 = v0 < 1
+    del v0
+    return v1
 def method4(v0 : f32) -> None:
     print("{:.6f}".format(v0), end="")
     del v0
     return 
-def method1(v0 : cp.ndarray, v1 : i32, v2 : i32, v3 : i32, v4 : i32, v5 : i32, v6 : i32, v7 : i32) -> None:
-    v8 = 0
-    v9 = '['
-    method2(v9)
-    del v9
-    v10 = 0
-    while method3(v5, v10):
-        v12 = v8
-        v13 = v12 >= 100
-        del v12
-        if v13:
-            v14 = " ..."
-            method0(v14)
-            del v14
-            break
-        else:
-            pass
-        del v13
-        v15 = v10 == 0
-        v16 = v15 != True
-        del v15
-        if v16:
-            v17 = "; "
-            method0(v17)
-        else:
-            pass
-        del v16
-        v18 = '['
-        method2(v18)
-        del v18
-        v19 = 0
-        while method3(v6, v19):
-            v21 = v8
-            v22 = v21 >= 100
-            del v21
-            if v22:
-                v23 = " ..."
-                method0(v23)
-                del v23
-                break
-            else:
-                pass
-            del v22
-            v24 = v19 == 0
-            v25 = v24 != True
-            del v24
-            if v25:
-                v26 = "; "
-                method0(v26)
-            else:
-                pass
-            del v25
-            v27 = '['
-            method2(v27)
-            del v27
-            v28 = 0
-            while method3(v7, v28):
-                v30 = v8
-                v31 = v30 >= 100
-                del v30
-                if v31:
-                    v32 = " ..."
-                    method0(v32)
-                    del v32
-                    break
-                else:
-                    pass
-                del v31
-                v33 = v28 == 0
-                v34 = v33 != True
-                del v33
-                if v34:
-                    v35 = "; "
-                    method0(v35)
-                else:
-                    pass
-                del v34
-                v36 = v8 + 1
-                v8 = v36
-                del v36
-                v37 = v10 * v2
-                v38 = v1 + v37
-                del v37
-                v39 = v19 * v3
-                v40 = v38 + v39
-                del v38, v39
-                v41 = v28 * v4
-                v42 = v40 + v41
-                del v40, v41
-                v43 = v0[v42].item()
-                del v42
-                method4(v43)
-                del v43
-                v28 += 1 
-            del v28
-            v44 = ']'
-            method2(v44)
-            del v44
-            v19 += 1 
-        del v19
-        v45 = ']'
-        method2(v45)
-        del v45
-        v10 += 1 
-    del v0, v1, v2, v3, v4, v5, v6, v7, v8, v10
-    v46 = ']'
-    return method2(v46)
-def method5(v0 : i32) -> bool:
-    v1 = v0 < 16
-    del v0
-    return v1
-def method6(v0 : i32) -> bool:
-    v1 = v0 < 1
-    del v0
-    return v1
-def method7() -> None:
+def method5() -> None:
     return 
-def method8(v0 : i32) -> None:
+def method6(v0 : i32) -> None:
     print(v0, end="")
     del v0
     return 
@@ -2999,318 +3460,267 @@ def main():
     v10 = cp.random.normal(0.0,1.0,4096,dtype=cp.float32) # type: ignore
     cp.copyto(v9[0:0+4096],v10[0:0+4096])
     del v9, v10
-    v11 = "Here are the weight matrices."
-    method0(v11)
-    del v11
-    print()
-    v13 = v0[0:0+4*2048].view(cp.float32)
+    v12 = v1[0:0+4*128].view(cp.float32)
+    v13 = cp.random.normal(0.0,1.0,128,dtype=cp.float32) # type: ignore
+    cp.copyto(v12[0:0+128],v13[0:0+128])
+    del v12, v13
     v14 = 0
-    v15 = 128
-    v16 = 8
-    v17 = 1
-    v18 = 16
-    v19 = 16
-    v20 = 8
-    method1(v13, v14, v15, v16, v17, v18, v19, v20)
-    del v13, v14, v15, v16, v17, v18, v19, v20
+    v15 = raw_module.get_function(f"entry{v14}")
+    del v14
+    v15.max_dynamic_shared_size_bytes = 1536 
+    v15((1,),(32,),(v1, v0),shared_mem=1536)
+    del v0, v15
+    v16 = "Here is the output tensor."
+    method0(v16)
+    del v16
     print()
-    v22 = v0[8192:8192+4*4096].view(cp.float32)
-    v23 = 0
-    v24 = 256
-    v25 = 16
-    v26 = 1
-    v27 = 16
-    v28 = 16
-    v29 = 16
-    method1(v22, v23, v24, v25, v26, v27, v28, v29)
-    del v22, v23, v24, v25, v26, v27, v28, v29
-    print()
-    v31 = v0[24576:24576+4*4096].view(cp.float32)
-    v32 = 0
-    v33 = 256
-    v34 = 16
-    v35 = 1
-    v36 = 16
-    v37 = 16
-    v38 = 16
-    method1(v31, v32, v33, v34, v35, v36, v37, v38)
-    del v31, v32, v33, v34, v35, v36, v37, v38
-    print()
-    v40 = v1[0:0+4*128].view(cp.float32)
-    v41 = cp.random.normal(0.0,1.0,128,dtype=cp.float32) # type: ignore
-    cp.copyto(v40[0:0+128],v41[0:0+128])
-    del v41
-    v42 = 0
-    v43 = raw_module.get_function(f"entry{v42}")
-    del v42
-    v43.max_dynamic_shared_size_bytes = 1536 
-    v43((1,),(32,),(v1, v0),shared_mem=1536)
-    del v0, v43
-    v44 = "Here is the input tensor."
-    method0(v44)
-    del v44
-    print()
-    v45 = 0
-    v46 = 128
-    v47 = 8
-    v48 = 1
-    v49 = 1
-    v50 = 16
-    v51 = 8
-    method1(v40, v45, v46, v47, v48, v49, v50, v51)
-    del v40, v45, v46, v47, v48, v49, v50, v51
-    print()
-    v52 = "Here is the output tensor."
-    method0(v52)
-    del v52
-    print()
-    v54 = v1[7680:7680+4*4096].view(cp.float32)
-    v55 = 0
-    v56 = '['
-    method2(v56)
-    del v56
-    v57 = 0
-    while method5(v57):
-        v59 = v55
-        v60 = v59 >= 512
-        del v59
-        if v60:
-            v61 = " ..."
-            method0(v61)
-            del v61
+    v18 = v1[7680:7680+4*4096].view(cp.float32)
+    v19 = 0
+    v20 = '['
+    method1(v20)
+    del v20
+    v21 = 0
+    while method2(v21):
+        v23 = v19
+        v24 = v23 >= 2147483647
+        del v23
+        if v24:
+            v25 = " ..."
+            method0(v25)
+            del v25
             break
         else:
             pass
-        del v60
-        v62 = v57 == 0
-        v63 = v62 != True
-        del v62
-        if v63:
-            v64 = "; "
-            method0(v64)
+        del v24
+        v26 = v21 == 0
+        v27 = v26 != True
+        del v26
+        if v27:
+            v28 = "; "
+            method0(v28)
         else:
             pass
-        del v63
-        v65 = '['
-        method2(v65)
-        del v65
-        v66 = 0
-        while method6(v66):
-            v68 = v55
-            v69 = v68 >= 512
-            del v68
-            if v69:
-                v70 = " ..."
-                method0(v70)
-                del v70
+        del v27
+        v29 = '['
+        method1(v29)
+        del v29
+        v30 = 0
+        while method3(v30):
+            v32 = v19
+            v33 = v32 >= 2147483647
+            del v32
+            if v33:
+                v34 = " ..."
+                method0(v34)
+                del v34
                 break
             else:
                 pass
-            del v69
-            v71 = v66 == 0
-            v72 = v71 != True
-            del v71
-            if v72:
-                v73 = "; "
-                method0(v73)
+            del v33
+            v35 = v30 == 0
+            v36 = v35 != True
+            del v35
+            if v36:
+                v37 = "; "
+                method0(v37)
             else:
                 pass
-            del v72
-            v74 = '['
-            method2(v74)
-            del v74
-            v75 = 0
-            while method5(v75):
-                v77 = v55
-                v78 = v77 >= 512
-                del v77
-                if v78:
-                    v79 = " ..."
-                    method0(v79)
-                    del v79
+            del v36
+            v38 = '['
+            method1(v38)
+            del v38
+            v39 = 0
+            while method2(v39):
+                v41 = v19
+                v42 = v41 >= 2147483647
+                del v41
+                if v42:
+                    v43 = " ..."
+                    method0(v43)
+                    del v43
                     break
                 else:
                     pass
-                del v78
-                v80 = v75 == 0
-                v81 = v80 != True
-                del v80
-                if v81:
-                    v82 = "; "
-                    method0(v82)
+                del v42
+                v44 = v39 == 0
+                v45 = v44 != True
+                del v44
+                if v45:
+                    v46 = "; "
+                    method0(v46)
                 else:
                     pass
-                del v81
-                v83 = '['
-                method2(v83)
-                del v83
-                v84 = 0
-                while method5(v84):
-                    v86 = v55
-                    v87 = v86 >= 512
-                    del v86
-                    if v87:
-                        v88 = " ..."
-                        method0(v88)
-                        del v88
+                del v45
+                v47 = '['
+                method1(v47)
+                del v47
+                v48 = 0
+                while method2(v48):
+                    v50 = v19
+                    v51 = v50 >= 2147483647
+                    del v50
+                    if v51:
+                        v52 = " ..."
+                        method0(v52)
+                        del v52
                         break
                     else:
                         pass
-                    del v87
-                    v89 = v84 == 0
-                    v90 = v89 != True
-                    del v89
-                    if v90:
-                        v91 = "; "
-                        method0(v91)
+                    del v51
+                    v53 = v48 == 0
+                    v54 = v53 != True
+                    del v53
+                    if v54:
+                        v55 = "; "
+                        method0(v55)
                     else:
                         pass
-                    del v90
-                    v92 = v55 + 1
-                    v55 = v92
-                    del v92
-                    v93 = v57 * 256
-                    v94 = v66 * 256
-                    v95 = v93 + v94
-                    del v93, v94
-                    v96 = v75 * 16
-                    v97 = v95 + v96
-                    del v95, v96
-                    v98 = v97 + v84
-                    del v97
-                    v99 = v54[v98].item()
-                    del v98
-                    method4(v99)
-                    del v99
-                    v84 += 1 
-                del v84
-                v100 = ']'
-                method2(v100)
-                del v100
-                v75 += 1 
-            del v75
-            v101 = ']'
-            method2(v101)
-            del v101
-            v66 += 1 
+                    del v54
+                    v56 = v19 + 1
+                    v19 = v56
+                    del v56
+                    v57 = v21 * 256
+                    v58 = v30 * 256
+                    v59 = v57 + v58
+                    del v57, v58
+                    v60 = v39 * 16
+                    v61 = v59 + v60
+                    del v59, v60
+                    v62 = v61 + v48
+                    del v61
+                    v63 = v18[v62].item()
+                    del v62
+                    method4(v63)
+                    del v63
+                    v48 += 1 
+                del v48
+                v64 = ']'
+                method1(v64)
+                del v64
+                v39 += 1 
+            del v39
+            v65 = ']'
+            method1(v65)
+            del v65
+            v30 += 1 
+        del v30
+        v66 = ']'
+        method1(v66)
         del v66
-        v102 = ']'
-        method2(v102)
-        del v102
-        v57 += 1 
-    del v54, v55, v57
-    v103 = ']'
-    method2(v103)
-    del v103
-    method7()
+        v21 += 1 
+    del v18, v19, v21
+    v67 = ']'
+    method1(v67)
+    del v67
+    method5()
     print()
-    v105 = v1[24064:24064+4*256].view(cp.int32)
+    v69 = v1[24064:24064+4*256].view(cp.int32)
     del v1
-    v106 = 0
-    v107 = '['
-    method2(v107)
-    del v107
-    v108 = 0
-    while method5(v108):
-        v110 = v106
-        v111 = v110 >= 2147483647
-        del v110
-        if v111:
-            v112 = " ..."
-            method0(v112)
-            del v112
+    v70 = 0
+    v71 = '['
+    method1(v71)
+    del v71
+    v72 = 0
+    while method2(v72):
+        v74 = v70
+        v75 = v74 >= 2147483647
+        del v74
+        if v75:
+            v76 = " ..."
+            method0(v76)
+            del v76
             break
         else:
             pass
-        del v111
-        v113 = v108 == 0
-        v114 = v113 != True
-        del v113
-        if v114:
-            v115 = "; "
-            method0(v115)
+        del v75
+        v77 = v72 == 0
+        v78 = v77 != True
+        del v77
+        if v78:
+            v79 = "; "
+            method0(v79)
         else:
             pass
-        del v114
-        v116 = '['
-        method2(v116)
-        del v116
-        v117 = 0
-        while method6(v117):
-            v119 = v106
-            v120 = v119 >= 2147483647
-            del v119
-            if v120:
-                v121 = " ..."
-                method0(v121)
-                del v121
+        del v78
+        v80 = '['
+        method1(v80)
+        del v80
+        v81 = 0
+        while method3(v81):
+            v83 = v70
+            v84 = v83 >= 2147483647
+            del v83
+            if v84:
+                v85 = " ..."
+                method0(v85)
+                del v85
                 break
             else:
                 pass
-            del v120
-            v122 = v117 == 0
-            v123 = v122 != True
-            del v122
-            if v123:
-                v124 = "; "
-                method0(v124)
+            del v84
+            v86 = v81 == 0
+            v87 = v86 != True
+            del v86
+            if v87:
+                v88 = "; "
+                method0(v88)
             else:
                 pass
-            del v123
-            v125 = '['
-            method2(v125)
-            del v125
-            v126 = 0
-            while method5(v126):
-                v128 = v106
-                v129 = v128 >= 2147483647
-                del v128
-                if v129:
-                    v130 = " ..."
-                    method0(v130)
-                    del v130
+            del v87
+            v89 = '['
+            method1(v89)
+            del v89
+            v90 = 0
+            while method2(v90):
+                v92 = v70
+                v93 = v92 >= 2147483647
+                del v92
+                if v93:
+                    v94 = " ..."
+                    method0(v94)
+                    del v94
                     break
                 else:
                     pass
-                del v129
-                v131 = v126 == 0
-                v132 = v131 != True
-                del v131
-                if v132:
-                    v133 = "; "
-                    method0(v133)
+                del v93
+                v95 = v90 == 0
+                v96 = v95 != True
+                del v95
+                if v96:
+                    v97 = "; "
+                    method0(v97)
                 else:
                     pass
-                del v132
-                v134 = v106 + 1
-                v106 = v134
-                del v134
-                v135 = v108 * 16
-                v136 = v117 * 16
-                v137 = v135 + v136
-                del v135, v136
-                v138 = v137 + v126
-                del v137
-                v139 = v105[v138].item()
-                del v138
-                method8(v139)
-                del v139
-                v126 += 1 
-            del v126
-            v140 = ']'
-            method2(v140)
-            del v140
-            v117 += 1 
-        del v117
-        v141 = ']'
-        method2(v141)
-        del v141
-        v108 += 1 
-    del v105, v106, v108
-    v142 = ']'
-    method2(v142)
-    del v142
-    method7()
+                del v96
+                v98 = v70 + 1
+                v70 = v98
+                del v98
+                v99 = v72 * 16
+                v100 = v81 * 16
+                v101 = v99 + v100
+                del v99, v100
+                v102 = v101 + v90
+                del v101
+                v103 = v69[v102].item()
+                del v102
+                method6(v103)
+                del v103
+                v90 += 1 
+            del v90
+            v104 = ']'
+            method1(v104)
+            del v104
+            v81 += 1 
+        del v81
+        v105 = ']'
+        method1(v105)
+        del v105
+        v72 += 1 
+    del v69, v70, v72
+    v106 = ']'
+    method1(v106)
+    del v106
+    method5()
     print()
     return 
 

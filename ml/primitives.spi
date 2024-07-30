@@ -476,7 +476,9 @@ inl local_argmax config x (j_tns : tensor (int * int) int) =
 
 inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_inclusive_scan_sum config x
-    inl probability = random.uniform rng |> conv
+    inl probability = // TODO: Refactor this.
+        inl r = random.uniform rng |> conv
+        local_reduce config 0 (fun a b => r) j_tns
     inl x = local_map (fun x => x - probability) x
     local_reduce config (limit.min, 0) (fun a b =>
         if fst a >= 0 && fst b >= 0 then
@@ -484,8 +486,7 @@ inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
         elif fst a >= 0 then a
         elif fst b >= 0 then b
         else a
-        ) (zip x j_tns)
-    |> snd
+    ) (zip x j_tns) |> snd
 
 inl local_softmax_and_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_softmax config x
@@ -515,8 +516,8 @@ inl test1() =
     ()
 
 inl test2() =
-    inl m,n : int * int = (1 <<< 4), (1 <<< 8)
-    // inl m,n : int * int = (1 <<< 10), (1 <<< 2)
+    // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
+    inl m,n : int * int = (1 <<< 8), (1 <<< 4)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
@@ -571,15 +572,15 @@ inl test2() =
     // printing.tensor_print_ln 1024 input_identity
     // printing.tensor_print_ln 1024 output_reduce
     // printing.tensor_print_ln 1024 output_softmax
-    printing.tensor_print_ln 1024 output_masked_softmax
+    // printing.tensor_print_ln 1024 output_masked_softmax
     // printing.tensor_print_ln 1024 output_ln
     // printing.tensor_print_ln 1024 output_argmax
     // printing.tensor_print_ln (m * n) output_softmax_scan
     // printing.tensor_print_ln (m * n) output_identity
     // printing.tensor_print_ln (m * n) output_indices_map
     // printing.tensor_print_ln (m * n) output_indices_reduction
-    printing.tensor_print_ln 1024 output_softmax'
-    printing.tensor_print_ln 1024 output_sampling
+    // printing.tensor_print_ln 1024 output_softmax'
+    // printing.tensor_print_ln 1024 output_sampling
     // printing.tensor_print_ln (m * n) output_sum_exclusive
     ()
 

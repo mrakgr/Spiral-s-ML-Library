@@ -45,11 +45,13 @@ inl create_coalesced_threads() : ref coalesced_group = $"auto \v = cooperative_g
 
 inl cg_reduce forall el. (tile : ref coalesced_group) (f : el -> el -> el) (x : el) : el = 
     global "#include <cooperative_groups/reduce.h>"
-    inl f (arg a), (arg b) = f a b 
+    // The CUDA reduce function is passing the arguments in wrong order so we correct them here.
+    inl f (arg a), (arg b) : el = f b a
     $"cooperative_groups::reduce(!tile, !x, !f)"
 inl cg_inclusive_scan forall el. (tile : ref coalesced_group) (f : el -> el -> el) (x : el) : el = 
     global "#include <cooperative_groups/scan.h>"
-    inl f (arg a), (arg b) = f a b 
+    // The CUDA inclusive scan function is passing the arguments in wrong order so we correct them here.
+    inl f (arg a), (arg b) : el = f b a
     $"cooperative_groups::inclusive_scan(!tile, !x, !f)"
 inl cg_shuffle forall el. (tile : ref coalesced_group) (x : el) (i : int) : el = $"!tile.shfl(!x,!i)"
 // Also returns the sum at the end.
