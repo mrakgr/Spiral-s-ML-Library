@@ -477,8 +477,8 @@ inl local_argmax config x (j_tns : tensor (int * int) int) =
 inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_inclusive_scan_sum config x
     inl probability = // TODO: Refactor this.
-        inl r = random.uniform rng |> conv
-        local_reduce config 0 (fun a b => r) j_tns
+        local_map (fun j => if j = 0 then random.uniform rng |> conv else 0) j_tns
+        |> local_reduce config 0 (fun a b => a)
     inl x = local_map (fun x => x - probability) x
     local_reduce config (limit.min, 0) (fun a b =>
         if fst a >= 0 && fst b >= 0 then
