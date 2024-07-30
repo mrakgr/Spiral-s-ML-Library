@@ -1,100 +1,151 @@
-Error trace on line: 583, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl main() = test2()
-        ^
-Error trace on line: 583, column: 14 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl main() = test2()
-             ^
-Error trace on line: 518, column: 10 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl test2() =
-         ^
-Error trace on line: 519, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl m,n : int * int = (1 <<< 4), (1 <<< 8)
+Error trace on line: 25, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                            ^
+Error trace on line: 25, column: 57 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                                        ^
+Error trace on line: 32, column: 32 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                               ^
+Error trace on line: 32, column: 38 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                                     ^
+Error trace on line: 157, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+            for' {from=0; nearTo} (fun i => on_success (i :: l))
+                                            ^
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
+                 ^
+Error trace on line: 439, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            graph_run_device m ls indices
+            ^
+Error trace on line: 422, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     ^
-Error trace on line: 519, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl m,n : int * int = (1 <<< 4), (1 <<< 8)
-        ^
-Error trace on line: 522, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+Error trace on line: 423, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     ^
-Error trace on line: 523, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
+Error trace on line: 424, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl _ = graph_run m ls indices
     ^
-Error trace on line: 524, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl input_action : _ _ float = cupy.random_uniform m
+Error trace on line: 424, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl _ = graph_run m ls indices
+            ^
+Error trace on line: 367, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl h = hashmapm.create()
     ^
-Error trace on line: 526, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_reduce = tensor_create 1
+Error trace on line: 368, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl abi t = apply block_index() t
     ^
-Error trace on line: 527, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_identity = tensor_create (m,n)
+Error trace on line: 369, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl tensor_extract forall t. (graph : graph t) : t = graph_tensor_extract (model {m with graph}) indices
     ^
-Error trace on line: 528, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_softmax = tensor_create (m,n)
+Error trace on line: 418, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    f graph
     ^
-Error trace on line: 529, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_masked_softmax = tensor_create (m,n)
+Error trace on line: 65, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match hashmapm.try_get h k with
     ^
-Error trace on line: 530, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_softmax_scan = tensor_create (m,n)
-    ^
-Error trace on line: 531, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_ln = tensor_create (m,n)
-    ^
-Error trace on line: 532, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_argmax = tensor_create m
-    ^
-Error trace on line: 533, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_sampling = tensor_create m
-    ^
-Error trace on line: 533, column: 27 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_sampling = tensor_create m
-                          ^
-Error trace on line: 43, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl stride, len = real calculate_stride_len dim
-    ^
-Error trace on line: 43, column: 9 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl stride, len = real calculate_stride_len dim
-        ^
-Error trace on line: 44, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    assert_long_length len dim
-    ^
-Error trace on line: 45, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl create_body forall t. : tensor_body dim t = tensor_body {
-    ^
-Error trace on line: 50, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    tensor {dim bodies=real infer_map `el create_body}
-    ^
-Error trace on line: 50, column: 12 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    tensor {dim bodies=real infer_map `el create_body}
-           ^
-Error trace on line: 50, column: 29 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    tensor {dim bodies=real infer_map `el create_body}
-                            ^
-Error trace on line: 9, column: 5 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-    f `el
-    ^
-Error trace on line: 5, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        typecase el with
-        ^
-Error trace on line: 6, column: 22 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        | ~a * ~b => f `a, f `b
-                     ^
-Error trace on line: 5, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        typecase el with
-        ^
-Error trace on line: 8, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        | _ => g `el
-               ^
-Error trace on line: 45, column: 53 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl create_body forall t. : tensor_body dim t = tensor_body {
-                                                    ^
-Error trace on line: 45, column: 65 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl create_body forall t. : tensor_body dim t = tensor_body {
-                                                                ^
-Error trace on line: 46, column: 17 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-        array = create len
+Error trace on line: 66, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 67, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 67, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 373, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            match x with
+            ^
+Error trace on line: 374, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. g,a,_) =>
+              ^
+Error trace on line: 379, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. g,a,_) =>
+              ^
+Error trace on line: 384, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. g,a,_) =>
+              ^
+Error trace on line: 389, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. g,a,_) =>
+              ^
+Error trace on line: 389, column: 33 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. g,a,_) =>
+                                ^
+Error trace on line: 389, column: 43 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. g,a,_) =>
+                                          ^
+Error trace on line: 389, column: 45 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. g,a,_) =>
+                                            ^
+Error trace on line: 390, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a, (out_map, out_reduce as out) = f a, tensor_extract x
                 ^
-Error trace on line: 47, column: 37 in module: c:\Spiral_s_ML_Library\corebase\base.spi.
-instance create array = fun size => array !!!!ArrayCreate(`el,size)
-                                    ^
-Only stack allocated primitive types (i8,i16,i32,i64 and u8,u16,u32,u64 and f32,f64 and bool) are allowed in CuPy arrays.
+Error trace on line: 390, column: 60 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a, (out_map, out_reduce as out) = f a, tensor_extract x
+                                                           ^
+Error trace on line: 369, column: 58 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl tensor_extract forall t. (graph : graph t) : t = graph_tensor_extract (model {m with graph}) indices
+                                                         ^
+Error trace on line: 322, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    loop graph
+    ^
+Error trace on line: 297, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        match graph with
+        ^
+Error trace on line: 298, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockMap(exists a. _,_,Some out) => loop out
+          ^
+Error trace on line: 299, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockRowMap(exists a. _,_,Some out) => loop out
+          ^
+Error trace on line: 300, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockRowReduce(exists a. _,_,Some out) => loop out
+          ^
+Error trace on line: 301, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | Zip(a,b) => zip (loop a) (loop b)
+          ^
+Error trace on line: 302, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | Pair(a,b) => loop a, loop b
+          ^
+Error trace on line: 303, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | Apply(exists a. a,b) => apply (loop b) (loop a)
+          ^
+Error trace on line: 304, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | KeyScalar(exists k. k) => real 
+          ^
+Error trace on line: 308, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | KeyTensor(_,x) => loop x
+          ^
+Error trace on line: 310, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            match hashmapm.try_get (fst param.offset) graph with
+            ^
+Error trace on line: 311, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Some x => partitionm.from_partition_offsets param.array x
+              ^
+Error trace on line: 312, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | None =>
+              ^
+Error trace on line: 313, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                match hashmapm.try_get (fst output.offset) graph with
+                ^
+Error trace on line: 314, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                | Some (x : partition_of t) => 
+                  ^
+Error trace on line: 319, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                | None =>
+                  ^
+Error trace on line: 320, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    print_static graph
+                    ^
+Error trace on line: 321, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
+                    ^
+Error trace on line: 149, column: 38 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl error_type (msg : string) = real error_type msg
+                                     ^
+Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is.

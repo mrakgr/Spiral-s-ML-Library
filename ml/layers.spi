@@ -66,50 +66,21 @@ inl memoize (h : hashmapm.hashmap) f k =
     | Some v => v
     | None => inl v = f k in hashmapm.add h k v . v
 
-// Returns the top level dimension. Takes in a hashmap for memoization purposes.
-inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t_top) -> dim_top =
-    inl f x = get_dim h x
-    inl f' x = get_dim_pair h x
-    inl check x = optionm.iter (fun x' => assert (D_D x = f' x') "The dimensions coming from the input and the dimensions of the output have to match.")
-    memoize h (function
-        | BlockMap(exists a. _, a, out) => 
-            inl a = f a
-            assert (fst a = blocks_per_grid()) "The batch dimension in the map node needs to equal the number of blocks per grid."
-            check a out
-            a
-        | BlockRowMap(exists a. _, a, out) => 
-            inl a = f a
-            assert (fst a = blocks_per_grid()) "The batch dimension in the row map node needs to equal the number of blocks per grid."
-            check a out
-            a
-        | BlockRowReduce(exists a. _, a, out) => 
-            inl q,w,_ = f a
-            assert (q = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
-            check (q,w) out
-            q,w
-        | BlockMatmul(a,b) =>
-            inl (q,m,k as a) = f a
-            assert (q = blocks_per_grid()) "The batch dimension in the matmul node needs to equal the number of blocks per grid."
-            inl (n,k') = f b
-            assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
-            q,m,n
-        | Zip(a,b) =>
-            inl a,b = f a,f b
-            assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
-            a
-        | Weight dim => dim
-        | Input dim => dim
-        | KeyTensor(_,x) => f x
-        | Apply(exists a. a,b) => snd (f a)
-        )
+// // Returns the top level dimension. Takes in a hashmap for memoization purposes.
+// inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t_top) -> dim_top =
+//     inl f x = get_dim h x
+//     inl f' x = get_dim_pair h x
+//     memoize h (function
+
+//         )
 
 
 // Returns the top level dimension for an arbitrary graph type. Takes in a hashmap for memoization purposes.
 // Results in a type errors error on the KeyScalar node.
-and inl get_dim_pair forall t. (h : graph_dims) : graph t -> dim_of t =
-    inl f x = get_dim h x
+inl rec get_dim_pair forall t_top. (h : graph_dims) : graph t_top -> dim_of t_top =
+    inl f x = get_dim h x 
     inl f' x = get_dim_pair h x
-    inl g x = D_D(f x)
+    inl check x = optionm.iter (fun x' => assert (D_D x = f' x') "The dimensions coming from the input and the dimensions of the output have to match.")
     memoize h (function
         | BlockRowMapReduce(exists a. _, a, out) =>
             inl q,w,e = f a
@@ -121,17 +92,37 @@ and inl get_dim_pair forall t. (h : graph_dims) : graph t -> dim_of t =
                 )
             D_P(D_D(q,w,e),D_D(q,w))
         | Pair(a,b) => D_P(f' a, f' b)
-        // Note: We cannot group these in a single clause due to the way GADT typecase insertion works.
-        | BlockMap as x => g x
-        | BlockRowMap as x => g x
-        | BlockRowReduce as x => g x
-        | BlockMatmul as x => g x
-        | Zip as x => g x
-        | Weight as x => g x
-        | Input as x => g x
-        | KeyTensor as x => g x
-        | Apply as x => g x
+        | BlockMap(exists a. _, a, out) => 
+            inl a = f a
+            assert (fst a = blocks_per_grid()) "The batch dimension in the map node needs to equal the number of blocks per grid."
+            check a out
+            D_D a
+        | BlockRowMap(exists a. _, a, out) => 
+            inl a = f a
+            assert (fst a = blocks_per_grid()) "The batch dimension in the row map node needs to equal the number of blocks per grid."
+            check a out
+            D_D a
+        | BlockRowReduce(exists a. _, a, out) => 
+            inl q,w,_ = f a
+            assert (q = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
+            check (q,w) out
+            D_D(q,w)
+        | BlockMatmul(a,b) =>
+            inl (q,m,k as a) = f a
+            assert (q = blocks_per_grid()) "The batch dimension in the matmul node needs to equal the number of blocks per grid."
+            inl (n,k') = f b
+            assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
+            D_D(q,m,n)
+        | Zip(a,b) =>
+            inl a,b = f a,f b
+            assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
+            D_D a
+        | Weight dim => D_D dim
+        | Input dim => D_D dim
+        | KeyTensor(_,x) => D_D(f x)
+        | Apply(exists a. a,b) => D_D(snd (f a))
         )
+and inl get_dim forall dim t. (h : graph_dims) (x : graph (tensor dim t)) : dim = match get_dim_pair h x with D_D x => x
 
 // Calculates the parameter offsets.
 inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
@@ -186,8 +177,7 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
                     inl partition_offsets = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset()
                     set_offset partition_offsets.offset_end
                     P_D partition_offsets
-            inl k = get_dim_pair k
-            hashmapm.add h_offset_output k (loop k)
+            hashmapm.add h_offset_output k (loop (get_dim_pair k))
     and inl f forall t. : graph t -> () =
         memoize h fun k =>
             match k with
@@ -225,6 +215,7 @@ inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
             | BlockMap(exists a. _,a,out) => f a . g out
             | BlockRowMap(exists a. _,a,out) => f a . g out
             | BlockRowReduce(exists a. _,a,out) => f a . g out
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
             | BlockMatmul(a,b) => 
                 inl memory : size =
                     inl tf32 () : size = fst(matmul.matmul_tf32' false true).offset_end
@@ -258,6 +249,7 @@ inl param_init forall t_top. (model {graph param} : model t_top) =
             | BlockMap(exists a. _,a,out)  => f a . g out
             | BlockRowMap(exists a. _,a,out) => f a . g out
             | BlockRowReduce(exists a. _,a,out) => f a . g out
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
             | BlockMatmul(a,b) => f a . f b
             | Zip(a,b) => f a . f b
             | Pair(a,b) => f a . f b
@@ -283,6 +275,7 @@ inl param_print forall t_top. (model {graph param} : model t_top) =
             | BlockMap(exists a. _,a,out)  => f a . g out
             | BlockRowMap(exists a. _,a,out) => f a . g out
             | BlockRowReduce(exists a. _,a,out) => f a . g out
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
             | BlockMatmul(a,b) => f a . f b
             | Zip(a,b) => f a . f b
             | Pair(a,b) => f a . f b
@@ -305,6 +298,7 @@ inl graph_tensor_extract forall t_top indices. (model {graph param output} : mod
         | BlockMap(exists a. _,_,Some out) => loop out
         | BlockRowMap(exists a. _,_,Some out) => loop out
         | BlockRowReduce(exists a. _,_,Some out) => loop out
+        | BlockRowMapReduce(exists a. _,_,Some out) => loop out
         | Zip(a,b) => zip (loop a) (loop b)
         | Pair(a,b) => loop a, loop b
         | Apply(exists a. a,b) => apply (loop b) (loop a)
@@ -348,6 +342,7 @@ inl key_extract forall t_top key{symbol} dim input. (model ({graph param output}
             | BlockMap(exists a. _,a,out) => g (f a) out
             | BlockRowMap(exists a. _,a,out) => g (f a) out
             | BlockRowReduce(exists a. _,a,out) => g (f a) out
+            | BlockRowMapReduce(exists a. _,a,out) => g (f a) out
             | BlockMatmul(a,b) => pair a b
             | Apply(exists a. a,b) => pair a b
             | Zip(a,b) => pair a b
@@ -391,6 +386,11 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
                 inl a, out = f a, tensor_extract x
                 inl g = g ls
                 join row_reduce g (abi a) (abi out)
+                out
+            | BlockRowMapReduce(exists a. g,a,_) =>
+                inl a, (out_map, out_reduce as out) = f a, tensor_extract x
+                inl g = g ls
+                join row_map_reduce g (abi a) (abi out_map) (abi out_reduce)
                 out
             | BlockMatmul(a,b) =>
                 inl a,b,out = f a, f b, tensor_extract x
@@ -457,6 +457,12 @@ inl max' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)
 inl max forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) t) = 
     max_ None x
 
+inl ln_l2 forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    BlockRowMap (exists (fun _ config x _ _ => primitives.local_ln_l2 config x), x, None)
+
+inl argmax forall dim t{number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) =
+    BlockRowReduce (exists (fun _ config x _ j_tns => primitives.local_argmax config x j_tns), x, None)
+
 inl softmax_ forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     BlockRowMap (exists (fun _ config x _ _ => primitives.local_softmax config x), x, out)
 inl softmax' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
@@ -464,19 +470,6 @@ inl softmax' forall dim t{float;number}. out (x : graph (tensor (int * dim * int
 inl softmax forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     softmax_ None x
 
-inl masked_softmax_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
-    BlockRowMap (exists (fun _ config x => primitives.local_masked_softmax (fun config x i j => j < size) config x), x, out)
-inl masked_softmax' forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
-    masked_softmax_ size (Some out) x
-inl masked_softmax forall dim t{float;number}. size (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
-    masked_softmax_ size None x
-
-inl ln_l2 forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
-    BlockRowMap (exists (fun _ config x _ _ => primitives.local_ln_l2 config x), x, None)
-
-
-inl argmax forall dim t{number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) =
-    BlockRowReduce (exists (fun _ config x _ j_tns => primitives.local_argmax config x j_tns), x, None)
 
 inl discrete_sample_ forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) = 
     inl f (layer_state {rng}) config x i j_tns = primitives.local_discrete_sampling rng config x i j_tns
@@ -493,6 +486,21 @@ inl softmax_and_discrete_sample' forall dim t{float;number}. out (x : graph (ten
     softmax_and_discrete_sample_ (Some out) x
 inl softmax_and_discrete_sample forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) =
     softmax_and_discrete_sample_ None x
+
+inl masked_softmax_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    BlockRowMap (exists (fun _ config x => primitives.local_masked_softmax (fun config x i j => j < size) config x), x, out)
+inl masked_softmax' forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    masked_softmax_ size (Some out) x
+inl masked_softmax forall dim t{float;number}. size (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    masked_softmax_ size None x
+
+inl masked_softmax_and_discrete_sample_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t * tensor (int * dim) int) = 
+    inl f (layer_state {rng}) = primitives.local_masked_softmax_and_discrete_sampling (fun confix x i j => j < size) rng
+    BlockRowMapReduce (exists f, x, out)
+inl masked_softmax_and_discrete_sample' forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) =
+    masked_softmax_and_discrete_sample_ size (Some out) x
+inl masked_softmax_and_discrete_sample forall dim t{float;number}. size (x : graph (tensor (int * dim * int) t)) =
+    masked_softmax_and_discrete_sample_ size None x
 
 inl matmul (b,a) x = BlockMatmul(x, Weight (a,b))
 inl key_scalar forall t key{symbol}. (key : key) : graph t = KeyScalar(exists key)
@@ -639,40 +647,41 @@ inl test4() =
     printing.tensor_print_ln limit.max output
     ()
 
-// // Tests running a feedforward ensemble model which keeps around the path probabilities.
-// inl test5() =
-//     inl ensemble : int = 16
-//     inl graph =
-//         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
-//         |> matmul_ensemble (ensemble,8,16)
-//         |> ln_l2
-//         |> relu
-//         |> matmul_ensemble (ensemble,16,16)
-//         |> ln_l2
-//         |> relu
-//         |> matmul_ensemble (ensemble,16,16)
-//         |> softmax 
-//         |> mask' (input .output_probs (ensemble,blocks_per_grid(),16,16) |> apply .ensemble)
-//         |> discrete_sample' (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
+// Tests running a feedforward ensemble model which keeps around the path probabilities.
+inl test5() =
+    inl ensemble : int = 16
+    inl graph =
+        (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
+        |> matmul_ensemble (ensemble,8,16)
+        |> ln_l2
+        |> relu
+        |> matmul_ensemble (ensemble,16,16)
+        |> ln_l2
+        |> relu
+        |> matmul_ensemble (ensemble,16,16)
+        |> masked_softmax_and_discrete_sample' 4 (
+            pair (input .output_probs   (ensemble,blocks_per_grid(),16,16) |> apply .ensemble) 
+                 (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
+            )
 
-//     inl model = create_model graph
-//     param_init model
-//     console.write_ln "Here are the weight matrices."
-//     param_print model
-//     inl input : tensor d3 float = key_extract model .input
-//     // Immitates the passing of data into the output vector.
-//     // In the poker game the serialization function will be responsible for this.
-//     cupy.copy_to {
-//         from = cupy.random_normal{mean=0; std=1} input.dim
-//         to = input
-//     }
-//     graph_run_host model {ensemble}
-//     console.write_ln "Here is the input tensor."
-//     console.write_ln input
-//     console.write_ln "Here is the output tensor."
-//     inl output : tensor d4 float = key_extract model .output_probs
-//     printing.tensor_print_ln (1 <<< 9) output
-//     inl output : tensor d3 int = key_extract model .output_indices
-//     printing.tensor_print_ln limit.max output
+    inl model = create_model graph
+    param_init model
+    console.write_ln "Here are the weight matrices."
+    param_print model
+    inl input : tensor d3 float = key_extract model .input
+    // Immitates the passing of data into the output vector.
+    // In the poker game the serialization function will be responsible for this.
+    cupy.copy_to {
+        from = cupy.random_normal{mean=0; std=1} input.dim
+        to = input
+    }
+    graph_run_host model {ensemble}
+    console.write_ln "Here is the input tensor."
+    console.write_ln input
+    console.write_ln "Here is the output tensor."
+    inl output : tensor d4 float = key_extract model .output_probs
+    printing.tensor_print_ln (1 <<< 9) output
+    inl output : tensor d3 int = key_extract model .output_indices
+    printing.tensor_print_ln limit.max output
 
-inl main() = test1()
+inl main() = test5()
