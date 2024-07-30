@@ -47,8 +47,11 @@ union rec graph t =
     | KeyTensor :: forall dim t. (exists key{symbol}. key) * graph (tensor dim t) -> graph (tensor dim t)
     | KeyScalar :: forall t. (exists key{symbol}. key) -> graph t
 union rec dim_of t =
-    | D :: forall dim t. dim -> dim_of (tensor dim t)
-    | P :: forall a b. dim_of a * dim_of b -> dim_of (a * b)
+    | D_D :: forall dim t. dim -> dim_of (tensor dim t)
+    | D_P :: forall a b. dim_of a * dim_of b -> dim_of (a * b)
+union rec partition_of t =
+    | P_D :: forall dim t. partitionm.partition_offsets (tensor dim t) -> partition_of (tensor dim t)
+    | P_P :: forall a b. partition_of a * partition_of b -> partition_of (a * b)
 
 nominal model t =
     {
@@ -67,7 +70,7 @@ inl memoize (h : hashmapm.hashmap) f k =
 inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t_top) -> dim_top =
     inl f x = get_dim h x
     inl f' x = get_dim_pair h x
-    inl check x = optionm.iter (fun x' => assert (D x = f' x') "The dimensions coming from the input and the dimensions of the output have to match.")
+    inl check x = optionm.iter (fun x' => assert (D_D x = f' x') "The dimensions coming from the input and the dimensions of the output have to match.")
     memoize h (function
         | BlockMap(exists a. _, a, out) => 
             inl a = f a
@@ -106,26 +109,28 @@ inl rec get_dim forall dim_top t_top. (h : graph_dims) : graph (tensor dim_top t
 and inl get_dim_pair forall t. (h : graph_dims) : graph t -> dim_of t =
     inl f x = get_dim h x
     inl f' x = get_dim_pair h x
+    inl g x = D_D(f x)
     memoize h (function
         | BlockRowMapReduce(exists a. _, a, out) =>
             inl q,w,e = f a
             assert (q = blocks_per_grid()) "The batch dimension in the row reduce node needs to equal the number of blocks per grid."
             out |> optionm.iter (fun out => 
-                inl (P(D a, D b)) = f' out
+                inl (D_P(D_D a, D_D b)) = f' out
                 assert ((q,w,e) = a) "The dimensions coming from the input and the dimensions of the first output have to match."
                 assert ((q,w) = b) "The dimensions coming from the input and the dimensions of the second output have to match."
                 )
-            P(D(q,w,e),D(q,w))
-        | Pair(a,b) => P(f' a, f' b)
-        | BlockMap as x => D(f x)
-        | BlockRowMap as x => D(f x)
-        | BlockRowReduce as x => D(f x)
-        | BlockMatmul as x => D(f x)
-        | Zip as x => D(f x)
-        | Weight as x => D(f x)
-        | Input as x => D(f x)
-        | KeyTensor as x => D(f x)
-        | Apply as x => D(f x)
+            D_P(D_D(q,w,e),D_D(q,w))
+        | Pair(a,b) => D_P(f' a, f' b)
+        // Note: We cannot group these in a single clause due to the way GADT typecase insertion works.
+        | BlockMap as x => g x
+        | BlockRowMap as x => g x
+        | BlockRowReduce as x => g x
+        | BlockMatmul as x => g x
+        | Zip as x => g x
+        | Weight as x => g x
+        | Input as x => g x
+        | KeyTensor as x => g x
+        | Apply as x => g x
         )
 
 // Calculates the parameter offsets.
@@ -157,7 +162,7 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : grap
             | KeyTensor(_,x) => f x
             | KeyScalar => ()
             | Input => ()
-    inl offset = f x
+    f x
     hashmapm.set_immutable(h_offset_param)
     h_offset_param, get_offset()
 
@@ -172,17 +177,17 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
     inl get_dim_pair x = get_dim_pair dims x
     inl rec g forall t. (k : graph t) (out : option (graph t)) : () =
         match out with
-        | Some x => f' x
+        | Some x => f x
         | None =>
-            inl body forall t'. (k : graph t') =
-                inl partition_offsets : _ (_ _ t) = partitionm.to_partition (get_dim k) |> partitionm.calculate_offsets get_offset()
-                hashmapm.add h_offset_output k partition_offsets
-                set_offset partition_offsets.offset_end
-            inl rec loop forall t'. (x : graph_pair t') : () =
+            inl rec loop forall t'. (x : dim_of t') : partition_of t' =
                 match x with
-                | GP_D x => body x
-                | GP_P(a,b) => loop a . loop b
-            loop k
+                | D_P(a,b) => P_P(loop a, loop b)
+                | D_D dim =>
+                    inl partition_offsets = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset()
+                    set_offset partition_offsets.offset_end
+                    P_D partition_offsets
+            inl k = get_dim_pair k
+            hashmapm.add h_offset_output k (loop k)
     and inl f forall t. : graph t -> () =
         memoize h fun k =>
             match k with
@@ -192,18 +197,14 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
             | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
             | BlockMatmul(a,b) => f a . f b . g k None
             | Zip(a,b) => f a . f b // passthrough
-            | Pair x => f' x // passthrough
+            | Pair(a,b) => f a . f b // passthrough
             | Weight => ()
             | Apply(exists a. a,b) => f a . f b // passthrough
             | Input => g k None
             | KeyTensor(_,x) => f x // passthrough
             | KeyScalar(_) => ()
-    and inl f' forall t. : graph_pair t -> () =
-        memoize h function
-            | GP_Single x => f x
-            | GP_Pair(a,b) => f' a . f' b
         
-    inl offset = f x
+    f x
     hashmapm.set_immutable(h_offset_output)
     h_offset_output, get_offset()
 
@@ -298,7 +299,7 @@ inl create_graph_data (offset : graph_offset) : graph_data =
     {array offset}
 
 // Extracts the tensor at the top level node.
-inl graph_tensor_extract forall t' indices. (model {graph param output} : model t') (indices : indices) : t' =
+inl graph_tensor_extract forall t_top indices. (model {graph param output} : model t_top) (indices : indices) : t_top =
     inl rec loop forall t. (graph : graph t) : t =
         match graph with
         | BlockMap(exists a. _,_,Some out) => loop out
@@ -317,7 +318,11 @@ inl graph_tensor_extract forall t' indices. (model {graph param output} : model 
             | Some x => partitionm.from_partition_offsets param.array x
             | None =>
                 match hashmapm.try_get (fst output.offset) graph with
-                | Some x => partitionm.from_partition_offsets output.array x
+                | Some (x : partition_of t) => 
+                    inl rec f forall t'. : partition_of t' -> t' = function
+                        | P_D x => partitionm.from_partition_offsets output.array x
+                        | P_P(a,b) => f a, f b
+                    f x
                 | None =>
                     print_static graph
                     error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
@@ -481,12 +486,12 @@ inl discrete_sample' forall dim t{float;number}. out (x : graph (tensor (int * d
 inl discrete_sample forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) = 
     discrete_sample_ None x
 
-inl softmax_and_discrete_sample_ forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) = 
+inl softmax_and_discrete_sample_ forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t * tensor (int * dim) int) = 
     inl f (layer_state {rng}) config x i j_tns = primitives.local_softmax_and_discrete_sampling rng config x i j_tns
-    BlockRowReduce (exists f, x, out)
-inl softmax_and_discrete_sample' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) = 
+    BlockRowMapReduce (exists f, x, out)
+inl softmax_and_discrete_sample' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) =
     softmax_and_discrete_sample_ (Some out) x
-inl softmax_and_discrete_sample forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) = 
+inl softmax_and_discrete_sample forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) =
     softmax_and_discrete_sample_ None x
 
 inl matmul (b,a) x = BlockMatmul(x, Weight (a,b))
@@ -569,7 +574,7 @@ inl test2() =
 
 // Tests running a feedforward model.
 inl test3() =
-    inl graph : graph (tensor d2 int) =
+    inl graph : graph (tensor d3 float * tensor d2 int) =
         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
         |> matmul (8,16)
         |> ln_l2
@@ -584,7 +589,7 @@ inl test3() =
     param_init model
     console.write_ln "Here are the weight matrices."
     param_print model
-    inl input : tensor (int * int * int) float = key_extract model .input
+    inl input : tensor d3 float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
     cupy.copy_to {
@@ -602,7 +607,7 @@ inl test3() =
 // Tests running a feedforward ensemble model.
 inl test4() =
     inl ensemble = 16
-    inl graph : graph (tensor d2 int) =
+    inl graph : graph (tensor d3 float * tensor d2 int) =
         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
         |> matmul_ensemble (ensemble,8,16)
         |> ln_l2
@@ -611,7 +616,10 @@ inl test4() =
         |> ln_l2
         |> relu
         |> matmul_ensemble (ensemble,16,16)
-        |> softmax_and_discrete_sample' (input .output (ensemble,blocks_per_grid(),16) |> apply .ensemble)
+        |> softmax_and_discrete_sample' (
+            pair (input .output_probs   (ensemble,blocks_per_grid(),16,16) |> apply .ensemble) 
+                 (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
+            )
 
     inl model = create_model graph
     param_init model
@@ -627,44 +635,44 @@ inl test4() =
     console.write_ln input
     console.write_ln "Here is the output tensor."
     graph_run_host model {ensemble}
-    inl output : tensor d3 int = key_extract model .output
+    inl output : tensor d3 int = key_extract model .output_indices
     printing.tensor_print_ln limit.max output
     ()
 
-// Tests running a feedforward ensemble model which keeps around the path probabilities.
-inl test5() =
-    inl ensemble : int = 16
-    inl graph =
-        (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
-        |> matmul_ensemble (ensemble,8,16)
-        |> ln_l2
-        |> relu
-        |> matmul_ensemble (ensemble,16,16)
-        |> ln_l2
-        |> relu
-        |> matmul_ensemble (ensemble,16,16)
-        |> softmax 
-        |> mask' (input .output_probs (ensemble,blocks_per_grid(),16,16) |> apply .ensemble)
-        |> discrete_sample' (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
+// // Tests running a feedforward ensemble model which keeps around the path probabilities.
+// inl test5() =
+//     inl ensemble : int = 16
+//     inl graph =
+//         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
+//         |> matmul_ensemble (ensemble,8,16)
+//         |> ln_l2
+//         |> relu
+//         |> matmul_ensemble (ensemble,16,16)
+//         |> ln_l2
+//         |> relu
+//         |> matmul_ensemble (ensemble,16,16)
+//         |> softmax 
+//         |> mask' (input .output_probs (ensemble,blocks_per_grid(),16,16) |> apply .ensemble)
+//         |> discrete_sample' (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
 
-    inl model = create_model graph
-    param_init model
-    console.write_ln "Here are the weight matrices."
-    param_print model
-    inl input : tensor d3 float = key_extract model .input
-    // Immitates the passing of data into the output vector.
-    // In the poker game the serialization function will be responsible for this.
-    cupy.copy_to {
-        from = cupy.random_normal{mean=0; std=1} input.dim
-        to = input
-    }
-    graph_run_host model {ensemble}
-    console.write_ln "Here is the input tensor."
-    console.write_ln input
-    console.write_ln "Here is the output tensor."
-    inl output : tensor d4 float = key_extract model .output_probs
-    printing.tensor_print_ln (1 <<< 9) output
-    inl output : tensor d3 int = key_extract model .output_indices
-    printing.tensor_print_ln limit.max output
+//     inl model = create_model graph
+//     param_init model
+//     console.write_ln "Here are the weight matrices."
+//     param_print model
+//     inl input : tensor d3 float = key_extract model .input
+//     // Immitates the passing of data into the output vector.
+//     // In the poker game the serialization function will be responsible for this.
+//     cupy.copy_to {
+//         from = cupy.random_normal{mean=0; std=1} input.dim
+//         to = input
+//     }
+//     graph_run_host model {ensemble}
+//     console.write_ln "Here is the input tensor."
+//     console.write_ln input
+//     console.write_ln "Here is the output tensor."
+//     inl output : tensor d4 float = key_extract model .output_probs
+//     printing.tensor_print_ln (1 <<< 9) output
+//     inl output : tensor d3 int = key_extract model .output_indices
+//     printing.tensor_print_ln limit.max output
 
-inl main() = test5()
+inl main() = test1()
