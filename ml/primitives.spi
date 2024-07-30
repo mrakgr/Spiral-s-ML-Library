@@ -477,8 +477,11 @@ inl local_argmax config x (j_tns : tensor (int * int) int) =
 inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_inclusive_scan_sum config x
     inl probability = // TODO: Refactor this.
-        local_map (fun j => if j = 0 then random.uniform rng |> conv else 0) j_tns
-        |> local_reduce config 0 (fun a b => a)
+        j_tns
+        |> local_map const(random.uniform rng |> conv)
+        |> local_reduce config 0 (fun a b => b)
+    semaphore.write_ln_system {probability tid=thread_index()}
+    __syncthreads()
     inl x = local_map (fun x => x - probability) x
     local_reduce config (limit.min, 0) (fun a b =>
         if fst a >= 0 && fst b >= 0 then
