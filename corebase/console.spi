@@ -9,7 +9,7 @@ inl prim x = real
 prototype printable t : t -> ()
 
 inl rec write forall t. (x : t) : () =
-    let rec write (x : .obj) : () = real
+    inl rec write (x : .obj) : () = real
         open real_core
         inl p (a,b) = 
             backend_switch `(()) {
@@ -59,3 +59,8 @@ inl write_ln l =
         Cuda = fun () => $'printf("\\n")' : ()
         Python = fun () => $"print()" : ()
     }
+
+inl main() =
+    inl s : string = !!!!StaticStringConcat(("qwe\n","asd\n","zxc\n"))
+    s
+    // write_ln {a=1i32; b=2f32; c="asdzxc"; d=true}
