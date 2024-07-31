@@ -9,7 +9,7 @@ type size = // The block and thread dimensions should match blocks_per_grid and 
 
 open corecuda
 open rangem
-inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : float -> out) (data : inp) =
+inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (data : inp) =
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
     inl () = // Assert that all the dimensions are right.
@@ -66,26 +66,19 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
         |> tensor_index thread_index()
 
     {
-        action = output (conv (output_id + 1) / conv inner)
+        action = output output_id
+        sampling_prob_selected = output_probs |> tensor_index (ensemble_id,block_index(),thread_index(),output_id)
         sampling_prob_ensemble =
             output_probs
             |> reorder (fun ensemble,block,thread,inner => block,thread,inner,ensemble)
-            |> apply block_index()
-            |> apply thread_index()
-            |> apply output_id
-        sampling_prob_selected = 
-            output_probs
-            |> apply ensemble_id
-            |> apply block_index()
-            |> apply thread_index()
-            |> tensor_index output_id
+            |> apply block_index() |> apply thread_index() |> apply output_id
     }
 
 nominal game_model inp out = 
     {
         model : exists t. model t
         input : pickler.pu inp
-        output : float -> out
+        output : int -> out
     }
 
 inl run forall inp out. (game_model {model input output} : game_model inp out) = run' model input output

@@ -1,3 +1,6 @@
+// The default int and float for this project should be: i32 and f32.
+// It hasn't been tested with any other values.
+
 // packages: |core
 
 modules:
