@@ -521,8 +521,8 @@ inl test1() =
 
 inl test2() =
     // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
-    inl m,n : int * int = (1 <<< 4), (1 <<< 7)
-    // inl m,n : int * int = (1 <<< 8), (1 <<< 4)
+    // inl m,n : int * int = (1 <<< 4), (1 <<< 7)
+    inl m,n : int * int = (1 <<< 8), (1 <<< 4)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
