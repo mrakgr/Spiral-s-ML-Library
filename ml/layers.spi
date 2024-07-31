@@ -580,7 +580,7 @@ inl test2() =
     console.write_ln input
     ()
 
-// Tests running a feedforward model.
+// Tests running a feedforward model which outputs the sampling indices.
 inl test3() =
     inl graph : graph (tensor d3 float * tensor d2 int) =
         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
@@ -612,7 +612,7 @@ inl test3() =
     console.write_ln "===="
     ()
 
-// Tests running a feedforward ensemble model.
+// Tests running a feedforward ensemble model which keeps around the sampling probabilities.
 inl test4() =
     inl ensemble = 16
     inl graph : graph (tensor d3 float * tensor d2 int) =
@@ -647,7 +647,7 @@ inl test4() =
     printing.tensor_print_ln limit.max output
     ()
 
-// Tests running a feedforward ensemble model which keeps around the path probabilities.
+// Tests running a feedforward ensemble model which keeps around the sampling probabilities with masking.
 inl test5() =
     inl ensemble : int = 16
     inl graph =
