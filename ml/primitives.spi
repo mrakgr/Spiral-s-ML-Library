@@ -482,11 +482,14 @@ inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
         |> local_reduce config 0 (fun a b => b)
     inl x = local_map (fun x => x - probability) x
     local_reduce config (limit.min, 0) (fun a b =>
-        if fst a >= 0 && fst b >= 0 then
-            if fst a <= fst b then a else b
-        elif fst a >= 0 then a
-        elif fst b >= 0 then b
-        else a
+        join
+            $"// wtf"
+            $'printf("%i, %i\\n", !(snd a), !(snd b))'
+            if fst a >= 0 && fst b >= 0 then
+                if fst a <= fst b then a else b
+            elif fst a >= 0 then a
+            elif fst b >= 0 then b
+            else a
     ) (zip x j_tns) |> snd
 
 inl local_softmax_and_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
@@ -518,56 +521,57 @@ inl test1() =
 
 inl test2() =
     // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
-    inl m,n : int * int = (1 <<< 8), (1 <<< 4)
+    inl m,n : int * int = (1 <<< 4), (1 <<< 7)
+    // inl m,n : int * int = (1 <<< 8), (1 <<< 4)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
     inl input_action : _ _ float = cupy.random_uniform m
     // inl input : _ _ float = cupy.ones (m,n)
-    inl output_reduce = tensor_create 1
-    inl output_identity = tensor_create (m,n)
-    inl output_softmax = tensor_create (m,n)
+    // inl output_reduce = tensor_create 1
+    // inl output_identity = tensor_create (m,n)
+    // inl output_softmax = tensor_create (m,n)
+    // inl output_masked_softmax = tensor_create (m,n)
+    // inl output_softmax_scan = tensor_create (m,n)
+    // inl output_ln = tensor_create (m,n)
+    // inl output_argmax = tensor_create m
+    // inl output_indices_map = tensor_create (m,n)
+    // inl output_indices_reduction = tensor_create m
+    // inl output_sum_exclusive = tensor_create (m,n)
     inl output_softmax' = tensor_create (m,n)
-    inl output_masked_softmax = tensor_create (m,n)
-    inl output_softmax_scan = tensor_create (m,n)
-    inl output_ln = tensor_create (m,n)
-    inl output_argmax = tensor_create m
     inl output_sampling = tensor_create m
-    inl output_indices_map = tensor_create (m,n)
-    inl output_indices_reduction = tensor_create m
-    inl output_sum_exclusive = tensor_create (m,n)
     run fun _ =>
         open random
         inl rng : _ philox_state = init {seed = clock64(); subsequence=0; offset=0}
-        map ((+) 1) input input
-        reduce 0 (+) input output_reduce
-        // indices (identity)
-        row_map (fun config x i j_tns => x) input_identity output_identity
-        // indices (map)
-        row_map (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
-        // indices (reduction)
-        row_reduce (fun config x i j_tns => i) input output_indices_reduction
-        // numerically stable softmax
-        row_map (fun config x _ _ => local_softmax config x) input output_softmax
-        // layer normalization L2
-        row_map (fun config x _ _ => local_ln_l2 config x) input output_ln
-        // argument maximum
-        row_reduce (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
-        // numerically stable softmax (scan)
-        row_map (fun config x _ _ =>
-            inl x' = local_softmax config x
-            inl x = local_inclusive_scan_sum config x'
-            zip x' x
-            ) input output_softmax_scan
-        // sum (exclusive scan)
-        row_map (fun config x _ _ =>
-            local_exclusive_scan config 0 (+) x
-            ) input_identity output_sum_exclusive
-        row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
+        // map ((+) 1) input input
+        // reduce 0 (+) input output_reduce
+        // // indices (identity)
+        // row_map (fun config x i j_tns => x) input_identity output_identity
+        // // indices (map)
+        // row_map (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
+        // // indices (reduction)
+        // row_reduce (fun config x i j_tns => i) input output_indices_reduction
+        // // numerically stable softmax
+        // row_map (fun config x _ _ => local_softmax config x) input output_softmax
+        // // layer normalization L2
+        // row_map (fun config x _ _ => local_ln_l2 config x) input output_ln
+        // // argument maximum
+        // row_reduce (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
+        // // numerically stable softmax (scan)
+        // row_map (fun config x _ _ =>
+        //     inl x' = local_softmax config x
+        //     inl x = local_inclusive_scan_sum config x'
+        //     zip x' x
+        //     ) input output_softmax_scan
+        // // sum (exclusive scan)
+        // row_map (fun config x _ _ =>
+        //     local_exclusive_scan config 0 (+) x
+        //     ) input_identity output_sum_exclusive
+        // row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
         // // discrete sampling
         // row_map_reduce (local_softmax_and_discrete_sampling rng) input output_softmax' output_sampling
         // masked discrete sampling
-        row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 4) rng) input output_softmax' output_sampling
+        row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 3) rng) input output_softmax' output_sampling
 
     // printing.tensor_print_ln 1024 input
     // printing.tensor_print_ln 1024 input_identity

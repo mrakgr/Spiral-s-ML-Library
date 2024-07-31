@@ -649,18 +649,19 @@ inl test4() =
 
 // Tests running a feedforward ensemble model which keeps around the sampling probabilities with masking.
 inl test5() =
+    inl inner : int = 128
     inl ensemble : int = 16
     inl graph =
-        (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
-        |> matmul_ensemble (ensemble,8,16)
+        (input .input (blocks_per_grid(),16,inner) : graph (tensor _ float))
+        |> matmul_ensemble (ensemble,inner,inner)
         |> ln_l2
         |> relu
-        |> matmul_ensemble (ensemble,16,16)
+        |> matmul_ensemble (ensemble,inner,inner)
         |> ln_l2
         |> relu
-        |> matmul_ensemble (ensemble,16,16)
-        |> masked_softmax_and_discrete_sample' 4 (
-            pair (input .output_probs   (ensemble,blocks_per_grid(),16,16) |> apply .ensemble) 
+        |> matmul_ensemble (ensemble,inner,inner)
+        |> masked_softmax_and_discrete_sample' 3 (
+            pair (input .output_probs   (ensemble,blocks_per_grid(),16,inner) |> apply .ensemble) 
                  (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
             )
 
