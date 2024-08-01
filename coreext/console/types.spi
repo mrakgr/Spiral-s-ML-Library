@@ -1,0 +1,10 @@
+open corebase.compile_time
+
+nominal console_config =
+    {
+        h : hashmapm.hashmap
+        key_fmt : .fmt
+        key_value : .value
+    }
+
+prototype printable t : console_config -> t -> ()

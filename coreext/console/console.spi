@@ -1,0 +1,8 @@
+open corebase
+open corecuda
+open console_cuda
+
+inl main() =
+    run fun () =>
+        write_ln {a=true; b=2i32; c=dyn Some(3f32, 4i64, 5u8)}
+    ()

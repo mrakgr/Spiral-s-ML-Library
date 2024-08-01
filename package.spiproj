@@ -54,15 +54,23 @@ modules:
         tensor_cuda
         cupy
         thread_scope
-        semaphore
         pipeline
         wmma
         pragma 
         cooperative_groups
+        semaphore
         tests/
             serializer
             pickler
-        
+
+    coreext/
+        console/
+            types-
+            utils
+            console_cuda
+            console_python
+            console-
+
     ml/
         matmul
         primitives

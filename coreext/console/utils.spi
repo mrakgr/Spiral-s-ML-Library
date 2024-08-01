@@ -1,0 +1,8 @@
+open corebase
+open compile_time
+
+inl create_console_config() =
+    inl h : hashmapm.hashmap = hashmapm.create()
+    inl key_fmt = .fmt
+    inl key_value = .value
+    console_config {h key_fmt key_value}

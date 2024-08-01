@@ -1,0 +1,1 @@
+print("".join(["qwe","{:.6f}".format(23.45)]))

@@ -42,6 +42,7 @@ inl create_thread() : ref thread = $"auto \v = cooperative_groups::this_thread()
 inl create_labeled_partition forall parent {tileable}. (x : ref parent) (i : int) : ref coalesced_group = $"auto \v = cooperative_groups::labeled_partition(!x,!i)"
 inl create_binary_partition forall parent {tileable}. (x : ref parent) (i : bool) : ref coalesced_group = $"auto \v = cooperative_groups::binary_partition(!x,!i)"
 inl create_coalesced_threads() : ref coalesced_group = $"auto \v = cooperative_groups::coalesced_threads()"
+inl cg_sync (tile : ref coalesced_group) : () = $"!tile.sync()"
 
 inl cg_reduce forall el. (tile : ref coalesced_group) (f : el -> el -> el) (x : el) : el = 
     global "#include <cooperative_groups/reduce.h>"

@@ -60,7 +60,7 @@ inl write_ln l =
         Python = fun () => $"print()" : ()
     }
 
-inl main() =
-    inl s : string = !!!!StaticStringConcat(("qwe\n","asd\n","zxc\n"))
-    s
+// inl main() =
+//     inl s : string = !!!!StaticStringConcat(("qwe\n","asd\n","zxc\n"))
+//     s
     // write_ln {a=1i32; b=2f32; c="asdzxc"; d=true}
