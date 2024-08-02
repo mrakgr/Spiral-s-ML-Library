@@ -106,12 +106,11 @@ inl test3() =
         ml.game_modelm.game_model {
             model = exists model
             input = pu_history
-            // output = function
-            //     | 0 => Fold
-            //     | 1 => Call
-            //     | 2 => Raise
-            //     | _ => failwith "Invalid output id in the Leduc model."
-            output = id
+            output = function
+                | 0 => Fold
+                | 1 => Call
+                | 2 => Raise
+                | _ => failwith "Invalid output id in the Leduc model."
         }
 
     console.write_ln "Running the kernel."
@@ -119,14 +118,14 @@ inl test3() =
     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
         ml.game_modelm.run game_model data
-        |> console.single_threaded console.write_ln
+        |> console.write_ln
 
     device_sync()
-    console.write_ln "The output tensor is:"
-    inl output : tensor d4 float = key_extract model .output_probs
-    console.tensor.write_ln limit.max output
-    inl output : tensor d3 int = key_extract model .output_indices
-    console.tensor.write_ln limit.max output
+    // console.write_ln "The output tensor is:"
+    // inl output : tensor d4 float = key_extract model .output_probs
+    // console.tensor.write_ln limit.max output
+    // inl output : tensor d3 int = key_extract model .output_indices
+    // console.tensor.write_ln limit.max output
 
 inl test4() =
     ()
