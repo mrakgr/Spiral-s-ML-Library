@@ -206,7 +206,9 @@ struct dynamic_array_list
 };
 
 struct Union0;
+struct Union1;
 __device__ void method_0(Union0 v0);
+__device__ void method_1(sptr<Union1> v0);
 struct Union0_0 { // None
 };
 struct Union0_1 { // Some
@@ -269,6 +271,68 @@ struct Union0 {
         this->tag = 255;
     }
 };
+struct Union1_0 { // Cons
+    sptr<Union1> v1;
+    int v0;
+    __device__ Union1_0(int t0, sptr<Union1> t1) : v0(t0), v1(t1) {}
+    __device__ Union1_0() = delete;
+};
+struct Union1_1 { // Nil
+};
+struct Union1 {
+    union {
+        Union1_0 case0; // Cons
+        Union1_1 case1; // Nil
+    };
+    int refc{0};
+    unsigned char tag{255};
+    __device__ Union1() {}
+    __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Cons
+    __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // Nil
+    __device__ Union1(Union1 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(x.case0); break; // Cons
+            case 1: new (&this->case1) Union1_1(x.case1); break; // Nil
+        }
+    }
+    __device__ Union1(Union1 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Cons
+            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // Nil
+        }
+    }
+    __device__ Union1 & operator=(Union1 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Cons
+                case 1: this->case1 = x.case1; break; // Nil
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{x};
+        }
+        return *this;
+    }
+    __device__ Union1 & operator=(Union1 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Cons
+                case 1: this->case1 = std::move(x.case1); break; // Nil
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union1() {
+        switch(this->tag){
+            case 0: this->case0.~Union1_0(); break; // Cons
+            case 1: this->case1.~Union1_1(); break; // Nil
+        }
+        this->tag = 255;
+    }
+};
 __device__ void method_0(Union0 v0){
     switch (v0.tag) {
         case 0: { // None
@@ -287,6 +351,26 @@ __device__ void method_0(Union0 v0){
         }
     }
 }
+__device__ void method_1(sptr<Union1> v0){
+    switch (v0.base->tag) {
+        case 0: { // Cons
+            int v1 = v0.base->case0.v0; sptr<Union1> v2 = v0.base->case0.v1;
+            printf("%s(%d, ","Cons", v1);
+            method_1(v2);
+            printf(")");
+            return ;
+            break;
+        }
+        case 1: { // Nil
+            printf("%s","Nil");
+            return ;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+        }
+    }
+}
 extern "C" __global__ void entry0() {
     float v0;
     v0 = 3.0f;
@@ -296,14 +380,34 @@ extern "C" __global__ void entry0() {
     v2 = 5u;
     Union0 v3;
     v3 = Union0{Union0_1{v0, v1, v2}};
-    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v4 = console_lock;
-    auto v5 = cooperative_groups::coalesced_threads();
-    v4.acquire();
+    int v4;
+    v4 = 1l;
+    int v5;
+    v5 = 2l;
+    int v6;
+    v6 = 3l;
+    int v7;
+    v7 = 4l;
+    sptr<Union1> v8;
+    v8 = sptr<Union1>{new Union1{Union1_1{}}};
+    sptr<Union1> v9;
+    v9 = sptr<Union1>{new Union1{Union1_0{v7, v8}}};
+    sptr<Union1> v10;
+    v10 = sptr<Union1>{new Union1{Union1_0{v6, v9}}};
+    sptr<Union1> v11;
+    v11 = sptr<Union1>{new Union1{Union1_0{v5, v10}}};
+    sptr<Union1> v12;
+    v12 = sptr<Union1>{new Union1{Union1_0{v4, v11}}};
+    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v13 = console_lock;
+    auto v14 = cooperative_groups::coalesced_threads();
+    v13.acquire();
     printf("{%s = %s; %s = %d; %s = ","a", "true", "b", 2l, "c");
     method_0(v3);
+    printf("; %s = ","d");
+    method_1(v12);
     printf("}\n");
-    v4.release();
-    v5.sync() ;
+    v13.release();
+    v14.sync() ;
     return ;
 }
 """

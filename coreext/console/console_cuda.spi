@@ -49,9 +49,11 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
                 else
                     if var_is x then 
                         flush false
-                        join unbox x (fun (k,v) => 
-                            write_ `(`x) utils.create_console_config() false (nominal_create `(`x) (k,v))
-                            )
+                        join 
+                            unbox x (fun (k,v) => 
+                                write_ `(`x) utils.create_console_config() false (nominal_create `(`x) (k,v))
+                                )
+                        : ()
                     else 
                         unbox x (fun (k,v) => 
                             write k
