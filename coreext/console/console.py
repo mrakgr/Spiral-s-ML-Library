@@ -401,7 +401,7 @@ extern "C" __global__ void entry0() {
     cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v13 = console_lock;
     auto v14 = cooperative_groups::coalesced_threads();
     v13.acquire();
-    printf("{%s = %s; %s = %d; %s = ","a", "true", "b", 2l, "c");
+    printf("{%s = %s; %s = %d; %s = ","a", "false", "b", 2l, "c");
     method_0(v3);
     printf("; %s = ","d");
     method_1(v12);
@@ -470,13 +470,105 @@ options.append('--restrict')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
+UH0 = Union["UH0_0", "UH0_1"]
+class US0_0(NamedTuple): # None
+    tag = 0
+class US0_1(NamedTuple): # Some
+    v0 : f32
+    v1 : i64
+    v2 : u8
+    tag = 1
+US0 = Union[US0_0, US0_1]
+class UH0_0(NamedTuple): # Cons
+    v0 : i32
+    v1 : UH0
+    tag = 0
+class UH0_1(NamedTuple): # Nil
+    tag = 1
+def method0(v0 : US0) -> None:
+    match v0:
+        case US0_0(): # None
+            del v0
+            v2 = "{}"
+            v3 = "None"
+            print(v2.format(v3),end="")
+            del v2, v3
+            return 
+        case US0_1(v4, v5, v6): # Some
+            del v0
+            v8 = "{}({:.6f}, {}, {})"
+            v9 = "Some"
+            print(v8.format(v9, v4, v5, v6),end="")
+            del v4, v5, v6, v8, v9
+            return 
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method1(v0 : UH0) -> None:
+    match v0:
+        case UH0_0(v1, v2): # Cons
+            del v0
+            v4 = "{}({}, "
+            v5 = "Cons"
+            print(v4.format(v5, v1),end="")
+            del v1, v4, v5
+            method1(v2)
+            del v2
+            v6 = ")"
+            print(v6,end="")
+            del v6
+            return 
+        case UH0_1(): # Nil
+            del v0
+            v8 = "{}"
+            v9 = "Nil"
+            print(v8.format(v9),end="")
+            del v8, v9
+            return 
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
 def main():
-    v0 = 0
-    v1 = raw_module.get_function(f"entry{v0}")
-    del v0
-    v1.max_dynamic_shared_size_bytes = 0 
-    v1((1,),(32,),(),shared_mem=0)
-    del v1
+    v0 = 3.0
+    v1 = 4
+    v2 = 5
+    v3 = US0_1(v0, v1, v2)
+    del v0, v1, v2
+    v4 = 1
+    v5 = 2
+    v6 = 3
+    v7 = 4
+    v8 = UH0_1()
+    v9 = UH0_0(v7, v8)
+    del v7, v8
+    v10 = UH0_0(v6, v9)
+    del v6, v9
+    v11 = UH0_0(v5, v10)
+    del v5, v10
+    v12 = UH0_0(v4, v11)
+    del v4, v11
+    v13 = "{{{} = {}; {} = {}; {} = "
+    v14 = "a"
+    v15 = "true"
+    v16 = "b"
+    v17 = "c"
+    print(v13.format(v14, v15, v16, 2, v17),end="")
+    del v13, v14, v15, v16, v17
+    method0(v3)
+    del v3
+    v18 = "; {} = "
+    v19 = "d"
+    print(v18.format(v19),end="")
+    del v18, v19
+    method1(v12)
+    del v12
+    v20 = "}}\n"
+    print(v20,end="")
+    del v20
+    v21 = 0
+    v22 = raw_module.get_function(f"entry{v21}")
+    del v21
+    v22.max_dynamic_shared_size_bytes = 0 
+    v22((1,),(32,),(),shared_mem=0)
+    del v22
     return 
 
 if __name__ == '__main__': print(main())

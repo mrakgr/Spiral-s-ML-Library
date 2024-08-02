@@ -6,5 +6,3 @@ nominal console_config =
         key_fmt : .fmt
         key_value : .value
     }
-
-prototype printable t : console_config -> t -> ()

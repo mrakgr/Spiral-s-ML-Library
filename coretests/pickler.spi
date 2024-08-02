@@ -1,6 +1,7 @@
 open corebase
-open console
+open corecuda
 open pickler
+open coreext
 
 union card = King | Queen | Jack
 union action = Raise | Fold | Call
@@ -34,5 +35,5 @@ inl main() =
             serialize p {stack=5; pot=8; card=King; action_history=arraym.fromList [Raise; Raise; Call]}
             // |> fun x => write_ln x . x
             |> deserialize p
-            |> write_ln
+            |> console.write_ln
             ()

@@ -1,5 +1,6 @@
 open corebase
 open corecuda
+open coreext
 open rangem
 
 inl main() =

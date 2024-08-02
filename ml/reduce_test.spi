@@ -1,5 +1,6 @@
 open corebase
 open corecuda
+open coreext
 open refm
 open rangem
 open tensorm
@@ -12,7 +13,7 @@ inl test_reduce() =
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl output_identity = tensor_create m
     console.write_ln "The input is:"
-    printing.tensor_print_ln limit.max input_identity
+    console.tensor.tensor_print_ln limit.max input_identity
     run fun _ =>
         // indices (left identity)
         row_reduce (fun config x i j_tns => 
@@ -25,7 +26,7 @@ inl test_reduce() =
             ) input_identity output_identity
 
     console.write_ln "The output is:"
-    printing.tensor_print_ln limit.max output_identity
+    console.tensor.tensor_print_ln limit.max output_identity
     ()
 
 inl main() = test_reduce()

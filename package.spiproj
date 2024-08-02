@@ -22,7 +22,6 @@ modules:
         loop
         optionm
         monad
-        console
         arraym
         sam
         dam
@@ -31,7 +30,6 @@ modules:
         tensorm/
             utils*
             tensor_main-
-            printing
         partitionm
         serializer/
             types-
@@ -59,9 +57,6 @@ modules:
         pragma 
         cooperative_groups
         semaphore
-        tests/
-            serializer
-            pickler
 
     coreext/
         console/
@@ -70,6 +65,11 @@ modules:
             console_cuda
             console_python
             console-
+            tensor
+            
+    coretests/
+        serializer
+        pickler
 
     ml/
         matmul

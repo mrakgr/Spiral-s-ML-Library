@@ -1,0 +1,74 @@
+open corebase
+open compile_time
+
+inl rec write_ forall t. (console_config {h key_fmt key_value} as config : console_config) (is_newline : bool) (x : t) : () =
+    // The types of these are lies.
+    inl get_fmt () = hashmapm.get_with_default h key_fmt ()
+    inl get_value () = hashmapm.get_with_default h key_value ()
+    inl put_fmt (sep : string) = hashmapm.set h key_fmt (get_fmt(), sep)
+    inl put_value (fmt, str : string * .obj) =
+        put_fmt fmt
+        hashmapm.set h key_value (get_value(), str)
+    inl flush is_newline =
+        if is_newline then put_fmt "\n"
+        inl fmt = !!!!StaticStringConcat(get_fmt())
+        inl str = get_value()
+        real
+            match str with
+            | () => $'print(!fmt,end="")' : ()
+            | (), _ => $'print(!fmt.format(!str),end="")' : ()
+            | _, _ => $'print(!fmt.format!str,end="")' : ()
+        hashmapm.remove h key_fmt |> ignore
+        hashmapm.remove h key_value |> ignore
+    inl rec write (x : .obj) : () = real
+        open real_core
+        inl p = put_value
+        
+        match x with
+        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("{}", x)
+        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("{}", x)
+        | (x : f32) | (x : f64) => p ("{:.6f}", x)
+        | (x : string) => p ("{}", x)
+        | (x : char) => p ("{}", x)
+        | (x : bool) => p ("{}", if x then "true" else "false")
+        | (a,b) => write a . put_fmt ", " . write b
+        | {} as x =>
+            put_fmt "{{"
+            record_fold (fun {state=separator key value} => 
+                put_fmt separator
+                write (symbol_to_string key) 
+                put_fmt " = " 
+                write value
+                "; "
+                ) () x |> ignore
+            put_fmt "}}"
+        | () => ()
+        | x when symbol_is x => write (symbol_to_string x)
+        | x => 
+            if union_is x then
+                if prototype_has `(`x) printable then printable `(`x) config x
+                else
+                    if var_is x then 
+                        flush false
+                        join 
+                            unbox x (fun (k,v) => 
+                                write_ `(`x) utils.create_console_config() false (nominal_create `(`x) (k,v))
+                                )
+                        : ()
+                    else 
+                        unbox x (fun (k,v) => 
+                            write k
+                            match v with
+                            | () => ()
+                            | _ => put_fmt "(" . write v . put_fmt ")"
+                            )
+            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) config x
+            // elif layout_is x then write *x // TODO: Deal with all the layout type cases.
+            else error_type "Unsupported type."
+            
+    real write x
+    flush is_newline
+
+inl write_ln l = write_ utils.create_console_config() true l
+inl write l = write_ utils.create_console_config() false l
+

@@ -1,5 +1,6 @@
 open corebase
 open corecuda
+open coreext
 open tensorm
 open compile_time
 
@@ -644,7 +645,7 @@ inl test4() =
     console.write_ln "Here is the output tensor."
     graph_run_host model {ensemble}
     inl output : tensor d3 int = key_extract model .output_indices
-    printing.tensor_print_ln limit.max output
+    console.tensor.tensor_print_ln limit.max output
     ()
 
 // Tests running a feedforward ensemble model which keeps around the sampling probabilities with masking.
@@ -681,8 +682,8 @@ inl test5() =
     // console.write_ln input
     console.write_ln "Here is the output tensor."
     inl output : tensor d4 float = key_extract model .output_probs
-    printing.tensor_print_ln limit.max output
+    console.tensor.tensor_print_ln limit.max output
     inl output : tensor d3 int = key_extract model .output_indices
-    printing.tensor_print_ln limit.max output
+    console.tensor.tensor_print_ln limit.max output
 
 inl main() = test5()

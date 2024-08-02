@@ -74,16 +74,17 @@ open thread_scope
 open semaphore
 open cooperative_groups
 
-inl write_semaphore is_newline l =
+// Uses a global lock to execute the print statement sequentially across the threads.
+inl single_threaded write_ l =
     global "#include <cooperative_groups.h>"
     global "#include <cuda/semaphore>"
     global "__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);" // It is global so that only one instance of printf can be executed at any given time.
     inl lock : ref (binary_semaphore thread_scope_system) = $"`(binary_semaphore thread_scope_system) & \v = console_lock"
     inl active_warp_threads = create_coalesced_threads()
     acquire lock // This is so only one instance of print can be executed at a time.
-    write_ utils.create_console_config() is_newline l
+    write_ l
     release lock
     sync active_warp_threads // cg_sync is so the print works in a reduction kernel. The warp threads need to be reconverged.
 
-inl write_ln l = write_semaphore true l
-inl write l = write_semaphore false l
+inl write_ln l = write_ utils.create_console_config() true l
+inl write l = write_ utils.create_console_config() false l

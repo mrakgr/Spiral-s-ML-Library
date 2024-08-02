@@ -28,6 +28,4 @@ let draw_cards forall dim. rng deck : sam.sa dim card * deck =
         deck
         ) deck
 
-open console
-
-instance printable deck = fun (deck d) => write d
+instance printable deck = fun {write} (deck d) => write d

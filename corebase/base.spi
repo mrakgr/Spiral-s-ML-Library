@@ -72,3 +72,11 @@ nominal cupy_type t = `(
     )
 
 nominal arg x = x
+
+type printable_funs =
+        {
+        write_ln : forall t. t -> ()
+        write : forall t. t -> ()
+    }
+
+prototype printable t : printable_funs -> t -> ()

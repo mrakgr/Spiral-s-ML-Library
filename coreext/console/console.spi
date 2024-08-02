@@ -1,8 +1,26 @@
 open corebase
 open corecuda
-open console_cuda
+
+inl write_ln x =
+    backend_switch {
+        Python = fun () => console_python.write_ln x
+        Cuda = fun () => console_cuda.write_ln x
+    }
+
+inl write x =
+    backend_switch {
+        Python = fun () => console_python.write x
+        Cuda = fun () => console_cuda.write x
+    }
+
+inl single_threaded write x =
+    backend_switch {
+        Python = fun () => write x
+        Cuda = fun () => console_cuda.single_threaded write x
+    }
 
 inl main() =
+    write_ln {a=true; b=2i32; c=dyn Some(3f32, 4i64, 5u8); d=dyn [1i32;2;3;4]}
     run fun () =>
-        write_ln {a=true; b=2i32; c=dyn Some(3f32, 4i64, 5u8); d=dyn [1i32;2;3;4]}
+        single_threaded write_ln {a=false; b=2i32; c=dyn Some(3f32, 4i64, 5u8); d=dyn [1i32;2;3;4]}
     ()

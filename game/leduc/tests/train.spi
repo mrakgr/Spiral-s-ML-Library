@@ -1,5 +1,6 @@
 open corebase
 open corecuda
+open coreext
 open game
 
 inl pu_table() : pickler.pu table =
@@ -118,14 +119,14 @@ inl test3() =
     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
         ml.game_modelm.run game_model data
-        |> semaphore.write_ln_system
+        |> console.single_threaded console.write_ln
 
     device_sync()
     console.write_ln "The output tensor is:"
     inl output : tensor d4 float = key_extract model .output_probs
-    printing.tensor_print_ln limit.max output
+    console.tensor.tensor_print_ln limit.max output
     inl output : tensor d3 int = key_extract model .output_indices
-    printing.tensor_print_ln limit.max output
+    console.tensor.tensor_print_ln limit.max output
 
 inl test4() =
     ()

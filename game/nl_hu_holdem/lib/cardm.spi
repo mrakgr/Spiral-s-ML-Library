@@ -16,8 +16,7 @@ instance full card = fun (card x) => x
 instance equable card = fun a b => full a = full b
 instance comparable card = fun a b => comp (full a) (full b)
 
-open console
-instance printable card = fun card =>
+instance printable card = fun {write write_ln} card =>
     inl rank = 
         match rank card with
         | 12 => 'A'

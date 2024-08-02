@@ -55,6 +55,4 @@ open arraym
 instance equable sa_list dim el = generic_equable
 instance comparable sa_list dim el = generic_comparable
 
-open console
-
 instance printable sa_list dim el = array_print 100

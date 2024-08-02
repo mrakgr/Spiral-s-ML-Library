@@ -233,5 +233,4 @@ inl deserialize forall t. (pu p : pu t) ~(binary_array x : binary_array t) : t =
     assert (c = 1) "Invalid format detected during deserialization."
     x
 
-open console
-instance printable binary_array t = fun (binary_array x) => console.write_ln x
+instance printable binary_array t = fun ({write write_ln} : printable_funs) (binary_array x) => write_ln x

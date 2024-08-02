@@ -43,7 +43,6 @@ instance comparable da dim el = generic_comparable
 // Initializes array using the given function.
 inl init forall dim el. f : da dim el = init (real real_core.type_lit_to_lit `dim) f
 
-open console
 instance printable da dim el = array_print 100
 
 // inl main() =
