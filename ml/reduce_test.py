@@ -3,7 +3,7 @@ kernel = r"""
 #include <assert.h>
 #include <stdio.h>
 #include <cooperative_groups.h>
-#include <cooperative_groups/reduce.h>
+#include <cooperative_groups/scan.h>
 using default_int = int;
 using default_uint = unsigned int;
 template <typename el>
@@ -204,10 +204,18 @@ struct dynamic_array_list
     }
 };
 
+struct Tuple0;
 __device__ int return_snd_0(int v0, int v1);
+struct Tuple0 {
+    int v0;
+    int v1;
+    __device__ Tuple0() = default;
+    __device__ Tuple0(int t0, int t1) : v0(t0), v1(t1) {}
+};
 struct Closure0 {
     __device__ int operator()(int tup0, int tup1){
         int v0 = tup0; int v1 = tup1;
+
         return return_snd_0(v0, v1);
     }
 };
@@ -269,6 +277,7 @@ extern "C" __global__ void entry0(int * v0, int * v1) {
     int v13;
     v13 = v12 + v11;
     assert("Tensor range check" && 0 <= v7 && v7 < 8l);
+    assert("Tensor range check" && 0 <= v6 && v6 < 4l);
     int v14;
     v14 = 0l;
     while (while_method_0(v14)){
@@ -401,44 +410,103 @@ extern "C" __global__ void entry0(int * v0, int * v1) {
         v61 = v14 * 8l;
         int v62;
         v62 = v61 + v7;
-        int v63;
-        v63 = -1l;
+        int v63[4l];
         int v64;
-        v64 = 0l;
-        while (while_method_1(v64)){
-            int v66;
-            v66 = 0l;
-            while (while_method_2(v66)){
-                assert("Tensor range check" && 0 <= v64 && v64 < 1l);
-                assert("Tensor range check" && 0 <= v66 && v66 < 4l);
-                int v68;
-                v68 = 4l * v64;
-                int v69;
-                v69 = v68 + v66;
-                int v70;
-                v70 = v18[v69];
+        v64 = -1l;
+        int v65;
+        v65 = 0l;
+        while (while_method_1(v65)){
+            assert("Tensor range check" && 0 <= v65 && v65 < 1l);
+            int v67;
+            v67 = 4l * v65;
+            assert("Tensor range check" && 0 <= v65 && v65 < 1l);
+            int v68; int v69;
+            Tuple0 tmp0 = Tuple0{0l, -1l};
+            v68 = tmp0.v0; v69 = tmp0.v1;
+            while (while_method_2(v68)){
+                assert("Tensor range check" && 0 <= v68 && v68 < 4l);
                 int v71;
-                v71 = return_snd_0(v63, v70);
-                v63 = v71;
-                v66 += 1l ;
+                v71 = v68 + v67;
+                int v72;
+                v72 = v18[v71];
+                int v73;
+                v73 = return_snd_0(v69, v72);
+                v69 = v73;
+                v68 += 1l ;
             }
-            v64 += 1l ;
+            auto v74 = cooperative_groups::coalesced_threads();
+            int v75;
+            v75 = threadIdx.x;
+            int v76;
+            v76 = v75 / 4l;
+            auto v77 = cooperative_groups::labeled_partition(v74,v76);
+            Closure0 v78{};
+            int v79;
+            v79 = cooperative_groups::inclusive_scan(v77, v69, v78);
+            int v80;
+            v80 = v77.shfl_up(v79,1);
+            bool v81;
+            v81 = v77.thread_rank() == 0;
+            int v82;
+            if (v81){
+                v82 = -1l;
+            } else {
+                v82 = v80;
+            }
+            int v83;
+            v83 = v77.shfl(v79,v77.num_threads()-1);
+            int v84;
+            if (v64 >= v82) {
+                printf("wrong in own code 2\n");
+            }
+            v84 = return_snd_0(v64, v82);
+            int v85; int v86;
+            Tuple0 tmp1 = Tuple0{0l, v84};
+            v85 = tmp1.v0; v86 = tmp1.v1;
+            while (while_method_2(v85)){
+                assert("Tensor range check" && 0 <= v85 && v85 < 4l);
+                int v88;
+                v88 = v85 + v67;
+                int v89;
+                v89 = v18[v88];
+                int v90;
+                if (v86 >= v89) {
+                    printf("wrong in own code 3\n");
+                }
+                v90 = return_snd_0(v86, v89);
+                assert("Tensor range check" && 0 <= v85 && v85 < 4l);
+                v63[v88] = v90;
+                v86 = v90;
+                v85 += 1l ;
+            }
+            int v91;
+            if (v64 >= v83) {
+                printf("wrong in own code 4\n");
+            }
+            v91 = return_snd_0(v64, v83);
+            v64 = v91;
+            v65 += 1l ;
         }
-        auto v72 = cooperative_groups::coalesced_threads();
-        int v73;
-        v73 = threadIdx.x;
-        int v74;
-        v74 = v73 / 4l;
-        auto v75 = cooperative_groups::labeled_partition(v72,v74);
-        Closure0 v76{};
-        int v77;
-        v77 = cooperative_groups::reduce(v75, v63, v76);
         assert("Tensor range check" && 0 <= v14 && v14 < 32l);
-        int v78;
-        v78 = 8l * v14;
-        int v79;
-        v79 = v78 + v7;
-        v1[v79] = v77;
+        int v92;
+        v92 = 0l;
+        while (while_method_1(v92)){
+            assert("Tensor range check" && 0 <= v92 && v92 < 1l);
+            int v94;
+            v94 = 16l * v92;
+            int v95;
+            v95 = v94 + v17;
+            assert("Tensor range check" && 0 <= v92 && v92 < 1l);
+            int v96;
+            v96 = 4l * v92;
+            int4* v97;
+            v97 = reinterpret_cast<int4*>(v63 + v96);
+            int4* v98;
+            v98 = reinterpret_cast<int4*>(v1 + v95);
+            assert("Pointer alignment check" && (unsigned long long)(v97) % 4l == 0 && (unsigned long long)(v98) % 4l == 0);
+            *v98 = *v97;
+            v92 += 1l ;
+        }
         v14 += 1l ;
     }
     __syncthreads();
@@ -504,28 +572,14 @@ options.append('--restrict')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
-def method0(v0 : string) -> None:
-    print(v0, end="")
-    del v0
-    return 
-def method1(v0 : char) -> None:
-    print(v0, end="")
-    del v0
-    return 
-def method2(v0 : i32) -> bool:
+def method0(v0 : i32) -> bool:
     v1 = v0 < 256
     del v0
     return v1
-def method3(v0 : i32) -> bool:
+def method1(v0 : i32) -> bool:
     v1 = v0 < 16
     del v0
     return v1
-def method4(v0 : i32) -> None:
-    print(v0, end="")
-    del v0
-    return 
-def method5() -> None:
-    return 
 def main():
     v0 = cp.arange(0,4096,1,dtype=cp.int32) # type: ignore
     v1 = v0.size
@@ -539,133 +593,156 @@ def main():
     else:
         pass
     del v2, v3
-    v5 = cp.empty(256,dtype=cp.int32)
-    v6 = "The input is:"
-    method0(v6)
-    del v6
-    print()
-    v7 = 0
-    v8 = '['
-    method1(v8)
-    del v8
-    v9 = 0
-    while method2(v9):
-        v11 = v7
-        v12 = v11 >= 2147483647
-        del v11
-        if v12:
-            v13 = " ..."
-            method0(v13)
-            del v13
+    v5 = cp.empty(4096,dtype=cp.int32)
+    v8 = "{}\n"
+    v9 = "The input is:"
+    print(v8.format(v9),end="")
+    del v9
+    v37 = 0
+    v38 = "{}"
+    print(v38.format('['),end="")
+    v39 = 0
+    while method0(v39):
+        v41 = v37
+        v42 = v41 >= 2147483647
+        del v41
+        if v42:
+            v43 = " ..."
+            print(v38.format(v43),end="")
+            del v43
             break
         else:
             pass
-        del v12
-        v14 = v9 == 0
-        v15 = v14 != True
-        del v14
-        if v15:
-            v16 = "; "
-            method0(v16)
+        del v42
+        v44 = v39 == 0
+        v45 = v44 != True
+        del v44
+        if v45:
+            v46 = "; "
+            print(v38.format(v46),end="")
+            del v46
         else:
             pass
-        del v15
-        v17 = '['
-        method1(v17)
-        del v17
-        v18 = 0
-        while method3(v18):
-            v20 = v7
-            v21 = v20 >= 2147483647
-            del v20
-            if v21:
-                v22 = " ..."
-                method0(v22)
-                del v22
+        del v45
+        print(v38.format('['),end="")
+        v47 = 0
+        while method1(v47):
+            v49 = v37
+            v50 = v49 >= 2147483647
+            del v49
+            if v50:
+                v51 = " ..."
+                print(v38.format(v51),end="")
+                del v51
                 break
             else:
                 pass
-            del v21
-            v23 = v18 == 0
-            v24 = v23 != True
-            del v23
-            if v24:
-                v25 = "; "
-                method0(v25)
+            del v50
+            v52 = v47 == 0
+            v53 = v52 != True
+            del v52
+            if v53:
+                v54 = "; "
+                print(v38.format(v54),end="")
+                del v54
             else:
                 pass
-            del v24
-            v26 = v7 + 1
-            v7 = v26
-            del v26
-            v27 = v9 * 16
-            v28 = v27 + v18
-            del v27
-            v29 = v0[v28].item()
-            del v28
-            method4(v29)
-            del v29
-            v18 += 1 
-        del v18
-        v30 = ']'
-        method1(v30)
-        del v30
-        v9 += 1 
-    del v7, v9
-    v31 = ']'
-    method1(v31)
-    del v31
-    method5()
-    print()
-    v32 = 0
-    v33 = raw_module.get_function(f"entry{v32}")
-    del v32
-    v33.max_dynamic_shared_size_bytes = 0 
-    v33((1,),(32,),(v0, v5),shared_mem=0)
-    del v0, v33
-    v34 = "The output is:"
-    method0(v34)
-    del v34
-    print()
-    v35 = 0
-    v36 = '['
-    method1(v36)
-    del v36
-    v37 = 0
-    while method2(v37):
-        v39 = v35
-        v40 = v39 >= 2147483647
-        del v39
-        if v40:
-            v41 = " ..."
-            method0(v41)
-            del v41
+            del v53
+            v55 = v37 + 1
+            v37 = v55
+            del v55
+            v56 = v39 * 16
+            v57 = v56 + v47
+            del v56
+            v58 = v0[v57].item()
+            del v57
+            print(v38.format(v58),end="")
+            del v58
+            v47 += 1 
+        del v47
+        print(v38.format(']'),end="")
+        v39 += 1 
+    del v37, v39
+    print(v38.format(']'),end="")
+    v61 = "\n"
+    print(v61,end="")
+    v62 = 0
+    v63 = raw_module.get_function(f"entry{v62}")
+    del v62
+    v63.max_dynamic_shared_size_bytes = 0 
+    v63((1,),(32,),(v0, v5),shared_mem=0)
+    del v0, v63
+    v66 = "The output is:"
+    print(v8.format(v66),end="")
+    del v8, v66
+    v92 = 0
+    print(v38.format('['),end="")
+    v93 = 0
+    while method0(v93):
+        v95 = v92
+        v96 = v95 >= 2147483647
+        del v95
+        if v96:
+            v97 = " ..."
+            print(v38.format(v97),end="")
+            del v97
             break
         else:
             pass
-        del v40
-        v42 = v37 == 0
-        v43 = v42 != True
-        del v42
-        if v43:
-            v44 = "; "
-            method0(v44)
+        del v96
+        v98 = v93 == 0
+        v99 = v98 != True
+        del v98
+        if v99:
+            v100 = "; "
+            print(v38.format(v100),end="")
+            del v100
         else:
             pass
-        del v43
-        v45 = v35 + 1
-        v35 = v45
-        del v45
-        v46 = v5[v37].item()
-        method4(v46)
-        del v46
-        v37 += 1 
-    del v5, v35, v37
-    v47 = ']'
-    method1(v47)
-    del v47
-    method5()
-    print()
+        del v99
+        print(v38.format('['),end="")
+        v101 = 0
+        while method1(v101):
+            v103 = v92
+            v104 = v103 >= 2147483647
+            del v103
+            if v104:
+                v105 = " ..."
+                print(v38.format(v105),end="")
+                del v105
+                break
+            else:
+                pass
+            del v104
+            v106 = v101 == 0
+            v107 = v106 != True
+            del v106
+            if v107:
+                v108 = "; "
+                print(v38.format(v108),end="")
+                del v108
+            else:
+                pass
+            del v107
+            v109 = v92 + 1
+            v92 = v109
+            del v109
+            v110 = v93 * 16
+            v111 = v110 + v101
+            del v110
+            v112 = v5[v111].item()
+            del v111
+            print(v38.format(v112),end="")
+            del v112
+            v101 += 1 
+        del v101
+        print(v38.format(']'),end="")
+        v93 += 1 
+    del v5, v92, v93
+    print(v38.format(']'),end="")
+    del v38
+    print(v61,end="")
+    del v61
     return 
 
 if __name__ == '__main__': print(main())
