@@ -1,26 +1,45 @@
 open corebase
 open corecuda
 
-inl write_ln x =
-    backend_switch {
-        Python = fun () => console_python.write_ln x
-        Cuda = fun () => console_cuda.write_ln x
-    }
-
-inl write x =
-    backend_switch {
-        Python = fun () => console_python.write x
-        Cuda = fun () => console_cuda.write x
-    }
-
+// Uses a global lock to make sure the printing comes out correctly in the presence of multithreading on the Cuda side.
+// `write` and `write_ln` already use this one automatically. It's only useful when custom printing functions.
 inl single_threaded write x =
     backend_switch {
         Python = fun () => write x
         Cuda = fun () => console_cuda.single_threaded write x
     }
 
+// These don't do locking on the CUDA side.
+inl printable_funs () : printable_funs = 
+    inl write_ln x =
+        backend_switch {
+            Python = fun () => console_python.write_ln x
+            Cuda = fun () => console_cuda.write_ln x
+        }
+    inl write x =
+        backend_switch {
+            Python = fun () => console_python.write x
+            Cuda = fun () => console_cuda.write x
+        }
+    {
+        write = `$write
+        write_ln = `$write_ln
+    }
+
+inl write_ln x =
+    backend_switch {
+        Python = fun () => console_python.write_ln x
+        Cuda = fun () => console_cuda.single_threaded console_cuda.write_ln x
+    }
+
+inl write x =
+    backend_switch {
+        Python = fun () => console_python.write x
+        Cuda = fun () => console_cuda.single_threaded console_cuda.write x
+    }
+
 inl main() =
     write_ln {a=true; b=2i32; c=dyn Some(3f32, 4i64, 5u8); d=dyn [1i32;2;3;4]}
     run fun () =>
-        single_threaded write_ln {a=false; b=2i32; c=dyn Some(3f32, 4i64, 5u8); d=dyn [1i32;2;3;4]}
+        write_ln {a=false; b=2i32; c=dyn Some(3f32, 4i64, 5u8); d=dyn [1i32;2;3;4]}
     ()

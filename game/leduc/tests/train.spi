@@ -124,9 +124,9 @@ inl test3() =
     device_sync()
     console.write_ln "The output tensor is:"
     inl output : tensor d4 float = key_extract model .output_probs
-    console.tensor.tensor_print_ln limit.max output
+    console.tensor.write_ln limit.max output
     inl output : tensor d3 int = key_extract model .output_indices
-    console.tensor.tensor_print_ln limit.max output
+    console.tensor.write_ln limit.max output
 
 inl test4() =
     ()

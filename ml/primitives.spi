@@ -479,15 +479,19 @@ inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_inclusive_scan_sum config x
     inl probability = // TODO: Needs to be optimized and factored out into local_shared.
         j_tns
-        |> local_map const(random.uniform rng |> conv)
-        |> local_reduce config 0 (fun a b => b)
+        |> local_map (fun j => random.uniform rng, j)
+        |> local_reduce config (0, limit.max) (fun a b => // It's important that here the ordering is being preserved so all the threads get the same value.
+            if snd a < snd b then a else b
+            )
+        |> fst |> conv
     inl x = local_map (fun x => x - probability) x
-    local_reduce config (limit.min, 0) (fun a b =>
+    local_reduce config (limit.min, limit.max) (fun a b =>
         join
-            $"// wtf"
-            $'printf("%i, %i\\n", !(snd a), !(snd b))'
+            // It's imporant for correctness that the ordering is maintained as local_reduce does a butterfly reduction under the hood.
+            inl a,b = if snd a < snd b then a,b else b,a
             if fst a >= 0 && fst b >= 0 then
-                if fst a <= fst b then a else b
+                if fst a <= fst b then a 
+                else b 
             elif fst a >= 0 then a
             elif fst b >= 0 then b
             else a
@@ -514,15 +518,14 @@ inl test1() =
         exclusive_scan_2d 0 (+) input output_exclusive
         inclusive_scan_2d 0 (+) input output_inclusive
         reduce_2d 0 (+) input output_reduce
-    console.tensor.tensor_print_ln 1024 input
-    console.tensor.tensor_print_ln 1024 output_exclusive
-    console.tensor.tensor_print_ln 1024 output_inclusive
-    console.tensor.tensor_print_ln 1024 output_reduce
+    console.tensor.write_ln 1024 input
+    console.tensor.write_ln 1024 output_exclusive
+    console.tensor.write_ln 1024 output_inclusive
+    console.tensor.write_ln 1024 output_reduce
     ()
 
 inl test2() =
     // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
-    // inl m,n : int * int = (1 <<< 4), (1 <<< 7)
     inl m,n : int * int = (1 <<< 8), (1 <<< 4)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
@@ -574,20 +577,20 @@ inl test2() =
         // masked discrete sampling
         row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 3) rng) input output_softmax' output_sampling
 
-    // console.tensor.tensor_print_ln 1024 input
-    // console.tensor.tensor_print_ln 1024 input_identity
-    // console.tensor.tensor_print_ln 1024 output_reduce
-    // console.tensor.tensor_print_ln 1024 output_softmax
-    // console.tensor.tensor_print_ln 1024 output_masked_softmax
-    // console.tensor.tensor_print_ln 1024 output_ln
-    // console.tensor.tensor_print_ln 1024 output_argmax
-    // console.tensor.tensor_print_ln (m * n) output_softmax_scan
-    // console.tensor.tensor_print_ln (m * n) output_identity
-    // console.tensor.tensor_print_ln (m * n) output_indices_map
-    // console.tensor.tensor_print_ln (m * n) output_indices_reduction
-    // console.tensor.tensor_print_ln (m * n) output_sum_exclusive
-    console.tensor.tensor_print_ln 1024 output_softmax'
-    console.tensor.tensor_print_ln 1024 output_sampling
+    // console.tensor.write_ln 1024 input
+    // console.tensor.write_ln 1024 input_identity
+    // console.tensor.write_ln 1024 output_reduce
+    // console.tensor.write_ln 1024 output_softmax
+    // console.tensor.write_ln 1024 output_masked_softmax
+    // console.tensor.write_ln 1024 output_ln
+    // console.tensor.write_ln 1024 output_argmax
+    // console.tensor.write_ln (m * n) output_softmax_scan
+    // console.tensor.write_ln (m * n) output_identity
+    // console.tensor.write_ln (m * n) output_indices_map
+    // console.tensor.write_ln (m * n) output_indices_reduction
+    // console.tensor.write_ln (m * n) output_sum_exclusive
+    console.tensor.write_ln 1024 output_softmax'
+    console.tensor.write_ln 1024 output_sampling
     ()
 
 inl main() = test2()

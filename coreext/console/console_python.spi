@@ -45,8 +45,13 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
         | () => ()
         | x when symbol_is x => write (symbol_to_string x)
         | x => 
+            inl printable_funs =
+                {
+                    write_ln = forall t. (x : t) : () => write_ `t config true x
+                    write = forall t. (x : t) : () => write_ `t config false x
+                }
             if union_is x then
-                if prototype_has `(`x) printable then printable `(`x) config x
+                if prototype_has `(`x) printable then printable `(`x) printable_funs x
                 else
                     if var_is x then 
                         flush false
@@ -62,9 +67,10 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
                             | () => ()
                             | _ => put_fmt "(" . write v . put_fmt ")"
                             )
-            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) config x
+            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) printable_funs x
             // elif layout_is x then write *x // TODO: Deal with all the layout type cases.
             else error_type "Unsupported type."
+
             
     real write x
     flush is_newline

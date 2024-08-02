@@ -545,30 +545,30 @@ def main():
     del v5, v10
     v12 = UH0_0(v4, v11)
     del v4, v11
-    v13 = "{{{} = {}; {} = {}; {} = "
-    v14 = "a"
-    v15 = "true"
-    v16 = "b"
-    v17 = "c"
-    print(v13.format(v14, v15, v16, 2, v17),end="")
-    del v13, v14, v15, v16, v17
+    v15 = "{{{} = {}; {} = {}; {} = "
+    v16 = "a"
+    v17 = "true"
+    v18 = "b"
+    v19 = "c"
+    print(v15.format(v16, v17, v18, 2, v19),end="")
+    del v15, v16, v17, v18, v19
     method0(v3)
     del v3
-    v18 = "; {} = "
-    v19 = "d"
-    print(v18.format(v19),end="")
-    del v18, v19
+    v20 = "; {} = "
+    v21 = "d"
+    print(v20.format(v21),end="")
+    del v20, v21
     method1(v12)
     del v12
-    v20 = "}}\n"
-    print(v20,end="")
-    del v20
-    v21 = 0
-    v22 = raw_module.get_function(f"entry{v21}")
-    del v21
-    v22.max_dynamic_shared_size_bytes = 0 
-    v22((1,),(32,),(),shared_mem=0)
+    v22 = "}}\n"
+    print(v22,end="")
     del v22
+    v23 = 0
+    v24 = raw_module.get_function(f"entry{v23}")
+    del v23
+    v24.max_dynamic_shared_size_bytes = 0 
+    v24((1,),(32,),(),shared_mem=0)
+    del v24
     return 
 
 if __name__ == '__main__': print(main())
