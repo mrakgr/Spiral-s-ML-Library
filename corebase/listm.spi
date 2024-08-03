@@ -95,6 +95,9 @@ inl mapFoldBack forall state el el'. (f : el -> state -> el' * state) l s =
 
 // Picks an element from a probability distribution represented as a list.
 // The second argument is a random number in the (0,1] range and is used to make the selection.
+// 
+// TODO: This function has not been tested yet. I implemented it and went with another approach before
+// giving it a chance, so use it at your own discression.
 inl pick_discrete forall t. (r : float) (l : list (t * float)) =
     inl l,sum = mapFold (fun s x => inl s = s + snd x in (fst x, s), s) 0 l
     assert (0 < r && r <= 1) "The random number needs to be in the given range."
