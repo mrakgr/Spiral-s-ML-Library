@@ -50,6 +50,11 @@ inl push forall dim el. (ar : da_list dim el) (x : el) = $"!ar.push(!x)"
 // Pop a value from the top of the array.
 inl pop forall dim el. (ar : da_list dim el) : el = $"!ar.pop()"
 
+inl choose forall dim_a a dim_b b. f (ar : da_list dim_a a) : da_list dim_b b =
+    inl out = sa_create
+    arraym.iter (f >> optionm.iter (push out)) ar
+    out
+
 open arraym
 
 instance equable da_list dim el = generic_equable

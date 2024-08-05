@@ -9,7 +9,6 @@ open tensorm
 nominal map t = ()
 nominal reduce t = ()
 nominal singleton t = ()
-nominal pair t = ()
 
 union rec compound (f : * -> *) t =
     | Singleton :: forall (f : * -> *) t. f t -> compound f (singleton t)

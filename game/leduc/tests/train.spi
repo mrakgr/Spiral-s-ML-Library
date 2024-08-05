@@ -103,7 +103,7 @@ inl test3() =
     param_init model
     
     inl game_model =
-        ml.game_modelm.game_model {
+        ml.models.game_model {
             model = exists model
             input = pu_history
             output = function
@@ -117,7 +117,7 @@ inl test3() =
 
     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
-        ml.game_modelm.run game_model data
+        ml.models.run game_model data
         |> console.write_ln
 
     device_sync()

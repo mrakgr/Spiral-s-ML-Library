@@ -1,127 +1,55 @@
-// open corebase
-// open corecuda
-// open tensorm
-// open ml.layers
-// open game
+open corebase
+open corecuda
+open tensorm
+open ml.layers
+open game
 
-// inl pu_history() : pickler.pu history =
-//     open pickler
-//     inl card : pu card = alt {
-//         King = unit()
-//         Queen = unit()
-//         Jack = unit()
-//     }
-//     inl action : pu action = alt {
-//         Fold = unit()
-//         Call = unit()
-//         Raise = unit()
-//     }
-//     inl action_or_card : pu (choice2 action card) = action ++ card
-//     inl history : pu history = sa_list action_or_card
-//     history
+inl leduc_input() : pickler.pu history =
+    open pickler
+    inl card : pu card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl action : pu action = alt {
+        Fold = unit()
+        Call = unit()
+        Raise = unit()
+    }
+    inl action_or_card : pu (choice2 action card) = action ++ card
+    inl history : pu history = sa_list action_or_card
+    history
 
-// inl graph() =
-//     inl pu_history = pu_history()
-//     inl size = {
-//         ensemble = 4 // The third dimension of each weight layer.
-//         block = blocks_per_grid()
-//         minibatch = 16 // threads_per_block()
-//         inner = modup pu_history.size 128
-//     }
+inl leduc_graph() =
+    inl pu_history = leduc_input()
+    inl size = {
+        ensemble = 4 // The third dimension of each weight layer.
+        block = blocks_per_grid()
+        thread = threads_per_block()
+        inner = modup pu_history.size 128
+    }
 
-//     inl graph =
-//         (input .input (size.block,size.minibatch,size.inner) : graph (tensor (int * int * int) float))
-//         |> apply .block
-//         |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-//         // |> ln_l2
-//         // |> relu
-//         // |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-//         // |> ln_l2
-//         // |> relu
-//         // |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-//         |> softmax_and_discrete_sample' (input .output_indices (size.block,size.ensemble,size.minibatch) |> apply .block |> apply .ensemble)
+    inl graph =
+        (input .input (size.block,size.thread,size.inner) : graph (tensor (int * int * int) float))
+        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+        |> masked_softmax_and_discrete_sample' 3 (
+            pair (input .output_probs   (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
+                 (input .output_indices (size.ensemble,size.block,size.thread) |> apply .ensemble)
+            )
 
-//     graph
+    graph
 
-// // open tensorm
+inl leduc_output : int -> _ = function
+    | 0 => Fold
+    | 1 => Call
+    | 2 => Raise
+    | _ => failwith "Invalid output id in the Leduc model."
 
-// // inl pickle_into_model forall inp out. (pu_history : pickler.pu inp) (data : inp) (model : model out) =
-// //     open rangem
+open ml.models
+inl game_graph() : game_graph _ _ =
+    game_graph {
+        graph = exists leduc_graph()
+        input = leduc_input()
+        output = leduc_output
+    }
 
-// //     inl tns_input = (input_extract model .input : tensor (int * int * int) float) |> apply block_index()
-
-// //     // Sets the input tensor to 0.
-// //     loop.projective threads_in_block(tns_input.dim) fun i =>
-// //         tensor_set i 0 tns_input
-
-// //     __syncthreads()
-
-// //     // Serializes the data into the input tensor.
-// //     loop.projective threads_in_block(fst tns_input.dim) fun minibatch_id =>
-// //         open pickler
-// //         inl tns_input = tns_input |> apply minibatch_id
-// //         pu_history.pickle data (0,tns_input |> ptr_at_current_offset)
-
-// //     __syncthreads()
-
-// //     // Runs the model on the inputs.
-// //     loop.linear size.ensemble fun ensemble =>
-// //         graph_run_device model {ensemble}
-
-// //     __syncthreads()
-
-
-
-// // inl test3() =
-// //     inl pu_history = pu_history()
-// //     open ml.layers
-
-// //     inl size = {
-// //         ensemble = 4 // The third dimension of each weight layer.
-// //         block = blocks_per_grid()
-// //         minibatch = 16 // threads_per_block()
-// //         inner = modup pu_history.size 128
-// //     }
-
-// //     inl graph =
-// //         (input .input (size.block,size.minibatch,size.inner) : graph (tensor (int * int * int) float))
-// //         |> apply .block
-// //         |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-// //         |> ln_l2
-// //         |> relu
-// //         |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-// //         |> ln_l2
-// //         |> relu
-// //         |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-// //         |> softmax_and_discrete_sample' (input .output_indices (size.block,size.ensemble,size.minibatch) |> apply .block |> apply .ensemble)
-
-// //     inl model = create_model graph
-// //     param_init model
-
-// //     console.write_ln "Running the kernel."
-
-// //     open tensorm
-// //     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
-// //         open rangem
-// //         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
-
-// //         // Gets the input tensor from the model
-// //         inl tns_input = (input_extract model .input : tensor (int * int * int) float) |> apply block_index()
-
-// //         inl tns_output = (input_extract model .output_indices : tensor (int * int * int) int) |> apply block_index()
-        
-// //         // Deserialize the action and print it.
-// //         loop.projective threads_in_block(tns_output.dim) fun i =>
-// //             match tensor_index i tns_output % 3 with
-// //             | 0 => Fold
-// //             | 1 => Call
-// //             | _ => Raise
-// //             |> semaphore.write_ln_system
-
-// //     device_sync()
-// //     console.write_ln "The output tensor is:"
-// //     inl tns_output = (input_extract model .output_indices : tensor (int * int * int) int)
-// //     console.write_ln tns_output
-// //     console.write_ln "==="
-
-// // inl main() = test3()

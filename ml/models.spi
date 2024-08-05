@@ -74,11 +74,31 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
             |> apply block_index() |> apply thread_index() |> apply output_id
     }
 
+nominal game_graph inp out =
+    {
+        graph : exists mid. graph mid
+        input : pickler.pu inp
+        output : int -> out
+    }
+
 nominal game_model inp out = 
     {
-        model : exists t. model t
+        model : exists mid. model mid
         input : pickler.pu inp
         output : int -> out
     }
 
 inl run forall inp out. (game_model {model input output} : game_model inp out) = run' model input output
+
+inl to_model_data forall a b. (game_model {model=exists t. model} : game_model a b) : layers.model_data = model_to_model_data model
+inl from_model_data forall inp out. 
+        (game_graph {graph=(exists t. graph) input output} : game_graph inp out) 
+        (x : layers.model_data) 
+        : game_model inp out = 
+    inl model : exists t. model t = exists model_data_to_model graph x
+    game_model {model input output}
+
+inl init forall a b. (game_graph {graph=(exists t. graph) input output} : game_graph a b) : game_model a b = 
+    inl model = create_model graph
+    param_init model
+    game_model { input output model = exists model }

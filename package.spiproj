@@ -75,7 +75,7 @@ modules:
         matmul
         primitives
         layers
-        game_modelm
+        models
         
     game/
         utils
