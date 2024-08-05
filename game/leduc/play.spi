@@ -27,21 +27,39 @@ type state_private =
     {
         game : option game_node
         deck : deck
+    }
+
+type state_neural =
+    {
         model_data : ml.layers.model_data
     }
 
-type state = {private : state_private; public : state_public}
+type state_game = 
+    {
+        private : state_private
+        public : state_public
+    }
+
+type state =
+    {
+        game : state_game
+        neural : state_neural
+    }
 
 inl init() : state = 
     {
-        public = {
-            ui_game_state = GameNotStarted
-            pl_type = arraym.fromList [Computer; Human]
-            messages = sa_create
+        game = {
+            public = {
+                ui_game_state = GameNotStarted
+                pl_type = arraym.fromList [Computer; Human]
+                messages = sa_create
+            }
+            private = {
+                deck = create_deck()
+                game = None
+            }
         }
-        private = {
-            deck = create_deck()
-            game = None
+        neural = {
             model_data = model.game_graph() |> ml.models.init |> ml.models.to_model_data
         }
     }
@@ -53,23 +71,21 @@ type state_internal =
         game : refm.ref (option game_node)
         deck : refm.ref deck
         messages : refm.ref messages
-        model_data : ml.layers.model_data
     }
 
 // Converts the given state to internal one.
 // The refs will point to the original locations.
-inl state_to_internal (state : state) : state_internal =
+inl state_to_internal (state : state_game) : state_internal =
     {
         ui_game_state = refm.from_local state.public.ui_game_state
         pl_type = refm.from_local state.public.pl_type
         game = refm.from_local state.private.game
         deck = refm.from_local state.private.deck
         messages = refm.from_local state.public.messages
-        model_data = state.private.model_data
     }
 
 // Sets the internal state to the values held by the regular one.
-inl internal_set (state_internal : state_internal) (state : state) =
+inl internal_set (state_internal : state_internal) (state : state_game) =
     open refm
     state_internal.ui_game_state <-# state.public.ui_game_state
     state_internal.pl_type <-# state.public.pl_type
@@ -77,7 +93,7 @@ inl internal_set (state_internal : state_internal) (state : state) =
     state_internal.deck <-# state.private.deck
     state_internal.messages <-# state.public.messages
 
-let play_loop (state : state_internal) node =
+let play_loop (neural : state_neural) (state : state_internal) node =
     inl push_message = sa_listm.push (refm.to_local state.messages)
     inl pop_deck = 
         inl deck = refm.to_local state.deck
@@ -110,7 +126,7 @@ let play_loop (state : state_internal) node =
         | Round table => 
             match index #state.pl_type table.player_turn with
             | Computer =>
-                inl model = ml.models.from_model_data model.game_graph() state.model_data
+                inl model = ml.models.from_model_data model.game_graph() neural.model_data
                 inl data = refm.to_local state.messages |> sa_listm.choose function
                     | PlayerGotCard(id,card) when id = table.player_turn => Some(C2of2 card)
                     | CommunityCardIs card => Some(C2of2 card)
@@ -146,12 +162,12 @@ let play_loop (state : state_internal) node =
     
     loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
 
-inl event_loop (msg, state_internal : event * state_internal) : () =
+inl event_loop state_neural (msg, state_internal : event * state_internal) : () =
     open refm
     match msg with
     | StartGame =>
         internal_set state_internal init()
-        play_loop state_internal game_init()
+        play_loop state_neural state_internal game_init()
     | PlayerChanged pl_type => 
         state_internal.pl_type <-# pl_type
     | ActionSelected action =>
@@ -175,7 +191,8 @@ inl main() =
                 state = create_serializer
             }
             serialize seri.msg (jsonm.deserialize msg)
-            serialize seri.state (jsonm.deserialize state)
+            inl {public private neural} = jsonm.deserialize state
+            serialize seri.state {public private}
 
             console.write_ln "Going to run the kernel."
             global "import time"
@@ -186,7 +203,7 @@ inl main() =
                 if from = 0 then
                     inl msg, state = deserialize seri.msg, deserialize seri.state
                     // When converting the state to internal form, the refs will point to the original.
-                    event_loop (msg, state_to_internal state)
+                    event_loop (msg, state_to_internal {state with neural})
                     serialize seri.state state
 
             inl p2 : f64 = $"time.perf_counter()"

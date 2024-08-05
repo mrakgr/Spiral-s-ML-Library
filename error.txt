@@ -1,151 +1,151 @@
-Error trace on line: 58, column: 39 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                        unbox x (fun (k,v) => 
-                                      ^
-Error trace on line: 59, column: 29 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                            write k
-                            ^
-Error trace on line: 60, column: 29 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                            match v with
-                            ^
-Error trace on line: 61, column: 31 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                            | () => ()
-                              ^
-Error trace on line: 62, column: 36 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                            | _ => put_fmt "(" . write v . put_fmt ")"
-                                   ^
-Error trace on line: 62, column: 50 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                            | _ => put_fmt "(" . write v . put_fmt ")"
-                                                 ^
-Error trace on line: 24, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        inl p = put_value
-        ^
-Error trace on line: 26, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        match x with // According to Bing it shouldn't matter whether these are %d or %lld in printf.
-        ^
-Error trace on line: 27, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-           ^
-Error trace on line: 27, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                      ^
-Error trace on line: 27, column: 35 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                                  ^
-Error trace on line: 27, column: 47 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                                              ^
-Error trace on line: 28, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-           ^
-Error trace on line: 28, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                      ^
-Error trace on line: 28, column: 35 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                                  ^
-Error trace on line: 28, column: 47 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                                              ^
-Error trace on line: 29, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : f32) | (x : f64) => p ("%f", x)
-           ^
-Error trace on line: 29, column: 24 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : f32) | (x : f64) => p ("%f", x)
-                       ^
-Error trace on line: 30, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : string) => p ("%s", x)
-           ^
-Error trace on line: 31, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : char) => p ("%c", x)
-           ^
-Error trace on line: 32, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : bool) => p ("%s", if x then "true" else "false")
-           ^
-Error trace on line: 33, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (a,b) => write a . put_fmt ", " . write b
-           ^
-Error trace on line: 33, column: 20 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (a,b) => write a . put_fmt ", " . write b
-                   ^
-Error trace on line: 33, column: 30 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (a,b) => write a . put_fmt ", " . write b
-                             ^
-Error trace on line: 33, column: 45 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (a,b) => write a . put_fmt ", " . write b
-                                            ^
-Error trace on line: 24, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        inl p = put_value
-        ^
-Error trace on line: 26, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        match x with // According to Bing it shouldn't matter whether these are %d or %lld in printf.
-        ^
-Error trace on line: 27, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-           ^
-Error trace on line: 27, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                      ^
-Error trace on line: 27, column: 35 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                                  ^
-Error trace on line: 27, column: 47 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                                              ^
-Error trace on line: 28, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-           ^
-Error trace on line: 28, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                      ^
-Error trace on line: 28, column: 35 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                                  ^
-Error trace on line: 28, column: 47 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                                              ^
-Error trace on line: 29, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : f32) | (x : f64) => p ("%f", x)
-           ^
-Error trace on line: 29, column: 24 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : f32) | (x : f64) => p ("%f", x)
-                       ^
-Error trace on line: 30, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : string) => p ("%s", x)
-           ^
-Error trace on line: 31, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : char) => p ("%c", x)
-           ^
-Error trace on line: 32, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : bool) => p ("%s", if x then "true" else "false")
-           ^
-Error trace on line: 33, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (a,b) => write a . put_fmt ", " . write b
-           ^
-Error trace on line: 34, column: 11 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | {} as x =>
-          ^
-Error trace on line: 44, column: 11 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | () => ()
-          ^
-Error trace on line: 45, column: 11 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | x when symbol_is x => write (symbol_to_string x)
-          ^
-Error trace on line: 46, column: 11 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | x => 
-          ^
-Error trace on line: 47, column: 13 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-            if union_is x then
-            ^
-Error trace on line: 48, column: 17 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                if prototype_has `(`x) printable then printable `(`x) config x
+Error trace on line: 28, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+                inl value, state = f `value state
                 ^
-Error trace on line: 50, column: 21 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                    if var_is x then 
+Error trace on line: 28, column: 36 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+                inl value, state = f `value state
+                                   ^
+Error trace on line: 21, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        typecase el with
+        ^
+Error trace on line: 27, column: 13 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+            record_type_fold (fun (m,state) key => forall value. => 
+            ^
+Error trace on line: 28, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+                inl value, state = f `value state
+                ^
+Error trace on line: 28, column: 36 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+                inl value, state = f `value state
+                                   ^
+Error trace on line: 21, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        typecase el with
+        ^
+Error trace on line: 31, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | _ => g `el s
+               ^
+Error trace on line: 27, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            inl case_sa forall dim el'. =
+            ^
+Error trace on line: 32, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            inl case_sa_list forall dim el'. =
+            ^
+Error trace on line: 38, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            typecase el with
+            ^
+Error trace on line: 44, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                if singleton_type_is `el then (exists [el] s), s
+                ^
+Error trace on line: 45, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif union_type_is `el then
+                ^
+Error trace on line: 55, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif prim_type_is `el then
+                ^
+Error trace on line: 58, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif nominal_type_is `el then
+                ^
+Error trace on line: 59, column: 21 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl (exists el'. _) = nominal_type_apply `el
                     ^
-Error trace on line: 51, column: 25 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                        flush false
+Error trace on line: 59, column: 26 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl (exists el'. _) = nominal_type_apply `el
+                         ^
+Error trace on line: 60, column: 21 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl offset, s = f `el' s
+                    ^
+Error trace on line: 60, column: 37 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl offset, s = f `el' s
+                                    ^
+Error trace on line: 21, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        typecase el with
+        ^
+Error trace on line: 27, column: 13 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+            record_type_fold (fun (m,state) key => forall value. => 
+            ^
+Error trace on line: 28, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+                inl value, state = f `value state
+                ^
+Error trace on line: 28, column: 36 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+                inl value, state = f `value state
+                                   ^
+Error trace on line: 21, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        typecase el with
+        ^
+Error trace on line: 23, column: 13 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+            inl a,s = f `a s
+            ^
+Error trace on line: 23, column: 23 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+            inl a,s = f `a s
+                      ^
+Error trace on line: 21, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        typecase el with
+        ^
+Error trace on line: 31, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | _ => g `el s
+               ^
+Error trace on line: 27, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            inl case_sa forall dim el'. =
+            ^
+Error trace on line: 32, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            inl case_sa_list forall dim el'. =
+            ^
+Error trace on line: 38, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            typecase el with
+            ^
+Error trace on line: 44, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                if singleton_type_is `el then (exists [el] s), s
+                ^
+Error trace on line: 45, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif union_type_is `el then
+                ^
+Error trace on line: 55, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif prim_type_is `el then
+                ^
+Error trace on line: 58, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif nominal_type_is `el then
+                ^
+Error trace on line: 59, column: 21 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl (exists el'. _) = nominal_type_apply `el
+                    ^
+Error trace on line: 59, column: 26 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl (exists el'. _) = nominal_type_apply `el
+                         ^
+Error trace on line: 60, column: 21 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl offset, s = f `el' s
+                    ^
+Error trace on line: 60, column: 37 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    inl offset, s = f `el' s
+                                    ^
+Error trace on line: 21, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        typecase el with
+        ^
+Error trace on line: 31, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | _ => g `el s
+               ^
+Error trace on line: 27, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            inl case_sa forall dim el'. =
+            ^
+Error trace on line: 32, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            inl case_sa_list forall dim el'. =
+            ^
+Error trace on line: 38, column: 13 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+            typecase el with
+            ^
+Error trace on line: 44, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                if singleton_type_is `el then (exists [el] s), s
+                ^
+Error trace on line: 45, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif union_type_is `el then
+                ^
+Error trace on line: 55, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif prim_type_is `el then
+                ^
+Error trace on line: 58, column: 17 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                elif nominal_type_is `el then
+                ^
+Error trace on line: 63, column: 25 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    !!!!PrintStatic(`el) // TODO: Put in string interpolation into the language.
                         ^
-Error trace on line: 53, column: 29 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-                            unbox x (fun (k,v) => 
-                            ^
-Recursive join points must be annotated.
+Error trace on line: 64, column: 21 in module: c:\Spiral_s_ML_Library\corebase\serializer\utils.spir.
+                    error_type "Unsupported type encountered during serialization. Check out the Spiral terminal for more info."
+                    ^
+Unsupported type encountered during serialization. Check out the Spiral terminal for more info.

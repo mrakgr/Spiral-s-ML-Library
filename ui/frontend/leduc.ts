@@ -9,8 +9,9 @@ type Option<t> = ["Some",t] | ["None",[]]
 type Card = ["King",[]] | ["Queen",[]] | ["Jack",[]]
 const card : Card[] = [["King",[]], ["Queen",[]], ["Jack",[]]]
 type Action = ["Raise",[]] | ["Call",[]] | ["Fold",[]]
-type Players = ["Computer",[]] | ["Human",[]]
-const players : Players[] = [["Computer",[]], ["Human",[]]]
+type Players = ["Computer",[]] | ["Human",[]] | ["Random",[]]
+const possible_player_types : Players[] = [["Computer",[]], ["Human",[]], ["Random",[]]]
+const players : Players[] = [possible_player_types[2],possible_player_types[1]]
 type Table = {
     pot: [number, number]
     community_card: Option<Card>,
@@ -164,16 +165,18 @@ class Leduc_Menu extends GameElement {
             <div>
                 <sl-select name="pl1" id="pl1" .value=${this.pl_type[0][0]} @sl-change=${this.on_change(0)}>
                     <div slot="label">Player 0:</div>
-                    <sl-option value="Computer">Computer</sl-option>
-                    <sl-option value="Human">Human</sl-option>
+                    ${possible_player_types.map(([x,[]]) =>
+                        html`<sl-option value=${x}>${x}</sl-option>`
+                    )}
                 </sl-select>
             </div>
             ${gap(20)}
             <div>
                 <sl-select name="pl2" id="pl2" .value=${this.pl_type[1][0]} @sl-change=${this.on_change(1)}>
                     <div slot="label">Player 1:</div>
-                    <sl-option value="Computer">Computer</sl-option>
-                    <sl-option value="Human">Human</sl-option>
+                    ${possible_player_types.map(([x,[]]) =>
+                        html`<sl-option value=${x}>${x}</sl-option>`
+                    )}
                 </sl-select>
             </div>
             `
