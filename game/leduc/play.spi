@@ -1,6 +1,7 @@
 open game
 open corebase
 open corecuda
+open coreext
 
 union player_type = Computer | Random | Human
 type player_types = sam.sa 2 player_type
@@ -46,19 +47,22 @@ type state =
         neural : state_neural
     }
 
+inl init_game() =
+    {
+        public = {
+            ui_game_state = GameNotStarted
+            pl_type = arraym.fromList [Computer; Human]
+            messages = sa_create
+        }
+        private = {
+            deck = create_deck()
+            game = None
+        }
+    }
+
 inl init() : state = 
     {
-        game = {
-            public = {
-                ui_game_state = GameNotStarted
-                pl_type = arraym.fromList [Computer; Human]
-                messages = sa_create
-            }
-            private = {
-                deck = create_deck()
-                game = None
-            }
-        }
+        game = init_game()
         neural = {
             model_data = model.game_graph() |> ml.models.init |> ml.models.to_model_data
         }
@@ -132,7 +136,10 @@ let play_loop (neural : state_neural) (state : state_internal) node =
                     | CommunityCardIs card => Some(C2of2 card)
                     | PlayerAction(id,action) => Some(C1of2 action)
                     | _ => None
+                console.write_ln "Running the GPU model."
                 inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model data
+                console.write "The action is: "
+                console.write_ln action
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
                 Some (game_round table action)
@@ -166,15 +173,15 @@ inl event_loop state_neural (msg, state_internal : event * state_internal) : () 
     open refm
     match msg with
     | StartGame =>
-        internal_set state_internal init()
+        internal_set state_internal init_game()
         play_loop state_neural state_internal game_init()
     | PlayerChanged pl_type => 
         state_internal.pl_type <-# pl_type
     | ActionSelected action =>
         match #state_internal.game with
-        | Some game => 
+        | Some game =>
             match game with
-            | Round table => play_loop state_internal RoundWithAction(table, action)
+            | Round table => play_loop state_neural state_internal RoundWithAction(table, action)
             | _ => failwith "Unexpected game node in ActionSelected."
         | None => failwith "The hasn't been started in ActionSelected."
 
@@ -191,24 +198,27 @@ inl main() =
                 state = create_serializer
             }
             serialize seri.msg (jsonm.deserialize msg)
-            inl {public private neural} = jsonm.deserialize state
-            serialize seri.state {public private}
+            inl {game neural} = jsonm.deserialize state
+            serialize seri.state game
 
             console.write_ln "Going to run the kernel."
             global "import time"
             inl p : f64 = $"time.perf_counter()"
 
-            run fun () =>
+            run' {shared_mem=model.game_graph() |> ml.models.smem_used} fun () =>
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
                     inl msg, state = deserialize seri.msg, deserialize seri.state
                     // When converting the state to internal form, the refs will point to the original.
-                    event_loop (msg, state_to_internal {state with neural})
+                    event_loop neural (msg, state_to_internal state)
                     serialize seri.state state
 
             inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "
             console.write_ln (p2 - p)
 
-            jsonm.serialize (deserialize seri.state)
+            jsonm.serialize {
+                game = deserialize seri.state
+                neural
+                }
     }

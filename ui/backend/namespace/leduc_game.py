@@ -16,7 +16,7 @@ class Leduc_Namespace(Namespace):
         print(f'Client connected to Leduc game: {self.sid()}')
         state = funs.init()
         Leduc_Namespace.user_state[self.sid()] = state
-        self.emit_update(state["public"])
+        self.emit_update(state["game"]["public"])
 
     def on_disconnect(self):
         Leduc_Namespace.user_state.pop(self.sid())
@@ -26,4 +26,4 @@ class Leduc_Namespace(Namespace):
         state = Leduc_Namespace.user_state[self.sid()]
         state = funs.event_loop_gpu(msg,state)
         Leduc_Namespace.user_state[self.sid()] = state
-        self.emit_update(state["public"])
+        self.emit_update(state["game"]["public"])

@@ -103,7 +103,8 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
         open tensor_cuda
 
         inl a_shared_tile, b_shared_tile, c_shared_tile = 
-            assert (memory.offset_end <= conv dynamic_shared_memory_used()) "The shared memory used in the matmult node is lower than the allocated amount."
+            inl smem_used = conv dynamic_shared_memory_used()
+            assert (memory.offset_end <= smem_used) "The shared memory used in the matmult node is lower than the allocated amount."
             inl extern = $"extern __shared__ unsigned char \v[]"
             inl (a, b), c = partitionm.from_partition_offsets (extern, memory.offset_end) memory
 
