@@ -206,6 +206,7 @@ inl main() =
             inl p : f64 = $"time.perf_counter()"
 
             run' {shared_mem=model.game_graph() |> ml.models.smem_used} fun () =>
+                // TODO: Fix the neural net model using only a single thread.
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
                     inl msg, state = deserialize seri.msg, deserialize seri.state

@@ -96,6 +96,8 @@ modules:
                 cardm
                 deckm
                 hand_rankerm
+            game
+            model
             main
 
     tests/

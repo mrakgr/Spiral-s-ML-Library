@@ -1,5 +1,4 @@
 open corebase
-open corepython
 
 union action = Raise | Call | Fold
 union card = King | Queen | Jack
