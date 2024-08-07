@@ -33,7 +33,6 @@ union message =
 
 type deck = lib.deckm.deck
 type messages = da_listm.da_list 128 message
-type history = da_listm.da_list 128 (choice2 action card) // The game history. RL agents need this one.
 
 inl bb() = 2 : int
 inl sb() = 1 : int

@@ -4,6 +4,8 @@ open tensorm
 open ml.layers
 open game
 
+type history = sa_listm.sa_list 10 (choice2 action card) // The game history. RL agents need this one.
+
 inl leduc_input() : pickler.pu history =
     open pickler
     inl card : pu card = alt {
@@ -19,6 +21,13 @@ inl leduc_input() : pickler.pu history =
     inl action_or_card : pu (choice2 action card) = action ++ card
     inl history : pu history = sa_list action_or_card
     history
+
+inl leduc_conv (table, messages : table * messages) : history = 
+    messages |> sa_listm.choose function
+        | PlayerGotCard(id,card) when id = table.player_turn => Some(C2of2 card)
+        | CommunityCardIs card => Some(C2of2 card)
+        | PlayerAction(id,action) => Some(C1of2 action)
+        | _ => None
 
 inl leduc_graph() =
     inl pu_history = leduc_input()
@@ -49,7 +58,7 @@ open ml.models
 inl game_graph() : game_graph _ _ =
     game_graph {
         graph = exists leduc_graph()
-        input = leduc_input()
+        input = exists leduc_conv, leduc_input()
         output = leduc_output
     }
 

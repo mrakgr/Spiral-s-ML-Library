@@ -9,7 +9,7 @@ type size = // The block and thread dimensions should match blocks_per_grid and 
 
 open corecuda
 open rangem
-inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.pu inp) (output : int -> out) (data : inp) =
+inl run' forall inp out. (exists t. model : exists t. model t) (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) (output : int -> out) (data : inp) =
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
     inl () = // Assert that all the dimensions are right.
@@ -41,8 +41,8 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
     // Serializes the data into the input tensor.
     inl _ =
         open pickler
-        inl tns_input = x |> apply thread_index()
-        input.pickle data (0,tns_input |> ptr_at_current_offset)
+        inl tns_input = apply thread_index() x
+        snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
 
     __syncthreads()
 
@@ -77,14 +77,14 @@ inl run' forall inp out. (exists t. model : exists t. model t) (input : pickler.
 nominal game_graph inp out =
     {
         graph : exists mid. graph mid
-        input : pickler.pu inp
+        input : exists t. (inp -> t) * pickler.pu t
         output : int -> out
     }
 
 nominal game_model inp out = 
     {
         model : exists mid. model mid
-        input : pickler.pu inp
+        input : exists t. (inp -> t) * pickler.pu t
         output : int -> out
     }
 

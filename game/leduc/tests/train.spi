@@ -2,6 +2,7 @@ open corebase
 open corecuda
 open coreext
 open game
+open model
 
 inl pu_table() : pickler.pu table =
     open pickler
@@ -105,7 +106,7 @@ inl test3() =
     inl game_model =
         ml.models.game_model {
             model = exists model
-            input = pu_history
+            input = exists id, pu_history
             output = function
                 | 0 => Fold
                 | 1 => Call

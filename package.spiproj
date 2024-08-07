@@ -91,19 +91,19 @@ modules:
             tests/
                 train
 
-        nl_hu_holdem/
-            lib/
-                cardm
-                deckm
-                hand_rankerm
-            game
-            model
-            main
+    //     nl_hu_holdem/
+    //         lib/
+    //             cardm
+    //             deckm
+    //             hand_rankerm
+    //         game
+    //         model
+    //         main
 
-    tests/
-        test1
-        test2
-        test3
-        test4
-        test5
-        test6
+    // tests/
+    //     test1
+    //     test2
+    //     test3
+    //     test4
+    //     test5
+    //     test6

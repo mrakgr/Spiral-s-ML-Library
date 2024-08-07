@@ -1,5 +1,8 @@
 open corebase
+open coreext
 open game
+
+type history = da_listm.da_list 128 (option action) // The game history. RL agents need this one.
 
 union player_type =
     | Computer
@@ -172,9 +175,28 @@ let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
         | G_Round table =>
             inl player_turn = player_turn table
             match index pl_type player_turn with
+            | Computer =>
+                // inl model = ml.models.from_model_data model.game_graph() neural.model_data
+                // inl data = refm.to_local state.messages |> sa_listm.choose function
+                //     | PlayerGotCard(id,card) when id = table.player_turn => Some(C2of2 card)
+                //     | CommunityCardIs card => Some(C2of2 card)
+                //     | PlayerAction(id,action) => Some(C1of2 action)
+                //     | _ => None
+                console.write_ln "Running the GPU model."
+                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model data
+                match action with
+                | AA_Fold => failwith "TODO"
+                | AA_Call => failwith "TODO"
+                | AA_Raise => failwith "TODO"
+                console.write "The action is: "
+                console.write_ln action
+                // inl action = random_action state.rng table
+                inl msg = PlayerAction(player_turn, action)
+                push_message msg
+                continue (round table action)
             | Human =>
                 done node
-            | Computer =>
+            | Random =>
                 inl action = random_action state.rng table
                 inl msg = PlayerAction(player_turn, action)
                 push_message msg

@@ -131,11 +131,7 @@ let play_loop (neural : state_neural) (state : state_internal) node =
             match index #state.pl_type table.player_turn with
             | Computer =>
                 inl model = ml.models.from_model_data model.game_graph() neural.model_data
-                inl data = refm.to_local state.messages |> sa_listm.choose function
-                    | PlayerGotCard(id,card) when id = table.player_turn => Some(C2of2 card)
-                    | CommunityCardIs card => Some(C2of2 card)
-                    | PlayerAction(id,action) => Some(C1of2 action)
-                    | _ => None
+                inl data = table, refm.to_local state.messages
                 console.write_ln "Running the GPU model."
                 inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model data
                 console.write "The action is: "

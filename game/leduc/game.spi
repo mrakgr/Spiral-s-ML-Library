@@ -13,8 +13,6 @@ type table = // The complete game state.
         player_turn : int
     }
 
-type history = sa_listm.sa_list 10 (choice2 action card) // The game history. RL agents need this one.
-
 union message =
     | PlayerGotCard : int * card
     | CommunityCardIs : card
