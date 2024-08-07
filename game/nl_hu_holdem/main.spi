@@ -2,7 +2,6 @@ open corebase
 open coreext
 open game
 
-type history = da_listm.da_list 128 (option action) // The game history. RL agents need this one.
 
 union player_type =
     | Computer

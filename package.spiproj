@@ -91,14 +91,14 @@ modules:
             tests/
                 train
 
-    //     nl_hu_holdem/
-    //         lib/
-    //             cardm
-    //             deckm
-    //             hand_rankerm
-    //         game
-    //         model
-    //         main
+        nl_hu_holdem/
+            lib/
+                cardm
+                deckm
+                hand_rankerm
+            game
+            model
+            main
 
     // tests/
     //     test1

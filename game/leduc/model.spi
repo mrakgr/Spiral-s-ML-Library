@@ -6,7 +6,7 @@ open game
 
 type history = sa_listm.sa_list 10 (choice2 action card) // The game history. RL agents need this one.
 
-inl leduc_input() : pickler.pu history =
+inl leduc_pickler() : pickler.pu history =
     open pickler
     inl card : pu card = alt {
         King = unit()
@@ -30,7 +30,7 @@ inl leduc_conv (table, messages : table * messages) : history =
         | _ => None
 
 inl leduc_graph() =
-    inl pu_history = leduc_input()
+    inl pu_history = leduc_pickler()
     inl size = {
         ensemble = 4 // The third dimension of each weight layer.
         block = blocks_per_grid()
@@ -58,7 +58,7 @@ open ml.models
 inl game_graph() : game_graph _ _ =
     game_graph {
         graph = exists leduc_graph()
-        input = exists leduc_conv, leduc_input()
+        input = exists leduc_conv, leduc_pickler()
         output = leduc_output
     }
 

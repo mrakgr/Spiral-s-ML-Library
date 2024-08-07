@@ -4,24 +4,46 @@ open tensorm
 open ml.layers
 open game
 
-inl nlholdem_input() : pickler.pu history =
+type history = da_listm.da_list 128 (option action) // The game history. RL agents need this one.
+
+inl nlholdem_pickler() : pickler.pu {history : history; pot : sam.sa 2 int; stack : sam.sa 2 int; player_cards : sam.sa 2 card; community_cards : sa_listm.sa_list 5 card} =
     open pickler
-    inl card : pu card = alt {
-        King = unit()
-        Queen = unit()
-        Jack = unit()
-    }
+
+    inl card =
+        open lib.cardm
+        wrap {inp=fun (x : card) => conv (suit x), conv (rank x); out=fun suit,rank => from_suit_rank (conv suit, conv rank)} (int 4 ** int 13)
+
     inl action : pu action = alt {
-        Fold = unit()
-        Call = unit()
-        Raise = unit()
+        A_Fold = unit()
+        A_Call = unit()
+        A_All_In = unit()
+        A_Raise = bin_int {from=1; nearTo=(1 <<< 10) - 1}
     }
-    inl action_or_card : pu (choice2 action card) = action ++ card
-    inl history : pu history = sa_list action_or_card
-    history
+    inl history : pu history = sa_list (option action)
+    inl pot : pu (sam.sa 2 int) = sa (bin_int {from=0; nearTo=(1 <<< 10) - 1})
+    inl stack : pu (sam.sa 2 int) = pot
+    inl player_cards : pu (sam.sa 2 card) = sa card
+    inl community_cards : pu (sa_listm.sa_list 5 card) = sa_list card
+    wrap {
+        out = fun history,pot,stack,player_cards,community_cards => {history pot stack player_cards community_cards}
+        inp = fun {history pot stack player_cards community_cards} => history,pot,stack,player_cards,community_cards
+    } (history ** pot ** stack ** player_cards ** community_cards)
+
+inl nlholdem_conv (table, messages : table * messages) =
+    inl rotate_left forall dim t. (i' : int) (x : sam.sa dim t) : sam.sa dim t = sam.init (fun i => index x (i + i' % length x))
+    inl history : history =
+        messages |> arraym.map function
+            | PlayerAction(id,action) => Some(action)
+            | _ => None
+    history, rotate_left table.round_turn table.stack, rotate_left table.round_turn table.pot, index table.pl_card (table.round_turn % length table.pl_card), 
+    match table.street with
+    | Preflop => sa_create : sa_listm.sa_list 5 card
+    | Flop cards => arraym.init (length cards) (index cards) : sa_listm.sa_list 5 card
+    | Turn cards => arraym.init (length cards) (index cards) : sa_listm.sa_list 5 card
+    | River cards => arraym.init (length cards) (index cards) : sa_listm.sa_list 5 card
 
 inl nlholdem_graph() =
-    inl pu_history = nlholdem_input()
+    inl pu_history = nlholdem_pickler()
     inl size = {
         ensemble = 4 // The third dimension of each weight layer.
         block = blocks_per_grid()
@@ -74,7 +96,7 @@ open ml.models
 inl game_graph() : game_graph _ _ =
     game_graph {
         graph = exists nlholdem_graph()
-        input = nlholdem_input()
+        input = exists nlholdem_conv, nlholdem_input()
         output = nlholdem_output
     }
 
