@@ -175,12 +175,12 @@ let play_loop rng (neural : state_neural) (state : state_internal) node =
             | Computer =>
                 open model
                 inl model = ml.models.from_model_data model.game_graph() neural.model_data
-                inl data = refm.to_local state.messages
+                inl data = table, refm.to_local state.messages
                 console.write_ln "Running the GPU model."
-                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model (table,data)
+                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model (Some data)
+                inl action = action_conv table action
                 console.write "The action is: "
                 console.write_ln action
-                inl action = action_conv table action
                 inl msg = PlayerAction(player_turn, action)
                 push_message msg
                 Some (round table action)

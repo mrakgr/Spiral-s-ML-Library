@@ -118,7 +118,7 @@ inl test3() =
 
     run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
-        ml.models.run game_model data
+        ml.models.run game_model (Some data)
         |> console.write_ln
 
     device_sync()

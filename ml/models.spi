@@ -1,4 +1,5 @@
 open corebase
+open coreext
 open layers
 open tensorm
 
@@ -9,7 +10,24 @@ type size = // The block and thread dimensions should match blocks_per_grid and 
 
 open corecuda
 open rangem
-inl run' forall inp out. (exists t. model : exists t. model t) (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) (output : int -> out) (data : inp) =
+inl run' forall inp out. =
+    !!!!PrintStatic(`out)
+    fun
+        (exists t. model : exists t. model t) 
+        (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
+        (output : int -> out) 
+        (data : option inp) => join
+    !!!!PrintStatic(`inp)
+    !!!!PrintStatic(`out)
+    !!!!PrintStatic(`t)
+    !!!!PrintStatic(`mid)
+    !!!!PrintStatic("***")
+    
+    // All the threads will be waiting on this barrier until the game threads call on it with the inputs.
+    __syncthreads()
+
+    console.write_ln {tid=thread_index()}
+
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
     inl () = // Assert that all the dimensions are right.
@@ -38,8 +56,10 @@ inl run' forall inp out. (exists t. model : exists t. model t) (exists mid. inpu
 
     __syncthreads()
 
-    // Serializes the data into the input tensor.
-    inl _ =
+    // Serializes the data into the input tensor if there is any data being passed into the model.
+    // If there is no data being passed into run here, the individual threads for which that is the case can 
+    // still contribute by doing computation. They contribute to the functioning of the entire block.
+    data |> optionm.iter fun data =>
         open pickler
         inl tns_input = apply thread_index() x
         snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
@@ -88,7 +108,14 @@ nominal game_model inp out =
         output : int -> out
     }
 
-inl run forall inp out. (game_model {model input output} : game_model inp out) = run' model input output
+inl run forall inp out. (game_model {model input output} : game_model inp out) (data : option inp) : {action : out; sampling_prob_ensemble : tensor i32 f32; sampling_prob_selected : f32} = 
+    !!!!PrintStatic(`inp)
+    !!!!PrintStatic(`out)
+    !!!!PrintStatic("===")
+    // !!!!PrintRaw((run' model input output))
+    // !!!!PrintRaw(123)
+    real run' `inp `out model input output data
+    // run' model input output data
 
 inl to_model_data forall a b. (game_model {model=exists t. model} : game_model a b) : layers.model_data = model_to_model_data model
 inl from_model_data forall inp out. 

@@ -30,7 +30,20 @@ inl to_local forall t. (x : ref t) : t = $"`t & \v = !x"
 // Creates a reference from a local value. The reference points to the adress of the original value.
 inl from_local forall t. (x : t) : ref t = $"`t & \v = !x"
 
-
 // Indexes into an array. Returns a reference to the element instead of the actual element.
 prototype ref_index ar el : ar el -> int -> ref el
 instance ref_index array = fun array i => $"`el & \v = !array[!i]"
+
+// Creates a variable in shared memory. Does block synchronization.
+inl create_shared_var forall a b. (con : () -> a) : ref b =
+    inl x = $"__shared__ `b \v"
+    __syncthreads()
+    if thread_index() = 0 then $"new(&!x) `b{!(con())}"
+    __syncthreads()
+    x
+
+// Creates a variable in local scope.
+inl create_thread_var forall a b. (con : () -> a) : ref b = $"`b \v{!(con())}"
+
+// Creates a variable in global scope (using the static keyword.)
+inl create_static_var forall a b. (con : () -> a) : ref b = $"static `b \v{!(con())}"

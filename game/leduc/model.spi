@@ -1,7 +1,6 @@
 open corebase
 open corecuda
 open tensorm
-open ml.layers
 open game
 
 type history = sa_listm.sa_list 10 (choice2 action card) // The game history. RL agents need this one.
@@ -30,6 +29,7 @@ inl leduc_conv (table, messages : table * messages) : history =
         | _ => None
 
 inl leduc_graph() =
+    open ml.layers
     inl pu_history = leduc_pickler()
     inl size = {
         ensemble = 4 // The third dimension of each weight layer.
@@ -48,10 +48,21 @@ inl leduc_graph() =
 
     graph
 
+union alt_action = AA_Raise | AA_Call | AA_Fold
+
+// Converts the alternative actions to the regular ones.
+inl action_conv (table : table) (x : alt_action) : action =
+    match x with
+    | AA_Fold => 
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        if index table.pot table.player_turn = pot_size_needed_to_call then Call else Fold
+    | AA_Call => Call
+    | AA_Raise ratio => if table.raises_left > 0 then Raise else Call
+
 inl leduc_output : int -> _ = function
-    | 0 => Fold
-    | 1 => Call
-    | 2 => Raise
+    | 0 => AA_Fold
+    | 1 => AA_Call
+    | 2 => AA_Raise
     | _ => failwith "Invalid output id in the Leduc model."
 
 open ml.models

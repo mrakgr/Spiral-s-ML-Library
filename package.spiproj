@@ -57,6 +57,7 @@ modules:
         pragma 
         cooperative_groups
         semaphore
+        latchm
 
     coreext/
         console/

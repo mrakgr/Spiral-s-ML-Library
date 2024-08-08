@@ -46,26 +46,6 @@ inl nlholdem_conv (table, messages : table * messages) =
         community_cards = extract_community_cards table
     }
 
-inl nlholdem_graph() =
-    open ml.layers
-    inl pu_history = nlholdem_pickler()
-    inl size = {
-        ensemble = 4 // The third dimension of each weight layer.
-        block = blocks_per_grid()
-        thread = threads_per_block()
-        inner = modup pu_history.size 128
-    }
-
-    inl graph =
-        (input .input (size.block,size.thread,size.inner) : graph (tensor (int * int * int) float))
-        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-        |> softmax_and_discrete_sample' (
-            pair (input .output_probs   (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
-                 (input .output_indices (size.ensemble,size.block,size.thread) |> apply .ensemble)
-            )
-
-    graph
-
 union alt_action = // Instead of having direct raises these use a ratio of the pot bet size.
     | AA_Fold
     | AA_Call
@@ -85,6 +65,26 @@ inl possible_actions () =
         AA_Raise(3, 1)
         AA_Raise(limit.max, 1)
     ]
+
+inl nlholdem_graph() =
+    open ml.layers
+    inl pu_history = nlholdem_pickler()
+    inl size = {
+        ensemble = 4 // The third dimension of each weight layer.
+        block = blocks_per_grid()
+        thread = threads_per_block()
+        inner = modup pu_history.size 128
+    }
+
+    inl graph =
+        (input .input (size.block,size.thread,size.inner) : graph (tensor (int * int * int) float))
+        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
+        |> masked_softmax_and_discrete_sample' (listm.length possible_actions()) (
+            pair (input .output_probs   (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
+                 (input .output_indices (size.ensemble,size.block,size.thread) |> apply .ensemble)
+            )
+
+    graph
 
 inl nlholdem_output (i' : int) : alt_action =
     listm.foldBack 

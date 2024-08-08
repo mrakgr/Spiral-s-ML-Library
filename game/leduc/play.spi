@@ -130,10 +130,12 @@ let play_loop (neural : state_neural) (state : state_internal) node =
         | Round table => 
             match index #state.pl_type table.player_turn with
             | Computer =>
+                open model
                 inl model = ml.models.from_model_data model.game_graph() neural.model_data
                 inl data = table, refm.to_local state.messages
                 console.write_ln "Running the GPU model."
-                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model data
+                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model (Some data)
+                inl action = action_conv table action
                 console.write "The action is: "
                 console.write_ln action
                 inl msg = PlayerAction(table.player_turn, action)
@@ -197,18 +199,27 @@ inl main() =
             inl {game neural} = jsonm.deserialize state
             serialize seri.game_state game
 
-            console.write_ln "Going to run the NL Holdem game kernel."
+            console.write_ln "Going to run the Leduc game kernel."
             global "import time"
             inl p : f64 = $"time.perf_counter()"
 
             run' {shared_mem=model.game_graph() |> ml.models.smem_used} fun () =>
-                // TODO: Fix the neural net model using only a single thread.
+                inl latch = latchm.create_latch_in_block threads_per_block()
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
                     inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
                     // When converting the state to internal form, the refs will point to the original.
                     event_loop neural (msg, state_to_internal game_state)
                     serialize seri.game_state game_state
+
+                // nn model loop
+                latchm.count_down latch
+                loop.while' (fun () => latchm.try_wait latch = false)
+                    (fun () =>
+                        inl model = ml.models.from_model_data model.game_graph() neural.model_data
+                        ml.models.run model None |> ignore
+                        )
+
 
             inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "

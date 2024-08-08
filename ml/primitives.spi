@@ -144,7 +144,6 @@ inl block_reduce_2d forall b.
         // All the warps in a block store their intermediate results into the shared tensor.
         tensor_set index_warp warp_result shared
 
-        // semaphore.write_ln_system (fst index_warp)
         barrier_sync {threads_per_miniblock miniblock_index=fst index_warp}
     
         inl threads_in_warp = threads_in_warp()

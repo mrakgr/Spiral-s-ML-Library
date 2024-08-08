@@ -3,8 +3,8 @@ from typing import Any, Callable, Never, TypedDict, Literal
 from flask import request
 from flask_socketio import Namespace, emit # type: ignore
 
-from game.nl_hu_holdem.main import main
-spiral_game = main()
+from game.nl_hu_holdem.play import main
+funs = main()
 
 class HU_NL_Holdem_Namespace(Namespace):
     user_state : dict[str, Any] = {}
@@ -14,9 +14,9 @@ class HU_NL_Holdem_Namespace(Namespace):
 
     def on_connect(self):
         print(f'Client connected to HU NL game: {self.sid()}')
-        state = spiral_game.init()
+        state = funs.init()
         HU_NL_Holdem_Namespace.user_state[self.sid()] = state
-        self.emit_update(state["ui_state"])
+        self.emit_update(state["game"]["public"])
 
     def on_disconnect(self):
         HU_NL_Holdem_Namespace.user_state.pop(self.sid())
@@ -24,6 +24,6 @@ class HU_NL_Holdem_Namespace(Namespace):
 
     def on_update(self, msg : Any):
         state = HU_NL_Holdem_Namespace.user_state[self.sid()]
-        state = spiral_game.event_loop_gpu(msg,state["game_state"])
+        state = funs.event_loop_gpu(msg,state)
         HU_NL_Holdem_Namespace.user_state[self.sid()] = state
-        self.emit_update(state["ui_state"])
+        self.emit_update(state["game"]["public"])
