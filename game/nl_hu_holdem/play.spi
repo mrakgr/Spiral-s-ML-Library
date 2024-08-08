@@ -66,49 +66,45 @@ inl init() : state =
         }
     }
 
-inl game_to_ui (x : state) : state_ui =
-    {
-        ui_game_state = x.small.ui_game_state
-        pl_type = x.small.pl_type
-        messages = x.large.messages
-    }
-
-inl init() : state = 
-    {
-        small = {
-            ui_game_state = GameNotStarted
-            pl_type = arraym.fromList [Computer; Human]
-            game = None
-        }
-        large = {
-            deck = lib.deckm.create()
-            messages = sa_create
-        }
-    }
-
 open corecuda
 
-type state_large_ref =
+type state_internal =
     {
+        ui_game_state : refm.ref ui_game_state
+        pl_type : refm.ref player_types
+        game : refm.ref (option game_node)
         deck : refm.ref deck
         messages : refm.ref messages
-        rng : refm.ref random.philox_state
+        // rng : refm.ref random.philox_state
     }
 
-inl large_to_refs (large : state_large) : state_large_ref =
-    {large with
-        deck#=refm.from_local
-        messages#=refm.from_local
-        rng=random.init {seed = $"clock64()"; subsequence=conv corecuda.rangem.threads_in_grid().from; offset=0}
+// Converts the given state to internal one.
+// The refs will point to the original locations.
+inl state_to_internal (state : state_game) : state_internal =
+    {
+        ui_game_state = refm.from_local state.public.ui_game_state
+        pl_type = refm.from_local state.public.pl_type
+        game = refm.from_local state.private.game
+        deck = refm.from_local state.private.deck
+        messages = refm.from_local state.public.messages
     }
+
+// Sets the internal state to the values held by the regular one.
+inl internal_set (state_internal : state_internal) (state : state_game) =
+    open refm
+    state_internal.ui_game_state <-# state.public.ui_game_state
+    state_internal.pl_type <-# state.public.pl_type
+    state_internal.game <-# state.private.game
+    state_internal.deck <-# state.private.deck
+    state_internal.messages <-# state.public.messages
 
 inl random_action = fun rng (table : table) =>
     inl player_turn = player_turn table
     inl full_stack = arraym.map2 (+) table.stack table.pot
     inl pot_size_needed_to_call = arraym.reduce max table.pot
     inl pot_after_calling = arraym.update' player_turn (min (pot_size_needed_to_call) (index full_stack player_turn)) table.pot
-    inl stack_after_calling = arraym.map2 (-) full_stack pot_after_calling
     inl pot_bet_size = arraym.reduce (+) pot_after_calling
+    inl stack_after_calling = arraym.map2 (-) full_stack pot_after_calling
     inl raise x = // Only do the raise if there are enough chips in the stack after calling.
         inl prob = if table.min_raise <= x && x < index stack_after_calling player_turn then 1 else 0
         A_Raise x, prob
@@ -122,16 +118,15 @@ inl random_action = fun rng (table : table) =>
         ]
     random.sample_discrete actions rng
     
-let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
-    inl push_message = da_listm.push (refm.to_local state.messages)
-    inl deck = refm.to_local state.deck
+let play_loop rng (neural : state_neural) (state : state_internal) node =
+    open refm
+    inl push_message = da_listm.push (to_local state.messages)
+    inl deck = to_local state.deck
     inl pop_deck () = 
         open random
-        inl cards, deck = lib.deckm.draw_cards state.rng deck
+        inl cards, deck = lib.deckm.draw_cards rng deck
         refm.setref state.deck deck
         cards
-    inl done x = false, x
-    inl continue x = true, x
     let get_community_cards street new_cards = 
         inl ar = sa_create
         inl push cards = arraym.iter (sa_listm.push ar) cards 
@@ -146,7 +141,7 @@ let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
         inl new_cards = pop_deck()
         inl msg = CommunityCardsAre (get_community_cards table.street new_cards)
         push_message msg
-        continue (flop table new_cards)
+        Some (flop table new_cards)
 
     inl body node =
         match node with
@@ -155,7 +150,9 @@ let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
                 inl chips_won = index table.pot (player_turn table)
                 Fold {chips_won winner_id=next_turn table.round_turn % num_players()}
             push_message msg
-            done node
+            state.ui_game_state <-# GameOver(table)
+            state.game <-# None
+            None
         | G_Showdown table => 
             inl msg =
                 inl community_cards = match table.street with River cards => cards | _ => failwith "Invalid street in showdown."
@@ -170,40 +167,37 @@ let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
                 inl hands_shown = arraym.fromList [s0; s1]
                 Showdown {hands_shown chips_won winner_id}
             push_message msg
-            done node
+            state.ui_game_state <-# GameOver(table)
+            state.game <-# None
+            None
         | G_Round table =>
             inl player_turn = player_turn table
-            match index pl_type player_turn with
+            match index #state.pl_type player_turn with
             | Computer =>
-                // inl model = ml.models.from_model_data model.game_graph() neural.model_data
-                // inl data = refm.to_local state.messages |> sa_listm.choose function
-                //     | PlayerGotCard(id,card) when id = table.player_turn => Some(C2of2 card)
-                //     | CommunityCardIs card => Some(C2of2 card)
-                //     | PlayerAction(id,action) => Some(C1of2 action)
-                //     | _ => None
+                open model
+                inl model = ml.models.from_model_data model.game_graph() neural.model_data
+                inl data = refm.to_local state.messages
                 console.write_ln "Running the GPU model."
-                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model data
-                match action with
-                | AA_Fold => failwith "TODO"
-                | AA_Call => failwith "TODO"
-                | AA_Raise => failwith "TODO"
+                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model (table,data)
                 console.write "The action is: "
                 console.write_ln action
-                // inl action = random_action state.rng table
+                inl action = action_conv table action
                 inl msg = PlayerAction(player_turn, action)
                 push_message msg
-                continue (round table action)
+                Some (round table action)
             | Human =>
-                done node
+                state.ui_game_state <-# WaitingForActionFromPlayerId(table)
+                state.game <-# Some node
+                None
             | Random =>
-                inl action = random_action state.rng table
+                inl action = random_action rng table
                 inl msg = PlayerAction(player_turn, action)
                 push_message msg
-                continue (round table action)
+                Some (round table action)
         | G_Round'(table,action) =>
             inl msg = PlayerAction(player_turn table, action)
             push_message msg
-            continue (round table action)
+            Some (round table action)
         | G_Flop table => go_street table flop
         | G_Turn table => go_street table turn
         | G_River table => go_street table river
@@ -211,49 +205,29 @@ let play_loop_inner (state : state_large_ref) (pl_type : player_types) node =
             inl c0,c1 = pop_deck(), pop_deck()
             push_message PlayerGotCards(0, c0)
             push_message PlayerGotCards(1, c1)
-            continue (preflop (arraym.fromList [c0; c1]))
+            Some (preflop (arraym.fromList [c0; c1]))
     
-    loop.while fst (snd >> body) (continue node) |> snd
-
-let play_loop (small : state_small) (large : state_large_ref) node : state_small =
-    match play_loop_inner large small.pl_type node with
-    | G_Round table as game =>
-        {small with
-            ui_game_state = WaitingForActionFromPlayerId(table)
-            game = Some game
-            }
-    | G_Showdown table | G_Fold table =>
-        {small with
-            ui_game_state = GameOver(table)
-            game = None
-            }
-    | game =>
-        failwith "Unexpected node received in play_loop."
+    loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
 
 union event = 
     | StartGame
     | PlayerChanged : sam.sa 2 player_type
     | ActionSelected : action
 
-inl event_loop (msg, {small large} & state : event * state) : state =
-    inl large_refs = large_to_refs large
-    inl small =
-        match msg with
-        | StartGame =>
-            open refm
-            inl ({small large} as state) = init()
-            large_refs.deck <-# large.deck
-            large_refs.messages <-# large.messages
-            play_loop small large_refs start()
-        | PlayerChanged pl_type => {small with pl_type}
-        | ActionSelected action =>
-            match small.game with
-            | Some game => 
-                match game with
-                | G_Round table => play_loop small large_refs G_Round'(table, action)
-                | _ => failwith "Unexpected game node in ActionSelected."
-            | None => small
-    {small large}
+inl event_loop state_neural (msg, state_internal : event * state_internal) : () =
+    open refm
+    match msg with
+    | StartGame =>
+        internal_set state_internal init_game()
+        play_loop state_neural (random.create()) state_internal game_init()
+    | PlayerChanged pl_type => {small with pl_type}
+    | ActionSelected action =>
+        match small.game with
+        | Some game => 
+            match game with
+            | G_Round table => play_loop small large_refs G_Round'(table, action)
+            | _ => failwith "Unexpected game node in ActionSelected."
+        | None => small
 
 open corepython
 open coreext

@@ -1,7 +1,6 @@
 open corebase
 open corecuda
 open tensorm
-open ml.layers
 open game
 
 type history = da_listm.da_list 128 (option action) // The game history. RL agents need this one.
@@ -29,20 +28,26 @@ inl nlholdem_pickler() : pickler.pu {history : history; pot : sam.sa 2 int; stac
         inp = fun {history pot stack player_cards community_cards} => history,pot,stack,player_cards,community_cards
     } (history ** pot ** stack ** player_cards ** community_cards)
 
+inl extract_community_cards (table : table) =
+    inl community_cards = sa_create : sa_listm.sa_list 5 card
+    inl f cards = arraym.iter (sa_listm.push community_cards) cards
+    match table.street with Preflop => () | Flop cards => f cards | Turn cards => f cards | River cards => f cards
+    community_cards
+
 inl nlholdem_conv (table, messages : table * messages) =
     inl rotate_left forall dim t. (i' : int) (x : sam.sa dim t) : sam.sa dim t = sam.init (fun i => index x (i + i' % length x))
-    inl history : history =
-        messages |> arraym.map function
+    {
+        history = messages |> arraym.map function
             | PlayerAction(id,action) => Some(action)
             | _ => None
-    history, rotate_left table.round_turn table.stack, rotate_left table.round_turn table.pot, index table.pl_card (table.round_turn % length table.pl_card), 
-    match table.street with
-    | Preflop => sa_create : sa_listm.sa_list 5 card
-    | Flop cards => arraym.init (length cards) (index cards) : sa_listm.sa_list 5 card
-    | Turn cards => arraym.init (length cards) (index cards) : sa_listm.sa_list 5 card
-    | River cards => arraym.init (length cards) (index cards) : sa_listm.sa_list 5 card
+        pot = rotate_left table.round_turn table.pot
+        stack = rotate_left table.round_turn table.stack
+        player_cards = index table.pl_card (table.round_turn % length table.pl_card)
+        community_cards = extract_community_cards table
+    }
 
 inl nlholdem_graph() =
+    open ml.layers
     inl pu_history = nlholdem_pickler()
     inl size = {
         ensemble = 4 // The third dimension of each weight layer.
@@ -61,7 +66,7 @@ inl nlholdem_graph() =
 
     graph
 
-union action_model =
+union alt_action = // Instead of having direct raises these use a ratio of the pot bet size.
     | AA_Fold
     | AA_Call
     | AA_Raise : int * int // numerator * denominator
@@ -81,22 +86,40 @@ inl possible_actions () =
         AA_Raise(limit.max, 1)
     ]
 
-inl nlholdem_output (i' : int) : action_model =
+inl nlholdem_output (i' : int) : alt_action =
     listm.foldBack 
-        (fun (x : action_model) (next : int -> action_model) (i : int) =>
+        (fun (x : alt_action) (next : int -> alt_action) (i : int) =>
             if i = i' then x else next (i + 1)
             )
         possible_actions() 
         (fun i => failwith "Invalid output id in the NL Holdem model.")
         0
 
-// TODO: table -> action_model -> action
+// Converts the alternative actions to the regular ones.
+inl action_conv (table : table) (x : alt_action) : action =
+    match x with
+    | AA_Fold => 
+        inl player_turn = player_turn table
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        if index table.pot player_turn = pot_size_needed_to_call then A_Call else A_Fold
+    | AA_Call => A_Call
+    | AA_Raise ratio =>
+        inl player_turn = player_turn table
+        inl full_stack = arraym.map2 (+) table.stack table.pot
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        inl pot_after_calling = arraym.update' player_turn (min pot_size_needed_to_call (index full_stack player_turn)) table.pot
+        inl pot_bet_size = arraym.reduce (+) pot_after_calling
+        inl stack_after_calling = arraym.map2 (-) full_stack pot_after_calling
+        inl bet_size = max table.min_raise (fst ratio * pot_bet_size / snd ratio)
+        if bet_size >= index stack_after_calling player_turn then A_All_In
+        // elif bet_size < table.min_raise then A_Call
+        else A_Raise bet_size
 
 open ml.models
 inl game_graph() : game_graph _ _ =
     game_graph {
         graph = exists nlholdem_graph()
-        input = exists nlholdem_conv, nlholdem_input()
+        input = exists nlholdem_conv, nlholdem_pickler()
         output = nlholdem_output
     }
 

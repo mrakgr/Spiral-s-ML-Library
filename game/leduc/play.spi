@@ -140,8 +140,8 @@ let play_loop (neural : state_neural) (state : state_internal) node =
                 push_message msg
                 Some (game_round table action)
             | Human => 
-                state.game <-# Some node
                 state.ui_game_state <-# WaitingForActionFromPlayerId(table)
+                state.game <-# Some node
                 None
             | Random =>
                 inl action = random_action table
