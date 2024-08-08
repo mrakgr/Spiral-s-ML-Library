@@ -75,7 +75,6 @@ type state_internal =
         game : refm.ref (option game_node)
         deck : refm.ref deck
         messages : refm.ref messages
-        // rng : refm.ref random.philox_state
     }
 
 // Converts the given state to internal one.
@@ -216,57 +215,55 @@ union event =
 
 inl event_loop state_neural (msg, state_internal : event * state_internal) : () =
     open refm
+    inl rng : _ random.philox_state = random.init {seed = $"clock64()"; subsequence=conv corecuda.rangem.threads_in_grid().from; offset=0}
     match msg with
     | StartGame =>
         internal_set state_internal init_game()
-        play_loop state_neural (random.create()) state_internal game_init()
-    | PlayerChanged pl_type => {small with pl_type}
+        play_loop rng state_neural state_internal start()
+    | PlayerChanged pl_type =>
+        state_internal.pl_type <-# pl_type
     | ActionSelected action =>
-        match small.game with
-        | Some game => 
+        match #state_internal.game with
+        | Some game =>
             match game with
-            | G_Round table => play_loop small large_refs G_Round'(table, action)
+            | G_Round table => play_loop rng state_neural state_internal G_Round'(table, action)
             | _ => failwith "Unexpected game node in ActionSelected."
-        | None => small
+        | None => failwith "The game hasn't been started in ActionSelected."
 
 open corepython
 open coreext
 inl main() =
     named_tuple "HU_Holdem_Game" {
-        init = fun () =>
-            inl x = init()
-            jsonm.serialize {
-                game_state = x
-                ui_state = game_to_ui x
-            }
-
-        event_loop_gpu = fun (msg, game_state : jsonm.json event * jsonm.json state) =>
+        init = fun () => jsonm.serialize init()
+        event_loop_gpu = fun (msg, state : jsonm.json event * jsonm.json state) =>
             open serializer
             inl seri = {
                 msg = create_serializer
                 game_state = create_serializer
-                ui_state = create_serializer
             }
-            
-            inl msg, game_state = jsonm.deserialize msg, jsonm.deserialize game_state
-            serialize seri.msg msg
-            serialize seri.game_state game_state
+            serialize seri.msg (jsonm.deserialize msg)
+            inl {game neural} = jsonm.deserialize state
+            serialize seri.game_state game
 
-            console.write_ln "Going to run the kernel."
+            console.write_ln "Going to run the NL Holdem game kernel."
             global "import time"
             inl p : f64 = $"time.perf_counter()"
-            run fun () =>
+
+            run' {shared_mem=model.game_graph() |> ml.models.smem_used} fun () =>
+                // TODO: Fix the neural net model using only a single thread.
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
-                    inl game_state = event_loop (deserialize seri.msg, deserialize seri.game_state)
-                    // inl game_state = deserialize seri.game_state
+                    inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
+                    // When converting the state to internal form, the refs will point to the original.
+                    event_loop neural (msg, state_to_internal game_state)
                     serialize seri.game_state game_state
-                    serialize seri.ui_state (game_to_ui game_state)
+
             inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "
             console.write_ln (p2 - p)
+
             jsonm.serialize {
-                game_state = deserialize seri.game_state
-                ui_state = deserialize seri.ui_state
-            }
+                game = deserialize seri.game_state
+                neural
+                }
     }

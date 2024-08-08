@@ -179,7 +179,7 @@ inl event_loop state_neural (msg, state_internal : event * state_internal) : () 
             match game with
             | Round table => play_loop state_neural state_internal RoundWithAction(table, action)
             | _ => failwith "Unexpected game node in ActionSelected."
-        | None => failwith "The hasn't been started in ActionSelected."
+        | None => failwith "The game hasn't been started in ActionSelected."
 
 open corecuda
 open corepython
@@ -191,13 +191,13 @@ inl main() =
             open serializer
             inl seri = {
                 msg = create_serializer
-                state = create_serializer
+                game_state = create_serializer
             }
             serialize seri.msg (jsonm.deserialize msg)
             inl {game neural} = jsonm.deserialize state
-            serialize seri.state game
+            serialize seri.game_state game
 
-            console.write_ln "Going to run the kernel."
+            console.write_ln "Going to run the NL Holdem game kernel."
             global "import time"
             inl p : f64 = $"time.perf_counter()"
 
@@ -205,17 +205,17 @@ inl main() =
                 // TODO: Fix the neural net model using only a single thread.
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
-                    inl msg, state = deserialize seri.msg, deserialize seri.state
+                    inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
                     // When converting the state to internal form, the refs will point to the original.
-                    event_loop neural (msg, state_to_internal state)
-                    serialize seri.state state
+                    event_loop neural (msg, state_to_internal game_state)
+                    serialize seri.game_state game_state
 
             inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "
             console.write_ln (p2 - p)
 
             jsonm.serialize {
-                game = deserialize seri.state
+                game = deserialize seri.game_state
                 neural
                 }
     }
