@@ -10,18 +10,11 @@ type size = // The block and thread dimensions should match blocks_per_grid and 
 
 open corecuda
 open rangem
-inl run' forall inp out. =
-    !!!!PrintStatic(`out)
-    fun
+inl run' forall inp out.
         (exists t. model : exists t. model t) 
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
-        (data : option inp) => join
-    !!!!PrintStatic(`inp)
-    !!!!PrintStatic(`out)
-    !!!!PrintStatic(`t)
-    !!!!PrintStatic(`mid)
-    !!!!PrintStatic("***")
+        (data : option inp) = join
     
     // All the threads will be waiting on this barrier until the game threads call on it with the inputs.
     __syncthreads()
@@ -108,14 +101,8 @@ nominal game_model inp out =
         output : int -> out
     }
 
-inl run forall inp out. (game_model {model input output} : game_model inp out) (data : option inp) : {action : out; sampling_prob_ensemble : tensor i32 f32; sampling_prob_selected : f32} = 
-    !!!!PrintStatic(`inp)
-    !!!!PrintStatic(`out)
-    !!!!PrintStatic("===")
-    // !!!!PrintRaw((run' model input output))
-    // !!!!PrintRaw(123)
-    real run' `inp `out model input output data
-    // run' model input output data
+inl run forall inp out. (game_model {model input output} : game_model inp out) = 
+    run' model input output
 
 inl to_model_data forall a b. (game_model {model=exists t. model} : game_model a b) : layers.model_data = model_to_model_data model
 inl from_model_data forall inp out. 

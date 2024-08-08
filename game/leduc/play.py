@@ -2,6 +2,7 @@ kernel = r"""
 #include <new>
 #include <assert.h>
 #include <stdio.h>
+#include <cuda/latch>
 #include <cooperative_groups.h>
 #include <cuda/semaphore>
 __device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
@@ -247,40 +248,42 @@ __device__ int f_19(unsigned char * v0);
 __device__ Tuple0 f_6(unsigned char * v0);
 struct Tuple6;
 struct Union9;
+struct Tuple7;
 struct Union10;
 struct Union11;
-__device__ void method_21(float * v0, int v1, float * v2, int v3, float * v4, int v5);
-struct Tuple7;
+__device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, int v5);
 struct Tuple8;
-__device__ Tuple8 method_23(float v0, int v1, float v2, int v3);
-__device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5);
-__device__ unsigned int loop_25(unsigned int v0, curandStatePhilox4_32_10_t & v1);
-__device__ int int_range_24(int v0, int v1, curandStatePhilox4_32_10_t & v2);
+struct Tuple9;
+__device__ Tuple9 method_24(float v0, int v1, float v2, int v3);
+__device__ void method_23(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5);
+__device__ unsigned int loop_26(unsigned int v0, curandStatePhilox4_32_10_t & v1);
+__device__ int int_range_25(int v0, int v1, curandStatePhilox4_32_10_t & v2);
+__device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union6 v2, bool v3, static_array<Union3,2l> v4, int v5, static_array<int,2l> v6, int v7, static_array_list<Union7,32l> v8);
+__device__ void method_27(Union1 v0);
 struct Union12;
-__device__ void method_26(Union1 v0);
-struct Union13;
-__device__ int tag_28(Union3 v0);
-__device__ bool is_pair_29(int v0, int v1);
-__device__ Tuple6 order_30(int v0, int v1);
-__device__ Union13 compare_hands_27(Union6 v0, bool v1, static_array<Union3,2l> v2, int v3, static_array<int,2l> v4, int v5);
+__device__ int tag_29(Union3 v0);
+__device__ bool is_pair_30(int v0, int v1);
+__device__ Tuple6 order_31(int v0, int v1);
+__device__ Union12 compare_hands_28(Union6 v0, bool v1, static_array<Union3,2l> v2, int v3, static_array<int,2l> v4, int v5);
 __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned char * v2, unsigned long long v3, static_array_list<Union3,6l> & v4, Union4 & v5, static_array_list<Union7,32l> & v6, static_array<Union2,2l> & v7, Union8 & v8, Union5 v9);
-__device__ void f_32(unsigned char * v0, int v1);
-__device__ void f_34(unsigned char * v0);
-__device__ void f_33(unsigned char * v0, Union3 v1);
-__device__ void f_35(unsigned char * v0, int v1);
-__device__ void f_37(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6);
-__device__ void f_39(unsigned char * v0, int v1);
-__device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6, Union1 v7);
-__device__ void f_36(unsigned char * v0, Union5 v1);
+__device__ void f_33(unsigned char * v0, int v1);
+__device__ void f_35(unsigned char * v0);
+__device__ void f_34(unsigned char * v0, Union3 v1);
+__device__ void f_36(unsigned char * v0, int v1);
+__device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6);
 __device__ void f_40(unsigned char * v0, int v1);
-__device__ void f_43(unsigned char * v0, int v1);
-__device__ void f_42(unsigned char * v0, int v1, Union1 v2);
-__device__ void f_44(unsigned char * v0, int v1, Union3 v2);
-__device__ void f_45(unsigned char * v0, static_array<Union3,2l> v1, int v2, int v3);
-__device__ void f_41(unsigned char * v0, Union7 v1);
-__device__ void f_46(unsigned char * v0, Union2 v1);
-__device__ void f_47(unsigned char * v0, int v1);
-__device__ void f_31(unsigned char * v0, static_array_list<Union3,6l> v1, Union4 v2, static_array_list<Union7,32l> v3, static_array<Union2,2l> v4, Union8 v5);
+__device__ void f_39(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6, Union1 v7);
+__device__ void f_37(unsigned char * v0, Union5 v1);
+__device__ void f_41(unsigned char * v0, int v1);
+__device__ void f_44(unsigned char * v0, int v1);
+__device__ void f_43(unsigned char * v0, int v1, Union1 v2);
+__device__ void f_45(unsigned char * v0, int v1, Union3 v2);
+__device__ void f_46(unsigned char * v0, static_array<Union3,2l> v1, int v2, int v3);
+__device__ void f_42(unsigned char * v0, Union7 v1);
+__device__ void f_47(unsigned char * v0, Union2 v1);
+__device__ void f_48(unsigned char * v0, int v1);
+__device__ void f_32(unsigned char * v0, static_array_list<Union3,6l> v1, Union4 v2, static_array_list<Union7,32l> v3, static_array<Union2,2l> v4, Union8 v5);
+__device__ Tuple7 run__49(unsigned char * v0, unsigned char * v1);
 struct Union1_0 { // Call
 };
 struct Union1_1 { // Fold
@@ -1033,45 +1036,43 @@ struct Tuple6 {
     __device__ Tuple6() = default;
     __device__ Tuple6(int t0, int t1) : v0(t0), v1(t1) {}
 };
-struct Union9_0 { // None
+struct Union9_0 { // AA_Call
 };
-struct Union9_1 { // Some
-    Union6 v0;
-    static_array<Union3,2l> v2;
-    static_array<int,2l> v4;
-    static_array_list<Union7,32l> v6;
-    int v3;
-    int v5;
-    bool v1;
-    __device__ Union9_1(Union6 t0, bool t1, static_array<Union3,2l> t2, int t3, static_array<int,2l> t4, int t5, static_array_list<Union7,32l> t6) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5), v6(t6) {}
-    __device__ Union9_1() = delete;
+struct Union9_1 { // AA_Fold
+};
+struct Union9_2 { // AA_Raise
 };
 struct Union9 {
     union {
-        Union9_0 case0; // None
-        Union9_1 case1; // Some
+        Union9_0 case0; // AA_Call
+        Union9_1 case1; // AA_Fold
+        Union9_2 case2; // AA_Raise
     };
     unsigned char tag{255};
     __device__ Union9() {}
-    __device__ Union9(Union9_0 t) : tag(0), case0(t) {} // None
-    __device__ Union9(Union9_1 t) : tag(1), case1(t) {} // Some
+    __device__ Union9(Union9_0 t) : tag(0), case0(t) {} // AA_Call
+    __device__ Union9(Union9_1 t) : tag(1), case1(t) {} // AA_Fold
+    __device__ Union9(Union9_2 t) : tag(2), case2(t) {} // AA_Raise
     __device__ Union9(Union9 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union9_0(x.case0); break; // None
-            case 1: new (&this->case1) Union9_1(x.case1); break; // Some
+            case 0: new (&this->case0) Union9_0(x.case0); break; // AA_Call
+            case 1: new (&this->case1) Union9_1(x.case1); break; // AA_Fold
+            case 2: new (&this->case2) Union9_2(x.case2); break; // AA_Raise
         }
     }
     __device__ Union9(Union9 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union9_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union9_1(std::move(x.case1)); break; // Some
+            case 0: new (&this->case0) Union9_0(std::move(x.case0)); break; // AA_Call
+            case 1: new (&this->case1) Union9_1(std::move(x.case1)); break; // AA_Fold
+            case 2: new (&this->case2) Union9_2(std::move(x.case2)); break; // AA_Raise
         }
     }
     __device__ Union9 & operator=(Union9 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = x.case0; break; // None
-                case 1: this->case1 = x.case1; break; // Some
+                case 0: this->case0 = x.case0; break; // AA_Call
+                case 1: this->case1 = x.case1; break; // AA_Fold
+                case 2: this->case2 = x.case2; break; // AA_Raise
             }
         } else {
             this->~Union9();
@@ -1082,8 +1083,9 @@ struct Union9 {
     __device__ Union9 & operator=(Union9 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // None
-                case 1: this->case1 = std::move(x.case1); break; // Some
+                case 0: this->case0 = std::move(x.case0); break; // AA_Call
+                case 1: this->case1 = std::move(x.case1); break; // AA_Fold
+                case 2: this->case2 = std::move(x.case2); break; // AA_Raise
             }
         } else {
             this->~Union9();
@@ -1093,11 +1095,22 @@ struct Union9 {
     }
     __device__ ~Union9() {
         switch(this->tag){
-            case 0: this->case0.~Union9_0(); break; // None
-            case 1: this->case1.~Union9_1(); break; // Some
+            case 0: this->case0.~Union9_0(); break; // AA_Call
+            case 1: this->case1.~Union9_1(); break; // AA_Fold
+            case 2: this->case2.~Union9_2(); break; // AA_Raise
         }
         this->tag = 255;
     }
+};
+struct Tuple7 {
+    Union9 v0;
+    float * v1;
+    int v2;
+    int v3;
+    int v4;
+    float v5;
+    __device__ Tuple7() = default;
+    __device__ Tuple7(Union9 t0, float * t1, int t2, int t3, int t4, float t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
 };
 struct Union10_0 { // C1of2
     Union1 v0;
@@ -1238,11 +1251,11 @@ struct Closure1 {
         return v2;
     }
 };
-struct Tuple7 {
+struct Tuple8 {
     int v0;
     float v1;
-    __device__ Tuple7() = default;
-    __device__ Tuple7(int t0, float t1) : v0(t0), v1(t1) {}
+    __device__ Tuple8() = default;
+    __device__ Tuple8(int t0, float t1) : v0(t0), v1(t1) {}
 };
 struct Closure2 {
     __device__ float operator()(float tup0, float tup1){
@@ -1252,67 +1265,67 @@ struct Closure2 {
         return v2;
     }
 };
-struct Tuple8 {
+struct Tuple9 {
     float v0;
     int v1;
-    __device__ Tuple8() = default;
-    __device__ Tuple8(float t0, int t1) : v0(t0), v1(t1) {}
+    __device__ Tuple9() = default;
+    __device__ Tuple9(float t0, int t1) : v0(t0), v1(t1) {}
 };
 struct Closure3 {
-    __device__ Tuple8 operator()(Tuple8 tup0, Tuple8 tup1){
+    __device__ Tuple9 operator()(Tuple9 tup0, Tuple9 tup1){
         float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
         bool v4;
         v4 = v1 < v3;
         if (v4){
-            return Tuple8{v0, v1};
+            return Tuple9{v0, v1};
         } else {
-            return Tuple8{v2, v3};
+            return Tuple9{v2, v3};
         }
     }
 };
 struct Closure4 {
-    __device__ Tuple8 operator()(Tuple8 tup0, Tuple8 tup1){
+    __device__ Tuple9 operator()(Tuple9 tup0, Tuple9 tup1){
         float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
-        return method_23(v0, v1, v2, v3);
+        return method_24(v0, v1, v2, v3);
     }
 };
-struct Union12_0 { // AA_Call
+struct Union12_0 { // Eq
 };
-struct Union12_1 { // AA_Fold
+struct Union12_1 { // Gt
 };
-struct Union12_2 { // AA_Raise
+struct Union12_2 { // Lt
 };
 struct Union12 {
     union {
-        Union12_0 case0; // AA_Call
-        Union12_1 case1; // AA_Fold
-        Union12_2 case2; // AA_Raise
+        Union12_0 case0; // Eq
+        Union12_1 case1; // Gt
+        Union12_2 case2; // Lt
     };
     unsigned char tag{255};
     __device__ Union12() {}
-    __device__ Union12(Union12_0 t) : tag(0), case0(t) {} // AA_Call
-    __device__ Union12(Union12_1 t) : tag(1), case1(t) {} // AA_Fold
-    __device__ Union12(Union12_2 t) : tag(2), case2(t) {} // AA_Raise
+    __device__ Union12(Union12_0 t) : tag(0), case0(t) {} // Eq
+    __device__ Union12(Union12_1 t) : tag(1), case1(t) {} // Gt
+    __device__ Union12(Union12_2 t) : tag(2), case2(t) {} // Lt
     __device__ Union12(Union12 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union12_0(x.case0); break; // AA_Call
-            case 1: new (&this->case1) Union12_1(x.case1); break; // AA_Fold
-            case 2: new (&this->case2) Union12_2(x.case2); break; // AA_Raise
+            case 0: new (&this->case0) Union12_0(x.case0); break; // Eq
+            case 1: new (&this->case1) Union12_1(x.case1); break; // Gt
+            case 2: new (&this->case2) Union12_2(x.case2); break; // Lt
         }
     }
     __device__ Union12(Union12 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union12_0(std::move(x.case0)); break; // AA_Call
-            case 1: new (&this->case1) Union12_1(std::move(x.case1)); break; // AA_Fold
-            case 2: new (&this->case2) Union12_2(std::move(x.case2)); break; // AA_Raise
+            case 0: new (&this->case0) Union12_0(std::move(x.case0)); break; // Eq
+            case 1: new (&this->case1) Union12_1(std::move(x.case1)); break; // Gt
+            case 2: new (&this->case2) Union12_2(std::move(x.case2)); break; // Lt
         }
     }
     __device__ Union12 & operator=(Union12 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = x.case0; break; // AA_Call
-                case 1: this->case1 = x.case1; break; // AA_Fold
-                case 2: this->case2 = x.case2; break; // AA_Raise
+                case 0: this->case0 = x.case0; break; // Eq
+                case 1: this->case1 = x.case1; break; // Gt
+                case 2: this->case2 = x.case2; break; // Lt
             }
         } else {
             this->~Union12();
@@ -1323,9 +1336,9 @@ struct Union12 {
     __device__ Union12 & operator=(Union12 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // AA_Call
-                case 1: this->case1 = std::move(x.case1); break; // AA_Fold
-                case 2: this->case2 = std::move(x.case2); break; // AA_Raise
+                case 0: this->case0 = std::move(x.case0); break; // Eq
+                case 1: this->case1 = std::move(x.case1); break; // Gt
+                case 2: this->case2 = std::move(x.case2); break; // Lt
             }
         } else {
             this->~Union12();
@@ -1335,75 +1348,9 @@ struct Union12 {
     }
     __device__ ~Union12() {
         switch(this->tag){
-            case 0: this->case0.~Union12_0(); break; // AA_Call
-            case 1: this->case1.~Union12_1(); break; // AA_Fold
-            case 2: this->case2.~Union12_2(); break; // AA_Raise
-        }
-        this->tag = 255;
-    }
-};
-struct Union13_0 { // Eq
-};
-struct Union13_1 { // Gt
-};
-struct Union13_2 { // Lt
-};
-struct Union13 {
-    union {
-        Union13_0 case0; // Eq
-        Union13_1 case1; // Gt
-        Union13_2 case2; // Lt
-    };
-    unsigned char tag{255};
-    __device__ Union13() {}
-    __device__ Union13(Union13_0 t) : tag(0), case0(t) {} // Eq
-    __device__ Union13(Union13_1 t) : tag(1), case1(t) {} // Gt
-    __device__ Union13(Union13_2 t) : tag(2), case2(t) {} // Lt
-    __device__ Union13(Union13 & x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union13_0(x.case0); break; // Eq
-            case 1: new (&this->case1) Union13_1(x.case1); break; // Gt
-            case 2: new (&this->case2) Union13_2(x.case2); break; // Lt
-        }
-    }
-    __device__ Union13(Union13 && x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union13_0(std::move(x.case0)); break; // Eq
-            case 1: new (&this->case1) Union13_1(std::move(x.case1)); break; // Gt
-            case 2: new (&this->case2) Union13_2(std::move(x.case2)); break; // Lt
-        }
-    }
-    __device__ Union13 & operator=(Union13 & x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = x.case0; break; // Eq
-                case 1: this->case1 = x.case1; break; // Gt
-                case 2: this->case2 = x.case2; break; // Lt
-            }
-        } else {
-            this->~Union13();
-            new (this) Union13{x};
-        }
-        return *this;
-    }
-    __device__ Union13 & operator=(Union13 && x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Eq
-                case 1: this->case1 = std::move(x.case1); break; // Gt
-                case 2: this->case2 = std::move(x.case2); break; // Lt
-            }
-        } else {
-            this->~Union13();
-            new (this) Union13{std::move(x)};
-        }
-        return *this;
-    }
-    __device__ ~Union13() {
-        switch(this->tag){
-            case 0: this->case0.~Union13_0(); break; // Eq
-            case 1: this->case1.~Union13_1(); break; // Gt
-            case 2: this->case2.~Union13_2(); break; // Lt
+            case 0: this->case0.~Union12_0(); break; // Eq
+            case 1: this->case1.~Union12_1(); break; // Gt
+            case 2: this->case2.~Union12_2(); break; // Lt
         }
         this->tag = 255;
     }
@@ -2101,7 +2048,7 @@ __device__ inline bool while_method_7(int v0){
     v1 = v0 < 16l;
     return v1;
 }
-__device__ void method_21(float * v0, int v1, float * v2, int v3, float * v4, int v5){
+__device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, int v5){
     unsigned int v6;
     v6 = 0ul;
     asm("mov.u32 %0, %dynamic_smem_size;" : "=r"(v6));
@@ -2780,7 +2727,7 @@ __device__ inline bool while_method_8(int v0){
     v1 = v0 < 32l;
     return v1;
 }
-__device__ Tuple8 method_23(float v0, int v1, float v2, int v3){
+__device__ Tuple9 method_24(float v0, int v1, float v2, int v3){
     bool v4;
     v4 = v1 < v3;
     float v5; int v6; float v7; int v8;
@@ -2803,25 +2750,25 @@ __device__ Tuple8 method_23(float v0, int v1, float v2, int v3){
         bool v12;
         v12 = v5 <= v7;
         if (v12){
-            return Tuple8{v5, v6};
+            return Tuple9{v5, v6};
         } else {
-            return Tuple8{v7, v8};
+            return Tuple9{v7, v8};
         }
     } else {
         if (v9){
-            return Tuple8{v5, v6};
+            return Tuple9{v5, v6};
         } else {
             bool v15;
             v15 = v7 >= 0.0f;
             if (v15){
-                return Tuple8{v7, v8};
+                return Tuple9{v7, v8};
             } else {
-                return Tuple8{v5, v6};
+                return Tuple9{v5, v6};
             }
         }
     }
 }
-__device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5){
+__device__ void method_23(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5){
     int v6;
     v6 = blockIdx.x;
     assert("Tensor range check" && 0 <= v6 && v6 < 1l);
@@ -3274,7 +3221,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
             v181 = 4l * v179;
             assert("Tensor range check" && 0 <= v179 && v179 < 1l);
             int v182; float v183;
-            Tuple7 tmp12 = Tuple7{0l, 0.0f};
+            Tuple8 tmp12 = Tuple8{0l, 0.0f};
             v182 = tmp12.v0; v183 = tmp12.v1;
             while (while_method_4(v182)){
                 assert("Tensor range check" && 0 <= v182 && v182 < 4l);
@@ -3311,7 +3258,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
             float v198;
             v198 = v178 + v196;
             int v199; float v200;
-            Tuple7 tmp13 = Tuple7{0l, v198};
+            Tuple8 tmp13 = Tuple8{0l, v198};
             v199 = tmp13.v0; v200 = tmp13.v1;
             while (while_method_4(v199)){
                 assert("Tensor range check" && 0 <= v199 && v199 < 4l);
@@ -3358,7 +3305,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
             v208 += 1l ;
         }
         float v216; int v217;
-        Tuple8 tmp14 = Tuple8{0.0f, 2147483647l};
+        Tuple9 tmp14 = Tuple9{0.0f, 2147483647l};
         v216 = tmp14.v0; v217 = tmp14.v1;
         int v218;
         v218 = 0l;
@@ -3398,7 +3345,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
         auto v232 = cooperative_groups::labeled_partition(v229,v231);
         Closure3 v233{};
         float v234; int v235;
-        Tuple8 tmp15 = cooperative_groups::reduce(v232, Tuple8{v216, v217}, v233);
+        Tuple9 tmp15 = cooperative_groups::reduce(v232, Tuple9{v216, v217}, v233);
         v234 = tmp15.v0; v235 = tmp15.v1;
         float v236[4l];
         int v237;
@@ -3425,7 +3372,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
             v237 += 1l ;
         }
         float v245; int v246;
-        Tuple8 tmp16 = Tuple8{-1.0f / 0.0f, 2147483647l};
+        Tuple9 tmp16 = Tuple9{-1.0f / 0.0f, 2147483647l};
         v245 = tmp16.v0; v246 = tmp16.v1;
         int v247;
         v247 = 0l;
@@ -3444,7 +3391,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
                 int v254;
                 v254 = v35[v252];
                 float v255; int v256;
-                Tuple8 tmp17 = method_23(v245, v246, v253, v254);
+                Tuple9 tmp17 = method_24(v245, v246, v253, v254);
                 v255 = tmp17.v0; v256 = tmp17.v1;
                 v245 = v255;
                 v246 = v256;
@@ -3460,7 +3407,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
         auto v260 = cooperative_groups::labeled_partition(v257,v259);
         Closure4 v261{};
         float v262; int v263;
-        Tuple8 tmp18 = cooperative_groups::reduce(v260, Tuple8{v245, v246}, v261);
+        Tuple9 tmp18 = cooperative_groups::reduce(v260, Tuple9{v245, v246}, v261);
         v262 = tmp18.v0; v263 = tmp18.v1;
         assert("Tensor range check" && 0 <= v30 && v30 < 32l);
         int v264;
@@ -3493,7 +3440,7 @@ __device__ void method_22(int * v0, int v1, float * v2, int v3, float * v4, cura
     __syncthreads();
     return ;
 }
-__device__ unsigned int loop_25(unsigned int v0, curandStatePhilox4_32_10_t & v1){
+__device__ unsigned int loop_26(unsigned int v0, curandStatePhilox4_32_10_t & v1){
     unsigned int v2;
     v2 = curand(&v1);
     unsigned int v3;
@@ -3507,16 +3454,16 @@ __device__ unsigned int loop_25(unsigned int v0, curandStatePhilox4_32_10_t & v1
     if (v6){
         return v3;
     } else {
-        return loop_25(v0, v1);
+        return loop_26(v0, v1);
     }
 }
-__device__ int int_range_24(int v0, int v1, curandStatePhilox4_32_10_t & v2){
+__device__ int int_range_25(int v0, int v1, curandStatePhilox4_32_10_t & v2){
     int v3;
     v3 = v0 - v1;
     unsigned int v4;
     v4 = (unsigned int)v3;
     unsigned int v5;
-    v5 = loop_25(v4, v2);
+    v5 = loop_26(v4, v2);
     unsigned int v6;
     v6 = (unsigned int)v1;
     unsigned int v7;
@@ -3525,7 +3472,364 @@ __device__ int int_range_24(int v0, int v1, curandStatePhilox4_32_10_t & v2){
     v8 = (int)v7;
     return v8;
 }
-__device__ void method_26(Union1 v0){
+__device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union6 v2, bool v3, static_array<Union3,2l> v4, int v5, static_array<int,2l> v6, int v7, static_array_list<Union7,32l> v8){
+    __syncthreads();
+    int v9;
+    v9 = threadIdx.x;
+    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v10 = console_lock;
+    auto v11 = cooperative_groups::coalesced_threads();
+    v10.acquire();
+    printf("{%s = %d}\n","tid", v9);
+    v10.release();
+    v11.sync() ;
+    float * v14;
+    v14 = reinterpret_cast<float *>(&v0[32768ull]);
+    float * v16;
+    v16 = reinterpret_cast<float *>(&v0[0ull]);
+    int * v18;
+    v18 = reinterpret_cast<int *>(&v0[98304ull]);
+    unsigned long long v20;
+    v20 = clock64();
+    int v21;
+    v21 = threadIdx.x;
+    int v22;
+    v22 = blockIdx.x;
+    int v23;
+    v23 = v22 * 32l;
+    int v24;
+    v24 = v21 + v23;
+    unsigned long long v25;
+    v25 = (unsigned long long)v24;
+    curandStatePhilox4_32_10_t v26;
+    curand_init(v20,v25,0ull,&v26);
+    float * v27;
+    v27 = reinterpret_cast<float *>(&v0[0ull]);
+    int v29;
+    v29 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v29 && v29 < 1l);
+    int v30;
+    v30 = 4096l * v29;
+    unsigned long long v31;
+    v31 = clock64();
+    int v32;
+    v32 = threadIdx.x;
+    int v33;
+    v33 = blockIdx.x;
+    int v34;
+    v34 = v33 * 32l;
+    int v35;
+    v35 = v32 + v34;
+    unsigned long long v36;
+    v36 = (unsigned long long)v35;
+    curandStatePhilox4_32_10_t v37;
+    curand_init(v31,v36,0ull,&v37);
+    int v38;
+    v38 = threadIdx.x;
+    int v39;
+    v39 = v38;
+    while (while_method_3(v39)){
+        bool v41;
+        v41 = 0l <= v39;
+        bool v42;
+        v42 = v41 == false;
+        if (v42){
+            assert("The index needs to be zero or positive." && v41);
+        } else {
+        }
+        int v44;
+        v44 = v39 % 128l;
+        int v45;
+        v45 = v39 / 128l;
+        bool v46;
+        v46 = v45 < 32l;
+        bool v47;
+        v47 = v46 == false;
+        if (v47){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v46);
+        } else {
+        }
+        assert("Tensor range check" && 0 <= v45 && v45 < 32l);
+        assert("Tensor range check" && 0 <= v44 && v44 < 128l);
+        int v49;
+        v49 = v44 + v30;
+        int v50;
+        v50 = 128l * v45;
+        int v51;
+        v51 = v50 + v49;
+        v27[v51] = 0.0f;
+        v39 += 32l ;
+    }
+    __syncthreads();
+    int v52;
+    v52 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v52 && v52 < 32l);
+    int v53;
+    v53 = 128l * v52;
+    int v54;
+    v54 = v53 + v30;
+    static_array_list<Union10,10l> v55;
+    v55 = static_array_list<Union10,10l>{};
+    int v57;
+    v57 = v8.length;
+    int v58;
+    v58 = 0l;
+    while (while_method_1(v57, v58)){
+        Union7 v60;
+        v60 = v8[v58];
+        Union11 v79;
+        switch (v60.tag) {
+            case 0: { // CommunityCardIs
+                Union3 v69 = v60.case0.v0;
+                Union10 v70;
+                v70 = Union10{Union10_1{v69}};
+                v79 = Union11{Union11_1{v70}};
+                break;
+            }
+            case 1: { // PlayerAction
+                int v72 = v60.case1.v0; Union1 v73 = v60.case1.v1;
+                Union10 v74;
+                v74 = Union10{Union10_0{v73}};
+                v79 = Union11{Union11_1{v74}};
+                break;
+            }
+            case 2: { // PlayerGotCard
+                int v62 = v60.case2.v0; Union3 v63 = v60.case2.v1;
+                bool v64;
+                v64 = v62 == v5;
+                if (v64){
+                    Union10 v65;
+                    v65 = Union10{Union10_1{v63}};
+                    v79 = Union11{Union11_1{v65}};
+                } else {
+                    v79 = Union11{Union11_0{}};
+                }
+                break;
+            }
+            default: {
+                v79 = Union11{Union11_0{}};
+            }
+        }
+        switch (v79.tag) {
+            case 0: { // None
+                break;
+            }
+            case 1: { // Some
+                Union10 v80 = v79.case1.v0;
+                v55.push(v80);
+                break;
+            }
+            default: {
+                assert("Invalid tag." && false);
+            }
+        }
+        v58 += 1l ;
+    }
+    float * v81;
+    v81 = v27+v54;
+    int v83;
+    v83 = v55.length;
+    bool v84;
+    v84 = v83 == 0l;
+    if (v84){
+        v81[0l] = 1.0f;
+    } else {
+    }
+    int v85;
+    v85 = v55.length;
+    int v86;
+    v86 = 0l;
+    while (while_method_1(v85, v86)){
+        Union10 v88;
+        v88 = v55[v86];
+        int v90;
+        v90 = v86 * 6l;
+        int v91;
+        v91 = 1l + v90;
+        switch (v88.tag) {
+            case 0: { // C1of2
+                Union1 v92 = v88.case0.v0;
+                switch (v92.tag) {
+                    case 0: { // Call
+                        v81[v91] = 1.0f;
+                        break;
+                    }
+                    case 1: { // Fold
+                        int v93;
+                        v93 = v91 + 1l;
+                        v81[v93] = 1.0f;
+                        break;
+                    }
+                    case 2: { // Raise
+                        int v94;
+                        v94 = v91 + 2l;
+                        v81[v94] = 1.0f;
+                        break;
+                    }
+                    default: {
+                        assert("Invalid tag." && false);
+                    }
+                }
+                break;
+            }
+            case 1: { // C2of2
+                Union3 v95 = v88.case1.v0;
+                int v96;
+                v96 = v91 + 3l;
+                switch (v95.tag) {
+                    case 0: { // Jack
+                        v81[v96] = 1.0f;
+                        break;
+                    }
+                    case 1: { // King
+                        int v97;
+                        v97 = v96 + 1l;
+                        v81[v97] = 1.0f;
+                        break;
+                    }
+                    case 2: { // Queen
+                        int v98;
+                        v98 = v96 + 2l;
+                        v81[v98] = 1.0f;
+                        break;
+                    }
+                    default: {
+                        assert("Invalid tag." && false);
+                    }
+                }
+                break;
+            }
+            default: {
+                assert("Invalid tag." && false);
+            }
+        }
+        v86 += 1l ;
+    }
+    __syncthreads();
+    int v99;
+    v99 = 0l;
+    while (while_method_4(v99)){
+        float * v101;
+        v101 = reinterpret_cast<float *>(&v0[0ull]);
+        float * v103;
+        v103 = reinterpret_cast<float *>(&v1[0ull]);
+        assert("Tensor range check" && 0 <= v99 && v99 < 4l);
+        int v105;
+        v105 = 16384l * v99;
+        float * v106;
+        v106 = reinterpret_cast<float *>(&v0[16384ull]);
+        int v108;
+        v108 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v108 && v108 < 1l);
+        int v109;
+        v109 = 4096l * v108;
+        int v110;
+        v110 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v110 && v110 < 1l);
+        int v111;
+        v111 = 4096l * v110;
+        method_22(v103, v105, v106, v111, v101, v109);
+        float * v112;
+        v112 = reinterpret_cast<float *>(&v0[32768ull]);
+        assert("Tensor range check" && 0 <= v99 && v99 < 4l);
+        int v114;
+        v114 = 4096l * v99;
+        int * v115;
+        v115 = reinterpret_cast<int *>(&v0[98304ull]);
+        assert("Tensor range check" && 0 <= v99 && v99 < 4l);
+        int v117;
+        v117 = 32l * v99;
+        method_23(v115, v117, v112, v114, v106, v37);
+        v99 += 1l ;
+    }
+    __syncthreads();
+    int v118;
+    v118 = 0l;
+    int v119;
+    v119 = 4l;
+    int v120;
+    v120 = int_range_25(v119, v118, v37);
+    float * v121;
+    v121 = reinterpret_cast<float *>(&v0[32768ull]);
+    int * v123;
+    v123 = reinterpret_cast<int *>(&v0[98304ull]);
+    assert("Tensor range check" && 0 <= v120 && v120 < 4l);
+    int v125;
+    v125 = 32l * v120;
+    int v126;
+    v126 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v126 && v126 < 1l);
+    int v127;
+    v127 = 32l * v126;
+    int v128;
+    v128 = v127 + v125;
+    int v129;
+    v129 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v129 && v129 < 32l);
+    int v130;
+    v130 = v129 + v128;
+    int v131;
+    v131 = v123[v130];
+    bool v132;
+    v132 = 0l == v131;
+    Union9 v141;
+    if (v132){
+        v141 = Union9{Union9_1{}};
+    } else {
+        bool v134;
+        v134 = 1l == v131;
+        if (v134){
+            v141 = Union9{Union9_0{}};
+        } else {
+            bool v136;
+            v136 = 2l == v131;
+            if (v136){
+                v141 = Union9{Union9_2{}};
+            } else {
+                printf("%s\n", "Invalid output id in the Leduc model.");
+                asm("exit;");
+            }
+        }
+    }
+    int v142;
+    v142 = blockIdx.x;
+    int v143;
+    v143 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v120 && v120 < 4l);
+    assert("Tensor range check" && 0 <= v142 && v142 < 1l);
+    assert("Tensor range check" && 0 <= v143 && v143 < 32l);
+    assert("Tensor range check" && 0 <= v131 && v131 < 128l);
+    int v144;
+    v144 = 128l * v143;
+    int v145;
+    v145 = v144 + v131;
+    int v146;
+    v146 = 4096l * v142;
+    int v147;
+    v147 = v146 + v145;
+    int v148;
+    v148 = 4096l * v120;
+    int v149;
+    v149 = v148 + v147;
+    float v150;
+    v150 = v121[v149];
+    int v151;
+    v151 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v151 && v151 < 1l);
+    int v152;
+    v152 = 4096l * v151;
+    int v153;
+    v153 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v153 && v153 < 32l);
+    int v154;
+    v154 = 128l * v153;
+    int v155;
+    v155 = v154 + v152;
+    assert("Tensor range check" && 0 <= v131 && v131 < 128l);
+    int v156;
+    v156 = v131 + v155;
+    return Tuple7{v141, v121, v156, 4096l, 4l, v150};
+}
+__device__ void method_27(Union1 v0){
     switch (v0.tag) {
         case 0: { // Call
             printf("%s","Call");
@@ -3547,7 +3851,7 @@ __device__ void method_26(Union1 v0){
         }
     }
 }
-__device__ int tag_28(Union3 v0){
+__device__ int tag_29(Union3 v0){
     switch (v0.tag) {
         case 0: { // Jack
             return 0l;
@@ -3566,12 +3870,12 @@ __device__ int tag_28(Union3 v0){
         }
     }
 }
-__device__ bool is_pair_29(int v0, int v1){
+__device__ bool is_pair_30(int v0, int v1){
     bool v2;
     v2 = v1 == v0;
     return v2;
 }
-__device__ Tuple6 order_30(int v0, int v1){
+__device__ Tuple6 order_31(int v0, int v1){
     bool v2;
     v2 = v1 > v0;
     if (v2){
@@ -3580,7 +3884,7 @@ __device__ Tuple6 order_30(int v0, int v1){
         return Tuple6{v0, v1};
     }
 }
-__device__ Union13 compare_hands_27(Union6 v0, bool v1, static_array<Union3,2l> v2, int v3, static_array<int,2l> v4, int v5){
+__device__ Union12 compare_hands_28(Union6 v0, bool v1, static_array<Union3,2l> v2, int v3, static_array<int,2l> v4, int v5){
     switch (v0.tag) {
         case 0: { // None
             printf("%s\n", "Expected the community card to be present in the table.");
@@ -3590,59 +3894,59 @@ __device__ Union13 compare_hands_27(Union6 v0, bool v1, static_array<Union3,2l> 
         case 1: { // Some
             Union3 v7 = v0.case1.v0;
             int v8;
-            v8 = tag_28(v7);
+            v8 = tag_29(v7);
             Union3 v9;
             v9 = v2[0l];
             int v11;
-            v11 = tag_28(v9);
+            v11 = tag_29(v9);
             Union3 v12;
             v12 = v2[1l];
             int v14;
-            v14 = tag_28(v12);
+            v14 = tag_29(v12);
             bool v15;
-            v15 = is_pair_29(v8, v11);
+            v15 = is_pair_30(v8, v11);
             bool v16;
-            v16 = is_pair_29(v8, v14);
+            v16 = is_pair_30(v8, v14);
             if (v15){
                 if (v16){
                     bool v17;
                     v17 = v11 < v14;
                     if (v17){
-                        return Union13{Union13_2{}};
+                        return Union12{Union12_2{}};
                     } else {
                         bool v19;
                         v19 = v11 > v14;
                         if (v19){
-                            return Union13{Union13_1{}};
+                            return Union12{Union12_1{}};
                         } else {
-                            return Union13{Union13_0{}};
+                            return Union12{Union12_0{}};
                         }
                     }
                 } else {
-                    return Union13{Union13_1{}};
+                    return Union12{Union12_1{}};
                 }
             } else {
                 if (v16){
-                    return Union13{Union13_2{}};
+                    return Union12{Union12_2{}};
                 } else {
                     int v27; int v28;
-                    Tuple6 tmp29 = order_30(v8, v11);
-                    v27 = tmp29.v0; v28 = tmp29.v1;
+                    Tuple6 tmp30 = order_31(v8, v11);
+                    v27 = tmp30.v0; v28 = tmp30.v1;
                     int v29; int v30;
-                    Tuple6 tmp30 = order_30(v8, v14);
-                    v29 = tmp30.v0; v30 = tmp30.v1;
+                    Tuple6 tmp31 = order_31(v8, v14);
+                    v29 = tmp31.v0; v30 = tmp31.v1;
                     bool v31;
                     v31 = v27 < v29;
-                    Union13 v37;
+                    Union12 v37;
                     if (v31){
-                        v37 = Union13{Union13_2{}};
+                        v37 = Union12{Union12_2{}};
                     } else {
                         bool v33;
                         v33 = v27 > v29;
                         if (v33){
-                            v37 = Union13{Union13_1{}};
+                            v37 = Union12{Union12_1{}};
                         } else {
-                            v37 = Union13{Union13_0{}};
+                            v37 = Union12{Union12_0{}};
                         }
                     }
                     bool v38;
@@ -3659,14 +3963,14 @@ __device__ Union13 compare_hands_27(Union6 v0, bool v1, static_array<Union3,2l> 
                         bool v39;
                         v39 = v28 < v30;
                         if (v39){
-                            return Union13{Union13_2{}};
+                            return Union12{Union12_2{}};
                         } else {
                             bool v41;
                             v41 = v28 > v30;
                             if (v41){
-                                return Union13{Union13_1{}};
+                                return Union12{Union12_1{}};
                             } else {
-                                return Union13{Union13_0{}};
+                                return Union12{Union12_0{}};
                             }
                         }
                     } else {
@@ -3689,79 +3993,79 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
     Union4 v13;
     v13 = v12;
     while (while_method_2(v13)){
-        Union4 v610;
+        Union4 v460;
         switch (v13.tag) {
             case 0: { // None
-                v610 = Union4{Union4_0{}};
+                v460 = Union4{Union4_0{}};
                 break;
             }
             case 1: { // Some
                 Union5 v15 = v13.case1.v0;
                 switch (v15.tag) {
                     case 0: { // ChanceCommunityCard
-                        Union6 v567 = v15.case0.v0; bool v568 = v15.case0.v1; static_array<Union3,2l> v569 = v15.case0.v2; int v570 = v15.case0.v3; static_array<int,2l> v571 = v15.case0.v4; int v572 = v15.case0.v5;
-                        Union3 v573;
-                        v573 = v11.pop();
-                        Union7 v574;
-                        v574 = Union7{Union7_0{v573}};
-                        v10.push(v574);
-                        int v575;
-                        v575 = 2l;
-                        int v576; int v577;
+                        Union6 v417 = v15.case0.v0; bool v418 = v15.case0.v1; static_array<Union3,2l> v419 = v15.case0.v2; int v420 = v15.case0.v3; static_array<int,2l> v421 = v15.case0.v4; int v422 = v15.case0.v5;
+                        Union3 v423;
+                        v423 = v11.pop();
+                        Union7 v424;
+                        v424 = Union7{Union7_0{v423}};
+                        v10.push(v424);
+                        int v425;
+                        v425 = 2l;
+                        int v426; int v427;
                         Tuple6 tmp11 = Tuple6{0l, 0l};
-                        v576 = tmp11.v0; v577 = tmp11.v1;
-                        while (while_method_0(v576)){
-                            int v579;
-                            v579 = v571[v576];
-                            bool v581;
-                            v581 = v577 >= v579;
-                            int v582;
-                            if (v581){
-                                v582 = v577;
+                        v426 = tmp11.v0; v427 = tmp11.v1;
+                        while (while_method_0(v426)){
+                            int v429;
+                            v429 = v421[v426];
+                            bool v431;
+                            v431 = v427 >= v429;
+                            int v432;
+                            if (v431){
+                                v432 = v427;
                             } else {
-                                v582 = v579;
+                                v432 = v429;
                             }
-                            v577 = v582;
-                            v576 += 1l ;
+                            v427 = v432;
+                            v426 += 1l ;
                         }
-                        static_array<int,2l> v583;
-                        int v585;
-                        v585 = 0l;
-                        while (while_method_0(v585)){
-                            v583[v585] = v577;
-                            v585 += 1l ;
+                        static_array<int,2l> v433;
+                        int v435;
+                        v435 = 0l;
+                        while (while_method_0(v435)){
+                            v433[v435] = v427;
+                            v435 += 1l ;
                         }
-                        Union6 v587;
-                        v587 = Union6{Union6_1{v573}};
-                        Union5 v588;
-                        v588 = Union5{Union5_2{v587, true, v569, 0l, v583, v575}};
-                        v610 = Union4{Union4_1{v588}};
+                        Union6 v437;
+                        v437 = Union6{Union6_1{v423}};
+                        Union5 v438;
+                        v438 = Union5{Union5_2{v437, true, v419, 0l, v433, v425}};
+                        v460 = Union4{Union4_1{v438}};
                         break;
                     }
                     case 1: { // ChanceInit
-                        Union3 v590;
-                        v590 = v11.pop();
-                        Union3 v591;
-                        v591 = v11.pop();
-                        Union7 v592;
-                        v592 = Union7{Union7_2{0l, v590}};
-                        v10.push(v592);
-                        Union7 v593;
-                        v593 = Union7{Union7_2{1l, v591}};
-                        v10.push(v593);
-                        int v594;
-                        v594 = 2l;
-                        static_array<int,2l> v595;
-                        v595[0l] = 1l;
-                        v595[1l] = 1l;
-                        static_array<Union3,2l> v597;
-                        v597[0l] = v590;
-                        v597[1l] = v591;
-                        Union6 v599;
-                        v599 = Union6{Union6_0{}};
-                        Union5 v600;
-                        v600 = Union5{Union5_2{v599, true, v597, 0l, v595, v594}};
-                        v610 = Union4{Union4_1{v600}};
+                        Union3 v440;
+                        v440 = v11.pop();
+                        Union3 v441;
+                        v441 = v11.pop();
+                        Union7 v442;
+                        v442 = Union7{Union7_2{0l, v440}};
+                        v10.push(v442);
+                        Union7 v443;
+                        v443 = Union7{Union7_2{1l, v441}};
+                        v10.push(v443);
+                        int v444;
+                        v444 = 2l;
+                        static_array<int,2l> v445;
+                        v445[0l] = 1l;
+                        v445[1l] = 1l;
+                        static_array<Union3,2l> v447;
+                        v447[0l] = v440;
+                        v447[1l] = v441;
+                        Union6 v449;
+                        v449 = Union6{Union6_0{}};
+                        Union5 v450;
+                        v450 = Union5{Union5_2{v449, true, v447, 0l, v445, v444}};
+                        v460 = Union4{Union4_1{v450}};
                         break;
                     }
                     case 2: { // Round
@@ -3794,418 +4098,53 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                 printf("%s\n","Running the GPU model.");
                                 v65.release();
                                 v66.sync() ;
-                                Union9 v69;
-                                v69 = Union9{Union9_1{v49, v50, v51, v52, v53, v54, v64}};
-                                __syncthreads();
-                                int v70;
-                                v70 = threadIdx.x;
-                                cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v71 = console_lock;
-                                auto v72 = cooperative_groups::coalesced_threads();
-                                v71.acquire();
-                                printf("{%s = %d}\n","tid", v70);
-                                v71.release();
-                                v72.sync() ;
-                                float * v75;
-                                v75 = reinterpret_cast<float *>(&v0[32768ull]);
-                                float * v77;
-                                v77 = reinterpret_cast<float *>(&v0[0ull]);
-                                int * v79;
-                                v79 = reinterpret_cast<int *>(&v0[98304ull]);
-                                unsigned long long v81;
-                                v81 = clock64();
-                                int v82;
-                                v82 = threadIdx.x;
-                                int v83;
-                                v83 = blockIdx.x;
-                                int v84;
-                                v84 = v83 * 32l;
-                                int v85;
-                                v85 = v82 + v84;
-                                unsigned long long v86;
-                                v86 = (unsigned long long)v85;
-                                curandStatePhilox4_32_10_t v87;
-                                curand_init(v81,v86,0ull,&v87);
-                                float * v88;
-                                v88 = reinterpret_cast<float *>(&v0[0ull]);
-                                int v90;
-                                v90 = blockIdx.x;
-                                assert("Tensor range check" && 0 <= v90 && v90 < 1l);
-                                int v91;
-                                v91 = 4096l * v90;
-                                unsigned long long v92;
-                                v92 = clock64();
-                                int v93;
-                                v93 = threadIdx.x;
-                                int v94;
-                                v94 = blockIdx.x;
-                                int v95;
-                                v95 = v94 * 32l;
-                                int v96;
-                                v96 = v93 + v95;
-                                unsigned long long v97;
-                                v97 = (unsigned long long)v96;
-                                curandStatePhilox4_32_10_t v98;
-                                curand_init(v92,v97,0ull,&v98);
-                                int v99;
-                                v99 = threadIdx.x;
-                                int v100;
-                                v100 = v99;
-                                while (while_method_3(v100)){
-                                    bool v102;
-                                    v102 = 0l <= v100;
-                                    bool v103;
-                                    v103 = v102 == false;
-                                    if (v103){
-                                        assert("The index needs to be zero or positive." && v102);
-                                    } else {
-                                    }
-                                    int v105;
-                                    v105 = v100 % 128l;
-                                    int v106;
-                                    v106 = v100 / 128l;
-                                    bool v107;
-                                    v107 = v106 < 32l;
-                                    bool v108;
-                                    v108 = v107 == false;
-                                    if (v108){
-                                        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v107);
-                                    } else {
-                                    }
-                                    assert("Tensor range check" && 0 <= v106 && v106 < 32l);
-                                    assert("Tensor range check" && 0 <= v105 && v105 < 128l);
-                                    int v110;
-                                    v110 = v105 + v91;
-                                    int v111;
-                                    v111 = 128l * v106;
-                                    int v112;
-                                    v112 = v111 + v110;
-                                    v88[v112] = 0.0f;
-                                    v100 += 32l ;
-                                }
-                                __syncthreads();
+                                Union9 v69; float * v70; int v71; int v72; int v73; float v74;
+                                Tuple7 tmp19 = run__21(v0, v2, v49, v50, v51, v52, v53, v54, v64);
+                                v69 = tmp19.v0; v70 = tmp19.v1; v71 = tmp19.v2; v72 = tmp19.v3; v73 = tmp19.v4; v74 = tmp19.v5;
+                                Union1 v97;
                                 switch (v69.tag) {
-                                    case 0: { // None
-                                        break;
-                                    }
-                                    case 1: { // Some
-                                        Union6 v113 = v69.case1.v0; bool v114 = v69.case1.v1; static_array<Union3,2l> v115 = v69.case1.v2; int v116 = v69.case1.v3; static_array<int,2l> v117 = v69.case1.v4; int v118 = v69.case1.v5; static_array_list<Union7,32l> v119 = v69.case1.v6;
-                                        int v120;
-                                        v120 = threadIdx.x;
-                                        assert("Tensor range check" && 0 <= v120 && v120 < 32l);
-                                        int v121;
-                                        v121 = 128l * v120;
-                                        int v122;
-                                        v122 = v121 + v91;
-                                        static_array_list<Union10,10l> v123;
-                                        v123 = static_array_list<Union10,10l>{};
-                                        int v125;
-                                        v125 = v119.length;
-                                        int v126;
-                                        v126 = 0l;
-                                        while (while_method_1(v125, v126)){
-                                            Union7 v128;
-                                            v128 = v119[v126];
-                                            Union11 v147;
-                                            switch (v128.tag) {
-                                                case 0: { // CommunityCardIs
-                                                    Union3 v137 = v128.case0.v0;
-                                                    Union10 v138;
-                                                    v138 = Union10{Union10_1{v137}};
-                                                    v147 = Union11{Union11_1{v138}};
-                                                    break;
-                                                }
-                                                case 1: { // PlayerAction
-                                                    int v140 = v128.case1.v0; Union1 v141 = v128.case1.v1;
-                                                    Union10 v142;
-                                                    v142 = Union10{Union10_0{v141}};
-                                                    v147 = Union11{Union11_1{v142}};
-                                                    break;
-                                                }
-                                                case 2: { // PlayerGotCard
-                                                    int v130 = v128.case2.v0; Union3 v131 = v128.case2.v1;
-                                                    bool v132;
-                                                    v132 = v130 == v116;
-                                                    if (v132){
-                                                        Union10 v133;
-                                                        v133 = Union10{Union10_1{v131}};
-                                                        v147 = Union11{Union11_1{v133}};
-                                                    } else {
-                                                        v147 = Union11{Union11_0{}};
-                                                    }
-                                                    break;
-                                                }
-                                                default: {
-                                                    v147 = Union11{Union11_0{}};
-                                                }
-                                            }
-                                            switch (v147.tag) {
-                                                case 0: { // None
-                                                    break;
-                                                }
-                                                case 1: { // Some
-                                                    Union10 v148 = v147.case1.v0;
-                                                    v123.push(v148);
-                                                    break;
-                                                }
-                                                default: {
-                                                    assert("Invalid tag." && false);
-                                                }
-                                            }
-                                            v126 += 1l ;
-                                        }
-                                        float * v149;
-                                        v149 = v88+v122;
-                                        int v151;
-                                        v151 = v123.length;
-                                        bool v152;
-                                        v152 = v151 == 0l;
-                                        if (v152){
-                                            v149[0l] = 1.0f;
-                                        } else {
-                                        }
-                                        int v153;
-                                        v153 = v123.length;
-                                        int v154;
-                                        v154 = 0l;
-                                        while (while_method_1(v153, v154)){
-                                            Union10 v156;
-                                            v156 = v123[v154];
-                                            int v158;
-                                            v158 = v154 * 6l;
-                                            int v159;
-                                            v159 = 1l + v158;
-                                            switch (v156.tag) {
-                                                case 0: { // C1of2
-                                                    Union1 v160 = v156.case0.v0;
-                                                    switch (v160.tag) {
-                                                        case 0: { // Call
-                                                            v149[v159] = 1.0f;
-                                                            break;
-                                                        }
-                                                        case 1: { // Fold
-                                                            int v161;
-                                                            v161 = v159 + 1l;
-                                                            v149[v161] = 1.0f;
-                                                            break;
-                                                        }
-                                                        case 2: { // Raise
-                                                            int v162;
-                                                            v162 = v159 + 2l;
-                                                            v149[v162] = 1.0f;
-                                                            break;
-                                                        }
-                                                        default: {
-                                                            assert("Invalid tag." && false);
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                                case 1: { // C2of2
-                                                    Union3 v163 = v156.case1.v0;
-                                                    int v164;
-                                                    v164 = v159 + 3l;
-                                                    switch (v163.tag) {
-                                                        case 0: { // Jack
-                                                            v149[v164] = 1.0f;
-                                                            break;
-                                                        }
-                                                        case 1: { // King
-                                                            int v165;
-                                                            v165 = v164 + 1l;
-                                                            v149[v165] = 1.0f;
-                                                            break;
-                                                        }
-                                                        case 2: { // Queen
-                                                            int v166;
-                                                            v166 = v164 + 2l;
-                                                            v149[v166] = 1.0f;
-                                                            break;
-                                                        }
-                                                        default: {
-                                                            assert("Invalid tag." && false);
-                                                        }
-                                                    }
-                                                    break;
-                                                }
-                                                default: {
-                                                    assert("Invalid tag." && false);
-                                                }
-                                            }
-                                            v154 += 1l ;
-                                        }
-                                        break;
-                                    }
-                                    default: {
-                                        assert("Invalid tag." && false);
-                                    }
-                                }
-                                __syncthreads();
-                                int v167;
-                                v167 = 0l;
-                                while (while_method_4(v167)){
-                                    float * v169;
-                                    v169 = reinterpret_cast<float *>(&v0[0ull]);
-                                    float * v171;
-                                    v171 = reinterpret_cast<float *>(&v2[0ull]);
-                                    assert("Tensor range check" && 0 <= v167 && v167 < 4l);
-                                    int v173;
-                                    v173 = 16384l * v167;
-                                    float * v174;
-                                    v174 = reinterpret_cast<float *>(&v0[16384ull]);
-                                    int v176;
-                                    v176 = blockIdx.x;
-                                    assert("Tensor range check" && 0 <= v176 && v176 < 1l);
-                                    int v177;
-                                    v177 = 4096l * v176;
-                                    int v178;
-                                    v178 = blockIdx.x;
-                                    assert("Tensor range check" && 0 <= v178 && v178 < 1l);
-                                    int v179;
-                                    v179 = 4096l * v178;
-                                    method_21(v171, v173, v174, v179, v169, v177);
-                                    float * v180;
-                                    v180 = reinterpret_cast<float *>(&v0[32768ull]);
-                                    assert("Tensor range check" && 0 <= v167 && v167 < 4l);
-                                    int v182;
-                                    v182 = 4096l * v167;
-                                    int * v183;
-                                    v183 = reinterpret_cast<int *>(&v0[98304ull]);
-                                    assert("Tensor range check" && 0 <= v167 && v167 < 4l);
-                                    int v185;
-                                    v185 = 32l * v167;
-                                    method_22(v183, v185, v180, v182, v174, v98);
-                                    v167 += 1l ;
-                                }
-                                __syncthreads();
-                                int v186;
-                                v186 = 0l;
-                                int v187;
-                                v187 = 4l;
-                                int v188;
-                                v188 = int_range_24(v187, v186, v98);
-                                float * v189;
-                                v189 = reinterpret_cast<float *>(&v0[32768ull]);
-                                int * v191;
-                                v191 = reinterpret_cast<int *>(&v0[98304ull]);
-                                assert("Tensor range check" && 0 <= v188 && v188 < 4l);
-                                int v193;
-                                v193 = 32l * v188;
-                                int v194;
-                                v194 = blockIdx.x;
-                                assert("Tensor range check" && 0 <= v194 && v194 < 1l);
-                                int v195;
-                                v195 = 32l * v194;
-                                int v196;
-                                v196 = v195 + v193;
-                                int v197;
-                                v197 = threadIdx.x;
-                                assert("Tensor range check" && 0 <= v197 && v197 < 32l);
-                                int v198;
-                                v198 = v197 + v196;
-                                int v199;
-                                v199 = v191[v198];
-                                bool v200;
-                                v200 = 0l == v199;
-                                Union12 v209;
-                                if (v200){
-                                    v209 = Union12{Union12_1{}};
-                                } else {
-                                    bool v202;
-                                    v202 = 1l == v199;
-                                    if (v202){
-                                        v209 = Union12{Union12_0{}};
-                                    } else {
-                                        bool v204;
-                                        v204 = 2l == v199;
-                                        if (v204){
-                                            v209 = Union12{Union12_2{}};
-                                        } else {
-                                            printf("%s\n", "Invalid output id in the Leduc model.");
-                                            asm("exit;");
-                                        }
-                                    }
-                                }
-                                int v210;
-                                v210 = blockIdx.x;
-                                int v211;
-                                v211 = threadIdx.x;
-                                assert("Tensor range check" && 0 <= v188 && v188 < 4l);
-                                assert("Tensor range check" && 0 <= v210 && v210 < 1l);
-                                assert("Tensor range check" && 0 <= v211 && v211 < 32l);
-                                assert("Tensor range check" && 0 <= v199 && v199 < 128l);
-                                int v212;
-                                v212 = 128l * v211;
-                                int v213;
-                                v213 = v212 + v199;
-                                int v214;
-                                v214 = 4096l * v210;
-                                int v215;
-                                v215 = v214 + v213;
-                                int v216;
-                                v216 = 4096l * v188;
-                                int v217;
-                                v217 = v216 + v215;
-                                float v218;
-                                v218 = v189[v217];
-                                int v219;
-                                v219 = blockIdx.x;
-                                assert("Tensor range check" && 0 <= v219 && v219 < 1l);
-                                int v220;
-                                v220 = 4096l * v219;
-                                int v221;
-                                v221 = threadIdx.x;
-                                assert("Tensor range check" && 0 <= v221 && v221 < 32l);
-                                int v222;
-                                v222 = 128l * v221;
-                                int v223;
-                                v223 = v222 + v220;
-                                assert("Tensor range check" && 0 <= v199 && v199 < 128l);
-                                int v224;
-                                v224 = v199 + v223;
-                                Union1 v247;
-                                switch (v209.tag) {
                                     case 0: { // AA_Call
-                                        v247 = Union1{Union1_0{}};
+                                        v97 = Union1{Union1_0{}};
                                         break;
                                     }
                                     case 1: { // AA_Fold
-                                        int v225;
-                                        v225 = v53[0l];
-                                        int v227; int v228;
-                                        Tuple6 tmp19 = Tuple6{1l, v225};
-                                        v227 = tmp19.v0; v228 = tmp19.v1;
-                                        while (while_method_0(v227)){
-                                            int v230;
-                                            v230 = v53[v227];
-                                            bool v232;
-                                            v232 = v228 >= v230;
-                                            int v233;
-                                            if (v232){
-                                                v233 = v228;
+                                        int v75;
+                                        v75 = v53[0l];
+                                        int v77; int v78;
+                                        Tuple6 tmp20 = Tuple6{1l, v75};
+                                        v77 = tmp20.v0; v78 = tmp20.v1;
+                                        while (while_method_0(v77)){
+                                            int v80;
+                                            v80 = v53[v77];
+                                            bool v82;
+                                            v82 = v78 >= v80;
+                                            int v83;
+                                            if (v82){
+                                                v83 = v78;
                                             } else {
-                                                v233 = v230;
+                                                v83 = v80;
                                             }
-                                            v228 = v233;
-                                            v227 += 1l ;
+                                            v78 = v83;
+                                            v77 += 1l ;
                                         }
-                                        int v234;
-                                        v234 = v53[v52];
-                                        bool v236;
-                                        v236 = v234 == v228;
-                                        if (v236){
-                                            v247 = Union1{Union1_0{}};
+                                        int v84;
+                                        v84 = v53[v52];
+                                        bool v86;
+                                        v86 = v84 == v78;
+                                        if (v86){
+                                            v97 = Union1{Union1_0{}};
                                         } else {
-                                            v247 = Union1{Union1_1{}};
+                                            v97 = Union1{Union1_1{}};
                                         }
                                         break;
                                     }
                                     case 2: { // AA_Raise
-                                        bool v241;
-                                        v241 = v54 > 0l;
-                                        if (v241){
-                                            v247 = Union1{Union1_2{}};
+                                        bool v91;
+                                        v91 = v54 > 0l;
+                                        if (v91){
+                                            v97 = Union1{Union1_2{}};
                                         } else {
-                                            v247 = Union1{Union1_0{}};
+                                            v97 = Union1{Union1_0{}};
                                         }
                                         break;
                                     }
@@ -4213,105 +4152,105 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                         assert("Invalid tag." && false);
                                     }
                                 }
-                                cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v248 = console_lock;
-                                auto v249 = cooperative_groups::coalesced_threads();
-                                v248.acquire();
+                                cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v98 = console_lock;
+                                auto v99 = cooperative_groups::coalesced_threads();
+                                v98.acquire();
                                 printf("%s","The action is: ");
-                                v248.release();
-                                v249.sync() ;
-                                cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v252 = console_lock;
-                                auto v253 = cooperative_groups::coalesced_threads();
-                                v252.acquire();
+                                v98.release();
+                                v99.sync() ;
+                                cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v102 = console_lock;
+                                auto v103 = cooperative_groups::coalesced_threads();
+                                v102.acquire();
                                 printf("");
-                                method_26(v247);
+                                method_27(v97);
                                 printf("\n");
-                                v252.release();
-                                v253.sync() ;
-                                Union7 v256;
-                                v256 = Union7{Union7_1{v52, v247}};
-                                v10.push(v256);
-                                Union5 v342;
+                                v102.release();
+                                v103.sync() ;
+                                Union7 v106;
+                                v106 = Union7{Union7_1{v52, v97}};
+                                v10.push(v106);
+                                Union5 v192;
                                 switch (v49.tag) {
                                     case 0: { // None
-                                        switch (v247.tag) {
+                                        switch (v97.tag) {
                                             case 0: { // Call
                                                 if (v50){
-                                                    bool v306;
-                                                    v306 = v52 == 0l;
-                                                    int v307;
-                                                    if (v306){
-                                                        v307 = 1l;
+                                                    bool v156;
+                                                    v156 = v52 == 0l;
+                                                    int v157;
+                                                    if (v156){
+                                                        v157 = 1l;
                                                     } else {
-                                                        v307 = 0l;
+                                                        v157 = 0l;
                                                     }
-                                                    v342 = Union5{Union5_2{v49, false, v51, v307, v53, v54}};
+                                                    v192 = Union5{Union5_2{v49, false, v51, v157, v53, v54}};
                                                 } else {
-                                                    v342 = Union5{Union5_0{v49, v50, v51, v52, v53, v54}};
+                                                    v192 = Union5{Union5_0{v49, v50, v51, v52, v53, v54}};
                                                 }
                                                 break;
                                             }
                                             case 1: { // Fold
-                                                v342 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
+                                                v192 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
                                                 break;
                                             }
                                             case 2: { // Raise
-                                                bool v311;
-                                                v311 = v54 > 0l;
-                                                if (v311){
-                                                    bool v312;
-                                                    v312 = v52 == 0l;
-                                                    int v313;
-                                                    if (v312){
-                                                        v313 = 1l;
+                                                bool v161;
+                                                v161 = v54 > 0l;
+                                                if (v161){
+                                                    bool v162;
+                                                    v162 = v52 == 0l;
+                                                    int v163;
+                                                    if (v162){
+                                                        v163 = 1l;
                                                     } else {
-                                                        v313 = 0l;
+                                                        v163 = 0l;
                                                     }
-                                                    int v314;
-                                                    v314 = -1l + v54;
-                                                    int v315; int v316;
-                                                    Tuple6 tmp20 = Tuple6{0l, 0l};
-                                                    v315 = tmp20.v0; v316 = tmp20.v1;
-                                                    while (while_method_0(v315)){
-                                                        int v318;
-                                                        v318 = v53[v315];
-                                                        bool v320;
-                                                        v320 = v316 >= v318;
-                                                        int v321;
-                                                        if (v320){
-                                                            v321 = v316;
+                                                    int v164;
+                                                    v164 = -1l + v54;
+                                                    int v165; int v166;
+                                                    Tuple6 tmp21 = Tuple6{0l, 0l};
+                                                    v165 = tmp21.v0; v166 = tmp21.v1;
+                                                    while (while_method_0(v165)){
+                                                        int v168;
+                                                        v168 = v53[v165];
+                                                        bool v170;
+                                                        v170 = v166 >= v168;
+                                                        int v171;
+                                                        if (v170){
+                                                            v171 = v166;
                                                         } else {
-                                                            v321 = v318;
+                                                            v171 = v168;
                                                         }
-                                                        v316 = v321;
-                                                        v315 += 1l ;
+                                                        v166 = v171;
+                                                        v165 += 1l ;
                                                     }
-                                                    static_array<int,2l> v322;
-                                                    int v324;
-                                                    v324 = 0l;
-                                                    while (while_method_0(v324)){
-                                                        v322[v324] = v316;
-                                                        v324 += 1l ;
+                                                    static_array<int,2l> v172;
+                                                    int v174;
+                                                    v174 = 0l;
+                                                    while (while_method_0(v174)){
+                                                        v172[v174] = v166;
+                                                        v174 += 1l ;
                                                     }
-                                                    static_array<int,2l> v326;
-                                                    int v328;
-                                                    v328 = 0l;
-                                                    while (while_method_0(v328)){
-                                                        int v330;
-                                                        v330 = v322[v328];
-                                                        bool v332;
-                                                        v332 = v328 == v52;
-                                                        int v334;
-                                                        if (v332){
-                                                            int v333;
-                                                            v333 = v330 + 2l;
-                                                            v334 = v333;
+                                                    static_array<int,2l> v176;
+                                                    int v178;
+                                                    v178 = 0l;
+                                                    while (while_method_0(v178)){
+                                                        int v180;
+                                                        v180 = v172[v178];
+                                                        bool v182;
+                                                        v182 = v178 == v52;
+                                                        int v184;
+                                                        if (v182){
+                                                            int v183;
+                                                            v183 = v180 + 2l;
+                                                            v184 = v183;
                                                         } else {
-                                                            v334 = v330;
+                                                            v184 = v180;
                                                         }
-                                                        v326[v328] = v334;
-                                                        v328 += 1l ;
+                                                        v176[v178] = v184;
+                                                        v178 += 1l ;
                                                     }
-                                                    v342 = Union5{Union5_2{v49, false, v51, v313, v326, v314}};
+                                                    v192 = Union5{Union5_2{v49, false, v51, v163, v176, v164}};
                                                 } else {
                                                     printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                                     asm("exit;");
@@ -4325,110 +4264,110 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                         break;
                                     }
                                     case 1: { // Some
-                                        Union3 v257 = v49.case1.v0;
-                                        switch (v247.tag) {
+                                        Union3 v107 = v49.case1.v0;
+                                        switch (v97.tag) {
                                             case 0: { // Call
                                                 if (v50){
-                                                    bool v259;
-                                                    v259 = v52 == 0l;
-                                                    int v260;
-                                                    if (v259){
-                                                        v260 = 1l;
+                                                    bool v109;
+                                                    v109 = v52 == 0l;
+                                                    int v110;
+                                                    if (v109){
+                                                        v110 = 1l;
                                                     } else {
-                                                        v260 = 0l;
+                                                        v110 = 0l;
                                                     }
-                                                    v342 = Union5{Union5_2{v49, false, v51, v260, v53, v54}};
+                                                    v192 = Union5{Union5_2{v49, false, v51, v110, v53, v54}};
                                                 } else {
-                                                    int v262; int v263;
-                                                    Tuple6 tmp21 = Tuple6{0l, 0l};
-                                                    v262 = tmp21.v0; v263 = tmp21.v1;
-                                                    while (while_method_0(v262)){
-                                                        int v265;
-                                                        v265 = v53[v262];
-                                                        bool v267;
-                                                        v267 = v263 >= v265;
-                                                        int v268;
-                                                        if (v267){
-                                                            v268 = v263;
+                                                    int v112; int v113;
+                                                    Tuple6 tmp22 = Tuple6{0l, 0l};
+                                                    v112 = tmp22.v0; v113 = tmp22.v1;
+                                                    while (while_method_0(v112)){
+                                                        int v115;
+                                                        v115 = v53[v112];
+                                                        bool v117;
+                                                        v117 = v113 >= v115;
+                                                        int v118;
+                                                        if (v117){
+                                                            v118 = v113;
                                                         } else {
-                                                            v268 = v265;
+                                                            v118 = v115;
                                                         }
-                                                        v263 = v268;
-                                                        v262 += 1l ;
+                                                        v113 = v118;
+                                                        v112 += 1l ;
                                                     }
-                                                    static_array<int,2l> v269;
-                                                    int v271;
-                                                    v271 = 0l;
-                                                    while (while_method_0(v271)){
-                                                        v269[v271] = v263;
-                                                        v271 += 1l ;
+                                                    static_array<int,2l> v119;
+                                                    int v121;
+                                                    v121 = 0l;
+                                                    while (while_method_0(v121)){
+                                                        v119[v121] = v113;
+                                                        v121 += 1l ;
                                                     }
-                                                    v342 = Union5{Union5_4{v49, v50, v51, v52, v269, v54}};
+                                                    v192 = Union5{Union5_4{v49, v50, v51, v52, v119, v54}};
                                                 }
                                                 break;
                                             }
                                             case 1: { // Fold
-                                                v342 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
+                                                v192 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
                                                 break;
                                             }
                                             case 2: { // Raise
-                                                bool v275;
-                                                v275 = v54 > 0l;
-                                                if (v275){
-                                                    bool v276;
-                                                    v276 = v52 == 0l;
-                                                    int v277;
-                                                    if (v276){
-                                                        v277 = 1l;
+                                                bool v125;
+                                                v125 = v54 > 0l;
+                                                if (v125){
+                                                    bool v126;
+                                                    v126 = v52 == 0l;
+                                                    int v127;
+                                                    if (v126){
+                                                        v127 = 1l;
                                                     } else {
-                                                        v277 = 0l;
+                                                        v127 = 0l;
                                                     }
-                                                    int v278;
-                                                    v278 = -1l + v54;
-                                                    int v279; int v280;
-                                                    Tuple6 tmp22 = Tuple6{0l, 0l};
-                                                    v279 = tmp22.v0; v280 = tmp22.v1;
-                                                    while (while_method_0(v279)){
-                                                        int v282;
-                                                        v282 = v53[v279];
-                                                        bool v284;
-                                                        v284 = v280 >= v282;
-                                                        int v285;
-                                                        if (v284){
-                                                            v285 = v280;
+                                                    int v128;
+                                                    v128 = -1l + v54;
+                                                    int v129; int v130;
+                                                    Tuple6 tmp23 = Tuple6{0l, 0l};
+                                                    v129 = tmp23.v0; v130 = tmp23.v1;
+                                                    while (while_method_0(v129)){
+                                                        int v132;
+                                                        v132 = v53[v129];
+                                                        bool v134;
+                                                        v134 = v130 >= v132;
+                                                        int v135;
+                                                        if (v134){
+                                                            v135 = v130;
                                                         } else {
-                                                            v285 = v282;
+                                                            v135 = v132;
                                                         }
-                                                        v280 = v285;
-                                                        v279 += 1l ;
+                                                        v130 = v135;
+                                                        v129 += 1l ;
                                                     }
-                                                    static_array<int,2l> v286;
-                                                    int v288;
-                                                    v288 = 0l;
-                                                    while (while_method_0(v288)){
-                                                        v286[v288] = v280;
-                                                        v288 += 1l ;
+                                                    static_array<int,2l> v136;
+                                                    int v138;
+                                                    v138 = 0l;
+                                                    while (while_method_0(v138)){
+                                                        v136[v138] = v130;
+                                                        v138 += 1l ;
                                                     }
-                                                    static_array<int,2l> v290;
-                                                    int v292;
-                                                    v292 = 0l;
-                                                    while (while_method_0(v292)){
-                                                        int v294;
-                                                        v294 = v286[v292];
-                                                        bool v296;
-                                                        v296 = v292 == v52;
-                                                        int v298;
-                                                        if (v296){
-                                                            int v297;
-                                                            v297 = v294 + 4l;
-                                                            v298 = v297;
+                                                    static_array<int,2l> v140;
+                                                    int v142;
+                                                    v142 = 0l;
+                                                    while (while_method_0(v142)){
+                                                        int v144;
+                                                        v144 = v136[v142];
+                                                        bool v146;
+                                                        v146 = v142 == v52;
+                                                        int v148;
+                                                        if (v146){
+                                                            int v147;
+                                                            v147 = v144 + 4l;
+                                                            v148 = v147;
                                                         } else {
-                                                            v298 = v294;
+                                                            v148 = v144;
                                                         }
-                                                        v290[v292] = v298;
-                                                        v292 += 1l ;
+                                                        v140[v142] = v148;
+                                                        v142 += 1l ;
                                                     }
-                                                    v342 = Union5{Union5_2{v49, false, v51, v277, v290, v278}};
+                                                    v192 = Union5{Union5_2{v49, false, v51, v127, v140, v128}};
                                                 } else {
                                                     printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                                     asm("exit;");
@@ -4445,156 +4384,156 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                         assert("Invalid tag." && false);
                                     }
                                 }
-                                v610 = Union4{Union4_1{v342}};
+                                v460 = Union4{Union4_1{v192}};
                                 break;
                             }
                             case 1: { // Human
-                                Union8 v344;
-                                v344 = Union8{Union8_2{v49, v50, v51, v52, v53, v54}};
-                                v8 = v344;
-                                Union4 v345;
-                                v345 = Union4{Union4_1{v15}};
-                                v5 = v345;
-                                v610 = Union4{Union4_0{}};
+                                Union8 v194;
+                                v194 = Union8{Union8_2{v49, v50, v51, v52, v53, v54}};
+                                v8 = v194;
+                                Union4 v195;
+                                v195 = Union4{Union4_1{v15}};
+                                v5 = v195;
+                                v460 = Union4{Union4_0{}};
                                 break;
                             }
                             case 2: { // Random
-                                static_array_list<Union1,3l> v347;
-                                v347 = static_array_list<Union1,3l>{};
-                                v347.unsafe_set_length(1l);
-                                Union1 v349;
-                                v349 = Union1{Union1_0{}};
-                                v347[0l] = v349;
-                                int v351;
-                                v351 = v53[0l];
-                                int v353;
-                                v353 = v53[1l];
-                                bool v355;
-                                v355 = v351 == v353;
-                                bool v356;
-                                v356 = v355 != true;
-                                if (v356){
-                                    Union1 v357;
-                                    v357 = Union1{Union1_1{}};
-                                    v347.push(v357);
+                                static_array_list<Union1,3l> v197;
+                                v197 = static_array_list<Union1,3l>{};
+                                v197.unsafe_set_length(1l);
+                                Union1 v199;
+                                v199 = Union1{Union1_0{}};
+                                v197[0l] = v199;
+                                int v201;
+                                v201 = v53[0l];
+                                int v203;
+                                v203 = v53[1l];
+                                bool v205;
+                                v205 = v201 == v203;
+                                bool v206;
+                                v206 = v205 != true;
+                                if (v206){
+                                    Union1 v207;
+                                    v207 = Union1{Union1_1{}};
+                                    v197.push(v207);
                                 } else {
                                 }
-                                bool v358;
-                                v358 = v54 > 0l;
-                                if (v358){
-                                    Union1 v359;
-                                    v359 = Union1{Union1_2{}};
-                                    v347.push(v359);
+                                bool v208;
+                                v208 = v54 > 0l;
+                                if (v208){
+                                    Union1 v209;
+                                    v209 = Union1{Union1_2{}};
+                                    v197.push(v209);
                                 } else {
                                 }
-                                unsigned long long v360;
-                                v360 = clock64();
-                                curandStatePhilox4_32_10_t v361;
-                                curand_init(v360,0ull,0ull,&v361);
-                                int v362;
-                                v362 = v347.length;
-                                int v363;
-                                v363 = v362 - 1l;
-                                int v364;
-                                v364 = 0l;
-                                while (while_method_1(v363, v364)){
-                                    int v366;
-                                    v366 = v347.length;
-                                    int v367;
-                                    v367 = int_range_24(v366, v364, v361);
-                                    Union1 v368;
-                                    v368 = v347[v364];
-                                    Union1 v370;
-                                    v370 = v347[v367];
-                                    v347[v364] = v370;
-                                    v347[v367] = v368;
-                                    v364 += 1l ;
+                                unsigned long long v210;
+                                v210 = clock64();
+                                curandStatePhilox4_32_10_t v211;
+                                curand_init(v210,0ull,0ull,&v211);
+                                int v212;
+                                v212 = v197.length;
+                                int v213;
+                                v213 = v212 - 1l;
+                                int v214;
+                                v214 = 0l;
+                                while (while_method_1(v213, v214)){
+                                    int v216;
+                                    v216 = v197.length;
+                                    int v217;
+                                    v217 = int_range_25(v216, v214, v211);
+                                    Union1 v218;
+                                    v218 = v197[v214];
+                                    Union1 v220;
+                                    v220 = v197[v217];
+                                    v197[v214] = v220;
+                                    v197[v217] = v218;
+                                    v214 += 1l ;
                                 }
-                                Union1 v382;
-                                v382 = v347.pop();
-                                Union7 v383;
-                                v383 = Union7{Union7_1{v52, v382}};
-                                v10.push(v383);
-                                Union5 v467;
+                                Union1 v232;
+                                v232 = v197.pop();
+                                Union7 v233;
+                                v233 = Union7{Union7_1{v52, v232}};
+                                v10.push(v233);
+                                Union5 v317;
                                 switch (v49.tag) {
                                     case 0: { // None
-                                        switch (v382.tag) {
+                                        switch (v232.tag) {
                                             case 0: { // Call
                                                 if (v50){
-                                                    bool v432;
-                                                    v432 = v52 == 0l;
-                                                    int v433;
-                                                    if (v432){
-                                                        v433 = 1l;
+                                                    bool v282;
+                                                    v282 = v52 == 0l;
+                                                    int v283;
+                                                    if (v282){
+                                                        v283 = 1l;
                                                     } else {
-                                                        v433 = 0l;
+                                                        v283 = 0l;
                                                     }
-                                                    v467 = Union5{Union5_2{v49, false, v51, v433, v53, v54}};
+                                                    v317 = Union5{Union5_2{v49, false, v51, v283, v53, v54}};
                                                 } else {
-                                                    v467 = Union5{Union5_0{v49, v50, v51, v52, v53, v54}};
+                                                    v317 = Union5{Union5_0{v49, v50, v51, v52, v53, v54}};
                                                 }
                                                 break;
                                             }
                                             case 1: { // Fold
-                                                v467 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
+                                                v317 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
                                                 break;
                                             }
                                             case 2: { // Raise
-                                                if (v358){
-                                                    bool v437;
-                                                    v437 = v52 == 0l;
-                                                    int v438;
-                                                    if (v437){
-                                                        v438 = 1l;
+                                                if (v208){
+                                                    bool v287;
+                                                    v287 = v52 == 0l;
+                                                    int v288;
+                                                    if (v287){
+                                                        v288 = 1l;
                                                     } else {
-                                                        v438 = 0l;
+                                                        v288 = 0l;
                                                     }
-                                                    int v439;
-                                                    v439 = -1l + v54;
-                                                    int v440; int v441;
-                                                    Tuple6 tmp23 = Tuple6{0l, 0l};
-                                                    v440 = tmp23.v0; v441 = tmp23.v1;
-                                                    while (while_method_0(v440)){
-                                                        int v443;
-                                                        v443 = v53[v440];
-                                                        bool v445;
-                                                        v445 = v441 >= v443;
-                                                        int v446;
-                                                        if (v445){
-                                                            v446 = v441;
+                                                    int v289;
+                                                    v289 = -1l + v54;
+                                                    int v290; int v291;
+                                                    Tuple6 tmp24 = Tuple6{0l, 0l};
+                                                    v290 = tmp24.v0; v291 = tmp24.v1;
+                                                    while (while_method_0(v290)){
+                                                        int v293;
+                                                        v293 = v53[v290];
+                                                        bool v295;
+                                                        v295 = v291 >= v293;
+                                                        int v296;
+                                                        if (v295){
+                                                            v296 = v291;
                                                         } else {
-                                                            v446 = v443;
+                                                            v296 = v293;
                                                         }
-                                                        v441 = v446;
-                                                        v440 += 1l ;
+                                                        v291 = v296;
+                                                        v290 += 1l ;
                                                     }
-                                                    static_array<int,2l> v447;
-                                                    int v449;
-                                                    v449 = 0l;
-                                                    while (while_method_0(v449)){
-                                                        v447[v449] = v441;
-                                                        v449 += 1l ;
+                                                    static_array<int,2l> v297;
+                                                    int v299;
+                                                    v299 = 0l;
+                                                    while (while_method_0(v299)){
+                                                        v297[v299] = v291;
+                                                        v299 += 1l ;
                                                     }
-                                                    static_array<int,2l> v451;
-                                                    int v453;
-                                                    v453 = 0l;
-                                                    while (while_method_0(v453)){
-                                                        int v455;
-                                                        v455 = v447[v453];
-                                                        bool v457;
-                                                        v457 = v453 == v52;
-                                                        int v459;
-                                                        if (v457){
-                                                            int v458;
-                                                            v458 = v455 + 2l;
-                                                            v459 = v458;
+                                                    static_array<int,2l> v301;
+                                                    int v303;
+                                                    v303 = 0l;
+                                                    while (while_method_0(v303)){
+                                                        int v305;
+                                                        v305 = v297[v303];
+                                                        bool v307;
+                                                        v307 = v303 == v52;
+                                                        int v309;
+                                                        if (v307){
+                                                            int v308;
+                                                            v308 = v305 + 2l;
+                                                            v309 = v308;
                                                         } else {
-                                                            v459 = v455;
+                                                            v309 = v305;
                                                         }
-                                                        v451[v453] = v459;
-                                                        v453 += 1l ;
+                                                        v301[v303] = v309;
+                                                        v303 += 1l ;
                                                     }
-                                                    v467 = Union5{Union5_2{v49, false, v51, v438, v451, v439}};
+                                                    v317 = Union5{Union5_2{v49, false, v51, v288, v301, v289}};
                                                 } else {
                                                     printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                                     asm("exit;");
@@ -4608,108 +4547,108 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                         break;
                                     }
                                     case 1: { // Some
-                                        Union3 v384 = v49.case1.v0;
-                                        switch (v382.tag) {
+                                        Union3 v234 = v49.case1.v0;
+                                        switch (v232.tag) {
                                             case 0: { // Call
                                                 if (v50){
-                                                    bool v386;
-                                                    v386 = v52 == 0l;
-                                                    int v387;
-                                                    if (v386){
-                                                        v387 = 1l;
+                                                    bool v236;
+                                                    v236 = v52 == 0l;
+                                                    int v237;
+                                                    if (v236){
+                                                        v237 = 1l;
                                                     } else {
-                                                        v387 = 0l;
+                                                        v237 = 0l;
                                                     }
-                                                    v467 = Union5{Union5_2{v49, false, v51, v387, v53, v54}};
+                                                    v317 = Union5{Union5_2{v49, false, v51, v237, v53, v54}};
                                                 } else {
-                                                    int v389; int v390;
-                                                    Tuple6 tmp24 = Tuple6{0l, 0l};
-                                                    v389 = tmp24.v0; v390 = tmp24.v1;
-                                                    while (while_method_0(v389)){
-                                                        int v392;
-                                                        v392 = v53[v389];
-                                                        bool v394;
-                                                        v394 = v390 >= v392;
-                                                        int v395;
-                                                        if (v394){
-                                                            v395 = v390;
+                                                    int v239; int v240;
+                                                    Tuple6 tmp25 = Tuple6{0l, 0l};
+                                                    v239 = tmp25.v0; v240 = tmp25.v1;
+                                                    while (while_method_0(v239)){
+                                                        int v242;
+                                                        v242 = v53[v239];
+                                                        bool v244;
+                                                        v244 = v240 >= v242;
+                                                        int v245;
+                                                        if (v244){
+                                                            v245 = v240;
                                                         } else {
-                                                            v395 = v392;
+                                                            v245 = v242;
                                                         }
-                                                        v390 = v395;
-                                                        v389 += 1l ;
+                                                        v240 = v245;
+                                                        v239 += 1l ;
                                                     }
-                                                    static_array<int,2l> v396;
-                                                    int v398;
-                                                    v398 = 0l;
-                                                    while (while_method_0(v398)){
-                                                        v396[v398] = v390;
-                                                        v398 += 1l ;
+                                                    static_array<int,2l> v246;
+                                                    int v248;
+                                                    v248 = 0l;
+                                                    while (while_method_0(v248)){
+                                                        v246[v248] = v240;
+                                                        v248 += 1l ;
                                                     }
-                                                    v467 = Union5{Union5_4{v49, v50, v51, v52, v396, v54}};
+                                                    v317 = Union5{Union5_4{v49, v50, v51, v52, v246, v54}};
                                                 }
                                                 break;
                                             }
                                             case 1: { // Fold
-                                                v467 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
+                                                v317 = Union5{Union5_5{v49, v50, v51, v52, v53, v54}};
                                                 break;
                                             }
                                             case 2: { // Raise
-                                                if (v358){
-                                                    bool v402;
-                                                    v402 = v52 == 0l;
-                                                    int v403;
-                                                    if (v402){
-                                                        v403 = 1l;
+                                                if (v208){
+                                                    bool v252;
+                                                    v252 = v52 == 0l;
+                                                    int v253;
+                                                    if (v252){
+                                                        v253 = 1l;
                                                     } else {
-                                                        v403 = 0l;
+                                                        v253 = 0l;
                                                     }
-                                                    int v404;
-                                                    v404 = -1l + v54;
-                                                    int v405; int v406;
-                                                    Tuple6 tmp25 = Tuple6{0l, 0l};
-                                                    v405 = tmp25.v0; v406 = tmp25.v1;
-                                                    while (while_method_0(v405)){
-                                                        int v408;
-                                                        v408 = v53[v405];
-                                                        bool v410;
-                                                        v410 = v406 >= v408;
-                                                        int v411;
-                                                        if (v410){
-                                                            v411 = v406;
+                                                    int v254;
+                                                    v254 = -1l + v54;
+                                                    int v255; int v256;
+                                                    Tuple6 tmp26 = Tuple6{0l, 0l};
+                                                    v255 = tmp26.v0; v256 = tmp26.v1;
+                                                    while (while_method_0(v255)){
+                                                        int v258;
+                                                        v258 = v53[v255];
+                                                        bool v260;
+                                                        v260 = v256 >= v258;
+                                                        int v261;
+                                                        if (v260){
+                                                            v261 = v256;
                                                         } else {
-                                                            v411 = v408;
+                                                            v261 = v258;
                                                         }
-                                                        v406 = v411;
-                                                        v405 += 1l ;
+                                                        v256 = v261;
+                                                        v255 += 1l ;
                                                     }
-                                                    static_array<int,2l> v412;
-                                                    int v414;
-                                                    v414 = 0l;
-                                                    while (while_method_0(v414)){
-                                                        v412[v414] = v406;
-                                                        v414 += 1l ;
+                                                    static_array<int,2l> v262;
+                                                    int v264;
+                                                    v264 = 0l;
+                                                    while (while_method_0(v264)){
+                                                        v262[v264] = v256;
+                                                        v264 += 1l ;
                                                     }
-                                                    static_array<int,2l> v416;
-                                                    int v418;
-                                                    v418 = 0l;
-                                                    while (while_method_0(v418)){
-                                                        int v420;
-                                                        v420 = v412[v418];
-                                                        bool v422;
-                                                        v422 = v418 == v52;
-                                                        int v424;
-                                                        if (v422){
-                                                            int v423;
-                                                            v423 = v420 + 4l;
-                                                            v424 = v423;
+                                                    static_array<int,2l> v266;
+                                                    int v268;
+                                                    v268 = 0l;
+                                                    while (while_method_0(v268)){
+                                                        int v270;
+                                                        v270 = v262[v268];
+                                                        bool v272;
+                                                        v272 = v268 == v52;
+                                                        int v274;
+                                                        if (v272){
+                                                            int v273;
+                                                            v273 = v270 + 4l;
+                                                            v274 = v273;
                                                         } else {
-                                                            v424 = v420;
+                                                            v274 = v270;
                                                         }
-                                                        v416[v418] = v424;
-                                                        v418 += 1l ;
+                                                        v266[v268] = v274;
+                                                        v268 += 1l ;
                                                     }
-                                                    v467 = Union5{Union5_2{v49, false, v51, v403, v416, v404}};
+                                                    v317 = Union5{Union5_2{v49, false, v51, v253, v266, v254}};
                                                 } else {
                                                     printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                                     asm("exit;");
@@ -4726,7 +4665,7 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                         assert("Invalid tag." && false);
                                     }
                                 }
-                                v610 = Union4{Union4_1{v467}};
+                                v460 = Union4{Union4_1{v317}};
                                 break;
                             }
                             default: {
@@ -4736,92 +4675,92 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                         break;
                     }
                     case 3: { // RoundWithAction
-                        Union6 v472 = v15.case3.v0; bool v473 = v15.case3.v1; static_array<Union3,2l> v474 = v15.case3.v2; int v475 = v15.case3.v3; static_array<int,2l> v476 = v15.case3.v4; int v477 = v15.case3.v5; Union1 v478 = v15.case3.v6;
-                        Union7 v479;
-                        v479 = Union7{Union7_1{v475, v478}};
-                        v10.push(v479);
-                        Union5 v565;
-                        switch (v472.tag) {
+                        Union6 v322 = v15.case3.v0; bool v323 = v15.case3.v1; static_array<Union3,2l> v324 = v15.case3.v2; int v325 = v15.case3.v3; static_array<int,2l> v326 = v15.case3.v4; int v327 = v15.case3.v5; Union1 v328 = v15.case3.v6;
+                        Union7 v329;
+                        v329 = Union7{Union7_1{v325, v328}};
+                        v10.push(v329);
+                        Union5 v415;
+                        switch (v322.tag) {
                             case 0: { // None
-                                switch (v478.tag) {
+                                switch (v328.tag) {
                                     case 0: { // Call
-                                        if (v473){
-                                            bool v529;
-                                            v529 = v475 == 0l;
-                                            int v530;
-                                            if (v529){
-                                                v530 = 1l;
+                                        if (v323){
+                                            bool v379;
+                                            v379 = v325 == 0l;
+                                            int v380;
+                                            if (v379){
+                                                v380 = 1l;
                                             } else {
-                                                v530 = 0l;
+                                                v380 = 0l;
                                             }
-                                            v565 = Union5{Union5_2{v472, false, v474, v530, v476, v477}};
+                                            v415 = Union5{Union5_2{v322, false, v324, v380, v326, v327}};
                                         } else {
-                                            v565 = Union5{Union5_0{v472, v473, v474, v475, v476, v477}};
+                                            v415 = Union5{Union5_0{v322, v323, v324, v325, v326, v327}};
                                         }
                                         break;
                                     }
                                     case 1: { // Fold
-                                        v565 = Union5{Union5_5{v472, v473, v474, v475, v476, v477}};
+                                        v415 = Union5{Union5_5{v322, v323, v324, v325, v326, v327}};
                                         break;
                                     }
                                     case 2: { // Raise
-                                        bool v534;
-                                        v534 = v477 > 0l;
-                                        if (v534){
-                                            bool v535;
-                                            v535 = v475 == 0l;
-                                            int v536;
-                                            if (v535){
-                                                v536 = 1l;
+                                        bool v384;
+                                        v384 = v327 > 0l;
+                                        if (v384){
+                                            bool v385;
+                                            v385 = v325 == 0l;
+                                            int v386;
+                                            if (v385){
+                                                v386 = 1l;
                                             } else {
-                                                v536 = 0l;
+                                                v386 = 0l;
                                             }
-                                            int v537;
-                                            v537 = -1l + v477;
-                                            int v538; int v539;
-                                            Tuple6 tmp26 = Tuple6{0l, 0l};
-                                            v538 = tmp26.v0; v539 = tmp26.v1;
-                                            while (while_method_0(v538)){
-                                                int v541;
-                                                v541 = v476[v538];
-                                                bool v543;
-                                                v543 = v539 >= v541;
-                                                int v544;
-                                                if (v543){
-                                                    v544 = v539;
+                                            int v387;
+                                            v387 = -1l + v327;
+                                            int v388; int v389;
+                                            Tuple6 tmp27 = Tuple6{0l, 0l};
+                                            v388 = tmp27.v0; v389 = tmp27.v1;
+                                            while (while_method_0(v388)){
+                                                int v391;
+                                                v391 = v326[v388];
+                                                bool v393;
+                                                v393 = v389 >= v391;
+                                                int v394;
+                                                if (v393){
+                                                    v394 = v389;
                                                 } else {
-                                                    v544 = v541;
+                                                    v394 = v391;
                                                 }
-                                                v539 = v544;
-                                                v538 += 1l ;
+                                                v389 = v394;
+                                                v388 += 1l ;
                                             }
-                                            static_array<int,2l> v545;
-                                            int v547;
-                                            v547 = 0l;
-                                            while (while_method_0(v547)){
-                                                v545[v547] = v539;
-                                                v547 += 1l ;
+                                            static_array<int,2l> v395;
+                                            int v397;
+                                            v397 = 0l;
+                                            while (while_method_0(v397)){
+                                                v395[v397] = v389;
+                                                v397 += 1l ;
                                             }
-                                            static_array<int,2l> v549;
-                                            int v551;
-                                            v551 = 0l;
-                                            while (while_method_0(v551)){
-                                                int v553;
-                                                v553 = v545[v551];
-                                                bool v555;
-                                                v555 = v551 == v475;
-                                                int v557;
-                                                if (v555){
-                                                    int v556;
-                                                    v556 = v553 + 2l;
-                                                    v557 = v556;
+                                            static_array<int,2l> v399;
+                                            int v401;
+                                            v401 = 0l;
+                                            while (while_method_0(v401)){
+                                                int v403;
+                                                v403 = v395[v401];
+                                                bool v405;
+                                                v405 = v401 == v325;
+                                                int v407;
+                                                if (v405){
+                                                    int v406;
+                                                    v406 = v403 + 2l;
+                                                    v407 = v406;
                                                 } else {
-                                                    v557 = v553;
+                                                    v407 = v403;
                                                 }
-                                                v549[v551] = v557;
-                                                v551 += 1l ;
+                                                v399[v401] = v407;
+                                                v401 += 1l ;
                                             }
-                                            v565 = Union5{Union5_2{v472, false, v474, v536, v549, v537}};
+                                            v415 = Union5{Union5_2{v322, false, v324, v386, v399, v387}};
                                         } else {
                                             printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                             asm("exit;");
@@ -4835,110 +4774,110 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                 break;
                             }
                             case 1: { // Some
-                                Union3 v480 = v472.case1.v0;
-                                switch (v478.tag) {
+                                Union3 v330 = v322.case1.v0;
+                                switch (v328.tag) {
                                     case 0: { // Call
-                                        if (v473){
-                                            bool v482;
-                                            v482 = v475 == 0l;
-                                            int v483;
-                                            if (v482){
-                                                v483 = 1l;
+                                        if (v323){
+                                            bool v332;
+                                            v332 = v325 == 0l;
+                                            int v333;
+                                            if (v332){
+                                                v333 = 1l;
                                             } else {
-                                                v483 = 0l;
+                                                v333 = 0l;
                                             }
-                                            v565 = Union5{Union5_2{v472, false, v474, v483, v476, v477}};
+                                            v415 = Union5{Union5_2{v322, false, v324, v333, v326, v327}};
                                         } else {
-                                            int v485; int v486;
-                                            Tuple6 tmp27 = Tuple6{0l, 0l};
-                                            v485 = tmp27.v0; v486 = tmp27.v1;
-                                            while (while_method_0(v485)){
-                                                int v488;
-                                                v488 = v476[v485];
-                                                bool v490;
-                                                v490 = v486 >= v488;
-                                                int v491;
-                                                if (v490){
-                                                    v491 = v486;
+                                            int v335; int v336;
+                                            Tuple6 tmp28 = Tuple6{0l, 0l};
+                                            v335 = tmp28.v0; v336 = tmp28.v1;
+                                            while (while_method_0(v335)){
+                                                int v338;
+                                                v338 = v326[v335];
+                                                bool v340;
+                                                v340 = v336 >= v338;
+                                                int v341;
+                                                if (v340){
+                                                    v341 = v336;
                                                 } else {
-                                                    v491 = v488;
+                                                    v341 = v338;
                                                 }
-                                                v486 = v491;
-                                                v485 += 1l ;
+                                                v336 = v341;
+                                                v335 += 1l ;
                                             }
-                                            static_array<int,2l> v492;
-                                            int v494;
-                                            v494 = 0l;
-                                            while (while_method_0(v494)){
-                                                v492[v494] = v486;
-                                                v494 += 1l ;
+                                            static_array<int,2l> v342;
+                                            int v344;
+                                            v344 = 0l;
+                                            while (while_method_0(v344)){
+                                                v342[v344] = v336;
+                                                v344 += 1l ;
                                             }
-                                            v565 = Union5{Union5_4{v472, v473, v474, v475, v492, v477}};
+                                            v415 = Union5{Union5_4{v322, v323, v324, v325, v342, v327}};
                                         }
                                         break;
                                     }
                                     case 1: { // Fold
-                                        v565 = Union5{Union5_5{v472, v473, v474, v475, v476, v477}};
+                                        v415 = Union5{Union5_5{v322, v323, v324, v325, v326, v327}};
                                         break;
                                     }
                                     case 2: { // Raise
-                                        bool v498;
-                                        v498 = v477 > 0l;
-                                        if (v498){
-                                            bool v499;
-                                            v499 = v475 == 0l;
-                                            int v500;
-                                            if (v499){
-                                                v500 = 1l;
+                                        bool v348;
+                                        v348 = v327 > 0l;
+                                        if (v348){
+                                            bool v349;
+                                            v349 = v325 == 0l;
+                                            int v350;
+                                            if (v349){
+                                                v350 = 1l;
                                             } else {
-                                                v500 = 0l;
+                                                v350 = 0l;
                                             }
-                                            int v501;
-                                            v501 = -1l + v477;
-                                            int v502; int v503;
-                                            Tuple6 tmp28 = Tuple6{0l, 0l};
-                                            v502 = tmp28.v0; v503 = tmp28.v1;
-                                            while (while_method_0(v502)){
-                                                int v505;
-                                                v505 = v476[v502];
-                                                bool v507;
-                                                v507 = v503 >= v505;
-                                                int v508;
-                                                if (v507){
-                                                    v508 = v503;
+                                            int v351;
+                                            v351 = -1l + v327;
+                                            int v352; int v353;
+                                            Tuple6 tmp29 = Tuple6{0l, 0l};
+                                            v352 = tmp29.v0; v353 = tmp29.v1;
+                                            while (while_method_0(v352)){
+                                                int v355;
+                                                v355 = v326[v352];
+                                                bool v357;
+                                                v357 = v353 >= v355;
+                                                int v358;
+                                                if (v357){
+                                                    v358 = v353;
                                                 } else {
-                                                    v508 = v505;
+                                                    v358 = v355;
                                                 }
-                                                v503 = v508;
-                                                v502 += 1l ;
+                                                v353 = v358;
+                                                v352 += 1l ;
                                             }
-                                            static_array<int,2l> v509;
-                                            int v511;
-                                            v511 = 0l;
-                                            while (while_method_0(v511)){
-                                                v509[v511] = v503;
-                                                v511 += 1l ;
+                                            static_array<int,2l> v359;
+                                            int v361;
+                                            v361 = 0l;
+                                            while (while_method_0(v361)){
+                                                v359[v361] = v353;
+                                                v361 += 1l ;
                                             }
-                                            static_array<int,2l> v513;
-                                            int v515;
-                                            v515 = 0l;
-                                            while (while_method_0(v515)){
-                                                int v517;
-                                                v517 = v509[v515];
-                                                bool v519;
-                                                v519 = v515 == v475;
-                                                int v521;
-                                                if (v519){
-                                                    int v520;
-                                                    v520 = v517 + 4l;
-                                                    v521 = v520;
+                                            static_array<int,2l> v363;
+                                            int v365;
+                                            v365 = 0l;
+                                            while (while_method_0(v365)){
+                                                int v367;
+                                                v367 = v359[v365];
+                                                bool v369;
+                                                v369 = v365 == v325;
+                                                int v371;
+                                                if (v369){
+                                                    int v370;
+                                                    v370 = v367 + 4l;
+                                                    v371 = v370;
                                                 } else {
-                                                    v521 = v517;
+                                                    v371 = v367;
                                                 }
-                                                v513[v515] = v521;
-                                                v515 += 1l ;
+                                                v363[v365] = v371;
+                                                v365 += 1l ;
                                             }
-                                            v565 = Union5{Union5_2{v472, false, v474, v500, v513, v501}};
+                                            v415 = Union5{Union5_2{v322, false, v324, v350, v363, v351}};
                                         } else {
                                             printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                             asm("exit;");
@@ -4955,15 +4894,15 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                 assert("Invalid tag." && false);
                             }
                         }
-                        v610 = Union4{Union4_1{v565}};
+                        v460 = Union4{Union4_1{v415}};
                         break;
                     }
                     case 4: { // TerminalCall
                         Union6 v30 = v15.case4.v0; bool v31 = v15.case4.v1; static_array<Union3,2l> v32 = v15.case4.v2; int v33 = v15.case4.v3; static_array<int,2l> v34 = v15.case4.v4; int v35 = v15.case4.v5;
                         int v36;
                         v36 = v34[v33];
-                        Union13 v38;
-                        v38 = compare_hands_27(v30, v31, v32, v33, v34, v35);
+                        Union12 v38;
+                        v38 = compare_hands_28(v30, v31, v32, v33, v34, v35);
                         int v43; int v44;
                         switch (v38.tag) {
                             case 0: { // Eq
@@ -4991,7 +4930,7 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                         Union4 v47;
                         v47 = Union4{Union4_0{}};
                         v5 = v47;
-                        v610 = Union4{Union4_0{}};
+                        v460 = Union4{Union4_0{}};
                         break;
                     }
                     case 5: { // TerminalFold
@@ -5015,7 +4954,7 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                         Union4 v28;
                         v28 = Union4{Union4_0{}};
                         v5 = v28;
-                        v610 = Union4{Union4_0{}};
+                        v460 = Union4{Union4_0{}};
                         break;
                     }
                     default: {
@@ -5028,36 +4967,36 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                 assert("Invalid tag." && false);
             }
         }
-        v13 = v610;
+        v13 = v460;
     }
     return ;
 }
-__device__ void f_32(unsigned char * v0, int v1){
+__device__ void f_33(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+0ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_34(unsigned char * v0){
+__device__ void f_35(unsigned char * v0){
     return ;
 }
-__device__ void f_33(unsigned char * v0, Union3 v1){
+__device__ void f_34(unsigned char * v0, Union3 v1){
     int v2;
     v2 = v1.tag;
-    f_32(v0, v2);
+    f_33(v0, v2);
     unsigned char * v3;
     v3 = (unsigned char *)(v0+4ull);
     switch (v1.tag) {
         case 0: { // Jack
-            return f_34(v3);
+            return f_35(v3);
             break;
         }
         case 1: { // King
-            return f_34(v3);
+            return f_35(v3);
             break;
         }
         case 2: { // Queen
-            return f_34(v3);
+            return f_35(v3);
             break;
         }
         default: {
@@ -5065,26 +5004,26 @@ __device__ void f_33(unsigned char * v0, Union3 v1){
         }
     }
 }
-__device__ void f_35(unsigned char * v0, int v1){
+__device__ void f_36(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+28ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_37(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6){
+__device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6){
     int v7;
     v7 = v1.tag;
-    f_32(v0, v7);
+    f_33(v0, v7);
     unsigned char * v8;
     v8 = (unsigned char *)(v0+4ull);
     switch (v1.tag) {
         case 0: { // None
-            f_34(v8);
+            f_35(v8);
             break;
         }
         case 1: { // Some
             Union3 v10 = v1.case1.v0;
-            f_33(v8, v10);
+            f_34(v8, v10);
             break;
         }
         default: {
@@ -5107,7 +5046,7 @@ __device__ void f_37(unsigned char * v0, Union6 v1, bool v2, static_array<Union3
         v18 = (unsigned char *)(v0+v17);
         Union3 v20;
         v20 = v3[v13];
-        f_33(v18, v20);
+        f_34(v18, v20);
         v13 += 1l ;
     }
     int * v22;
@@ -5126,7 +5065,7 @@ __device__ void f_37(unsigned char * v0, Union6 v1, bool v2, static_array<Union3
         v29 = (unsigned char *)(v0+v28);
         int v31;
         v31 = v5[v24];
-        f_32(v29, v31);
+        f_33(v29, v31);
         v24 += 1l ;
     }
     int * v33;
@@ -5134,26 +5073,26 @@ __device__ void f_37(unsigned char * v0, Union6 v1, bool v2, static_array<Union3
     v33[0l] = v6;
     return ;
 }
-__device__ void f_39(unsigned char * v0, int v1){
+__device__ void f_40(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+36ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6, Union1 v7){
+__device__ void f_39(unsigned char * v0, Union6 v1, bool v2, static_array<Union3,2l> v3, int v4, static_array<int,2l> v5, int v6, Union1 v7){
     int v8;
     v8 = v1.tag;
-    f_32(v0, v8);
+    f_33(v0, v8);
     unsigned char * v9;
     v9 = (unsigned char *)(v0+4ull);
     switch (v1.tag) {
         case 0: { // None
-            f_34(v9);
+            f_35(v9);
             break;
         }
         case 1: { // Some
             Union3 v11 = v1.case1.v0;
-            f_33(v9, v11);
+            f_34(v9, v11);
             break;
         }
         default: {
@@ -5176,7 +5115,7 @@ __device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3
         v19 = (unsigned char *)(v0+v18);
         Union3 v21;
         v21 = v3[v14];
-        f_33(v19, v21);
+        f_34(v19, v21);
         v14 += 1l ;
     }
     int * v23;
@@ -5195,7 +5134,7 @@ __device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3
         v30 = (unsigned char *)(v0+v29);
         int v32;
         v32 = v5[v25];
-        f_32(v30, v32);
+        f_33(v30, v32);
         v25 += 1l ;
     }
     int * v34;
@@ -5203,20 +5142,20 @@ __device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3
     v34[0l] = v6;
     int v36;
     v36 = v7.tag;
-    f_39(v0, v36);
+    f_40(v0, v36);
     unsigned char * v37;
     v37 = (unsigned char *)(v0+40ull);
     switch (v7.tag) {
         case 0: { // Call
-            return f_34(v37);
+            return f_35(v37);
             break;
         }
         case 1: { // Fold
-            return f_34(v37);
+            return f_35(v37);
             break;
         }
         case 2: { // Raise
-            return f_34(v37);
+            return f_35(v37);
             break;
         }
         default: {
@@ -5224,40 +5163,40 @@ __device__ void f_38(unsigned char * v0, Union6 v1, bool v2, static_array<Union3
         }
     }
 }
-__device__ void f_36(unsigned char * v0, Union5 v1){
+__device__ void f_37(unsigned char * v0, Union5 v1){
     int v2;
     v2 = v1.tag;
-    f_32(v0, v2);
+    f_33(v0, v2);
     unsigned char * v3;
     v3 = (unsigned char *)(v0+16ull);
     switch (v1.tag) {
         case 0: { // ChanceCommunityCard
             Union6 v5 = v1.case0.v0; bool v6 = v1.case0.v1; static_array<Union3,2l> v7 = v1.case0.v2; int v8 = v1.case0.v3; static_array<int,2l> v9 = v1.case0.v4; int v10 = v1.case0.v5;
-            return f_37(v3, v5, v6, v7, v8, v9, v10);
+            return f_38(v3, v5, v6, v7, v8, v9, v10);
             break;
         }
         case 1: { // ChanceInit
-            return f_34(v3);
+            return f_35(v3);
             break;
         }
         case 2: { // Round
             Union6 v11 = v1.case2.v0; bool v12 = v1.case2.v1; static_array<Union3,2l> v13 = v1.case2.v2; int v14 = v1.case2.v3; static_array<int,2l> v15 = v1.case2.v4; int v16 = v1.case2.v5;
-            return f_37(v3, v11, v12, v13, v14, v15, v16);
+            return f_38(v3, v11, v12, v13, v14, v15, v16);
             break;
         }
         case 3: { // RoundWithAction
             Union6 v17 = v1.case3.v0; bool v18 = v1.case3.v1; static_array<Union3,2l> v19 = v1.case3.v2; int v20 = v1.case3.v3; static_array<int,2l> v21 = v1.case3.v4; int v22 = v1.case3.v5; Union1 v23 = v1.case3.v6;
-            return f_38(v3, v17, v18, v19, v20, v21, v22, v23);
+            return f_39(v3, v17, v18, v19, v20, v21, v22, v23);
             break;
         }
         case 4: { // TerminalCall
             Union6 v24 = v1.case4.v0; bool v25 = v1.case4.v1; static_array<Union3,2l> v26 = v1.case4.v2; int v27 = v1.case4.v3; static_array<int,2l> v28 = v1.case4.v4; int v29 = v1.case4.v5;
-            return f_37(v3, v24, v25, v26, v27, v28, v29);
+            return f_38(v3, v24, v25, v26, v27, v28, v29);
             break;
         }
         case 5: { // TerminalFold
             Union6 v30 = v1.case5.v0; bool v31 = v1.case5.v1; static_array<Union3,2l> v32 = v1.case5.v2; int v33 = v1.case5.v3; static_array<int,2l> v34 = v1.case5.v4; int v35 = v1.case5.v5;
-            return f_37(v3, v30, v31, v32, v33, v34, v35);
+            return f_38(v3, v30, v31, v32, v33, v34, v35);
             break;
         }
         default: {
@@ -5265,38 +5204,38 @@ __device__ void f_36(unsigned char * v0, Union5 v1){
         }
     }
 }
-__device__ void f_40(unsigned char * v0, int v1){
+__device__ void f_41(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+96ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_43(unsigned char * v0, int v1){
+__device__ void f_44(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+4ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_42(unsigned char * v0, int v1, Union1 v2){
+__device__ void f_43(unsigned char * v0, int v1, Union1 v2){
     int * v3;
     v3 = (int *)(v0+0ull);
     v3[0l] = v1;
     int v5;
     v5 = v2.tag;
-    f_43(v0, v5);
+    f_44(v0, v5);
     unsigned char * v6;
     v6 = (unsigned char *)(v0+8ull);
     switch (v2.tag) {
         case 0: { // Call
-            return f_34(v6);
+            return f_35(v6);
             break;
         }
         case 1: { // Fold
-            return f_34(v6);
+            return f_35(v6);
             break;
         }
         case 2: { // Raise
-            return f_34(v6);
+            return f_35(v6);
             break;
         }
         default: {
@@ -5304,26 +5243,26 @@ __device__ void f_42(unsigned char * v0, int v1, Union1 v2){
         }
     }
 }
-__device__ void f_44(unsigned char * v0, int v1, Union3 v2){
+__device__ void f_45(unsigned char * v0, int v1, Union3 v2){
     int * v3;
     v3 = (int *)(v0+0ull);
     v3[0l] = v1;
     int v5;
     v5 = v2.tag;
-    f_43(v0, v5);
+    f_44(v0, v5);
     unsigned char * v6;
     v6 = (unsigned char *)(v0+8ull);
     switch (v2.tag) {
         case 0: { // Jack
-            return f_34(v6);
+            return f_35(v6);
             break;
         }
         case 1: { // King
-            return f_34(v6);
+            return f_35(v6);
             break;
         }
         case 2: { // Queen
-            return f_34(v6);
+            return f_35(v6);
             break;
         }
         default: {
@@ -5331,7 +5270,7 @@ __device__ void f_44(unsigned char * v0, int v1, Union3 v2){
         }
     }
 }
-__device__ void f_45(unsigned char * v0, static_array<Union3,2l> v1, int v2, int v3){
+__device__ void f_46(unsigned char * v0, static_array<Union3,2l> v1, int v2, int v3){
     int v4;
     v4 = 0l;
     while (while_method_0(v4)){
@@ -5343,7 +5282,7 @@ __device__ void f_45(unsigned char * v0, static_array<Union3,2l> v1, int v2, int
         v8 = (unsigned char *)(v0+v7);
         Union3 v10;
         v10 = v1[v4];
-        f_33(v8, v10);
+        f_34(v8, v10);
         v4 += 1l ;
     }
     int * v12;
@@ -5354,31 +5293,31 @@ __device__ void f_45(unsigned char * v0, static_array<Union3,2l> v1, int v2, int
     v14[0l] = v3;
     return ;
 }
-__device__ void f_41(unsigned char * v0, Union7 v1){
+__device__ void f_42(unsigned char * v0, Union7 v1){
     int v2;
     v2 = v1.tag;
-    f_32(v0, v2);
+    f_33(v0, v2);
     unsigned char * v3;
     v3 = (unsigned char *)(v0+16ull);
     switch (v1.tag) {
         case 0: { // CommunityCardIs
             Union3 v5 = v1.case0.v0;
-            return f_33(v3, v5);
+            return f_34(v3, v5);
             break;
         }
         case 1: { // PlayerAction
             int v6 = v1.case1.v0; Union1 v7 = v1.case1.v1;
-            return f_42(v3, v6, v7);
+            return f_43(v3, v6, v7);
             break;
         }
         case 2: { // PlayerGotCard
             int v8 = v1.case2.v0; Union3 v9 = v1.case2.v1;
-            return f_44(v3, v8, v9);
+            return f_45(v3, v8, v9);
             break;
         }
         case 3: { // Showdown
             static_array<Union3,2l> v10 = v1.case3.v0; int v11 = v1.case3.v1; int v12 = v1.case3.v2;
-            return f_45(v3, v10, v11, v12);
+            return f_46(v3, v10, v11, v12);
             break;
         }
         default: {
@@ -5386,23 +5325,23 @@ __device__ void f_41(unsigned char * v0, Union7 v1){
         }
     }
 }
-__device__ void f_46(unsigned char * v0, Union2 v1){
+__device__ void f_47(unsigned char * v0, Union2 v1){
     int v2;
     v2 = v1.tag;
-    f_32(v0, v2);
+    f_33(v0, v2);
     unsigned char * v3;
     v3 = (unsigned char *)(v0+4ull);
     switch (v1.tag) {
         case 0: { // Computer
-            return f_34(v3);
+            return f_35(v3);
             break;
         }
         case 1: { // Human
-            return f_34(v3);
+            return f_35(v3);
             break;
         }
         case 2: { // Random
-            return f_34(v3);
+            return f_35(v3);
             break;
         }
         default: {
@@ -5410,16 +5349,16 @@ __device__ void f_46(unsigned char * v0, Union2 v1){
         }
     }
 }
-__device__ void f_47(unsigned char * v0, int v1){
+__device__ void f_48(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+1144ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_31(unsigned char * v0, static_array_list<Union3,6l> v1, Union4 v2, static_array_list<Union7,32l> v3, static_array<Union2,2l> v4, Union8 v5){
+__device__ void f_32(unsigned char * v0, static_array_list<Union3,6l> v1, Union4 v2, static_array_list<Union7,32l> v3, static_array<Union2,2l> v4, Union8 v5){
     int v6;
     v6 = v1.length;
-    f_32(v0, v6);
+    f_33(v0, v6);
     int v7;
     v7 = v1.length;
     int v8;
@@ -5435,22 +5374,22 @@ __device__ void f_31(unsigned char * v0, static_array_list<Union3,6l> v1, Union4
         v13 = (unsigned char *)(v0+v12);
         Union3 v15;
         v15 = v1[v8];
-        f_33(v13, v15);
+        f_34(v13, v15);
         v8 += 1l ;
     }
     int v17;
     v17 = v2.tag;
-    f_35(v0, v17);
+    f_36(v0, v17);
     unsigned char * v18;
     v18 = (unsigned char *)(v0+32ull);
     switch (v2.tag) {
         case 0: { // None
-            f_34(v18);
+            f_35(v18);
             break;
         }
         case 1: { // Some
             Union5 v20 = v2.case1.v0;
-            f_36(v18, v20);
+            f_37(v18, v20);
             break;
         }
         default: {
@@ -5459,7 +5398,7 @@ __device__ void f_31(unsigned char * v0, static_array_list<Union3,6l> v1, Union4
     }
     int v21;
     v21 = v3.length;
-    f_40(v0, v21);
+    f_41(v0, v21);
     int v22;
     v22 = v3.length;
     int v23;
@@ -5475,7 +5414,7 @@ __device__ void f_31(unsigned char * v0, static_array_list<Union3,6l> v1, Union4
         v28 = (unsigned char *)(v0+v27);
         Union7 v30;
         v30 = v3[v23];
-        f_41(v28, v30);
+        f_42(v28, v30);
         v23 += 1l ;
     }
     int v32;
@@ -5491,27 +5430,27 @@ __device__ void f_31(unsigned char * v0, static_array_list<Union3,6l> v1, Union4
         v37 = (unsigned char *)(v0+v36);
         Union2 v39;
         v39 = v4[v32];
-        f_46(v37, v39);
+        f_47(v37, v39);
         v32 += 1l ;
     }
     int v41;
     v41 = v5.tag;
-    f_47(v0, v41);
+    f_48(v0, v41);
     unsigned char * v42;
     v42 = (unsigned char *)(v0+1152ull);
     switch (v5.tag) {
         case 0: { // GameNotStarted
-            return f_34(v42);
+            return f_35(v42);
             break;
         }
         case 1: { // GameOver
             Union6 v44 = v5.case1.v0; bool v45 = v5.case1.v1; static_array<Union3,2l> v46 = v5.case1.v2; int v47 = v5.case1.v3; static_array<int,2l> v48 = v5.case1.v4; int v49 = v5.case1.v5;
-            return f_37(v42, v44, v45, v46, v47, v48, v49);
+            return f_38(v42, v44, v45, v46, v47, v48, v49);
             break;
         }
         case 2: { // WaitingForActionFromPlayerId
             Union6 v50 = v5.case2.v0; bool v51 = v5.case2.v1; static_array<Union3,2l> v52 = v5.case2.v2; int v53 = v5.case2.v3; static_array<int,2l> v54 = v5.case2.v4; int v55 = v5.case2.v5;
-            return f_37(v42, v50, v51, v52, v53, v54, v55);
+            return f_38(v42, v50, v51, v52, v53, v54, v55);
             break;
         }
         default: {
@@ -5525,6 +5464,219 @@ __device__ inline bool while_method_9(cuda::latch<cuda::thread_scope_block> & v0
     bool v2;
     v2 = v1 == false;
     return v2;
+}
+__device__ Tuple7 run__49(unsigned char * v0, unsigned char * v1){
+    __syncthreads();
+    int v2;
+    v2 = threadIdx.x;
+    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v3 = console_lock;
+    auto v4 = cooperative_groups::coalesced_threads();
+    v3.acquire();
+    printf("{%s = %d}\n","tid", v2);
+    v3.release();
+    v4.sync() ;
+    float * v7;
+    v7 = reinterpret_cast<float *>(&v0[32768ull]);
+    float * v9;
+    v9 = reinterpret_cast<float *>(&v0[0ull]);
+    int * v11;
+    v11 = reinterpret_cast<int *>(&v0[98304ull]);
+    unsigned long long v13;
+    v13 = clock64();
+    int v14;
+    v14 = threadIdx.x;
+    int v15;
+    v15 = blockIdx.x;
+    int v16;
+    v16 = v15 * 32l;
+    int v17;
+    v17 = v14 + v16;
+    unsigned long long v18;
+    v18 = (unsigned long long)v17;
+    curandStatePhilox4_32_10_t v19;
+    curand_init(v13,v18,0ull,&v19);
+    float * v20;
+    v20 = reinterpret_cast<float *>(&v0[0ull]);
+    int v22;
+    v22 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v22 && v22 < 1l);
+    int v23;
+    v23 = 4096l * v22;
+    unsigned long long v24;
+    v24 = clock64();
+    int v25;
+    v25 = threadIdx.x;
+    int v26;
+    v26 = blockIdx.x;
+    int v27;
+    v27 = v26 * 32l;
+    int v28;
+    v28 = v25 + v27;
+    unsigned long long v29;
+    v29 = (unsigned long long)v28;
+    curandStatePhilox4_32_10_t v30;
+    curand_init(v24,v29,0ull,&v30);
+    int v31;
+    v31 = threadIdx.x;
+    int v32;
+    v32 = v31;
+    while (while_method_3(v32)){
+        bool v34;
+        v34 = 0l <= v32;
+        bool v35;
+        v35 = v34 == false;
+        if (v35){
+            assert("The index needs to be zero or positive." && v34);
+        } else {
+        }
+        int v37;
+        v37 = v32 % 128l;
+        int v38;
+        v38 = v32 / 128l;
+        bool v39;
+        v39 = v38 < 32l;
+        bool v40;
+        v40 = v39 == false;
+        if (v40){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v39);
+        } else {
+        }
+        assert("Tensor range check" && 0 <= v38 && v38 < 32l);
+        assert("Tensor range check" && 0 <= v37 && v37 < 128l);
+        int v42;
+        v42 = v37 + v23;
+        int v43;
+        v43 = 128l * v38;
+        int v44;
+        v44 = v43 + v42;
+        v20[v44] = 0.0f;
+        v32 += 32l ;
+    }
+    __syncthreads();
+    __syncthreads();
+    int v45;
+    v45 = 0l;
+    while (while_method_4(v45)){
+        float * v47;
+        v47 = reinterpret_cast<float *>(&v0[0ull]);
+        float * v49;
+        v49 = reinterpret_cast<float *>(&v1[0ull]);
+        assert("Tensor range check" && 0 <= v45 && v45 < 4l);
+        int v51;
+        v51 = 16384l * v45;
+        float * v52;
+        v52 = reinterpret_cast<float *>(&v0[16384ull]);
+        int v54;
+        v54 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v54 && v54 < 1l);
+        int v55;
+        v55 = 4096l * v54;
+        int v56;
+        v56 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v56 && v56 < 1l);
+        int v57;
+        v57 = 4096l * v56;
+        method_22(v49, v51, v52, v57, v47, v55);
+        float * v58;
+        v58 = reinterpret_cast<float *>(&v0[32768ull]);
+        assert("Tensor range check" && 0 <= v45 && v45 < 4l);
+        int v60;
+        v60 = 4096l * v45;
+        int * v61;
+        v61 = reinterpret_cast<int *>(&v0[98304ull]);
+        assert("Tensor range check" && 0 <= v45 && v45 < 4l);
+        int v63;
+        v63 = 32l * v45;
+        method_23(v61, v63, v58, v60, v52, v30);
+        v45 += 1l ;
+    }
+    __syncthreads();
+    int v64;
+    v64 = 0l;
+    int v65;
+    v65 = 4l;
+    int v66;
+    v66 = int_range_25(v65, v64, v30);
+    float * v67;
+    v67 = reinterpret_cast<float *>(&v0[32768ull]);
+    int * v69;
+    v69 = reinterpret_cast<int *>(&v0[98304ull]);
+    assert("Tensor range check" && 0 <= v66 && v66 < 4l);
+    int v71;
+    v71 = 32l * v66;
+    int v72;
+    v72 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v72 && v72 < 1l);
+    int v73;
+    v73 = 32l * v72;
+    int v74;
+    v74 = v73 + v71;
+    int v75;
+    v75 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v75 && v75 < 32l);
+    int v76;
+    v76 = v75 + v74;
+    int v77;
+    v77 = v69[v76];
+    bool v78;
+    v78 = 0l == v77;
+    Union9 v87;
+    if (v78){
+        v87 = Union9{Union9_1{}};
+    } else {
+        bool v80;
+        v80 = 1l == v77;
+        if (v80){
+            v87 = Union9{Union9_0{}};
+        } else {
+            bool v82;
+            v82 = 2l == v77;
+            if (v82){
+                v87 = Union9{Union9_2{}};
+            } else {
+                printf("%s\n", "Invalid output id in the Leduc model.");
+                asm("exit;");
+            }
+        }
+    }
+    int v88;
+    v88 = blockIdx.x;
+    int v89;
+    v89 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v66 && v66 < 4l);
+    assert("Tensor range check" && 0 <= v88 && v88 < 1l);
+    assert("Tensor range check" && 0 <= v89 && v89 < 32l);
+    assert("Tensor range check" && 0 <= v77 && v77 < 128l);
+    int v90;
+    v90 = 128l * v89;
+    int v91;
+    v91 = v90 + v77;
+    int v92;
+    v92 = 4096l * v88;
+    int v93;
+    v93 = v92 + v91;
+    int v94;
+    v94 = 4096l * v66;
+    int v95;
+    v95 = v94 + v93;
+    float v96;
+    v96 = v67[v95];
+    int v97;
+    v97 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v97 && v97 < 1l);
+    int v98;
+    v98 = 4096l * v97;
+    int v99;
+    v99 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v99 && v99 < 32l);
+    int v100;
+    v100 = 128l * v99;
+    int v101;
+    v101 = v100 + v98;
+    assert("Tensor range check" && 0 <= v77 && v77 < 128l);
+    int v102;
+    v102 = v77 + v101;
+    return Tuple7{v87, v67, v102, 4096l, 4l, v96};
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsigned char * v2, unsigned long long v3, unsigned char * v4, unsigned long long v5) {
     __shared__ cuda::latch<cuda::thread_scope_block> v6;
@@ -5642,7 +5794,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     int v53;
                     v53 = v33.length;
                     int v54;
-                    v54 = int_range_24(v53, v51, v48);
+                    v54 = int_range_25(v53, v51, v48);
                     Union3 v55;
                     v55 = v33[v51];
                     Union3 v57;
@@ -5669,7 +5821,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                 assert("Invalid tag." && false);
             }
         }
-        f_31(v0, v15, v16, v17, v18, v19);
+        f_32(v0, v15, v16, v17, v18, v19);
     } else {
     }
     v6.count_down();
@@ -5690,374 +5842,9 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
             assert("The outputs needs to have matching offsets." && v87);
         } else {
         }
-        Union9 v90;
-        v90 = Union9{Union9_0{}};
-        __syncthreads();
-        int v91;
-        v91 = threadIdx.x;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v92 = console_lock;
-        auto v93 = cooperative_groups::coalesced_threads();
-        v92.acquire();
-        printf("{%s = %d}\n","tid", v91);
-        v92.release();
-        v93.sync() ;
-        float * v96;
-        v96 = reinterpret_cast<float *>(&v2[32768ull]);
-        float * v98;
-        v98 = reinterpret_cast<float *>(&v2[0ull]);
-        int * v100;
-        v100 = reinterpret_cast<int *>(&v2[98304ull]);
-        unsigned long long v102;
-        v102 = clock64();
-        int v103;
-        v103 = threadIdx.x;
-        int v104;
-        v104 = blockIdx.x;
-        int v105;
-        v105 = v104 * 32l;
-        int v106;
-        v106 = v103 + v105;
-        unsigned long long v107;
-        v107 = (unsigned long long)v106;
-        curandStatePhilox4_32_10_t v108;
-        curand_init(v102,v107,0ull,&v108);
-        float * v109;
-        v109 = reinterpret_cast<float *>(&v2[0ull]);
-        int v111;
-        v111 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v111 && v111 < 1l);
-        int v112;
-        v112 = 4096l * v111;
-        unsigned long long v113;
-        v113 = clock64();
-        int v114;
-        v114 = threadIdx.x;
-        int v115;
-        v115 = blockIdx.x;
-        int v116;
-        v116 = v115 * 32l;
-        int v117;
-        v117 = v114 + v116;
-        unsigned long long v118;
-        v118 = (unsigned long long)v117;
-        curandStatePhilox4_32_10_t v119;
-        curand_init(v113,v118,0ull,&v119);
-        int v120;
-        v120 = threadIdx.x;
-        int v121;
-        v121 = v120;
-        while (while_method_3(v121)){
-            bool v123;
-            v123 = 0l <= v121;
-            bool v124;
-            v124 = v123 == false;
-            if (v124){
-                assert("The index needs to be zero or positive." && v123);
-            } else {
-            }
-            int v126;
-            v126 = v121 % 128l;
-            int v127;
-            v127 = v121 / 128l;
-            bool v128;
-            v128 = v127 < 32l;
-            bool v129;
-            v129 = v128 == false;
-            if (v129){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v128);
-            } else {
-            }
-            assert("Tensor range check" && 0 <= v127 && v127 < 32l);
-            assert("Tensor range check" && 0 <= v126 && v126 < 128l);
-            int v131;
-            v131 = v126 + v112;
-            int v132;
-            v132 = 128l * v127;
-            int v133;
-            v133 = v132 + v131;
-            v109[v133] = 0.0f;
-            v121 += 32l ;
-        }
-        __syncthreads();
-        switch (v90.tag) {
-            case 0: { // None
-                break;
-            }
-            case 1: { // Some
-                Union6 v134 = v90.case1.v0; bool v135 = v90.case1.v1; static_array<Union3,2l> v136 = v90.case1.v2; int v137 = v90.case1.v3; static_array<int,2l> v138 = v90.case1.v4; int v139 = v90.case1.v5; static_array_list<Union7,32l> v140 = v90.case1.v6;
-                int v141;
-                v141 = threadIdx.x;
-                assert("Tensor range check" && 0 <= v141 && v141 < 32l);
-                int v142;
-                v142 = 128l * v141;
-                int v143;
-                v143 = v142 + v112;
-                static_array_list<Union10,10l> v144;
-                v144 = static_array_list<Union10,10l>{};
-                int v146;
-                v146 = v140.length;
-                int v147;
-                v147 = 0l;
-                while (while_method_1(v146, v147)){
-                    Union7 v149;
-                    v149 = v140[v147];
-                    Union11 v168;
-                    switch (v149.tag) {
-                        case 0: { // CommunityCardIs
-                            Union3 v158 = v149.case0.v0;
-                            Union10 v159;
-                            v159 = Union10{Union10_1{v158}};
-                            v168 = Union11{Union11_1{v159}};
-                            break;
-                        }
-                        case 1: { // PlayerAction
-                            int v161 = v149.case1.v0; Union1 v162 = v149.case1.v1;
-                            Union10 v163;
-                            v163 = Union10{Union10_0{v162}};
-                            v168 = Union11{Union11_1{v163}};
-                            break;
-                        }
-                        case 2: { // PlayerGotCard
-                            int v151 = v149.case2.v0; Union3 v152 = v149.case2.v1;
-                            bool v153;
-                            v153 = v151 == v137;
-                            if (v153){
-                                Union10 v154;
-                                v154 = Union10{Union10_1{v152}};
-                                v168 = Union11{Union11_1{v154}};
-                            } else {
-                                v168 = Union11{Union11_0{}};
-                            }
-                            break;
-                        }
-                        default: {
-                            v168 = Union11{Union11_0{}};
-                        }
-                    }
-                    switch (v168.tag) {
-                        case 0: { // None
-                            break;
-                        }
-                        case 1: { // Some
-                            Union10 v169 = v168.case1.v0;
-                            v144.push(v169);
-                            break;
-                        }
-                        default: {
-                            assert("Invalid tag." && false);
-                        }
-                    }
-                    v147 += 1l ;
-                }
-                float * v170;
-                v170 = v109+v143;
-                int v172;
-                v172 = v144.length;
-                bool v173;
-                v173 = v172 == 0l;
-                if (v173){
-                    v170[0l] = 1.0f;
-                } else {
-                }
-                int v174;
-                v174 = v144.length;
-                int v175;
-                v175 = 0l;
-                while (while_method_1(v174, v175)){
-                    Union10 v177;
-                    v177 = v144[v175];
-                    int v179;
-                    v179 = v175 * 6l;
-                    int v180;
-                    v180 = 1l + v179;
-                    switch (v177.tag) {
-                        case 0: { // C1of2
-                            Union1 v181 = v177.case0.v0;
-                            switch (v181.tag) {
-                                case 0: { // Call
-                                    v170[v180] = 1.0f;
-                                    break;
-                                }
-                                case 1: { // Fold
-                                    int v182;
-                                    v182 = v180 + 1l;
-                                    v170[v182] = 1.0f;
-                                    break;
-                                }
-                                case 2: { // Raise
-                                    int v183;
-                                    v183 = v180 + 2l;
-                                    v170[v183] = 1.0f;
-                                    break;
-                                }
-                                default: {
-                                    assert("Invalid tag." && false);
-                                }
-                            }
-                            break;
-                        }
-                        case 1: { // C2of2
-                            Union3 v184 = v177.case1.v0;
-                            int v185;
-                            v185 = v180 + 3l;
-                            switch (v184.tag) {
-                                case 0: { // Jack
-                                    v170[v185] = 1.0f;
-                                    break;
-                                }
-                                case 1: { // King
-                                    int v186;
-                                    v186 = v185 + 1l;
-                                    v170[v186] = 1.0f;
-                                    break;
-                                }
-                                case 2: { // Queen
-                                    int v187;
-                                    v187 = v185 + 2l;
-                                    v170[v187] = 1.0f;
-                                    break;
-                                }
-                                default: {
-                                    assert("Invalid tag." && false);
-                                }
-                            }
-                            break;
-                        }
-                        default: {
-                            assert("Invalid tag." && false);
-                        }
-                    }
-                    v175 += 1l ;
-                }
-                break;
-            }
-            default: {
-                assert("Invalid tag." && false);
-            }
-        }
-        __syncthreads();
-        int v188;
-        v188 = 0l;
-        while (while_method_4(v188)){
-            float * v190;
-            v190 = reinterpret_cast<float *>(&v2[0ull]);
-            float * v192;
-            v192 = reinterpret_cast<float *>(&v4[0ull]);
-            assert("Tensor range check" && 0 <= v188 && v188 < 4l);
-            int v194;
-            v194 = 16384l * v188;
-            float * v195;
-            v195 = reinterpret_cast<float *>(&v2[16384ull]);
-            int v197;
-            v197 = blockIdx.x;
-            assert("Tensor range check" && 0 <= v197 && v197 < 1l);
-            int v198;
-            v198 = 4096l * v197;
-            int v199;
-            v199 = blockIdx.x;
-            assert("Tensor range check" && 0 <= v199 && v199 < 1l);
-            int v200;
-            v200 = 4096l * v199;
-            method_21(v192, v194, v195, v200, v190, v198);
-            float * v201;
-            v201 = reinterpret_cast<float *>(&v2[32768ull]);
-            assert("Tensor range check" && 0 <= v188 && v188 < 4l);
-            int v203;
-            v203 = 4096l * v188;
-            int * v204;
-            v204 = reinterpret_cast<int *>(&v2[98304ull]);
-            assert("Tensor range check" && 0 <= v188 && v188 < 4l);
-            int v206;
-            v206 = 32l * v188;
-            method_22(v204, v206, v201, v203, v195, v119);
-            v188 += 1l ;
-        }
-        __syncthreads();
-        int v207;
-        v207 = 0l;
-        int v208;
-        v208 = 4l;
-        int v209;
-        v209 = int_range_24(v208, v207, v119);
-        float * v210;
-        v210 = reinterpret_cast<float *>(&v2[32768ull]);
-        int * v212;
-        v212 = reinterpret_cast<int *>(&v2[98304ull]);
-        assert("Tensor range check" && 0 <= v209 && v209 < 4l);
-        int v214;
-        v214 = 32l * v209;
-        int v215;
-        v215 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v215 && v215 < 1l);
-        int v216;
-        v216 = 32l * v215;
-        int v217;
-        v217 = v216 + v214;
-        int v218;
-        v218 = threadIdx.x;
-        assert("Tensor range check" && 0 <= v218 && v218 < 32l);
-        int v219;
-        v219 = v218 + v217;
-        int v220;
-        v220 = v212[v219];
-        bool v221;
-        v221 = 0l == v220;
-        Union12 v230;
-        if (v221){
-            v230 = Union12{Union12_1{}};
-        } else {
-            bool v223;
-            v223 = 1l == v220;
-            if (v223){
-                v230 = Union12{Union12_0{}};
-            } else {
-                bool v225;
-                v225 = 2l == v220;
-                if (v225){
-                    v230 = Union12{Union12_2{}};
-                } else {
-                    printf("%s\n", "Invalid output id in the Leduc model.");
-                    asm("exit;");
-                }
-            }
-        }
-        int v231;
-        v231 = blockIdx.x;
-        int v232;
-        v232 = threadIdx.x;
-        assert("Tensor range check" && 0 <= v209 && v209 < 4l);
-        assert("Tensor range check" && 0 <= v231 && v231 < 1l);
-        assert("Tensor range check" && 0 <= v232 && v232 < 32l);
-        assert("Tensor range check" && 0 <= v220 && v220 < 128l);
-        int v233;
-        v233 = 128l * v232;
-        int v234;
-        v234 = v233 + v220;
-        int v235;
-        v235 = 4096l * v231;
-        int v236;
-        v236 = v235 + v234;
-        int v237;
-        v237 = 4096l * v209;
-        int v238;
-        v238 = v237 + v236;
-        float v239;
-        v239 = v210[v238];
-        int v240;
-        v240 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v240 && v240 < 1l);
-        int v241;
-        v241 = 4096l * v240;
-        int v242;
-        v242 = threadIdx.x;
-        assert("Tensor range check" && 0 <= v242 && v242 < 32l);
-        int v243;
-        v243 = 128l * v242;
-        int v244;
-        v244 = v243 + v241;
-        assert("Tensor range check" && 0 <= v220 && v220 < 128l);
-        int v245;
-        v245 = v220 + v244;
+        Union9 v90; float * v91; int v92; int v93; int v94; float v95;
+        Tuple7 tmp32 = run__49(v2, v4);
+        v90 = tmp32.v0; v91 = tmp32.v1; v92 = tmp32.v2; v93 = tmp32.v3; v94 = tmp32.v4; v95 = tmp32.v5;
     }
     return ;
 }
