@@ -1,0 +1,18 @@
+open corebase
+open corecuda
+open coreext
+open rangem
+
+let foo() =
+    console.write_ln {tid_before=thread_index()}
+    __syncthreads()
+    console.write_ln {tid_after=thread_index()}
+
+inl main() =
+    run fun () =>
+        if thread_index() < 10 then 
+            console.write_ln "in true"
+            foo()
+        else
+            console.write_ln "in false"
+            foo()
