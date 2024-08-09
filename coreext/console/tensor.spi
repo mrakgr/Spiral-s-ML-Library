@@ -40,4 +40,6 @@ inl write i =
 // Allows passing the printing length for the tensor being printed.
 inl write_ln i = 
     single_threaded fun x =>
-    tensor_write i printable_funs() x . write_ln () 
+    inl ({write_ln} & funs) = printable_funs()
+    tensor_write i funs x 
+    write_ln() 

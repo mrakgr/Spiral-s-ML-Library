@@ -372,6 +372,13 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
     inl rec f forall t. : graph t -> t =
         open primitives
         memoize h fun x =>
+            // inl debug str f =
+            //     if thread_index() = 0 then console.write_ln str
+            //     barrier_cta_sync 0
+            //     inl x = f()
+            //     if thread_index() = 0 then console.write_ln "done"
+            //     barrier_cta_sync 0
+            //     x
             match x with
             | BlockMap(exists a. g,a,_) =>
                 inl a, out = f a, tensor_extract x
@@ -496,7 +503,10 @@ inl masked_softmax forall dim t{float;number}. size (x : graph (tensor (int * di
     masked_softmax_ size None x
 
 inl masked_softmax_and_discrete_sample_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t * tensor (int * dim) int) = 
-    inl f (layer_state {rng}) = primitives.local_masked_softmax_and_discrete_sampling (fun confix x i j => j < size) rng
+    inl f (layer_state {rng}) config x i j_tns = 
+        inl i = primitives.local_masked_softmax_and_discrete_sampling (fun confix x i j => j < size) rng config x i j_tns
+        assert (snd i < size) "The masking requirement is violated in masked_softmax_and_discrete_sample_."
+        i
     BlockRowMapReduce (exists f, x, out)
 inl masked_softmax_and_discrete_sample' forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) =
     masked_softmax_and_discrete_sample_ size (Some out) x
@@ -650,20 +660,20 @@ inl test4() =
 
 // Tests running a feedforward ensemble model which keeps around the sampling probabilities with masking.
 inl test5() =
-    inl inner : int = 128
-    inl ensemble : int = 16
+    inl inner : int = 32 * 4 * 64
+    inl ensemble : int = 4
     inl graph =
-        (input .input (blocks_per_grid(),16,inner) : graph (tensor _ float))
+        (input .input (blocks_per_grid(),threads_per_block(),inner) : graph (tensor _ float))
         |> matmul_ensemble (ensemble,inner,inner)
-        |> ln_l2
-        |> relu
-        |> matmul_ensemble (ensemble,inner,inner)
-        |> ln_l2
-        |> relu
-        |> matmul_ensemble (ensemble,inner,inner)
-        |> masked_softmax_and_discrete_sample' 3 (
-            pair (input .output_probs   (ensemble,blocks_per_grid(),16,inner) |> apply .ensemble) 
-                 (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
+        // |> ln_l2
+        // |> relu
+        // |> matmul_ensemble (ensemble,inner,inner)
+        // |> ln_l2
+        // |> relu
+        // |> matmul_ensemble (ensemble,inner,inner)
+        |> masked_softmax_and_discrete_sample' 11 (
+            pair (input .output_probs   (ensemble,blocks_per_grid(),threads_per_block(),inner) |> apply .ensemble) 
+                 (input .output_indices (ensemble,blocks_per_grid(),threads_per_block()) |> apply .ensemble)
             )
 
     inl model = create_model graph
@@ -680,10 +690,10 @@ inl test5() =
     graph_run_host model {ensemble}
     // console.write_ln "Here is the input tensor."
     // console.write_ln input
-    console.write_ln "Here is the output tensor."
-    inl output : tensor d4 float = key_extract model .output_probs
-    console.tensor.write_ln limit.max output
-    inl output : tensor d3 int = key_extract model .output_indices
-    console.tensor.write_ln limit.max output
+    // console.write_ln "Here is the output tensor."
+    // inl output : tensor d4 float = key_extract model .output_probs
+    // console.tensor.write_ln limit.max output
+    // inl output : tensor d3 int = key_extract model .output_indices
+    // console.tensor.write_ln limit.max output
 
 inl main() = test5()

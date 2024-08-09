@@ -3,9 +3,11 @@ kernel = r"""
 #include <assert.h>
 #include <stdio.h>
 #include <curand_kernel.h>
+#include <cooperative_groups.h>
+#include <cuda/semaphore>
+__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
 #include <mma.h>
 using namespace nvcuda;
-#include <cooperative_groups.h>
 #include <cooperative_groups/reduce.h>
 #include <cooperative_groups/scan.h>
 using default_int = int;
@@ -651,7 +653,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                     }
                     v146 += 1l ;
                 }
-                barrier_cta_sync 0;
+                asm("barrier.cta.sync %0;" :: "r"(0l));
                 wmma::fragment<wmma::matrix_a, 16l, 16l, 8l, wmma::precision::tf32, wmma::row_major> v163[1l];
                 wmma::fragment<wmma::matrix_b, 16l, 16l, 8l, wmma::precision::tf32, wmma::col_major> v164[1l];
                 int v165;
@@ -826,7 +828,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                     }
                     v195 += 1l ;
                 }
-                barrier_cta_sync 0;
+                asm("barrier.cta.sync %0;" :: "r"(0l));
                 int v225;
                 v225 = 0l;
                 #pragma unroll
@@ -891,7 +893,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                 }
                 v237 += 1l ;
             }
-            barrier_cta_sync 0;
+            asm("barrier.cta.sync %0;" :: "r"(0l));
             int v248;
             v248 = threadIdx.x;
             bool v249;
@@ -960,7 +962,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                 }
                 v266 += 1l ;
             }
-            barrier_cta_sync 0;
+            asm("barrier.cta.sync %0;" :: "r"(0l));
             // Poping the loop unrolling to: 0
             v67 += 1l ;
         }
@@ -1261,7 +1263,7 @@ __device__ void method_1(float * v0, float * v1){
         }
         v21 += 1l ;
     }
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     return ;
 }
 __device__ inline bool while_method_5(int v0){
@@ -1358,7 +1360,7 @@ __device__ void method_2(float * v0, float * v1){
         *v33 = *v32;
         v7 += 32l ;
     }
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     return ;
 }
 __device__ Tuple1 method_4(float v0, int v1, float v2, int v3){
@@ -2071,7 +2073,7 @@ __device__ void method_3(int * v0, int v1, float * v2, int v3, float * v4, curan
         v0[v272] = v263;
         v30 += 1l ;
     }
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     return ;
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
@@ -2092,81 +2094,305 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
     int v9;
     v9 = 0l;
     while (while_method_0(v9)){
-        float * v11;
-        v11 = reinterpret_cast<float *>(&v0[0ull]);
-        float * v13;
-        v13 = reinterpret_cast<float *>(&v1[0ull]);
+        int v11;
+        v11 = threadIdx.x;
+        bool v12;
+        v12 = v11 == 0l;
+        if (v12){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v13 = console_lock;
+            auto v14 = cooperative_groups::coalesced_threads();
+            v13.acquire();
+            printf("%s\n","in block row map reduce");
+            v13.release();
+            v14.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        int v17;
+        v17 = threadIdx.x;
+        bool v18;
+        v18 = v17 == 0l;
+        if (v18){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v19 = console_lock;
+            auto v20 = cooperative_groups::coalesced_threads();
+            v19.acquire();
+            printf("%s\n","in block matmul");
+            v19.release();
+            v20.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        int v23;
+        v23 = threadIdx.x;
+        bool v24;
+        v24 = v23 == 0l;
+        if (v24){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v25 = console_lock;
+            auto v26 = cooperative_groups::coalesced_threads();
+            v25.acquire();
+            printf("%s\n","in block map");
+            v25.release();
+            v26.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        int v29;
+        v29 = threadIdx.x;
+        bool v30;
+        v30 = v29 == 0l;
+        if (v30){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v31 = console_lock;
+            auto v32 = cooperative_groups::coalesced_threads();
+            v31.acquire();
+            printf("%s\n","in block row map");
+            v31.release();
+            v32.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        int v35;
+        v35 = threadIdx.x;
+        bool v36;
+        v36 = v35 == 0l;
+        if (v36){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v37 = console_lock;
+            auto v38 = cooperative_groups::coalesced_threads();
+            v37.acquire();
+            printf("%s\n","in block matmul");
+            v37.release();
+            v38.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        int v41;
+        v41 = threadIdx.x;
+        bool v42;
+        v42 = v41 == 0l;
+        if (v42){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v43 = console_lock;
+            auto v44 = cooperative_groups::coalesced_threads();
+            v43.acquire();
+            printf("%s\n","in block map");
+            v43.release();
+            v44.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        int v47;
+        v47 = threadIdx.x;
+        bool v48;
+        v48 = v47 == 0l;
+        if (v48){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v49 = console_lock;
+            auto v50 = cooperative_groups::coalesced_threads();
+            v49.acquire();
+            printf("%s\n","in block row map");
+            v49.release();
+            v50.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        int v53;
+        v53 = threadIdx.x;
+        bool v54;
+        v54 = v53 == 0l;
+        if (v54){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v55 = console_lock;
+            auto v56 = cooperative_groups::coalesced_threads();
+            v55.acquire();
+            printf("%s\n","in block matmul");
+            v55.release();
+            v56.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v59;
+        v59 = reinterpret_cast<float *>(&v0[0ull]);
+        float * v61;
+        v61 = reinterpret_cast<float *>(&v1[0ull]);
         assert("Tensor range check" && 0 <= v9 && v9 < 16l);
-        int v15;
-        v15 = 16384l * v9;
-        float * v16;
-        v16 = reinterpret_cast<float *>(&v0[8192ull]);
-        int v18;
-        v18 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v18 && v18 < 1l);
-        int v19;
-        v19 = 2048l * v18;
-        int v20;
-        v20 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v20 && v20 < 1l);
-        int v21;
-        v21 = 2048l * v20;
-        method_0(v13, v15, v16, v21, v11, v19);
-        float * v22;
-        v22 = reinterpret_cast<float *>(&v0[16384ull]);
-        method_1(v22, v16);
-        float * v24;
-        v24 = reinterpret_cast<float *>(&v0[24576ull]);
-        method_2(v24, v22);
-        float * v26;
-        v26 = reinterpret_cast<float *>(&v1[1048576ull]);
+        int v63;
+        v63 = 16384l * v9;
+        float * v64;
+        v64 = reinterpret_cast<float *>(&v0[8192ull]);
+        int v66;
+        v66 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v66 && v66 < 1l);
+        int v67;
+        v67 = 2048l * v66;
+        int v68;
+        v68 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v68 && v68 < 1l);
+        int v69;
+        v69 = 2048l * v68;
+        method_0(v61, v63, v64, v69, v59, v67);
+        int v70;
+        v70 = threadIdx.x;
+        bool v71;
+        v71 = v70 == 0l;
+        if (v71){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v72 = console_lock;
+            auto v73 = cooperative_groups::coalesced_threads();
+            v72.acquire();
+            printf("%s\n","done");
+            v72.release();
+            v73.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v76;
+        v76 = reinterpret_cast<float *>(&v0[16384ull]);
+        method_1(v76, v64);
+        int v78;
+        v78 = threadIdx.x;
+        bool v79;
+        v79 = v78 == 0l;
+        if (v79){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v80 = console_lock;
+            auto v81 = cooperative_groups::coalesced_threads();
+            v80.acquire();
+            printf("%s\n","done");
+            v80.release();
+            v81.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v84;
+        v84 = reinterpret_cast<float *>(&v0[24576ull]);
+        method_2(v84, v76);
+        int v86;
+        v86 = threadIdx.x;
+        bool v87;
+        v87 = v86 == 0l;
+        if (v87){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v88 = console_lock;
+            auto v89 = cooperative_groups::coalesced_threads();
+            v88.acquire();
+            printf("%s\n","done");
+            v88.release();
+            v89.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v92;
+        v92 = reinterpret_cast<float *>(&v1[1048576ull]);
         assert("Tensor range check" && 0 <= v9 && v9 < 16l);
-        float * v28;
-        v28 = reinterpret_cast<float *>(&v0[32768ull]);
-        int v30;
-        v30 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v30 && v30 < 1l);
-        int v31;
-        v31 = 2048l * v30;
-        int v32;
-        v32 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v32 && v32 < 1l);
-        int v33;
-        v33 = 2048l * v32;
-        method_0(v26, v15, v28, v33, v24, v31);
-        float * v34;
-        v34 = reinterpret_cast<float *>(&v0[40960ull]);
-        method_1(v34, v28);
-        float * v36;
-        v36 = reinterpret_cast<float *>(&v0[49152ull]);
-        method_2(v36, v34);
-        float * v38;
-        v38 = reinterpret_cast<float *>(&v1[2097152ull]);
+        float * v94;
+        v94 = reinterpret_cast<float *>(&v0[32768ull]);
+        int v96;
+        v96 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v96 && v96 < 1l);
+        int v97;
+        v97 = 2048l * v96;
+        int v98;
+        v98 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v98 && v98 < 1l);
+        int v99;
+        v99 = 2048l * v98;
+        method_0(v92, v63, v94, v99, v84, v97);
+        int v100;
+        v100 = threadIdx.x;
+        bool v101;
+        v101 = v100 == 0l;
+        if (v101){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v102 = console_lock;
+            auto v103 = cooperative_groups::coalesced_threads();
+            v102.acquire();
+            printf("%s\n","done");
+            v102.release();
+            v103.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v106;
+        v106 = reinterpret_cast<float *>(&v0[40960ull]);
+        method_1(v106, v94);
+        int v108;
+        v108 = threadIdx.x;
+        bool v109;
+        v109 = v108 == 0l;
+        if (v109){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v110 = console_lock;
+            auto v111 = cooperative_groups::coalesced_threads();
+            v110.acquire();
+            printf("%s\n","done");
+            v110.release();
+            v111.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v114;
+        v114 = reinterpret_cast<float *>(&v0[49152ull]);
+        method_2(v114, v106);
+        int v116;
+        v116 = threadIdx.x;
+        bool v117;
+        v117 = v116 == 0l;
+        if (v117){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v118 = console_lock;
+            auto v119 = cooperative_groups::coalesced_threads();
+            v118.acquire();
+            printf("%s\n","done");
+            v118.release();
+            v119.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v122;
+        v122 = reinterpret_cast<float *>(&v1[2097152ull]);
         assert("Tensor range check" && 0 <= v9 && v9 < 16l);
-        float * v40;
-        v40 = reinterpret_cast<float *>(&v0[57344ull]);
-        int v42;
-        v42 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v42 && v42 < 1l);
-        int v43;
-        v43 = 2048l * v42;
-        int v44;
-        v44 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v44 && v44 < 1l);
-        int v45;
-        v45 = 2048l * v44;
-        method_0(v38, v15, v40, v45, v36, v43);
-        float * v46;
-        v46 = reinterpret_cast<float *>(&v0[65536ull]);
+        float * v124;
+        v124 = reinterpret_cast<float *>(&v0[57344ull]);
+        int v126;
+        v126 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v126 && v126 < 1l);
+        int v127;
+        v127 = 2048l * v126;
+        int v128;
+        v128 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v128 && v128 < 1l);
+        int v129;
+        v129 = 2048l * v128;
+        method_0(v122, v63, v124, v129, v114, v127);
+        int v130;
+        v130 = threadIdx.x;
+        bool v131;
+        v131 = v130 == 0l;
+        if (v131){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v132 = console_lock;
+            auto v133 = cooperative_groups::coalesced_threads();
+            v132.acquire();
+            printf("%s\n","done");
+            v132.release();
+            v133.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
+        float * v136;
+        v136 = reinterpret_cast<float *>(&v0[65536ull]);
         assert("Tensor range check" && 0 <= v9 && v9 < 16l);
-        int v48;
-        v48 = 2048l * v9;
-        int * v49;
-        v49 = reinterpret_cast<int *>(&v0[196608ull]);
+        int v138;
+        v138 = 2048l * v9;
+        int * v139;
+        v139 = reinterpret_cast<int *>(&v0[196608ull]);
         assert("Tensor range check" && 0 <= v9 && v9 < 16l);
-        int v51;
-        v51 = 16l * v9;
-        method_3(v49, v51, v46, v48, v40, v8);
+        int v141;
+        v141 = 16l * v9;
+        method_3(v139, v141, v136, v138, v124, v8);
+        int v142;
+        v142 = threadIdx.x;
+        bool v143;
+        v143 = v142 == 0l;
+        if (v143){
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v144 = console_lock;
+            auto v145 = cooperative_groups::coalesced_threads();
+            v144.acquire();
+            printf("%s\n","done");
+            v144.release();
+            v145.sync() ;
+        } else {
+        }
+        asm("barrier.cta.sync %0;" :: "r"(0l));
         v9 += 1l ;
     }
     return ;
@@ -2225,8 +2451,8 @@ from typing import NamedTuple, Union, Callable, Tuple
 i8 = i16 = i32 = i64 = u8 = u16 = u32 = u64 = int; f32 = f64 = float; char = string = str
 
 options = []
-options.append('--diag-suppress=550,20012,68')
 options.append('--dopt=on')
+options.append('--diag-suppress=550,20012,68')
 options.append('--restrict')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')

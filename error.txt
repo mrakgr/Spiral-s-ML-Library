@@ -1,0 +1,151 @@
+Error trace on line: 188, column: 33 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
+                                ^
+Error trace on line: 188, column: 43 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
+                                          ^
+Error trace on line: 188, column: 45 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
+                                            ^
+Error trace on line: 188, column: 55 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
+                                                      ^
+Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match hashmapm.try_get h k with
+    ^
+Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 68, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 68, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 68, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 184, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            match k with
+            ^
+Error trace on line: 185, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . g k out
+              ^
+Error trace on line: 186, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. _,a,out) => f a . g k out
+              ^
+Error trace on line: 187, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. _,a,out) => f a . g k out
+              ^
+Error trace on line: 188, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
+              ^
+Error trace on line: 189, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => f a . f b . g k None
+              ^
+Error trace on line: 189, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => f a . f b . g k None
+                          ^
+Error trace on line: 189, column: 35 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => f a . f b . g k None
+                                  ^
+Error trace on line: 189, column: 41 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => f a . f b . g k None
+                                        ^
+Error trace on line: 189, column: 47 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => f a . f b . g k None
+                                              ^
+Error trace on line: 171, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        match out with
+        ^
+Error trace on line: 172, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | Some x => f x
+          ^
+Error trace on line: 173, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | None =>
+          ^
+Error trace on line: 181, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            hashmapm.add h_offset_output k (loop (get_dim_pair k))
+            ^
+Error trace on line: 181, column: 45 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            hashmapm.add h_offset_output k (loop (get_dim_pair k))
+                                            ^
+Error trace on line: 181, column: 51 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            hashmapm.add h_offset_output k (loop (get_dim_pair k))
+                                                  ^
+Error trace on line: 169, column: 26 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl get_dim_pair x = get_dim_pair dims x
+                         ^
+Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match hashmapm.try_get h k with
+    ^
+Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 68, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 68, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 68, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 86, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockRowMapReduce(exists a. _, a, out) =>
+          ^
+Error trace on line: 95, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | Pair(a,b) => D_P(f' a, f' b)
+          ^
+Error trace on line: 96, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockMap(exists a. _, a, out) => 
+          ^
+Error trace on line: 101, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockRowMap(exists a. _, a, out) => 
+          ^
+Error trace on line: 106, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockRowReduce(exists a. _, a, out) => 
+          ^
+Error trace on line: 111, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockMatmul(a,b) =>
+          ^
+Error trace on line: 111, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | BlockMatmul(a,b) =>
+                      ^
+Error trace on line: 112, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            inl (q,m,k as a) = f a
+            ^
+Error trace on line: 112, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            inl (q,m,k as a) = f a
+                 ^
+Error trace on line: 112, column: 20 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            inl (q,m,k as a) = f a
+                   ^
+Error trace on line: 112, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            inl (q,m,k as a) = f a
+                          ^
+Error trace on line: 113, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            assert (q = blocks_per_grid()) "The batch dimension in the matmul node needs to equal the number of blocks per grid."
+            ^
+Error trace on line: 114, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            inl (n,k') = f b
+            ^
+Error trace on line: 114, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            inl (n,k') = f b
+                 ^
+Error trace on line: 115, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
+            ^
+Error trace on line: 131, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 266, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 266, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+The inner dimensions of the matrix multiplication node have to be equal.

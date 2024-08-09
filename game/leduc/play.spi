@@ -205,7 +205,7 @@ inl main() =
 
             run' {shared_mem=model.game_graph() |> ml.models.smem_used} fun () =>
                 inl c : _ int = refm.create_shared_var (const threads_per_block())
-                inl from = rangem.threads_in_grid().from
+                inl from = rangem.threads_in_block().from
                 if from = 0 then
                     inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
                     // When converting the state to internal form, the refs will point to the original.
@@ -214,10 +214,11 @@ inl main() =
 
                 // nn model loop
                 intrinsic.atomic_add_ref c -1
-                loop.while' (fun () => refm.deref c > 0)
+                loop.while' (const true)
                     (fun () =>
                         inl model = ml.models.from_model_data model.game_graph() neural.model_data
                         ml.models.run model None |> ignore
+                        if refm.deref c = 0 then loop.break()
                         )
 
 

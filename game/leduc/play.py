@@ -258,7 +258,7 @@ __device__ Tuple9 method_24(float v0, int v1, float v2, int v3);
 __device__ void method_23(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5);
 __device__ unsigned int loop_26(unsigned int v0, curandStatePhilox4_32_10_t & v1);
 __device__ int int_range_25(int v0, int v1, curandStatePhilox4_32_10_t & v2);
-__device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2);
+__device__ Tuple7 noinline_run_21(unsigned char * v0, unsigned char * v1, Union9 v2);
 __device__ void method_27(Union1 v0);
 struct Union13;
 __device__ int tag_29(Union3 v0);
@@ -2470,7 +2470,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                     }
                     v146 += 1l ;
                 }
-                barrier_cta_sync 0;
+                asm("barrier.cta.sync %0;" :: "r"(0l));
                 wmma::fragment<wmma::matrix_a, 16l, 16l, 8l, wmma::precision::tf32, wmma::row_major> v163[1l];
                 wmma::fragment<wmma::matrix_b, 16l, 16l, 8l, wmma::precision::tf32, wmma::col_major> v164[1l];
                 int v165;
@@ -2645,7 +2645,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                     }
                     v195 += 1l ;
                 }
-                barrier_cta_sync 0;
+                asm("barrier.cta.sync %0;" :: "r"(0l));
                 int v225;
                 v225 = 0l;
                 #pragma unroll
@@ -2710,7 +2710,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                 }
                 v237 += 1l ;
             }
-            barrier_cta_sync 0;
+            asm("barrier.cta.sync %0;" :: "r"(0l));
             int v248;
             v248 = threadIdx.x;
             bool v249;
@@ -2779,7 +2779,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                 }
                 v266 += 1l ;
             }
-            barrier_cta_sync 0;
+            asm("barrier.cta.sync %0;" :: "r"(0l));
             // Poping the loop unrolling to: 0
             v67 += 1l ;
         }
@@ -3474,35 +3474,108 @@ __device__ void method_23(int * v0, int v1, float * v2, int v3, float * v4, cura
         float v262; int v263;
         Tuple9 tmp18 = cooperative_groups::reduce(v260, Tuple9{v245, v246}, v261);
         v262 = tmp18.v0; v263 = tmp18.v1;
-        assert("Tensor range check" && 0 <= v30 && v30 < 32l);
-        int v264;
-        v264 = v32 + v28;
-        int v265;
-        v265 = 0l;
-        while (while_method_6(v265)){
-            assert("Tensor range check" && 0 <= v265 && v265 < 1l);
-            int v267;
-            v267 = 128l * v265;
+        bool v264;
+        v264 = v263 > 11l;
+        if (v264){
+            int v265;
+            v265 = threadIdx.x;
+            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v266 = console_lock;
+            auto v267 = cooperative_groups::coalesced_threads();
+            v266.acquire();
             int v268;
-            v268 = v267 + v264;
-            assert("Tensor range check" && 0 <= v265 && v265 < 1l);
+            v268 = 0l;
+            printf("{%s = %d; %s = %d; %s = %c","output_id", v263, "tid", v265, "x", '[');
             int v269;
-            v269 = 4l * v265;
-            int4* v270;
-            v270 = reinterpret_cast<int4*>(v165 + v269);
-            int4* v271;
-            v271 = reinterpret_cast<int4*>(v2 + v268);
-            assert("Pointer alignment check" && (unsigned long long)(v270) % 4l == 0 && (unsigned long long)(v271) % 4l == 0);
-            *v271 = *v270;
-            v265 += 1l ;
+            v269 = 0l;
+            while (while_method_6(v269)){
+                int v271;
+                v271 = v268;
+                bool v272;
+                v272 = v271 >= 100l;
+                if (v272){
+                    printf("%s"," ...");
+                    break;
+                } else {
+                }
+                bool v273;
+                v273 = v269 == 0l;
+                bool v274;
+                v274 = v273 != true;
+                if (v274){
+                    printf("%s","; ");
+                } else {
+                }
+                printf("%c",'[');
+                int v275;
+                v275 = 0l;
+                while (while_method_4(v275)){
+                    int v277;
+                    v277 = v268;
+                    bool v278;
+                    v278 = v277 >= 100l;
+                    if (v278){
+                        printf("%s"," ...");
+                        break;
+                    } else {
+                    }
+                    bool v279;
+                    v279 = v275 == 0l;
+                    bool v280;
+                    v280 = v279 != true;
+                    if (v280){
+                        printf("%s","; ");
+                    } else {
+                    }
+                    int v281;
+                    v281 = v268 + 1l;
+                    v268 = v281;
+                    int v282;
+                    v282 = v269 * 4l;
+                    int v283;
+                    v283 = v282 + v275;
+                    float v284;
+                    v284 = v236[v283];
+                    printf("%f",v284);
+                    v275 += 1l ;
+                }
+                printf("%c",']');
+                v269 += 1l ;
+            }
+            printf("%c",']');
+            printf("}\n");
+            v266.release();
+            v267.sync() ;
+        } else {
         }
         assert("Tensor range check" && 0 <= v30 && v30 < 32l);
-        int v272;
-        v272 = v30 + v29;
-        v0[v272] = v263;
+        int v316;
+        v316 = v32 + v28;
+        int v317;
+        v317 = 0l;
+        while (while_method_6(v317)){
+            assert("Tensor range check" && 0 <= v317 && v317 < 1l);
+            int v319;
+            v319 = 128l * v317;
+            int v320;
+            v320 = v319 + v316;
+            assert("Tensor range check" && 0 <= v317 && v317 < 1l);
+            int v321;
+            v321 = 4l * v317;
+            int4* v322;
+            v322 = reinterpret_cast<int4*>(v165 + v321);
+            int4* v323;
+            v323 = reinterpret_cast<int4*>(v2 + v320);
+            assert("Pointer alignment check" && (unsigned long long)(v322) % 4l == 0 && (unsigned long long)(v323) % 4l == 0);
+            *v323 = *v322;
+            v317 += 1l ;
+        }
+        assert("Tensor range check" && 0 <= v30 && v30 < 32l);
+        int v324;
+        v324 = v30 + v29;
+        v0[v324] = v263;
         v30 += 1l ;
     }
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     return ;
 }
 __device__ unsigned int loop_26(unsigned int v0, curandStatePhilox4_32_10_t & v1){
@@ -3537,212 +3610,195 @@ __device__ int int_range_25(int v0, int v1, curandStatePhilox4_32_10_t & v2){
     v8 = (int)v7;
     return v8;
 }
-__device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2){
-    int v3;
-    v3 = threadIdx.x;
-    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v4 = console_lock;
-    auto v5 = cooperative_groups::coalesced_threads();
-    v4.acquire();
-    v4.release();
-    v5.sync() ;
-    printf("{%s = %d}\n","tid_before", v3);
-    asm("bar.cta.sync 0, 32;");
-    printf("{%s = %d}\n","tid_before2", v3);
-    int v8;
-    v8 = threadIdx.x;
-    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v9 = console_lock;
-    auto v10 = cooperative_groups::coalesced_threads();
-    v9.acquire();
-    printf("{%s = %d}\n","tid_after", v8);
-    v9.release();
-    v10.sync() ;
-    float * v13;
-    v13 = reinterpret_cast<float *>(&v0[32768ull]);
-    float * v15;
-    v15 = reinterpret_cast<float *>(&v0[0ull]);
-    int * v17;
-    v17 = reinterpret_cast<int *>(&v0[98304ull]);
-    unsigned long long v19;
-    v19 = clock64();
-    int v20;
-    v20 = threadIdx.x;
+__device__ __noinline__ Tuple7 noinline_run_21(unsigned char * v0, unsigned char * v1, Union9 v2){
+    asm("barrier.cta.sync %0;" :: "r"(0l));
+    float * v3;
+    v3 = reinterpret_cast<float *>(&v0[32768ull]);
+    float * v5;
+    v5 = reinterpret_cast<float *>(&v0[0ull]);
+    int * v7;
+    v7 = reinterpret_cast<int *>(&v0[98304ull]);
+    unsigned long long v9;
+    v9 = clock64();
+    int v10;
+    v10 = threadIdx.x;
+    int v11;
+    v11 = blockIdx.x;
+    int v12;
+    v12 = v11 * 32l;
+    int v13;
+    v13 = v10 + v12;
+    unsigned long long v14;
+    v14 = (unsigned long long)v13;
+    curandStatePhilox4_32_10_t v15;
+    curand_init(v9,v14,0ull,&v15);
+    float * v16;
+    v16 = reinterpret_cast<float *>(&v0[0ull]);
+    int v18;
+    v18 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v18 && v18 < 1l);
+    int v19;
+    v19 = 4096l * v18;
+    unsigned long long v20;
+    v20 = clock64();
     int v21;
-    v21 = blockIdx.x;
+    v21 = threadIdx.x;
     int v22;
-    v22 = v21 * 32l;
+    v22 = blockIdx.x;
     int v23;
-    v23 = v20 + v22;
-    unsigned long long v24;
-    v24 = (unsigned long long)v23;
-    curandStatePhilox4_32_10_t v25;
-    curand_init(v19,v24,0ull,&v25);
-    float * v26;
-    v26 = reinterpret_cast<float *>(&v0[0ull]);
+    v23 = v22 * 32l;
+    int v24;
+    v24 = v21 + v23;
+    unsigned long long v25;
+    v25 = (unsigned long long)v24;
+    curandStatePhilox4_32_10_t v26;
+    curand_init(v20,v25,0ull,&v26);
+    int v27;
+    v27 = threadIdx.x;
     int v28;
-    v28 = blockIdx.x;
-    assert("Tensor range check" && 0 <= v28 && v28 < 1l);
-    int v29;
-    v29 = 4096l * v28;
-    unsigned long long v30;
-    v30 = clock64();
-    int v31;
-    v31 = threadIdx.x;
-    int v32;
-    v32 = blockIdx.x;
-    int v33;
-    v33 = v32 * 32l;
-    int v34;
-    v34 = v31 + v33;
-    unsigned long long v35;
-    v35 = (unsigned long long)v34;
-    curandStatePhilox4_32_10_t v36;
-    curand_init(v30,v35,0ull,&v36);
-    int v37;
-    v37 = threadIdx.x;
-    int v38;
-    v38 = v37;
-    while (while_method_3(v38)){
-        bool v40;
-        v40 = 0l <= v38;
-        bool v41;
-        v41 = v40 == false;
-        if (v41){
-            assert("The index needs to be zero or positive." && v40);
+    v28 = v27;
+    while (while_method_3(v28)){
+        bool v30;
+        v30 = 0l <= v28;
+        bool v31;
+        v31 = v30 == false;
+        if (v31){
+            assert("The index needs to be zero or positive." && v30);
         } else {
         }
-        int v43;
-        v43 = v38 % 128l;
-        int v44;
-        v44 = v38 / 128l;
-        bool v45;
-        v45 = v44 < 32l;
-        bool v46;
-        v46 = v45 == false;
-        if (v46){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v45);
+        int v33;
+        v33 = v28 % 128l;
+        int v34;
+        v34 = v28 / 128l;
+        bool v35;
+        v35 = v34 < 32l;
+        bool v36;
+        v36 = v35 == false;
+        if (v36){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v35);
         } else {
         }
-        assert("Tensor range check" && 0 <= v44 && v44 < 32l);
-        assert("Tensor range check" && 0 <= v43 && v43 < 128l);
-        int v48;
-        v48 = v43 + v29;
-        int v49;
-        v49 = 128l * v44;
-        int v50;
-        v50 = v49 + v48;
-        v26[v50] = 0.0f;
-        v38 += 32l ;
+        assert("Tensor range check" && 0 <= v34 && v34 < 32l);
+        assert("Tensor range check" && 0 <= v33 && v33 < 128l);
+        int v38;
+        v38 = v33 + v19;
+        int v39;
+        v39 = 128l * v34;
+        int v40;
+        v40 = v39 + v38;
+        v16[v40] = 0.0f;
+        v28 += 32l ;
     }
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     switch (v2.tag) {
         case 0: { // None
             break;
         }
         case 1: { // Some
-            Union6 v51 = v2.case1.v0; bool v52 = v2.case1.v1; static_array<Union3,2l> v53 = v2.case1.v2; int v54 = v2.case1.v3; static_array<int,2l> v55 = v2.case1.v4; int v56 = v2.case1.v5; static_array_list<Union7,32l> v57 = v2.case1.v6;
-            int v58;
-            v58 = threadIdx.x;
-            assert("Tensor range check" && 0 <= v58 && v58 < 32l);
-            int v59;
-            v59 = 128l * v58;
-            int v60;
-            v60 = v59 + v29;
-            static_array_list<Union11,10l> v61;
-            v61 = static_array_list<Union11,10l>{};
-            int v63;
-            v63 = v57.length;
-            int v64;
-            v64 = 0l;
-            while (while_method_1(v63, v64)){
-                Union7 v66;
-                v66 = v57[v64];
-                Union12 v85;
-                switch (v66.tag) {
+            Union6 v41 = v2.case1.v0; bool v42 = v2.case1.v1; static_array<Union3,2l> v43 = v2.case1.v2; int v44 = v2.case1.v3; static_array<int,2l> v45 = v2.case1.v4; int v46 = v2.case1.v5; static_array_list<Union7,32l> v47 = v2.case1.v6;
+            int v48;
+            v48 = threadIdx.x;
+            assert("Tensor range check" && 0 <= v48 && v48 < 32l);
+            int v49;
+            v49 = 128l * v48;
+            int v50;
+            v50 = v49 + v19;
+            static_array_list<Union11,10l> v51;
+            v51 = static_array_list<Union11,10l>{};
+            int v53;
+            v53 = v47.length;
+            int v54;
+            v54 = 0l;
+            while (while_method_1(v53, v54)){
+                Union7 v56;
+                v56 = v47[v54];
+                Union12 v75;
+                switch (v56.tag) {
                     case 0: { // CommunityCardIs
-                        Union3 v75 = v66.case0.v0;
-                        Union11 v76;
-                        v76 = Union11{Union11_1{v75}};
-                        v85 = Union12{Union12_1{v76}};
+                        Union3 v65 = v56.case0.v0;
+                        Union11 v66;
+                        v66 = Union11{Union11_1{v65}};
+                        v75 = Union12{Union12_1{v66}};
                         break;
                     }
                     case 1: { // PlayerAction
-                        int v78 = v66.case1.v0; Union1 v79 = v66.case1.v1;
-                        Union11 v80;
-                        v80 = Union11{Union11_0{v79}};
-                        v85 = Union12{Union12_1{v80}};
+                        int v68 = v56.case1.v0; Union1 v69 = v56.case1.v1;
+                        Union11 v70;
+                        v70 = Union11{Union11_0{v69}};
+                        v75 = Union12{Union12_1{v70}};
                         break;
                     }
                     case 2: { // PlayerGotCard
-                        int v68 = v66.case2.v0; Union3 v69 = v66.case2.v1;
-                        bool v70;
-                        v70 = v68 == v54;
-                        if (v70){
-                            Union11 v71;
-                            v71 = Union11{Union11_1{v69}};
-                            v85 = Union12{Union12_1{v71}};
+                        int v58 = v56.case2.v0; Union3 v59 = v56.case2.v1;
+                        bool v60;
+                        v60 = v58 == v44;
+                        if (v60){
+                            Union11 v61;
+                            v61 = Union11{Union11_1{v59}};
+                            v75 = Union12{Union12_1{v61}};
                         } else {
-                            v85 = Union12{Union12_0{}};
+                            v75 = Union12{Union12_0{}};
                         }
                         break;
                     }
                     default: {
-                        v85 = Union12{Union12_0{}};
+                        v75 = Union12{Union12_0{}};
                     }
                 }
-                switch (v85.tag) {
+                switch (v75.tag) {
                     case 0: { // None
                         break;
                     }
                     case 1: { // Some
-                        Union11 v86 = v85.case1.v0;
-                        v61.push(v86);
+                        Union11 v76 = v75.case1.v0;
+                        v51.push(v76);
                         break;
                     }
                     default: {
                         assert("Invalid tag." && false);
                     }
                 }
-                v64 += 1l ;
+                v54 += 1l ;
             }
-            float * v87;
-            v87 = v26+v60;
-            int v89;
-            v89 = v61.length;
-            bool v90;
-            v90 = v89 == 0l;
-            if (v90){
-                v87[0l] = 1.0f;
+            float * v77;
+            v77 = v16+v50;
+            int v79;
+            v79 = v51.length;
+            bool v80;
+            v80 = v79 == 0l;
+            if (v80){
+                v77[0l] = 1.0f;
             } else {
             }
-            int v91;
-            v91 = v61.length;
-            int v92;
-            v92 = 0l;
-            while (while_method_1(v91, v92)){
-                Union11 v94;
-                v94 = v61[v92];
-                int v96;
-                v96 = v92 * 6l;
-                int v97;
-                v97 = 1l + v96;
-                switch (v94.tag) {
+            int v81;
+            v81 = v51.length;
+            int v82;
+            v82 = 0l;
+            while (while_method_1(v81, v82)){
+                Union11 v84;
+                v84 = v51[v82];
+                int v86;
+                v86 = v82 * 6l;
+                int v87;
+                v87 = 1l + v86;
+                switch (v84.tag) {
                     case 0: { // C1of2
-                        Union1 v98 = v94.case0.v0;
-                        switch (v98.tag) {
+                        Union1 v88 = v84.case0.v0;
+                        switch (v88.tag) {
                             case 0: { // Call
-                                v87[v97] = 1.0f;
+                                v77[v87] = 1.0f;
                                 break;
                             }
                             case 1: { // Fold
-                                int v99;
-                                v99 = v97 + 1l;
-                                v87[v99] = 1.0f;
+                                int v89;
+                                v89 = v87 + 1l;
+                                v77[v89] = 1.0f;
                                 break;
                             }
                             case 2: { // Raise
-                                int v100;
-                                v100 = v97 + 2l;
-                                v87[v100] = 1.0f;
+                                int v90;
+                                v90 = v87 + 2l;
+                                v77[v90] = 1.0f;
                                 break;
                             }
                             default: {
@@ -3752,24 +3808,24 @@ __device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2){
                         break;
                     }
                     case 1: { // C2of2
-                        Union3 v101 = v94.case1.v0;
-                        int v102;
-                        v102 = v97 + 3l;
-                        switch (v101.tag) {
+                        Union3 v91 = v84.case1.v0;
+                        int v92;
+                        v92 = v87 + 3l;
+                        switch (v91.tag) {
                             case 0: { // Jack
-                                v87[v102] = 1.0f;
+                                v77[v92] = 1.0f;
                                 break;
                             }
                             case 1: { // King
-                                int v103;
-                                v103 = v102 + 1l;
-                                v87[v103] = 1.0f;
+                                int v93;
+                                v93 = v92 + 1l;
+                                v77[v93] = 1.0f;
                                 break;
                             }
                             case 2: { // Queen
-                                int v104;
-                                v104 = v102 + 2l;
-                                v87[v104] = 1.0f;
+                                int v94;
+                                v94 = v92 + 2l;
+                                v77[v94] = 1.0f;
                                 break;
                             }
                             default: {
@@ -3782,7 +3838,7 @@ __device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2){
                         assert("Invalid tag." && false);
                     }
                 }
-                v92 += 1l ;
+                v82 += 1l ;
             }
             break;
         }
@@ -3790,130 +3846,130 @@ __device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2){
             assert("Invalid tag." && false);
         }
     }
-    barrier_cta_sync 0;
-    int v105;
-    v105 = 0l;
-    while (while_method_4(v105)){
-        float * v107;
-        v107 = reinterpret_cast<float *>(&v0[0ull]);
-        float * v109;
-        v109 = reinterpret_cast<float *>(&v1[0ull]);
-        assert("Tensor range check" && 0 <= v105 && v105 < 4l);
-        int v111;
-        v111 = 16384l * v105;
-        float * v112;
-        v112 = reinterpret_cast<float *>(&v0[16384ull]);
-        int v114;
-        v114 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v114 && v114 < 1l);
-        int v115;
-        v115 = 4096l * v114;
-        int v116;
-        v116 = blockIdx.x;
-        assert("Tensor range check" && 0 <= v116 && v116 < 1l);
-        int v117;
-        v117 = 4096l * v116;
-        method_22(v109, v111, v112, v117, v107, v115);
-        float * v118;
-        v118 = reinterpret_cast<float *>(&v0[32768ull]);
-        assert("Tensor range check" && 0 <= v105 && v105 < 4l);
-        int v120;
-        v120 = 4096l * v105;
-        int * v121;
-        v121 = reinterpret_cast<int *>(&v0[98304ull]);
-        assert("Tensor range check" && 0 <= v105 && v105 < 4l);
-        int v123;
-        v123 = 32l * v105;
-        method_23(v121, v123, v118, v120, v112, v36);
-        v105 += 1l ;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
+    int v95;
+    v95 = 0l;
+    while (while_method_4(v95)){
+        float * v97;
+        v97 = reinterpret_cast<float *>(&v0[0ull]);
+        float * v99;
+        v99 = reinterpret_cast<float *>(&v1[0ull]);
+        assert("Tensor range check" && 0 <= v95 && v95 < 4l);
+        int v101;
+        v101 = 16384l * v95;
+        float * v102;
+        v102 = reinterpret_cast<float *>(&v0[16384ull]);
+        int v104;
+        v104 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v104 && v104 < 1l);
+        int v105;
+        v105 = 4096l * v104;
+        int v106;
+        v106 = blockIdx.x;
+        assert("Tensor range check" && 0 <= v106 && v106 < 1l);
+        int v107;
+        v107 = 4096l * v106;
+        method_22(v99, v101, v102, v107, v97, v105);
+        float * v108;
+        v108 = reinterpret_cast<float *>(&v0[32768ull]);
+        assert("Tensor range check" && 0 <= v95 && v95 < 4l);
+        int v110;
+        v110 = 4096l * v95;
+        int * v111;
+        v111 = reinterpret_cast<int *>(&v0[98304ull]);
+        assert("Tensor range check" && 0 <= v95 && v95 < 4l);
+        int v113;
+        v113 = 32l * v95;
+        method_23(v111, v113, v108, v110, v102, v26);
+        v95 += 1l ;
     }
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
+    int v114;
+    v114 = 0l;
+    int v115;
+    v115 = 4l;
+    int v116;
+    v116 = int_range_25(v115, v114, v26);
+    float * v117;
+    v117 = reinterpret_cast<float *>(&v0[32768ull]);
+    int * v119;
+    v119 = reinterpret_cast<int *>(&v0[98304ull]);
+    assert("Tensor range check" && 0 <= v116 && v116 < 4l);
+    int v121;
+    v121 = 32l * v116;
+    int v122;
+    v122 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v122 && v122 < 1l);
+    int v123;
+    v123 = 32l * v122;
     int v124;
-    v124 = 0l;
+    v124 = v123 + v121;
     int v125;
-    v125 = 4l;
+    v125 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v125 && v125 < 32l);
     int v126;
-    v126 = int_range_25(v125, v124, v36);
-    float * v127;
-    v127 = reinterpret_cast<float *>(&v0[32768ull]);
-    int * v129;
-    v129 = reinterpret_cast<int *>(&v0[98304ull]);
-    assert("Tensor range check" && 0 <= v126 && v126 < 4l);
-    int v131;
-    v131 = 32l * v126;
-    int v132;
-    v132 = blockIdx.x;
-    assert("Tensor range check" && 0 <= v132 && v132 < 1l);
-    int v133;
-    v133 = 32l * v132;
-    int v134;
-    v134 = v133 + v131;
-    int v135;
-    v135 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v135 && v135 < 32l);
-    int v136;
-    v136 = v135 + v134;
-    int v137;
-    v137 = v129[v136];
-    bool v138;
-    v138 = 0l == v137;
-    Union10 v147;
-    if (v138){
-        v147 = Union10{Union10_1{}};
+    v126 = v125 + v124;
+    int v127;
+    v127 = v119[v126];
+    bool v128;
+    v128 = 0l == v127;
+    Union10 v137;
+    if (v128){
+        v137 = Union10{Union10_1{}};
     } else {
-        bool v140;
-        v140 = 1l == v137;
-        if (v140){
-            v147 = Union10{Union10_0{}};
+        bool v130;
+        v130 = 1l == v127;
+        if (v130){
+            v137 = Union10{Union10_0{}};
         } else {
-            bool v142;
-            v142 = 2l == v137;
-            if (v142){
-                v147 = Union10{Union10_2{}};
+            bool v132;
+            v132 = 2l == v127;
+            if (v132){
+                v137 = Union10{Union10_2{}};
             } else {
                 printf("%s\n", "Invalid output id in the Leduc model.");
                 asm("exit;");
             }
         }
     }
+    int v138;
+    v138 = blockIdx.x;
+    int v139;
+    v139 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v116 && v116 < 4l);
+    assert("Tensor range check" && 0 <= v138 && v138 < 1l);
+    assert("Tensor range check" && 0 <= v139 && v139 < 32l);
+    assert("Tensor range check" && 0 <= v127 && v127 < 128l);
+    int v140;
+    v140 = 128l * v139;
+    int v141;
+    v141 = v140 + v127;
+    int v142;
+    v142 = 4096l * v138;
+    int v143;
+    v143 = v142 + v141;
+    int v144;
+    v144 = 4096l * v116;
+    int v145;
+    v145 = v144 + v143;
+    float v146;
+    v146 = v117[v145];
+    int v147;
+    v147 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v147 && v147 < 1l);
     int v148;
-    v148 = blockIdx.x;
+    v148 = 4096l * v147;
     int v149;
     v149 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v126 && v126 < 4l);
-    assert("Tensor range check" && 0 <= v148 && v148 < 1l);
     assert("Tensor range check" && 0 <= v149 && v149 < 32l);
-    assert("Tensor range check" && 0 <= v137 && v137 < 128l);
     int v150;
     v150 = 128l * v149;
     int v151;
-    v151 = v150 + v137;
+    v151 = v150 + v148;
+    assert("Tensor range check" && 0 <= v127 && v127 < 128l);
     int v152;
-    v152 = 4096l * v148;
-    int v153;
-    v153 = v152 + v151;
-    int v154;
-    v154 = 4096l * v126;
-    int v155;
-    v155 = v154 + v153;
-    float v156;
-    v156 = v127[v155];
-    int v157;
-    v157 = blockIdx.x;
-    assert("Tensor range check" && 0 <= v157 && v157 < 1l);
-    int v158;
-    v158 = 4096l * v157;
-    int v159;
-    v159 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v159 && v159 < 32l);
-    int v160;
-    v160 = 128l * v159;
-    int v161;
-    v161 = v160 + v158;
-    assert("Tensor range check" && 0 <= v137 && v137 < 128l);
-    int v162;
-    v162 = v137 + v161;
-    return Tuple7{v147, v127, v162, 4096l, 4l, v156};
+    v152 = v127 + v151;
+    return Tuple7{v137, v117, v152, 4096l, 4l, v146};
 }
 __device__ void method_27(Union1 v0){
     switch (v0.tag) {
@@ -4187,7 +4243,7 @@ __device__ void play_loop_20(unsigned char * v0, unsigned long long v1, unsigned
                                 Union9 v69;
                                 v69 = Union9{Union9_1{v49, v50, v51, v52, v53, v54, v64}};
                                 Union10 v70; float * v71; int v72; int v73; int v74; float v75;
-                                Tuple7 tmp19 = run__21(v0, v2, v69);
+                                Tuple7 tmp19 = noinline_run_21(v0, v2, v69);
                                 v70 = tmp19.v0; v71 = tmp19.v1; v72 = tmp19.v2; v73 = tmp19.v3; v74 = tmp19.v4; v75 = tmp19.v5;
                                 Union1 v98;
                                 switch (v70.tag) {
@@ -5546,15 +5602,12 @@ __device__ void f_32(unsigned char * v0, static_array_list<Union3,6l> v1, Union4
         }
     }
 }
-__device__ inline bool while_method_9(int & v0){
-    int v1 = v0;
-    bool v2;
-    v2 = v1 > 0l;
-    return v2;
+__device__ inline bool while_method_9(){
+    return true;
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsigned char * v2, unsigned long long v3, unsigned char * v4, unsigned long long v5) {
     __shared__ int v6;
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     int v7;
     v7 = threadIdx.x;
     bool v8;
@@ -5563,46 +5616,40 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
         new(&v6) int{32l};
     } else {
     }
-    barrier_cta_sync 0;
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     int v9;
     v9 = threadIdx.x;
-    int v10;
-    v10 = blockIdx.x;
-    int v11;
-    v11 = v10 * 32l;
-    int v12;
-    v12 = v9 + v11;
-    bool v13;
-    v13 = v12 == 0l;
-    if (v13){
-        Union0 v14;
-        v14 = f_0(v1);
-        static_array_list<Union3,6l> v15; Union4 v16; static_array_list<Union7,32l> v17; static_array<Union2,2l> v18; Union8 v19;
+    bool v10;
+    v10 = v9 == 0l;
+    if (v10){
+        Union0 v11;
+        v11 = f_0(v1);
+        static_array_list<Union3,6l> v12; Union4 v13; static_array_list<Union7,32l> v14; static_array<Union2,2l> v15; Union8 v16;
         Tuple0 tmp10 = f_6(v0);
-        v15 = tmp10.v0; v16 = tmp10.v1; v17 = tmp10.v2; v18 = tmp10.v3; v19 = tmp10.v4;
-        Union8 & v20 = v19;
-        static_array<Union2,2l> & v21 = v18;
-        Union4 & v22 = v16;
-        static_array_list<Union3,6l> & v23 = v15;
-        static_array_list<Union7,32l> & v24 = v17;
-        switch (v14.tag) {
+        v12 = tmp10.v0; v13 = tmp10.v1; v14 = tmp10.v2; v15 = tmp10.v3; v16 = tmp10.v4;
+        Union8 & v17 = v16;
+        static_array<Union2,2l> & v18 = v15;
+        Union4 & v19 = v13;
+        static_array_list<Union3,6l> & v20 = v12;
+        static_array_list<Union7,32l> & v21 = v14;
+        switch (v11.tag) {
             case 0: { // ActionSelected
-                Union1 v73 = v14.case0.v0;
-                Union4 v74 = v22;
-                switch (v74.tag) {
+                Union1 v70 = v11.case0.v0;
+                Union4 v71 = v19;
+                switch (v71.tag) {
                     case 0: { // None
                         printf("%s\n", "The game hasn't been started in ActionSelected.");
                         asm("exit;");
                         break;
                     }
                     case 1: { // Some
-                        Union5 v75 = v74.case1.v0;
-                        switch (v75.tag) {
+                        Union5 v72 = v71.case1.v0;
+                        switch (v72.tag) {
                             case 2: { // Round
-                                Union6 v76 = v75.case2.v0; bool v77 = v75.case2.v1; static_array<Union3,2l> v78 = v75.case2.v2; int v79 = v75.case2.v3; static_array<int,2l> v80 = v75.case2.v4; int v81 = v75.case2.v5;
-                                Union5 v82;
-                                v82 = Union5{Union5_3{v76, v77, v78, v79, v80, v81, v73}};
-                                play_loop_20(v2, v3, v4, v5, v23, v22, v24, v21, v20, v82);
+                                Union6 v73 = v72.case2.v0; bool v74 = v72.case2.v1; static_array<Union3,2l> v75 = v72.case2.v2; int v76 = v72.case2.v3; static_array<int,2l> v77 = v72.case2.v4; int v78 = v72.case2.v5;
+                                Union5 v79;
+                                v79 = Union5{Union5_3{v73, v74, v75, v76, v77, v78, v70}};
+                                play_loop_20(v2, v3, v4, v5, v20, v19, v21, v18, v17, v79);
                                 break;
                             }
                             default: {
@@ -5619,108 +5666,115 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                 break;
             }
             case 1: { // PlayerChanged
-                static_array<Union2,2l> v72 = v14.case1.v0;
-                v21 = v72;
+                static_array<Union2,2l> v69 = v11.case1.v0;
+                v18 = v69;
                 break;
             }
             case 2: { // StartGame
-                static_array<Union2,2l> v25;
-                Union2 v27;
-                v27 = Union2{Union2_0{}};
-                v25[0l] = v27;
-                Union2 v29;
-                v29 = Union2{Union2_1{}};
-                v25[1l] = v29;
-                static_array_list<Union7,32l> v31;
-                v31 = static_array_list<Union7,32l>{};
-                static_array_list<Union3,6l> v33;
-                v33 = static_array_list<Union3,6l>{};
-                v33.unsafe_set_length(6l);
-                Union3 v35;
-                v35 = Union3{Union3_1{}};
-                v33[0l] = v35;
-                Union3 v37;
-                v37 = Union3{Union3_1{}};
-                v33[1l] = v37;
-                Union3 v39;
-                v39 = Union3{Union3_2{}};
-                v33[2l] = v39;
-                Union3 v41;
-                v41 = Union3{Union3_2{}};
-                v33[3l] = v41;
-                Union3 v43;
-                v43 = Union3{Union3_0{}};
-                v33[4l] = v43;
-                Union3 v45;
-                v45 = Union3{Union3_0{}};
-                v33[5l] = v45;
-                unsigned long long v47;
-                v47 = clock64();
-                curandStatePhilox4_32_10_t v48;
-                curand_init(v47,0ull,0ull,&v48);
-                int v49;
-                v49 = v33.length;
-                int v50;
-                v50 = v49 - 1l;
-                int v51;
-                v51 = 0l;
-                while (while_method_1(v50, v51)){
-                    int v53;
-                    v53 = v33.length;
-                    int v54;
-                    v54 = int_range_25(v53, v51, v48);
-                    Union3 v55;
-                    v55 = v33[v51];
-                    Union3 v57;
-                    v57 = v33[v54];
-                    v33[v51] = v57;
-                    v33[v54] = v55;
-                    v51 += 1l ;
+                static_array<Union2,2l> v22;
+                Union2 v24;
+                v24 = Union2{Union2_0{}};
+                v22[0l] = v24;
+                Union2 v26;
+                v26 = Union2{Union2_1{}};
+                v22[1l] = v26;
+                static_array_list<Union7,32l> v28;
+                v28 = static_array_list<Union7,32l>{};
+                static_array_list<Union3,6l> v30;
+                v30 = static_array_list<Union3,6l>{};
+                v30.unsafe_set_length(6l);
+                Union3 v32;
+                v32 = Union3{Union3_1{}};
+                v30[0l] = v32;
+                Union3 v34;
+                v34 = Union3{Union3_1{}};
+                v30[1l] = v34;
+                Union3 v36;
+                v36 = Union3{Union3_2{}};
+                v30[2l] = v36;
+                Union3 v38;
+                v38 = Union3{Union3_2{}};
+                v30[3l] = v38;
+                Union3 v40;
+                v40 = Union3{Union3_0{}};
+                v30[4l] = v40;
+                Union3 v42;
+                v42 = Union3{Union3_0{}};
+                v30[5l] = v42;
+                unsigned long long v44;
+                v44 = clock64();
+                curandStatePhilox4_32_10_t v45;
+                curand_init(v44,0ull,0ull,&v45);
+                int v46;
+                v46 = v30.length;
+                int v47;
+                v47 = v46 - 1l;
+                int v48;
+                v48 = 0l;
+                while (while_method_1(v47, v48)){
+                    int v50;
+                    v50 = v30.length;
+                    int v51;
+                    v51 = int_range_25(v50, v48, v45);
+                    Union3 v52;
+                    v52 = v30[v48];
+                    Union3 v54;
+                    v54 = v30[v51];
+                    v30[v48] = v54;
+                    v30[v51] = v52;
+                    v48 += 1l ;
                 }
-                Union8 v69;
-                v69 = Union8{Union8_0{}};
-                v20 = v69;
-                v21 = v25;
-                Union4 v70;
-                v70 = Union4{Union4_0{}};
-                v22 = v70;
-                v23 = v33;
-                v24 = v31;
-                Union5 v71;
-                v71 = Union5{Union5_1{}};
-                play_loop_20(v2, v3, v4, v5, v23, v22, v24, v21, v20, v71);
+                Union8 v66;
+                v66 = Union8{Union8_0{}};
+                v17 = v66;
+                v18 = v22;
+                Union4 v67;
+                v67 = Union4{Union4_0{}};
+                v19 = v67;
+                v20 = v30;
+                v21 = v28;
+                Union5 v68;
+                v68 = Union5{Union5_1{}};
+                play_loop_20(v2, v3, v4, v5, v20, v19, v21, v18, v17, v68);
                 break;
             }
             default: {
                 assert("Invalid tag." && false);
             }
         }
-        f_32(v0, v15, v16, v17, v18, v19);
+        f_32(v0, v12, v13, v14, v15, v16);
     } else {
     }
     atomicAdd(&v6,-1l);
-    while (while_method_9(v6)){
+    while (while_method_9()){
+        bool v81;
+        v81 = 262144ull == v5;
+        bool v82;
+        v82 = v81 == false;
+        if (v82){
+            assert("The params needs to have matching offsets." && v81);
+        } else {
+        }
         bool v84;
-        v84 = 262144ull == v5;
+        v84 = 98816ull == v3;
         bool v85;
         v85 = v84 == false;
         if (v85){
-            assert("The params needs to have matching offsets." && v84);
+            assert("The outputs needs to have matching offsets." && v84);
         } else {
         }
-        bool v87;
-        v87 = 98816ull == v3;
-        bool v88;
-        v88 = v87 == false;
-        if (v88){
-            assert("The outputs needs to have matching offsets." && v87);
+        Union9 v87;
+        v87 = Union9{Union9_0{}};
+        Union10 v88; float * v89; int v90; int v91; int v92; float v93;
+        Tuple7 tmp32 = noinline_run_21(v2, v4, v87);
+        v88 = tmp32.v0; v89 = tmp32.v1; v90 = tmp32.v2; v91 = tmp32.v3; v92 = tmp32.v4; v93 = tmp32.v5;
+        int v94 = v6;
+        bool v95;
+        v95 = v94 == 0l;
+        if (v95){
+            break;
         } else {
         }
-        Union9 v90;
-        v90 = Union9{Union9_0{}};
-        Union10 v91; float * v92; int v93; int v94; int v95; float v96;
-        Tuple7 tmp32 = run__21(v2, v4, v90);
-        v91 = tmp32.v0; v92 = tmp32.v1; v93 = tmp32.v2; v94 = tmp32.v3; v95 = tmp32.v4; v96 = tmp32.v5;
     }
     return ;
 }
