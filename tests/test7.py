@@ -215,7 +215,7 @@ __device__ void foo_0(){
     printf("{%s = %d}\n","tid_before", v0);
     v1.release();
     v2.sync() ;
-    asm("barrier.cta.sync 0;");
+    asm("barrier.cta.sync %0;" :: "r"(0l));
     int v5;
     v5 = threadIdx.x;
     cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v6 = console_lock;
