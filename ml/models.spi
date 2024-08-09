@@ -14,12 +14,13 @@ inl run' forall inp out.
         (exists t. model : exists t. model t) 
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
-        (data : option inp) = join
+        ~(data : option inp) = join
+    console.write_ln {tid_before=thread_index()}
     
     // All the threads will be waiting on this barrier until the game threads call on it with the inputs.
     __syncthreads()
 
-    console.write_ln {tid=thread_index()}
+    console.write_ln {tid_after=thread_index()}
 
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim

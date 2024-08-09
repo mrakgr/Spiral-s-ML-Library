@@ -13,4 +13,7 @@ inl popc_u64 (x : u64) : i32 = $"__popcll(!x)"
 inl fns (mask : u32) (base : u32) (offset : i32) : u32 = $"__fns(!mask,!base,!offset)"
 
 // Device scope atomic addition.
+inl atomic_add_ref forall el. (a : refm.ref el) (v : el) = $"atomicAdd(&!a,!v)"
+
+// Device scope atomic addition.
 inl atomic_add forall el. (a : array el) (i : int) (v : el) = $"atomicAdd(!a+!i,!v)"

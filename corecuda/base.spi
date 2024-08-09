@@ -32,8 +32,8 @@ inl run' ({shared_mem} : run_config) f =
     // Global statements only get executed once.
     global "options = []"
     // global "options.append('--define-macro=NDEBUG')" // turns off the macros
-    global "options.append('--diag-suppress=550,20012,68')" // suppresses some warnings related to unused vars
     global "options.append('--dopt=on')" // turns on the device optimizations
+    global "options.append('--diag-suppress=550,20012,68')" // suppresses some warnings related to unused vars
     global "options.append('--restrict')" // assumes all the pointers are restricted
     
     match threads_per_block with
