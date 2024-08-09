@@ -101,8 +101,7 @@ nominal game_model inp out =
         output : int -> out
     }
 
-inl run forall inp out. (game_model {model input output} : game_model inp out) = 
-    run' model input output
+inl run forall inp out. (game_model {model input output} : game_model inp out) = run' model input output
 
 inl to_model_data forall a b. (game_model {model=exists t. model} : game_model a b) : layers.model_data = model_to_model_data model
 inl from_model_data forall inp out. 

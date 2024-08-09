@@ -1,3 +1,9 @@
+Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options = []"
+    ^
+Error trace on line: 35, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--diag-suppress=550,20012,68')" // suppresses some warnings related to unused vars
+    ^
 Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
     global "options.append('--dopt=on')" // turns on the device optimizations
     ^
@@ -139,15 +145,8 @@ Error trace on line: 137, column: 17 in module: c:\Spiral_s_ML_Library\game\ledu
 Error trace on line: 137, column: 78 in module: c:\Spiral_s_ML_Library\game\leduc\play.spi.
                 inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model (Some data)
                                                                              ^
-Error trace on line: 13, column: 150 in module: c:\Spiral_s_ML_Library\ml\models.spi.
-inl run' forall inp out. (exists t. model : exists t. model t) (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) (output : int -> out) ~(data : option inp) = join
-                                                                                                                                                     ^
-Error trace on line: 13, column: 152 in module: c:\Spiral_s_ML_Library\ml\models.spi.
-inl run' forall inp out. (exists t. model : exists t. model t) (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) (output : int -> out) ~(data : option inp) = join
-                                                                                                                                                       ^
-Error trace on line: 15, column: 5 in module: c:\Spiral_s_ML_Library\ml\models.spi.
+Error trace on line: 20, column: 5 in module: c:\Spiral_s_ML_Library\ml\models.spi.
     __syncthreads()
     ^
-The annotation of the join point does not match its body's type.
-Got:      {action : alt_action; sampling_prob_ensemble : tensor i32 f32; sampling_prob_selected : f32}
+The annotation of the join point does not match its body's type.Got: {action : alt_action; sampling_prob_ensemble : tensor i32 f32; sampling_prob_selected : f32}
 Expected: {action : tensor (i32 * i32 * i32) f32 * tensor (i32 * i32) i32; sampling_prob_ensemble : tensor i32 f32; sampling_prob_selected : f32}
