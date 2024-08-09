@@ -651,7 +651,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                     }
                     v146 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 wmma::fragment<wmma::matrix_a, 16l, 16l, 8l, wmma::precision::tf32, wmma::row_major> v163[1l];
                 wmma::fragment<wmma::matrix_b, 16l, 16l, 8l, wmma::precision::tf32, wmma::col_major> v164[1l];
                 int v165;
@@ -826,7 +826,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                     }
                     v195 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 int v225;
                 v225 = 0l;
                 #pragma unroll
@@ -891,7 +891,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                 }
                 v237 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             int v248;
             v248 = threadIdx.x;
             bool v249;
@@ -960,7 +960,7 @@ __device__ void method_0(float * v0, int v1, float * v2, int v3, float * v4, int
                 }
                 v266 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             // Poping the loop unrolling to: 0
             v67 += 1l ;
         }
@@ -1261,7 +1261,7 @@ __device__ void method_1(float * v0, float * v1){
         }
         v21 += 1l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     return ;
 }
 __device__ inline bool while_method_5(int v0){
@@ -1358,7 +1358,7 @@ __device__ void method_2(float * v0, float * v1){
         *v33 = *v32;
         v7 += 32l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     return ;
 }
 __device__ Tuple1 method_4(float v0, int v1, float v2, int v3){
@@ -2071,7 +2071,7 @@ __device__ void method_3(int * v0, int v1, float * v2, int v3, float * v4, curan
         v0[v272] = v263;
         v30 += 1l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     return ;
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {

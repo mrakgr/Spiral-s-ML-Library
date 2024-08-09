@@ -967,7 +967,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, int * v2) {
         v2[v260] = v251;
         v17 += 1l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     return ;
 }
 """

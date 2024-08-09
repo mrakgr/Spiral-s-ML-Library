@@ -228,7 +228,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                 }
                 v67 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             long v78;
             v78 = 0l;
             #pragma unroll
@@ -257,7 +257,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                 }
                 v78 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             long v88;
             v88 = 0l;
             #pragma unroll
@@ -446,7 +446,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                     }
                     v141 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 wmma::fragment<wmma::matrix_a, 16l, 16l, 8l, wmma::precision::tf32, wmma::row_major> v158[1l];
                 wmma::fragment<wmma::matrix_b, 16l, 16l, 8l, wmma::precision::tf32, wmma::col_major> v159[1l];
                 long v160;
@@ -621,7 +621,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                     }
                     v188 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 long v216;
                 v216 = 0l;
                 #pragma unroll
@@ -686,7 +686,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                 }
                 v228 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             long v238;
             v238 = threadIdx.x;
             bool v239;
@@ -755,7 +755,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                 }
                 v252 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             // Poping the loop unrolling to: 0
             v47 += 1l ;
         }

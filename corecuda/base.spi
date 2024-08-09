@@ -69,22 +69,22 @@ inl run' ({shared_mem} : run_config) f =
 // Executes the lambda on the GPU device.
 inl run f = run' {shared_mem = 0} f
 
-// Synchronizes all the threads in a block.
+// Synchronizes all the threads in a block using barrier 0.
+// Requires all the threads to execute the same instruction which can cause trouble given that the Cuda compiler does inlining.
+// It is recommended to use `barrier_cta_sync` instead.
 inl __syncthreads() : () = $"__syncthreads()"
 
-// Synchronizes all the threads in the selected miniblock. Takes in the number of threads in the miniblock and index of the miniblock in the block.
-// The miniblock index should be a runtime value while the number of threads per miniblock is asserted to be a compile time literal.
-// 
-// 
-// Note: It's easy to get resource contention using this function. The reason why the miniblock index is being incremented by 1 is so the followup
-// __syncthreads does not cause an invalid instruction error. There are 16 barriers on Nvidia GPUs, and __syncthreads uses 0 by default hence it should
-// be reserved.
-inl barrier_sync {threads_per_miniblock miniblock_index} =
-    assert (threads_per_miniblock % threads_per_warp() = 0) "The number of threads per miniblock has to be divisible by the warp size."
-    assert (divup threads_per_block() threads_per_miniblock < 16) "The number of blocks divided by miniblock has be less than 16 otherwise the number of barriers would be insufficient."
-    inl i = miniblock_index + 1
-    assert (i < 16) "The miniblock_index + 1 has to be less than 16."
-    $'asm("bar.cta.sync %0, %1;" :: "r"(!(conv (dyn i) : i32)), "r"(!(conv threads_per_miniblock : i32)))'
+// Synchronizes all the threads in the CTA given the barrier id and the thread count.
+inl barrier_cta_sync' ({barrier_id thread_count} : {barrier_id : int; thread_count : int}) =
+    assert (thread_count % threads_per_warp() = 0) "The number of threads has to be divisible by the warp size."
+    assert (barrier_id < 16) "The barrier_id has to be less than 16."
+    $'asm("barrier.cta.sync %0, %1;" :: "r"(!(conv barrier_id : i32)), "r"(!(conv thread_count : i32)))'
+
+// Synchronizes all the threads in the CTA given the barrier id.
+inl barrier_cta_sync (barrier_id : int) =
+    assert (threads_per_block() % threads_per_warp() = 0) "The number of threads per block has to be divisible by the warp size."
+    assert (barrier_id < 16) "The barrier_id has to be less than 16."
+    $'asm("barrier.cta.sync %0;" :: "r"(!(conv barrier_id : i32)))'
 
 inl dynamic_shared_memory_used() =
     inl ~x : u32 = 0

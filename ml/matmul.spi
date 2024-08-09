@@ -168,7 +168,7 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
                     fill_fragment (tensor_ref_index (m,n) c_frag) 0
             else 
                 tensor_memcpy_sync chunk_size threads_in_block(zip c_shared_tile c)
-                __syncthreads()
+                barrier_cta_sync 0
 
                 loop.linear c_frag.dim fun m,n =>
                     inl c_frag = tensor_ref_index (m,n) c_frag
@@ -179,7 +179,7 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
                     if beta / alpha <> 1 then
                         loop.linear (fragment_length c_frag) fun i =>
                             fragment_set c_frag i (beta / alpha * fragment_index c_frag i)
-                __syncthreads()
+                barrier_cta_sync 0
             
             loop.linear ((snd >> fst) a.dim) fun k =>
                 inl a = apply m a |> apply k |> apply_ptr
@@ -188,7 +188,7 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
                 // Loads the data from global to shared memory.
                 tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip b_shared_tile b)
                 tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip a_shared_tile a)
-                __syncthreads()
+                barrier_cta_sync 0
 
                 inl a_frag, b_frag : _ _ (fragment matrix_a m_frag n_frag k_frag a_layout tf32)
                                 * _ _ (fragment matrix_b m_frag n_frag k_frag b_layout tf32) =
@@ -205,7 +205,7 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
                     inl b_frag = tensor_ref_index (n,k) b_frag
                     load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
 
-                __syncthreads()
+                barrier_cta_sync 0
 
                 // Does the matrix multiplication and accumulates the results in the fragment.
                 loop.linear (m_local, n_local, k_local) fun m,n,k =>
@@ -227,12 +227,12 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
                 inl c = apply (m,n) c_shared_frag
                 store_matrix_sync c c_frag
 
-            __syncthreads()
+            barrier_cta_sync 0
 
             // Stores the end result into global memory.
             tensor_memcpy_sync chunk_size threads_in_block(zip c c_shared_tile)
 
-            __syncthreads()
+            barrier_cta_sync 0
 
 inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
     matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}

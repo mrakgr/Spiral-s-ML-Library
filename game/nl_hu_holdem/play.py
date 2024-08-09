@@ -3463,7 +3463,7 @@ __device__ void method_44(float * v0, int v1, float * v2, int v3, float * v4, in
                     }
                     v146 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 wmma::fragment<wmma::matrix_a, 16l, 16l, 8l, wmma::precision::tf32, wmma::row_major> v163[1l];
                 wmma::fragment<wmma::matrix_b, 16l, 16l, 8l, wmma::precision::tf32, wmma::col_major> v164[1l];
                 int v165;
@@ -3638,7 +3638,7 @@ __device__ void method_44(float * v0, int v1, float * v2, int v3, float * v4, in
                     }
                     v195 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 int v225;
                 v225 = 0l;
                 #pragma unroll
@@ -3703,7 +3703,7 @@ __device__ void method_44(float * v0, int v1, float * v2, int v3, float * v4, in
                 }
                 v237 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             int v248;
             v248 = threadIdx.x;
             bool v249;
@@ -3772,7 +3772,7 @@ __device__ void method_44(float * v0, int v1, float * v2, int v3, float * v4, in
                 }
                 v266 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             // Poping the loop unrolling to: 0
             v67 += 1l ;
         }
@@ -4500,7 +4500,7 @@ __device__ void method_45(int * v0, int v1, float * v2, int v3, float * v4, cura
         v0[v272] = v263;
         v30 += 1l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     return ;
 }
 __device__ int int_range_47(int v0, int v1, curandStatePhilox4_32_10_t & v2){
@@ -7311,7 +7311,7 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                     v144[v168] = 0.0f;
                                     v156 += 32l ;
                                 }
-                                __syncthreads();
+                                barrier_cta_sync 0;
                                 int v169;
                                 v169 = threadIdx.x;
                                 assert("Tensor range check" && 0 <= v169 && v169 < 32l);
@@ -7678,7 +7678,7 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                     v220[v316] = 1.0f;
                                     v294 += 1l ;
                                 }
-                                __syncthreads();
+                                barrier_cta_sync 0;
                                 int v317;
                                 v317 = 0l;
                                 while (while_method_3(v317)){
@@ -7715,7 +7715,7 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                     method_45(v333, v335, v330, v332, v324, v154);
                                     v317 += 1l ;
                                 }
-                                __syncthreads();
+                                barrier_cta_sync 0;
                                 int v336;
                                 v336 = 0l;
                                 int v337;

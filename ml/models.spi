@@ -18,7 +18,7 @@ inl run' forall inp out.
     console.write_ln {tid_before=thread_index()}
     
     // All the threads will be waiting on this barrier until the game threads call on it with the inputs.
-    __syncthreads()
+    barrier_cta_sync 0
 
     console.write_ln {tid_after=thread_index()}
 
@@ -48,7 +48,7 @@ inl run' forall inp out.
     loop.projective threads_in_block(x.dim) fun i =>
         tensor_set i 0 x
 
-    __syncthreads()
+    barrier_cta_sync 0
 
     // Serializes the data into the input tensor if there is any data being passed into the model.
     // If there is no data being passed into run here, the individual threads for which that is the case can 
@@ -58,13 +58,13 @@ inl run' forall inp out.
         inl tns_input = apply thread_index() x
         snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
 
-    __syncthreads()
+    barrier_cta_sync 0
 
     // Runs the model on the inputs.
     loop.linear ensemble fun ensemble =>
         graph_run_device model ls {ensemble}
 
-    __syncthreads()
+    barrier_cta_sync 0
 
     // Randomly pick an ensemble id for each thread.
     inl ensemble_id : int = random.int_range {from=0; nearTo=ensemble} ls.rng

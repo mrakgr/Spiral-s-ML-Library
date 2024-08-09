@@ -2470,7 +2470,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                     }
                     v146 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 wmma::fragment<wmma::matrix_a, 16l, 16l, 8l, wmma::precision::tf32, wmma::row_major> v163[1l];
                 wmma::fragment<wmma::matrix_b, 16l, 16l, 8l, wmma::precision::tf32, wmma::col_major> v164[1l];
                 int v165;
@@ -2645,7 +2645,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                     }
                     v195 += 1l ;
                 }
-                __syncthreads();
+                barrier_cta_sync 0;
                 int v225;
                 v225 = 0l;
                 #pragma unroll
@@ -2710,7 +2710,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                 }
                 v237 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             int v248;
             v248 = threadIdx.x;
             bool v249;
@@ -2779,7 +2779,7 @@ __device__ void method_22(float * v0, int v1, float * v2, int v3, float * v4, in
                 }
                 v266 += 1l ;
             }
-            __syncthreads();
+            barrier_cta_sync 0;
             // Poping the loop unrolling to: 0
             v67 += 1l ;
         }
@@ -3502,7 +3502,7 @@ __device__ void method_23(int * v0, int v1, float * v2, int v3, float * v4, cura
         v0[v272] = v263;
         v30 += 1l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     return ;
 }
 __device__ unsigned int loop_26(unsigned int v0, curandStatePhilox4_32_10_t & v1){
@@ -3633,7 +3633,7 @@ __device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2){
         v26[v50] = 0.0f;
         v38 += 32l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     switch (v2.tag) {
         case 0: { // None
             break;
@@ -3790,7 +3790,7 @@ __device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2){
             assert("Invalid tag." && false);
         }
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     int v105;
     v105 = 0l;
     while (while_method_4(v105)){
@@ -3827,7 +3827,7 @@ __device__ Tuple7 run__21(unsigned char * v0, unsigned char * v1, Union9 v2){
         method_23(v121, v123, v118, v120, v112, v36);
         v105 += 1l ;
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     int v124;
     v124 = 0l;
     int v125;
@@ -5554,7 +5554,7 @@ __device__ inline bool while_method_9(int & v0){
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsigned char * v2, unsigned long long v3, unsigned char * v4, unsigned long long v5) {
     __shared__ int v6;
-    __syncthreads();
+    barrier_cta_sync 0;
     int v7;
     v7 = threadIdx.x;
     bool v8;
@@ -5563,7 +5563,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
         new(&v6) int{32l};
     } else {
     }
-    __syncthreads();
+    barrier_cta_sync 0;
     int v9;
     v9 = threadIdx.x;
     int v10;
