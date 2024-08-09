@@ -1,0 +1,20 @@
+open corebase
+open corecuda
+open coreext
+open rangem
+
+open cooperative_groups
+let foo block =
+    console.write_ln {tid_before=thread_index()}
+    sync block
+    console.write_ln {tid_after=thread_index()}
+
+inl main() =
+    run fun () =>
+        inl block = create_block()
+        if thread_index() < 10 then 
+            console.write_ln "in true"
+            foo block
+        else
+            console.write_ln "in false"
+            foo block

@@ -205,48 +205,49 @@ struct dynamic_array_list
     }
 };
 
-__device__ void foo_0();
-__device__ void foo_0(){
-    int v0;
-    v0 = threadIdx.x;
-    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v1 = console_lock;
-    auto v2 = cooperative_groups::coalesced_threads();
-    v1.acquire();
-    printf("{%s = %d}\n","tid_before", v0);
-    v1.release();
-    v2.sync() ;
-    asm("barrier.cta.sync 0;");
-    int v5;
-    v5 = threadIdx.x;
-    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v6 = console_lock;
-    auto v7 = cooperative_groups::coalesced_threads();
-    v6.acquire();
-    printf("{%s = %d}\n","tid_after", v5);
-    v6.release();
-    v7.sync() ;
+__device__ void foo_0(cooperative_groups::thread_block & v0);
+__device__ void foo_0(cooperative_groups::thread_block & v0){
+    int v1;
+    v1 = threadIdx.x;
+    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v2 = console_lock;
+    auto v3 = cooperative_groups::coalesced_threads();
+    v2.acquire();
+    printf("{%s = %d}\n","tid_before", v1);
+    v2.release();
+    v3.sync() ;
+    v0.sync() ;
+    int v6;
+    v6 = threadIdx.x;
+    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v7 = console_lock;
+    auto v8 = cooperative_groups::coalesced_threads();
+    v7.acquire();
+    printf("{%s = %d}\n","tid_after", v6);
+    v7.release();
+    v8.sync() ;
     return ;
 }
 extern "C" __global__ void entry0() {
-    int v0;
-    v0 = threadIdx.x;
-    bool v1;
-    v1 = v0 < 10l;
-    if (v1){
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v2 = console_lock;
-        auto v3 = cooperative_groups::coalesced_threads();
-        v2.acquire();
+    auto v0 = cooperative_groups::this_thread_block();
+    int v1;
+    v1 = threadIdx.x;
+    bool v2;
+    v2 = v1 < 10l;
+    if (v2){
+        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v3 = console_lock;
+        auto v4 = cooperative_groups::coalesced_threads();
+        v3.acquire();
         printf("%s\n","in true");
-        v2.release();
-        v3.sync() ;
-        return foo_0();
+        v3.release();
+        v4.sync() ;
+        return foo_0(v0);
     } else {
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v6 = console_lock;
-        auto v7 = cooperative_groups::coalesced_threads();
-        v6.acquire();
+        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v7 = console_lock;
+        auto v8 = cooperative_groups::coalesced_threads();
+        v7.acquire();
         printf("%s\n","in false");
-        v6.release();
-        v7.sync() ;
-        return foo_0();
+        v7.release();
+        v8.sync() ;
+        return foo_0(v0);
     }
 }
 """
