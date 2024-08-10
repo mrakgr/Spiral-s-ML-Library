@@ -134,7 +134,7 @@ inl block_reduce_2d forall b.
     if threads_per_miniblock <= threads_per_warp() then
         inl group = create_labeled_partition group miniblocks_in_block(threads_per_miniblock)().from
         inl x = cg_reduce group f result
-        console.write_ln {x tid=thread_index(); result}
+        // console.write_ln {x tid=thread_index(); result}
         x
     else
         inl warp_result = cg_reduce group f result
@@ -442,30 +442,6 @@ inl inclusive_scan_2d forall dim a. : a -> (a -> a -> a) -> tensor (dim * int) a
 // Scans the innermost dimension of a given tensor.
 inl exclusive_scan_2d forall dim a. : a -> (a -> a -> a) -> tensor (dim * int) a -> tensor (dim * int) a -> () = scan_2d false
 
-// Numerically stable softmax.
-inl local_softmax config x =
-    inl average = local_average config x
-    inl x = local_map (fun x => exp (x - average)) x
-    inl sum = local_sum config x
-    inl len = 1 / conv (local_length config x)
-    local_map (fun x => if sum <> 0 then x / sum else len) x
-
-inl local_masked_average config x mask =
-    inl count = mask |> local_map (fun mask => if mask then 1 else 0 : int) |> local_sum config
-    inl sum = zip x mask |> local_map (fun x,mask => if mask then x else 0) |> local_sum config
-    sum / conv count
-
-// Numerically stable softmax.
-inl local_masked_softmax forall dim t{number;float}. (mask : row_config -> t -> dim -> int -> bool) config x i j_tns =
-    inl mask = local_map (fun x,j => mask config x i j : bool) (zip x j_tns)
-    inl average = local_masked_average config x mask
-    inl x = local_map (fun x,mask => 
-        inl x = if mask then x else limit.min
-        exp (x - average)) (zip x mask)
-    inl sum = local_sum config x
-    inl len = 1 / conv (local_length config x)
-    local_map (fun x => if sum <> 0 then x / sum else len) x
-
 inl local_ln_l2 config x =
     inl sum = local_map (fun x => x * x) x |> local_sum config
     local_map (fun x => if sum <> 0 then x / sum else 0) x
@@ -475,30 +451,91 @@ inl local_argmax config x (j_tns : tensor (int * int) int) =
     |> local_reduce config (limit.min, 0) (fun a b => if fst a > fst b then a else b)
     |> snd
 
-inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
-    inl x = local_inclusive_scan_sum config x
-    inl probability = // TODO: Needs to be optimized and factored out into local_shared.
-        j_tns
-        |> local_map (fun j => random.uniform rng, j)
-        |> local_reduce config (0, limit.max) (fun a b => // It's important that here the ordering is being preserved so all the threads get the same value.
-            if snd a < snd b then a else b
-            )
-        |> fst |> conv
-    inl x = local_map (fun x => x - probability) x
-    local_reduce config (limit.min, limit.max) (fun a b =>
-        join
-            // It's imporant for correctness that the ordering is maintained as local_reduce does a butterfly reduction under the hood.
-            inl a,b = if snd a < snd b then a,b else b,a
-            if fst a >= 0 && fst b >= 0 then
-                if fst a <= fst b then a else b
-            elif fst a >= 0 then a
-            elif fst b >= 0 then b
-            else a
-    ) (zip x j_tns)
-    |> snd
-    |> fun output_id => 
-        if not (output_id < 11) then console.write_ln {output_id tid=thread_index(); x}
-        output_id
+// Numerically stable softmax.
+inl local_softmax config x =
+    inl average = local_average config x
+    inl x = local_map (fun x => exp (x - average)) x
+    inl sum = local_sum config x
+    inl len = 1 / conv (local_length config x)
+    local_map (fun x => if sum <> 0 then x / sum else len) x
+
+inl local_masked_reduce' forall t. config (f : t -> t -> t) (x : tensor (int * int) (option t)) : option t =
+    local_reduce config None (fun a b =>
+        match a,b with
+        | Some a, Some b => Some(f a b)
+        | Some x, _ | _, Some x => Some x 
+        | _ => None
+        ) x
+
+inl local_masked_reduce forall t. config (f : t -> t -> t) (x : tensor (int * int) (option t)) : t =
+    match local_masked_reduce' config f x with
+    | Some x => x
+    | None => 
+        inl msg = "Got None from local_masked_reduce'."
+        assert (dyn true) "Got None from local_masked_reduce'."
+        failwith msg
+
+inl local_masked_e' forall t. config (f : t -> t -> t) (x : tensor (int * int) (option t)) : option t =
+
+
+inl local_masked_average config x mask =
+    inl count = mask |> local_map (fun mask => if mask then 1 else 0 : int) |> local_sum config
+    inl sum = zip x mask |> local_map (fun x,mask => if mask then x else 0) |> local_sum config
+    sum / conv count
+
+// Numerically stable softmax.
+inl local_masked_softmax forall dim t{number;float}. (mask : row_config -> t -> dim -> int -> bool) config x i j_tns =
+    inl x = local_map (fun x,j => if mask config x i j then Some x else None) (zip x j_tns)
+    inl average = local_masked_average config x mask
+    inl x = local_map (fun x,mask => 
+        inl x = if mask then x else limit.min
+        exp (x - average)) (zip x mask)
+    inl sum = local_sum config x
+    inl len = 1 / conv (local_length config x)
+    local_map (fun x => if sum <> 0 then x / sum else len) x
+
+// inl local_masked_average config x mask =
+//     inl count = mask |> local_map (fun mask => if mask then 1 else 0 : int) |> local_sum config
+//     inl sum = zip x mask |> local_map (fun x,mask => if mask then x else 0) |> local_sum config
+//     sum / conv count
+
+// // Numerically stable softmax.
+// inl local_masked_softmax forall dim t{number;float}. (mask : row_config -> t -> dim -> int -> bool) config x i j_tns =
+//     inl mask = local_map (fun x,j => mask config x i j : bool) (zip x j_tns)
+//     inl average = local_masked_average config x mask
+//     inl x = local_map (fun x,mask => 
+//         inl x = if mask then x else limit.min
+//         exp (x - average)) (zip x mask)
+//     inl sum = local_sum config x
+//     inl len = 1 / conv (local_length config x)
+//     local_map (fun x => if sum <> 0 then x / sum else len) x
+
+// inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
+//     inl mask = local_map ((<>) 0) x
+//     inl x = local_inclusive_scan_sum config x
+//     inl max_probability = local_reduce config (limit.min, false) (fun a b => if m then ) (zip x mask)
+//     inl probability = // TODO: Needs to be optimized and factored out into local_shared.
+//         max_probability
+//         // j_tns
+//         // |> local_map (fun j => random.uniform rng, j)
+//         // |> local_reduce config (0, limit.max) (fun a b => // It's important that here the ordering is being preserved so all the threads get the same value.
+//         //     if snd a < snd b then a else b
+//         //     )
+//         // |> fst |> conv
+//     inl x = local_map (fun (x, m) => if m then x - probability else limit.min) (zip x mask)
+//     local_reduce config (limit.min, limit.max) (fun a b =>
+//         join
+//             // It's imporant for correctness that the ordering is maintained as local_reduce does a butterfly reduction under the hood.
+//             inl a,b = if snd a < snd b then a,b else b,a
+//             if fst a >= 0 && fst b >= 0 then a // It holds that fst a <= fst b (unless numerical inaccuracy)
+//             elif fst a >= 0 then a
+//             elif fst b >= 0 then b
+//             else a
+//         ) (zip x j_tns)
+//     |> snd
+//     |> fun output_id => 
+//         if not (output_id < 11) then console.write_ln {output_id tid=thread_index(); x}
+//         output_id
 
 inl local_softmax_and_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_softmax config x
@@ -579,7 +616,7 @@ inl test2() =
         // // discrete sampling
         // row_map_reduce (local_softmax_and_discrete_sampling rng) input output_softmax' output_sampling
         // masked discrete sampling
-        row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 12) rng) input output_softmax' output_sampling
+        row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng) input output_softmax' output_sampling
 
     // console.tensor.write_ln 1024 input
     // console.tensor.write_ln 1024 input_identity

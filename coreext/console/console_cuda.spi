@@ -26,6 +26,7 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
         match x with // According to Bing it shouldn't matter whether these are %d or %lld in printf.
         | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
         | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
+        // | (x : f32) => p ("%u", ($"*(int *)&!x" : int))
         | (x : f32) | (x : f64) => p ("%f", x)
         | (x : string) => p ("%s", x)
         | (x : char) => p ("%c", x)
