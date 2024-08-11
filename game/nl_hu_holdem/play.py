@@ -282,58 +282,59 @@ __device__ void method_44(unsigned int v0, float * v1, int v2);
 __device__ void method_45(float * v0, int v1, float * v2, int v3, float * v4, int v5);
 struct Tuple15;
 struct Tuple16;
-__device__ Tuple16 method_47(float v0, int v1, float v2, int v3);
-__device__ void method_46(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5);
-__device__ int int_range_48(int v0, int v1, curandStatePhilox4_32_10_t & v2);
-__device__ Tuple13 noinline_run_42(unsigned char * v0, unsigned char * v1, Union8 v2);
-__device__ void method_49(Union1 v0);
 struct Tuple17;
-__device__ int loop_53(static_array<float,6l> v0, float v1, int v2);
-__device__ int pick_discrete__52(static_array<float,6l> v0, float v1);
-__device__ int sample_discrete__51(static_array<float,6l> v0, curandStatePhilox4_32_10_t & v1);
-__device__ Union1 sample_discrete_50(static_array<Tuple17,6l> v0, curandStatePhilox4_32_10_t & v1);
 struct Tuple18;
+__device__ void method_46(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5);
+__device__ int int_range_47(int v0, int v1, curandStatePhilox4_32_10_t & v2);
+__device__ Tuple13 noinline_run_42(unsigned char * v0, unsigned char * v1, Union8 v2);
+__device__ void method_48(Union1 v0);
 struct Tuple19;
-struct Union11;
+__device__ int loop_52(static_array<float,6l> v0, float v1, int v2);
+__device__ int pick_discrete__51(static_array<float,6l> v0, float v1);
+__device__ int sample_discrete__50(static_array<float,6l> v0, curandStatePhilox4_32_10_t & v1);
+__device__ Union1 sample_discrete_49(static_array<Tuple19,6l> v0, curandStatePhilox4_32_10_t & v1);
 struct Tuple20;
-struct Union12;
 struct Tuple21;
+struct Union11;
 struct Tuple22;
+struct Union12;
+struct Tuple23;
+struct Tuple24;
 struct Union13;
 struct Union14;
 struct Union15;
 struct Union16;
 struct Union17;
-__device__ Tuple0 score_54(static_array<unsigned char,7l> v0);
+__device__ Tuple0 score_53(static_array<unsigned char,7l> v0);
 __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1, unsigned long long v2, unsigned char * v3, unsigned long long v4, unsigned long long & v5, Union3 & v6, dynamic_array_list<Union6,128l> & v7, static_array<Union2,2l> & v8, Union7 & v9, Union4 v10);
-__device__ void f_56(unsigned char * v0, unsigned long long v1);
-__device__ void f_57(unsigned char * v0, int v1);
-__device__ void f_58(unsigned char * v0);
-__device__ void f_60(unsigned char * v0, int v1);
-__device__ void f_64(unsigned char * v0, unsigned char v1);
+__device__ void f_55(unsigned char * v0, unsigned long long v1);
+__device__ void f_56(unsigned char * v0, int v1);
+__device__ void f_57(unsigned char * v0);
+__device__ void f_59(unsigned char * v0, int v1);
 __device__ void f_63(unsigned char * v0, unsigned char v1);
-__device__ void f_62(unsigned char * v0, static_array<unsigned char,2l> v1);
-__device__ void f_65(unsigned char * v0, int v1);
-__device__ void f_66(unsigned char * v0, static_array<unsigned char,3l> v1);
-__device__ void f_67(unsigned char * v0, static_array<unsigned char,5l> v1);
-__device__ void f_68(unsigned char * v0, static_array<unsigned char,4l> v1);
-__device__ void f_61(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6);
+__device__ void f_62(unsigned char * v0, unsigned char v1);
+__device__ void f_61(unsigned char * v0, static_array<unsigned char,2l> v1);
+__device__ void f_64(unsigned char * v0, int v1);
+__device__ void f_65(unsigned char * v0, static_array<unsigned char,3l> v1);
+__device__ void f_66(unsigned char * v0, static_array<unsigned char,5l> v1);
+__device__ void f_67(unsigned char * v0, static_array<unsigned char,4l> v1);
+__device__ void f_60(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6);
+__device__ void f_69(unsigned char * v0, int v1);
+__device__ void f_68(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6, Union1 v7);
+__device__ void f_58(unsigned char * v0, Union4 v1);
 __device__ void f_70(unsigned char * v0, int v1);
-__device__ void f_69(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6, Union1 v7);
-__device__ void f_59(unsigned char * v0, Union4 v1);
-__device__ void f_71(unsigned char * v0, int v1);
-__device__ void f_73(unsigned char * v0, static_array_list<unsigned char,5l> v1);
-__device__ void f_74(unsigned char * v0, int v1, int v2);
-__device__ void f_76(unsigned char * v0, int v1);
-__device__ void f_75(unsigned char * v0, int v1, Union1 v2);
-__device__ void f_77(unsigned char * v0, int v1, static_array<unsigned char,2l> v2);
-__device__ void f_80(unsigned char * v0, static_array<unsigned char,5l> v1, char v2);
+__device__ void f_72(unsigned char * v0, static_array_list<unsigned char,5l> v1);
+__device__ void f_73(unsigned char * v0, int v1, int v2);
+__device__ void f_75(unsigned char * v0, int v1);
+__device__ void f_74(unsigned char * v0, int v1, Union1 v2);
+__device__ void f_76(unsigned char * v0, int v1, static_array<unsigned char,2l> v2);
 __device__ void f_79(unsigned char * v0, static_array<unsigned char,5l> v1, char v2);
-__device__ void f_78(unsigned char * v0, int v1, static_array<Tuple0,2l> v2, int v3);
-__device__ void f_72(unsigned char * v0, Union6 v1);
-__device__ void f_81(unsigned char * v0, Union2 v1);
-__device__ void f_82(unsigned char * v0, int v1);
-__device__ void f_55(unsigned char * v0, unsigned long long v1, Union3 v2, dynamic_array_list<Union6,128l> v3, static_array<Union2,2l> v4, Union7 v5);
+__device__ void f_78(unsigned char * v0, static_array<unsigned char,5l> v1, char v2);
+__device__ void f_77(unsigned char * v0, int v1, static_array<Tuple0,2l> v2, int v3);
+__device__ void f_71(unsigned char * v0, Union6 v1);
+__device__ void f_80(unsigned char * v0, Union2 v1);
+__device__ void f_81(unsigned char * v0, int v1);
+__device__ void f_54(unsigned char * v0, unsigned long long v1, Union3 v2, dynamic_array_list<Union6,128l> v3, static_array<Union2,2l> v4, Union7 v5);
 struct Union1_0 { // A_All_In
 };
 struct Union1_1 { // A_Call
@@ -1383,46 +1384,104 @@ struct Closure2 {
 };
 struct Tuple16 {
     float v0;
-    int v1;
+    bool v1;
     __device__ Tuple16() = default;
-    __device__ Tuple16(float t0, int t1) : v0(t0), v1(t1) {}
+    __device__ Tuple16(float t0, bool t1) : v0(t0), v1(t1) {}
 };
 struct Closure3 {
     __device__ Tuple16 operator()(Tuple16 tup0, Tuple16 tup1){
+        float v0 = tup0.v0; bool v1 = tup0.v1; float v2 = tup1.v0; bool v3 = tup1.v1;
+        if (v1){
+            if (v3){
+                bool v4;
+                v4 = v0 >= v2;
+                float v5;
+                if (v4){
+                    v5 = v0;
+                } else {
+                    v5 = v2;
+                }
+                return Tuple16{v5, true};
+            } else {
+                return Tuple16{v0, v1};
+            }
+        } else {
+            if (v3){
+                return Tuple16{v2, v3};
+            } else {
+                return Tuple16{v0, v1};
+            }
+        }
+    }
+};
+struct Tuple17 {
+    float v0;
+    int v1;
+    __device__ Tuple17() = default;
+    __device__ Tuple17(float t0, int t1) : v0(t0), v1(t1) {}
+};
+struct Closure4 {
+    __device__ Tuple17 operator()(Tuple17 tup0, Tuple17 tup1){
         float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
         bool v4;
         v4 = v1 < v3;
         if (v4){
-            return Tuple16{v0, v1};
+            return Tuple17{v0, v1};
         } else {
-            return Tuple16{v2, v3};
+            return Tuple17{v2, v3};
         }
     }
 };
-struct Closure4 {
-    __device__ Tuple16 operator()(Tuple16 tup0, Tuple16 tup1){
-        float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
-        return method_47(v0, v1, v2, v3);
+struct Tuple18 {
+    int v0;
+    bool v1;
+    __device__ Tuple18() = default;
+    __device__ Tuple18(int t0, bool t1) : v0(t0), v1(t1) {}
+};
+struct Closure5 {
+    __device__ Tuple18 operator()(Tuple18 tup0, Tuple18 tup1){
+        int v0 = tup0.v0; bool v1 = tup0.v1; int v2 = tup1.v0; bool v3 = tup1.v1;
+        if (v1){
+            if (v3){
+                bool v4;
+                v4 = v0 < v2;
+                int v5;
+                if (v4){
+                    v5 = v0;
+                } else {
+                    v5 = v2;
+                }
+                return Tuple18{v5, true};
+            } else {
+                return Tuple18{v0, v1};
+            }
+        } else {
+            if (v3){
+                return Tuple18{v2, v3};
+            } else {
+                return Tuple18{v0, v1};
+            }
+        }
     }
 };
-struct Tuple17 {
+struct Tuple19 {
     Union1 v0;
     float v1;
-    __device__ Tuple17() = default;
-    __device__ Tuple17(Union1 t0, float t1) : v0(t0), v1(t1) {}
+    __device__ Tuple19() = default;
+    __device__ Tuple19(Union1 t0, float t1) : v0(t0), v1(t1) {}
 };
-struct Tuple18 {
+struct Tuple20 {
     int v1;
     bool v0;
-    __device__ Tuple18() = default;
-    __device__ Tuple18(bool t0, int t1) : v0(t0), v1(t1) {}
+    __device__ Tuple20() = default;
+    __device__ Tuple20(bool t0, int t1) : v0(t0), v1(t1) {}
 };
-struct Tuple19 {
+struct Tuple21 {
     int v0;
     int v1;
     int v2;
-    __device__ Tuple19() = default;
-    __device__ Tuple19(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+    __device__ Tuple21() = default;
+    __device__ Tuple21(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union11_0 { // Eq
 };
@@ -1490,12 +1549,12 @@ struct Union11 {
         this->tag = 255;
     }
 };
-struct Tuple20 {
+struct Tuple22 {
     int v0;
     int v1;
     unsigned char v2;
-    __device__ Tuple20() = default;
-    __device__ Tuple20(int t0, int t1, unsigned char t2) : v0(t0), v1(t1), v2(t2) {}
+    __device__ Tuple22() = default;
+    __device__ Tuple22(int t0, int t1, unsigned char t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union12_0 { // None
 };
@@ -1557,19 +1616,19 @@ struct Union12 {
         this->tag = 255;
     }
 };
-struct Tuple21 {
+struct Tuple23 {
     Union11 v1;
     int v0;
-    __device__ Tuple21() = default;
-    __device__ Tuple21(int t0, Union11 t1) : v0(t0), v1(t1) {}
+    __device__ Tuple23() = default;
+    __device__ Tuple23(int t0, Union11 t1) : v0(t0), v1(t1) {}
 };
-struct Tuple22 {
+struct Tuple24 {
     int v0;
     int v1;
     int v2;
     unsigned char v3;
-    __device__ Tuple22() = default;
-    __device__ Tuple22(int t0, int t1, int t2, unsigned char t3) : v0(t0), v1(t1), v2(t2), v3(t3) {}
+    __device__ Tuple24() = default;
+    __device__ Tuple24(int t0, int t1, int t2, unsigned char t3) : v0(t0), v1(t1), v2(t2), v3(t3) {}
 };
 struct Union13_0 { // None
 };
@@ -3869,47 +3928,6 @@ __device__ inline bool while_method_13(int v0){
     v1 = v0 < 16l;
     return v1;
 }
-__device__ Tuple16 method_47(float v0, int v1, float v2, int v3){
-    bool v4;
-    v4 = v1 < v3;
-    float v5; int v6; float v7; int v8;
-    if (v4){
-        v5 = v0; v6 = v1; v7 = v2; v8 = v3;
-    } else {
-        v5 = v2; v6 = v3; v7 = v0; v8 = v1;
-    }
-    bool v9;
-    v9 = v5 >= 0.0f;
-    bool v11;
-    if (v9){
-        bool v10;
-        v10 = v7 >= 0.0f;
-        v11 = v10;
-    } else {
-        v11 = false;
-    }
-    if (v11){
-        bool v12;
-        v12 = v5 <= v7;
-        if (v12){
-            return Tuple16{v5, v6};
-        } else {
-            return Tuple16{v7, v8};
-        }
-    } else {
-        if (v9){
-            return Tuple16{v5, v6};
-        } else {
-            bool v15;
-            v15 = v7 >= 0.0f;
-            if (v15){
-                return Tuple16{v7, v8};
-            } else {
-                return Tuple16{v5, v6};
-            }
-        }
-    }
-}
 __device__ void method_46(int * v0, int v1, float * v2, int v3, float * v4, curandStatePhilox4_32_10_t & v5){
     int v6;
     v6 = blockIdx.x;
@@ -4187,124 +4205,138 @@ __device__ void method_46(int * v0, int v1, float * v2, int v3, float * v4, cura
         Closure0 v110{};
         int v111;
         v111 = cooperative_groups::reduce(v109, v97, v110);
-        int v112;
-        v112 = threadIdx.x;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v113 = console_lock;
-        auto v114 = cooperative_groups::coalesced_threads();
-        v113.acquire();
-        printf("{%s = %d; %s = %d; %s = %d}\n","result", v97, "tid", v112, "x", v111);
-        v113.release();
-        v114.sync() ;
-        float v119[64l];
-        int v120;
-        v120 = 0l;
-        while (while_method_13(v120)){
-            int v122;
-            v122 = 0l;
-            while (while_method_3(v122)){
-                assert("Tensor range check" && 0 <= v120 && v120 < 16l);
-                assert("Tensor range check" && 0 <= v122 && v122 < 4l);
-                int v124;
-                v124 = 4l * v120;
-                int v125;
-                v125 = v124 + v122;
-                float v126;
-                v126 = v34[v125];
-                bool v127;
-                v127 = v78[v125];
-                float v128;
-                if (v127){
-                    v128 = v126;
+        float v112[64l];
+        int v113;
+        v113 = 0l;
+        while (while_method_13(v113)){
+            int v115;
+            v115 = 0l;
+            while (while_method_3(v115)){
+                assert("Tensor range check" && 0 <= v113 && v113 < 16l);
+                assert("Tensor range check" && 0 <= v115 && v115 < 4l);
+                int v117;
+                v117 = 4l * v113;
+                int v118;
+                v118 = v117 + v115;
+                float v119;
+                v119 = v34[v118];
+                bool v120;
+                v120 = v78[v118];
+                float v121;
+                if (v120){
+                    v121 = v119;
                 } else {
-                    v128 = 0.0f;
+                    v121 = 0.0f;
                 }
-                assert("Tensor range check" && 0 <= v120 && v120 < 16l);
-                assert("Tensor range check" && 0 <= v122 && v122 < 4l);
-                v119[v125] = v128;
-                v122 += 1l ;
+                assert("Tensor range check" && 0 <= v113 && v113 < 16l);
+                assert("Tensor range check" && 0 <= v115 && v115 < 4l);
+                v112[v118] = v121;
+                v115 += 1l ;
             }
-            v120 += 1l ;
+            v113 += 1l ;
         }
-        float v129;
-        v129 = 0.0f;
-        int v130;
-        v130 = 0l;
-        while (while_method_13(v130)){
-            int v132;
-            v132 = 0l;
-            while (while_method_3(v132)){
-                assert("Tensor range check" && 0 <= v130 && v130 < 16l);
-                assert("Tensor range check" && 0 <= v132 && v132 < 4l);
-                int v134;
-                v134 = 4l * v130;
-                int v135;
-                v135 = v134 + v132;
-                float v136;
-                v136 = v119[v135];
-                float v137;
-                v137 = v129 + v136;
-                v129 = v137;
-                v132 += 1l ;
+        float v122;
+        v122 = 0.0f;
+        int v123;
+        v123 = 0l;
+        while (while_method_13(v123)){
+            int v125;
+            v125 = 0l;
+            while (while_method_3(v125)){
+                assert("Tensor range check" && 0 <= v123 && v123 < 16l);
+                assert("Tensor range check" && 0 <= v125 && v125 < 4l);
+                int v127;
+                v127 = 4l * v123;
+                int v128;
+                v128 = v127 + v125;
+                float v129;
+                v129 = v112[v128];
+                float v130;
+                v130 = v122 + v129;
+                v122 = v130;
+                v125 += 1l ;
             }
-            v130 += 1l ;
+            v123 += 1l ;
         }
-        auto v138 = cooperative_groups::coalesced_threads();
-        int v139;
-        v139 = threadIdx.x;
+        auto v131 = cooperative_groups::coalesced_threads();
+        int v132;
+        v132 = threadIdx.x;
+        int v133;
+        v133 = v132 / 32l;
+        auto v134 = cooperative_groups::labeled_partition(v131,v133);
+        Closure1 v135{};
+        float v136;
+        v136 = cooperative_groups::reduce(v134, v122, v135);
+        float v137;
+        v137 = (float)v111;
+        float v138;
+        v138 = v136 / v137;
+        float v139[64l];
         int v140;
-        v140 = v139 / 32l;
-        auto v141 = cooperative_groups::labeled_partition(v138,v140);
-        Closure1 v142{};
-        float v143;
-        v143 = cooperative_groups::reduce(v141, v129, v142);
-        int v144;
-        v144 = threadIdx.x;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v145 = console_lock;
-        auto v146 = cooperative_groups::coalesced_threads();
-        v145.acquire();
-        printf("{%s = %f; %s = %d; %s = %f}\n","result", v129, "tid", v144, "x", v143);
-        v145.release();
-        v146.sync() ;
-        float v151;
-        v151 = (float)v111;
-        float v152;
-        v152 = v143 / v151;
-        float v153[64l];
-        int v154;
-        v154 = 0l;
-        while (while_method_13(v154)){
-            int v156;
-            v156 = 0l;
-            while (while_method_3(v156)){
-                assert("Tensor range check" && 0 <= v154 && v154 < 16l);
-                assert("Tensor range check" && 0 <= v156 && v156 < 4l);
-                int v158;
-                v158 = 4l * v154;
-                int v159;
-                v159 = v158 + v156;
-                float v160;
-                v160 = v34[v159];
-                bool v161;
-                v161 = v78[v159];
-                float v162;
-                if (v161){
-                    v162 = v160;
+        v140 = 0l;
+        while (while_method_13(v140)){
+            int v142;
+            v142 = 0l;
+            while (while_method_3(v142)){
+                assert("Tensor range check" && 0 <= v140 && v140 < 16l);
+                assert("Tensor range check" && 0 <= v142 && v142 < 4l);
+                int v144;
+                v144 = 4l * v140;
+                int v145;
+                v145 = v144 + v142;
+                float v146;
+                v146 = v34[v145];
+                bool v147;
+                v147 = v78[v145];
+                float v148;
+                if (v147){
+                    v148 = v146;
                 } else {
-                    v162 = -1.0f / 0.0f;
+                    v148 = -1.0f / 0.0f;
                 }
-                float v163;
-                v163 = v162 - v152;
-                float v164;
-                v164 = exp(v163);
-                assert("Tensor range check" && 0 <= v154 && v154 < 16l);
-                assert("Tensor range check" && 0 <= v156 && v156 < 4l);
-                v153[v159] = v164;
-                v156 += 1l ;
+                float v149;
+                v149 = v148 - v138;
+                float v150;
+                v150 = exp(v149);
+                assert("Tensor range check" && 0 <= v140 && v140 < 16l);
+                assert("Tensor range check" && 0 <= v142 && v142 < 4l);
+                v139[v145] = v150;
+                v142 += 1l ;
             }
-            v154 += 1l ;
+            v140 += 1l ;
         }
-        float v165;
-        v165 = 0.0f;
+        float v151;
+        v151 = 0.0f;
+        int v152;
+        v152 = 0l;
+        while (while_method_13(v152)){
+            int v154;
+            v154 = 0l;
+            while (while_method_3(v154)){
+                assert("Tensor range check" && 0 <= v152 && v152 < 16l);
+                assert("Tensor range check" && 0 <= v154 && v154 < 4l);
+                int v156;
+                v156 = 4l * v152;
+                int v157;
+                v157 = v156 + v154;
+                float v158;
+                v158 = v139[v157];
+                float v159;
+                v159 = v151 + v158;
+                v151 = v159;
+                v154 += 1l ;
+            }
+            v152 += 1l ;
+        }
+        auto v160 = cooperative_groups::coalesced_threads();
+        int v161;
+        v161 = threadIdx.x;
+        int v162;
+        v162 = v161 / 32l;
+        auto v163 = cooperative_groups::labeled_partition(v160,v162);
+        float v164;
+        v164 = cooperative_groups::reduce(v163, v151, v135);
+        float v165[64l];
         int v166;
         v166 = 0l;
         while (while_method_13(v166)){
@@ -4318,390 +4350,397 @@ __device__ void method_46(int * v0, int v1, float * v2, int v3, float * v4, cura
                 int v171;
                 v171 = v170 + v168;
                 float v172;
-                v172 = v153[v171];
-                float v173;
-                v173 = v165 + v172;
-                v165 = v173;
+                v172 = v139[v171];
+                bool v173;
+                v173 = v164 == 0.0f;
+                bool v174;
+                v174 = v173 != true;
+                float v176;
+                if (v174){
+                    float v175;
+                    v175 = v172 / v164;
+                    v176 = v175;
+                } else {
+                    v176 = 0.00048828125f;
+                }
+                assert("Tensor range check" && 0 <= v166 && v166 < 16l);
+                assert("Tensor range check" && 0 <= v168 && v168 < 4l);
+                v165[v171] = v176;
                 v168 += 1l ;
             }
             v166 += 1l ;
         }
-        auto v174 = cooperative_groups::coalesced_threads();
-        int v175;
-        v175 = threadIdx.x;
-        int v176;
-        v176 = v175 / 32l;
-        auto v177 = cooperative_groups::labeled_partition(v174,v176);
+        float v177[64l];
         float v178;
-        v178 = cooperative_groups::reduce(v177, v165, v142);
+        v178 = 0.0f;
         int v179;
-        v179 = threadIdx.x;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v180 = console_lock;
-        auto v181 = cooperative_groups::coalesced_threads();
-        v180.acquire();
-        printf("{%s = %f; %s = %d; %s = %f}\n","result", v165, "tid", v179, "x", v178);
-        v180.release();
-        v181.sync() ;
-        float v186[64l];
-        int v187;
-        v187 = 0l;
-        while (while_method_13(v187)){
-            int v189;
-            v189 = 0l;
-            while (while_method_3(v189)){
-                assert("Tensor range check" && 0 <= v187 && v187 < 16l);
-                assert("Tensor range check" && 0 <= v189 && v189 < 4l);
-                int v191;
-                v191 = 4l * v187;
-                int v192;
-                v192 = v191 + v189;
-                float v193;
-                v193 = v153[v192];
-                bool v194;
-                v194 = v178 == 0.0f;
-                bool v195;
-                v195 = v194 != true;
-                float v197;
-                if (v195){
-                    float v196;
-                    v196 = v193 / v178;
-                    v197 = v196;
-                } else {
-                    v197 = 0.00048828125f;
-                }
-                assert("Tensor range check" && 0 <= v187 && v187 < 16l);
-                assert("Tensor range check" && 0 <= v189 && v189 < 4l);
-                v186[v192] = v197;
-                v189 += 1l ;
-            }
-            v187 += 1l ;
-        }
-        float v198[64l];
-        float v199;
-        v199 = 0.0f;
-        int v200;
-        v200 = 0l;
-        while (while_method_13(v200)){
-            assert("Tensor range check" && 0 <= v200 && v200 < 16l);
-            int v202;
-            v202 = 4l * v200;
-            assert("Tensor range check" && 0 <= v200 && v200 < 16l);
-            int v203; float v204;
+        v179 = 0l;
+        while (while_method_13(v179)){
+            assert("Tensor range check" && 0 <= v179 && v179 < 16l);
+            int v181;
+            v181 = 4l * v179;
+            assert("Tensor range check" && 0 <= v179 && v179 < 16l);
+            int v182; float v183;
             Tuple15 tmp30 = Tuple15{0l, 0.0f};
-            v203 = tmp30.v0; v204 = tmp30.v1;
-            while (while_method_3(v203)){
-                assert("Tensor range check" && 0 <= v203 && v203 < 4l);
-                int v206;
-                v206 = v203 + v202;
-                float v207;
-                v207 = v186[v206];
-                float v208;
-                v208 = v204 + v207;
-                v204 = v208;
-                v203 += 1l ;
+            v182 = tmp30.v0; v183 = tmp30.v1;
+            while (while_method_3(v182)){
+                assert("Tensor range check" && 0 <= v182 && v182 < 4l);
+                int v185;
+                v185 = v182 + v181;
+                float v186;
+                v186 = v165[v185];
+                float v187;
+                v187 = v183 + v186;
+                v183 = v187;
+                v182 += 1l ;
             }
-            auto v209 = cooperative_groups::coalesced_threads();
-            int v210;
-            v210 = threadIdx.x;
-            int v211;
-            v211 = v210 / 32l;
-            auto v212 = cooperative_groups::labeled_partition(v209,v211);
-            Closure2 v213{};
-            float v214;
-            v214 = cooperative_groups::inclusive_scan(v212, v204, v213);
-            float v215;
-            v215 = v212.shfl_up(v214,1);
-            bool v216;
-            v216 = v212.thread_rank() == 0;
-            float v217;
-            if (v216){
-                v217 = 0.0f;
+            auto v188 = cooperative_groups::coalesced_threads();
+            int v189;
+            v189 = threadIdx.x;
+            int v190;
+            v190 = v189 / 32l;
+            auto v191 = cooperative_groups::labeled_partition(v188,v190);
+            Closure2 v192{};
+            float v193;
+            v193 = cooperative_groups::inclusive_scan(v191, v183, v192);
+            float v194;
+            v194 = v191.shfl_up(v193,1);
+            bool v195;
+            v195 = v191.thread_rank() == 0;
+            float v196;
+            if (v195){
+                v196 = 0.0f;
             } else {
-                v217 = v215;
+                v196 = v194;
             }
-            float v218;
-            v218 = v212.shfl(v214,v212.num_threads()-1);
-            float v219;
-            v219 = v199 + v217;
-            int v220; float v221;
-            Tuple15 tmp31 = Tuple15{0l, v219};
-            v220 = tmp31.v0; v221 = tmp31.v1;
-            while (while_method_3(v220)){
-                assert("Tensor range check" && 0 <= v220 && v220 < 4l);
+            float v197;
+            v197 = v191.shfl(v193,v191.num_threads()-1);
+            float v198;
+            v198 = v178 + v196;
+            int v199; float v200;
+            Tuple15 tmp31 = Tuple15{0l, v198};
+            v199 = tmp31.v0; v200 = tmp31.v1;
+            while (while_method_3(v199)){
+                assert("Tensor range check" && 0 <= v199 && v199 < 4l);
+                int v202;
+                v202 = v199 + v181;
+                float v203;
+                v203 = v165[v202];
+                float v204;
+                v204 = v200 + v203;
+                assert("Tensor range check" && 0 <= v199 && v199 < 4l);
+                v177[v202] = v204;
+                v200 = v204;
+                v199 += 1l ;
+            }
+            float v205;
+            v205 = v178 + v197;
+            v178 = v205;
+            v179 += 1l ;
+        }
+        float v206[64l];
+        bool v207[64l];
+        int v208;
+        v208 = 0l;
+        while (while_method_13(v208)){
+            int v210;
+            v210 = 0l;
+            while (while_method_3(v210)){
+                assert("Tensor range check" && 0 <= v208 && v208 < 16l);
+                assert("Tensor range check" && 0 <= v210 && v210 < 4l);
+                int v212;
+                v212 = 4l * v208;
+                int v213;
+                v213 = v212 + v210;
+                float v214;
+                v214 = v177[v213];
+                float v215;
+                v215 = v165[v213];
+                bool v216;
+                v216 = v215 > 0.0f;
+                assert("Tensor range check" && 0 <= v208 && v208 < 16l);
+                assert("Tensor range check" && 0 <= v210 && v210 < 4l);
+                v206[v213] = v214;
+                v207[v213] = v216;
+                v210 += 1l ;
+            }
+            v208 += 1l ;
+        }
+        float v217; bool v218;
+        Tuple16 tmp32 = Tuple16{-1.0f / 0.0f, false};
+        v217 = tmp32.v0; v218 = tmp32.v1;
+        int v219;
+        v219 = 0l;
+        while (while_method_13(v219)){
+            int v221;
+            v221 = 0l;
+            while (while_method_3(v221)){
+                assert("Tensor range check" && 0 <= v219 && v219 < 16l);
+                assert("Tensor range check" && 0 <= v221 && v221 < 4l);
                 int v223;
-                v223 = v220 + v202;
-                float v224;
-                v224 = v186[v223];
+                v223 = 4l * v219;
+                int v224;
+                v224 = v223 + v221;
                 float v225;
-                v225 = v221 + v224;
-                assert("Tensor range check" && 0 <= v220 && v220 < 4l);
-                v198[v223] = v225;
-                v221 = v225;
-                v220 += 1l ;
-            }
-            float v226;
-            v226 = v199 + v218;
-            v199 = v226;
-            v200 += 1l ;
-        }
-        float v227[64l];
-        int v228[64l];
-        int v229;
-        v229 = 0l;
-        while (while_method_13(v229)){
-            int v231;
-            v231 = 0l;
-            while (while_method_3(v231)){
-                assert("Tensor range check" && 0 <= v229 && v229 < 16l);
-                assert("Tensor range check" && 0 <= v231 && v231 < 4l);
-                int v233;
-                v233 = 4l * v229;
-                int v234;
-                v234 = v233 + v231;
-                int v235;
-                v235 = v35[v234];
-                float v236;
-                v236 = curand_uniform(&v5);
-                assert("Tensor range check" && 0 <= v229 && v229 < 16l);
-                assert("Tensor range check" && 0 <= v231 && v231 < 4l);
-                v227[v234] = v236;
-                v228[v234] = v235;
-                v231 += 1l ;
-            }
-            v229 += 1l ;
-        }
-        float v237; int v238;
-        Tuple16 tmp32 = Tuple16{0.0f, 2147483647l};
-        v237 = tmp32.v0; v238 = tmp32.v1;
-        int v239;
-        v239 = 0l;
-        while (while_method_13(v239)){
-            int v241;
-            v241 = 0l;
-            while (while_method_3(v241)){
-                assert("Tensor range check" && 0 <= v239 && v239 < 16l);
-                assert("Tensor range check" && 0 <= v241 && v241 < 4l);
-                int v243;
-                v243 = 4l * v239;
-                int v244;
-                v244 = v243 + v241;
-                float v245;
-                v245 = v227[v244];
-                int v246;
-                v246 = v228[v244];
-                bool v247;
-                v247 = v238 < v246;
-                float v248; int v249;
-                if (v247){
-                    v248 = v237; v249 = v238;
+                v225 = v206[v224];
+                bool v226;
+                v226 = v207[v224];
+                float v233; bool v234;
+                if (v218){
+                    if (v226){
+                        bool v227;
+                        v227 = v217 >= v225;
+                        float v228;
+                        if (v227){
+                            v228 = v217;
+                        } else {
+                            v228 = v225;
+                        }
+                        v233 = v228; v234 = true;
+                    } else {
+                        v233 = v217; v234 = v218;
+                    }
                 } else {
-                    v248 = v245; v249 = v246;
+                    if (v226){
+                        v233 = v225; v234 = v226;
+                    } else {
+                        v233 = v217; v234 = v218;
+                    }
                 }
-                v237 = v248;
-                v238 = v249;
-                v241 += 1l ;
+                v217 = v233;
+                v218 = v234;
+                v221 += 1l ;
             }
-            v239 += 1l ;
+            v219 += 1l ;
         }
-        auto v250 = cooperative_groups::coalesced_threads();
-        int v251;
-        v251 = threadIdx.x;
-        int v252;
-        v252 = v251 / 32l;
-        auto v253 = cooperative_groups::labeled_partition(v250,v252);
-        Closure3 v254{};
-        float v255; int v256;
-        Tuple16 tmp33 = cooperative_groups::reduce(v253, Tuple16{v237, v238}, v254);
-        v255 = tmp33.v0; v256 = tmp33.v1;
-        int v257;
-        v257 = threadIdx.x;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v258 = console_lock;
-        auto v259 = cooperative_groups::coalesced_threads();
-        v258.acquire();
-        printf("{%s = %f, %d; %s = %d; %s = %f, %d}\n","result", v237, v238, "tid", v257, "x", v255, v256);
-        v258.release();
-        v259.sync() ;
-        float v264[64l];
-        int v265;
-        v265 = 0l;
-        while (while_method_13(v265)){
-            int v267;
-            v267 = 0l;
-            while (while_method_3(v267)){
-                assert("Tensor range check" && 0 <= v265 && v265 < 16l);
-                assert("Tensor range check" && 0 <= v267 && v267 < 4l);
-                int v269;
-                v269 = 4l * v265;
-                int v270;
-                v270 = v269 + v267;
-                float v271;
-                v271 = v198[v270];
-                float v272;
-                v272 = v271 - v255;
-                assert("Tensor range check" && 0 <= v265 && v265 < 16l);
-                assert("Tensor range check" && 0 <= v267 && v267 < 4l);
-                v264[v270] = v272;
-                v267 += 1l ;
+        auto v235 = cooperative_groups::coalesced_threads();
+        int v236;
+        v236 = threadIdx.x;
+        int v237;
+        v237 = v236 / 32l;
+        auto v238 = cooperative_groups::labeled_partition(v235,v237);
+        Closure3 v239{};
+        float v240; bool v241;
+        Tuple16 tmp33 = cooperative_groups::reduce(v238, Tuple16{v217, v218}, v239);
+        v240 = tmp33.v0; v241 = tmp33.v1;
+        bool v242;
+        v242 = v241 == false;
+        if (v242){
+            assert("The local reduce must be true." && v241);
+        } else {
+        }
+        float v244[64l];
+        int v245[64l];
+        int v246;
+        v246 = 0l;
+        while (while_method_13(v246)){
+            int v248;
+            v248 = 0l;
+            while (while_method_3(v248)){
+                assert("Tensor range check" && 0 <= v246 && v246 < 16l);
+                assert("Tensor range check" && 0 <= v248 && v248 < 4l);
+                int v250;
+                v250 = 4l * v246;
+                int v251;
+                v251 = v250 + v248;
+                int v252;
+                v252 = v35[v251];
+                float v253;
+                v253 = curand_uniform(&v5);
+                assert("Tensor range check" && 0 <= v246 && v246 < 16l);
+                assert("Tensor range check" && 0 <= v248 && v248 < 4l);
+                v244[v251] = v253;
+                v245[v251] = v252;
+                v248 += 1l ;
             }
-            v265 += 1l ;
+            v246 += 1l ;
         }
-        float v273; int v274;
-        Tuple16 tmp34 = Tuple16{-1.0f / 0.0f, 2147483647l};
-        v273 = tmp34.v0; v274 = tmp34.v1;
-        int v275;
-        v275 = 0l;
-        while (while_method_13(v275)){
-            int v277;
-            v277 = 0l;
-            while (while_method_3(v277)){
-                assert("Tensor range check" && 0 <= v275 && v275 < 16l);
-                assert("Tensor range check" && 0 <= v277 && v277 < 4l);
-                int v279;
-                v279 = 4l * v275;
-                int v280;
-                v280 = v279 + v277;
-                float v281;
-                v281 = v264[v280];
+        float v254; int v255;
+        Tuple17 tmp34 = Tuple17{0.0f, 2147483647l};
+        v254 = tmp34.v0; v255 = tmp34.v1;
+        int v256;
+        v256 = 0l;
+        while (while_method_13(v256)){
+            int v258;
+            v258 = 0l;
+            while (while_method_3(v258)){
+                assert("Tensor range check" && 0 <= v256 && v256 < 16l);
+                assert("Tensor range check" && 0 <= v258 && v258 < 4l);
+                int v260;
+                v260 = 4l * v256;
+                int v261;
+                v261 = v260 + v258;
+                float v262;
+                v262 = v244[v261];
+                int v263;
+                v263 = v245[v261];
+                bool v264;
+                v264 = v255 < v263;
+                float v265; int v266;
+                if (v264){
+                    v265 = v254; v266 = v255;
+                } else {
+                    v265 = v262; v266 = v263;
+                }
+                v254 = v265;
+                v255 = v266;
+                v258 += 1l ;
+            }
+            v256 += 1l ;
+        }
+        auto v267 = cooperative_groups::coalesced_threads();
+        int v268;
+        v268 = threadIdx.x;
+        int v269;
+        v269 = v268 / 32l;
+        auto v270 = cooperative_groups::labeled_partition(v267,v269);
+        Closure4 v271{};
+        float v272; int v273;
+        Tuple17 tmp35 = cooperative_groups::reduce(v270, Tuple17{v254, v255}, v271);
+        v272 = tmp35.v0; v273 = tmp35.v1;
+        float v274;
+        v274 = v240 * v272;
+        int v275[64l];
+        bool v276[64l];
+        int v277;
+        v277 = 0l;
+        while (while_method_13(v277)){
+            int v279;
+            v279 = 0l;
+            while (while_method_3(v279)){
+                assert("Tensor range check" && 0 <= v277 && v277 < 16l);
+                assert("Tensor range check" && 0 <= v279 && v279 < 4l);
+                int v281;
+                v281 = 4l * v277;
                 int v282;
-                v282 = v35[v280];
-                float v283; int v284;
-                Tuple16 tmp35 = method_47(v273, v274, v281, v282);
-                v283 = tmp35.v0; v284 = tmp35.v1;
-                v273 = v283;
-                v274 = v284;
-                v277 += 1l ;
+                v282 = v281 + v279;
+                float v283;
+                v283 = v206[v282];
+                bool v284;
+                v284 = v207[v282];
+                int v285;
+                v285 = v35[v282];
+                int v288; bool v289;
+                if (v284){
+                    float v286;
+                    v286 = v283 - v274;
+                    bool v287;
+                    v287 = v286 >= 0.0f;
+                    v288 = v285; v289 = v287;
+                } else {
+                    v288 = 2147483647l; v289 = false;
+                }
+                assert("Tensor range check" && 0 <= v277 && v277 < 16l);
+                assert("Tensor range check" && 0 <= v279 && v279 < 4l);
+                v275[v282] = v288;
+                v276[v282] = v289;
+                v279 += 1l ;
             }
-            v275 += 1l ;
+            v277 += 1l ;
         }
-        auto v285 = cooperative_groups::coalesced_threads();
-        int v286;
-        v286 = threadIdx.x;
-        int v287;
-        v287 = v286 / 32l;
-        auto v288 = cooperative_groups::labeled_partition(v285,v287);
-        Closure4 v289{};
-        float v290; int v291;
-        Tuple16 tmp36 = cooperative_groups::reduce(v288, Tuple16{v273, v274}, v289);
+        int v290; bool v291;
+        Tuple18 tmp36 = Tuple18{2147483647l, false};
         v290 = tmp36.v0; v291 = tmp36.v1;
         int v292;
-        v292 = threadIdx.x;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v293 = console_lock;
-        auto v294 = cooperative_groups::coalesced_threads();
-        v293.acquire();
-        printf("{%s = %f, %d; %s = %d; %s = %f, %d}\n","result", v273, v274, "tid", v292, "x", v290, v291);
-        v293.release();
-        v294.sync() ;
-        bool v299;
-        v299 = v291 < 11l;
-        bool v300;
-        v300 = v299 == false;
-        if (v300){
-            int v301;
-            v301 = threadIdx.x;
-            cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v302 = console_lock;
-            auto v303 = cooperative_groups::coalesced_threads();
-            v302.acquire();
-            int v304;
-            v304 = 0l;
-            printf("{%s = %d; %s = %d; %s = %c","output_id", v291, "tid", v301, "x", '[');
-            int v305;
-            v305 = 0l;
-            while (while_method_13(v305)){
-                int v307;
-                v307 = v304;
-                bool v308;
-                v308 = v307 >= 100l;
-                if (v308){
-                    printf("%s"," ...");
-                    break;
-                } else {
-                }
-                bool v309;
-                v309 = v305 == 0l;
-                bool v310;
-                v310 = v309 != true;
-                if (v310){
-                    printf("%s","; ");
-                } else {
-                }
-                printf("%c",'[');
-                int v311;
-                v311 = 0l;
-                while (while_method_3(v311)){
-                    int v313;
-                    v313 = v304;
-                    bool v314;
-                    v314 = v313 >= 100l;
-                    if (v314){
-                        printf("%s"," ...");
-                        break;
+        v292 = 0l;
+        while (while_method_13(v292)){
+            int v294;
+            v294 = 0l;
+            while (while_method_3(v294)){
+                assert("Tensor range check" && 0 <= v292 && v292 < 16l);
+                assert("Tensor range check" && 0 <= v294 && v294 < 4l);
+                int v296;
+                v296 = 4l * v292;
+                int v297;
+                v297 = v296 + v294;
+                int v298;
+                v298 = v275[v297];
+                bool v299;
+                v299 = v276[v297];
+                int v306; bool v307;
+                if (v291){
+                    if (v299){
+                        bool v300;
+                        v300 = v290 < v298;
+                        int v301;
+                        if (v300){
+                            v301 = v290;
+                        } else {
+                            v301 = v298;
+                        }
+                        v306 = v301; v307 = true;
                     } else {
+                        v306 = v290; v307 = v291;
                     }
-                    bool v315;
-                    v315 = v311 == 0l;
-                    bool v316;
-                    v316 = v315 != true;
-                    if (v316){
-                        printf("%s","; ");
+                } else {
+                    if (v299){
+                        v306 = v298; v307 = v299;
                     } else {
+                        v306 = v290; v307 = v291;
                     }
-                    int v317;
-                    v317 = v304 + 1l;
-                    v304 = v317;
-                    int v318;
-                    v318 = v305 * 4l;
-                    int v319;
-                    v319 = v318 + v311;
-                    float v320;
-                    v320 = v264[v319];
-                    printf("%f",v320);
-                    v311 += 1l ;
                 }
-                printf("%c",']');
-                v305 += 1l ;
+                v290 = v306;
+                v291 = v307;
+                v294 += 1l ;
             }
-            printf("%c",']');
-            printf("}\n");
-            v302.release();
-            v303.sync() ;
+            v292 += 1l ;
+        }
+        auto v308 = cooperative_groups::coalesced_threads();
+        int v309;
+        v309 = threadIdx.x;
+        int v310;
+        v310 = v309 / 32l;
+        auto v311 = cooperative_groups::labeled_partition(v308,v310);
+        Closure5 v312{};
+        int v313; bool v314;
+        Tuple18 tmp37 = cooperative_groups::reduce(v311, Tuple18{v290, v291}, v312);
+        v313 = tmp37.v0; v314 = tmp37.v1;
+        bool v315;
+        v315 = v314 == false;
+        if (v315){
+            assert("The local reduce must be true." && v314);
         } else {
         }
-        if (v300){
-            assert("The masking requirement is violated in masked_softmax_and_discrete_sample_." && v299);
+        bool v317;
+        v317 = v313 < 11l;
+        bool v318;
+        v318 = v317 == false;
+        if (v318){
+            assert("The masking requirement is violated in masked_softmax_and_discrete_sample_." && v317);
         } else {
         }
         assert("Tensor range check" && 0 <= v30 && v30 < 32l);
-        int v353;
-        v353 = v32 + v28;
-        int v354;
-        v354 = 0l;
-        while (while_method_13(v354)){
-            assert("Tensor range check" && 0 <= v354 && v354 < 16l);
-            int v356;
-            v356 = 128l * v354;
-            int v357;
-            v357 = v356 + v353;
-            assert("Tensor range check" && 0 <= v354 && v354 < 16l);
-            int v358;
-            v358 = 4l * v354;
-            int4* v359;
-            v359 = reinterpret_cast<int4*>(v186 + v358);
-            int4* v360;
-            v360 = reinterpret_cast<int4*>(v2 + v357);
-            assert("Pointer alignment check" && (unsigned long long)(v359) % 4l == 0 && (unsigned long long)(v360) % 4l == 0);
-            *v360 = *v359;
-            v354 += 1l ;
+        int v320;
+        v320 = v32 + v28;
+        int v321;
+        v321 = 0l;
+        while (while_method_13(v321)){
+            assert("Tensor range check" && 0 <= v321 && v321 < 16l);
+            int v323;
+            v323 = 128l * v321;
+            int v324;
+            v324 = v323 + v320;
+            assert("Tensor range check" && 0 <= v321 && v321 < 16l);
+            int v325;
+            v325 = 4l * v321;
+            int4* v326;
+            v326 = reinterpret_cast<int4*>(v165 + v325);
+            int4* v327;
+            v327 = reinterpret_cast<int4*>(v2 + v324);
+            assert("Pointer alignment check" && (unsigned long long)(v326) % 4l == 0 && (unsigned long long)(v327) % 4l == 0);
+            *v327 = *v326;
+            v321 += 1l ;
         }
         assert("Tensor range check" && 0 <= v30 && v30 < 32l);
-        int v361;
-        v361 = v30 + v29;
-        v0[v361] = v291;
+        int v328;
+        v328 = v30 + v29;
+        v0[v328] = v313;
         v30 += 1l ;
     }
     asm("barrier.cta.sync %0;" :: "r"(0l));
     return ;
 }
-__device__ int int_range_48(int v0, int v1, curandStatePhilox4_32_10_t & v2){
+__device__ int int_range_47(int v0, int v1, curandStatePhilox4_32_10_t & v2){
     int v3;
     v3 = v0 - v1;
     unsigned int v4;
@@ -5223,7 +5262,7 @@ __device__ __noinline__ Tuple13 noinline_run_42(unsigned char * v0, unsigned cha
     int v219;
     v219 = 4l;
     int v220;
-    v220 = int_range_48(v219, v218, v26);
+    v220 = int_range_47(v219, v218, v26);
     float * v221;
     v221 = reinterpret_cast<float *>(&v0[524288ull]);
     int * v223;
@@ -5353,7 +5392,7 @@ __device__ __noinline__ Tuple13 noinline_run_42(unsigned char * v0, unsigned cha
     v280 = v231 + v279;
     return Tuple13{v265, v221, v280, 65536l, 4l, v274};
 }
-__device__ void method_49(Union1 v0){
+__device__ void method_48(Union1 v0){
     switch (v0.tag) {
         case 0: { // A_All_In
             printf("%s","A_All_In");
@@ -5396,7 +5435,7 @@ __device__ inline bool while_method_16(int v0, int v1){
     v2 = v1 > v0;
     return v2;
 }
-__device__ int loop_53(static_array<float,6l> v0, float v1, int v2){
+__device__ int loop_52(static_array<float,6l> v0, float v1, int v2){
     bool v3;
     v3 = v2 < 6l;
     if (v3){
@@ -5409,13 +5448,13 @@ __device__ int loop_53(static_array<float,6l> v0, float v1, int v2){
         } else {
             int v7;
             v7 = v2 + 1l;
-            return loop_53(v0, v1, v7);
+            return loop_52(v0, v1, v7);
         }
     } else {
         return 5l;
     }
 }
-__device__ int pick_discrete__52(static_array<float,6l> v0, float v1){
+__device__ int pick_discrete__51(static_array<float,6l> v0, float v1){
     static_array<float,6l> v2;
     int v4;
     v4 = 0l;
@@ -5452,29 +5491,29 @@ __device__ int pick_discrete__52(static_array<float,6l> v0, float v1){
     v21 = v1 * v19;
     int v22;
     v22 = 0l;
-    return loop_53(v2, v21, v22);
+    return loop_52(v2, v21, v22);
 }
-__device__ int sample_discrete__51(static_array<float,6l> v0, curandStatePhilox4_32_10_t & v1){
+__device__ int sample_discrete__50(static_array<float,6l> v0, curandStatePhilox4_32_10_t & v1){
     float v2;
     v2 = curand_uniform(&v1);
-    return pick_discrete__52(v0, v2);
+    return pick_discrete__51(v0, v2);
 }
-__device__ Union1 sample_discrete_50(static_array<Tuple17,6l> v0, curandStatePhilox4_32_10_t & v1){
+__device__ Union1 sample_discrete_49(static_array<Tuple19,6l> v0, curandStatePhilox4_32_10_t & v1){
     static_array<float,6l> v2;
     int v4;
     v4 = 0l;
     while (while_method_14(v4)){
         Union1 v6; float v7;
-        Tuple17 tmp46 = v0[v4];
-        v6 = tmp46.v0; v7 = tmp46.v1;
+        Tuple19 tmp47 = v0[v4];
+        v6 = tmp47.v0; v7 = tmp47.v1;
         v2[v4] = v7;
         v4 += 1l ;
     }
     int v10;
-    v10 = sample_discrete__51(v2, v1);
+    v10 = sample_discrete__50(v2, v1);
     Union1 v11; float v12;
-    Tuple17 tmp47 = v0[v10];
-    v11 = tmp47.v0; v12 = tmp47.v1;
+    Tuple19 tmp48 = v0[v10];
+    v11 = tmp48.v0; v12 = tmp48.v1;
     return v11;
 }
 __device__ inline bool while_method_17(int v0){
@@ -5497,7 +5536,7 @@ __device__ inline bool while_method_20(int v0, int v1, int v2, int v3){
     v4 = v3 < v0;
     return v4;
 }
-__device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
+__device__ Tuple0 score_53(static_array<unsigned char,7l> v0){
     static_array<unsigned char,7l> v1;
     int v3;
     v3 = 0l;
@@ -5509,8 +5548,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,7l> v7;
     bool v9; int v10;
-    Tuple18 tmp54 = Tuple18{true, 1l};
-    v9 = tmp54.v0; v10 = tmp54.v1;
+    Tuple20 tmp55 = Tuple20{true, 1l};
+    v9 = tmp55.v0; v10 = tmp55.v1;
     while (while_method_18(v1, v9, v10)){
         int v12;
         v12 = 0l;
@@ -5538,8 +5577,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                 v20 = 7l;
             }
             int v21; int v22; int v23;
-            Tuple19 tmp55 = Tuple19{v12, v16, v12};
-            v21 = tmp55.v0; v22 = tmp55.v1; v23 = tmp55.v2;
+            Tuple21 tmp56 = Tuple21{v12, v16, v12};
+            v21 = tmp56.v0; v22 = tmp56.v1; v23 = tmp56.v2;
             while (while_method_20(v20, v21, v22, v23)){
                 bool v25;
                 v25 = v21 < v16;
@@ -5691,8 +5730,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v85;
     int v87; int v88; unsigned char v89;
-    Tuple20 tmp56 = Tuple20{0l, 0l, 12u};
-    v87 = tmp56.v0; v88 = tmp56.v1; v89 = tmp56.v2;
+    Tuple22 tmp57 = Tuple22{0l, 0l, 12u};
+    v87 = tmp57.v0; v88 = tmp57.v1; v89 = tmp57.v2;
     while (while_method_17(v87)){
         unsigned char v91;
         v91 = v84[v87];
@@ -5855,8 +5894,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v153;
     int v155; int v156; unsigned char v157;
-    Tuple20 tmp57 = Tuple20{0l, 0l, 12u};
-    v155 = tmp57.v0; v156 = tmp57.v1; v157 = tmp57.v2;
+    Tuple22 tmp58 = Tuple22{0l, 0l, 12u};
+    v155 = tmp58.v0; v156 = tmp58.v1; v157 = tmp58.v2;
     while (while_method_17(v155)){
         unsigned char v159;
         v159 = v84[v155];
@@ -6035,8 +6074,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                     Union11 v223;
                     v223 = Union11{Union11_0{}};
                     int v224; Union11 v225;
-                    Tuple21 tmp58 = Tuple21{0l, v223};
-                    v224 = tmp58.v0; v225 = tmp58.v1;
+                    Tuple23 tmp59 = Tuple23{0l, v223};
+                    v224 = tmp59.v0; v225 = tmp59.v1;
                     while (while_method_2(v224)){
                         unsigned char v227;
                         v227 = v221[v224];
@@ -6102,8 +6141,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v249;
     int v251; int v252; unsigned char v253;
-    Tuple20 tmp59 = Tuple20{0l, 0l, 12u};
-    v251 = tmp59.v0; v252 = tmp59.v1; v253 = tmp59.v2;
+    Tuple22 tmp60 = Tuple22{0l, 0l, 12u};
+    v251 = tmp60.v0; v252 = tmp60.v1; v253 = tmp60.v2;
     while (while_method_17(v251)){
         unsigned char v255;
         v255 = v84[v251];
@@ -6282,8 +6321,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                     Union11 v319;
                     v319 = Union11{Union11_0{}};
                     int v320; Union11 v321;
-                    Tuple21 tmp60 = Tuple21{0l, v319};
-                    v320 = tmp60.v0; v321 = tmp60.v1;
+                    Tuple23 tmp61 = Tuple23{0l, v319};
+                    v320 = tmp61.v0; v321 = tmp61.v1;
                     while (while_method_2(v320)){
                         unsigned char v323;
                         v323 = v317[v320];
@@ -6349,8 +6388,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
     }
     static_array<unsigned char,5l> v345;
     int v347; int v348; unsigned char v349;
-    Tuple20 tmp61 = Tuple20{0l, 0l, 12u};
-    v347 = tmp61.v0; v348 = tmp61.v1; v349 = tmp61.v2;
+    Tuple22 tmp62 = Tuple22{0l, 0l, 12u};
+    v347 = tmp62.v0; v348 = tmp62.v1; v349 = tmp62.v2;
     while (while_method_17(v347)){
         unsigned char v351;
         v351 = v84[v347];
@@ -6529,8 +6568,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                     Union11 v415;
                     v415 = Union11{Union11_0{}};
                     int v416; Union11 v417;
-                    Tuple21 tmp62 = Tuple21{0l, v415};
-                    v416 = tmp62.v0; v417 = tmp62.v1;
+                    Tuple23 tmp63 = Tuple23{0l, v415};
+                    v416 = tmp63.v0; v417 = tmp63.v1;
                     while (while_method_2(v416)){
                         unsigned char v419;
                         v419 = v413[v416];
@@ -6600,8 +6639,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
             static_array<unsigned char,4l> v442;
             static_array<unsigned char,3l> v444;
             int v446; int v447; int v448; unsigned char v449;
-            Tuple22 tmp63 = Tuple22{0l, 0l, 0l, 12u};
-            v446 = tmp63.v0; v447 = tmp63.v1; v448 = tmp63.v2; v449 = tmp63.v3;
+            Tuple24 tmp64 = Tuple24{0l, 0l, 0l, 12u};
+            v446 = tmp64.v0; v447 = tmp64.v1; v448 = tmp64.v2; v449 = tmp64.v3;
             while (while_method_17(v446)){
                 unsigned char v451;
                 v451 = v84[v446];
@@ -6707,8 +6746,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                     static_array<unsigned char,3l> v500;
                     static_array<unsigned char,4l> v502;
                     int v504; int v505; int v506; unsigned char v507;
-                    Tuple22 tmp64 = Tuple22{0l, 0l, 0l, 12u};
-                    v504 = tmp64.v0; v505 = tmp64.v1; v506 = tmp64.v2; v507 = tmp64.v3;
+                    Tuple24 tmp65 = Tuple24{0l, 0l, 0l, 12u};
+                    v504 = tmp65.v0; v505 = tmp65.v1; v506 = tmp65.v2; v507 = tmp65.v3;
                     while (while_method_17(v504)){
                         unsigned char v509;
                         v509 = v84[v504];
@@ -6777,8 +6816,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                             static_array<unsigned char,2l> v536;
                             static_array<unsigned char,2l> v538;
                             int v540; int v541; int v542; unsigned char v543;
-                            Tuple22 tmp65 = Tuple22{0l, 0l, 0l, 12u};
-                            v540 = tmp65.v0; v541 = tmp65.v1; v542 = tmp65.v2; v543 = tmp65.v3;
+                            Tuple24 tmp66 = Tuple24{0l, 0l, 0l, 12u};
+                            v540 = tmp66.v0; v541 = tmp66.v1; v542 = tmp66.v2; v543 = tmp66.v3;
                             while (while_method_3(v540)){
                                 unsigned char v545;
                                 v545 = v535[v540];
@@ -6879,8 +6918,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                         case 0: { // None
                             static_array<unsigned char,5l> v591;
                             int v593; int v594;
-                            Tuple4 tmp66 = Tuple4{0l, 0l};
-                            v593 = tmp66.v0; v594 = tmp66.v1;
+                            Tuple4 tmp67 = Tuple4{0l, 0l};
+                            v593 = tmp67.v0; v594 = tmp67.v1;
                             while (while_method_17(v593)){
                                 unsigned char v596;
                                 v596 = v84[v593];
@@ -6918,8 +6957,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                             }
                             static_array<unsigned char,5l> v608;
                             int v610; int v611;
-                            Tuple4 tmp67 = Tuple4{0l, 0l};
-                            v610 = tmp67.v0; v611 = tmp67.v1;
+                            Tuple4 tmp68 = Tuple4{0l, 0l};
+                            v610 = tmp68.v0; v611 = tmp68.v1;
                             while (while_method_17(v610)){
                                 unsigned char v613;
                                 v613 = v84[v610];
@@ -6973,8 +7012,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                             Union11 v627;
                                             v627 = Union11{Union11_0{}};
                                             int v628; Union11 v629;
-                                            Tuple21 tmp68 = Tuple21{0l, v627};
-                                            v628 = tmp68.v0; v629 = tmp68.v1;
+                                            Tuple23 tmp69 = Tuple23{0l, v627};
+                                            v628 = tmp69.v0; v629 = tmp69.v1;
                                             while (while_method_2(v628)){
                                                 unsigned char v631;
                                                 v631 = v625[v628];
@@ -7040,8 +7079,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                             }
                             static_array<unsigned char,5l> v653;
                             int v655; int v656;
-                            Tuple4 tmp69 = Tuple4{0l, 0l};
-                            v655 = tmp69.v0; v656 = tmp69.v1;
+                            Tuple4 tmp70 = Tuple4{0l, 0l};
+                            v655 = tmp70.v0; v656 = tmp70.v1;
                             while (while_method_17(v655)){
                                 unsigned char v658;
                                 v658 = v84[v655];
@@ -7095,8 +7134,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                             Union11 v672;
                                             v672 = Union11{Union11_0{}};
                                             int v673; Union11 v674;
-                                            Tuple21 tmp70 = Tuple21{0l, v672};
-                                            v673 = tmp70.v0; v674 = tmp70.v1;
+                                            Tuple23 tmp71 = Tuple23{0l, v672};
+                                            v673 = tmp71.v0; v674 = tmp71.v1;
                                             while (while_method_2(v673)){
                                                 unsigned char v676;
                                                 v676 = v670[v673];
@@ -7162,8 +7201,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                             }
                             static_array<unsigned char,5l> v698;
                             int v700; int v701;
-                            Tuple4 tmp71 = Tuple4{0l, 0l};
-                            v700 = tmp71.v0; v701 = tmp71.v1;
+                            Tuple4 tmp72 = Tuple4{0l, 0l};
+                            v700 = tmp72.v0; v701 = tmp72.v1;
                             while (while_method_17(v700)){
                                 unsigned char v703;
                                 v703 = v84[v700];
@@ -7217,8 +7256,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                             Union11 v717;
                                             v717 = Union11{Union11_0{}};
                                             int v718; Union11 v719;
-                                            Tuple21 tmp72 = Tuple21{0l, v717};
-                                            v718 = tmp72.v0; v719 = tmp72.v1;
+                                            Tuple23 tmp73 = Tuple23{0l, v717};
+                                            v718 = tmp73.v0; v719 = tmp73.v1;
                                             while (while_method_2(v718)){
                                                 unsigned char v721;
                                                 v721 = v715[v718];
@@ -7286,8 +7325,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                 case 0: { // None
                                     static_array<unsigned char,5l> v744;
                                     int v746; int v747; unsigned char v748;
-                                    Tuple20 tmp73 = Tuple20{0l, 0l, 12u};
-                                    v746 = tmp73.v0; v747 = tmp73.v1; v748 = tmp73.v2;
+                                    Tuple22 tmp74 = Tuple22{0l, 0l, 12u};
+                                    v746 = tmp74.v0; v747 = tmp74.v1; v748 = tmp74.v2;
                                     while (while_method_17(v746)){
                                         unsigned char v750;
                                         v750 = v84[v746];
@@ -7370,8 +7409,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                             static_array<unsigned char,3l> v783;
                                             static_array<unsigned char,4l> v785;
                                             int v787; int v788; int v789; unsigned char v790;
-                                            Tuple22 tmp74 = Tuple22{0l, 0l, 0l, 12u};
-                                            v787 = tmp74.v0; v788 = tmp74.v1; v789 = tmp74.v2; v790 = tmp74.v3;
+                                            Tuple24 tmp75 = Tuple24{0l, 0l, 0l, 12u};
+                                            v787 = tmp75.v0; v788 = tmp75.v1; v789 = tmp75.v2; v790 = tmp75.v3;
                                             while (while_method_17(v787)){
                                                 unsigned char v792;
                                                 v792 = v84[v787];
@@ -7477,8 +7516,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                                     static_array<unsigned char,2l> v841;
                                                     static_array<unsigned char,5l> v843;
                                                     int v845; int v846; int v847; unsigned char v848;
-                                                    Tuple22 tmp75 = Tuple22{0l, 0l, 0l, 12u};
-                                                    v845 = tmp75.v0; v846 = tmp75.v1; v847 = tmp75.v2; v848 = tmp75.v3;
+                                                    Tuple24 tmp76 = Tuple24{0l, 0l, 0l, 12u};
+                                                    v845 = tmp76.v0; v846 = tmp76.v1; v847 = tmp76.v2; v848 = tmp76.v3;
                                                     while (while_method_17(v845)){
                                                         unsigned char v850;
                                                         v850 = v84[v845];
@@ -7547,8 +7586,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                                             static_array<unsigned char,2l> v877;
                                                             static_array<unsigned char,3l> v879;
                                                             int v881; int v882; int v883; unsigned char v884;
-                                                            Tuple22 tmp76 = Tuple22{0l, 0l, 0l, 12u};
-                                                            v881 = tmp76.v0; v882 = tmp76.v1; v883 = tmp76.v2; v884 = tmp76.v3;
+                                                            Tuple24 tmp77 = Tuple24{0l, 0l, 0l, 12u};
+                                                            v881 = tmp77.v0; v882 = tmp77.v1; v883 = tmp77.v2; v884 = tmp77.v3;
                                                             while (while_method_2(v881)){
                                                                 unsigned char v886;
                                                                 v886 = v876[v881];
@@ -7669,8 +7708,8 @@ __device__ Tuple0 score_54(static_array<unsigned char,7l> v0){
                                                             static_array<unsigned char,2l> v943;
                                                             static_array<unsigned char,5l> v945;
                                                             int v947; int v948; int v949; unsigned char v950;
-                                                            Tuple22 tmp77 = Tuple22{0l, 0l, 0l, 12u};
-                                                            v947 = tmp77.v0; v948 = tmp77.v1; v949 = tmp77.v2; v950 = tmp77.v3;
+                                                            Tuple24 tmp78 = Tuple24{0l, 0l, 0l, 12u};
+                                                            v947 = tmp78.v0; v948 = tmp78.v1; v949 = tmp78.v2; v950 = tmp78.v3;
                                                             while (while_method_17(v947)){
                                                                 unsigned char v952;
                                                                 v952 = v84[v947];
@@ -8072,8 +8111,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 Union8 v131;
                                 v131 = Union8{Union8_1{v110, v111, v112, v113, v114, v115, v126}};
                                 Union9 v132; float * v133; int v134; int v135; int v136; float v137;
-                                Tuple13 tmp37 = noinline_run_42(v1, v3, v131);
-                                v132 = tmp37.v0; v133 = tmp37.v1; v134 = tmp37.v2; v135 = tmp37.v3; v136 = tmp37.v4; v137 = tmp37.v5;
+                                Tuple13 tmp38 = noinline_run_42(v1, v3, v131);
+                                v132 = tmp38.v0; v133 = tmp38.v1; v134 = tmp38.v2; v135 = tmp38.v3; v136 = tmp38.v4; v137 = tmp38.v5;
                                 Union1 v215;
                                 switch (v132.tag) {
                                     case 0: { // AA_Call
@@ -8084,8 +8123,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v138;
                                         v138 = v112[0l];
                                         int v140; int v141;
-                                        Tuple4 tmp38 = Tuple4{1l, v138};
-                                        v140 = tmp38.v0; v141 = tmp38.v1;
+                                        Tuple4 tmp39 = Tuple4{1l, v138};
+                                        v140 = tmp39.v0; v141 = tmp39.v1;
                                         while (while_method_0(v140)){
                                             int v143;
                                             v143 = v112[v140];
@@ -8129,8 +8168,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v165;
                                         v165 = v112[0l];
                                         int v167; int v168;
-                                        Tuple4 tmp39 = Tuple4{1l, v165};
-                                        v167 = tmp39.v0; v168 = tmp39.v1;
+                                        Tuple4 tmp40 = Tuple4{1l, v165};
+                                        v167 = tmp40.v0; v168 = tmp40.v1;
                                         while (while_method_0(v167)){
                                             int v170;
                                             v170 = v112[v167];
@@ -8175,8 +8214,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v186;
                                         v186 = v178[0l];
                                         int v188; int v189;
-                                        Tuple4 tmp40 = Tuple4{1l, v186};
-                                        v188 = tmp40.v0; v189 = tmp40.v1;
+                                        Tuple4 tmp41 = Tuple4{1l, v186};
+                                        v188 = tmp41.v0; v189 = tmp41.v1;
                                         while (while_method_0(v188)){
                                             int v191;
                                             v191 = v178[v188];
@@ -8235,7 +8274,7 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 auto v221 = cooperative_groups::coalesced_threads();
                                 v220.acquire();
                                 printf("");
-                                method_49(v215);
+                                method_48(v215);
                                 printf("\n");
                                 v220.release();
                                 v221.sync() ;
@@ -8261,8 +8300,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v351;
                                         v351 = v112[0l];
                                         int v353; int v354;
-                                        Tuple4 tmp41 = Tuple4{1l, v351};
-                                        v353 = tmp41.v0; v354 = tmp41.v1;
+                                        Tuple4 tmp42 = Tuple4{1l, v351};
+                                        v353 = tmp42.v0; v354 = tmp42.v1;
                                         while (while_method_0(v353)){
                                             int v356;
                                             v356 = v112[v353];
@@ -8391,8 +8430,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v235;
                                         v235 = v112[0l];
                                         int v237; int v238;
-                                        Tuple4 tmp42 = Tuple4{1l, v235};
-                                        v237 = tmp42.v0; v238 = tmp42.v1;
+                                        Tuple4 tmp43 = Tuple4{1l, v235};
+                                        v237 = tmp43.v0; v238 = tmp43.v1;
                                         while (while_method_0(v237)){
                                             int v240;
                                             v240 = v112[v237];
@@ -8488,8 +8527,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v283;
                                         v283 = v112[0l];
                                         int v285; int v286;
-                                        Tuple4 tmp43 = Tuple4{1l, v283};
-                                        v285 = tmp43.v0; v286 = tmp43.v1;
+                                        Tuple4 tmp44 = Tuple4{1l, v283};
+                                        v285 = tmp44.v0; v286 = tmp44.v1;
                                         while (while_method_0(v285)){
                                             int v288;
                                             v288 = v112[v285];
@@ -8635,8 +8674,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 int v426;
                                 v426 = v112[0l];
                                 int v428; int v429;
-                                Tuple4 tmp44 = Tuple4{1l, v426};
-                                v428 = tmp44.v0; v429 = tmp44.v1;
+                                Tuple4 tmp45 = Tuple4{1l, v426};
+                                v428 = tmp45.v0; v429 = tmp45.v1;
                                 while (while_method_0(v428)){
                                     int v431;
                                     v431 = v112[v428];
@@ -8681,8 +8720,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 int v447;
                                 v447 = v439[0l];
                                 int v449; int v450;
-                                Tuple4 tmp45 = Tuple4{1l, v447};
-                                v449 = tmp45.v0; v450 = tmp45.v1;
+                                Tuple4 tmp46 = Tuple4{1l, v447};
+                                v449 = tmp46.v0; v450 = tmp46.v1;
                                 while (while_method_0(v449)){
                                     int v452;
                                     v452 = v439[v449];
@@ -8772,27 +8811,27 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 } else {
                                     v487 = 0.0f;
                                 }
-                                static_array<Tuple17,6l> v488;
+                                static_array<Tuple19,6l> v488;
                                 Union1 v490;
                                 v490 = Union1{Union1_2{}};
-                                v488[0l] = Tuple17{v490, v467};
+                                v488[0l] = Tuple19{v490, v467};
                                 Union1 v492;
                                 v492 = Union1{Union1_1{}};
-                                v488[1l] = Tuple17{v492, 4.0f};
+                                v488[1l] = Tuple19{v492, 4.0f};
                                 Union1 v494;
                                 v494 = Union1{Union1_3{v468}};
-                                v488[2l] = Tuple17{v494, v474};
+                                v488[2l] = Tuple19{v494, v474};
                                 Union1 v496;
                                 v496 = Union1{Union1_3{v475}};
-                                v488[3l] = Tuple17{v496, v481};
+                                v488[3l] = Tuple19{v496, v481};
                                 Union1 v498;
                                 v498 = Union1{Union1_3{v450}};
-                                v488[4l] = Tuple17{v498, v487};
+                                v488[4l] = Tuple19{v498, v487};
                                 Union1 v500;
                                 v500 = Union1{Union1_0{}};
-                                v488[5l] = Tuple17{v500, 1.0f};
+                                v488[5l] = Tuple19{v500, 1.0f};
                                 Union1 v502;
-                                v502 = sample_discrete_50(v488, v0);
+                                v502 = sample_discrete_49(v488, v0);
                                 Union6 v503;
                                 v503 = Union6{Union6_2{v116, v502}};
                                 v11.push(v503);
@@ -8815,8 +8854,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v630;
                                         v630 = v112[0l];
                                         int v632; int v633;
-                                        Tuple4 tmp48 = Tuple4{1l, v630};
-                                        v632 = tmp48.v0; v633 = tmp48.v1;
+                                        Tuple4 tmp49 = Tuple4{1l, v630};
+                                        v632 = tmp49.v0; v633 = tmp49.v1;
                                         while (while_method_0(v632)){
                                             int v635;
                                             v635 = v112[v632];
@@ -8945,8 +8984,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v514;
                                         v514 = v112[0l];
                                         int v516; int v517;
-                                        Tuple4 tmp49 = Tuple4{1l, v514};
-                                        v516 = tmp49.v0; v517 = tmp49.v1;
+                                        Tuple4 tmp50 = Tuple4{1l, v514};
+                                        v516 = tmp50.v0; v517 = tmp50.v1;
                                         while (while_method_0(v516)){
                                             int v519;
                                             v519 = v112[v516];
@@ -9042,8 +9081,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                         int v562;
                                         v562 = v112[0l];
                                         int v564; int v565;
-                                        Tuple4 tmp50 = Tuple4{1l, v562};
-                                        v564 = tmp50.v0; v565 = tmp50.v1;
+                                        Tuple4 tmp51 = Tuple4{1l, v562};
+                                        v564 = tmp51.v0; v565 = tmp51.v1;
                                         while (while_method_0(v564)){
                                             int v567;
                                             v567 = v112[v564];
@@ -9194,8 +9233,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 int v831;
                                 v831 = v698[0l];
                                 int v833; int v834;
-                                Tuple4 tmp51 = Tuple4{1l, v831};
-                                v833 = tmp51.v0; v834 = tmp51.v1;
+                                Tuple4 tmp52 = Tuple4{1l, v831};
+                                v833 = tmp52.v0; v834 = tmp52.v1;
                                 while (while_method_0(v833)){
                                     int v836;
                                     v836 = v698[v833];
@@ -9324,8 +9363,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 int v715;
                                 v715 = v698[0l];
                                 int v717; int v718;
-                                Tuple4 tmp52 = Tuple4{1l, v715};
-                                v717 = tmp52.v0; v718 = tmp52.v1;
+                                Tuple4 tmp53 = Tuple4{1l, v715};
+                                v717 = tmp53.v0; v718 = tmp53.v1;
                                 while (while_method_0(v717)){
                                     int v720;
                                     v720 = v698[v717];
@@ -9421,8 +9460,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 int v763;
                                 v763 = v698[0l];
                                 int v765; int v766;
-                                Tuple4 tmp53 = Tuple4{1l, v763};
-                                v765 = tmp53.v0; v766 = tmp53.v1;
+                                Tuple4 tmp54 = Tuple4{1l, v763};
+                                v765 = tmp54.v0; v766 = tmp54.v1;
                                 while (while_method_0(v765)){
                                     int v768;
                                     v768 = v698[v765];
@@ -9577,8 +9616,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                             v49 += 1l ;
                         }
                         static_array<unsigned char,5l> v54; char v55;
-                        Tuple0 tmp78 = score_54(v43);
-                        v54 = tmp78.v0; v55 = tmp78.v1;
+                        Tuple0 tmp79 = score_53(v43);
+                        v54 = tmp79.v0; v55 = tmp79.v1;
                         static_array<unsigned char,2l> v56;
                         v56 = v33[1l];
                         static_array<unsigned char,7l> v58;
@@ -9601,8 +9640,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                             v64 += 1l ;
                         }
                         static_array<unsigned char,5l> v69; char v70;
-                        Tuple0 tmp79 = score_54(v58);
-                        v69 = tmp79.v0; v70 = tmp79.v1;
+                        Tuple0 tmp80 = score_53(v58);
+                        v69 = tmp80.v0; v70 = tmp80.v1;
                         int v71;
                         v71 = v35 % 2l;
                         int v72;
@@ -9709,8 +9748,8 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                     case 7: { // G_Turn
                         int v911 = v16.case7.v0; static_array<static_array<unsigned char,2l>,2l> v912 = v16.case7.v1; static_array<int,2l> v913 = v16.case7.v2; int v914 = v16.case7.v3; static_array<int,2l> v915 = v16.case7.v4; Union5 v916 = v16.case7.v5;
                         static_array<unsigned char,1l> v917; unsigned long long v918;
-                        Tuple12 tmp80 = draw_cards_40(v0, v12);
-                        v917 = tmp80.v0; v918 = tmp80.v1;
+                        Tuple12 tmp81 = draw_cards_40(v0, v12);
+                        v917 = tmp81.v0; v918 = tmp81.v1;
                         v5 = v918;
                         static_array_list<unsigned char,5l> v919;
                         v919 = get_community_cards_41(v916, v917);
@@ -9771,37 +9810,37 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
     }
     return ;
 }
-__device__ void f_56(unsigned char * v0, unsigned long long v1){
+__device__ void f_55(unsigned char * v0, unsigned long long v1){
     unsigned long long * v2;
     v2 = (unsigned long long *)(v0+0ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_57(unsigned char * v0, int v1){
+__device__ void f_56(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+8ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_58(unsigned char * v0){
+__device__ void f_57(unsigned char * v0){
     return ;
 }
-__device__ void f_60(unsigned char * v0, int v1){
+__device__ void f_59(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+0ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_64(unsigned char * v0, unsigned char v1){
+__device__ void f_63(unsigned char * v0, unsigned char v1){
     unsigned char * v2;
     v2 = (unsigned char *)(v0+0ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_63(unsigned char * v0, unsigned char v1){
-    return f_64(v0, v1);
+__device__ void f_62(unsigned char * v0, unsigned char v1){
+    return f_63(v0, v1);
 }
-__device__ void f_62(unsigned char * v0, static_array<unsigned char,2l> v1){
+__device__ void f_61(unsigned char * v0, static_array<unsigned char,2l> v1){
     int v2;
     v2 = 0l;
     while (while_method_0(v2)){
@@ -9811,18 +9850,18 @@ __device__ void f_62(unsigned char * v0, static_array<unsigned char,2l> v1){
         v5 = (unsigned char *)(v0+v4);
         unsigned char v7;
         v7 = v1[v2];
-        f_63(v5, v7);
+        f_62(v5, v7);
         v2 += 1l ;
     }
     return ;
 }
-__device__ void f_65(unsigned char * v0, int v1){
+__device__ void f_64(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+28ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_66(unsigned char * v0, static_array<unsigned char,3l> v1){
+__device__ void f_65(unsigned char * v0, static_array<unsigned char,3l> v1){
     int v2;
     v2 = 0l;
     while (while_method_1(v2)){
@@ -9832,12 +9871,12 @@ __device__ void f_66(unsigned char * v0, static_array<unsigned char,3l> v1){
         v5 = (unsigned char *)(v0+v4);
         unsigned char v7;
         v7 = v1[v2];
-        f_63(v5, v7);
+        f_62(v5, v7);
         v2 += 1l ;
     }
     return ;
 }
-__device__ void f_67(unsigned char * v0, static_array<unsigned char,5l> v1){
+__device__ void f_66(unsigned char * v0, static_array<unsigned char,5l> v1){
     int v2;
     v2 = 0l;
     while (while_method_2(v2)){
@@ -9847,12 +9886,12 @@ __device__ void f_67(unsigned char * v0, static_array<unsigned char,5l> v1){
         v5 = (unsigned char *)(v0+v4);
         unsigned char v7;
         v7 = v1[v2];
-        f_63(v5, v7);
+        f_62(v5, v7);
         v2 += 1l ;
     }
     return ;
 }
-__device__ void f_68(unsigned char * v0, static_array<unsigned char,4l> v1){
+__device__ void f_67(unsigned char * v0, static_array<unsigned char,4l> v1){
     int v2;
     v2 = 0l;
     while (while_method_3(v2)){
@@ -9862,12 +9901,12 @@ __device__ void f_68(unsigned char * v0, static_array<unsigned char,4l> v1){
         v5 = (unsigned char *)(v0+v4);
         unsigned char v7;
         v7 = v1[v2];
-        f_63(v5, v7);
+        f_62(v5, v7);
         v2 += 1l ;
     }
     return ;
 }
-__device__ void f_61(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6){
+__device__ void f_60(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6){
     int * v7;
     v7 = (int *)(v0+0ull);
     v7[0l] = v1;
@@ -9884,7 +9923,7 @@ __device__ void f_61(unsigned char * v0, int v1, static_array<static_array<unsig
         v14 = (unsigned char *)(v0+v13);
         static_array<unsigned char,2l> v16;
         v16 = v2[v9];
-        f_62(v14, v16);
+        f_61(v14, v16);
         v9 += 1l ;
     }
     int v18;
@@ -9900,7 +9939,7 @@ __device__ void f_61(unsigned char * v0, int v1, static_array<static_array<unsig
         v23 = (unsigned char *)(v0+v22);
         int v25;
         v25 = v3[v18];
-        f_60(v23, v25);
+        f_59(v23, v25);
         v18 += 1l ;
     }
     int * v27;
@@ -9919,32 +9958,32 @@ __device__ void f_61(unsigned char * v0, int v1, static_array<static_array<unsig
         v34 = (unsigned char *)(v0+v33);
         int v36;
         v36 = v5[v29];
-        f_60(v34, v36);
+        f_59(v34, v36);
         v29 += 1l ;
     }
     int v38;
     v38 = v6.tag;
-    f_65(v0, v38);
+    f_64(v0, v38);
     unsigned char * v39;
     v39 = (unsigned char *)(v0+32ull);
     switch (v6.tag) {
         case 0: { // Flop
             static_array<unsigned char,3l> v41 = v6.case0.v0;
-            return f_66(v39, v41);
+            return f_65(v39, v41);
             break;
         }
         case 1: { // Preflop
-            return f_58(v39);
+            return f_57(v39);
             break;
         }
         case 2: { // River
             static_array<unsigned char,5l> v42 = v6.case2.v0;
-            return f_67(v39, v42);
+            return f_66(v39, v42);
             break;
         }
         case 3: { // Turn
             static_array<unsigned char,4l> v43 = v6.case3.v0;
-            return f_68(v39, v43);
+            return f_67(v39, v43);
             break;
         }
         default: {
@@ -9952,13 +9991,13 @@ __device__ void f_61(unsigned char * v0, int v1, static_array<static_array<unsig
         }
     }
 }
-__device__ void f_70(unsigned char * v0, int v1){
+__device__ void f_69(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+40ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_69(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6, Union1 v7){
+__device__ void f_68(unsigned char * v0, int v1, static_array<static_array<unsigned char,2l>,2l> v2, static_array<int,2l> v3, int v4, static_array<int,2l> v5, Union5 v6, Union1 v7){
     int * v8;
     v8 = (int *)(v0+0ull);
     v8[0l] = v1;
@@ -9975,7 +10014,7 @@ __device__ void f_69(unsigned char * v0, int v1, static_array<static_array<unsig
         v15 = (unsigned char *)(v0+v14);
         static_array<unsigned char,2l> v17;
         v17 = v2[v10];
-        f_62(v15, v17);
+        f_61(v15, v17);
         v10 += 1l ;
     }
     int v19;
@@ -9991,7 +10030,7 @@ __device__ void f_69(unsigned char * v0, int v1, static_array<static_array<unsig
         v24 = (unsigned char *)(v0+v23);
         int v26;
         v26 = v3[v19];
-        f_60(v24, v26);
+        f_59(v24, v26);
         v19 += 1l ;
     }
     int * v28;
@@ -10010,32 +10049,32 @@ __device__ void f_69(unsigned char * v0, int v1, static_array<static_array<unsig
         v35 = (unsigned char *)(v0+v34);
         int v37;
         v37 = v5[v30];
-        f_60(v35, v37);
+        f_59(v35, v37);
         v30 += 1l ;
     }
     int v39;
     v39 = v6.tag;
-    f_65(v0, v39);
+    f_64(v0, v39);
     unsigned char * v40;
     v40 = (unsigned char *)(v0+32ull);
     switch (v6.tag) {
         case 0: { // Flop
             static_array<unsigned char,3l> v42 = v6.case0.v0;
-            f_66(v40, v42);
+            f_65(v40, v42);
             break;
         }
         case 1: { // Preflop
-            f_58(v40);
+            f_57(v40);
             break;
         }
         case 2: { // River
             static_array<unsigned char,5l> v43 = v6.case2.v0;
-            f_67(v40, v43);
+            f_66(v40, v43);
             break;
         }
         case 3: { // Turn
             static_array<unsigned char,4l> v44 = v6.case3.v0;
-            f_68(v40, v44);
+            f_67(v40, v44);
             break;
         }
         default: {
@@ -10044,25 +10083,25 @@ __device__ void f_69(unsigned char * v0, int v1, static_array<static_array<unsig
     }
     int v45;
     v45 = v7.tag;
-    f_70(v0, v45);
+    f_69(v0, v45);
     unsigned char * v46;
     v46 = (unsigned char *)(v0+44ull);
     switch (v7.tag) {
         case 0: { // A_All_In
-            return f_58(v46);
+            return f_57(v46);
             break;
         }
         case 1: { // A_Call
-            return f_58(v46);
+            return f_57(v46);
             break;
         }
         case 2: { // A_Fold
-            return f_58(v46);
+            return f_57(v46);
             break;
         }
         case 3: { // A_Raise
             int v48 = v7.case3.v0;
-            return f_60(v46, v48);
+            return f_59(v46, v48);
             break;
         }
         default: {
@@ -10070,50 +10109,50 @@ __device__ void f_69(unsigned char * v0, int v1, static_array<static_array<unsig
         }
     }
 }
-__device__ void f_59(unsigned char * v0, Union4 v1){
+__device__ void f_58(unsigned char * v0, Union4 v1){
     int v2;
     v2 = v1.tag;
-    f_60(v0, v2);
+    f_59(v0, v2);
     unsigned char * v3;
     v3 = (unsigned char *)(v0+16ull);
     switch (v1.tag) {
         case 0: { // G_Flop
             int v5 = v1.case0.v0; static_array<static_array<unsigned char,2l>,2l> v6 = v1.case0.v1; static_array<int,2l> v7 = v1.case0.v2; int v8 = v1.case0.v3; static_array<int,2l> v9 = v1.case0.v4; Union5 v10 = v1.case0.v5;
-            return f_61(v3, v5, v6, v7, v8, v9, v10);
+            return f_60(v3, v5, v6, v7, v8, v9, v10);
             break;
         }
         case 1: { // G_Fold
             int v11 = v1.case1.v0; static_array<static_array<unsigned char,2l>,2l> v12 = v1.case1.v1; static_array<int,2l> v13 = v1.case1.v2; int v14 = v1.case1.v3; static_array<int,2l> v15 = v1.case1.v4; Union5 v16 = v1.case1.v5;
-            return f_61(v3, v11, v12, v13, v14, v15, v16);
+            return f_60(v3, v11, v12, v13, v14, v15, v16);
             break;
         }
         case 2: { // G_Preflop
-            return f_58(v3);
+            return f_57(v3);
             break;
         }
         case 3: { // G_River
             int v17 = v1.case3.v0; static_array<static_array<unsigned char,2l>,2l> v18 = v1.case3.v1; static_array<int,2l> v19 = v1.case3.v2; int v20 = v1.case3.v3; static_array<int,2l> v21 = v1.case3.v4; Union5 v22 = v1.case3.v5;
-            return f_61(v3, v17, v18, v19, v20, v21, v22);
+            return f_60(v3, v17, v18, v19, v20, v21, v22);
             break;
         }
         case 4: { // G_Round
             int v23 = v1.case4.v0; static_array<static_array<unsigned char,2l>,2l> v24 = v1.case4.v1; static_array<int,2l> v25 = v1.case4.v2; int v26 = v1.case4.v3; static_array<int,2l> v27 = v1.case4.v4; Union5 v28 = v1.case4.v5;
-            return f_61(v3, v23, v24, v25, v26, v27, v28);
+            return f_60(v3, v23, v24, v25, v26, v27, v28);
             break;
         }
         case 5: { // G_Round'
             int v29 = v1.case5.v0; static_array<static_array<unsigned char,2l>,2l> v30 = v1.case5.v1; static_array<int,2l> v31 = v1.case5.v2; int v32 = v1.case5.v3; static_array<int,2l> v33 = v1.case5.v4; Union5 v34 = v1.case5.v5; Union1 v35 = v1.case5.v6;
-            return f_69(v3, v29, v30, v31, v32, v33, v34, v35);
+            return f_68(v3, v29, v30, v31, v32, v33, v34, v35);
             break;
         }
         case 6: { // G_Showdown
             int v36 = v1.case6.v0; static_array<static_array<unsigned char,2l>,2l> v37 = v1.case6.v1; static_array<int,2l> v38 = v1.case6.v2; int v39 = v1.case6.v3; static_array<int,2l> v40 = v1.case6.v4; Union5 v41 = v1.case6.v5;
-            return f_61(v3, v36, v37, v38, v39, v40, v41);
+            return f_60(v3, v36, v37, v38, v39, v40, v41);
             break;
         }
         case 7: { // G_Turn
             int v42 = v1.case7.v0; static_array<static_array<unsigned char,2l>,2l> v43 = v1.case7.v1; static_array<int,2l> v44 = v1.case7.v2; int v45 = v1.case7.v3; static_array<int,2l> v46 = v1.case7.v4; Union5 v47 = v1.case7.v5;
-            return f_61(v3, v42, v43, v44, v45, v46, v47);
+            return f_60(v3, v42, v43, v44, v45, v46, v47);
             break;
         }
         default: {
@@ -10121,16 +10160,16 @@ __device__ void f_59(unsigned char * v0, Union4 v1){
         }
     }
 }
-__device__ void f_71(unsigned char * v0, int v1){
+__device__ void f_70(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+80ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_73(unsigned char * v0, static_array_list<unsigned char,5l> v1){
+__device__ void f_72(unsigned char * v0, static_array_list<unsigned char,5l> v1){
     int v2;
     v2 = v1.length;
-    f_60(v0, v2);
+    f_59(v0, v2);
     int v3;
     v3 = v1.length;
     int v4;
@@ -10144,12 +10183,12 @@ __device__ void f_73(unsigned char * v0, static_array_list<unsigned char,5l> v1)
         v8 = (unsigned char *)(v0+v7);
         unsigned char v10;
         v10 = v1[v4];
-        f_63(v8, v10);
+        f_62(v8, v10);
         v4 += 1l ;
     }
     return ;
 }
-__device__ void f_74(unsigned char * v0, int v1, int v2){
+__device__ void f_73(unsigned char * v0, int v1, int v2){
     int * v3;
     v3 = (int *)(v0+0ull);
     v3[0l] = v1;
@@ -10158,37 +10197,37 @@ __device__ void f_74(unsigned char * v0, int v1, int v2){
     v5[0l] = v2;
     return ;
 }
-__device__ void f_76(unsigned char * v0, int v1){
+__device__ void f_75(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+4ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_75(unsigned char * v0, int v1, Union1 v2){
+__device__ void f_74(unsigned char * v0, int v1, Union1 v2){
     int * v3;
     v3 = (int *)(v0+0ull);
     v3[0l] = v1;
     int v5;
     v5 = v2.tag;
-    f_76(v0, v5);
+    f_75(v0, v5);
     unsigned char * v6;
     v6 = (unsigned char *)(v0+8ull);
     switch (v2.tag) {
         case 0: { // A_All_In
-            return f_58(v6);
+            return f_57(v6);
             break;
         }
         case 1: { // A_Call
-            return f_58(v6);
+            return f_57(v6);
             break;
         }
         case 2: { // A_Fold
-            return f_58(v6);
+            return f_57(v6);
             break;
         }
         case 3: { // A_Raise
             int v8 = v2.case3.v0;
-            return f_60(v6, v8);
+            return f_59(v6, v8);
             break;
         }
         default: {
@@ -10196,7 +10235,7 @@ __device__ void f_75(unsigned char * v0, int v1, Union1 v2){
         }
     }
 }
-__device__ void f_77(unsigned char * v0, int v1, static_array<unsigned char,2l> v2){
+__device__ void f_76(unsigned char * v0, int v1, static_array<unsigned char,2l> v2){
     int * v3;
     v3 = (int *)(v0+0ull);
     v3[0l] = v1;
@@ -10211,12 +10250,12 @@ __device__ void f_77(unsigned char * v0, int v1, static_array<unsigned char,2l> 
         v9 = (unsigned char *)(v0+v8);
         unsigned char v11;
         v11 = v2[v5];
-        f_63(v9, v11);
+        f_62(v9, v11);
         v5 += 1l ;
     }
     return ;
 }
-__device__ void f_80(unsigned char * v0, static_array<unsigned char,5l> v1, char v2){
+__device__ void f_79(unsigned char * v0, static_array<unsigned char,5l> v1, char v2){
     int v3;
     v3 = 0l;
     while (while_method_2(v3)){
@@ -10226,7 +10265,7 @@ __device__ void f_80(unsigned char * v0, static_array<unsigned char,5l> v1, char
         v6 = (unsigned char *)(v0+v5);
         unsigned char v8;
         v8 = v1[v3];
-        f_63(v6, v8);
+        f_62(v6, v8);
         v3 += 1l ;
     }
     char * v10;
@@ -10234,10 +10273,10 @@ __device__ void f_80(unsigned char * v0, static_array<unsigned char,5l> v1, char
     v10[0l] = v2;
     return ;
 }
-__device__ void f_79(unsigned char * v0, static_array<unsigned char,5l> v1, char v2){
-    return f_80(v0, v1, v2);
+__device__ void f_78(unsigned char * v0, static_array<unsigned char,5l> v1, char v2){
+    return f_79(v0, v1, v2);
 }
-__device__ void f_78(unsigned char * v0, int v1, static_array<Tuple0,2l> v2, int v3){
+__device__ void f_77(unsigned char * v0, int v1, static_array<Tuple0,2l> v2, int v3){
     int * v4;
     v4 = (int *)(v0+0ull);
     v4[0l] = v1;
@@ -10253,9 +10292,9 @@ __device__ void f_78(unsigned char * v0, int v1, static_array<Tuple0,2l> v2, int
         unsigned char * v11;
         v11 = (unsigned char *)(v0+v10);
         static_array<unsigned char,5l> v13; char v14;
-        Tuple0 tmp81 = v2[v6];
-        v13 = tmp81.v0; v14 = tmp81.v1;
-        f_79(v11, v13, v14);
+        Tuple0 tmp82 = v2[v6];
+        v13 = tmp82.v0; v14 = tmp82.v1;
+        f_78(v11, v13, v14);
         v6 += 1l ;
     }
     int * v17;
@@ -10263,36 +10302,36 @@ __device__ void f_78(unsigned char * v0, int v1, static_array<Tuple0,2l> v2, int
     v17[0l] = v3;
     return ;
 }
-__device__ void f_72(unsigned char * v0, Union6 v1){
+__device__ void f_71(unsigned char * v0, Union6 v1){
     int v2;
     v2 = v1.tag;
-    f_60(v0, v2);
+    f_59(v0, v2);
     unsigned char * v3;
     v3 = (unsigned char *)(v0+16ull);
     switch (v1.tag) {
         case 0: { // CommunityCardsAre
             static_array_list<unsigned char,5l> v5 = v1.case0.v0;
-            return f_73(v3, v5);
+            return f_72(v3, v5);
             break;
         }
         case 1: { // Fold
             int v6 = v1.case1.v0; int v7 = v1.case1.v1;
-            return f_74(v3, v6, v7);
+            return f_73(v3, v6, v7);
             break;
         }
         case 2: { // PlayerAction
             int v8 = v1.case2.v0; Union1 v9 = v1.case2.v1;
-            return f_75(v3, v8, v9);
+            return f_74(v3, v8, v9);
             break;
         }
         case 3: { // PlayerGotCards
             int v10 = v1.case3.v0; static_array<unsigned char,2l> v11 = v1.case3.v1;
-            return f_77(v3, v10, v11);
+            return f_76(v3, v10, v11);
             break;
         }
         case 4: { // Showdown
             int v12 = v1.case4.v0; static_array<Tuple0,2l> v13 = v1.case4.v1; int v14 = v1.case4.v2;
-            return f_78(v3, v12, v13, v14);
+            return f_77(v3, v12, v13, v14);
             break;
         }
         default: {
@@ -10300,23 +10339,23 @@ __device__ void f_72(unsigned char * v0, Union6 v1){
         }
     }
 }
-__device__ void f_81(unsigned char * v0, Union2 v1){
+__device__ void f_80(unsigned char * v0, Union2 v1){
     int v2;
     v2 = v1.tag;
-    f_60(v0, v2);
+    f_59(v0, v2);
     unsigned char * v3;
     v3 = (unsigned char *)(v0+4ull);
     switch (v1.tag) {
         case 0: { // Computer
-            return f_58(v3);
+            return f_57(v3);
             break;
         }
         case 1: { // Human
-            return f_58(v3);
+            return f_57(v3);
             break;
         }
         case 2: { // Random
-            return f_58(v3);
+            return f_57(v3);
             break;
         }
         default: {
@@ -10324,27 +10363,27 @@ __device__ void f_81(unsigned char * v0, Union2 v1){
         }
     }
 }
-__device__ void f_82(unsigned char * v0, int v1){
+__device__ void f_81(unsigned char * v0, int v1){
     int * v2;
     v2 = (int *)(v0+6248ull);
     v2[0l] = v1;
     return ;
 }
-__device__ void f_55(unsigned char * v0, unsigned long long v1, Union3 v2, dynamic_array_list<Union6,128l> v3, static_array<Union2,2l> v4, Union7 v5){
-    f_56(v0, v1);
+__device__ void f_54(unsigned char * v0, unsigned long long v1, Union3 v2, dynamic_array_list<Union6,128l> v3, static_array<Union2,2l> v4, Union7 v5){
+    f_55(v0, v1);
     int v6;
     v6 = v2.tag;
-    f_57(v0, v6);
+    f_56(v0, v6);
     unsigned char * v7;
     v7 = (unsigned char *)(v0+16ull);
     switch (v2.tag) {
         case 0: { // None
-            f_58(v7);
+            f_57(v7);
             break;
         }
         case 1: { // Some
             Union4 v9 = v2.case1.v0;
-            f_59(v7, v9);
+            f_58(v7, v9);
             break;
         }
         default: {
@@ -10353,7 +10392,7 @@ __device__ void f_55(unsigned char * v0, unsigned long long v1, Union3 v2, dynam
     }
     int v10;
     v10 = v3.length_();
-    f_71(v0, v10);
+    f_70(v0, v10);
     int v11;
     v11 = v3.length_();
     int v12;
@@ -10369,7 +10408,7 @@ __device__ void f_55(unsigned char * v0, unsigned long long v1, Union3 v2, dynam
         v17 = (unsigned char *)(v0+v16);
         Union6 v19;
         v19 = v3[v12];
-        f_72(v17, v19);
+        f_71(v17, v19);
         v12 += 1l ;
     }
     int v21;
@@ -10385,27 +10424,27 @@ __device__ void f_55(unsigned char * v0, unsigned long long v1, Union3 v2, dynam
         v26 = (unsigned char *)(v0+v25);
         Union2 v28;
         v28 = v4[v21];
-        f_81(v26, v28);
+        f_80(v26, v28);
         v21 += 1l ;
     }
     int v30;
     v30 = v5.tag;
-    f_82(v0, v30);
+    f_81(v0, v30);
     unsigned char * v31;
     v31 = (unsigned char *)(v0+6256ull);
     switch (v5.tag) {
         case 0: { // GameNotStarted
-            return f_58(v31);
+            return f_57(v31);
             break;
         }
         case 1: { // GameOver
             int v33 = v5.case1.v0; static_array<static_array<unsigned char,2l>,2l> v34 = v5.case1.v1; static_array<int,2l> v35 = v5.case1.v2; int v36 = v5.case1.v3; static_array<int,2l> v37 = v5.case1.v4; Union5 v38 = v5.case1.v5;
-            return f_61(v31, v33, v34, v35, v36, v37, v38);
+            return f_60(v31, v33, v34, v35, v36, v37, v38);
             break;
         }
         case 2: { // WaitingForActionFromPlayerId
             int v39 = v5.case2.v0; static_array<static_array<unsigned char,2l>,2l> v40 = v5.case2.v1; static_array<int,2l> v41 = v5.case2.v2; int v42 = v5.case2.v3; static_array<int,2l> v43 = v5.case2.v4; Union5 v44 = v5.case2.v5;
-            return f_61(v31, v39, v40, v41, v42, v43, v44);
+            return f_60(v31, v39, v40, v41, v42, v43, v44);
             break;
         }
         default: {
@@ -10522,7 +10561,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                 assert("Invalid tag." && false);
             }
         }
-        f_55(v0, v12, v13, v14, v15, v16);
+        f_54(v0, v12, v13, v14, v15, v16);
     } else {
     }
     atomicAdd(&v6,-1l);
@@ -10546,8 +10585,8 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
         Union8 v58;
         v58 = Union8{Union8_0{}};
         Union9 v59; float * v60; int v61; int v62; int v63; float v64;
-        Tuple13 tmp82 = noinline_run_42(v2, v4, v58);
-        v59 = tmp82.v0; v60 = tmp82.v1; v61 = tmp82.v2; v62 = tmp82.v3; v63 = tmp82.v4; v64 = tmp82.v5;
+        Tuple13 tmp83 = noinline_run_42(v2, v4, v58);
+        v59 = tmp83.v0; v60 = tmp83.v1; v61 = tmp83.v2; v62 = tmp83.v3; v63 = tmp83.v4; v64 = tmp83.v5;
         int v65 = v6;
         bool v66;
         v66 = v65 == 0l;
