@@ -38,6 +38,10 @@ union rec row_op_local t =
     | RowMapLocal :: forall t. tensor (int * int) t -> row_op_local (map t)
     | RowReduceLocal :: forall t. t -> row_op_local (reduce t)
 
+union rec row_gather_op t =
+    | RowGatherMap :: forall t. tensor int t -> row_gather_op (map t)
+    | RowGatherReduce :: forall t. t -> row_gather_op (reduce t)
+
 // The primitives here are only attended for execution on the GPU.
 // They're all block level primitives. 
 
@@ -253,12 +257,27 @@ inl local_max config = local_reduce config limit.min max
 // Local min. The neutral element is inferred based on the input type and is expected to be a primitive type.
 inl local_min config = local_reduce config limit.max min
 
-inl row_gather_map forall a b.
-        (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) b)
-        (from : tensor int a) (to : tensor int b) : () =
-    assert (lit_is from.dim) "The input tensor dimension needs to be known at compile time." 
-    assert (lit_is to.dim) "The output tensor dimension needs to be known at compile time." 
-    assert (from.dim = to.dim) "The output tensor dimension needs to be known at compile time." 
+// inl row_ forall dim a b.
+//         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> compound row_op_local b)
+//         (from : tensor (dim * int) a) (to : compound (row_op dim) b) : () =
+//     inl assert_dim forall b'. (x : row_op dim b') : () =
+//         match x with
+//         | RowMap(to) => assert (from.dim = to.dim) "The input and the output tensor dimensions have to be equal."
+//         | RowReduce(to) => assert (fst from.dim = to.dim) "The input and the output tensor dimensions have to be equal."
+//     compound_iter `$assert_dim to
+
+inl row_gather_ forall a b.
+        (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> compound row_op_local b)
+        (from : tensor int a) (to : compound row_gather_op b) : () =
+    assert (lit_is from.dim) "The input tensor dimension needs to be known at compile time."
+    inl assert_dim forall b'. (x : row_gather_op b') : () =
+        match x with
+        | RowGatherMap(to) => 
+            assert (lit_is to.dim) "The output tensor dimension needs to be known at compile time."
+            assert (from.dim = to.dim) "The input and the output tensor dimensions must be equal."
+        | RowGatherReduce(to) => 
+            ()
+    compound_iter `$assert_dim to
     
     inl shared' : tensor int (tensor_ptrs a * tensor_ptrs b) = tensor_cuda.tensor_create_shared threads_per_block()
     tensor_set threads_in_block().from (ptrs_at_current_offset from, ptrs_at_current_offset to) shared'
@@ -273,7 +292,6 @@ inl row_gather_map forall a b.
     loop.linear dim_block' fun index_block' =>
         inl shared = tensor_index index_block' shared
         inl from = shared |> fst |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
-        inl to = shared |> snd |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
 
         inl local = tensor_create from.dim
         inl local_index = tensor_create from.dim
@@ -294,16 +312,104 @@ inl row_gather_map forall a b.
             inl index = index_block', index_block
             f row_config{threads_per_miniblock} local (loop.rigid_merge dim index) local_index
 
+        inl to = shared |> snd |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
         // Stores the result into global memory after mapping it.
         loop.linear (fst to.dim) fun i =>
             memcpy_sync (apply i to, apply i local)
                 
     barrier_cta_sync 0
 
-inl row_gather_reduce forall dim a b.
-        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> compound row_op_local b)
+inl row_gather_map forall a b.
+        (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) b)
+        (from : tensor int a) (to : tensor int b) : () =
+    assert (lit_is from.dim) "The input tensor dimension needs to be known at compile time." 
+    assert (lit_is to.dim) "The output tensor dimension needs to be known at compile time." 
+    assert (from.dim = to.dim) "The input and the output tensor dimensions must be equal." 
+    
+    inl shared' : tensor int (tensor_ptrs a * tensor_ptrs b) = tensor_cuda.tensor_create_shared threads_per_block()
+    tensor_set threads_in_block().from (ptrs_at_current_offset from, ptrs_at_current_offset to) shared'
+    barrier_cta_sync 0
+
+    inl dim_inner,dim_sizeof16 = (factorize_sizeof_16 from).dim
+    inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared'.dim, dim_inner)
+    inl threads_per_miniblock = dim_inner
+    inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
+    inl shared = reshape const(dim_block, dim_block') shared' |> apply index_block
+
+    loop.linear dim_block' fun index_block' =>
+        inl shared = tensor_index index_block' shared
+        inl from = shared |> fst |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
+
+        inl local = tensor_create from.dim
+        inl local_index = tensor_create from.dim
+
+        // Loads the tile into the registers.
+        loop.linear (fst from.dim) fun i =>
+            memcpy_sync (apply i local, apply i from)
+        
+        // Calculates the indices for the tensor elements.
+        loop.linear from.dim fun i => // Note: it's very easy to get the reverse indexing wrong.
+            inl dim = dim_inner, dim_inner', dim_sizeof16
+            inl index = index_inner, fst i, snd i
+            tensor_set i (loop.proj_rev dim index) local_index
+
+        // Map the local tensor using local operations.
+        inl local = 
+            inl dim = dim_block', dim_block
+            inl index = index_block', index_block
+            f row_config{threads_per_miniblock} local (loop.rigid_merge dim index) local_index
+
+        inl to = shared |> snd |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
+        // Stores the result into global memory after mapping it.
+        loop.linear (fst to.dim) fun i =>
+            memcpy_sync (apply i to, apply i local)
+                
+    barrier_cta_sync 0
+
+inl row_gather_reduce forall a b.
+        (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> b)
         (from : tensor int a) : b =
-    failwith "TODO"
+    assert (lit_is from.dim) "The input tensor dimension needs to be known at compile time." 
+    
+    inl shared' : tensor int (tensor_ptrs a * b) = tensor_cuda.tensor_create_shared threads_per_block()
+    tensor_set threads_in_block().from (ptrs_at_current_offset from) (rezip fst shared')
+    barrier_cta_sync 0
+
+    inl dim_inner,dim_sizeof16 = (factorize_sizeof_16 from).dim
+    inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared'.dim, dim_inner)
+    inl threads_per_miniblock = dim_inner
+    inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
+    inl shared = reshape const(dim_block, dim_block') shared' |> apply index_block
+
+    loop.linear dim_block' fun index_block' =>
+        inl from = shared |> rezip fst |> tensor_index index_block' |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
+
+        inl local = tensor_create from.dim
+        inl local_index = tensor_create from.dim
+
+        // Loads the tile into the registers.
+        loop.linear (fst from.dim) fun i =>
+            memcpy_sync (apply i local, apply i from)
+        
+        // Calculates the indices for the tensor elements.
+        loop.linear from.dim fun i => // Note: it's very easy to get the reverse indexing wrong.
+            inl dim = dim_inner, dim_inner', dim_sizeof16
+            inl index = index_inner, fst i, snd i
+            tensor_set i (loop.proj_rev dim index) local_index
+
+        // Map the local tensor using local operations.
+        inl result = 
+            inl dim = dim_block', dim_block
+            inl index = index_block', index_block
+            f row_config{threads_per_miniblock} local (loop.rigid_merge dim index) local_index
+
+        inl to = shared |> rezip snd
+        tensor_set index_block' result to
+                
+    barrier_cta_sync 0
+    inl x = rezip snd shared' |> tensor_index thread_index()
+    barrier_cta_sync 0
+    x
 
 // Template from which row_map and row_reduce are derived from. See the row_map for documentation.
 inl row_ forall dim a b.
@@ -631,8 +737,8 @@ inl test2() =
         //     local_exclusive_scan config 0 (+) x
         //     ) input_identity output_sum_exclusive
         // row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
-        // // discrete sampling
-        // row_map_reduce (local_softmax_and_discrete_sampling rng) input output_softmax' output_sampling
+        // discrete sampling
+        row_map_reduce (local_softmax_and_discrete_sampling rng) input output_softmax' output_sampling
         // masked discrete sampling
         row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng) input output_softmax' output_sampling
 
@@ -655,24 +761,46 @@ inl test2() =
 inl test3() =
     // inl m,n : int * int = (1 <<< 6), (1 <<< 12)
     // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
-    inl m,n : int * int = threads_per_block(), (1 <<< 10)
+    inl m,n : int * int = threads_per_block(), (1 <<< 4)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
-    // inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+    inl input_identity : _ _ float = cupy.arange{from=0; nearTo=m,n; by=1}
     // inl input_action : _ _ float = cupy.random_uniform m
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
-    inl output_identity = tensor_create (m,n)
+    inl output_indices_map = tensor_create (m,n)
+    inl output_indices_reduce = tensor_create m
+    inl output_sample_reduce = tensor_create m
+    inl output_identity_map = tensor_create (m,n)
+    inl output_op_map = tensor_create (m,n)
 
     run fun _ =>
-        // inl input = apply (thread_index()) input
-        // inl output_identity = apply (thread_index()) output_identity
-        row_map (fun config x i j_tns => 
+        open random
+        inl rng : _ philox_state = init {seed = clock64(); subsequence=conv thread_index(); offset=0}
+        inl input = apply (thread_index()) input
+        inl input_identity = apply (thread_index()) input_identity
+        inl output_indices_map = apply (thread_index()) output_indices_map
+        inl output_identity_map = apply (thread_index()) output_identity_map
+        inl output_op_map = apply (thread_index()) output_op_map
+        row_gather_map (fun config x i j_tns => 
             local_map (fun j => i, j) j_tns
-            ) input output_identity
+            ) input output_indices_map
+        row_gather_reduce (fun config x i j_tns =>
+            i
+            ) input
+        |> fun v => tensor_set thread_index() v output_indices_reduce
+        row_gather_map (fun config x i j_tns => 
+            x
+            ) input output_identity_map
+        row_gather_map (fun config x i j_tns => 
+            local_softmax config x
+            ) input output_op_map
+        row_gather_reduce (fun config x i j_tns =>
+            local_softmax_and_discrete_sampling rng config x i j_tns |> snd
+            ) input_identity
+        |> fun v => tensor_set thread_index() v output_sample_reduce
         ()
 
-    // console.tensor.write_ln limit.max input
-    console.tensor.write_ln limit.max output_identity
-    // console.tensor.write_ln 1024 output_sampling
+    console.tensor.write_ln limit.max input_identity
+    console.tensor.write_ln limit.max output_sample_reduce
     ()
 
 inl main() = test3()
