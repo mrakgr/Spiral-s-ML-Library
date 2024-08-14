@@ -78,12 +78,6 @@ inl noinline_run forall inp out.
         |> apply block_index()
         |> tensor_index thread_index()
 
-    // console.write_ln {tid=thread_index(); output_id}
-    // if output_id > 11 then 
-    //     inl tensor = output_probs |> tensorm.view (fun ensemble,block,thread,inner => {from=0,0,thread_index(),0; nearTo=ensemble,block,thread_index()+1,11} )
-    //     console.write_ln {tid=thread_index(); tensor}
-    // barrier_cta_sync 0
-
     {
         action = output output_id
         sampling_prob_selected = output_probs |> tensor_index (ensemble_id,block_index(),thread_index(),output_id)

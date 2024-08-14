@@ -1,151 +1,152 @@
-Error trace on line: 188, column: 33 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
-                                ^
-Error trace on line: 188, column: 43 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
-                                          ^
-Error trace on line: 188, column: 45 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
-                                            ^
-Error trace on line: 188, column: 55 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
-                                                      ^
-Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match hashmapm.try_get h k with
+Error trace on line: 259, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    assert (lit_is from.dim) "The input tensor dimension needs to be known at compile time." 
     ^
-Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 68, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-      ^
-Error trace on line: 68, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-              ^
-Error trace on line: 68, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-                      ^
-Error trace on line: 184, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            match k with
-            ^
-Error trace on line: 185, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . g k out
-              ^
-Error trace on line: 186, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMap(exists a. _,a,out) => f a . g k out
-              ^
-Error trace on line: 187, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowReduce(exists a. _,a,out) => f a . g k out
-              ^
-Error trace on line: 188, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
-              ^
-Error trace on line: 189, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => f a . f b . g k None
-              ^
-Error trace on line: 189, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => f a . f b . g k None
-                          ^
-Error trace on line: 189, column: 35 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => f a . f b . g k None
-                                  ^
-Error trace on line: 189, column: 41 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => f a . f b . g k None
-                                        ^
-Error trace on line: 189, column: 47 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => f a . f b . g k None
-                                              ^
-Error trace on line: 171, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match out with
+Error trace on line: 260, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    assert (lit_is to.dim) "The output tensor dimension needs to be known at compile time." 
+    ^
+Error trace on line: 261, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    assert (from.dim = to.dim) "The output tensor dimension needs to be known at compile time." 
+    ^
+Error trace on line: 263, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl shared' : tensor int (tensor_ptrs a * tensor_ptrs b) = tensor_cuda.tensor_create_shared threads_per_block()
+    ^
+Error trace on line: 264, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    tensor_set threads_in_block().from (ptrs_at_current_offset from, ptrs_at_current_offset to) shared'
+    ^
+Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    barrier_cta_sync 0
+    ^
+Error trace on line: 267, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl dim_inner,dim_sizeof16 = (factorize_sizeof_16 from).dim
+    ^
+Error trace on line: 267, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl dim_inner,dim_sizeof16 = (factorize_sizeof_16 from).dim
         ^
-Error trace on line: 172, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Some x => f x
-          ^
-Error trace on line: 173, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | None =>
-          ^
-Error trace on line: 181, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            hashmapm.add h_offset_output k (loop (get_dim_pair k))
-            ^
-Error trace on line: 181, column: 45 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            hashmapm.add h_offset_output k (loop (get_dim_pair k))
-                                            ^
-Error trace on line: 181, column: 51 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            hashmapm.add h_offset_output k (loop (get_dim_pair k))
-                                                  ^
-Error trace on line: 169, column: 26 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    inl get_dim_pair x = get_dim_pair dims x
-                         ^
-Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match hashmapm.try_get h k with
+Error trace on line: 268, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared'.dim, dim_inner)
     ^
-Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 68, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-      ^
-Error trace on line: 68, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-              ^
-Error trace on line: 68, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in hashmapm.add h k v . v
-                      ^
-Error trace on line: 86, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMapReduce(exists a. _, a, out) =>
-          ^
-Error trace on line: 95, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | Pair(a,b) => D_P(f' a, f' b)
-          ^
-Error trace on line: 96, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockMap(exists a. _, a, out) => 
-          ^
-Error trace on line: 101, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMap(exists a. _, a, out) => 
-          ^
-Error trace on line: 106, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowReduce(exists a. _, a, out) => 
-          ^
-Error trace on line: 111, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockMatmul(a,b) =>
-          ^
-Error trace on line: 111, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockMatmul(a,b) =>
-                      ^
-Error trace on line: 112, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl (q,m,k as a) = f a
+Error trace on line: 268, column: 10 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared'.dim, dim_inner)
+         ^
+Error trace on line: 268, column: 32 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared'.dim, dim_inner)
+                               ^
+Error trace on line: 269, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl threads_per_miniblock = dim_inner
+    ^
+Error trace on line: 270, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
+    ^
+Error trace on line: 270, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
+        ^
+Error trace on line: 271, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    inl shared = reshape const(dim_block, dim_block') shared' |> apply index_block
+    ^
+Error trace on line: 273, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+    loop.linear dim_block' fun index_block' =>
+    ^
+Error trace on line: 145, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_to_list (dim : dim) : list int = real
+    ^
+Error trace on line: 148, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl list_to_dim (l : list int) : dim = real
+    ^
+Error trace on line: 151, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    listm.foldBack (fun nearTo on_success l => 
+    ^
+Error trace on line: 157, column: 13 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+            for' {from=0; nearTo} (fun i => on_success (i :: l))
             ^
-Error trace on line: 112, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl (q,m,k as a) = f a
+Error trace on line: 32, column: 19 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                  ^
+Error trace on line: 30, column: 36 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for {from nearTo} body state = forBy {from nearTo by=1} body state
+                                   ^
+Error trace on line: 24, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl i, state = _dup (from, state)
+    ^
+Error trace on line: 24, column: 9 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl i, state = _dup (from, state)
+        ^
+Error trace on line: 25, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+    ^
+Error trace on line: 2, column: 82 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl while' (cond : () -> bool) (body : () -> ()) : () = !!!!While((join cond()),(body()))
+                                                                                 ^
+Error trace on line: 25, column: 39 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                      ^
+Error trace on line: 25, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                            ^
+Error trace on line: 25, column: 57 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun () => i < nearTo) fun () => _set state (body i state) . _add i by
+                                                        ^
+Error trace on line: 32, column: 32 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                               ^
+Error trace on line: 32, column: 38 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                                     ^
+Error trace on line: 157, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+            for' {from=0; nearTo} (fun i => on_success (i :: l))
+                                            ^
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
                  ^
-Error trace on line: 112, column: 20 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl (q,m,k as a) = f a
+Error trace on line: 274, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+        inl shared = tensor_index index_block' shared
+        ^
+Error trace on line: 275, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+        inl from = shared |> fst |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
+        ^
+Error trace on line: 275, column: 20 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
+        inl from = shared |> fst |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) |> apply index_inner
                    ^
-Error trace on line: 112, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl (q,m,k as a) = f a
-                          ^
-Error trace on line: 113, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            assert (q = blocks_per_grid()) "The batch dimension in the matmul node needs to equal the number of blocks per grid."
-            ^
-Error trace on line: 114, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl (n,k') = f b
-            ^
-Error trace on line: 114, column: 18 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl (n,k') = f b
-                 ^
-Error trace on line: 115, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            assert (k = k') "The inner dimensions of the matrix multiplication node have to be equal."
-            ^
-Error trace on line: 131, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl assert (c : bool) (msg : string) : () = real assert c msg
-                                                 ^
-Error trace on line: 265, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-    if c = false then 
+Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (|>) a b = b a
+               ^
+Error trace on line: 217, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    inl stride, len = real calculate_stride_len dim
     ^
-Error trace on line: 266, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
+Error trace on line: 217, column: 9 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    inl stride, len = real calculate_stride_len dim
         ^
-Error trace on line: 266, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-                                       ^
-The inner dimensions of the matrix multiplication node have to be equal.
+Error trace on line: 218, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    assert_long_length len dim
+    ^
+Error trace on line: 219, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    inl create_body forall t. (array : array t) : tensor_body dim t = tensor_body { array stride offset = 0 }
+    ^
+Error trace on line: 220, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    tensor {dim bodies=real 
+    ^
+Error trace on line: 220, column: 12 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    tensor {dim bodies=real 
+           ^
+Error trace on line: 221, column: 9 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+        map (fun x =>
+        ^
+Error trace on line: 54, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 55, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | a, b => f a, f b
+          ^
+Error trace on line: 56, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} as ar => record_map (fun {value} => f value) ar
+          ^
+Error trace on line: 57, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar => index ar
+          ^
+Error trace on line: 57, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar => index ar
+                ^
+Error trace on line: 222, column: 13 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+            typecase `x with array ~t => create_body `t x
+            ^
+Typecase miss.
+Got: tensor_ptrs f32

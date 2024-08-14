@@ -1,6 +1,7 @@
 open struct
 open utils
 
+nominal tensor_ptrs el = `(infer `array `el)
 nominal tensor_body dim el = {
     array : array el
     stride : dim
@@ -140,11 +141,6 @@ inl apply_ptr forall dim el. (tensor {bodies dim} : tensor dim el) : tensor dim 
                 ) bodies
         }
 
-// Returns the pointer at the specified index. The tensor must be a singleton.
-inl ptr_at_current_offset forall dim el. (t : tensor dim el) : array el = 
-    inl (tensor {dim bodies}) = apply_ptr t
-    real map (fun x => x.array) bodies : array el
-
 // Returns the leading stride. The tensor must be a singleton.
 inl stride_fst forall b el. (tensor {dim bodies} : tensor (int * b) el) : int = real
     map (fun (tensor_body {stride=a,_}) => a) bodies : int
@@ -210,6 +206,27 @@ inl flatten_snd forall a b el. : tensor (a * b) el -> tensor (a * int) el = swap
 
 // Flattens the tensor into a single dimension. For this to work, the tensor must be contiguous.
 inl flatten forall dim el. : tensor dim el -> tensor int el = reorder (fun x => x, ()) >> flatten_fst >> reorder fst
+
+// Returns the pointers at the specified index in the tensor_ptrs nominal.
+inl ptrs_at_current_offset forall dim el. (t : tensor dim el) : tensor_ptrs el = 
+    inl (tensor {dim bodies}) = apply_ptr t |> flatten
+    tensor_ptrs (real map (fun x => x.array) bodies)
+
+// Turns the tensor pointers into a tensor given the dimension.
+inl from_tensor_ptrs forall dim el. (dim : dim) (t : tensor_ptrs el) : tensor dim el = 
+    inl stride, len = real calculate_stride_len dim
+    assert_long_length len dim
+    inl create_body forall t. (array : array t) : tensor_body dim t = tensor_body { array stride offset = 0 }
+    tensor {dim bodies=real 
+        open real_core
+        map (fun x =>
+            typecase `x with array ~t => create_body `t x
+            ) (nominal_strip t)}
+
+// Returns the pointer at the specified index. The tensor must be a singleton.
+inl ptr_at_current_offset forall dim el. (t : tensor dim el) : array el = 
+    inl (tensor {dim bodies}) = apply_ptr t |> flatten
+    real map (fun x => x.array) bodies : array el
 
 // Reshapes the first part of the tensor dimension. For this to work, the tensor must be contiguous.
 inl reshape_fst forall a b dim el. (f : a -> dim) (x : tensor (a * b) el) : tensor (dim * b) el =

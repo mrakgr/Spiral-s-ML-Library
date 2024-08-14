@@ -214,13 +214,10 @@ inl main() =
 
                 // nn model loop
                 intrinsic.atomic_add_ref c -1
-                loop.while' (const true)
-                    (fun () =>
-                        inl model = ml.models.from_model_data model.game_graph() neural.model_data
-                        ml.models.run model None |> ignore
-                        if refm.deref c = 0 then loop.break()
-                        )
-
+                loop.while' (const true) fun () =>
+                    inl model = ml.models.from_model_data model.game_graph() neural.model_data
+                    ml.models.run model None |> ignore
+                    if refm.deref c = 0 then loop.break()
 
             inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "
