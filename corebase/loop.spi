@@ -119,6 +119,9 @@ inl rigid_split' forall dim. ({from nearTo by} : range dim) : {proj_small : dim;
     {dim_small dim_linear proj_small = proj dim_small from}
 
 // Reverse projects the indexes on the dimension that have been split using rigid split.
+// Treats the projective dimension (on the left) as the inner dimension and the linear dimension (on the right) as the outer dimension.
+// 
+// Formula: fst dim * snd index + fst index
 inl rigid_merge forall dim. (dim : dim * dim) (index : dim * dim) : dim = real
     open real_core
     struct.iter2 (fun i d =>

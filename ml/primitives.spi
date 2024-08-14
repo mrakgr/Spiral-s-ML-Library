@@ -284,14 +284,14 @@ inl row_gather_map forall a b.
         
         // Calculates the indices for the tensor elements.
         loop.linear from.dim fun i => // Note: it's very easy to get the reverse indexing wrong.
-            inl dim = dim_inner', dim_inner, dim_sizeof16
-            inl index = fst i, index_inner, snd i
+            inl dim = dim_inner, dim_inner', dim_sizeof16
+            inl index = index_inner, fst i, snd i
             tensor_set i (loop.proj_rev dim index) local_index
 
         // Map the local tensor using local operations.
         inl local = 
-            inl dim = dim_block, dim_block'
-            inl index = index_block, index_block'
+            inl dim = dim_block', dim_block
+            inl index = index_block', index_block
             f row_config{threads_per_miniblock} local (loop.rigid_merge dim index) local_index
 
         // Stores the result into global memory after mapping it.
@@ -655,21 +655,22 @@ inl test2() =
 inl test3() =
     // inl m,n : int * int = (1 <<< 6), (1 <<< 12)
     // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
-    inl m,n : int * int = threads_per_block(), (1 <<< 4)
+    inl m,n : int * int = threads_per_block(), (1 <<< 10)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     // inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+    // inl input_action : _ _ float = cupy.random_uniform m
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
-    inl input_action : _ _ float = cupy.random_uniform m
     inl output_identity = tensor_create (m,n)
 
     run fun _ =>
-        inl input = apply thread_index() input
-        inl output_identity = apply thread_index() output_identity
-        row_gather_map (fun config x i j_tns => 
-            j_tns
+        // inl input = apply (thread_index()) input
+        // inl output_identity = apply (thread_index()) output_identity
+        row_map (fun config x i j_tns => 
+            local_map (fun j => i, j) j_tns
             ) input output_identity
         ()
 
+    // console.tensor.write_ln limit.max input
     console.tensor.write_ln limit.max output_identity
     // console.tensor.write_ln 1024 output_sampling
     ()
