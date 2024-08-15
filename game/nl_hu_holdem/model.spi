@@ -91,12 +91,12 @@ inl nlholdem_output (i' : int) : alt_action =
         (fun (x : alt_action) (next : int -> alt_action) (i : int) =>
             if i = i' then x else next (i + 1)
             )
-        possible_actions() 
+        possible_actions()
         (fun i => failwith "Invalid output id in the NL Holdem model.")
         0
 
 // Converts the alternative actions to the regular ones.
-inl action_conv (table : table) (x : alt_action) : action =
+inl action_conv (table : table) (x : alt_action) : action = // TODO: Need to return bool instead of converting to a different action.
     match x with
     | AA_Fold => 
         inl player_turn = player_turn table
