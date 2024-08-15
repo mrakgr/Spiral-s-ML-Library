@@ -6,41 +6,6 @@ open rangem
 open dep_optionm
 open tensorm
 
-// Used in `row_`.
-nominal map t = ()
-nominal reduce t = ()
-nominal singleton t = ()
-
-union rec compound (f : * -> *) t =
-    | Singleton :: forall (f : * -> *) t. f t -> compound f (singleton t)
-    | Pair :: forall (f : * -> *) a b. compound f a * compound f b -> compound f (a * b)
-
-inl rec compound_map forall (f : * -> *) (g : * -> *) t. (f : forall t. f t -> g t) : compound f t -> compound g t = function
-    | Singleton x => Singleton(f x)
-    | Pair(a,b) => Pair(compound_map `$f a, compound_map `$f b)
-
-inl rec compound_iter forall (f : * -> *) t. (f : forall t. f t -> ()) : compound f t -> () = function
-    | Singleton x => f x
-    | Pair(a,b) => compound_iter `$f a . compound_iter `$f b
-
-inl rec compound_iter2 forall (f : * -> *) (g : * -> *) t. (f : forall t. f t -> g t -> ()) : compound f t * compound g t -> () = function
-    | Singleton a, Singleton b => f a b
-    | Pair(a,b), Pair(a',b') => compound_iter2 `$f (a, a') . compound_iter2 `$f (b, b')
-
-union rec row_op dim t =
-    | RowMap :: forall dim t. tensor (dim * int) t -> row_op dim (map t)
-    | RowReduce :: forall dim t. tensor dim t -> row_op dim (reduce t)
-
-union rec row_op_applied dim t =
-    | RowMapApplied :: forall dim t. tensor (dim * int * int) t -> row_op_applied dim (map t)
-    | RowReduceApplied :: forall dim t. tensor dim t -> row_op_applied dim (reduce t)
-    
-union rec row_op_local t =
-    | RowMapLocal :: forall t. tensor (int * int) t -> row_op_local (map t)
-    | RowReduceLocal :: forall t. t -> row_op_local (reduce t)
-
-
-
 // The primitives here are only attended for execution on the GPU.
 // They're all block level primitives. 
 
@@ -268,6 +233,7 @@ inl row_gather_ forall a kb b kc c.
     // Creates the shared arrays.
     inl shared_from' : tensor int (tensor_ptrs a) = tensor_cuda.tensor_create_shared threads_per_block()
     inl shared_to_map' = to_map |> dep_optionm.map fun _ => tensor_cuda.tensor_create_shared threads_per_block()
+    inl shared_to_reduce' : _ _ (_ _ c) = to_reduce |> dep_optionm.map fun _ => tensor_cuda.tensor_create_shared threads_per_block()
 
     // Sets the input and output pointers into the shared arrays.
     tensor_set thread_index() (ptrs_at_current_offset from) shared_from'
@@ -281,6 +247,7 @@ inl row_gather_ forall a kb b kc c.
     inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
     inl shared_from = reshape const(dim_block, dim_block') shared_from' |> apply index_block
     inl shared_to_map = shared_to_map' |> dep_optionm.map (reshape const(dim_block, dim_block') >> apply index_block)
+    inl shared_to_reduce = shared_to_reduce' |> dep_optionm.map (reshape const(dim_block, dim_block') >> apply index_block)
 
     loop.linear dim_block' fun index_block' =>
         inl shared_from = tensor_index index_block' shared_from
@@ -310,9 +277,9 @@ inl row_gather_ forall a kb b kc c.
         // Map the local tensor using local operations.
         inl local_map, local_reduce = f row_config{threads_per_miniblock} local i local_index
 
-        (local_reduce, to_reduce) ||> dep_optionm.iter2 fun result to =>
-            if thread_index() = i then set to 0 result
-            __syncwarp()
+        (shared_to_reduce, local_reduce) ||> dep_optionm.iter2 fun to result =>
+            // Stores the result into global memory after reducing it.
+            tensor_set i result to
             
         (shared_to_map, local_map) ||> dep_optionm.iter2 fun shared local => 
             inl to = from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) shared |> apply index_inner
@@ -350,14 +317,11 @@ inl row_gather_void forall a.
     row_gather_ (fun config x i j_tns => f config x i j_tns . None' , None') from (None' : _ _ (tensor _ ())) (None' : _ _ (array ()))
 
 // Template from which row_map and row_reduce are derived from. See the row_map for documentation.
-inl row_ forall dim a b.
-        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> compound row_op_local b)
-        (from : tensor (dim * int) a) (to : compound (row_op dim) b) : () =
-    inl assert_dim forall b'. (x : row_op dim b') : () =
-        match x with
-        | RowMap(to) => assert (from.dim = to.dim) "The input and the output tensor dimensions have to be equal."
-        | RowReduce(to) => assert (fst from.dim = to.dim) "The input and the output tensor dimensions have to be equal."
-    compound_iter `$assert_dim to
+inl row_ forall dim a kb b kc c.
+        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> dep_option kb (tensor (int * int) b) * dep_option kc c)
+        (from : tensor (dim * int) a) (to_map : dep_option kb (tensor (dim * int) b)) (to_reduce : dep_option kc (tensor dim c)) : () =
+    to_map |> dep_optionm.iter fun to => assert (from.dim = to.dim) "The input and the output tensor dimensions have to be equal."
+    to_reduce |> dep_optionm.iter fun to => assert (fst from.dim = to.dim) "The (first) input and the output tensor dimensions have to be equal."
 
     global "#include <cooperative_groups.h>"
     open cooperative_groups
@@ -375,22 +339,20 @@ inl row_ forall dim a b.
         |> apply index_block
         |> curry_fst
 
-    inl rec apply_outer_index forall b'. (to : row_op dim b') : row_op_applied dim b' =
-        match to with
-        | RowMap to =>
+    inl to_map =
+        to_map |> dep_optionm.map fun to =>
             to
             |> factorize_sizeof_16
             |> split_into_swapped_fst (loop.rigid_split threads_per_block())
             |> curry_fst
             |> apply index_block
             |> curry_fst
-            |> RowMapApplied
-        | RowReduce to =>
+
+    inl to_reduce =
+        to_reduce |> dep_optionm.map fun to =>
             to 
             |> split_into_swapped const(fst dim_block, fst dim_local)
             |> apply (fst index_block)
-            |> RowReduceApplied
-    inl to = compound_map `$apply_outer_index to
 
     loop.linear (fst from.dim) fun i =>
         inl from = apply i from
@@ -413,17 +375,14 @@ inl row_ forall dim a b.
             inl index = fst index_block, i
             f row_config{threads_per_miniblock} local (loop.rigid_merge dim index) local_index
 
-        inl rec store forall b'. (local : row_op_local b') (to : row_op_applied dim b') : () =
-            match local, to with 
-            | RowMapLocal local, RowMapApplied to =>
-                inl to = apply i to
-                // Stores the result into global memory after mapping it.
-                loop.linear (fst to.dim) fun i =>
-                    memcpy_sync (apply i to, apply i local)
-            | RowReduceLocal result, RowReduceApplied to =>
-                // Stores the result into global memory after reducing it.
-                tensor_set i result to
-        compound_iter2 `$store (local, to)
+        (fst local, to_map) ||> dep_optionm.iter2 fun local to =>
+            inl to = apply i to
+            // Stores the result into global memory after mapping it.
+            loop.linear (fst to.dim) fun i =>
+                memcpy_sync (apply i to, apply i local)
+        (snd local, to_reduce) ||> dep_optionm.iter2 fun result to =>
+            // Stores the result into global memory after reducing it.
+            tensor_set i result to
                 
     barrier_cta_sync 0
 
@@ -449,7 +408,7 @@ inl row_ forall dim a b.
 inl row_map forall dim a b.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b)
         (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
-    row_ (fun config x i j_tns => Singleton RowMapLocal(f config x i j_tns)) from Singleton(RowMap to)
+    row_ (fun config x i j_tns => Some'(f config x i j_tns),None') from (Some' to) (None' : _ _ (_ _ ()))
 
 // A reduce version of the `row_map` function. It's very similar to it apart from having the mapping function expect a scalar
 // output which is intended to be returned from a `local_reduce` operation. Of course, it is possible to return any kind of
@@ -457,7 +416,7 @@ inl row_map forall dim a b.
 inl row_reduce forall dim a b.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> b)
         (from : tensor (dim * int) a) (to : tensor dim b) : () =
-    row_ (fun config x i j_tns => Singleton RowReduceLocal(f config x i j_tns)) from Singleton(RowReduce to)
+    row_ (fun config x i j_tns => None',Some'(f config x i j_tns)) from (None' : _ _ (_ _ ())) (Some' to) 
 
 // A combined version of row_map and row_reduce that returns two outputs.
 inl row_map_reduce forall dim a b c.
@@ -465,8 +424,15 @@ inl row_map_reduce forall dim a b c.
         (from : tensor (dim * int) a) (to_map : tensor (dim * int) b) (to_reduce : tensor dim c) : () =
     row_ (fun config x i j_tns => 
         inl a,b = f config x i j_tns
-        Pair(Singleton (RowMapLocal a), Singleton (RowReduceLocal b))
-        ) from (Pair(Singleton (RowMap to_map), Singleton (RowReduce to_reduce)))
+        Some' a, Some' b
+        ) from (Some' to_map) (Some' to_reduce)
+
+// A version of `row_map` for when the output is a C void type. It's necessary because the Cuda compiler cannot have variables that are void.
+// Outputs could potentially be extracted from it using manual stores using the provided indices.
+inl row_void forall dim a b.
+        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> ())
+        (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
+    row_ (fun config x i j_tns => f config x i j_tns . None',None') from (None' : _ _ (_ _ ())) (None' : _ _ (_ _ ()))
 
 // Reduces the innermost dimension of a given tensor. Less flexible than `row_reduce` since it can only be used to do a single reduction, 
 // but can be used on smaller tensors than `row_reduce` allows.
