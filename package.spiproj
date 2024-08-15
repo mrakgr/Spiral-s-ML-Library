@@ -21,6 +21,7 @@ modules:
         listm
         loop
         optionm
+        dep_optionm
         monad
         arraym
         sam

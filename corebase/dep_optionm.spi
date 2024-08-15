@@ -1,0 +1,26 @@
+nominal some = ()
+nominal none = ()
+
+union dep_option g t =
+    | Some' :: forall t. t -> dep_option some t
+    | None' :: forall t. dep_option none t
+
+inl map forall k a b. (f : a -> b) (x : dep_option k a) : dep_option k b =
+    match x with
+    | Some' x => Some'(f x)
+    | None' => None'
+
+inl map2 forall k a b c. (f : a -> b -> c) (a : dep_option k a) (b : dep_option k b) : dep_option k c =
+    match a,b with
+    | Some' a, Some' b => Some'(f a b)
+    | None', None' => None'
+
+inl iter forall k a. (f : a -> ()) (x : dep_option k a) : () =
+    match x with
+    | Some' x => f x
+    | None' => ()
+
+inl iter2 forall k a b. (f : a -> b -> ()) (a : dep_option k a) (b : dep_option k b) : () =
+    match a,b with
+    | Some' a, Some' b => f a b
+    | None', None' => ()

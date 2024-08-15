@@ -71,8 +71,11 @@ inl run f = run' {shared_mem = 0} f
 
 // Synchronizes all the threads in a block using barrier 0.
 // Requires all the threads to execute the same instruction which can cause trouble given that the Cuda compiler does inlining.
-// It is recommended to use `barrier_cta_sync` instead.
+// It is recommended to use `barrier_cta_sync 0` instead.
 inl __syncthreads() : () = $"__syncthreads()"
+
+// Synchronizes all the threads in a warp.
+inl __syncwarp() : () = $"__syncwarp()"
 
 // Synchronizes all the threads in the CTA given the barrier id and the thread count.
 inl barrier_cta_sync' ({barrier_id thread_count} : {barrier_id : int; thread_count : int}) =
