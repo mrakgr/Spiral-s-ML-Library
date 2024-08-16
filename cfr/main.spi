@@ -1,0 +1,77 @@
+open corebase
+open corecuda
+open coreext
+open tensorm
+
+type world_id = int
+type action_id = int
+type seq_id = int
+type thread_id = int
+type prob = float
+
+type trace_elem =
+    {
+        world_id : world_id
+        action_id : action_id
+        action_prob : prob
+    }
+type trace = 
+    {
+        actions : tensor (thread_id * seq_id) trace_elem
+        policy_update : tensor (thread_id * seq_id * action_id) prob
+    }
+
+type model =
+    tensor (world_id * action_id) {
+        average_policy : prob
+        currect_policy : prob
+    }
+
+inl test() =
+    inl size = {
+        world_id = 1 <<< 12
+        action_id = 1 <<< 2
+        seq_id = 1 <<< 4
+        thread_id = threads_per_block()
+    }
+    inl trace : trace = {
+        actions = tensor_create (size.thread_id, size.seq_id)
+        policy_update = tensor_create (size.thread_id, size.seq_id, size.action_id)
+    }
+    inl model : model = tensor_create (size.world_id, size.action_id)
+    run fun () =>
+        open random
+        inl rng : _ philox_state = init {seed = clock64(); subsequence=conv thread_index(); offset=0}
+
+        inl get_action (world_id : world_id) : action_id * prob =
+            inl model = model |> apply world_id 
+            open ml.primitives
+            row_gather_reduce (fun config x i j_tns => 
+                inl probs, action_id = local_masked_regret_matching_and_discrete_sampling (fun config x i j => j < 3) rng config x i j_tns
+                inl prob = 
+                    local_reduce config (0,limit.max) (fun a b =>
+                        if snd a = action_id then a
+                        elif snd b = action_id then b
+                        else a
+                        ) (zip probs j_tns)
+                    |> fun prob,i => assert (i <> limit.max) "Expected a valid action id in get_action." . prob
+                action_id, prob
+                ) (model |> rezip (fun {currect_policy} => currect_policy))
+
+        open refm
+        inl seq_id = ref (0 : int)
+        let push' (world_id : world_id) (action_id, action_prob : action_id * prob) =
+            inl i = #seq_id
+            seq_id <-# i+1
+            tensor_set (thread_index(), i) {world_id action_id action_prob} trace.actions
+        inl push (world_id : world_id) = push' world_id (get_action world_id)
+        push 235
+        push 212
+        push 790
+        push 343
+        push 457
+        push 3447
+
+        // inl reward = -13
+        // optimize model trace reward
+        ()

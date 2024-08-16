@@ -78,6 +78,9 @@ modules:
         primitives
         layers
         models
+
+    cfr/
+        main
         
     game/
         utils
