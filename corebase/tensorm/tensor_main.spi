@@ -223,9 +223,14 @@ inl from_tensor_ptrs forall dim el. (dim : dim) (t : tensor_ptrs el) : tensor di
             typecase `x with array ~t => create_body `t x
             ) (nominal_strip t)}
 
-// Returns the pointer at the specified index. The tensor must be a singleton.
+// Returns the pointer at the current offset. The tensor must be a singleton.
 inl ptr_at_current_offset forall dim el. (t : tensor dim el) : array el = 
     inl (tensor {dim bodies}) = apply_ptr t |> flatten
+    real map (fun x => x.array) bodies : array el
+
+// Returns the pointer at the specified index. The tensor must be a singleton.
+inl ptr_at forall dim el. (i : dim) (t : tensor dim el) : array el = 
+    inl (tensor {dim bodies}) = t |> apply_all i |> apply_ptr
     real map (fun x => x.array) bodies : array el
 
 // Reshapes the first part of the tensor dimension. For this to work, the tensor must be contiguous.

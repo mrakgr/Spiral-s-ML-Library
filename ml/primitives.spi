@@ -66,11 +66,6 @@ inl reduce forall dim a. neutral_element (f : a -> a -> a) (from : tensor dim a)
     block_reduce_store f result to
     barrier_cta_sync 0
 
-// Adds the input tensor atomically to the output tensor.
-inl local_inplace_atomic_add forall a{number}. (from : tensor (int * int) a) (to : tensor (int * int) a) : () = 
-    loop.linear from.dim fun i =>
-        tensor_cuda.tensor_atomic_add i (tensor_index i from) to
-
 // Allows the user to specify the output for the map operation.
 inl local_inplace_map forall a b. f (from : tensor (int * int) a) (to : tensor (int * int) b) : () = 
     loop.linear from.dim fun i =>
@@ -81,6 +76,11 @@ inl local_map forall a b. f (from : tensor (int * int) a) : tensor (int * int) b
     inl to = tensor_create from.dim
     local_inplace_map f from to
     to
+
+// A local iter function.
+inl local_iter forall a. f (from : tensor (int * int) a) : () = 
+    loop.linear from.dim fun i =>
+        f (tensor_index i from)
 
 nominal row_config = {
     threads_per_miniblock : int

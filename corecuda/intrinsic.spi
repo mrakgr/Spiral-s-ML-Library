@@ -1,3 +1,4 @@
+open refm
 open corebase
 
 // Count the number of bits that are set to 1 in a 32-bit integer.
@@ -13,7 +14,25 @@ inl popc_u64 (x : u64) : i32 = $"__popcll(!x)"
 inl fns (mask : u32) (base : u32) (offset : i32) : u32 = $"__fns(!mask,!base,!offset)"
 
 // Device scope atomic addition.
-inl atomic_add_ref forall el. (a : refm.ref el) (v : el) = $"atomicAdd(&!a,!v)"
+inl atomic_add_ref forall el. (a : ref el) (v : el) = $"atomicAdd(&!a,!v)"
 
 // Device scope atomic addition.
-inl atomic_add forall el. (a : array el) (i : int) (v : el) = $"atomicAdd(!a+!i,!v)"
+inl atomic_add forall el. (a : array el) (v : el) = $"atomicAdd(!a,!v)"
+
+// Updates the value atomically given the mapping function.
+inl atomic_cas_update forall t. (a : array t) (f : t -> t) =
+    loop.while' (const true) fun () =>
+        inl old = index a 0
+        inl new = f old
+        inl cas forall t'. (_ : phantom t') =
+            inl old : t' * t' = reinterpret_cast_value old, reinterpret_cast_value new
+            inl old' = $"atomicCAS(&!a,!old,!new)"
+            if old = old' then loop.break()
+        match (sizeof : _ t).value with
+        | 2 => cas (phantom : _ u16)
+        | 4 => cas (phantom : _ u32)
+        | 8 => cas (phantom : _ u64)
+        | 16 => cas (phantom : _ t)
+        | size => 
+            assert (size = 2 || size = 4 || size = 8 || size = 16) "The type used in the cas_update has to be 2,4,8 or 16 bytes long."
+            failwith "Aborting the kernel in atomic_cas_update."

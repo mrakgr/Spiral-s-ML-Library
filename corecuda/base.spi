@@ -16,6 +16,7 @@ inl blocks_per_grid() : int = 1
 // // Dereferences a pointer.
 // inl (~*) forall t. (x : ptr t) : t = $"`t \v = *!x"
 
+// Synchronizes the device.
 inl device_sync() : () = $"cp.cuda.get_current_stream().synchronize()"
 
 type run_config = {
@@ -127,3 +128,11 @@ inl memcpy_sync forall float. (to, from : tensor int float * tensor int float) =
 
 inl tensor_memcpy_sync forall float a. access_size (r : loop.range (tensor a (float * float))) : () =
     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> memcpy_sync)
+
+// Reinterpters a value of one type as another. It doesn't do any conversion, but simply preserves the addresses of the values being converted.
+// Can be used to convert a f32 into an u32 for use in atomicCAS for example.
+inl reinterpret_cast_value forall a b. (x : a) : b = 
+    assert ((sizeof : _ a).value = (sizeof : _ b).value) "The two values being converted need to be of the same size."
+    real
+        open real_core
+        if `a `= `b then x else $"reinterpret_cast<`b&>(!x)" : b

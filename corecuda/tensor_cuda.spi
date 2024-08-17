@@ -27,9 +27,10 @@ inl tensor_ref_index forall dim el. (i : dim) (tensorm.tensor {bodies dim} : ten
     : ref el
 
 // Does an atomic add to the tensor at the specified index by a given value.
-inl tensor_atomic_add forall dim el. (i : dim) (v : el) (tensor {bodies dim} : tensor dim el) : () = real 
-    assert_indices i dim
-    iter2 (fun (tensor_body {array stride offset}) v =>
-        typecase `array with
-        | ~ar ~el => intrinsic.atomic_add `el array (calculate_offset stride i offset) v
-        ) bodies v
+inl tensor_atomic_add forall dim el. (i : dim) (v : el) (t : tensor dim el) : () = 
+    inl (tensor {dim bodies}) = t |> apply_all i |> apply_ptr
+    real
+        iter2 (fun (tensor_body {array}) v =>
+            typecase `array with
+            | array ~el => intrinsic.atomic_add `el array v
+            ) bodies v

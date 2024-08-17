@@ -8,23 +8,26 @@ type action_id = int
 type seq_id = int
 type thread_id = int
 type prob = float
+type reward = float
 
 type trace_elem =
     {
         world_id : world_id
         action_id : action_id
-        action_prob : prob
+        sampling_prob : prob
     }
 type trace = 
     {
-        actions : tensor (thread_id * seq_id) trace_elem
+        actions       : tensor (thread_id * seq_id) trace_elem
+        value_update  : tensor (thread_id * seq_id) reward
         policy_update : tensor (thread_id * seq_id * action_id) prob
     }
 
 type model =
     tensor (world_id * action_id) {
         average_policy : prob
-        currect_policy : prob
+        current_policy : prob
+        value : reward
     }
 
 inl test() =
@@ -37,17 +40,23 @@ inl test() =
     inl trace : trace = {
         actions = tensor_create (size.thread_id, size.seq_id)
         policy_update = tensor_create (size.thread_id, size.seq_id, size.action_id)
+        value_update = tensor_create (size.thread_id, size.seq_id)
     }
     inl model : model = tensor_create (size.world_id, size.action_id)
     run fun () =>
         open random
         inl rng : _ philox_state = init {seed = clock64(); subsequence=conv thread_index(); offset=0}
 
+        inl mask config x i j = j < 3
+
         inl get_action (world_id : world_id) : action_id * prob =
-            inl model = model |> apply world_id 
+            inl current_policy = 
+                model 
+                |> apply world_id 
+                |> rezip (fun x => x.current_policy)
             open ml.primitives
             row_gather_reduce (fun config x i j_tns => 
-                inl probs, action_id = local_masked_regret_matching_and_discrete_sampling (fun config x i j => j < 3) rng config x i j_tns
+                inl probs, action_id = local_masked_regret_matching_and_discrete_sampling mask rng config x i j_tns
                 inl prob = 
                     local_reduce config (0,limit.max) (fun a b =>
                         if snd a = action_id then a
@@ -56,14 +65,80 @@ inl test() =
                         ) (zip probs j_tns)
                     |> fun prob,i => assert (i <> limit.max) "Expected a valid action id in get_action." . prob
                 action_id, prob
-                ) (model |> rezip (fun {currect_policy} => currect_policy))
+                ) current_policy
 
+        // Calculates the policy and the value array updates.
+        inl calculate_updates (seq_id : seq_id) (model : model) (trace : trace) (reward : reward) =
+            loop.forDown {nearFrom=seq_id; to=0} (fun seq_id (reward : reward) =>
+                inl {action_id sampling_prob world_id} = tensor_index (thread_index(), seq_id) trace.actions
+                inl current_policy_and_value =
+                    model
+                    |> apply world_id
+                    |> rezip (fun x => x.current_policy, x.value)
+                inl policy_update =
+                    trace.policy_update
+                    |> apply thread_index()
+                    |> apply seq_id
+                inl () =
+                    trace.value_update
+                    |> tensor_set (thread_index(), seq_id) reward
+                open ml.primitives
+                row_gather_map_reduce (fun config x i j_tns =>
+                    inl current_policy, values = unzip x
+                    inl probs = local_masked_regret_matching mask config current_policy i j_tns
+                    inl adjusted_values =
+                        local_map (fun value, j => 
+                            (if action_id = j then (reward - value) / sampling_prob else 0) + value
+                            ) (zip values j_tns)
+                    inl expected_value =
+                        local_map (fun policy_prob, value => policy_prob * value) (zip probs adjusted_values)
+                        |> local_sum config
+                    inl policy_update =
+                        // TODO: Don't forget about the path probabilities!
+                        local_map (fun value => value - expected_value) adjusted_values
+                    policy_update, expected_value
+                    ) current_policy_and_value policy_update
+                ) reward
+            |> (ignore : reward -> ())
+
+        // Applies the policy and the value array updates.
+        inl apply_updates (seq_id : seq_id) (model : model) (trace : trace) () =
+            loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
+                inl {action_id sampling_prob world_id} = tensor_index (thread_index(), seq_id) trace.actions
+                inl value_update =
+                    trace.value_update
+                    |> tensor_index (thread_index(), seq_id)
+                inl current_policy,value =
+                    model
+                    |> apply world_id
+                    |> rezip (fun x => x.current_policy, x.value)
+                    |> unzip
+                inl policy_update =
+                    trace.policy_update
+                    |> apply thread_index()
+                    |> apply seq_id
+                
+                inl ma_factor = 0.2
+
+                open tensor_cuda
+                open ml.primitives
+                // Updates the value arrays.
+                intrinsic.atomic_cas_update (ptr_at action_id value) (fun value => value * (1 - ma_factor) + value_update * ma_factor)
+                // Updates the current policy.
+                row_gather_void (fun config x i j_tns =>
+                    local_iter (fun x, action_id =>
+                        tensor_atomic_add action_id x current_policy
+                        ) (zip x j_tns)
+                    ) policy_update
+                // TODO: Updates the average policy.
+                )
+        
         open refm
         inl seq_id = ref (0 : int)
-        let push' (world_id : world_id) (action_id, action_prob : action_id * prob) =
+        let push' (world_id : world_id) (action_id, sampling_prob : action_id * prob) =
             inl i = #seq_id
             seq_id <-# i+1
-            tensor_set (thread_index(), i) {world_id action_id action_prob} trace.actions
+            tensor_set (thread_index(), i) {world_id action_id sampling_prob} trace.actions
         inl push (world_id : world_id) = push' world_id (get_action world_id)
         push 235
         push 212
@@ -72,6 +147,5 @@ inl test() =
         push 457
         push 3447
 
-        // inl reward = -13
-        // optimize model trace reward
-        ()
+        inl reward = -13
+        calculate_updates #seq_id model trace reward
