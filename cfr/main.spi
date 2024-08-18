@@ -4,10 +4,12 @@ open coreext
 open tensorm
 
 type world_id = int
+type player_id = int
 type action_id = int
 type seq_id = int
 type thread_id = int
 type prob = float
+type log_prob = f64
 type reward = float
 type count = float
 
@@ -15,11 +17,13 @@ type trace_elem =
     {
         world_id : world_id
         action_id : action_id
+        player_id : player_id
         action_sampling_prob : prob
     }
 type trace = 
     {
         actions : tensor (thread_id * seq_id) trace_elem
+        log_path_prob : tensor (thread_id * seq_id * player_id) {sampling : log_prob; policy : log_prob}
         update : {
             value : tensor (thread_id * seq_id) (reward * count)
             policy : tensor (thread_id * seq_id * action_id) prob
@@ -39,12 +43,14 @@ type model =
 inl test() =
     inl size = {
         world_id = 1 <<< 12
+        player_id = 2
         action_id = 1 <<< 2
         seq_id = 1 <<< 4
         thread_id = threads_per_block()
     }
     inl trace : trace = {
         actions = tensor_create (size.thread_id, size.seq_id)
+        log_path_prob = tensor_create (size.thread_id, size.seq_id, size.player_id)
         update = {
             policy = tensor_create (size.thread_id, size.seq_id, size.action_id)
             value = tensor_create (size.thread_id, size.seq_id)
@@ -58,14 +64,14 @@ inl test() =
         inl mask config x i j = j < 3
 
         inl get_action (world_id : world_id) : action_id * prob =
-            inl current_policy = 
+            inl policy = 
                 model 
                 |> apply world_id 
-                |> rezip (fun x => x.policy.current)
+                |> rezip (fun x => x.policy.average)
             open ml.primitives
             row_gather_reduce (fun config x i j_tns => 
                 inl probs, action_id = local_masked_regret_matching_and_discrete_sampling mask rng config x i j_tns
-                inl prob = 
+                inl prob =
                     local_reduce config (0,limit.max) (fun a b =>
                         if snd a = action_id then a
                         elif snd b = action_id then b
@@ -73,16 +79,20 @@ inl test() =
                         ) (zip probs j_tns)
                     |> fun prob,i => assert (i <> limit.max) "Expected a valid action id in get_action." . prob
                 action_id, prob
-                ) current_policy
+                ) policy
 
         // Calculates the policy and the value array updates.
         inl calculate_updates (seq_id : seq_id) (model : model) (trace : trace) (reward : reward) =
             loop.forDown {nearFrom=seq_id; to=0} (fun seq_id (reward : reward) =>
-                inl {action_id action_sampling_prob world_id} = tensor_index (thread_index(), seq_id) trace.actions
+                inl {action_id player_id action_sampling_prob world_id} = tensor_index (thread_index(), seq_id) trace.actions
                 inl policy_current_and_value =
                     model
                     |> apply world_id
                     |> rezip (fun x => x.policy.current, x.value)
+                inl log_path_prob =
+                    trace.log_path_prob
+                    |> apply thread_index()
+                    |> apply seq_id
                 inl update_policy =
                     trace.update.policy
                     |> apply thread_index()
@@ -103,8 +113,18 @@ inl test() =
                         local_map (fun action_prob, value => action_prob * value) (zip action_probs adjusted_values)
                         |> local_sum config
                     inl update_policy =
-                        // TODO: Don't forget about the path probabilities!
-                        local_map (fun value => value - expected_value) adjusted_values
+                        local_map (fun value => 
+                            inl log_path_policy_prob =
+                                log_path_prob
+                                |> rezip (fun x => x.policy)
+                                |> tensorm.mapi (fun i x => if player_id = i then 0 else x)
+                                |> tensorm.fold 0 (+)
+                            inl log_path_sampling_prob =
+                                log_path_prob
+                                |> rezip (fun x => x.sampling)
+                                |> tensorm.fold 0 (+)
+                            exp (conv (log_path_policy_prob - log_path_sampling_prob)) * (value - expected_value)
+                            ) adjusted_values
                     update_policy, expected_value
                     ) policy_current_and_value update_policy
                 ) reward
@@ -112,8 +132,10 @@ inl test() =
 
         // Applies the policy and the value array updates.
         inl apply_updates (seq_id : seq_id) (model : model) (trace : trace) () =
+            open tensor_cuda
+            open ml.primitives
             loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
-                inl {action_id action_sampling_prob world_id} = tensor_index (thread_index(), seq_id) trace.actions
+                inl {action_id world_id} = tensor_index (thread_index(), seq_id) trace.actions
                 inl value_update =
                     trace.update.value
                     |> tensor_index (thread_index(), seq_id)
@@ -127,8 +149,6 @@ inl test() =
                     |> apply thread_index()
                     |> apply seq_id
                 
-                open tensor_cuda
-                open ml.primitives
                 // Updates the value arrays.
                 tensor_atomic_add action_id value_update value
                 // Updates the current policy.
@@ -136,24 +156,66 @@ inl test() =
                     local_iter (fun x, action_id =>
                         tensor_atomic_add action_id x policy_update
                         ) (zip x j_tns)
-                    ) update_policy
-                // TODO: Updates the average policy.
-                // TODO: Maybe decay the value arrays.
+                    ) update_policy                
                 )
-        
+
+            inl value_threeshold : float = 100
+            inl average_threeshold : float = 100
+
+            // TODO: Make row_map grid wide.
+            (model, model) ||> row_map (fun config x i j_tns =>
+                inl has_been_updated = 
+                    x
+                    |> rezip (fun x => x.policy.update)
+                    |> local_map (fun x => x <> 0)
+                    |> local_reduce config false (fun a b => a || b)
+                if has_been_updated then
+                    inl current =
+                        model
+                        |> rezip (fun {policy={average current update} value} => current, update)
+                        |> local_map (fun current, update => max 0 (current + update))
+                    inl average =
+                        inl action_probs = local_regret_matching config current
+                        zip (x |> rezip (fun {policy={average}} => average)) 
+                            action_probs
+                        |> local_map (fun average,action_prob => average + action_prob)
+                        |> local_l1_normalize average_threeshold config
+                    inl value =
+                        model
+                        |> rezip (fun {value} => value)
+                        |> local_map (fun a,b =>
+                            inl d = if b > value_threeshold then value_threeshold / b else 1
+                            a * d, b * d
+                            )
+                    local_map' (fun current,average,value => { value policy = {average current update = 0} }) 
+                        (zip current (zip average value)) 
+                        model
+                model
+                )
+
         open refm
         inl seq_id = ref (0 : int)
-        let push' (world_id : world_id) (action_id, action_sampling_prob : action_id * prob) =
+        
+        inl log_path_prob : _ _ {sampling : log_prob; policy : log_prob} = tensor_create size.player_id
+        loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
+
+        let push' (world_id, player_id : world_id * player_id) (action_id, action_sampling_prob : action_id * prob) : () =
             inl i = #seq_id
             seq_id <-# i+1
-            tensor_set (thread_index(), i) {world_id action_id action_sampling_prob} trace.actions
-        inl push (world_id : world_id) = push' world_id (get_action world_id)
-        push 235
-        push 212
-        push 790
-        push 343
-        push 457
-        push 3447
+            tensor_set (thread_index(), i) {world_id player_id action_id action_sampling_prob} trace.actions
+            inl v = {sampling = log action_sampling_prob; policy = log (tensor_index (world_id, action_id) (model |> rezip (fun x => x.policy.current)))}
+            tensor_update player_id (real open real_core in struct.map2 (+) v) log_path_prob
+            inl trace_log_path_prob = trace.log_path_prob |> apply thread_index() |> apply i
+            loop.linear trace_log_path_prob.dim fun i =>
+                tensor_set i (tensor_index i log_path_prob) trace_log_path_prob
+
+        inl push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action world_id)
+        push (235, 0)
+        push (212, 1)
+        push (790, 0)
+        push (343, 1)
+        push (457, 0)
+        push (3447, 1)
 
         inl reward = -13
         calculate_updates #seq_id model trace reward

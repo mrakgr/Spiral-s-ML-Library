@@ -11,4 +11,7 @@ let foo block =
 
 inl main() =
     run fun () =>
+        match dyn (Some 1i32) with
+        | Some x => ()
+        | None => ()
         failwith "Done. Trapping..."

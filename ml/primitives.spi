@@ -67,14 +67,14 @@ inl reduce forall dim a. neutral_element (f : a -> a -> a) (from : tensor dim a)
     barrier_cta_sync 0
 
 // Allows the user to specify the output for the map operation.
-inl local_inplace_map forall a b. f (from : tensor (int * int) a) (to : tensor (int * int) b) : () = 
+inl local_map' forall a b. f (from : tensor (int * int) a) (to : tensor (int * int) b) : () = 
     loop.linear from.dim fun i =>
         tensor_set i (f (tensor_index i from)) to
 
 // A local map function.
 inl local_map forall a b. f (from : tensor (int * int) a) : tensor (int * int) b = 
     inl to = tensor_create from.dim
-    local_inplace_map f from to
+    local_map' f from to
     to
 
 // A local iter function.
@@ -101,9 +101,7 @@ inl block_reduce_2d forall b.
     // The final result for each of the warps.
     if threads_per_miniblock <= threads_per_warp() then
         inl group = create_labeled_partition group miniblocks_in_block(threads_per_miniblock)().from
-        inl x = cg_reduce group f result
-        // console.write_ln {x tid=thread_index(); result}
-        x
+        cg_reduce group f result
     else
         inl warp_result = cg_reduce group f result
         inl warps_in_block = warps_in_block()
@@ -249,6 +247,7 @@ inl row_gather_ forall a kb b kc c.
     inl shared_to_map = shared_to_map' |> dep_optionm.map (reshape const(dim_block, dim_block') >> apply index_block)
     inl shared_to_reduce = shared_to_reduce' |> dep_optionm.map (reshape const(dim_block, dim_block') >> apply index_block)
 
+    // loop.projective blocks_in_grid(dim_block') fun index_block' =>
     loop.linear dim_block' fun index_block' =>
         inl shared_from = tensor_index index_block' shared_from
         inl shared_to_map = shared_to_map |> dep_optionm.map (tensor_index index_block')
@@ -305,6 +304,7 @@ inl row_gather_ forall a kb b kc c.
     (shared_to_reduce', to_reduce) ||> dep_optionm.iter2 fun from to =>
         set to 0 (tensor_index thread_index() from)
         barrier_cta_sync 0
+    // TODO: grid sync
 
 inl row_gather_map_reduce forall a b c.
         (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) b * c)
@@ -542,6 +542,13 @@ inl local_regret_matching config x =
     inl sum = local_sum config x
     inl inv_len = 1 / conv (local_length config x)
     local_map (fun x => if sum <> 0 then x / sum else inv_len) x
+
+// Clamps the norm of a vector to a threeshold if it is above it.
+inl local_l1_normalize threeshold config x =
+    inl x = local_map abs x
+    inl sum = local_sum config x
+    inl v = if sum > threeshold then threeshold / sum else 1
+    local_map ((*) v) x
 
 inl local_masked_regret_matching forall dim t{number;float}. (mask : row_config -> t -> dim -> int -> bool) config x i j_tns =
     inl mask = local_map (fun x,j => mask config x i j : bool) (zip x j_tns)

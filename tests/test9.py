@@ -202,7 +202,84 @@ struct dynamic_array_list
     }
 };
 
+struct Union0;
+struct Union0_0 { // None
+};
+struct Union0_1 { // Some
+    int v0;
+    __device__ Union0_1(int t0) : v0(t0) {}
+    __device__ Union0_1() = delete;
+};
+struct Union0 {
+    union {
+        Union0_0 case0; // None
+        Union0_1 case1; // Some
+    };
+    unsigned char tag{255};
+    __device__ Union0() {}
+    __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // None
+    __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // Some
+    __device__ Union0(Union0 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(x.case0); break; // None
+            case 1: new (&this->case1) Union0_1(x.case1); break; // Some
+        }
+    }
+    __device__ Union0(Union0 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __device__ Union0 & operator=(Union0 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
+        }
+        return *this;
+    }
+    __device__ Union0 & operator=(Union0 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union0() {
+        switch(this->tag){
+            case 0: this->case0.~Union0_0(); break; // None
+            case 1: this->case1.~Union0_1(); break; // Some
+        }
+        this->tag = 255;
+    }
+};
 extern "C" __global__ void entry0() {
+    int v0;
+    v0 = 1l;
+    Union0 v1;
+    v1 = Union0{Union0_1{v0}};
+    switch (v1.tag) {
+        case 0: { // None
+            break;
+        }
+        case 1: { // Some
+            int v2 = v1.case1.v0;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false); __trap();
+        }
+    }
     printf("%s\n", "Done. Trapping...");
     __trap();
 }

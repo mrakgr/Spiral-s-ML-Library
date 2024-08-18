@@ -351,6 +351,29 @@ inl apply_proj forall a b el. ({from by nearTo=t} : loop.range (tensor (a * b) e
     assert (prod dim = by) "The range being projected into has to equal the tensor's first dimension."
     apply (proj dim from) t
 
+// Updates the tensor at the specified index given the updater function.
+inl tensor_update forall dim el. (i : dim) (f : el -> el) (t : tensor dim el) : () = tensor_set i (f (tensor_index i t)) t
+
+// Maps over a tensor using a single thread.
+inl map forall dim a b. (f : a -> b) (t : tensor dim a) : tensor dim b = 
+    inl out = tensor_create t.dim
+    loop.linear t.dim fun i =>
+        tensor_set i f(tensor_index i t) out
+    out
+
+// Maps over a tensor using a single thread. Provides the index as the first argument.
+inl mapi forall dim a b. (f : dim -> a -> b) (t : tensor dim a) : tensor dim b = 
+    inl out = tensor_create t.dim
+    loop.linear t.dim fun i =>
+        tensor_set i (f i (tensor_index i t)) out
+    out
+
+// Folds over a tensor using a single thread.
+inl fold forall dim s a. (s : s) (f : s -> a -> s) (t : tensor dim a) : s = 
+    inl s = loop._dup s
+    loop.linear t.dim fun i =>
+        loop._set s (f s (tensor_index i t))
+    s
 
 // Note: `replicate_fst` doesn't play well with the rest of the library. `factorize` and `memcpy_sync` in particular.
 // // Replicates the first tensor dimension for an arbitrary amount of times with a stride of 0.

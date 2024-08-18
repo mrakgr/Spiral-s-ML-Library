@@ -152,7 +152,7 @@ inl linear forall dim. (dim : dim) body : () =
         open struct
         inl x, [] = infer_mapFoldBack `dim (forall el. (x :: l) => x, l) l in x
     listm.foldBack (fun nearTo on_success l => 
-        // Note, this segment is for if you want to experiment with manual loop unrolling, directly inspiral, instead of relying on C pragmas.
+        // Note, this segment is for if you want to experiment with manual loop unrolling, directly in Spiral, instead of relying on C pragmas.
         // if lit_is nearTo then
         //     inl rec loop i = if i < nearTo then on_success (i :: l) . loop (i+1)
         //     loop 0
