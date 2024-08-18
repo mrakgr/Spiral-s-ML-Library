@@ -203,7 +203,11 @@ inl test() =
             inl i = #seq_id
             seq_id <-# i+1
             tensor_set (thread_index(), i) {world_id player_id action_id action_sampling_prob} trace.actions
-            inl v = {sampling = log action_sampling_prob; policy = log (tensor_index (world_id, action_id) (model |> rezip (fun x => x.policy.current)))}
+            inl v : {sampling : log_prob; policy : log_prob} = 
+                {
+                    sampling = conv (log action_sampling_prob)
+                    policy = conv (log (tensor_index (world_id, action_id) (model |> rezip (fun x => x.policy.current))))
+                }
             tensor_update player_id (real open real_core in struct.map2 (+) v) log_path_prob
             inl trace_log_path_prob = trace.log_path_prob |> apply thread_index() |> apply i
             loop.linear trace_log_path_prob.dim fun i =>
