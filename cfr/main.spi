@@ -12,6 +12,7 @@ type prob = float
 type log_prob = f64
 type reward = float
 type count = float
+type log_path_prob = {sampling : log_prob; policy : log_prob}
 
 type trace_elem =
     {
@@ -23,7 +24,7 @@ type trace_elem =
 type trace = 
     {
         actions : tensor (thread_id * seq_id) trace_elem
-        log_path_prob : tensor (thread_id * seq_id * player_id) {sampling : log_prob; policy : log_prob}
+        log_path_probs : tensor (thread_id * seq_id * player_id) log_path_prob
         update : {
             value : tensor (thread_id * seq_id) (reward * count)
             policy : tensor (thread_id * seq_id * action_id) prob
@@ -50,7 +51,7 @@ inl test() =
     }
     inl trace : trace = {
         actions = tensor_create (size.thread_id, size.seq_id)
-        log_path_prob = tensor_create (size.thread_id, size.seq_id, size.player_id)
+        log_path_probs = tensor_create (size.thread_id, size.seq_id, size.player_id)
         update = {
             policy = tensor_create (size.thread_id, size.seq_id, size.action_id)
             value = tensor_create (size.thread_id, size.seq_id)
@@ -89,8 +90,8 @@ inl test() =
                     model
                     |> apply world_id
                     |> rezip (fun x => x.policy.current, x.value)
-                inl log_path_prob =
-                    trace.log_path_prob
+                inl log_path_probs =
+                    trace.log_path_probs
                     |> apply thread_index()
                     |> apply seq_id
                 inl update_policy =
@@ -115,15 +116,15 @@ inl test() =
                     inl update_policy =
                         local_map (fun value => 
                             inl log_path_policy_prob =
-                                log_path_prob
+                                log_path_probs
                                 |> rezip (fun x => x.policy)
                                 |> tensorm.mapi (fun i x => if player_id = i then 0 else x)
                                 |> tensorm.fold 0 (+)
                             inl log_path_sampling_prob =
-                                log_path_prob
+                                log_path_probs
                                 |> rezip (fun x => x.sampling)
                                 |> tensorm.fold 0 (+)
-                            exp (conv (log_path_policy_prob - log_path_sampling_prob)) * (value - expected_value)
+                            conv (exp (log_path_policy_prob - log_path_sampling_prob)) * (value - expected_value)
                             ) adjusted_values
                     update_policy, expected_value
                     ) policy_current_and_value update_policy
@@ -196,20 +197,20 @@ inl test() =
         open refm
         inl seq_id = ref (0 : int)
         
-        inl log_path_prob : _ _ {sampling : log_prob; policy : log_prob} = tensor_create size.player_id
+        inl log_path_prob : _ _ log_path_prob = tensor_create size.player_id
         loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
 
         let push' (world_id, player_id : world_id * player_id) (action_id, action_sampling_prob : action_id * prob) : () =
             inl i = #seq_id
             seq_id <-# i+1
             tensor_set (thread_index(), i) {world_id player_id action_id action_sampling_prob} trace.actions
-            inl v : {sampling : log_prob; policy : log_prob} = 
-                {
-                    sampling = conv (log action_sampling_prob)
-                    policy = conv (log (tensor_index (world_id, action_id) (model |> rezip (fun x => x.policy.current))))
-                }
-            tensor_update player_id (real open real_core in struct.map2 (+) v) log_path_prob
-            inl trace_log_path_prob = trace.log_path_prob |> apply thread_index() |> apply i
+            inl v = {
+                sampling = log (conv action_sampling_prob)
+                policy = log (conv (tensor_index (world_id, action_id) (model |> rezip (fun x => x.policy.current))))
+            }
+            inl add forall t. : t -> t -> t = real open real_core in struct.map2 (+)
+            tensor_update player_id (add v) log_path_prob
+            inl trace_log_path_prob = trace.log_path_probs |> apply thread_index() |> apply i
             loop.linear trace_log_path_prob.dim fun i =>
                 tensor_set i (tensor_index i log_path_prob) trace_log_path_prob
 
