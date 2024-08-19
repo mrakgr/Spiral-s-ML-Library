@@ -88,6 +88,7 @@ inl test() =
         // Calculates the policy and the value array updates.
         inl calculate_updates (seq_id : seq_id) (model : model) (trace : trace) (reward : reward) =
             loop.forDown {nearFrom=seq_id; to=0} (fun seq_id (reward : reward) =>
+                // console.write_ln {reward}
                 inl {action_id player_id action_sampling_prob world_id} = tensor_index (seq_id, thread_id) trace.actions
                 inl policy_current_and_value =
                     model
@@ -107,7 +108,8 @@ inl test() =
                 open ml.primitives
                 row_gather_map_reduce (fun config x i j_tns =>
                     inl policy_current, reward_and_count = unzip x
-                    inl values = local_map (fun reward, count => reward / count) reward_and_count
+                    // console.write_ln {policy_current reward_and_count}
+                    inl values = local_map (fun reward, count => if count <> 0 then reward / count else 0) reward_and_count
                     inl action_probs = local_masked_regret_matching mask config policy_current i j_tns
                     inl adjusted_values =
                         local_map (fun value, j => 
@@ -132,7 +134,10 @@ inl test() =
                     update_policy, expected_value
                     ) policy_current_and_value update_policy
                 ) reward
-            |> (ignore : reward -> ())
+            // |> (ignore : reward -> ())
+            |> fun fin_reward => console.write_ln {fin_reward}
+
+            barrier_cta_sync 0
 
         // Applies the policy and the value array updates.
         inl apply_updates (seq_id : seq_id) (model : model) (trace : trace) () =
@@ -165,6 +170,8 @@ inl test() =
 
             inl value_threeshold : float = 100
             inl average_threeshold : float = 100
+
+            barrier_cta_sync 0
 
             // TODO: Make row_map grid wide.
             (model, model) ||> row_map (fun config x i j_tns =>
@@ -227,3 +234,5 @@ inl test() =
 
         inl reward = -13
         calculate_updates #seq_id model trace reward
+
+inl main() = test()
