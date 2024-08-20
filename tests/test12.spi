@@ -1,13 +1,16 @@
 open corebase
 open corecuda
 open coreext
+open tensorm
 open transposing_loop
 
 inl main() =
     run fun () =>
-        inl reward = -13 * thread_index()
-        inl x =
-            linear (8 : int) fun tid' i =>
-                console.write_ln {reward tid=thread_index(); tid' i}
-                tid'
-        console.write_ln {x}
+        inl t : tensor int () = tensor_create 16
+        ()
+        // inl reward = -13 * thread_index()
+        // inl x =
+        //     linear (8 : int) fun tid' i =>
+        //         console.write_ln {reward tid=thread_index(); tid' i}
+        //         tid'
+        // console.write_ln {x}

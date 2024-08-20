@@ -2,9 +2,6 @@ kernel = r"""
 #include <new>
 #include <assert.h>
 #include <stdio.h>
-#include <cooperative_groups.h>
-#include <cuda/semaphore>
-__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
 using default_int = int;
 using default_uint = unsigned int;
 template <typename el>
@@ -205,113 +202,8 @@ struct dynamic_array_list
     }
 };
 
-__device__ inline bool while_method_0(int v0){
-    bool v1;
-    v1 = v0 < 8l;
-    return v1;
-}
 extern "C" __global__ void entry0() {
-    int v0;
-    v0 = threadIdx.x;
-    int v1;
-    v1 = -13l * v0;
-    __shared__ int v2[32l];
-    /* void shared array create v3 */;
-    __shared__ int v4[32l];
-    int v5;
-    v5 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v5 && v5 < 32l);
-    v2[v5] = v1;
-    /* void array set */;
-    asm("barrier.cta.sync %0;" :: "r"(0l));
-    int v6;
-    v6 = threadIdx.x;
-    bool v7;
-    v7 = 0l <= v6;
-    bool v8;
-    v8 = v7 == false;
-    if (v8){
-        assert("The index needs to be zero or positive." && v7);
-    } else {
-    }
-    int v10;
-    v10 = v6 % 8l;
-    int v11;
-    v11 = v6 / 8l;
-    bool v12;
-    v12 = v11 < 4l;
-    bool v13;
-    v13 = v12 == false;
-    if (v13){
-        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v12);
-    } else {
-    }
-    assert("Tensor range check" && 0 <= v11 && v11 < 4l);
-    int v15;
-    v15 = 0l;
-    while (while_method_0(v15)){
-        bool v17;
-        v17 = 0l <= v11;
-        bool v18;
-        v18 = v17 && v12;
-        bool v19;
-        v19 = v18 == false;
-        if (v19){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v18);
-        } else {
-        }
-        bool v21;
-        v21 = 0l <= v15;
-        bool v23;
-        if (v21){
-            bool v22;
-            v22 = v15 < 8l;
-            v23 = v22;
-        } else {
-            v23 = false;
-        }
-        bool v24;
-        v24 = v23 == false;
-        if (v24){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v23);
-        } else {
-        }
-        int v26;
-        v26 = v15 * 4l;
-        int v27;
-        v27 = v26 + v11;
-        assert("Tensor range check" && 0 <= v15 && v15 < 8l);
-        int v28;
-        v28 = 4l * v15;
-        int v29;
-        v29 = v28 + v11;
-        int v30;
-        v30 = v2[v29];
-        /* void array index */;
-        int v31;
-        v31 = threadIdx.x;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v32 = console_lock;
-        auto v33 = cooperative_groups::coalesced_threads();
-        v32.acquire();
-        printf("{%s = %d; %s = %d; %s = %d; %s = %d}\n","i", v10, "reward", v30, "tid", v31, "tid'", v27);
-        v32.release();
-        v33.sync() ;
-        assert("Tensor range check" && 0 <= v27 && v27 < 32l);
-        v4[v27] = v27;
-        v15 += 1l ;
-    }
-    asm("barrier.cta.sync %0;" :: "r"(0l));
-    int v39;
-    v39 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v39 && v39 < 32l);
-    int v40;
-    v40 = v4[v39];
-    cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v41 = console_lock;
-    auto v42 = cooperative_groups::coalesced_threads();
-    v41.acquire();
-    printf("{%s = %d}\n","x", v40);
-    v41.release();
-    v42.sync() ;
+    /* void array create */
     return ;
 }
 """

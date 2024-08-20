@@ -220,49 +220,26 @@ inl local_max config = local_reduce config limit.min max
 inl local_min config = local_reduce config limit.max min
 
 // The template function from which `row_gather_map`, `row_gather_reduce` and `row_gather_void` are derived from.
-inl row_gather_ forall a kb b kc c.
-        (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> dep_option kb (tensor (int * int) b) * dep_option kc c)
-        (from : tensor int a) (to_map : dep_option kb (tensor int b)) (to_reduce : dep_option kc (array c)) : () =
-    assert (lit_is from.dim) "The input tensor dimension needs to be known at compile time." 
-    to_map |> dep_optionm.iter fun to =>
-        assert (lit_is to.dim) "The output tensor dimension needs to be known at compile time." 
-        assert (from.dim = to.dim) "The input and the output tensor dimensions must be equal." 
+inl row_gather_ forall a b c.
+        (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) b * c)
+        (io : tensor int (a * b)) : c =
+    assert (lit_is io.dim) "The tensor dimension needs to be known at compile time." 
 
-    // Creates the shared arrays.
-    inl shared_from' : tensor int (tensor_ptrs a) = tensor_cuda.tensor_create_shared threads_per_block()
-    inl shared_to_map' = to_map |> dep_optionm.map fun _ => tensor_cuda.tensor_create_shared threads_per_block()
-    inl shared_to_reduce' = to_reduce |> dep_optionm.map fun _ => tensor_cuda.tensor_create_shared threads_per_block()
-
-    // Sets the input and output pointers into the shared arrays.
-    tensor_set thread_index() (ptrs_at_current_offset from) shared_from'
-    (to_map, shared_to_map') ||> dep_optionm.iter2 fun to_map shared_to_map' => tensor_set thread_index() (ptrs_at_current_offset to_map) shared_to_map'
-
-    barrier_cta_sync 0
-
-    inl dim_inner,dim_sizeof16 = (factorize_sizeof_16 from).dim
-    inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared_from'.dim, dim_inner)
+    inl dim_inner,dim_sizeof16 = (factorize_sizeof_16 io).dim
+    inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (threads_per_block(), dim_inner)
     inl threads_per_miniblock = dim_inner
-    inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
-    inl shared_from = reshape const(dim_block, dim_block') shared_from' |> apply index_block
-    inl shared_to_map = shared_to_map' |> dep_optionm.map (reshape const(dim_block, dim_block') >> apply index_block)
-    inl shared_to_reduce = shared_to_reduce' |> dep_optionm.map (reshape const(dim_block, dim_block') >> apply index_block)
 
-    // loop.projective blocks_in_grid(dim_block') fun index_block' =>
-    loop.linear dim_block' fun index_block' =>
-        inl shared_from = tensor_index index_block' shared_from
-        inl shared_to_map = shared_to_map |> dep_optionm.map (tensor_index index_block')
+    inl io = apply_ptr io
 
-        // inl from = 
-        //     shared_from 
-        //     |> from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) 
-        //     |> apply index_inner
-
-        inl from = 
-            shared_from 
-            |> from_tensor_ptrs (dim_inner',dim_inner,dim_sizeof16) 
+    transposing_loop.linear dim_inner fun thread_id index_inner =>
+        inl from,to = 
+            io
+            |> reshape const(dim_inner',dim_inner,dim_sizeof16) 
             |> reorder (fun dim_inner',dim_inner,dim_sizeof16 => dim_inner,dim_inner',dim_sizeof16) 
             |> apply index_inner
+            |> unzip
 
+        // Creates tensors in local memory.
         inl local = tensor_create from.dim
         inl local_index = tensor_create from.dim
 
@@ -277,66 +254,41 @@ inl row_gather_ forall a kb b kc c.
             tensor_set i (loop.proj_rev dim index) local_index
 
         // Map the local tensor using local operations.
-        inl local_map, local_reduce = 
-            // Calculate the local block index.
-            inl i =
-                inl dim = dim_block', dim_block
-                inl index = index_block', index_block
-                (loop.rigid_merge dim index)
-            f row_config{threads_per_miniblock} local i local_index
-
-        (shared_to_reduce, local_reduce) ||> dep_optionm.iter2 fun to result =>
-            // Stores the result into global memory after reducing it.
-            tensor_set index_block' result to
-            
-        (shared_to_map, local_map) ||> dep_optionm.iter2 fun shared local => 
-            inl to = 
-                shared
-                |> from_tensor_ptrs (dim_inner',dim_inner,dim_sizeof16) 
-                |> reorder (fun dim_inner',dim_inner,dim_sizeof16 => dim_inner,dim_inner',dim_sizeof16) 
-                |> apply index_inner
-                // from_tensor_ptrs (dim_inner,dim_inner',dim_sizeof16) shared |> apply index_inner
-            // Stores the result into global memory after mapping it.
-            loop.linear (fst to.dim) fun i =>
-                memcpy_sync (apply i to, apply i local)
-                
-    barrier_cta_sync 0
-    (shared_to_reduce', to_reduce) ||> dep_optionm.iter2 fun from to =>
-        set to 0 (tensor_index thread_index() from)
-        barrier_cta_sync 0
-    // TODO: grid sync
+        inl local_out, local_reduce = f row_config{threads_per_miniblock} local thread_id local_index
+        
+        // Stores the result into global memory after mapping it.
+        loop.linear (fst to.dim) fun i =>
+            memcpy_sync (apply i to, apply i local_out)
+        
+        local_reduce
 
 inl row_gather_map_reduce forall a b c.
         (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) b * c)
         (from : tensor int a) (to : tensor int b) : c =
-    inl to' : array c = create 1
-    row_gather_ (fun config x i j_tns => 
-        inl b,c = f config x i j_tns
-        Some' b, Some' c
-        ) from (Some' to) (Some' to')
-    index to' 0
+    assert (from.dim = to.dim) "The input and the output tensor dimensions have to be equal." // `zip` will already assert this, but this is just to make the error messages better.
+    row_gather_ (fun config x i j_tns => f config x i j_tns) (zip from to)
 
 inl row_gather_map forall a b.
         (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> tensor (int * int) b)
         (from : tensor int a) (to : tensor int b) : () =
-    row_gather_ (fun config x i j_tns => Some' (f config x i j_tns), None') from (Some' to) (None' : _ _ (array ()))
+    assert (from.dim = to.dim) "The input and the output tensor dimensions have to be equal."
+    row_gather_ (fun config x i j_tns => f config x i j_tns, ()) (zip from to)
 
 inl row_gather_reduce forall a b.
         (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> b)
         (from : tensor int a) : b =
-    inl to : array b = create 1
-    row_gather_ (fun config x i j_tns => None', Some'(f config x i j_tns)) from (None' : _ _ (tensor _ ())) (Some' to)
-    index to 0
+    row_gather_ (fun config x i j_tns => (tensor_create x.dim : _ _ {}), f config x i j_tns) (zip from (tensor_create from.dim))
 
 inl row_gather_void forall a.
         (f : row_config -> tensor (int * int) a -> int -> tensor (int * int) int -> ())
         (from : tensor int a) : () =
-    row_gather_ (fun config x i j_tns => f config x i j_tns . None' , None') from (None' : _ _ (tensor _ ())) (None' : _ _ (array ()))
+    row_gather_ (fun config x i j_tns => (tensor_create x.dim : _ _ {}), f config x i j_tns) (zip from (tensor_create from.dim))
 
 // Template from which row_map and row_reduce are derived from. See the row_map for documentation.
 inl row_ forall dim a kb b kc c.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> dep_option kb (tensor (int * int) b) * dep_option kc c)
         (from : tensor (dim * int) a) (to_map : dep_option kb (tensor (dim * int) b)) (to_reduce : dep_option kc (tensor dim c)) : () =
+    // Note(8/20/2024): I didn't realize that instead of using dep_option, I could have used tensor _ {} for empty tensors like in row_gather_.
     to_map |> dep_optionm.iter fun to => assert (from.dim = to.dim) "The input and the output tensor dimensions have to be equal."
     to_reduce |> dep_optionm.iter fun to => assert (fst from.dim = to.dim) "The (first) input and the output tensor dimensions have to be equal."
 
