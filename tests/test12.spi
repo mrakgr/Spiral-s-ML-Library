@@ -1,58 +1,13 @@
-// The transposing loop module.
-
 open corebase
 open corecuda
 open coreext
-open tensorm
-open tensor_cuda
-open rangem
-
-inl free_vars_replace forall a b. (a : a) (b : b) : a = !!!!FreeVarsReplace(a,b)
-
-inl projective forall dim. (dim : dim) (f : int -> dim -> ()) =
-    inl body forall el. (fv : el) : () = 
-        inl shared : tensor int el = tensor_create_shared threads_per_block()
-        tensor_set thread_index() fv shared
-        barrier_cta_sync 0
-        loop.projective threads_in_block(threads_per_block(), dim) fun thread_id, dim =>
-            free_vars_replace f (tensor_index thread_id shared) thread_id dim
-        barrier_cta_sync 0
-    real
-        open real_core
-        inl fv = free_vars f
-        body `(`fv) fv
-    ()
-
-inl linear forall dim. (dim_inner : dim) (f : int -> dim -> ()) =
-    inl body forall el. (fv : el) : () = 
-        inl shared : tensor int el = tensor_create_shared threads_per_block()
-        tensor_set thread_index() fv shared
-        barrier_cta_sync 0
-
-        inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared.dim, dim_inner)
-        assert (loop.prod dim_inner' = 1) "The threads per block need to be divisible by the inner dimension."
-        inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
-        inl shared = reshape const(dim_block',dim_block) shared |> reorder (fun dim_block',dim_block => dim_block,dim_block') |> apply index_block
-        loop.linear dim_block' fun index_block' =>
-            // Calculate the local thread id.
-            inl thread_id =
-                inl dim = dim_block, dim_block'
-                inl index = index_block, index_block'
-                (loop.rigid_merge dim index)
-
-            free_vars_replace f (tensor_index index_block' shared) thread_id index_inner
-
-        barrier_cta_sync 0
-    real
-        open real_core
-        inl fv = free_vars f
-        body `(`fv) fv
-    ()
+open transposing_loop
 
 inl main() =
     run fun () =>
         inl reward = -13 * thread_index()
-        linear (8 : int) fun tid' i =>
-            console.write_ln {reward tid=thread_index(); tid' i}
-            ()
-        ()
+        inl x =
+            linear (8 : int) fun tid' i =>
+                console.write_ln {reward tid=thread_index(); tid' i}
+                tid'
+        console.write_ln {x}

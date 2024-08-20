@@ -79,13 +79,13 @@ inl __syncthreads() : () = $"__syncthreads()"
 inl __syncwarp() : () = $"__syncwarp()"
 
 // Synchronizes all the threads in the CTA given the barrier id and the thread count.
-inl barrier_cta_sync' ({barrier_id thread_count} : {barrier_id : int; thread_count : int}) =
+inl barrier_cta_sync' ({barrier_id thread_count} : {barrier_id : int; thread_count : int}) : () =
     assert (thread_count % threads_per_warp() = 0) "The number of threads has to be divisible by the warp size."
     assert (barrier_id < 16) "The barrier_id has to be less than 16."
     $'asm("barrier.cta.sync %0, %1;" :: "r"(!(conv barrier_id : i32)), "r"(!(conv thread_count : i32)))'
 
 // Synchronizes all the threads in the CTA given the barrier id.
-inl barrier_cta_sync (barrier_id : int) =
+inl barrier_cta_sync (barrier_id : int) : () =
     assert (threads_per_block() % threads_per_warp() = 0) "The number of threads per block has to be divisible by the warp size."
     assert (barrier_id < 16) "The barrier_id has to be less than 16."
     $'asm("barrier.cta.sync %0;" :: "r"(!(conv barrier_id : i32)))'
