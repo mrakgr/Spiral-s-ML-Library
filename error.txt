@@ -1,82 +1,22 @@
-Error trace on line: 739, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl main() = test3()
+Error trace on line: 3, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
+inl main() : i32 * i32 =
         ^
-Error trace on line: 739, column: 14 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl main() = test3()
-             ^
-Error trace on line: 695, column: 10 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-inl test3() =
-         ^
-Error trace on line: 698, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl m,n : int * int = threads_per_block(), (1 <<< 4)
+Error trace on line: 4, column: 5 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
+    inl ~(a,b) = 1i32, 2i32
     ^
-Error trace on line: 698, column: 9 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl m,n : int * int = threads_per_block(), (1 <<< 4)
+Error trace on line: 4, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
+    inl ~(a,b) = 1i32, 2i32
         ^
-Error trace on line: 700, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+Error trace on line: 4, column: 11 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
+    inl ~(a,b) = 1i32, 2i32
+          ^
+Error trace on line: 5, column: 5 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
+    inl f () = a, b
     ^
-Error trace on line: 702, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
-    ^
-Error trace on line: 703, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_indices_map = tensor_create (m,n)
-    ^
-Error trace on line: 704, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_indices_reduce = tensor_create m
-    ^
-Error trace on line: 705, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_sample_reduce = tensor_create m
-    ^
-Error trace on line: 705, column: 32 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    inl output_sample_reduce = tensor_create m
-                               ^
-Error trace on line: 44, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl stride, len = real calculate_stride_len dim
-    ^
-Error trace on line: 44, column: 9 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl stride, len = real calculate_stride_len dim
+Error trace on line: 8, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
+        inl free_vars = !!!!FreeVars(f)
         ^
-Error trace on line: 45, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    assert_long_length len dim
-    ^
-Error trace on line: 46, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl create_body forall t. : tensor_body dim t = tensor_body {
-    ^
-Error trace on line: 51, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    tensor {dim bodies=real infer_map `el create_body}
-    ^
-Error trace on line: 51, column: 12 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    tensor {dim bodies=real infer_map `el create_body}
-           ^
-Error trace on line: 51, column: 29 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    tensor {dim bodies=real infer_map `el create_body}
-                            ^
-Error trace on line: 9, column: 5 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-    f `el
-    ^
-Error trace on line: 5, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        typecase el with
+Error trace on line: 9, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
+        inl free_vars' = 
         ^
-Error trace on line: 6, column: 22 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        | ~a * ~b => f `a, f `b
-                     ^
-Error trace on line: 5, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        typecase el with
-        ^
-Error trace on line: 8, column: 16 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
-        | _ => g `el
-               ^
-Error trace on line: 46, column: 53 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl create_body forall t. : tensor_body dim t = tensor_body {
-                                                    ^
-Error trace on line: 46, column: 65 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-    inl create_body forall t. : tensor_body dim t = tensor_body {
-                                                                ^
-Error trace on line: 47, column: 17 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
-        array = create len
-                ^
-Error trace on line: 47, column: 37 in module: c:\Spiral_s_ML_Library\corebase\base.spi.
-instance create array = fun size => array !!!!ArrayCreate(`el,size)
-                                    ^
-Only stack allocated primitive types (i8,i16,i32,i64 and u8,u16,u32,u64 and f32,f64 and bool) are allowed in CuPy arrays.
+The two expressions need to have the same number of free variables.

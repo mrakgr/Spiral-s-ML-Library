@@ -59,6 +59,7 @@ modules:
         cooperative_groups
         semaphore
         latchm
+        tloop
 
     coreext/
         console/
@@ -115,4 +116,8 @@ modules:
         test7
         test8
         test9
+        test10
+        test11
+        test12
+        
         

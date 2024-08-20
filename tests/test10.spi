@@ -1,0 +1,16 @@
+open corebase
+
+inl main() : i32 * i32 =
+    inl ~(a,b) = 1i32, 2i32
+    inl f () = a, b
+    real
+        open real_core
+        inl free_vars = !!!!FreeVars(f)
+        inl free_vars' = 
+            struct.map (function
+                | (x : i32) => x + 2i32
+                | x => x
+                ) free_vars
+        print_static {free_vars free_vars'}
+        !!!!FreeVarsReplace(f,free_vars')()
+    

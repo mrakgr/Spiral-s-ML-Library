@@ -209,6 +209,8 @@ inl function_term_slots_get a = !!!!FunctionTermSlotsGet(a)
 inl function_term_slots_set a b = !!!!FunctionTermSlotsSet(a,b)
 // Gets the free vars of a term as a tuple.
 inl free_vars x = !!!!FreeVars(x)
+// Sets the free vars of the first term to the second. Both the number and the types of the free vars have to be the same.
+inl free_vars_replace a b = !!!!FreeVarsReplace(a,b)
 
 // Returns the i32 tag of an union.
 inl union_tag x = !!!!UnionTag(x)
