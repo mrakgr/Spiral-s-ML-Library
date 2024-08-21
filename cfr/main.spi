@@ -27,6 +27,7 @@ type trace =
     {
         actions : tensor (seq_id * thread_id) trace_elem
         log_path_probs : tensor (seq_id * thread_id * player_id) log_path_prob
+        rewards : tensor (seq_id * thread_id * player_id) reward
         update : {
             value : tensor (seq_id * thread_id) (reward * prob)
             policy : tensor (seq_id * thread_id * action_id) prob
@@ -54,6 +55,7 @@ inl test() =
     inl trace : trace = {
         actions = tensor_create (size.seq_id, size.thread_id)
         log_path_probs = tensor_create (size.seq_id, size.thread_id, size.player_id)
+        rewards = tensor_create (size.seq_id, size.thread_id, size.player_id)
         update = {
             policy = tensor_create (size.seq_id, size.thread_id, size.action_id)
             value = tensor_create (size.seq_id, size.thread_id)
@@ -139,11 +141,11 @@ inl test() =
                     trace_update_policy, expected_value
                     )
                 ) reward
-            // |> (ignore : reward -> ())
-            |> fun fin_reward => console.write_ln {fin_reward}
+            |> (ignore : reward -> ())
+            // |> fun fin_reward => console.write_ln {fin_reward}
 
         // Applies the policy and the value array updates.
-        inl apply_updates (model : model) (trace : trace) (seq_id : seq_id)  =
+        inl apply_updates (model : model) (trace : trace) (seq_id : seq_id) =
             open tensor_cuda
             open ml.primitives
             loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
@@ -173,10 +175,7 @@ inl test() =
                     )
                 )
 
-            // inl value_threeshold : float = 100 // Would always be too high or too low depending on the path probability.
             inl average_threeshold : float = 100
-
-            // barrier_cta_sync 0 // `row_gather_void` above does a barrier sync
 
             // TODO: Make row_map grid wide.
             (model, model) ||> row_map (fun config model i j_tns =>
@@ -200,11 +199,6 @@ inl test() =
                     inl value =
                         model
                         |> rezip (fun {value} => value)
-                    //     |> local_map (fun a,b =>
-                    //         // inl d = if b > value_threeshold then value_threeshold / b else 1
-                    //         a * d, b * d
-                    //         )
-                    // console.write_ln {i average value}
                     local_map' (fun current,average,value => { value policy = {average current update = 0} }) 
                         (zip current (zip average value)) 
                         model
@@ -216,6 +210,9 @@ inl test() =
         
         inl log_path_prob : _ _ log_path_prob = tensor_create size.player_id
         loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
+        
+        inl rewards : _ _ reward = tensor_create size.player_id
+        loop.linear rewards.dim fun i => tensor_set i 0 rewards
 
         inl push' (world_id, player_id : world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
             inl i = #seq_id
@@ -244,3 +241,7 @@ inl test() =
         apply_updates model trace #seq_id
 
 inl main() = test()
+
+// multiplayer rewards
+// how could we adapt this to a restricted number of threads instead of the full block
+// make row map gridwise

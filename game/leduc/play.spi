@@ -213,7 +213,7 @@ inl main() =
                     serialize seri.game_state game_state
 
                 // nn model loop
-                intrinsic.atomic_add_ref c -1
+                intrinsic.atomic_add_ref c -1 |> ignore
                 loop.while' (const true) fun () =>
                     inl model = ml.models.from_model_data model.game_graph() neural.model_data
                     ml.models.run model None |> ignore
