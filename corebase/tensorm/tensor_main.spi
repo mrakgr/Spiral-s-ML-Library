@@ -107,7 +107,7 @@ inl apply_templ forall dim a b el. (fst : dim -> a) (snd : dim -> b) (i : a) (te
         bodies = 
             map (fun (tensor_body {array stride offset} as x) =>
                 typecase `x with
-                | tensor_body (a * b) ~el => tensor_body `b `el {
+                | tensor_body dim ~el => tensor_body `b `el {
                     array
                     stride = snd stride
                     offset = calculate_offset (fst stride) i offset

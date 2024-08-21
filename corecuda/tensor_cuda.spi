@@ -34,6 +34,7 @@ inl tensor_atomic_add forall dim el. (i : dim) (v : el) (t : tensor dim el) : ()
     inl (tensor {dim bodies}) = t |> apply_all i |> apply_ptr
     real
         iter2 (fun (tensor_body {array}) v =>
-            typecase `array with
-            | array ~el => intrinsic.atomic_add `el array v
+            typecase `array with array ~el => 
+            inl _ = intrinsic.atomic_add `el array v
+            ()
             ) bodies v

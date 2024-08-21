@@ -1,22 +1,151 @@
-Error trace on line: 3, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
-inl main() : i32 * i32 =
+Error trace on line: 215, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        inl seq_id = ref (0 : int)
         ^
-Error trace on line: 4, column: 5 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
-    inl ~(a,b) = 1i32, 2i32
+Error trace on line: 217, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        inl log_path_prob : _ _ log_path_prob = tensor_create size.player_id
+        ^
+Error trace on line: 218, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
+        ^
+Error trace on line: 220, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        inl push' (world_id, player_id : world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
+        ^
+Error trace on line: 234, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        let push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action world_id)
+        ^
+Error trace on line: 235, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        push (235, 0)
+        ^
+Error trace on line: 236, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        push (212, 1)
+        ^
+Error trace on line: 237, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        push (790, 0)
+        ^
+Error trace on line: 238, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        push (343, 1)
+        ^
+Error trace on line: 239, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        push (457, 0)
+        ^
+Error trace on line: 240, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        push (3447, 1)
+        ^
+Error trace on line: 242, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        inl reward = -13
+        ^
+Error trace on line: 243, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        calculate_updates model trace #seq_id reward
+        ^
+Error trace on line: 244, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+        apply_updates model trace #seq_id
+        ^
+Error trace on line: 149, column: 13 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+            loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
+            ^
+Error trace on line: 42, column: 23 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl forDown' r body = forDown r (fun i () => body i) ()
+                      ^
+Error trace on line: 40, column: 40 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl forDown {nearFrom to} body state = forDownBy {nearFrom to by=1} body state
+                                       ^
+Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl i, state = _dup (nearFrom, state)
     ^
-Error trace on line: 4, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
-    inl ~(a,b) = 1i32, 2i32
+Error trace on line: 36, column: 9 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl i, state = _dup (nearFrom, state)
         ^
-Error trace on line: 4, column: 11 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
-    inl ~(a,b) = 1i32, 2i32
+Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun _ => i > to) fun _ => _sub i by . _set state (body i state)
+    ^
+Error trace on line: 2, column: 82 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl while' (cond : () -> bool) (body : () -> ()) : () = !!!!While((join cond()),(body()))
+                                                                                 ^
+Error trace on line: 37, column: 39 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun _ => i > to) fun _ => _sub i by . _set state (body i state)
+                                      ^
+Error trace on line: 37, column: 51 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun _ => i > to) fun _ => _sub i by . _set state (body i state)
+                                                  ^
+Error trace on line: 37, column: 63 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    while' (fun _ => i > to) fun _ => _sub i by . _set state (body i state)
+                                                              ^
+Error trace on line: 42, column: 40 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl forDown' r body = forDown r (fun i () => body i) ()
+                                       ^
+Error trace on line: 42, column: 46 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl forDown' r body = forDown r (fun i () => body i) ()
+                                             ^
+Error trace on line: 150, column: 17 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                inl {action_id world_id} = tensor_index (seq_id, thread_id) trace.actions
+                ^
+Error trace on line: 150, column: 21 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                inl {action_id world_id} = tensor_index (seq_id, thread_id) trace.actions
+                    ^
+Error trace on line: 151, column: 17 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                inl trace_value_update =
+                ^
+Error trace on line: 154, column: 17 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                inl model_policy_update,value =
+                ^
+Error trace on line: 154, column: 21 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                inl model_policy_update,value =
+                    ^
+Error trace on line: 160, column: 17 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                inl trace_update_policy =
+                ^
+Error trace on line: 165, column: 17 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                console.write_ln {action_id trace_value_update}
+                ^
+Error trace on line: 168, column: 17 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
+                tensor_atomic_add action_id trace_value_update value
+                ^
+Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\tensor_cuda.spi.
+    inl (tensor {dim bodies}) = t |> apply_all i |> apply_ptr
+    ^
+Error trace on line: 34, column: 10 in module: c:\Spiral_s_ML_Library\corecuda\tensor_cuda.spi.
+    inl (tensor {dim bodies}) = t |> apply_all i |> apply_ptr
+         ^
+Error trace on line: 34, column: 17 in module: c:\Spiral_s_ML_Library\corecuda\tensor_cuda.spi.
+    inl (tensor {dim bodies}) = t |> apply_all i |> apply_ptr
+                ^
+Error trace on line: 36, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\tensor_cuda.spi.
+        iter2 (fun (tensor_body {array}) v =>
+        ^
+Error trace on line: 126, column: 5 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    f (ar, v)
+    ^
+Error trace on line: 122, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 123, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+           ^
+Error trace on line: 123, column: 20 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+                   ^
+Error trace on line: 123, column: 30 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+                             ^
+Error trace on line: 122, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 123, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va,vb) => f (a, va) . f (b, vb)
+           ^
+Error trace on line: 124, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_iter (fun {key value} => f (ar key, value)) v
           ^
-Error trace on line: 5, column: 5 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
-    inl f () = a, b
-    ^
-Error trace on line: 8, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
-        inl free_vars = !!!!FreeVars(f)
-        ^
-Error trace on line: 9, column: 9 in module: c:\Spiral_s_ML_Library\tests\test10.spi.
-        inl free_vars' = 
-        ^
-The two expressions need to have the same number of free variables.
+Error trace on line: 125, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v => set ar v
+          ^
+Error trace on line: 125, column: 19 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar,v => set ar v
+                  ^
+Error trace on line: 37, column: 13 in module: c:\Spiral_s_ML_Library\corecuda\tensor_cuda.spi.
+            typecase `array with array ~el => 
+            ^
+Error trace on line: 38, column: 13 in module: c:\Spiral_s_ML_Library\corecuda\tensor_cuda.spi.
+            intrinsic.atomic_add `el array v |> ignore
+            ^
+Cannot apply a forall with a term.
