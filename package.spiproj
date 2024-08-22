@@ -81,9 +81,6 @@ modules:
         cfr
         models
 
-    cfr/
-        main
-        
     game/
         utils
 

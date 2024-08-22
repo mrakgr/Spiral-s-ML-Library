@@ -585,6 +585,11 @@ inl local_masked_regret_matching_and_discrete_sampling mask rng config x i (j_tn
     inl x = local_masked_regret_matching mask config x i j_tns
     x, local_discrete_sampling rng config x i j_tns
 
+// Turns the vector into a hash.
+inl local_binarize config x i (j_tns : tensor (int * int) int) : int =
+    inl x = local_map (fun x,j => if x <= 0 then 0 else 1 <<< j) (zip x j_tns)
+    local_reduce config 0 (|||) x
+
 inl test1() =
     inl m,n : int * int = 3, 36*4
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])

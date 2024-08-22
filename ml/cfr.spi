@@ -64,6 +64,8 @@ inl sizes() =
         thread_id = threads_per_block()
     }
 
+type table = {model : model; trace : trace}
+
 inl graph () =
     inl size = sizes()
     open partitionm
@@ -73,11 +75,17 @@ inl graph () =
         *. !(size.seq_id, size.thread_id) *. !(size.seq_id, size.thread_id, size.action_id)
         |> reorder (fun ((actions, log_path_probs), value), policy => { actions log_path_probs update = { value policy } })
 
-    inl p = model *. trace |> reorder (fun model,trace => {model trace})
-    layers.Weight(p, real struct.iter (fun x => $"!x[:] = 0" : ()))
+    inl p : partition table = model *. trace |> reorder (fun model,trace => {model trace})
+    inl init (x : table) : () = real 
+        struct.iter (fun x => 
+            struct.iter (fun x =>
+                $"!(x.array)[:] = 0" : ()
+                ) x.bodies
+        ) x
+    layers.Weight(p, init)
 
 // Samples an action from the model using the average policy and returns both the action and the probabilities of it being selected.
-let get_action mask (model : model) (world_id : world_id) : action_prob * action_id =
+inl get_action mask (model : model) ~(world_id : world_id) : action_prob * action_id = join
     open primitives
     model
     |> apply world_id
@@ -153,7 +161,9 @@ inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (seq_i
                     ) weighted_values
             trace_update_policy, expected_value
             )
-        |> fun (reward : reward) => tensor_set player_id reward rewards
+        |> fun (reward : reward) => 
+            tensor_set player_id reward rewards
+            console.write_ln {rewards}
         )
 
 // Applies the policy and the value array updates.
@@ -262,3 +272,8 @@ inl test1() =
             apply_updates model trace #seq_id
 
 inl main() = test1()
+
+// TODOs:
+// * mask out the world_id if it's too large. take the modulo of its size
+// * adapt this to a restricted number of threads instead of the full block
+// * make row map gridwise
