@@ -109,9 +109,9 @@ inl rec get_dim_pair forall t_top. (h : graph_dims) : graph t_top -> dim_of t_to
             inl a,b = f a,f b
             assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
             D_D a
-        | Weight dim => real
+        | Weight(dim, init) => real
             typecase `dim with
-            | _ (tensor ~dim ~t) => D_D `dim `t (partitionm.dim_of dim)
+            | _ (tensor ~dim ~t) => D_D `dim `t (partitionm.dim_of `dim `t dim)
             | _ ~p => 
                 !!!!PrintStatic(`p)
                 error_type "Can only get the dimension of a singleton weight layer. Check the terminal to see the type of the Weight node."
@@ -505,7 +505,7 @@ inl masked_softmax_and_discrete_sample forall dim t{float;number}. size (x : gra
 
 // Takes the sqrt of the product of the tensor dimensions.
 inl weight_init forall dim t. (x : tensor dim t) : () =
-    cupy.copy_to {from=cupy.random_normal{mean=0; std=loop.prod x.dim |> conv |> sqrt} x.dim; to=x}
+    cupy.copy_to {from=cupy.random_normal{mean=0; std=loop.prod x.dim |> conv |> (/) 1 |> sqrt} x.dim; to=x}
 inl matmul (b,a) x =
     open partitionm
     BlockMatmul(x, Weight(!(a,b), weight_init))
@@ -693,4 +693,4 @@ inl test5() =
     // inl output : tensor d3 int = key_extract model .output_indices
     // console.tensor.write_ln limit.max output
 
-inl main() = test5()
+inl main() = test3()

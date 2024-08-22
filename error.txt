@@ -1,126 +1,144 @@
-Error trace on line: 241, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-inl main() = test()
-        ^
-Error trace on line: 241, column: 14 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-inl main() = test()
-             ^
-Error trace on line: 47, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-inl test() =
-        ^
-Error trace on line: 48, column: 5 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-    inl size = {
+Error trace on line: 32, column: 32 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                               ^
+Error trace on line: 32, column: 38 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl for' r body = for r (fun i () => body i) ()
+                                     ^
+Error trace on line: 160, column: 45 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+            for' {from=0; nearTo} (fun i => on_success (i :: l))
+                                            ^
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
+                 ^
+Error trace on line: 218, column: 53 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+            loop.linear (fst c_shared_frag.dim) fun m,n =>
+                                                    ^
+Error trace on line: 219, column: 17 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+                inl c_frag = tensor_ref_index (m,n) c_frag
+                ^
+Error trace on line: 223, column: 17 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+                if alpha <> 1 then
+                ^
+Error trace on line: 227, column: 17 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+                inl c = apply (m,n) c_shared_frag
+                ^
+Error trace on line: 228, column: 17 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+                store_matrix_sync c c_frag
+                ^
+Error trace on line: 97, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\wmma.spi.
+    assert_fragment_dimension f t
     ^
-Error trace on line: 55, column: 5 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-    inl trace : trace = {
+Error trace on line: 98, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\wmma.spi.
+    store_matrix_sync_array (ptr_at_current_offset t) f (stride_fst t)
     ^
-Error trace on line: 64, column: 5 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-    inl model : model = tensor_create (size.world_id, size.action_id)
+Error trace on line: 98, column: 30 in module: c:\Spiral_s_ML_Library\corecuda\wmma.spi.
+    store_matrix_sync_array (ptr_at_current_offset t) f (stride_fst t)
+                             ^
+Error trace on line: 228, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    inl (tensor {dim bodies}) = apply_ptr t |> flatten
     ^
-Error trace on line: 65, column: 5 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-    run fun () =>
+Error trace on line: 228, column: 33 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    inl (tensor {dim bodies}) = apply_ptr t |> flatten
+                                ^
+Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (|>) a b = b a
+               ^
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
+                 ^
+Error trace on line: 61, column: 21 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
+                    ^
+Error trace on line: 61, column: 18 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (>>) a b x = b (a x)
+                 ^
+Error trace on line: 190, column: 33 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+inl flatten_fst forall a b el. (tensor {dim bodies} : tensor (a * b) el) : tensor (int * b) el = 
+                                ^
+Error trace on line: 190, column: 40 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+inl flatten_fst forall a b el. (tensor {dim bodies} : tensor (a * b) el) : tensor (int * b) el = 
+                                       ^
+Error trace on line: 191, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    tensor {
     ^
-Error trace on line: 71, column: 13 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-inl run f = run' {shared_mem = 0} f
+Error trace on line: 191, column: 12 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+    tensor {
+           ^
+Error trace on line: 195, column: 13 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+            map (fun (tensor_body r as x) =>
             ^
-Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+Error trace on line: 54, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+    inl rec f = function
+                ^
+Error trace on line: 55, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | a, b => f a, f b
+          ^
+Error trace on line: 56, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} as ar => record_map (fun {value} => f value) ar
+          ^
+Error trace on line: 57, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar => index ar
+          ^
+Error trace on line: 57, column: 17 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar => index ar
+                ^
+Error trace on line: 195, column: 23 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+            map (fun (tensor_body r as x) =>
+                      ^
+Error trace on line: 195, column: 40 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+            map (fun (tensor_body r as x) =>
+                                       ^
+Error trace on line: 196, column: 17 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+                typecase `x with
+                ^
+Error trace on line: 197, column: 46 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+                | tensor_body (a * b) ~el => tensor_body `(int * b) `el {r with stride #= fun stride => assert_stride_contiguous (fst dim) (fst stride), snd stride}
+                                             ^
+Error trace on line: 197, column: 73 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+                | tensor_body (a * b) ~el => tensor_body `(int * b) `el {r with stride #= fun stride => assert_stride_contiguous (fst dim) (fst stride), snd stride}
+                                                                        ^
+Error trace on line: 197, column: 105 in module: c:\Spiral_s_ML_Library\corebase\tensorm\tensor_main.spi.
+                | tensor_body (a * b) ~el => tensor_body `(int * b) `el {r with stride #= fun stride => assert_stride_contiguous (fst dim) (fst stride), snd stride}
+                                                                                                        ^
+Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\utils.spir.
+    inl init = last stride
     ^
-Error trace on line: 32, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corebase\tensorm\utils.spir.
+    inl _ = 
+    ^
+Error trace on line: 34, column: 9 in module: c:\Spiral_s_ML_Library\corebase\tensorm\utils.spir.
+        foldBack2 (fun dim stride expected_stride => 
         ^
-Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options = []"
-    ^
-Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--dopt=on')" // turns on the device optimizations
-    ^
-Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--diag-suppress=550,20012,68,39')" // suppresses some warnings
-    ^
-Error trace on line: 38, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--restrict')" // assumes all the pointers are restricted
-    ^
-Error trace on line: 40, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    match threads_per_block with
-    ^
-Error trace on line: 46, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl compiler = NVCC
-    ^
-Error trace on line: 47, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    match compiler with
-    ^
-Error trace on line: 53, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl kernel_i, vars = join_backend Cuda
-    ^
-Error trace on line: 54, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-        match compiler with
+Error trace on line: 100, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        match ar, v with
         ^
-Error trace on line: 60, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-        f () : ()
+Error trace on line: 101, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va, vb) => f a va (f b vb s)
+           ^
+Error trace on line: 101, column: 20 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va, vb) => f a va (f b vb s)
+                   ^
+Error trace on line: 101, column: 31 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va, vb) => f a va (f b vb s)
+                              ^
+Error trace on line: 100, column: 9 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        match ar, v with
         ^
-Error trace on line: 65, column: 13 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-    run fun () =>
+Error trace on line: 101, column: 12 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | (a, b), (va, vb) => f a va (f b vb s)
+           ^
+Error trace on line: 102, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | {} & ar, {} & v => record_fold_back (fun x => f x.value (v x.key) x.state) ar s
+          ^
+Error trace on line: 103, column: 11 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar, v => g ar v s
+          ^
+Error trace on line: 103, column: 20 in module: c:\Spiral_s_ML_Library\corebase\struct.spir.
+        | ar, v => g ar v s
+                   ^
+Error trace on line: 35, column: 13 in module: c:\Spiral_s_ML_Library\corebase\tensorm\utils.spir.
+            assert (expected_stride = stride) "The tensor must be contiguous in order to be flattened."
             ^
-Error trace on line: 66, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        inl thread_id = {thread_id = thread_index()}
-        ^
-Error trace on line: 67, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        inl mask config x i j = j < 3
-        ^
-Error trace on line: 68, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        let get_action (world_id : world_id) : action_prob * action_id =
-        ^
-Error trace on line: 91, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        inl calculate_updates (model : model) (trace : trace) (seq_id : seq_id) (reward : list reward) =
-        ^
-Error trace on line: 150, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        inl apply_updates (model : model) (trace : trace) (seq_id : seq_id) =
-        ^
-Error trace on line: 211, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        inl seq_id = ref (0 : int)
-        ^
-Error trace on line: 213, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        inl log_path_prob : _ _ log_path_prob = tensor_create size.player_id
-        ^
-Error trace on line: 214, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
-        ^
-Error trace on line: 216, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        inl push' (world_id, player_id : world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
-        ^
-Error trace on line: 230, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        let push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action world_id)
-        ^
-Error trace on line: 231, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        push (235, 0)
-        ^
-Error trace on line: 232, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        push (212, 1)
-        ^
-Error trace on line: 233, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        push (790, 0)
-        ^
-Error trace on line: 234, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        push (343, 1)
-        ^
-Error trace on line: 235, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        push (457, 0)
-        ^
-Error trace on line: 236, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        push (3447, 1)
-        ^
-Error trace on line: 238, column: 9 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-        calculate_updates model trace #seq_id [13; -13; 4]
-        ^
-Error trace on line: 92, column: 13 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-            inl rewards : _ _ reward = tensorm.fromList reward
-            ^
-Error trace on line: 93, column: 13 in module: c:\Spiral_s_ML_Library\cfr\main.spi.
-            assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
-            ^
-Error trace on line: 131, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl assert (c : bool) (msg : string) : () = real assert c msg
-                                                 ^
 Error trace on line: 267, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
     if c = false then 
     ^
@@ -130,4 +148,4 @@ Error trace on line: 268, column: 9 in module: c:\Spiral_s_ML_Library\corebase\r
 Error trace on line: 268, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
         if lit_is c && lit_is msg then error_type msg
                                        ^
-The rewards have to equal the number of players.
+The tensor must be contiguous in order to be flattened.

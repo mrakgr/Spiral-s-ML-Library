@@ -49,7 +49,7 @@ inl (+.) forall a b. (partition_offsets a : partition_offsets a) (partition_offs
     partition_offsets {body=real a.body, b.body; offset_end=max a.offset_end b.offset_end}
 
 // Gets the dimension of a singleton partition.
-inl dim_of forall dim t. (partition p : partition (tensor dim t)) : dim = real inl (dim d) = p in d
+inl dim_of forall dim' t. (partition p : partition (tensor dim' t)) : dim' = real inl (dim d) = p in d
 
 // Transforms a partition into a structure that contains the relevant pointer offsets. Takes in the starting offset as the first argument.
 inl calculate_offsets forall el. (offset_start : size) (partition x : _ el) : partition_offsets el = 
