@@ -62,7 +62,6 @@ inl test() =
     inl model : model = tensor_create (size.world_id, size.action_id)
     run fun () =>
         inl thread_id = {thread_id = thread_index()}
-        inl mask config x i j = j < 3
         let get_action (world_id : world_id) : action_prob * action_id =
             open ml.primitives
             model

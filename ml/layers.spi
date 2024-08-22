@@ -690,7 +690,7 @@ inl test5() =
     // console.write_ln "Here is the output tensor."
     // inl output : tensor d4 float = key_extract model .output_probs
     // console.tensor.write_ln limit.max output
-    // inl output : tensor d3 int = key_extract model .output_indices
-    // console.tensor.write_ln limit.max output
+    inl output : tensor d3 int = key_extract model .output_indices
+    console.tensor.write_ln limit.max output
 
-inl main() = test3()
+inl main() = test5()
