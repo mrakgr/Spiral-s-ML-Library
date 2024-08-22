@@ -128,7 +128,7 @@ inl test3() =
     // inl output : tensor d3 int = key_extract model .output_indices
     // console.tensor.write_ln limit.max output
 
-inl test4() =
-    ()
+// inl test4() =
+//     ()
 
 inl main() = test3()

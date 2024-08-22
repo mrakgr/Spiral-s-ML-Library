@@ -70,7 +70,6 @@ inl noinline_run forall inp out.
     // Extract the output probabilities (already calculated).
     inl output_probs = (key_extract model .output_probs : tensor d4 float) 
 
-
     // Extract the output index.
     inl output_id =
         (key_extract model .output_indices : tensor d3 int) 
