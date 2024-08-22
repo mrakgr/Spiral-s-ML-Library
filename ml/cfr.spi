@@ -1,0 +1,72 @@
+open corebase
+open corecuda
+open coreext
+open tensorm
+
+type world_id = int
+type player_id = int
+type action_id = int
+type seq_id = int
+type thread_id = int
+type prob = float
+type log_prob = f64
+type reward = float
+type count = float
+type log_path_prob = {sampling : log_prob; policy : log_prob}
+type action_prob = {sampling : prob; policy : prob}
+
+type trace_elem =
+    {
+        world_id : world_id
+        action_id : action_id
+        player_id : player_id
+        action_sampling_prob : prob
+    }
+
+type trace =
+    {
+        actions : tensor (seq_id * thread_id) trace_elem
+        log_path_probs : tensor (seq_id * thread_id * player_id) log_path_prob
+        update : {
+            value : tensor (seq_id * thread_id) (reward * prob)
+            policy : tensor (seq_id * thread_id * action_id) prob
+        }
+    }
+
+type model =
+    tensor (world_id * action_id) {
+        policy : {
+            average : prob
+            current : prob
+            update : prob
+        }
+        value : (reward * count)
+    }
+
+type sizes =
+    {
+        world_id : int
+        player_id : int
+        action_id : int
+        seq_id : int
+        thread_id : int
+    }
+
+inl create () =
+    inl size : sizes = {
+        world_id = 1 <<< 12
+        player_id = 2
+        action_id = 1 <<< 2
+        seq_id = 1 <<< 4
+        thread_id = threads_per_block()
+    }
+
+    open partitionm
+    inl model : partition model = !(size.world_id, size.action_id)
+    inl trace : partition trace = 
+        !(size.seq_id, size.thread_id) *. !(size.seq_id, size.thread_id, size.player_id)
+        *. !(size.seq_id, size.thread_id) *. !(size.seq_id, size.thread_id, size.action_id)
+        |> reorder (fun ((actions, log_path_probs), value), policy => { actions log_path_probs update = { value policy } })
+
+    inl p = model *. trace |> reorder (fun model,trace => {model trace})
+    layers.Weight(p, real struct.iter (fun x => $"!x[:] = 0" : ()))

@@ -23,11 +23,10 @@ type trace_elem =
         action_sampling_prob : prob
     }
 
-type trace = 
+type trace =
     {
         actions : tensor (seq_id * thread_id) trace_elem
         log_path_probs : tensor (seq_id * thread_id * player_id) log_path_prob
-        rewards : tensor (seq_id * thread_id * player_id) reward
         update : {
             value : tensor (seq_id * thread_id) (reward * prob)
             policy : tensor (seq_id * thread_id * action_id) prob
@@ -55,7 +54,6 @@ inl test() =
     inl trace : trace = {
         actions = tensor_create (size.seq_id, size.thread_id)
         log_path_probs = tensor_create (size.seq_id, size.thread_id, size.player_id)
-        rewards = tensor_create (size.seq_id, size.thread_id, size.player_id)
         update = {
             policy = tensor_create (size.seq_id, size.thread_id, size.action_id)
             value = tensor_create (size.seq_id, size.thread_id)
@@ -88,10 +86,13 @@ inl test() =
                 )
 
         // Calculates the policy and the value array updates.
-        inl calculate_updates (model : model) (trace : trace) (seq_id : seq_id) (reward : reward) =
-            loop.forDown {nearFrom=seq_id; to=0} (fun seq_id (reward : reward) =>
-                // console.write_ln {reward}
+        inl calculate_updates (model : model) (trace : trace) (seq_id : seq_id) (reward : list reward) =
+            inl rewards : _ _ reward = tensorm.fromList reward
+            assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
+            
+            loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
                 inl {action_id player_id action_sampling_prob world_id} = tensor_index (seq_id, thread_id) trace.actions
+                inl reward = tensor_index player_id rewards
                 inl policy_current_and_value =
                     model
                     |> apply world_id
@@ -140,9 +141,8 @@ inl test() =
                     // console.write_ln {trace_update_policy world_id thread_id}
                     trace_update_policy, expected_value
                     )
-                ) reward
-            |> (ignore : reward -> ())
-            // |> fun fin_reward => console.write_ln {fin_reward}
+                |> fun (reward : reward) => tensor_set player_id reward rewards
+                )
 
         // Applies the policy and the value array updates.
         inl apply_updates (model : model) (trace : trace) (seq_id : seq_id) =
@@ -210,9 +210,6 @@ inl test() =
         
         inl log_path_prob : _ _ log_path_prob = tensor_create size.player_id
         loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
-        
-        inl rewards : _ _ reward = tensor_create size.player_id
-        loop.linear rewards.dim fun i => tensor_set i 0 rewards
 
         inl push' (world_id, player_id : world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
             inl i = #seq_id
@@ -236,12 +233,10 @@ inl test() =
         push (457, 0)
         push (3447, 1)
 
-        inl reward = -13
-        calculate_updates model trace #seq_id reward
+        calculate_updates model trace #seq_id [13; -13]
         apply_updates model trace #seq_id
 
 inl main() = test()
 
-// multiplayer rewards
-// how could we adapt this to a restricted number of threads instead of the full block
-// make row map gridwise
+// * how could we adapt this to a restricted number of threads instead of the full block
+// * make row map gridwise

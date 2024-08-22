@@ -78,6 +78,7 @@ modules:
         matmul
         primitives
         layers
+        cfr
         models
 
     cfr/
