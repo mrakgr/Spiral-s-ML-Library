@@ -80,6 +80,7 @@ modules:
         layers
         cfr
         models
+        cfr_models
 
     game/
         utils

@@ -6,6 +6,7 @@ open tensorm
 // Decays the average policy norm to this value after it exceeds it.
 inl average_threeshold() : float = 100
 
+type ensemble_id = int
 type world_id = int
 type player_id = int
 type action_id = int
@@ -28,16 +29,16 @@ type trace_elem =
 
 type trace =
     {
-        actions : tensor (seq_id * thread_id) trace_elem
-        log_path_probs : tensor (seq_id * thread_id * player_id) log_path_prob
+        actions : tensor (ensemble_id * seq_id * thread_id) trace_elem
+        log_path_probs : tensor (ensemble_id * seq_id * thread_id * player_id) log_path_prob
         update : {
-            value : tensor (seq_id * thread_id) (reward * prob)
-            policy : tensor (seq_id * thread_id * action_id) prob
+            value : tensor (ensemble_id * seq_id * thread_id) (reward * prob)
+            policy : tensor (ensemble_id * seq_id * thread_id * action_id) prob
         }
     }
 
 type model =
-    tensor (world_id * action_id) {
+    tensor (ensemble_id * world_id * action_id) {
         policy : {
             average : prob
             current : prob
@@ -48,6 +49,7 @@ type model =
 
 type sizes =
     {
+        ensemble_id : int
         world_id : int
         player_id : int
         action_id : int
@@ -57,6 +59,7 @@ type sizes =
 
 inl sizes() =
     {
+        ensemble_id = 4
         world_id = 1 <<< 12
         player_id = 2
         action_id = 1 <<< 2
@@ -69,10 +72,10 @@ type table = {model : model; trace : trace}
 inl graph () =
     inl size = sizes()
     open partitionm
-    inl model : partition model = !(size.world_id, size.action_id)
+    inl model : partition model = !(size.ensemble_id, size.world_id, size.action_id)
     inl trace : partition trace = 
-        !(size.seq_id, size.thread_id) *. !(size.seq_id, size.thread_id, size.player_id)
-        *. !(size.seq_id, size.thread_id) *. !(size.seq_id, size.thread_id, size.action_id)
+        !(size.ensemble_id, size.seq_id, size.thread_id) *. !(size.ensemble_id, size.seq_id, size.thread_id, size.player_id)
+        *. !(size.ensemble_id, size.seq_id, size.thread_id) *. !(size.ensemble_id, size.seq_id, size.thread_id, size.action_id)
         |> reorder (fun ((actions, log_path_probs), value), policy => { actions log_path_probs update = { value policy } })
 
     inl p : partition table = model *. trace |> reorder (fun model,trace => {model trace})
@@ -85,9 +88,10 @@ inl graph () =
     layers.Weight(p, init)
 
 // Samples an action from the model using the average policy and returns both the action and the probabilities of it being selected.
-inl get_action mask (model : model) ~(world_id : world_id) : action_prob * action_id = join
+inl get_action mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) : action_prob * action_id = join
     open primitives
     model
+    |> apply ensemble_id
     |> apply world_id
     |> rezip (fun {policy} => policy.average, policy.current)
     |> row_gather_reduce (fun config x i j_tns =>
@@ -107,25 +111,28 @@ inl get_action mask (model : model) ~(world_id : world_id) : action_prob * actio
         )
 
 // Calculates the policy and the value array updates.
-inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (seq_id : seq_id) (reward : list reward) =
+inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) (reward : list reward) =
     open primitives
     inl thread_id = thread_index()
     inl rewards : _ _ reward = tensorm.fromList reward
     assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
 
     loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
-        inl {action_id player_id action_sampling_prob world_id} = tensor_index (seq_id, thread_id) trace.actions
+        inl {action_id player_id action_sampling_prob world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
         inl reward = tensor_index player_id rewards
         inl policy_current_and_value =
             model
+            |> apply ensemble_id
             |> apply world_id
             |> rezip (fun x => x.policy.current, x.value)
         inl trace_update_policy =
             trace.update.policy
+            |> apply ensemble_id
             |> apply seq_id
             |> apply thread_id
         inl log_path_probs =
             trace.log_path_probs
+            |> apply ensemble_id
             |> apply seq_id
             |> apply_ptr
         inl path_prob thread_id =
@@ -142,7 +149,7 @@ inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (seq_i
             conv (exp (log_path_policy_prob - log_path_sampling_prob))
         inl () =
             inl path_prob = path_prob thread_id
-            tensor_set (seq_id, thread_id) (reward * path_prob, path_prob) trace.update.value
+            tensor_set (ensemble_id, seq_id, thread_id) (reward * path_prob, path_prob) trace.update.value
         (policy_current_and_value, trace_update_policy) ||> row_gather_map_reduce (fun config x thread_id j_tns =>
             inl policy_current, values = unzip x
             inl values = local_map (fun reward, count => if count <> 0 then reward / count else 0) values
@@ -167,24 +174,26 @@ inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (seq_i
         )
 
 // Applies the policy and the value array updates.
-inl apply_updates (model : model) (trace : trace) (seq_id : seq_id) =
+inl apply_updates (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) =
     open tensor_cuda
     open primitives
     inl thread_id = thread_index()
 
     loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
-        inl {action_id world_id} = tensor_index (seq_id, thread_id) trace.actions
+        inl {action_id world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
         inl trace_value_update =
             trace.update.value
-            |> tensor_index (seq_id, thread_id)
+            |> tensor_index (ensemble_id, seq_id, thread_id)
         inl model_policy_update,value =
             model
+            |> apply ensemble_id
             |> apply world_id
             |> apply_ptr
             |> rezip (fun x => x.policy.update, x.value)
             |> unzip
         inl trace_update_policy =
             trace.update.policy
+            |> apply ensemble_id
             |> apply seq_id
             |> apply thread_id
         
@@ -198,6 +207,8 @@ inl apply_updates (model : model) (trace : trace) (seq_id : seq_id) =
                 ) (zip trace_update_policy_tns action_id_tns)
             )
         )
+
+    inl model = model |> reorder (fun a,b,c => (a,b),c)
 
     // TODO: Make row_map grid wide.
     (model, model) ||> row_map (fun config model i j_tns =>
@@ -246,30 +257,30 @@ inl test1() =
             inl log_path_prob : _ _ log_path_prob = tensor_create sizes.player_id
             loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
 
-            inl push' (world_id, player_id : world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
+            inl push' (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
                 inl i = #seq_id
                 seq_id <-# i+1
-                tensor_set (i, thread_id) {world_id player_id action_id action_sampling_prob=action_prob.sampling} trace.actions
+                tensor_set (ensemble_id, i, thread_id) {world_id player_id action_id action_sampling_prob=action_prob.sampling} trace.actions
                 inl v = {
                     sampling = log (conv action_prob.sampling)
                     policy = log (conv action_prob.policy)
                 }
                 inl add forall t. : t -> t -> t = real open real_core in struct.map2 (+)
                 tensor_update player_id (add v) log_path_prob
-                inl trace_log_path_prob = trace.log_path_probs |> apply i |> apply thread_id
+                inl trace_log_path_prob = trace.log_path_probs |> apply ensemble_id |> apply i |> apply thread_id
                 loop.linear trace_log_path_prob.dim fun i =>
                     tensor_set i (tensor_index i log_path_prob) trace_log_path_prob
 
-            let push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action mask model world_id)
-            push (235, 0)
-            push (212, 1)
-            push (790, 0)
-            push (343, 1)
-            push (457, 0)
-            push (3447, 1)
+            let push (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) = push' (ensemble_id,world_id,player_id) (get_action mask model (ensemble_id, world_id))
+            push (0, 235, 0)
+            push (0, 212, 1)
+            push (0, 790, 0)
+            push (0, 343, 1)
+            push (0, 457, 0)
+            push (0, 3447, 1)
 
-            calculate_updates mask sizes model trace #seq_id [13; -13]
-            apply_updates model trace #seq_id
+            calculate_updates mask sizes model trace (0, #seq_id) [13; -13]
+            apply_updates model trace (0, #seq_id)
 
 inl main() = test1()
 
