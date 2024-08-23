@@ -16,7 +16,7 @@ instance full card = fun (card x) => x
 inl from_suit_rank (suit, rank : card_t * card_t) = card (suit ||| (rank * 4))
 
 instance equable card = fun a b => full a = full b
-instance comparable card = fun a b => comp (full a) (full b)
+instance comparable card = fun a b => comp (rank a) (rank b)
 
 instance printable card = fun {write write_ln} card =>
     inl rank = 

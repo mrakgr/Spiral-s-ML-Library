@@ -68,13 +68,11 @@ inl leduc_output : int -> _ = function
     | 2 => AA_Raise
     | _ => failwith "Invalid output id in the Leduc model."
 
-inl leduc_mask (config : ml.primitives.row_config) (_ : float) (_ : int) (action_id : int) = action_id < 3
-
 open ml.cfr_models
 inl game_graph() : cfr_game_graph _ _ =
     cfr_game_graph {
         graph = exists leduc_graph()
-        action_mask = leduc_mask
+        action_mask = fun _ _ _ action_id => action_id < 3
         input = exists leduc_conv, leduc_pickler()
         output = leduc_output
     }

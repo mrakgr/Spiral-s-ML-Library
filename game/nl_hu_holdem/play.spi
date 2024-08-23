@@ -62,7 +62,7 @@ inl init() : state =
     {
         game = init_game()
         neural = {
-            model_data = model.game_graph() |> ml.models.init |> ml.models.to_model_data
+            model_data = model.game_graph() |> ml.cfr_models.init |> ml.cfr_models.to_model_data
         }
     }
 
@@ -174,11 +174,10 @@ let play_loop rng (neural : state_neural) (state : state_internal) node =
             match index #state.pl_type player_turn with
             | Computer =>
                 open model
-                inl model = ml.models.from_model_data model.game_graph() neural.model_data
+                inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
                 inl data = table, refm.to_local state.messages
                 console.write_ln "Running the GPU model."
-                inl {action sampling_prob_ensemble sampling_prob_selected} = ml.models.run model (Some data)
-                inl action = action_conv table action
+                inl action = ml.cfr_models.run model (Some data) |> action_conv table
                 console.write "The action is: "
                 console.write_ln action
                 inl msg = PlayerAction(player_turn, action)
@@ -249,7 +248,7 @@ inl main() =
             global "import time"
             inl p : f64 = $"time.perf_counter()"
 
-            run' {shared_mem=model.game_graph() |> ml.models.smem_used} fun () =>
+            run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
                 inl c : _ int = refm.create_shared_var (const threads_per_block())
                 inl from = rangem.threads_in_block().from
                 if from = 0 then
@@ -261,8 +260,8 @@ inl main() =
                 // nn model loop
                 intrinsic.atomic_add_ref c -1 |> ignore
                 loop.while' (const true) fun () =>
-                    inl model = ml.models.from_model_data model.game_graph() neural.model_data
-                    ml.models.run model None |> ignore
+                    inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+                    ml.cfr_models.run model None |> ignore
                     if refm.deref c = 0 then loop.break()
 
             inl p2 : f64 = $"time.perf_counter()"

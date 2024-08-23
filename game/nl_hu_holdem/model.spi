@@ -69,22 +69,27 @@ inl possible_actions () =
 inl nlholdem_graph() =
     open ml.layers
     inl pu_history = nlholdem_pickler()
-    inl size = {
-        ensemble = 4 // The third dimension of each weight layer.
+
+    inl cfr_sizes = ml.cfr.sizes()
+    inl sizes = {
+        ensemble = cfr_sizes.ensemble_id // The third dimension of each weight layer.
         block = blocks_per_grid()
         thread = threads_per_block()
         inner = modup pu_history.size 128
     }
 
-    inl graph =
-        (input .input (size.block,size.thread,size.inner) : graph (tensor (int * int * int) float))
-        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-        |> masked_softmax_and_discrete_sample' (listm.length possible_actions()) (
-            pair (input .output_probs   (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
-                 (input .output_indices (size.ensemble,size.block,size.thread) |> apply .ensemble)
-            )
+    print_static {sizes}
 
-    graph
+    inl neural =
+        (input .input (sizes.block,sizes.thread,sizes.inner) : graph (tensor (int * int * int) float))
+        |> matmul_ensemble (sizes.ensemble,sizes.inner,128)
+        |> binarize' (conv cfr_sizes.world_id) (
+            input .output_world_id (sizes.ensemble, sizes.block, sizes.thread) |> apply .ensemble
+        )
+
+    inl cfr_table = ml.cfr.graph() |> key_graph .cfr_table
+
+    pair neural cfr_table
 
 inl nlholdem_output (i' : int) : alt_action =
     listm.foldBack 
@@ -115,10 +120,11 @@ inl action_conv (table : table) (x : alt_action) : action = // TODO: Need to ret
         // elif bet_size < table.min_raise then A_Call
         else A_Raise bet_size
 
-open ml.models
-inl game_graph() : game_graph _ _ =
-    game_graph {
+open ml.cfr_models
+inl game_graph() : cfr_game_graph _ _ =
+    cfr_game_graph {
         graph = exists nlholdem_graph()
+        action_mask = fun _ _ _ action_id => action_id < length possible_actions()
         input = exists nlholdem_conv, nlholdem_pickler()
         output = nlholdem_output
     }
