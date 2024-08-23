@@ -145,7 +145,7 @@ let play_loop rng (neural : state_neural) (state : state_internal) node =
     inl body node =
         match node with
         | G_Fold table =>
-            inl msg = 
+            inl msg =
                 inl chips_won = index table.pot (player_turn table)
                 Fold {chips_won winner_id=next_turn table.round_turn % num_players()}
             push_message msg

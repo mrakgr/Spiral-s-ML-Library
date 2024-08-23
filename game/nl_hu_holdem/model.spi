@@ -70,24 +70,31 @@ inl nlholdem_graph() =
     open ml.layers
     inl pu_history = nlholdem_pickler()
 
-    inl cfr_sizes = ml.cfr.sizes()
+    inl cfr_sizes : ml.cfr.sizes =
+        {
+            ensemble_id = 4
+            world_id = 1 <<< 12
+            player_id = 2
+            action_id = 1 <<< 4
+            seq_id = 1 <<< 7
+            thread_id = threads_per_block()
+        }
+    assert (length possible_actions() <= cfr_sizes.action_id) "The sizes of action in the table must be >= the length of possible actions."
     inl sizes = {
         ensemble = cfr_sizes.ensemble_id // The third dimension of each weight layer.
         block = blocks_per_grid()
         thread = threads_per_block()
-        inner = modup pu_history.size 128
+        input = modup pu_history.size 128
     }
 
-    print_static {sizes}
-
     inl neural =
-        (input .input (sizes.block,sizes.thread,sizes.inner) : graph (tensor (int * int * int) float))
-        |> matmul_ensemble (sizes.ensemble,sizes.inner,128)
+        (input .input (sizes.block,sizes.thread,sizes.input) : graph (tensor (int * int * int) float))
+        |> matmul_ensemble (sizes.ensemble,sizes.input,128)
         |> binarize' (conv cfr_sizes.world_id) (
             input .output_world_id (sizes.ensemble, sizes.block, sizes.thread) |> apply .ensemble
         )
 
-    inl cfr_table = ml.cfr.graph() |> key_graph .cfr_table
+    inl cfr_table = ml.cfr.graph(cfr_sizes) |> key_graph .cfr_table
 
     pair neural cfr_table
 

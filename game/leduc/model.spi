@@ -28,11 +28,21 @@ inl leduc_conv (table, messages : table * messages) : history =
         | PlayerAction(id,action) => Some(C1of2 action)
         | _ => None
 
+
 inl leduc_graph() =
     open ml.layers
     inl pu_history = leduc_pickler()
 
-    inl cfr_sizes = ml.cfr.sizes()
+    inl cfr_sizes : ml.cfr.sizes =
+        {
+            ensemble_id = 4
+            world_id = 1 <<< 12
+            player_id = 2
+            action_id = 1 <<< 2
+            seq_id = 1 <<< 4
+            thread_id = threads_per_block()
+        }
+    assert (3 <= cfr_sizes.action_id) "The sizes of action in the table must be >= the length of possible actions."
     inl sizes = {
         ensemble = cfr_sizes.ensemble_id // The third dimension of each weight layer.
         block = blocks_per_grid()
@@ -47,7 +57,7 @@ inl leduc_graph() =
             input .output_world_id (sizes.ensemble, sizes.block, sizes.thread) |> apply .ensemble
         )
 
-    inl cfr_table = ml.cfr.graph() |> key_graph .cfr_table
+    inl cfr_table = ml.cfr.graph(cfr_sizes) |> key_graph .cfr_table
 
     pair neural cfr_table
 
