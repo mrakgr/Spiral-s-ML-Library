@@ -80,3 +80,14 @@ inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shar
         open real_core
         inl fv = free_vars f
         body `(`fv) fv
+
+// Broadcasts a value to all the threads in the block from a given one.
+inl shuffle forall t. (i : int) (v : t) : t =
+    open tensor_cuda
+    assert (lit_is i) "The index should be known at compile time."
+    inl q = tensor_create_shared 1
+    if thread_index() = i then tensor_set i v q
+    barrier_cta_sync 0
+    inl x = tensor_index 0 q
+    barrier_cta_sync 0
+    x
