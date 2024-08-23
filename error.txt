@@ -1,136 +1,152 @@
-Error trace on line: 269, column: 9 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-inl main() = test1()
-        ^
-Error trace on line: 269, column: 14 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-inl main() = test1()
-             ^
-Error trace on line: 225, column: 10 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-inl test1() =
-         ^
-Error trace on line: 228, column: 9 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-        inl mask config x i j = j < 3
-        ^
-Error trace on line: 230, column: 9 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-        inl graph = graph()
-        ^
-Error trace on line: 231, column: 9 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-        inl model = layers.create_model graph
-        ^
-Error trace on line: 232, column: 9 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-        layers.param_init model
-        ^
-Error trace on line: 234, column: 9 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-        run fun () =>
-        ^
-Error trace on line: 71, column: 13 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-inl run f = run' {shared_mem = 0} f
-            ^
-Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\cfr_models.spi.
+    graph_run_device model ls {ensemble=ensemble_id}
     ^
-Error trace on line: 32, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
-        ^
-Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options = []"
+Error trace on line: 68, column: 5 in module: c:\Spiral_s_ML_Library\ml\cfr_models.spi.
+    barrier_cta_sync 0
     ^
-Error trace on line: 36, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--dopt=on')" // turns on the device optimizations
+Error trace on line: 71, column: 5 in module: c:\Spiral_s_ML_Library\ml\cfr_models.spi.
+    inl world_id =
     ^
-Error trace on line: 37, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--diag-suppress=550,20012,68,39')" // suppresses some warnings
+Error trace on line: 76, column: 5 in module: c:\Spiral_s_ML_Library\ml\cfr_models.spi.
+    inl cfr_table = (key_extract model .cfr_table : cfr.table)
     ^
-Error trace on line: 38, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    global "options.append('--restrict')" // assumes all the pointers are restricted
+Error trace on line: 76, column: 22 in module: c:\Spiral_s_ML_Library\ml\cfr_models.spi.
+    inl cfr_table = (key_extract model .cfr_table : cfr.table)
+                     ^
+Error trace on line: 321, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
     ^
-Error trace on line: 40, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    match threads_per_block with
+Error trace on line: 322, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    inl h = hashmapm.create()
     ^
-Error trace on line: 46, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl compiler = NVCC
+Error trace on line: 351, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match f graph with
     ^
-Error trace on line: 47, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    match compiler with
+Error trace on line: 351, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match f graph with
+          ^
+Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match hashmapm.try_get h k with
     ^
-Error trace on line: 53, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-    inl kernel_i, vars = join_backend Cuda
-    ^
-Error trace on line: 54, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-        match compiler with
-        ^
-Error trace on line: 60, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
-        f () : ()
-        ^
-Error trace on line: 234, column: 17 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-        run fun () =>
-                ^
-Error trace on line: 235, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            inl sizes = sizes()
-            ^
-Error trace on line: 236, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            inl {model trace} = layers.graph_extract model {}
-            ^
-Error trace on line: 236, column: 17 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            inl {model trace} = layers.graph_extract model {}
-                ^
-Error trace on line: 238, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            inl thread_id = thread_index()
-            ^
-Error trace on line: 239, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            inl seq_id = ref (0 : int)
-            ^
-Error trace on line: 241, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            inl log_path_prob : _ _ log_path_prob = tensor_create sizes.player_id
-            ^
-Error trace on line: 242, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
-            ^
-Error trace on line: 244, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            inl push' (world_id, player_id : world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
-            ^
-Error trace on line: 258, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            let push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action mask model world_id)
-            ^
-Error trace on line: 259, column: 13 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            push (235, 0)
-            ^
-Error trace on line: 258, column: 23 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            let push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action mask model world_id)
+Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 68, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 68, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 68, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
                       ^
-Error trace on line: 258, column: 69 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            let push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action mask model world_id)
-                                                                    ^
-Error trace on line: 258, column: 97 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-            let push (world_id, player_id : world_id * player_id) = push' (world_id,player_id) (get_action mask model world_id)
-                                                                                                ^
-Error trace on line: 83, column: 38 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-let get_action mask (model : model) (world_id : world_id) : action_prob * action_id =
-                                     ^
-Error trace on line: 84, column: 5 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-    open primitives
+Error trace on line: 336, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 337, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 338, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 339, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 340, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => pair a b
+              ^
+Error trace on line: 341, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Apply(exists a. a,b) => pair a b
+              ^
+Error trace on line: 342, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Zip(a,b) => pair a b
+              ^
+Error trace on line: 343, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Pair(a,b) => pair a b
+              ^
+Error trace on line: 343, column: 20 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Pair(a,b) => pair a b
+                   ^
+Error trace on line: 343, column: 28 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Pair(a,b) => pair a b
+                           ^
+Error trace on line: 331, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        match f a with
+        ^
+Error trace on line: 332, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | None => f b
+          ^
+Error trace on line: 332, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+        | None => f b
+                  ^
+Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match hashmapm.try_get h k with
     ^
-Error trace on line: 85, column: 5 in module: c:\Spiral_s_ML_Library\ml\cfr.spi.
-    model
-    ^
+Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 68, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 68, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 68, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 336, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 337, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 338, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 339, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => g (f a) out
+              ^
+Error trace on line: 340, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => pair a b
+              ^
+Error trace on line: 341, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Apply(exists a. a,b) => pair a b
+              ^
+Error trace on line: 342, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Zip(a,b) => pair a b
+              ^
+Error trace on line: 343, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Pair(a,b) => pair a b
+              ^
+Error trace on line: 344, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Weight => None
+              ^
+Error trace on line: 345, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Input => None
+              ^
+Error trace on line: 346, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | KeyScalar => None
+              ^
+Error trace on line: 347, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | KeyGraph((exists key'. _),graph) =>
+              ^
+Error trace on line: 347, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | KeyGraph((exists key'. _),graph) =>
+                        ^
+Error trace on line: 348, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
+                ^
+Error trace on line: 349, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    Some (graph_extract (model {m with graph}) {} |> nominal_recreate)
+                    ^
+Error trace on line: 349, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    Some (graph_extract (model {m with graph}) {} |> nominal_recreate)
+                          ^
 Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
 inl (|>) a b = b a
                ^
-Error trace on line: 280, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    row_gather_ (fun config x i j_tns => (tensor_create x.dim : _ _ {}), f config x i j_tns) (zip from (tensor_create from.dim))
-    ^
-Error trace on line: 226, column: 5 in module: c:\Spiral_s_ML_Library\ml\primitives.spi.
-    assert (lit_is io.dim) "The tensor dimension needs to be known at compile time." 
-    ^
-Error trace on line: 131, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl assert (c : bool) (msg : string) : () = real assert c msg
-                                                 ^
-Error trace on line: 267, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-    if c = false then 
-    ^
-Error trace on line: 268, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-        ^
-Error trace on line: 268, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-                                       ^
-The tensor dimension needs to be known at compile time.
+Error trace on line: 151, column: 52 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl nominal_recreate forall a b. (x : a): b = real nominal_recreate `b x
+                                                   ^
+Expected a nominal.
+Got: {model : {bodies : {policy : {average : {array : array_base f32 : array f32; offset : 0i32; stride : 16384i32, 4i32, 1i32} : tensor_body (i32 * i32 * i32) f32; current : {array : array_base f32 : array f32; offset : 0i32; stride : 16384i32, 4i32, 1i32} : tensor_body (i32 * i32 * i32) f32; update : {array : array_base f32 : array f32; offset : 0i32; stride : 16384i32, 4i32, 1i32} : tensor_body (i32 * i32 * i32) f32}; value : ({array : array_base f32 : array f32; offset : 0i32; stride : 16384i32, 4i32, 1i32} : tensor_body (i32 * i32 * i32) f32), ({array : array_base f32 : array f32; offset : 0i32; stride : 16384i32, 4i32, 1i32} : tensor_body (i32 * i32 * i32) f32)}; dim : 4i32, 4096i32, 4i32} : tensor (i32 * i32 * i32) {policy : {average : f32; current : f32; update : f32}; value : f32 * f32}; trace : {actions : {bodies : {action_id : {array : array_base i32 : array i32; offset : 0i32; stride : 512i32, 32i32, 1i32} : tensor_body (i32 * i32 * i32) i32; action_sampling_prob : {array : array_base f32 : array f32; offset : 0i32; stride : 512i32, 32i32, 1i32} : tensor_body (i32 * i32 * i32) f32; player_id : {array : array_base i32 : array i32; offset : 0i32; stride : 512i32, 32i32, 1i32} : tensor_body (i32 * i32 * i32) i32; world_id : {array : array_base i32 : array i32; offset : 0i32; stride : 512i32, 32i32, 1i32} : tensor_body (i32 * i32 * i32) i32}; dim : 4i32, 16i32, 32i32} : tensor (i32 * i32 * i32) {action_id : i32; action_sampling_prob : f32; player_id : i32; world_id : i32}; log_path_probs : {bodies : {policy : {array : array_base f64 : array f64; offset : 0i32; stride : 1024i32, 64i32, 2i32, 1i32} : tensor_body (i32 * i32 * i32 * i32) f64; sampling : {array : array_base f64 : array f64; offset : 0i32; stride : 1024i32, 64i32, 2i32, 1i32} : tensor_body (i32 * i32 * i32 * i32) f64}; dim : 4i32, 16i32, 32i32, 2i32} : tensor (i32 * i32 * i32 * i32) {policy : f64; sampling : f64}; update : {policy : {bodies : {array : array_base f32 : array f32; offset : 0i32; stride : 2048i32, 128i32, 4i32, 1i32} : tensor_body (i32 * i32 * i32 * i32) f32; dim : 4i32, 16i32, 32i32, 4i32} : tensor (i32 * i32 * i32 * i32) f32; value : {bodies : ({array : array_base f32 : array f32; offset : 0i32; stride : 512i32, 32i32, 1i32} : tensor_body (i32 * i32 * i32) f32), ({array : array_base f32 : array f32; offset : 0i32; stride : 512i32, 32i32, 1i32} : tensor_body (i32 * i32 * i32) f32); dim : 4i32, 16i32, 32i32} : tensor (i32 * i32 * i32) (f32 * f32)}}}

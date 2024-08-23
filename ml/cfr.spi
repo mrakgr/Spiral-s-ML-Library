@@ -57,7 +57,7 @@ type sizes =
         thread_id : int
     }
 
-inl sizes() =
+inl sizes() : sizes =
     {
         ensemble_id = 4
         world_id = 1 <<< 12
@@ -285,6 +285,5 @@ inl test1() =
 inl main() = test1()
 
 // TODOs:
-// * mask out the world_id if it's too large. take the modulo of its size
 // * adapt this to a restricted number of threads instead of the full block
 // * make row map gridwise

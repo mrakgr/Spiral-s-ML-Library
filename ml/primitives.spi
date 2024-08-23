@@ -586,9 +586,9 @@ inl local_masked_regret_matching_and_discrete_sampling mask rng config x i (j_tn
     x, local_discrete_sampling rng config x i j_tns
 
 // Turns the vector into a hash.
-inl local_binarize config x i (j_tns : tensor (int * int) int) : int =
+inl local_binarize (modulo : uint) config x i (j_tns : tensor (int * int) int) : uint =
     inl x = local_map (fun x,j => if x <= 0 then 0 else 1 <<< j) (zip x j_tns)
-    local_reduce config 0 (|||) x
+    local_reduce config 0 (|||) x % modulo
 
 inl test1() =
     inl m,n : int * int = 3, 36*4

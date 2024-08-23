@@ -346,7 +346,8 @@ inl key_extract forall t_top key{symbol} input. (model ({graph param output} & m
             | KeyScalar => None
             | KeyGraph((exists key'. _),graph) =>
                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                    Some (graph_extract (model {m with graph}) {} |> nominal_recreate)
+                    inl g = graph_extract (model {m with graph}) {}
+                    Some (real g : input)
                 else f graph
     match f graph with
     | Some x => x
@@ -503,6 +504,13 @@ inl masked_softmax_and_discrete_sample' forall dim t{float;number}. size out (x 
 inl masked_softmax_and_discrete_sample forall dim t{float;number}. size (x : graph (tensor (int * dim * int) t)) =
     masked_softmax_and_discrete_sample_ size None x
 
+inl binarize_ forall dim t{float;number}. modulo out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) uint) = 
+    BlockRowReduce (exists const (primitives.local_binarize modulo), x, out)
+inl binarize forall dim t{float;number}. modulo (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) uint) =
+    binarize_ modulo None x
+inl binarize' forall dim t{float;number}. modulo out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) uint) =
+    binarize_ modulo (Some out) x
+
 // Takes the sqrt of the product of the tensor dimensions.
 inl weight_init forall dim t. (x : tensor dim t) : () =
     cupy.copy_to {from=cupy.random_normal{mean=0; std=loop.prod x.dim |> conv |> (/) 1 |> sqrt} x.dim; to=x}
@@ -513,6 +521,7 @@ inl key_scalar forall t key{symbol}. (key : key) : graph t = KeyScalar(exists ke
 inl matmul_ensemble (c,b,a : int * int * int) x =
     open partitionm
     BlockMatmul(x, Apply(exists Weight(!(c,a,b), weight_init), key_scalar .ensemble))
+inl key_graph forall key{symbol}. (key : key) x = KeyGraph((exists key), x)
 inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = KeyGraph((exists key), Input(dim))
 inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : graph (tensor b t) = Apply(exists a, key_scalar b)
 inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)

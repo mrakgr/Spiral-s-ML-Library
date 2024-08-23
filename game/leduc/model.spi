@@ -31,29 +31,32 @@ inl leduc_conv (table, messages : table * messages) : history =
 inl leduc_graph() =
     open ml.layers
     inl pu_history = leduc_pickler()
-    inl size = {
-        ensemble = 4 // The third dimension of each weight layer.
+
+    inl cfr_sizes = ml.cfr.sizes()
+    inl sizes = {
+        ensemble = cfr_sizes.ensemble_id // The third dimension of each weight layer.
         block = blocks_per_grid()
         thread = threads_per_block()
         inner = modup pu_history.size 128
     }
 
-    inl graph =
-        (input .input (size.block,size.thread,size.inner) : graph (tensor (int * int * int) float))
-        |> matmul_ensemble (size.ensemble,size.inner,size.inner)
-        |> masked_softmax_and_discrete_sample' 3 (
-            pair (input .output_probs   (size.ensemble,size.block,size.thread,size.inner) |> apply .ensemble)
-                 (input .output_indices (size.ensemble,size.block,size.thread) |> apply .ensemble)
-            )
+    inl neural =
+        (input .input (sizes.block,sizes.thread,sizes.inner) : graph (tensor (int * int * int) float))
+        |> matmul_ensemble (sizes.ensemble,sizes.inner,sizes.inner)
+        |> binarize' (conv cfr_sizes.world_id) (
+            input .output_world_id (sizes.ensemble, sizes.block, sizes.thread) |> apply .ensemble
+        )
 
-    graph
+    inl cfr_table = ml.cfr.graph() |> key_graph .cfr_table
+
+    pair neural cfr_table
 
 union alt_action = AA_Raise | AA_Call | AA_Fold
 
 // Converts the alternative actions to the regular ones.
-inl action_conv (table : table) (x : alt_action) : action =  // TODO: Need to return bool instead of converting to a different action.
+inl action_conv (table : table) (x : alt_action) : action = 
     match x with
-    | AA_Fold => 
+    | AA_Fold =>
         inl pot_size_needed_to_call = arraym.reduce max table.pot
         if index table.pot table.player_turn = pot_size_needed_to_call then Call else Fold
     | AA_Call => Call
@@ -65,10 +68,13 @@ inl leduc_output : int -> _ = function
     | 2 => AA_Raise
     | _ => failwith "Invalid output id in the Leduc model."
 
-open ml.models
-inl game_graph() : game_graph _ _ =
-    game_graph {
+inl leduc_mask (config : ml.primitives.row_config) (_ : float) (_ : int) (action_id : int) = action_id < 3
+
+open ml.cfr_models
+inl game_graph() : cfr_game_graph _ _ =
+    cfr_game_graph {
         graph = exists leduc_graph()
+        action_mask = leduc_mask
         input = exists leduc_conv, leduc_pickler()
         output = leduc_output
     }
