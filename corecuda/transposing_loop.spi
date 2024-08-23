@@ -9,42 +9,59 @@ open rangem
 // Both of them have to have the same number of free variables and the pairs of them have to have equal type.
 inl free_vars_replace forall a b. (a : a) (b : b) : a = !!!!FreeVarsReplace(a,b)
 
+type config passthrough dim =
+    {
+        passthrough : passthrough
+        dim_outer : int
+        dim_inner : dim
+    }
+
 // Uses a shared tensor to transpose all the free variables in shared memory before running the function.
+// The variables passed through `passthrough` won't be transposed and will be passed into the kernel directly.
 // Uses a projective loop under the hood.
 // The return value from the given function should be the same for every thread in the output dimension.
 // If not, the results are undefined.
-inl projective forall dim t. (dim : dim) (f : int -> dim -> t) : t =
+// If the number of threads per block is greater than dim_outer then the return is undefined for those threads.
+inl projective forall shared dim t. ({dim_outer passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
+    assert (dim_outer <= threads_per_block()) "The outer dimension needs to be <= the number of threads per block."
     inl body forall el. (fv : el) : t = 
-        inl shared_in : tensor int el = tensor_create_shared threads_per_block()
-        inl shared_out : tensor int t = tensor_create_shared threads_per_block()
-        tensor_set thread_index() fv shared_in
+        inl shared_in : tensor int el = tensor_create_shared dim_outer
+        inl shared_out : tensor int t = tensor_create_shared dim_outer
+        inl tid = thread_index()
+        if tid < dim_outer then tensor_set tid fv shared_in
         barrier_cta_sync 0
-        loop.projective threads_in_block(threads_per_block(), dim) fun thread_id, dim =>
+        loop.projective threads_in_block(dim_outer, dim_inner) fun thread_id, dim =>
             tensor_set thread_id
-                (free_vars_replace f (tensor_index thread_id shared_in) thread_id dim)
+                (free_vars_replace f (tensor_index thread_id shared_in) passthrough thread_id dim)
                 shared_out
         barrier_cta_sync 0
-        tensor_index thread_index() shared_out
+        inl x = if tid < dim_outer then tensor_index tid shared_out else undefined
+        barrier_cta_sync 0
+        x
     real
         open real_core
         inl fv = free_vars f
         body `(`fv) fv
 
 // Uses a shared tensor to transpose all the free variables in shared memory before running the function.
+// The variables passed through `passthrough` won't be transposed and will be passed into the kernel directly.
 // Uses a (restrictive) linear loop under the hood.
 // The inner dimension must be divisible by the number of threads per block.
 // The return value from the given function should be the same for every thread in the output dimension.
 // If not, the results are undefined.
-inl linear forall dim t. (dim_inner : dim) (f : int -> dim -> t) : t =
+// If the number of threads per block is greater than dim_outer then the return is undefined for those threads.
+inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
+    assert (dim_outer <= threads_per_block()) "The outer dimension needs to be <= the number of threads per block."
     inl body forall el. (fv : el) : t = 
-        inl shared_in : tensor int el = tensor_create_shared threads_per_block()
-        inl shared_out : tensor int t = tensor_create_shared threads_per_block()
-        tensor_set thread_index() fv shared_in
+        inl shared_in : tensor int el = tensor_create_shared dim_outer
+        inl shared_out : tensor int t = tensor_create_shared dim_outer
+        inl tid = thread_index()
+        if tid < dim_outer then tensor_set tid fv shared_in
         barrier_cta_sync 0
 
-        inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (shared_in.dim, dim_inner)
+        inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (dim_outer, dim_inner)
         assert (loop.prod dim_inner' = 1) "The threads per block need to be divisible by the inner dimension."
-        inl index_block,index_inner = loop.proj (dim_block,dim_inner) thread_index()
+        inl index_block,index_inner = loop.proj (dim_block,dim_inner) tid
         inl shared_in = reshape const(dim_block',dim_block) shared_in |> reorder (fun dim_block',dim_block => dim_block,dim_block') |> apply index_block
         loop.linear dim_block' fun index_block' =>
             // Calculate the local thread id.
@@ -53,10 +70,12 @@ inl linear forall dim t. (dim_inner : dim) (f : int -> dim -> t) : t =
                 inl index = index_block, index_block'
                 loop.rigid_merge dim index
             tensor_set thread_id
-                (free_vars_replace f (tensor_index index_block' shared_in) thread_id index_inner)
+                (free_vars_replace f (tensor_index index_block' shared_in) passthrough thread_id index_inner)
                 shared_out
         barrier_cta_sync 0
-        tensor_index thread_index() shared_out
+        inl x = if tid < dim_outer then tensor_index tid shared_out else undefined
+        barrier_cta_sync 0
+        x
     real
         open real_core
         inl fv = free_vars f

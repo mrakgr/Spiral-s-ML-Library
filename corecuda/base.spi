@@ -136,3 +136,6 @@ inl reinterpret_cast_value forall a b. (x : a) : b =
     real
         open real_core
         if `a `= `b then x else $"reinterpret_cast<`b&>(!x)" : b
+
+// Created an undefined variable for the given type.
+inl undefined forall t. : t = index (create 1 : array t) 0

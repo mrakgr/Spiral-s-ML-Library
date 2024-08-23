@@ -231,7 +231,7 @@ inl row_gather_ forall a b c.
 
     inl io = apply_ptr io
 
-    transposing_loop.linear dim_inner fun thread_id index_inner =>
+    transposing_loop.linear {dim_inner dim_outer = threads_per_block(); passthrough = ()} fun () thread_id index_inner =>
         inl from,to =
             io
             |> reshape const(dim_inner',dim_inner,dim_sizeof16) 

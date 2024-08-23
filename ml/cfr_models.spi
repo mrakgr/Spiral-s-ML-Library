@@ -21,14 +21,12 @@ inl noinline_run forall inp out.
     barrier_cta_sync 0
 
     // Get the ensemble,block and thread dimensions based on the output tensor.
-    inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
+    inl ensemble,block,thread = (key_extract model .output_world_id : tensor d3 float).dim
     inl () = // Assert that all the dimensions are right.
         assert (block = blocks_per_grid()) "The second dimension of the output tensor has to equal the number of blocks per grid."
         assert (thread = threads_per_block()) "The third dimension of the output tensor has to equal number threads per block."
         inl block',thread',_ = (key_extract model .input : tensor d3 float).dim
         assert ((block,thread) = (block',thread')) "The first two dimensions of the input tensor have to match number of blocks per grid and number of threads per block respectively."
-        inl ensemble',block',thread' = (key_extract model .output_indices : tensor d3 int).dim
-        assert ((ensemble,block,thread) = (ensemble',block',thread')) "The dimensions of the output indices tensor have to match."
 
     // Creates the layer state.
     inl ls = create_layer_state()
