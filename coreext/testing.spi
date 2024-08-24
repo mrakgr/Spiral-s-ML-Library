@@ -11,3 +11,4 @@ inl redirect_io_into (tail_dir : string) (head_dir : string) (filename : string)
     f()
     $"sys.stdout = sys.__stdout__"
     $"sys.stderr = sys.__stderr__"
+    ()

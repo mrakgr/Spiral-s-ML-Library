@@ -428,7 +428,7 @@ inl graph_run_device forall t_top indices. (model {graph param output} & m : mod
 inl create_layer_state() =
     open random
     layer_state {
-        rng = init {seed = clock64(); subsequence = conv rangem.threads_in_grid().from; offset=0}
+        rng = init {seed = cupy.constant_seed(); subsequence = conv rangem.threads_in_grid().from; offset=0}
     }
 
 // Runs the graph on the host.
@@ -554,6 +554,8 @@ type d4 = int * int * int * int
 
 // Tests whether randonmly initializing the params of the graph works.
 inl test1() =
+    cupy.set_random_seed(cupy.constant_seed())
+    testing.redirect_io_into "test_text_outputs/layers/" "test1" "layers.txt" fun () =>
     inl graph : graph (tensor d3 float) =
         input .input (blocks_per_grid(),1,4)
         |> matmul (4,4)
@@ -574,6 +576,8 @@ inl test1() =
 
 // Tests whether extracting the inputs of the graph works. Also randomly inits them.
 inl test2() =
+    cupy.set_random_seed(cupy.constant_seed())
+    testing.redirect_io_into "test_text_outputs/layers/" "test2" "layers.txt" fun () =>
     inl graph : graph (tensor d3 float) =
         input .input (blocks_per_grid(),1,2)
         |> matmul (2,4)
@@ -599,6 +603,8 @@ inl test2() =
 
 // Tests running a feedforward model which outputs the sampling indices.
 inl test3() =
+    cupy.set_random_seed(cupy.constant_seed())
+    testing.redirect_io_into "test_text_outputs/layers/" "test3" "layers.txt" fun () =>
     inl graph : graph (tensor d3 float * tensor d2 int) =
         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
         |> matmul (8,16)
@@ -631,6 +637,8 @@ inl test3() =
 
 // Tests running a feedforward ensemble model which keeps around the sampling probabilities.
 inl test4() =
+    cupy.set_random_seed(cupy.constant_seed())
+    testing.redirect_io_into "test_text_outputs/layers/" "test4" "layers.txt" fun () =>
     inl ensemble = 16
     inl graph : graph (tensor d3 float * tensor d2 int) =
         (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
@@ -666,6 +674,8 @@ inl test4() =
 
 // Tests running a feedforward ensemble model which keeps around the sampling probabilities with masking.
 inl test5() =
+    cupy.set_random_seed(cupy.constant_seed())
+    testing.redirect_io_into "test_text_outputs/layers/" "test5" "layers.txt" fun () =>
     inl inner : int = 32 * 4 * 64
     inl ensemble : int = 4
     inl graph =
@@ -702,4 +712,9 @@ inl test5() =
     inl output : tensor d3 int = key_extract model .output_indices
     console.tensor.write_ln limit.max output
 
-inl main() = test5()
+inl main() = 
+    test1()
+    test2()
+    test3()
+    test4()
+    test5()
