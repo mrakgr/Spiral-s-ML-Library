@@ -1,6 +1,11 @@
 open corebase
 open tensorm
 
+
+// The top level random seed set as an arbitrary constant.
+inl constant_seed() : u64 = 12344321
+
+// Sets the CuPy random seed.
 inl set_random_seed(seed : u64) = $"cp.random.seed(!seed)"
 
 inl template forall dim float. (dim : dim) (op : .fun) : tensor dim float =

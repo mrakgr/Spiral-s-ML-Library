@@ -1,0 +1,12 @@
+// The testing module
+
+open corebase
+
+inl redirect_io_into (file_path : string) f = join
+    global "import sys"
+    global "import pathlib"
+    $"pathlib.Path(!file_path).parent.mkdir(parents=True, exist_ok=True)"
+    $"sys.stdout = sys.stderr = open(!file_path,'w')"
+    f()
+    $"sys.stdout = sys.__stdout__"
+    $"sys.stderr = sys.__stderr__"

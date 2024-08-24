@@ -680,6 +680,7 @@ inl test2() =
     ()
 
 inl test3() =
+    cupy.set_random_seed(cupy.constant_seed())
     inl m,n : int * int = threads_per_block(), (1 <<< 8)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ float = cupy.arange{from=0; nearTo=m,n; by=1}
@@ -711,16 +712,23 @@ inl test3() =
             local_masked_regret_matching (fun config x i j => j < 3) config x i j_tns
             ) input output_op_map
         row_gather_reduce (fun config x i j_tns =>
-            inl rng : _ philox_state = init {seed = clock64(); subsequence=conv thread_index(); offset=0}
+            inl rng : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv thread_index(); offset=0}
             local_masked_softmax_and_discrete_sampling (fun config x i j => j < 3) rng config x i j_tns |> snd
             ) input |> fun v => tensor_set thread_index() v output_sample_reduce
 
-    // console.tensor.write_ln limit.max input_identity
-    // console.tensor.write_ln limit.max output_sample_reduce
-    // console.tensor.write_ln limit.max output_indices_map
-    // console.tensor.write_ln limit.max output_indices_reduce
-    // console.tensor.write_ln limit.max output_op_map
-    console.tensor.write_ln limit.max (zip input output_identity_map)
+    open testing
+    redirect_io_into "test_text_outputs/primitives/test3/input_identity.txt" fun () =>
+        console.tensor.write_ln limit.max input_identity
+    redirect_io_into "test_text_outputs/primitives/test3/output_sample_reduce.txt" fun () =>
+        console.tensor.write_ln limit.max output_sample_reduce
+    redirect_io_into "test_text_outputs/primitives/test3/output_indices_map.txt" fun () =>
+        console.tensor.write_ln limit.max output_indices_map
+    redirect_io_into "test_text_outputs/primitives/test3/output_indices_map.txt" fun () =>
+        console.tensor.write_ln limit.max output_indices_reduce
+    redirect_io_into "test_text_outputs/primitives/test3/output_op_map.txt" fun () =>
+        console.tensor.write_ln limit.max output_op_map
+    redirect_io_into "test_text_outputs/primitives/test3/zip_input_output_identity_map.txt" fun () =>
+        console.tensor.write_ln limit.max (zip input output_identity_map)
     ()
 
 inl main() = test3()
