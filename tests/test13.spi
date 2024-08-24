@@ -1,0 +1,9 @@
+open corebase
+open corecuda
+open coreext
+open tensorm
+open transposing_loop
+
+inl main() =
+    run fun () =>
+        console.write_ln {msg = "Hello"; tid = thread_index()}

@@ -3,6 +3,9 @@ open refm
 
 inl globals() = global "#include <curand_kernel.h>"
 
+// The top level random seed set as an arbitrary constant.
+inl seed() : u64 = 12344321
+
 // Returns the clock time in nanoseconds.
 inl clock64() : u64 = $"clock64()"
 

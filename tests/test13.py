@@ -1,10 +1,3 @@
-Link: https://stackoverflow.com/questions/78908746/how-do-i-redirect-the-cuda-kernel-io-in-cupy
-
-The question I asked here is CuPy specific, but I cannot find useful answers even for regular C++/Cuda code. Redirecting the entire process that's being run at the OS level using the > operator should work, but I am wondering how the redirection for Cuda `printf` statements could be done within a program. I am trying to upgrade the testing harness for the ML library I am working on, and it might be useful to have this capability.
-
-If you're interested in tackling this, here is the much longer script I am using to actually test this.
-
-```python
 kernel = r"""
 #include <new>
 #include <assert.h>
@@ -73,4 +66,3 @@ def main():
 
 
 if __name__ == '__main__': print(main())
-```

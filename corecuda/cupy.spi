@@ -1,6 +1,8 @@
 open corebase
 open tensorm
 
+inl set_random_seed(seed : u64) = $"cp.random.seed(!seed)"
+
 inl template forall dim float. (dim : dim) (op : .fun) : tensor dim float =
     inl len : int = loop.prod dim
     tensor {
