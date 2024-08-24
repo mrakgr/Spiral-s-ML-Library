@@ -2,11 +2,12 @@
 
 open corebase
 
-inl redirect_io_into (file_path : string) f = join
+inl redirect_io_into (tail_dir : string) (head_dir : string) (filename : string) f = join
     global "import sys"
     global "import pathlib"
-    $"pathlib.Path(!file_path).parent.mkdir(parents=True, exist_ok=True)"
-    $"sys.stdout = sys.stderr = open(!file_path,'w')"
+    inl path : $"pathlib.Path" = $"pathlib.Path(!tail_dir,!head_dir,!filename)"
+    $"!path.parent.mkdir(parents=True, exist_ok=True)"
+    $"sys.stdout = sys.stderr = open(str(!path),'w')"
     f()
     $"sys.stdout = sys.__stdout__"
     $"sys.stderr = sys.__stderr__"

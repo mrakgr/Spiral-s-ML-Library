@@ -609,79 +609,95 @@ inl test1() =
     console.tensor.write_ln 1024 output_reduce
     ()
 
-inl test2() =
-    inl m,n : int * int = (1 <<< 6), (1 <<< 12)
+inl test2 (m,n : int * int) head_dir =
+    cupy.set_random_seed(cupy.constant_seed())
+    // inl m,n : int * int = (1 <<< 6), (1 <<< 12)
     // inl m,n : int * int = (1 <<< 4), (1 <<< 8)
     // inl m,n : int * int = (1 <<< 8), (1 <<< 4)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
-    inl input_action : _ _ float = cupy.random_uniform m
-    // inl input : _ _ float = cupy.ones (m,n)
-    // inl output_reduce = tensor_create 1
-    // inl output_identity = tensor_create (m,n)
-    // inl output_softmax = tensor_create (m,n)
-    // inl output_masked_softmax = tensor_create (m,n)
-    // inl output_softmax_scan = tensor_create (m,n)
-    // inl output_ln = tensor_create (m,n)
-    // inl output_argmax = tensor_create m
-    // inl output_indices_map = tensor_create (m,n)
-    // inl output_indices_reduction = tensor_create m
-    // inl output_sum_exclusive = tensor_create (m,n)
+    // inl input_action : _ _ float = cupy.random_uniform m
+    inl output_reduce = tensor_create 1
+    inl output_identity = tensor_create (m,n)
+    inl output_softmax = tensor_create (m,n)
+    inl output_masked_softmax = tensor_create (m,n)
+    inl output_softmax_scan = tensor_create (m,n)
+    inl output_ln = tensor_create (m,n)
+    inl output_argmax = tensor_create m
+    inl output_indices_map = tensor_create (m,n)
+    inl output_indices_reduction = tensor_create m
+    inl output_sum_exclusive = tensor_create (m,n)
     inl output_softmax' = tensor_create (m,n)
     inl output_sampling = tensor_create m
     run fun _ =>
         open random
-        inl rng : _ philox_state = init {seed = clock64(); subsequence=0; offset=0}
-        // map ((+) 1) input input
-        // reduce 0 (+) input output_reduce
-        // // indices (identity)
-        // row_map (fun config x i j_tns => x) input_identity output_identity
-        // // indices (map)
-        // row_map (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
-        // // indices (reduction)
-        // row_reduce (fun config x i j_tns => i) input output_indices_reduction
-        // // numerically stable softmax
-        // row_map (fun config x _ _ => local_softmax config x) input output_softmax
-        // // layer normalization L2
-        // row_map (fun config x _ _ => local_ln_l2 config x) input output_ln
-        // // argument maximum
-        // row_reduce (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
-        // // numerically stable softmax (scan)
-        // row_map (fun config x _ _ =>
-        //     inl x' = local_softmax config x
-        //     inl x = local_inclusive_scan_sum config x'
-        //     zip x' x
-        //     ) input output_softmax_scan
-        // // sum (exclusive scan)
-        // row_map (fun config x _ _ =>
-        //     local_exclusive_scan config 0 (+) x
-        //     ) input_identity output_sum_exclusive
-        // row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
+        inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv thread_index(); offset=0}
+        map ((+) 1) input input
+        reduce 0 (+) input output_reduce
+        // indices (identity)
+        row_map (fun config x i j_tns => x) input_identity output_identity
+        // indices (map)
+        row_map (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
+        // indices (reduction)
+        row_reduce (fun config x i j_tns => i) input output_indices_reduction
+        // numerically stable softmax
+        row_map (fun config x _ _ => local_softmax config x) input output_softmax
+        // layer normalization L2
+        row_map (fun config x _ _ => local_ln_l2 config x) input output_ln
+        // argument maximum
+        row_reduce (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
+        // numerically stable softmax (scan)
+        row_map (fun config x _ _ =>
+            inl x' = local_softmax config x
+            inl x = local_inclusive_scan_sum config x'
+            zip x' x
+            ) input output_softmax_scan
+        // sum (exclusive scan)
+        row_map (fun config x _ _ =>
+            local_exclusive_scan config 0 (+) x
+            ) input_identity output_sum_exclusive
+        row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
         // discrete sampling
-        row_map_reduce (local_softmax_and_discrete_sampling rng) input output_softmax' output_sampling
+        row_map_reduce (local_softmax_and_discrete_sampling rng()) input output_softmax' output_sampling
         // masked discrete sampling
-        row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng) input output_softmax' output_sampling
+        row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng()) input output_softmax' output_sampling
 
-    // console.tensor.write_ln 1024 input
-    // console.tensor.write_ln 1024 input_identity
-    // console.tensor.write_ln 1024 output_reduce
-    // console.tensor.write_ln 1024 output_softmax
-    // console.tensor.write_ln 1024 output_masked_softmax
-    // console.tensor.write_ln 1024 output_ln
-    // console.tensor.write_ln 1024 output_argmax
-    // console.tensor.write_ln (m * n) output_softmax_scan
-    // console.tensor.write_ln (m * n) output_identity
-    // console.tensor.write_ln (m * n) output_indices_map
-    // console.tensor.write_ln (m * n) output_indices_reduction
-    // console.tensor.write_ln (m * n) output_sum_exclusive
-    console.tensor.write_ln 1024 output_softmax'
-    console.tensor.write_ln 1024 output_sampling
+    open testing
+    redirect_io_into "test_text_outputs/primitives/" head_dir "input.txt" fun () =>
+        console.tensor.write_ln 1024 input
+    redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
+        console.tensor.write_ln 1024 input_identity
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_reduce.txt" fun () =>
+        console.tensor.write_ln 1024 output_reduce
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax.txt" fun () =>
+        console.tensor.write_ln 1024 output_softmax
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_masked_softmax.txt" fun () =>
+        console.tensor.write_ln 1024 output_masked_softmax
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_ln.txt" fun () =>
+        console.tensor.write_ln 1024 output_ln
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_argmax.txt" fun () =>
+        console.tensor.write_ln 1024 output_argmax
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax_scan.txt" fun () =>
+        console.tensor.write_ln (m * n) output_softmax_scan
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_identity.txt" fun () =>
+        console.tensor.write_ln (m * n) output_identity
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_indices_map.txt" fun () =>
+        console.tensor.write_ln (m * n) output_indices_map
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_indices_reduction.txt" fun () =>
+        console.tensor.write_ln (m * n) output_indices_reduction
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_sum_exclusive.txt" fun () =>
+        console.tensor.write_ln (m * n) output_sum_exclusive
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax'.txt" fun () =>
+        console.tensor.write_ln 1024 output_softmax'
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_sampling.txt" fun () =>
+        console.tensor.write_ln 1024 output_sampling
     ()
 
-inl test3() =
+inl test3 (n : int) head_dir =
     cupy.set_random_seed(cupy.constant_seed())
-    inl m,n : int * int = threads_per_block(), (1 <<< 8)
+    inl m : int = threads_per_block()
+    // inl m,n : int * int = threads_per_block(), (1 <<< 8)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ float = cupy.arange{from=0; nearTo=m,n; by=1}
     // inl input_action : _ _ float = cupy.random_uniform m
@@ -717,18 +733,22 @@ inl test3() =
             ) input |> fun v => tensor_set thread_index() v output_sample_reduce
 
     open testing
-    redirect_io_into "test_text_outputs/primitives/test3/input_identity.txt" fun () =>
+    redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
         console.tensor.write_ln limit.max input_identity
-    redirect_io_into "test_text_outputs/primitives/test3/output_sample_reduce.txt" fun () =>
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_sample_reduce.txt" fun () =>
         console.tensor.write_ln limit.max output_sample_reduce
-    redirect_io_into "test_text_outputs/primitives/test3/output_indices_map.txt" fun () =>
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_indices_map.txt" fun () =>
         console.tensor.write_ln limit.max output_indices_map
-    redirect_io_into "test_text_outputs/primitives/test3/output_indices_map.txt" fun () =>
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_indices_map.txt" fun () =>
         console.tensor.write_ln limit.max output_indices_reduce
-    redirect_io_into "test_text_outputs/primitives/test3/output_op_map.txt" fun () =>
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_op_map.txt" fun () =>
         console.tensor.write_ln limit.max output_op_map
-    redirect_io_into "test_text_outputs/primitives/test3/zip_input_output_identity_map.txt" fun () =>
+    redirect_io_into "test_text_outputs/primitives/" head_dir "zip_input_output_identity_map.txt" fun () =>
         console.tensor.write_ln limit.max (zip input output_identity_map)
     ()
 
-inl main() = test3()
+inl main() = 
+    test2((1 <<< 6), (1 <<< 12)) "test2/a/"
+    test2((1 <<< 12), (1 <<< 6)) "test2/b/"
+    test3((1 <<< 4)) "test3/a"
+    test3((1 <<< 8)) "test3/b"
