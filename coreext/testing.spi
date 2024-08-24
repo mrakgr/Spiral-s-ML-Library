@@ -2,6 +2,7 @@
 
 open corebase
 
+// Redirects the console io into the "taild_dir/head_dir/filename" file.
 inl redirect_io_into (tail_dir : string) (head_dir : string) (filename : string) f = join
     global "import sys"
     global "import pathlib"
