@@ -43,7 +43,7 @@ union rec graph t =
     | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Pair :: forall a b. graph a * graph b -> graph (a * b)
     | Weight :: forall t. partitionm.partition t * (t -> ()) -> graph t
-    | Input :: forall dim t. dim -> graph (tensor dim t)
+    | Input :: forall t. partitionm.partition t -> graph t
     | Apply :: forall b el. (exists a. graph (tensor (a * b) el) * graph a) -> graph (tensor b el)
     | KeyGraph :: forall t. (exists key{symbol}. key) * graph t -> graph t
     | KeyScalar :: forall t. (exists key{symbol}. key) -> graph t
@@ -70,7 +70,7 @@ inl memoize (h : hashmapm.hashmap) f k =
 // Returns the top level dimension for an arbitrary graph type. Takes in a hashmap for memoization purposes.
 // Results in a type errors error on the KeyScalar node.
 inl rec get_dim_pair forall t_top. (h : graph_dims) : graph t_top -> dim_of t_top =
-    inl f x = get_dim h x 
+    inl f x = get_dim h x
     inl f' x = get_dim_pair h x
     inl check x = optionm.iter (fun x' => assert (D_D x = f' x') "The dimensions coming from the input and the dimensions of the output have to match.")
     memoize h (function
@@ -115,7 +115,12 @@ inl rec get_dim_pair forall t_top. (h : graph_dims) : graph t_top -> dim_of t_to
             | _ ~p => 
                 !!!!PrintStatic(`p)
                 error_type "Can only get the dimension of a singleton weight layer. Check the terminal to see the type of the Weight node."
-        | Input dim => D_D dim
+        | Input dim => real
+            typecase `dim with
+            | _ (tensor ~dim ~t) => D_D `dim `t (partitionm.dim_of `dim `t dim)
+            | _ ~p =>
+                !!!!PrintStatic(`p)
+                error_type "Can only get the dimension of a singleton input layer. Check the terminal to see the type of the Input node."
         | KeyGraph(_,x) => f' x
         | Apply(exists a. a,b) => D_D(snd (f a))
         )
@@ -187,7 +192,10 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
             | Pair(a,b) => f a . f b // passthrough
             | Weight => ()
             | Apply(exists a. a,b) => f a . f b // passthrough
-            | Input => g k None
+            | Input(p) =>
+                inl partition_offsets : _ t = partitionm.calculate_offsets get_offset() p
+                hashmapm.add h_offset_output k (P_D partition_offsets)
+                set_offset partition_offsets.offset_end
             | KeyGraph(_,x) => f x // passthrough
             | KeyScalar(_) => ()
         
@@ -522,7 +530,9 @@ inl matmul_ensemble (c,b,a : int * int * int) x =
     open partitionm
     BlockMatmul(x, Apply(exists Weight(!(c,a,b), weight_init), key_scalar .ensemble))
 inl key_graph forall key{symbol}. (key : key) x = KeyGraph((exists key), x)
-inl input forall dim t key{symbol}. (key : key) (dim : dim) : graph (tensor dim t) = KeyGraph((exists key), Input(dim))
+inl input forall dim' t key{symbol}. (key : key) (dim' : dim') : graph (tensor dim' t) = 
+    open partitionm
+    KeyGraph((exists key), Input !dim')
 inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : graph (tensor b t) = Apply(exists a, key_scalar b)
 inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)
 
