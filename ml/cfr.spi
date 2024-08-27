@@ -170,6 +170,7 @@ inl apply_updates (model : model) (trace : trace) (ensemble_id, seq_id : ensembl
     open primitives
     inl thread_id = thread_index() // TODO: Make sure to use the grid id.
 
+    // TODO: Move the loop into calculate updates.
     loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
         inl {action_id world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
         inl trace_value_update =
@@ -180,7 +181,7 @@ inl apply_updates (model : model) (trace : trace) (ensemble_id, seq_id : ensembl
             |> apply ensemble_id
             |> apply world_id
             |> apply_ptr
-            |> rezip (fun x => x.policy.update, x.value)
+            |> rezip (fun x => x.policy.update, x.value) // TODO: Add the value.update field.
             |> unzip
         inl trace_update_policy =
             trace.update.policy
@@ -189,6 +190,7 @@ inl apply_updates (model : model) (trace : trace) (ensemble_id, seq_id : ensembl
             |> apply thread_id
         
         // Updates the value arrays.
+        // TODO: Should not be done directly like this. Need to add value.update.
         tensor_atomic_add action_id trace_value_update value
 
         // Updates the current policy.
@@ -202,6 +204,7 @@ inl apply_updates (model : model) (trace : trace) (ensemble_id, seq_id : ensembl
     inl model = model |> reorder (fun a,b,c => (a,b),c)
 
     // TODO: Make row_map grid wide.
+    // TODO: Do the value updates here as well.
     (model, model) ||> row_map (fun config model i j_tns =>
         inl has_been_updated = 
             model
