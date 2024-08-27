@@ -381,8 +381,8 @@ __device__ inline bool while_method_2(int v0){
 __device__ Tuple0 method_1(float * v0, float * v1, float * v2, float * v3, float * v4, int v5, int v6){
     assert("Tensor range check" && 0 <= v6 && v6 < 4l);
     int v7;
-    v7 = 32768l * v6;
-    assert("Tensor range check" && 0 <= v5 && v5 < 8192l);
+    v7 = 16384l * v6;
+    assert("Tensor range check" && 0 <= v5 && v5 < 4096l);
     int v8;
     v8 = 4l * v5;
     int v9;
@@ -1517,38 +1517,38 @@ __device__ inline bool while_method_3(int v0){
 }
 __device__ inline bool while_method_4(int v0){
     bool v1;
-    v1 = v0 < 256l;
+    v1 = v0 < 128l;
     return v1;
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
     float * v2;
     v2 = reinterpret_cast<float *>(&v1[0ull]);
     float * v4;
-    v4 = reinterpret_cast<float *>(&v1[524288ull]);
+    v4 = reinterpret_cast<float *>(&v1[262144ull]);
     float * v6;
-    v6 = reinterpret_cast<float *>(&v1[1048576ull]);
+    v6 = reinterpret_cast<float *>(&v1[524288ull]);
     float * v8;
-    v8 = reinterpret_cast<float *>(&v1[1572864ull]);
+    v8 = reinterpret_cast<float *>(&v1[786432ull]);
     float * v10;
-    v10 = reinterpret_cast<float *>(&v1[2097152ull]);
+    v10 = reinterpret_cast<float *>(&v1[1048576ull]);
     int * v12;
-    v12 = reinterpret_cast<int *>(&v1[2621440ull]);
+    v12 = reinterpret_cast<int *>(&v0[0ull]);
     float * v14;
-    v14 = reinterpret_cast<float *>(&v1[2629632ull]);
+    v14 = reinterpret_cast<float *>(&v0[8192ull]);
     int * v16;
-    v16 = reinterpret_cast<int *>(&v1[2637824ull]);
+    v16 = reinterpret_cast<int *>(&v0[16384ull]);
     int * v18;
-    v18 = reinterpret_cast<int *>(&v1[2646016ull]);
+    v18 = reinterpret_cast<int *>(&v0[24576ull]);
     double * v20;
-    v20 = reinterpret_cast<double *>(&v1[2654208ull]);
+    v20 = reinterpret_cast<double *>(&v0[32768ull]);
     double * v22;
-    v22 = reinterpret_cast<double *>(&v1[2686976ull]);
+    v22 = reinterpret_cast<double *>(&v0[65536ull]);
     float * v24;
-    v24 = reinterpret_cast<float *>(&v1[2719744ull]);
+    v24 = reinterpret_cast<float *>(&v0[98304ull]);
     float * v26;
-    v26 = reinterpret_cast<float *>(&v1[2752512ull]);
+    v26 = reinterpret_cast<float *>(&v0[131072ull]);
     float * v28;
-    v28 = reinterpret_cast<float *>(&v1[2760704ull]);
+    v28 = reinterpret_cast<float *>(&v0[139264ull]);
     int v30;
     v30 = threadIdx.x;
     int v31 = 0l;
@@ -1631,7 +1631,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
         assert("Tensor range check" && 0 <= v63 && v63 < 2l);
         float v65;
         v65 = v56[v63];
-        assert("Tensor range check" && 0 <= v64 && v64 < 8192l);
+        assert("Tensor range check" && 0 <= v64 && v64 < 4096l);
         int v66;
         v66 = 4l * v64;
         assert("Tensor range check" && 0 <= v57 && v57 < 16l);
@@ -2448,7 +2448,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
         v397 = v26[v392];
         float v398;
         v398 = v28[v392];
-        assert("Tensor range check" && 0 <= v396 && v396 < 8192l);
+        assert("Tensor range check" && 0 <= v396 && v396 < 4096l);
         int v399;
         v399 = 4l * v396;
         float * v400;
@@ -2729,7 +2729,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
     int v509;
     v509 = v508 + v507;
     int v510;
-    v510 = 32768l * v503;
+    v510 = 16384l * v503;
     int v511;
     v511 = v510 + v509;
     assert("Tensor range check" && 0 <= v503 && v503 < 1l);
@@ -2742,13 +2742,13 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
         v514 = 0l;
         while (while_method_4(v514)){
             assert("Tensor range check" && 0 <= v512 && v512 < 4l);
-            assert("Tensor range check" && 0 <= v514 && v514 < 256l);
+            assert("Tensor range check" && 0 <= v514 && v514 < 128l);
             int v516;
             v516 = 128l * v514;
             int v517;
             v517 = v516 + v511;
             int v518;
-            v518 = 32768l * v512;
+            v518 = 16384l * v512;
             int v519;
             v519 = v518 + v517;
             float v520[4l];
@@ -2918,7 +2918,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             bool v581;
             if (v579){
                 bool v580;
-                v580 = v514 < 256l;
+                v580 = v514 < 128l;
                 v581 = v580;
             } else {
                 v581 = false;
@@ -3275,7 +3275,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             } else {
             }
             assert("Tensor range check" && 0 <= v512 && v512 < 4l);
-            assert("Tensor range check" && 0 <= v514 && v514 < 256l);
+            assert("Tensor range check" && 0 <= v514 && v514 < 128l);
             int v715;
             v715 = 0l;
             while (while_method_1(v715)){
@@ -3385,22 +3385,13 @@ options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
 def main_body():
-    v0 = cp.empty(2768896,dtype=cp.uint8)
-    v1 = cp.empty(0,dtype=cp.uint8)
-    v3 = v0[0:0+4*131072].view(cp.float32)
-    v5 = v0[524288:524288+4*131072].view(cp.float32)
-    v7 = v0[1048576:1048576+4*131072].view(cp.float32)
-    v9 = v0[1572864:1572864+4*131072].view(cp.float32)
-    v11 = v0[2097152:2097152+4*131072].view(cp.float32)
-    v13 = v0[2621440:2621440+4*2048].view(cp.int32)
-    v15 = v0[2629632:2629632+4*2048].view(cp.float32)
-    v17 = v0[2637824:2637824+4*2048].view(cp.int32)
-    v19 = v0[2646016:2646016+4*2048].view(cp.int32)
-    v21 = v0[2654208:2654208+8*4096].view(cp.float64)
-    v23 = v0[2686976:2686976+8*4096].view(cp.float64)
-    v25 = v0[2719744:2719744+4*8192].view(cp.float32)
-    v27 = v0[2752512:2752512+4*2048].view(cp.float32)
-    v29 = v0[2760704:2760704+4*2048].view(cp.float32)
+    v0 = cp.empty(1310720,dtype=cp.uint8)
+    v1 = cp.empty(147456,dtype=cp.uint8)
+    v3 = v0[0:0+4*65536].view(cp.float32)
+    v5 = v0[262144:262144+4*65536].view(cp.float32)
+    v7 = v0[524288:524288+4*65536].view(cp.float32)
+    v9 = v0[786432:786432+4*65536].view(cp.float32)
+    v11 = v0[1048576:1048576+4*65536].view(cp.float32)
     v3[:] = 0
     del v3
     v5[:] = 0
@@ -3411,30 +3402,12 @@ def main_body():
     del v9
     v11[:] = 0
     del v11
-    v13[:] = 0
-    del v13
-    v15[:] = 0
-    del v15
-    v17[:] = 0
-    del v17
-    v19[:] = 0
-    del v19
-    v21[:] = 0
-    del v21
-    v23[:] = 0
-    del v23
-    v25[:] = 0
-    del v25
-    v27[:] = 0
-    del v27
-    v29[:] = 0
-    del v29
-    v30 = 0
-    v31 = raw_module.get_function(f"entry{v30}")
-    del v30
-    v31.max_dynamic_shared_size_bytes = 0 
-    v31((1,),(32,),(v1, v0),shared_mem=0)
-    del v0, v1, v31
+    v12 = 0
+    v13 = raw_module.get_function(f"entry{v12}")
+    del v12
+    v13.max_dynamic_shared_size_bytes = 0 
+    v13((1,),(32,),(v1, v0),shared_mem=0)
+    del v0, v1, v13
     return 
 
 def main():

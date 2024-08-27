@@ -1,14 +1,17 @@
 open corebase
 open compile_time
 
+
 inl rec write_ forall t. (console_config {h key_fmt key_value} as config : console_config) (is_newline : bool) (x : t) : () =
     // The types of these are lies.
     inl get_fmt () = hashmapm.get_with_default h key_fmt ()
     inl get_value () = hashmapm.get_with_default h key_value ()
+    inl get_len () : int = real 
+        inl rec loop s = function
+            | _,xs => loop (1+s) xs
+            | () => s
+        loop 0 get_value()
     inl put_fmt (sep : string) = hashmapm.set h key_fmt (get_fmt(), sep)
-    inl put_value (fmt, str : string * .obj) =
-        put_fmt fmt
-        hashmapm.set h key_value (get_value(), str)
     inl flush is_newline =
         if is_newline then put_fmt "\n"
         inl fmt = !!!!StaticStringConcat(get_fmt())
@@ -19,6 +22,12 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
             | _ => !!!!Printf(fmt,str)
         hashmapm.remove h key_fmt |> ignore
         hashmapm.remove h key_value |> ignore
+    inl put_value (fmt, str : string * .obj) =
+        put_fmt fmt
+        hashmapm.set h key_value (get_value(), str)
+        // Cuda's printf only takes in 32 args max. Link: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#limitations
+        // We have to flush after that limit is reached.
+        if get_len() >= 32 then flush false
     inl rec write (x : .obj) : () = real
         open real_core
         inl p = put_value
@@ -26,7 +35,6 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
         match x with // According to Bing it shouldn't matter whether these are %d or %lld in printf.
         | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
         | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-        // | (x : f32) => p ("%u", ($"*(int *)&!x" : int))
         | (x : f32) | (x : f64) => p ("%f", x)
         | (x : string) => p ("%s", x)
         | (x : char) => p ("%c", x)

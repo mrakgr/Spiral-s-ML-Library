@@ -31,25 +31,21 @@ union game_node =
     | ChanceInit
 
 // Generates a valid random action.
-inl random_action (table : table) =
+inl random_action rng (table : table) =
     open sa_listm
     inl actions : sa_list 3 _ =  arraym.fromList [Call]
     if index table.pot 0 <> index table.pot 1 then push actions Fold
     if table.raises_left > 0 then push actions Raise
-    utils.shuffle actions
+    corecuda.random.shuffle rng actions
     pop actions
 
 // Creates a deck.
-inl create_deck() =
+inl create_deck () =
     open sa_listm
-    inl deck : sa_list 6 _ = arraym.fromList [King; King; Queen; Queen; Jack; Jack]
-    utils.shuffle deck
-    deck
-
+    arraym.fromList [King; King; Queen; Queen; Jack; Jack] : sa_list 6 _
+    
 // Pops from the top a deck.
-inl pop_deck (deck : sa_listm.sa_list 6 card) : card =
-    open sa_listm
-    pop deck
+inl pop_deck (deck : sa_listm.sa_list 6 card) : card = sa_listm.pop deck
 
 // Returns the max value of both pots in an static array.
 inl pot_call (pot : sam.sa 2 int) : sam.sa 2 int = sam.init (const (arraym.fold max 0 pot))

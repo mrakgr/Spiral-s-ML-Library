@@ -72,11 +72,11 @@ inl noinline_run forall inp out.
         (key_extract model .output_world_id : tensor d3 uint)
         |> tensor_index (ensemble_id, block_index(), thread_index())
 
-    // Extract the CFR table.
-    inl cfr_table = (key_extract model .cfr_table : cfr.table)
-    
+    // Extract the CFR model.
+    inl cfr_model = (key_extract model .cfr_model : cfr.model)
+
     // Extract the output index.
-    inl _,output_id = cfr.get_action action_mask cfr_table.model (ensemble_id, conv world_id)
+    inl _,output_id = cfr.get_action action_mask cfr_model (ensemble_id, conv world_id)
 
     output output_id
 

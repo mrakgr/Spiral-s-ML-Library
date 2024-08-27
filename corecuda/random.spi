@@ -73,18 +73,13 @@ let int_range forall int{number; int}. ({from nearTo} : {from : int; nearTo : in
         | _ => u32()
 
 // Shuffles the array.
-inl shuffle' forall (array : * -> *){index; set; length} el. rng (ar : array el) : () =
+inl shuffle forall (array : * -> *){index; set; length} el. rng (ar : array el) : () =
     // Knuth shuffle
     loop.for' {from=0; nearTo=length ar - 1} fun i =>
         inl j = int_range {from=i; nearTo=length ar} rng
         inl tmp = index ar i
         set ar i (index ar j)
         set ar j tmp
-
-// Shuffles the array.
-inl shuffle forall (array : * -> *){index; set; length} el. (ar : array el) : () =
-    inl rng : _ philox_state = init {seed = clock64(); subsequence=0; offset=0}
-    shuffle' rng ar
 
 instance uniform philox_state = fun s => $"curand_uniform(&!s)"
 instance normal philox_state = fun s => $"curand_normal(&!s)"
@@ -93,13 +88,20 @@ instance poisson philox_state = fun {lambda} s => $"curand_poisson(&!s,!lambda)"
 instance skipahead philox_state = fun {steps} s => $"skipahead(!steps,&!s)"
 instance skipahead_sequence philox_state = fun {steps} s => $"skipahead_sequence(!steps,&!s)"
 
-// Gets the position of the i-th (starting at 0) set bit in a pair of u32 masks.
-inl sample_masked_bit_u32_2 (a,b : u32 * u32) (i : i32) =
+// Gets the position of the i-th (starting at 0) set bit in a list of u32 masks.
+inl sample_masked_bit_u32_ (l : list u32) (i : i32) =
     inl fns (mask : u32) (offset : i32) : u32 = intrinsic.fns mask 0 (conv offset + 1)
-    inl a_popc = intrinsic.popc_u32 a
-    if i < a_popc then fns a i else fns b (i - a_popc) + 32
+    // TODO: Make sure this does not cause warp divergence.
+    listm.foldBack (fun a next (i,o) =>
+        inl a_popc = intrinsic.popc_u32 a
+        if i < a_popc then fns a i + o else next (i - a_popc, o + 32)
+        ) l (fun _ => failwith "Cannot find the n-th set bit.") (i, 0)
 
-inl sample_masked_bit_u64 (x : u64) i = sample_masked_bit_u32_2 (conv x, conv (x >>> 32)) i
+// Gets the position of the i-th (starting at 0) set bit from an u64 integer mask.
+inl sample_masked_bit_u64 (x : u64) i = sample_masked_bit_u32_ [conv x; conv (x >>> 32)] i
+
+// Gets the position of the i-th (starting at 0) set bit from an u32 integer mask.
+inl sample_masked_bit_u32 (x : u32) i = sample_masked_bit_u32_ [x] i
 
 open arraym
 open sam

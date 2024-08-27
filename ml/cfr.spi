@@ -57,9 +57,7 @@ type sizes =
         thread_id : int
     }
 
-type table = {model : model; trace : trace}
-
-inl graph (size : sizes) =
+inl graph (size : sizes) : _ (model * trace) =
     open partitionm
     inl model : partition model = !(size.ensemble_id, size.world_id, size.action_id)
     inl trace : partition trace = 
@@ -67,14 +65,15 @@ inl graph (size : sizes) =
         *. !(size.ensemble_id, size.seq_id, size.thread_id) *. !(size.ensemble_id, size.seq_id, size.thread_id, size.action_id)
         |> reorder (fun ((actions, log_path_probs), value), policy => { actions log_path_probs update = { value policy } })
 
-    inl p : partition table = model *. trace |> reorder (fun model,trace => {model trace})
-    inl init (x : table) : () = real 
+    inl init (x : model) : () = real
         struct.iter (fun x => 
             struct.iter (fun x =>
                 $"!(x.array)[:] = 0" : ()
                 ) x.bodies
         ) x
-    layers.Weight(p, init)
+    layers.pair 
+        (layers.key_graph .cfr_model layers.Weight(model, init))
+        (layers.key_graph .cfr_trace layers.Input(trace))
 
 // Samples an action from the model using the average policy and returns both the action and the probabilities of it being selected.
 inl get_action mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) : action_prob * action_id = join
@@ -249,7 +248,7 @@ inl test1() =
         layers.param_init model
 
         run fun () =>
-            inl {model trace} = layers.graph_extract model {}
+            inl model, trace : model * trace = layers.graph_extract model {}
 
             inl thread_id = thread_index()
             inl seq_id = ref (0 : int)

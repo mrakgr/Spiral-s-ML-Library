@@ -1,15 +1,15 @@
 open corebase
 
-// Shuffles the array.
-inl shuffle forall dim el. (ar : sa_listm.sa_list dim el) : () =
-    backend_switch {
-        Cuda = fun _ => corecuda.random.shuffle ar
-        Python = fun _ => 
-            global "import random"
-            // Knuth shuffle
-            loop.for' {from=0; nearTo=length ar - 1} fun i =>
-                inl j = $"random.randrange(!i, !(length ar))"
-                inl tmp = index ar i
-                set ar i (index ar j)
-                set ar j tmp
-    }
+// // Shuffles the array.
+// inl shuffle forall dim el. (ar : sa_listm.sa_list dim el) : () =
+//     backend_switch {
+//         Cuda = fun _ => corecuda.random.shuffle ar
+//         Python = fun _ => 
+//             global "import random"
+//             // Knuth shuffle
+//             loop.for' {from=0; nearTo=length ar - 1} fun i =>
+//                 inl j = $"random.randrange(!i, !(length ar))"
+//                 inl tmp = index ar i
+//                 set ar i (index ar j)
+//                 set ar j tmp
+//     }

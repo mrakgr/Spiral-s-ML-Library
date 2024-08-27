@@ -5315,76 +5315,72 @@ __device__ __noinline__ Union9 noinline_run_42(unsigned char * v0, unsigned char
     v3 = reinterpret_cast<unsigned int *>(&v0[278528ull]);
     float * v5;
     v5 = reinterpret_cast<float *>(&v0[0ull]);
-    unsigned long long v7;
-    v7 = clock64();
+    int v7;
+    v7 = threadIdx.x;
     int v8;
-    v8 = threadIdx.x;
+    v8 = blockIdx.x;
     int v9;
-    v9 = blockIdx.x;
+    v9 = v8 * 32l;
     int v10;
-    v10 = v9 * 32l;
-    int v11;
-    v11 = v8 + v10;
-    unsigned long long v12;
-    v12 = (unsigned long long)v11;
-    curandStatePhilox4_32_10_t v13;
-    curand_init(v7,v12,0ull,&v13);
-    float * v14;
-    v14 = reinterpret_cast<float *>(&v0[0ull]);
+    v10 = v7 + v9;
+    unsigned long long v11;
+    v11 = (unsigned long long)v10;
+    curandStatePhilox4_32_10_t v12;
+    curand_init(12344321ull,v11,0ull,&v12);
+    float * v13;
+    v13 = reinterpret_cast<float *>(&v0[0ull]);
+    int v15;
+    v15 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v15 && v15 < 1l);
     int v16;
-    v16 = blockIdx.x;
-    assert("Tensor range check" && 0 <= v16 && v16 < 1l);
+    v16 = 65536l * v15;
     int v17;
-    v17 = 65536l * v16;
-    unsigned long long v18;
-    v18 = clock64();
+    v17 = threadIdx.x;
+    int v18;
+    v18 = blockIdx.x;
     int v19;
-    v19 = threadIdx.x;
+    v19 = v18 * 32l;
     int v20;
-    v20 = blockIdx.x;
-    int v21;
-    v21 = v20 * 32l;
-    int v22;
-    v22 = v19 + v21;
-    unsigned long long v23;
-    v23 = (unsigned long long)v22;
-    curandStatePhilox4_32_10_t v24;
-    curand_init(v18,v23,0ull,&v24);
-    int v25;
-    v25 = threadIdx.x;
-    int v26;
-    v26 = v25;
-    while (while_method_7(v26)){
-        bool v28;
-        v28 = 0l <= v26;
-        bool v29;
-        v29 = v28 == false;
-        if (v29){
-            assert("The index needs to be zero or positive." && v28);
+    v20 = v17 + v19;
+    unsigned long long v21;
+    v21 = (unsigned long long)v20;
+    curandStatePhilox4_32_10_t v22;
+    curand_init(12344321ull,v21,0ull,&v22);
+    int v23;
+    v23 = threadIdx.x;
+    int v24;
+    v24 = v23;
+    while (while_method_7(v24)){
+        bool v26;
+        v26 = 0l <= v24;
+        bool v27;
+        v27 = v26 == false;
+        if (v27){
+            assert("The index needs to be zero or positive." && v26);
         } else {
         }
-        int v31;
-        v31 = v26 % 2048l;
-        int v32;
-        v32 = v26 / 2048l;
-        bool v33;
-        v33 = v32 < 32l;
-        bool v34;
-        v34 = v33 == false;
-        if (v34){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v33);
+        int v29;
+        v29 = v24 % 2048l;
+        int v30;
+        v30 = v24 / 2048l;
+        bool v31;
+        v31 = v30 < 32l;
+        bool v32;
+        v32 = v31 == false;
+        if (v32){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v31);
         } else {
         }
-        assert("Tensor range check" && 0 <= v32 && v32 < 32l);
-        assert("Tensor range check" && 0 <= v31 && v31 < 2048l);
+        assert("Tensor range check" && 0 <= v30 && v30 < 32l);
+        assert("Tensor range check" && 0 <= v29 && v29 < 2048l);
+        int v34;
+        v34 = v29 + v16;
+        int v35;
+        v35 = 2048l * v30;
         int v36;
-        v36 = v31 + v17;
-        int v37;
-        v37 = 2048l * v32;
-        int v38;
-        v38 = v37 + v36;
-        v14[v38] = 0.0f;
-        v26 += 32l ;
+        v36 = v35 + v34;
+        v13[v36] = 0.0f;
+        v24 += 32l ;
     }
     asm("barrier.cta.sync %0;" :: "r"(0l));
     switch (v2.tag) {
@@ -5392,87 +5388,87 @@ __device__ __noinline__ Union9 noinline_run_42(unsigned char * v0, unsigned char
             break;
         }
         case 1: { // Some
-            int v39 = v2.case1.v0; static_array<static_array<unsigned char,2l>,2l> v40 = v2.case1.v1; static_array<int,2l> v41 = v2.case1.v2; int v42 = v2.case1.v3; static_array<int,2l> v43 = v2.case1.v4; Union5 v44 = v2.case1.v5; dynamic_array_list<Union6,128l> v45 = v2.case1.v6;
+            int v37 = v2.case1.v0; static_array<static_array<unsigned char,2l>,2l> v38 = v2.case1.v1; static_array<int,2l> v39 = v2.case1.v2; int v40 = v2.case1.v3; static_array<int,2l> v41 = v2.case1.v4; Union5 v42 = v2.case1.v5; dynamic_array_list<Union6,128l> v43 = v2.case1.v6;
+            int v44;
+            v44 = threadIdx.x;
+            assert("Tensor range check" && 0 <= v44 && v44 < 32l);
+            int v45;
+            v45 = 2048l * v44;
             int v46;
-            v46 = threadIdx.x;
-            assert("Tensor range check" && 0 <= v46 && v46 < 32l);
+            v46 = v45 + v16;
             int v47;
-            v47 = 2048l * v46;
-            int v48;
-            v48 = v47 + v17;
-            int v49;
-            v49 = v45.length_();
-            bool v50;
-            v50 = 128l >= v49;
-            bool v51;
-            v51 = v50 == false;
-            if (v51){
-                assert("The type level dimension has to equal the value passed at runtime into create." && v50);
+            v47 = v43.length_();
+            bool v48;
+            v48 = 128l >= v47;
+            bool v49;
+            v49 = v48 == false;
+            if (v49){
+                assert("The type level dimension has to equal the value passed at runtime into create." && v48);
             } else {
             }
-            dynamic_array_list<Union10,128l> v53{0};
-            v53.unsafe_set_length(v49);
-            int v55;
-            v55 = 0l;
-            while (while_method_4(v49, v55)){
-                Union6 v57;
-                v57 = v45[v55];
-                Union10 v63;
-                switch (v57.tag) {
+            dynamic_array_list<Union10,128l> v51{0};
+            v51.unsafe_set_length(v47);
+            int v53;
+            v53 = 0l;
+            while (while_method_4(v47, v53)){
+                Union6 v55;
+                v55 = v43[v53];
+                Union10 v61;
+                switch (v55.tag) {
                     case 2: { // PlayerAction
-                        int v59 = v57.case2.v0; Union1 v60 = v57.case2.v1;
-                        v63 = Union10{Union10_1{v60}};
+                        int v57 = v55.case2.v0; Union1 v58 = v55.case2.v1;
+                        v61 = Union10{Union10_1{v58}};
                         break;
                     }
                     default: {
-                        v63 = Union10{Union10_0{}};
+                        v61 = Union10{Union10_0{}};
                     }
                 }
-                v53[v55] = v63;
-                v55 += 1l ;
+                v51[v53] = v61;
+                v53 += 1l ;
             }
-            static_array<int,2l> v64;
-            int v66;
-            v66 = 0l;
-            while (while_method_0(v66)){
+            static_array<int,2l> v62;
+            int v64;
+            v64 = 0l;
+            while (while_method_0(v64)){
+                int v66;
+                v66 = v40 % 2l;
+                int v67;
+                v67 = v64 + v66;
                 int v68;
-                v68 = v42 % 2l;
-                int v69;
-                v69 = v66 + v68;
-                int v70;
-                v70 = v41[v69];
-                v64[v66] = v70;
-                v66 += 1l ;
+                v68 = v39[v67];
+                v62[v64] = v68;
+                v64 += 1l ;
             }
-            static_array<int,2l> v72;
-            int v74;
-            v74 = 0l;
-            while (while_method_0(v74)){
+            static_array<int,2l> v70;
+            int v72;
+            v72 = 0l;
+            while (while_method_0(v72)){
+                int v74;
+                v74 = v40 % 2l;
+                int v75;
+                v75 = v72 + v74;
                 int v76;
-                v76 = v42 % 2l;
-                int v77;
-                v77 = v74 + v76;
-                int v78;
-                v78 = v43[v77];
-                v72[v74] = v78;
-                v74 += 1l ;
+                v76 = v41[v75];
+                v70[v72] = v76;
+                v72 += 1l ;
             }
-            int v80;
-            v80 = v42 % 2l;
-            static_array<unsigned char,2l> v81;
-            v81 = v40[v80];
-            static_array_list<unsigned char,5l> v83;
-            v83 = static_array_list<unsigned char,5l>{};
-            switch (v44.tag) {
+            int v78;
+            v78 = v40 % 2l;
+            static_array<unsigned char,2l> v79;
+            v79 = v38[v78];
+            static_array_list<unsigned char,5l> v81;
+            v81 = static_array_list<unsigned char,5l>{};
+            switch (v42.tag) {
                 case 0: { // Flop
-                    static_array<unsigned char,3l> v85 = v44.case0.v0;
-                    int v86;
-                    v86 = 0l;
-                    while (while_method_1(v86)){
-                        unsigned char v88;
-                        v88 = v85[v86];
-                        v83.push(v88);
-                        v86 += 1l ;
+                    static_array<unsigned char,3l> v83 = v42.case0.v0;
+                    int v84;
+                    v84 = 0l;
+                    while (while_method_1(v84)){
+                        unsigned char v86;
+                        v86 = v83[v84];
+                        v81.push(v86);
+                        v84 += 1l ;
                     }
                     break;
                 }
@@ -5480,26 +5476,26 @@ __device__ __noinline__ Union9 noinline_run_42(unsigned char * v0, unsigned char
                     break;
                 }
                 case 2: { // River
-                    static_array<unsigned char,5l> v95 = v44.case2.v0;
-                    int v96;
-                    v96 = 0l;
-                    while (while_method_2(v96)){
-                        unsigned char v98;
-                        v98 = v95[v96];
-                        v83.push(v98);
-                        v96 += 1l ;
+                    static_array<unsigned char,5l> v93 = v42.case2.v0;
+                    int v94;
+                    v94 = 0l;
+                    while (while_method_2(v94)){
+                        unsigned char v96;
+                        v96 = v93[v94];
+                        v81.push(v96);
+                        v94 += 1l ;
                     }
                     break;
                 }
                 case 3: { // Turn
-                    static_array<unsigned char,4l> v90 = v44.case3.v0;
-                    int v91;
-                    v91 = 0l;
-                    while (while_method_3(v91)){
-                        unsigned char v93;
-                        v93 = v90[v91];
-                        v83.push(v93);
-                        v91 += 1l ;
+                    static_array<unsigned char,4l> v88 = v42.case3.v0;
+                    int v89;
+                    v89 = 0l;
+                    while (while_method_3(v89)){
+                        unsigned char v91;
+                        v91 = v88[v89];
+                        v81.push(v91);
+                        v89 += 1l ;
                     }
                     break;
                 }
@@ -5507,78 +5503,78 @@ __device__ __noinline__ Union9 noinline_run_42(unsigned char * v0, unsigned char
                     assert("Invalid tag." && false); __trap();
                 }
             }
-            float * v100;
-            v100 = v14+v48;
-            int v102;
-            v102 = v53.length_();
-            bool v103;
-            v103 = v102 == 0l;
-            if (v103){
-                v100[0l] = 1.0f;
+            float * v98;
+            v98 = v13+v46;
+            int v100;
+            v100 = v51.length_();
+            bool v101;
+            v101 = v100 == 0l;
+            if (v101){
+                v98[0l] = 1.0f;
             } else {
             }
-            int v104;
-            v104 = v53.length_();
-            int v105;
-            v105 = 0l;
-            while (while_method_4(v104, v105)){
-                Union10 v107;
-                v107 = v53[v105];
-                int v109;
-                v109 = v105 * 14l;
-                int v110;
-                v110 = 1l + v109;
-                switch (v107.tag) {
+            int v102;
+            v102 = v51.length_();
+            int v103;
+            v103 = 0l;
+            while (while_method_4(v102, v103)){
+                Union10 v105;
+                v105 = v51[v103];
+                int v107;
+                v107 = v103 * 14l;
+                int v108;
+                v108 = 1l + v107;
+                switch (v105.tag) {
                     case 0: { // None
-                        v100[v110] = 1.0f;
+                        v98[v108] = 1.0f;
                         break;
                     }
                     case 1: { // Some
-                        Union1 v111 = v107.case1.v0;
-                        int v112;
-                        v112 = v110 + 1l;
-                        switch (v111.tag) {
+                        Union1 v109 = v105.case1.v0;
+                        int v110;
+                        v110 = v108 + 1l;
+                        switch (v109.tag) {
                             case 0: { // A_All_In
-                                v100[v112] = 1.0f;
+                                v98[v110] = 1.0f;
                                 break;
                             }
                             case 1: { // A_Call
-                                int v113;
-                                v113 = v112 + 1l;
-                                v100[v113] = 1.0f;
+                                int v111;
+                                v111 = v110 + 1l;
+                                v98[v111] = 1.0f;
                                 break;
                             }
                             case 2: { // A_Fold
-                                int v114;
-                                v114 = v112 + 2l;
-                                v100[v114] = 1.0f;
+                                int v112;
+                                v112 = v110 + 2l;
+                                v98[v112] = 1.0f;
                                 break;
                             }
                             case 3: { // A_Raise
-                                int v115 = v111.case3.v0;
-                                int v116;
-                                v116 = v112 + 3l;
+                                int v113 = v109.case3.v0;
+                                int v114;
+                                v114 = v110 + 3l;
+                                bool v115;
+                                v115 = 1l <= v113;
                                 bool v117;
-                                v117 = 1l <= v115;
-                                bool v119;
-                                if (v117){
-                                    bool v118;
-                                    v118 = v115 < 1023l;
-                                    v119 = v118;
+                                if (v115){
+                                    bool v116;
+                                    v116 = v113 < 1023l;
+                                    v117 = v116;
                                 } else {
-                                    v119 = false;
+                                    v117 = false;
                                 }
-                                bool v120;
-                                v120 = v119 == false;
-                                if (v120){
-                                    assert("Pickle failure. The input is out of the bounds of the given range." && v119);
+                                bool v118;
+                                v118 = v117 == false;
+                                if (v118){
+                                    assert("Pickle failure. The input is out of the bounds of the given range." && v117);
                                 } else {
                                 }
-                                int v122;
-                                v122 = v115 - 1l;
-                                unsigned int v123;
-                                v123 = (unsigned int)v122;
-                                method_43(v123, v100, v116);
+                                int v120;
+                                v120 = v113 - 1l;
+                                unsigned int v121;
+                                v121 = (unsigned int)v120;
+                                method_43(v121, v98, v114);
                                 break;
                             }
                             default: {
@@ -5591,179 +5587,179 @@ __device__ __noinline__ Union9 noinline_run_42(unsigned char * v0, unsigned char
                         assert("Invalid tag." && false); __trap();
                     }
                 }
-                v105 += 1l ;
+                v103 += 1l ;
             }
-            int v124;
-            v124 = 0l;
-            while (while_method_0(v124)){
+            int v122;
+            v122 = 0l;
+            while (while_method_0(v122)){
+                int v124;
+                v124 = v62[v122];
                 int v126;
-                v126 = v64[v124];
-                int v128;
-                v128 = v124 * 11l;
-                int v129;
-                v129 = 1794l + v128;
+                v126 = v122 * 11l;
+                int v127;
+                v127 = 1794l + v126;
+                bool v128;
+                v128 = 0l <= v124;
                 bool v130;
-                v130 = 0l <= v126;
-                bool v132;
-                if (v130){
-                    bool v131;
-                    v131 = v126 < 1023l;
-                    v132 = v131;
+                if (v128){
+                    bool v129;
+                    v129 = v124 < 1023l;
+                    v130 = v129;
                 } else {
-                    v132 = false;
+                    v130 = false;
                 }
-                bool v133;
-                v133 = v132 == false;
-                if (v133){
-                    assert("Pickle failure. The input is out of the bounds of the given range." && v132);
+                bool v131;
+                v131 = v130 == false;
+                if (v131){
+                    assert("Pickle failure. The input is out of the bounds of the given range." && v130);
                 } else {
                 }
-                unsigned int v135;
-                v135 = (unsigned int)v126;
-                method_44(v135, v100, v129);
-                v124 += 1l ;
+                unsigned int v133;
+                v133 = (unsigned int)v124;
+                method_44(v133, v98, v127);
+                v122 += 1l ;
             }
-            int v136;
-            v136 = 0l;
-            while (while_method_0(v136)){
+            int v134;
+            v134 = 0l;
+            while (while_method_0(v134)){
+                int v136;
+                v136 = v70[v134];
                 int v138;
-                v138 = v72[v136];
-                int v140;
-                v140 = v136 * 11l;
-                int v141;
-                v141 = 1817l + v140;
+                v138 = v134 * 11l;
+                int v139;
+                v139 = 1817l + v138;
+                bool v140;
+                v140 = 0l <= v136;
                 bool v142;
-                v142 = 0l <= v138;
-                bool v144;
-                if (v142){
-                    bool v143;
-                    v143 = v138 < 1023l;
-                    v144 = v143;
+                if (v140){
+                    bool v141;
+                    v141 = v136 < 1023l;
+                    v142 = v141;
                 } else {
-                    v144 = false;
+                    v142 = false;
                 }
-                bool v145;
-                v145 = v144 == false;
-                if (v145){
-                    assert("Pickle failure. The input is out of the bounds of the given range." && v144);
+                bool v143;
+                v143 = v142 == false;
+                if (v143){
+                    assert("Pickle failure. The input is out of the bounds of the given range." && v142);
                 } else {
                 }
-                unsigned int v147;
-                v147 = (unsigned int)v138;
-                method_44(v147, v100, v141);
-                v136 += 1l ;
+                unsigned int v145;
+                v145 = (unsigned int)v136;
+                method_44(v145, v98, v139);
+                v134 += 1l ;
             }
-            int v148;
-            v148 = 0l;
-            while (while_method_0(v148)){
-                unsigned char v150;
-                v150 = v81[v148];
-                int v152;
-                v152 = v148 * 17l;
+            int v146;
+            v146 = 0l;
+            while (while_method_0(v146)){
+                unsigned char v148;
+                v148 = v79[v146];
+                int v150;
+                v150 = v146 * 17l;
+                int v151;
+                v151 = 1840l + v150;
+                unsigned char v152;
+                v152 = v148 % 4u;
                 int v153;
-                v153 = 1840l + v152;
+                v153 = (int)v152;
                 unsigned char v154;
-                v154 = v150 % 4u;
+                v154 = v148 / 4u;
                 int v155;
                 v155 = (int)v154;
-                unsigned char v156;
-                v156 = v150 / 4u;
+                unsigned int v156;
+                v156 = (unsigned int)v153;
                 int v157;
                 v157 = (int)v156;
-                unsigned int v158;
-                v158 = (unsigned int)v155;
-                int v159;
-                v159 = (int)v158;
-                bool v160;
-                v160 = v159 < 4l;
-                bool v161;
-                v161 = v160 == false;
-                if (v161){
-                    assert("Pickle failure. Int value out of bounds." && v160);
+                bool v158;
+                v158 = v157 < 4l;
+                bool v159;
+                v159 = v158 == false;
+                if (v159){
+                    assert("Pickle failure. Int value out of bounds." && v158);
                 } else {
                 }
-                int v163;
-                v163 = v153 + v159;
-                v100[v163] = 1.0f;
+                int v161;
+                v161 = v151 + v157;
+                v98[v161] = 1.0f;
+                int v162;
+                v162 = v151 + 4l;
+                unsigned int v163;
+                v163 = (unsigned int)v155;
                 int v164;
-                v164 = v153 + 4l;
-                unsigned int v165;
-                v165 = (unsigned int)v157;
-                int v166;
-                v166 = (int)v165;
-                bool v167;
-                v167 = v166 < 13l;
-                bool v168;
-                v168 = v167 == false;
-                if (v168){
-                    assert("Pickle failure. Int value out of bounds." && v167);
+                v164 = (int)v163;
+                bool v165;
+                v165 = v164 < 13l;
+                bool v166;
+                v166 = v165 == false;
+                if (v166){
+                    assert("Pickle failure. Int value out of bounds." && v165);
                 } else {
                 }
-                int v170;
-                v170 = v164 + v166;
-                v100[v170] = 1.0f;
-                v148 += 1l ;
+                int v168;
+                v168 = v162 + v164;
+                v98[v168] = 1.0f;
+                v146 += 1l ;
             }
-            int v171;
-            v171 = v83.length;
-            bool v172;
-            v172 = v171 == 0l;
-            if (v172){
-                v100[1874l] = 1.0f;
+            int v169;
+            v169 = v81.length;
+            bool v170;
+            v170 = v169 == 0l;
+            if (v170){
+                v98[1874l] = 1.0f;
             } else {
             }
-            int v173;
-            v173 = v83.length;
-            int v174;
-            v174 = 0l;
-            while (while_method_4(v173, v174)){
-                unsigned char v176;
-                v176 = v83[v174];
-                int v178;
-                v178 = v174 * 17l;
+            int v171;
+            v171 = v81.length;
+            int v172;
+            v172 = 0l;
+            while (while_method_4(v171, v172)){
+                unsigned char v174;
+                v174 = v81[v172];
+                int v176;
+                v176 = v172 * 17l;
+                int v177;
+                v177 = 1875l + v176;
+                unsigned char v178;
+                v178 = v174 % 4u;
                 int v179;
-                v179 = 1875l + v178;
+                v179 = (int)v178;
                 unsigned char v180;
-                v180 = v176 % 4u;
+                v180 = v174 / 4u;
                 int v181;
                 v181 = (int)v180;
-                unsigned char v182;
-                v182 = v176 / 4u;
+                unsigned int v182;
+                v182 = (unsigned int)v179;
                 int v183;
                 v183 = (int)v182;
-                unsigned int v184;
-                v184 = (unsigned int)v181;
-                int v185;
-                v185 = (int)v184;
-                bool v186;
-                v186 = v185 < 4l;
-                bool v187;
-                v187 = v186 == false;
-                if (v187){
-                    assert("Pickle failure. Int value out of bounds." && v186);
+                bool v184;
+                v184 = v183 < 4l;
+                bool v185;
+                v185 = v184 == false;
+                if (v185){
+                    assert("Pickle failure. Int value out of bounds." && v184);
                 } else {
                 }
-                int v189;
-                v189 = v179 + v185;
-                v100[v189] = 1.0f;
+                int v187;
+                v187 = v177 + v183;
+                v98[v187] = 1.0f;
+                int v188;
+                v188 = v177 + 4l;
+                unsigned int v189;
+                v189 = (unsigned int)v181;
                 int v190;
-                v190 = v179 + 4l;
-                unsigned int v191;
-                v191 = (unsigned int)v183;
-                int v192;
-                v192 = (int)v191;
-                bool v193;
-                v193 = v192 < 13l;
-                bool v194;
-                v194 = v193 == false;
-                if (v194){
-                    assert("Pickle failure. Int value out of bounds." && v193);
+                v190 = (int)v189;
+                bool v191;
+                v191 = v190 < 13l;
+                bool v192;
+                v192 = v191 == false;
+                if (v192){
+                    assert("Pickle failure. Int value out of bounds." && v191);
                 } else {
                 }
-                int v196;
-                v196 = v190 + v192;
-                v100[v196] = 1.0f;
-                v174 += 1l ;
+                int v194;
+                v194 = v188 + v190;
+                v98[v194] = 1.0f;
+                v172 += 1l ;
             }
             break;
         }
@@ -5772,183 +5768,165 @@ __device__ __noinline__ Union9 noinline_run_42(unsigned char * v0, unsigned char
         }
     }
     asm("barrier.cta.sync %0;" :: "r"(0l));
+    int v195;
+    v195 = 0l;
+    int v196;
+    v196 = 4l;
     int v197;
-    v197 = 0l;
-    int v198;
-    v198 = 4l;
+    v197 = int_range_45(v196, v195, v22);
+    __shared__ int v198[1l];
     int v199;
-    v199 = int_range_45(v198, v197, v24);
-    __shared__ int v200[1l];
-    int v201;
-    v201 = threadIdx.x;
-    bool v202;
-    v202 = v201 == 0l;
-    if (v202){
-        v200[0l] = v199;
+    v199 = threadIdx.x;
+    bool v200;
+    v200 = v199 == 0l;
+    if (v200){
+        v198[0l] = v197;
     } else {
     }
     asm("barrier.cta.sync %0;" :: "r"(0l));
-    int v203;
-    v203 = v200[0l];
+    int v201;
+    v201 = v198[0l];
     asm("barrier.cta.sync %0;" :: "r"(0l));
+    float * v202;
+    v202 = reinterpret_cast<float *>(&v0[0ull]);
     float * v204;
-    v204 = reinterpret_cast<float *>(&v0[0ull]);
-    float * v206;
-    v206 = reinterpret_cast<float *>(&v1[0ull]);
-    assert("Tensor range check" && 0 <= v203 && v203 < 4l);
-    int v208;
-    v208 = 262144l * v203;
-    float * v209;
-    v209 = reinterpret_cast<float *>(&v0[262144ull]);
+    v204 = reinterpret_cast<float *>(&v1[0ull]);
+    assert("Tensor range check" && 0 <= v201 && v201 < 4l);
+    int v206;
+    v206 = 262144l * v201;
+    float * v207;
+    v207 = reinterpret_cast<float *>(&v0[262144ull]);
+    int v209;
+    v209 = blockIdx.x;
+    assert("Tensor range check" && 0 <= v209 && v209 < 1l);
+    int v210;
+    v210 = 65536l * v209;
     int v211;
     v211 = blockIdx.x;
     assert("Tensor range check" && 0 <= v211 && v211 < 1l);
     int v212;
-    v212 = 65536l * v211;
-    int v213;
-    v213 = blockIdx.x;
-    assert("Tensor range check" && 0 <= v213 && v213 < 1l);
-    int v214;
-    v214 = 4096l * v213;
-    method_46(v206, v208, v209, v214, v204, v212);
-    unsigned int * v215;
-    v215 = reinterpret_cast<unsigned int *>(&v0[278528ull]);
-    assert("Tensor range check" && 0 <= v203 && v203 < 4l);
-    int v217;
-    v217 = 32l * v203;
-    method_47(v215, v217, v209);
+    v212 = 4096l * v211;
+    method_46(v204, v206, v207, v212, v202, v210);
+    unsigned int * v213;
+    v213 = reinterpret_cast<unsigned int *>(&v0[278528ull]);
+    assert("Tensor range check" && 0 <= v201 && v201 < 4l);
+    int v215;
+    v215 = 32l * v201;
+    method_47(v213, v215, v207);
+    float * v216;
+    v216 = reinterpret_cast<float *>(&v1[4194304ull]);
     float * v218;
-    v218 = reinterpret_cast<float *>(&v1[4194304ull]);
+    v218 = reinterpret_cast<float *>(&v1[5242880ull]);
     float * v220;
-    v220 = reinterpret_cast<float *>(&v1[5242880ull]);
+    v220 = reinterpret_cast<float *>(&v1[6291456ull]);
     float * v222;
-    v222 = reinterpret_cast<float *>(&v1[6291456ull]);
+    v222 = reinterpret_cast<float *>(&v1[7340032ull]);
     float * v224;
-    v224 = reinterpret_cast<float *>(&v1[7340032ull]);
-    float * v226;
-    v226 = reinterpret_cast<float *>(&v1[8388608ull]);
-    int * v228;
-    v228 = reinterpret_cast<int *>(&v1[9437184ull]);
-    float * v230;
-    v230 = reinterpret_cast<float *>(&v1[9502720ull]);
+    v224 = reinterpret_cast<float *>(&v1[8388608ull]);
+    int * v226;
+    v226 = reinterpret_cast<int *>(&v0[279040ull]);
+    float * v228;
+    v228 = reinterpret_cast<float *>(&v0[344576ull]);
+    int * v230;
+    v230 = reinterpret_cast<int *>(&v0[410112ull]);
     int * v232;
-    v232 = reinterpret_cast<int *>(&v1[9568256ull]);
-    int * v234;
-    v234 = reinterpret_cast<int *>(&v1[9633792ull]);
+    v232 = reinterpret_cast<int *>(&v0[475648ull]);
+    double * v234;
+    v234 = reinterpret_cast<double *>(&v0[541184ull]);
     double * v236;
-    v236 = reinterpret_cast<double *>(&v1[9699328ull]);
-    double * v238;
-    v238 = reinterpret_cast<double *>(&v1[9961472ull]);
+    v236 = reinterpret_cast<double *>(&v0[803328ull]);
+    float * v238;
+    v238 = reinterpret_cast<float *>(&v0[1065472ull]);
     float * v240;
-    v240 = reinterpret_cast<float *>(&v1[10223616ull]);
+    v240 = reinterpret_cast<float *>(&v0[2114048ull]);
     float * v242;
-    v242 = reinterpret_cast<float *>(&v1[11272192ull]);
-    float * v244;
-    v244 = reinterpret_cast<float *>(&v1[11337728ull]);
+    v242 = reinterpret_cast<float *>(&v0[2179584ull]);
     asm("barrier.cta.sync %0;" :: "r"(0l));
-    unsigned int * v246;
-    v246 = reinterpret_cast<unsigned int *>(&v0[278528ull]);
+    unsigned int * v244;
+    v244 = reinterpret_cast<unsigned int *>(&v0[278528ull]);
+    int v246;
+    v246 = blockIdx.x;
+    int v247;
+    v247 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v201 && v201 < 4l);
+    assert("Tensor range check" && 0 <= v246 && v246 < 1l);
+    assert("Tensor range check" && 0 <= v247 && v247 < 32l);
     int v248;
-    v248 = blockIdx.x;
+    v248 = 32l * v246;
     int v249;
-    v249 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v203 && v203 < 4l);
-    assert("Tensor range check" && 0 <= v248 && v248 < 1l);
-    assert("Tensor range check" && 0 <= v249 && v249 < 32l);
+    v249 = v248 + v247;
     int v250;
-    v250 = 32l * v248;
-    int v251;
-    v251 = v250 + v249;
-    int v252;
-    v252 = v217 + v251;
-    unsigned int v253;
-    v253 = v246[v252];
+    v250 = v215 + v249;
+    unsigned int v251;
+    v251 = v244[v250];
+    float * v252;
+    v252 = reinterpret_cast<float *>(&v1[4194304ull]);
     float * v254;
-    v254 = reinterpret_cast<float *>(&v1[4194304ull]);
+    v254 = reinterpret_cast<float *>(&v1[5242880ull]);
     float * v256;
-    v256 = reinterpret_cast<float *>(&v1[5242880ull]);
+    v256 = reinterpret_cast<float *>(&v1[6291456ull]);
     float * v258;
-    v258 = reinterpret_cast<float *>(&v1[6291456ull]);
+    v258 = reinterpret_cast<float *>(&v1[7340032ull]);
     float * v260;
-    v260 = reinterpret_cast<float *>(&v1[7340032ull]);
-    float * v262;
-    v262 = reinterpret_cast<float *>(&v1[8388608ull]);
-    int * v264;
-    v264 = reinterpret_cast<int *>(&v1[9437184ull]);
-    float * v266;
-    v266 = reinterpret_cast<float *>(&v1[9502720ull]);
-    int * v268;
-    v268 = reinterpret_cast<int *>(&v1[9568256ull]);
-    int * v270;
-    v270 = reinterpret_cast<int *>(&v1[9633792ull]);
-    double * v272;
-    v272 = reinterpret_cast<double *>(&v1[9699328ull]);
-    double * v274;
-    v274 = reinterpret_cast<double *>(&v1[9961472ull]);
-    float * v276;
-    v276 = reinterpret_cast<float *>(&v1[10223616ull]);
-    float * v278;
-    v278 = reinterpret_cast<float *>(&v1[11272192ull]);
-    float * v280;
-    v280 = reinterpret_cast<float *>(&v1[11337728ull]);
-    int v282;
-    v282 = (int)v253;
-    float v283; float v284; int v285;
-    Tuple14 tmp43 = method_48(v254, v256, v258, v260, v262, v282, v203);
-    v283 = tmp43.v0; v284 = tmp43.v1; v285 = tmp43.v2;
-    bool v286;
-    v286 = 0l == v285;
-    if (v286){
+    v260 = reinterpret_cast<float *>(&v1[8388608ull]);
+    int v262;
+    v262 = (int)v251;
+    float v263; float v264; int v265;
+    Tuple14 tmp43 = method_48(v252, v254, v256, v258, v260, v262, v201);
+    v263 = tmp43.v0; v264 = tmp43.v1; v265 = tmp43.v2;
+    bool v266;
+    v266 = 0l == v265;
+    if (v266){
         return Union9{Union9_1{}};
     } else {
-        bool v288;
-        v288 = 1l == v285;
-        if (v288){
+        bool v268;
+        v268 = 1l == v265;
+        if (v268){
             return Union9{Union9_0{}};
         } else {
-            bool v290;
-            v290 = 2l == v285;
-            if (v290){
+            bool v270;
+            v270 = 2l == v265;
+            if (v270){
                 return Union9{Union9_2{1l, 3l}};
             } else {
-                bool v292;
-                v292 = 3l == v285;
-                if (v292){
+                bool v272;
+                v272 = 3l == v265;
+                if (v272){
                     return Union9{Union9_2{1l, 2l}};
                 } else {
-                    bool v294;
-                    v294 = 4l == v285;
-                    if (v294){
+                    bool v274;
+                    v274 = 4l == v265;
+                    if (v274){
                         return Union9{Union9_2{2l, 3l}};
                     } else {
-                        bool v296;
-                        v296 = 5l == v285;
-                        if (v296){
+                        bool v276;
+                        v276 = 5l == v265;
+                        if (v276){
                             return Union9{Union9_2{3l, 4l}};
                         } else {
-                            bool v298;
-                            v298 = 6l == v285;
-                            if (v298){
+                            bool v278;
+                            v278 = 6l == v265;
+                            if (v278){
                                 return Union9{Union9_2{1l, 1l}};
                             } else {
-                                bool v300;
-                                v300 = 7l == v285;
-                                if (v300){
+                                bool v280;
+                                v280 = 7l == v265;
+                                if (v280){
                                     return Union9{Union9_2{3l, 2l}};
                                 } else {
-                                    bool v302;
-                                    v302 = 8l == v285;
-                                    if (v302){
+                                    bool v282;
+                                    v282 = 8l == v265;
+                                    if (v282){
                                         return Union9{Union9_2{2l, 1l}};
                                     } else {
-                                        bool v304;
-                                        v304 = 9l == v285;
-                                        if (v304){
+                                        bool v284;
+                                        v284 = 9l == v265;
+                                        if (v284){
                                             return Union9{Union9_2{3l, 1l}};
                                         } else {
-                                            bool v306;
-                                            v306 = 10l == v285;
-                                            if (v306){
+                                            bool v286;
+                                            v286 = 10l == v265;
+                                            if (v286){
                                                 return Union9{Union9_2{2147483647l, 1l}};
                                             } else {
                                                 printf("%s\n", "Invalid output id in the NL Holdem model.");
@@ -8659,7 +8637,7 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                         switch (v120.tag) {
                             case 0: { // Computer
                                 bool v122;
-                                v122 = 11403264ull == v4;
+                                v122 = 9437184ull == v4;
                                 bool v123;
                                 v123 = v122 == false;
                                 if (v123){
@@ -8667,7 +8645,7 @@ __device__ void play_loop_31(curandStatePhilox4_32_10_t & v0, unsigned char * v1
                                 } else {
                                 }
                                 bool v125;
-                                v125 = 279040ull == v2;
+                                v125 = 2245120ull == v2;
                                 bool v126;
                                 v126 = v125 == false;
                                 if (v126){
@@ -11144,7 +11122,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
     v51 = atomicAdd(&v6,-1l);
     while (while_method_20()){
         bool v53;
-        v53 = 11403264ull == v5;
+        v53 = 9437184ull == v5;
         bool v54;
         v54 = v53 == false;
         if (v54){
@@ -11152,7 +11130,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
         } else {
         }
         bool v56;
-        v56 = 279040ull == v3;
+        v56 = 2245120ull == v3;
         bool v57;
         v57 = v56 == false;
         if (v57){
@@ -11424,8 +11402,8 @@ def Closure1():
         v1[1] = v5
         del v5
         v7 = dynamic_array_list(128)
-        v8 = cp.empty(11403264,dtype=cp.uint8)
-        v9 = cp.empty(279040,dtype=cp.uint8)
+        v8 = cp.empty(9437184,dtype=cp.uint8)
+        v9 = cp.empty(2245120,dtype=cp.uint8)
         v11 = v8[0:0+4*1048576].view(cp.float32)
         v12 = cp.random.normal(0.0,0.0009765625,1048576,dtype=cp.float32) # type: ignore
         cp.copyto(v11[0:0+1048576],v12[0:0+1048576])
@@ -11435,15 +11413,6 @@ def Closure1():
         v18 = v8[6291456:6291456+4*262144].view(cp.float32)
         v20 = v8[7340032:7340032+4*262144].view(cp.float32)
         v22 = v8[8388608:8388608+4*262144].view(cp.float32)
-        v24 = v8[9437184:9437184+4*16384].view(cp.int32)
-        v26 = v8[9502720:9502720+4*16384].view(cp.float32)
-        v28 = v8[9568256:9568256+4*16384].view(cp.int32)
-        v30 = v8[9633792:9633792+4*16384].view(cp.int32)
-        v32 = v8[9699328:9699328+8*32768].view(cp.float64)
-        v34 = v8[9961472:9961472+8*32768].view(cp.float64)
-        v36 = v8[10223616:10223616+4*262144].view(cp.float32)
-        v38 = v8[11272192:11272192+4*16384].view(cp.float32)
-        v40 = v8[11337728:11337728+4*16384].view(cp.float32)
         v14[:] = 0
         del v14
         v16[:] = 0
@@ -11454,30 +11423,12 @@ def Closure1():
         del v20
         v22[:] = 0
         del v22
-        v24[:] = 0
-        del v24
-        v26[:] = 0
-        del v26
-        v28[:] = 0
-        del v28
-        v30[:] = 0
-        del v30
-        v32[:] = 0
-        del v32
-        v34[:] = 0
-        del v34
-        v36[:] = 0
-        del v36
-        v38[:] = 0
-        del v38
-        v40[:] = 0
-        del v40
-        v41 = 4503599627370495
-        v42 = US3_0()
-        v43 = US6_0()
-        v44 = 279040
-        v45 = 11403264
-        return method109(v41, v42, v7, v1, v43, v9, v44, v8, v45)
+        v23 = 4503599627370495
+        v24 = US3_0()
+        v25 = US6_0()
+        v26 = 2245120
+        v27 = 9437184
+        return method109(v23, v24, v7, v1, v25, v9, v26, v8, v27)
     return inner
 def method3(v0 : object) -> None:
     assert v0 == [], f'Expected an unit type. Got: {v0}'

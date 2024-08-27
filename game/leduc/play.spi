@@ -33,6 +33,7 @@ type state_private =
 type state_neural =
     {
         model_data : ml.layers.model_data
+        rng : refm.ref random.philox_state
     }
 
 type state_game = 
@@ -75,6 +76,7 @@ type state_internal =
         game : refm.ref (option game_node)
         deck : refm.ref deck
         messages : refm.ref messages
+        rng : refm.ref random.philox_state
     }
 
 // Converts the given state to internal one.
