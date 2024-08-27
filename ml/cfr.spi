@@ -1,3 +1,5 @@
+// The Counter Factual Regret module
+
 open corebase
 open corecuda
 open coreext
@@ -102,7 +104,7 @@ inl get_action mask (model : model) ~(ensemble_id, world_id : ensemble_id * worl
 // Calculates the policy and the value array updates.
 inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) (reward : list reward) =
     open primitives
-    inl thread_id = thread_index()
+    inl thread_id = thread_index() // TODO: Make sure to use the grid id.
     inl rewards : _ _ reward = tensorm.fromList reward
     assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
 
@@ -166,7 +168,7 @@ inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensem
 inl apply_updates (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) =
     open tensor_cuda
     open primitives
-    inl thread_id = thread_index()
+    inl thread_id = thread_index() // TODO: Make sure to use the grid id.
 
     loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
         inl {action_id world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
