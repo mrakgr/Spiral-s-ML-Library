@@ -33,7 +33,6 @@ type state_private =
 type state_neural =
     {
         model_data : ml.layers.model_data
-        rng : refm.ref random.philox_state
     }
 
 type state_game = 
@@ -56,7 +55,7 @@ inl init_game() =
             messages = sa_create
         }
         private = {
-            deck = create_deck()
+            deck = deckm.create()
             game = None
         }
     }
@@ -88,6 +87,7 @@ inl state_to_internal (state : state_game) : state_internal =
         game = refm.from_local state.private.game
         deck = refm.from_local state.private.deck
         messages = refm.from_local state.public.messages
+        rng = random.init {seed = $"clock64()"; subsequence=conv rangem.threads_in_grid().from; offset=0}
     }
 
 // Sets the internal state to the values held by the regular one.
@@ -101,9 +101,11 @@ inl internal_set (state_internal : state_internal) (state : state_game) =
 
 let play_loop (neural : state_neural) (state : state_internal) node =
     inl push_message = sa_listm.push (refm.to_local state.messages)
-    inl pop_deck = 
-        inl deck = refm.to_local state.deck
-        fun () => pop_deck deck
+    inl pop_deck () = 
+        open refm
+        inl c,d = deckm.draw_card state.rng #state.deck
+        state.deck <-# d
+        c
 
     inl body node =
         open refm
@@ -147,7 +149,7 @@ let play_loop (neural : state_neural) (state : state_internal) node =
                 state.game <-# Some node
                 None
             | Random =>
-                inl action = random_action table
+                inl action = random_action state.rng table
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
                 Some (game_round table action)
@@ -206,7 +208,7 @@ inl main() =
 
             run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
                 inl c : _ int = refm.create_shared_var (const threads_per_block())
-                inl from = rangem.threads_in_block().from
+                inl from = rangem.threads_in_grid().from
                 if from = 0 then
                     inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
                     // When converting the state to internal form, the refs will point to the original.

@@ -1,35 +1,9 @@
 open corebase
-open corecuda
 
-type card_t = u8
-
-nominal card = u8
-
-prototype suit t : t -> card_t
-prototype rank t : t -> card_t
-prototype full t : t -> card_t
-
-instance suit card = fun (card x) => x % 2
-instance rank card = fun (card x) => x / 2
-instance full card = fun (card x) => x
-
-inl from_suit_rank (suit, rank : card_t * card_t) = card (suit ||| (rank * 2))
-
-instance equable card = fun a b => full a = full b
-instance comparable card = fun a b => comp (rank a) (rank b)
-
-instance printable card = fun {write write_ln} card =>
-    inl rank = 
-        match rank card with
-        | 2 => 'K'
-        | 1 => 'Q'
-        | 0 => 'J'
-        | _ => '?'
-
-    inl suit =
-        match suit card with
-        | 1 => 'c'
-        | 0 => 'd'
-        | _ => '?'
-
-    write rank . write suit
+union card = King | Queen | Jack
+inl u32_to_card (i : u32) =
+    match i with
+    | 0 | 1 => King
+    | 2 | 3 => Queen
+    | 4 | 5 => Jack
+    | _ => failwith "Invalid int in int_to_card."
