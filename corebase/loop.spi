@@ -162,3 +162,9 @@ inl linear forall dim. (dim : dim) body : () =
 
 // Iterates over the dimensions split by `rigid_split`.
 inl rigid forall dim. ({from nearTo=(a,b) by} : range (dim * dim)) (body : dim -> dim -> ()) : () = linear b (body (proj a from))
+
+// Adds two arbitrary types. They have to be numbers or compounds of them.
+inl add forall t. : t -> t -> t = real open real_core in struct.map2 (+)
+
+// Creates an instance of a type filled with zeroes. The type has to be a number or a compound of them.
+inl zeroes forall t. : t = real open real_core in struct.infer_map `t (forall t. => 0 : t)
