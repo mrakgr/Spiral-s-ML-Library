@@ -6,9 +6,10 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
     // The types of these are lies.
     inl get_fmt () = hashmapm.get_with_default h key_fmt ()
     inl get_value () = hashmapm.get_with_default h key_value ()
-    inl get_len () : int = real 
+    inl get_len () : int = real
+        open real_core
         inl rec loop s = function
-            | _,xs => loop (1+s) xs
+            | xs,_ => loop (1+s) xs
             | () => s
         loop 0 get_value()
     inl put_fmt (sep : string) = hashmapm.set h key_fmt (get_fmt(), sep)

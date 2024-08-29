@@ -1,4 +1,4 @@
-import pathlib
+import cupy as cp
 
-x = pathlib.Path("qwe", "asd", "hello.txt")
-str(x)
+device = cp.cuda.Device()
+print(device.attributes['MultiProcessorCount'])

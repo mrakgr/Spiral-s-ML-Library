@@ -286,6 +286,7 @@ inl row_gather_void forall a.
 
 // Template from which row_map and row_reduce are derived from. See the row_map for documentation.
 inl row_ forall dim a kb b kc c.
+        loop_
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> dep_option kb (tensor (int * int) b) * dep_option kc c)
         (from : tensor (dim * int) a) (to_map : dep_option kb (tensor (dim * int) b)) (to_reduce : dep_option kc (tensor dim c)) : () =
     // Note(8/20/2024): I didn't realize that instead of using dep_option, I could have used tensor _ {} for empty tensors like in row_gather_.
@@ -323,7 +324,7 @@ inl row_ forall dim a kb b kc c.
             |> split_into_swapped const(fst dim_block, fst dim_local)
             |> apply (fst index_block)
 
-    loop.linear (fst from.dim) fun i =>
+    loop_ (fst from.dim) fun i =>
         inl from = apply i from
         inl local = tensor_create from.dim
         inl local_index = tensor_create from.dim
@@ -353,7 +354,8 @@ inl row_ forall dim a kb b kc c.
             // Stores the result into global memory after reducing it.
             tensor_set i result to
                 
-    barrier_cta_sync 0
+inl loop_block dim f = loop.linear dim f . barrier_cta_sync 0
+inl loop_grid (grid : _ cooperative_groups.grid_group) dim f = loop.projective rangem.blocks_in_grid(dim) f . cooperative_groups.sync grid
 
 // A very flexible version of the `map_2d` kernel that allows the user to chain arbitrary local operations inside the mapping function.
 // Using `local_map`, `local_reduce` and `local_scan` it's possible to implement most kinds of activation functions,
@@ -377,7 +379,7 @@ inl row_ forall dim a kb b kc c.
 inl row_map forall dim a b.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b)
         (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
-    row_ (fun config x i j_tns => Some'(f config x i j_tns),None') from (Some' to) (None' : _ _ (_ _ ()))
+    row_ loop_block (fun config x i j_tns => Some'(f config x i j_tns),None') from (Some' to) (None' : _ _ (_ _ ()))
 
 // A reduce version of the `row_map` function. It's very similar to it apart from having the mapping function expect a scalar
 // output which is intended to be returned from a `local_reduce` operation. Of course, it is possible to return any kind of
@@ -385,13 +387,13 @@ inl row_map forall dim a b.
 inl row_reduce forall dim a b.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> b)
         (from : tensor (dim * int) a) (to : tensor dim b) : () =
-    row_ (fun config x i j_tns => None',Some'(f config x i j_tns)) from (None' : _ _ (_ _ ())) (Some' to) 
+    row_ loop_block (fun config x i j_tns => None',Some'(f config x i j_tns)) from (None' : _ _ (_ _ ())) (Some' to) 
 
 // A combined version of row_map and row_reduce that returns two outputs.
 inl row_map_reduce forall dim a b c.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b * c)
         (from : tensor (dim * int) a) (to_map : tensor (dim * int) b) (to_reduce : tensor dim c) : () =
-    row_ (fun config x i j_tns => 
+    row_ loop_block (fun config x i j_tns => 
         inl a,b = f config x i j_tns
         Some' a, Some' b
         ) from (Some' to_map) (Some' to_reduce)
@@ -401,7 +403,34 @@ inl row_map_reduce forall dim a b c.
 inl row_void forall dim a b.
         (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> ())
         (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
-    row_ (fun config x i j_tns => f config x i j_tns . None',None') from (None' : _ _ (_ _ ())) (None' : _ _ (_ _ ()))
+    row_ loop_block (fun config x i j_tns => f config x i j_tns . None',None') from (None' : _ _ (_ _ ())) (None' : _ _ (_ _ ()))
+
+// Gridwise version of row_map. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_map forall dim a b.
+        grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b)
+        (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
+    row_ (loop_grid grid) (fun config x i j_tns => Some'(f config x i j_tns),None') from (Some' to) (None' : _ _ (_ _ ()))
+
+// Gridwise version of row_reduce. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_reduce forall dim a b.
+        grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> b)
+        (from : tensor (dim * int) a) (to : tensor dim b) : () =
+    row_ (loop_grid grid) (fun config x i j_tns => None',Some'(f config x i j_tns)) from (None' : _ _ (_ _ ())) (Some' to) 
+
+// Gridwise version of row_map_reduce. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_map_reduce forall dim a b c.
+        grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b * c)
+        (from : tensor (dim * int) a) (to_map : tensor (dim * int) b) (to_reduce : tensor dim c) : () =
+    row_ (loop_grid grid) (fun config x i j_tns => 
+        inl a,b = f config x i j_tns
+        Some' a, Some' b
+        ) from (Some' to_map) (Some' to_reduce)
+
+// Gridwise version of row_void. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_void forall dim a b.
+        grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> ())
+        (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
+    row_ (loop_grid grid) (fun config x i j_tns => f config x i j_tns . None',None') from (None' : _ _ (_ _ ())) (None' : _ _ (_ _ ()))
 
 // Reduces the innermost dimension of a given tensor. Less flexible than `row_reduce` since it can only be used to do a single reduction, 
 // but can be used on smaller tensors than `row_reduce` allows.
@@ -747,8 +776,85 @@ inl test3 (n : int) head_dir =
         console.tensor.write_ln limit.max (zip input output_identity_map)
     ()
 
+inl test4 (m,n : int * int) head_dir =
+    cupy.set_random_seed(cupy.constant_seed())
+    inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+    inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
+    inl output_identity = tensor_create (m,n)
+    inl output_softmax = tensor_create (m,n)
+    inl output_masked_softmax = tensor_create (m,n)
+    inl output_softmax_scan = tensor_create (m,n)
+    inl output_ln = tensor_create (m,n)
+    inl output_argmax = tensor_create m
+    inl output_indices_map = tensor_create (m,n)
+    inl output_indices_reduction = tensor_create m
+    inl output_sum_exclusive = tensor_create (m,n)
+    inl output_softmax' = tensor_create (m,n)
+    inl output_sampling = tensor_create m
+    run fun _ =>
+        inl grid = cooperative_groups.create_grid()
+        open random
+        inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv thread_index(); offset=0}
+        // indices (identity)
+        grid_row_map grid (fun config x i j_tns => x) input_identity output_identity
+        // indices (map)
+        grid_row_map grid (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
+        // indices (reduction)
+        grid_row_reduce grid (fun config x i j_tns => i) input output_indices_reduction
+        // numerically stable softmax
+        grid_row_map grid (fun config x _ _ => local_softmax config x) input output_softmax
+        // layer normalization L2
+        grid_row_map grid (fun config x _ _ => local_ln_l2 config x) input output_ln
+        // argument maximum
+        grid_row_reduce grid (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
+        // numerically stable softmax (scan)
+        grid_row_map grid (fun config x _ _ =>
+            inl x' = local_softmax config x
+            inl x = local_inclusive_scan_sum config x'
+            zip x' x
+            ) input output_softmax_scan
+        // sum (exclusive scan)
+        grid_row_map grid (fun config x _ _ =>
+            local_exclusive_scan config 0 (+) x
+            ) input_identity output_sum_exclusive
+        grid_row_map grid (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
+        // discrete sampling
+        grid_row_map_reduce grid (local_softmax_and_discrete_sampling rng()) input output_softmax' output_sampling
+        // masked discrete sampling
+        grid_row_map_reduce grid (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng()) input output_softmax' output_sampling
+
+    open testing
+    redirect_io_into "test_text_outputs/primitives/" head_dir "input.txt" fun () =>
+        console.tensor.write_ln 1024 input
+    redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
+        console.tensor.write_ln 1024 input_identity
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax.txt" fun () =>
+        console.tensor.write_ln limit.max output_softmax
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_masked_softmax.txt" fun () =>
+        console.tensor.write_ln 1024 output_masked_softmax
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_ln.txt" fun () =>
+        console.tensor.write_ln 1024 output_ln
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_argmax.txt" fun () =>
+        console.tensor.write_ln 1024 output_argmax
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax_scan.txt" fun () =>
+        console.tensor.write_ln (m * n) output_softmax_scan
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_identity.txt" fun () =>
+        console.tensor.write_ln (m * n) output_identity
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_indices_map.txt" fun () =>
+        console.tensor.write_ln (m * n) output_indices_map
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_indices_reduction.txt" fun () =>
+        console.tensor.write_ln (m * n) output_indices_reduction
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_sum_exclusive.txt" fun () =>
+        console.tensor.write_ln (m * n) output_sum_exclusive
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax'.txt" fun () =>
+        console.tensor.write_ln 1024 output_softmax'
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_sampling.txt" fun () =>
+        console.tensor.write_ln 1024 output_sampling
+    ()
 inl main() = 
-    test2((1 <<< 6), (1 <<< 12)) "test2/a/"
-    test2((1 <<< 12), (1 <<< 6)) "test2/b/"
-    test3((1 <<< 4)) "test3/a"
-    test3((1 <<< 8)) "test3/b"
+    // test2((1 <<< 6), (1 <<< 12)) "test2/a/"
+    // test2((1 <<< 12), (1 <<< 6)) "test2/b/"
+    // test3((1 <<< 4)) "test3/a"
+    // test3((1 <<< 8)) "test3/b"
+    test4((1 <<< 6), (1 <<< 12)) "test4/a/"
+    test4((1 <<< 12), (1 <<< 6)) "test4/b/"
