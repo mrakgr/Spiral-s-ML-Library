@@ -531,19 +531,6 @@ inl local_l1_normalize threeshold config x =
     inl v = if sum > threeshold then threeshold / sum else 1
     local_map ((*) v) x
 
-inl local_masked_regret_matching forall dim t{number;float}. (mask : row_config -> t -> dim -> int -> bool) config x i j_tns =
-    inl mask = local_map (fun x,j => mask config x i j : bool) (zip x j_tns)
-    inl x = local_map (fun x,mask => if mask then max 0 x else 0) (zip x mask)
-    inl sum = local_sum config x
-    inl inv_len =
-        inl count = mask |> local_map (fun mask => if mask then 1 else 0 : int) |> local_sum config
-        1 / conv count
-    local_map (fun x, mask => 
-        if not mask then 0
-        elif sum <> 0 then x / sum
-        else inv_len
-        ) (zip x mask)
-
 inl local_masked_reduce forall t. config neutral_element (f : t -> t -> t) (x' : tensor (int * int) (t * bool)) : t =
     local_reduce config (neutral_element,false) (fun a b =>
         match a, b with

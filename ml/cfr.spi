@@ -102,7 +102,7 @@ inl get_action mask (model : model) ~(ensemble_id, world_id : ensemble_id * worl
 // Calculates the policy and the value array updates.
 inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) (reward : list reward) =
     open primitives
-    inl thread_id = thread_index() // TODO: Make sure to use the grid id.
+    inl thread_id = rangem.threads_in_grid().from
     inl rewards : _ _ reward = tensorm.fromList reward
     assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
 
@@ -163,32 +163,31 @@ inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensem
         )
 
 // Applies the policy and the value array updates.
-// TODO: Pass the grid cg object and sync on it.
-inl apply_updates (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) =
+// Clamps the average policy vector if applicable.
+inl apply_updates grid (model : model) =
     open tensor_cuda
     open primitives
-    inl thread_id = thread_index() // TODO: Make sure to use the grid id.
 
     inl model = model |> reorder (fun a,b,c => (a,b),c)
 
-    // TODO: Make row_map grid wide.
-    (model, model) ||> row_map (fun config model i j_tns =>
+    cooperative_groups.sync grid // Need to wait for all the atomics to calculate the updates
+    (model, model) ||> grid_row_map grid (fun config model i j_tns =>
         inl policy =
             inl current =
                 model
                 |> rezip (fun {policy={average current update} value} => current, update)
-                |> local_map (fun current, update => max 0 (current + update))
+                |> local_map (fun current, update => max 0 (current + update)) // Clamps the policy array to 0 in addition to adding the policy updates.
             inl average =
                 inl action_probs = local_regret_matching config current
                 zip (model |> rezip (fun {policy={average}} => average)) 
                     action_probs
                 |> local_map (fun average,action_prob => average + action_prob)
-                |> local_l1_normalize average_threeshold() config // decays the average policy if its norm is above the threeshold
+                |> local_l1_normalize average_threeshold() config // Decays the average policy if its norm is above the threeshold.
             zip current average
             |> rezip (fun current, average => {current average})
-        inl value_current = 
+        inl value_current =
             model 
-            |> local_map (fun {value={current update}} => loop.add current update)
+            |> local_map (fun {value={current update}} => loop.add current update) // Adds the value numerator and the denominator.
         (zip policy value_current)
         |> local_map (fun policy, current => { value = {current update = loop.zeroes}; policy = {policy with update = 0} }) 
         )
@@ -205,18 +204,18 @@ inl test1() =
                 player_id = 2
                 action_id = 1 <<< 2
                 seq_id = 1 <<< 4
-                thread_id = threads_per_block()
+                thread_id = rangem.threads_in_grid().by // number of threads in grid
             }
-
 
         inl graph = graph(sizes)
         inl model = layers.create_model graph
         layers.param_init model
 
         run fun () =>
+            inl grid = cooperative_groups.create_grid()
             inl model, trace : model * trace = layers.graph_extract model {}
 
-            inl thread_id = thread_index()
+            inl thread_id = rangem.threads_in_grid().from
             inl seq_id = ref (0 : int)
 
             inl log_path_prob : _ _ log_path_prob = tensor_create sizes.player_id
@@ -244,10 +243,9 @@ inl test1() =
             push (0, 3447, 1)
 
             calculate_updates mask sizes model trace (0, #seq_id) [13; -13]
-            apply_updates model trace (0, #seq_id)
+            apply_updates grid model
 
 inl main() = test1()
 
 // TODOs:
 // * adapt this to a restricted number of threads instead of the full block
-// * make row map gridwise

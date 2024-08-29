@@ -32,7 +32,7 @@ inl projective forall shared dim t. ({dim_outer passthrough dim_inner} : config 
         barrier_cta_sync 0
         loop.projective threads_in_block(dim_outer, dim_inner) fun thread_id, dim =>
             tensor_set thread_id
-                (free_vars_replace f (tensor_index thread_id shared_in) passthrough thread_id dim)
+                (free_vars_replace f (tensor_index thread_id shared_in) passthrough (block_index() * threads_per_block() + thread_id) dim)
                 shared_out
         barrier_cta_sync 0
         inl x = if tid < dim_outer then tensor_index tid shared_out else undefined
@@ -70,7 +70,7 @@ inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shar
                 inl index = index_block, index_block'
                 loop.rigid_merge dim index
             tensor_set thread_id
-                (free_vars_replace f (tensor_index index_block' shared_in) passthrough thread_id index_inner)
+                (free_vars_replace f (tensor_index index_block' shared_in) passthrough (block_index() * threads_per_block() + thread_id) index_inner)
                 shared_out
         barrier_cta_sync 0
         inl x = if tid < dim_outer then tensor_index tid shared_out else undefined
