@@ -109,7 +109,7 @@ inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensem
     loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
         inl {action_id player_id action_sampling_prob world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
         inl reward = tensor_index player_id rewards
-        inl model = 
+        inl model =
             model
             |> apply ensemble_id
             |> apply world_id

@@ -22,6 +22,9 @@ type config passthrough dim =
 // The return value from the given function should be the same for every thread in the output dimension.
 // If not, the results are undefined.
 // If the number of threads per block is greater than dim_outer then the return is undefined for those threads.
+// 
+// Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
+// It does block sync at the end. Any grid sync potentially needed would need to be done manually.
 inl projective forall shared dim t. ({dim_outer passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
     assert (dim_outer <= threads_per_block()) "The outer dimension needs to be <= the number of threads per block."
     inl body forall el. (fv : el) : t = 
@@ -50,6 +53,9 @@ inl projective forall shared dim t. ({dim_outer passthrough dim_inner} : config 
 // The return value from the given function should be the same for every thread in the output dimension.
 // If not, the results are undefined.
 // If the number of threads per block is greater than dim_outer then the return is undefined for those threads.
+// 
+// Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
+// It does block sync at the end. Any grid sync potentially needed would need to be done manually.
 inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
     assert (dim_outer <= threads_per_block()) "The outer dimension needs to be <= the number of threads per block."
     inl body forall el. (fv : el) : t = 
