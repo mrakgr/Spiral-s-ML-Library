@@ -829,7 +829,7 @@ inl test4 (m,n : int * int) head_dir =
     redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
         console.tensor.write_ln 1024 input_identity
     redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax.txt" fun () =>
-        console.tensor.write_ln limit.max output_softmax
+        console.tensor.write_ln 1024 output_softmax
     redirect_io_into "test_text_outputs/primitives/" head_dir "output_masked_softmax.txt" fun () =>
         console.tensor.write_ln 1024 output_masked_softmax
     redirect_io_into "test_text_outputs/primitives/" head_dir "output_ln.txt" fun () =>
@@ -852,9 +852,9 @@ inl test4 (m,n : int * int) head_dir =
         console.tensor.write_ln 1024 output_sampling
     ()
 inl main() = 
-    // test2((1 <<< 6), (1 <<< 12)) "test2/a/"
-    // test2((1 <<< 12), (1 <<< 6)) "test2/b/"
+    test2((1 <<< 6), (1 <<< 7)) "test2/a/"
+    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
     // test3((1 <<< 4)) "test3/a"
     // test3((1 <<< 8)) "test3/b"
-    test4((1 <<< 6), (1 <<< 12)) "test4/a/"
-    test4((1 <<< 12), (1 <<< 6)) "test4/b/"
+    // test4((1 <<< 6), (1 <<< 7)) "test2/a/"
+    // test4((1 <<< 7), (1 <<< 6)) "test2/b/"
