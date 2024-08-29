@@ -4,7 +4,7 @@
 // Has the new core libs, the RPS, the Leduc and HU NL Holdem games running on the GPU, and currently tabular CFR training is being worked on.
 
 // The games have a web based UI frontend, and a Flask based backend. If you are reading this in VS Code, press Ctrl + Shift + B to run it.
-// Most likely you'll have to run `npm install` and `poetry install` to install the necesarry dependencies first.
+// Most likely you'll have to run `npm install` and `poetry install` to install the necessary dependencies first.
 
 // Notes:
 // The default int and float for this project should be: i32 and f32.

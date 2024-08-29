@@ -7,7 +7,7 @@ open dep_optionm
 open tensorm
 
 // The primitives here are only attended for execution on the GPU.
-// They're all block level primitives. 
+// They're all block level primitives (unless otherwise noted.)
 
 // Maps all the elements of a tensor given the mapping function.
 inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 

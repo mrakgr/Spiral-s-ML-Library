@@ -1,7 +1,6 @@
 open corebase
 open compile_time
 
-
 inl rec write_ forall t. (console_config {h key_fmt key_value} as config : console_config) (is_newline : bool) (x : t) : () =
     // The types of these are lies.
     inl get_fmt () = hashmapm.get_with_default h key_fmt ()
