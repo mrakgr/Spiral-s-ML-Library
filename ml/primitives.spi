@@ -710,7 +710,6 @@ inl test2 (m,n : int * int) head_dir =
     run fun _ =>
         open random
         inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv thread_index(); offset=0}
-        map ((+) 1) input input
         reduce 0 (+) input output_reduce
         // indices (identity)
         row_map (fun config x i j_tns => x) input_identity output_identity
@@ -791,7 +790,6 @@ inl test4 (m,n : int * int) head_dir =
         inl grid = cooperative_groups.create_grid()
         open random
         inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv thread_index(); offset=0}
-        map ((+) 1) input input
         // indices (identity)
         grid_row_map grid (fun config x i j_tns => x) input_identity output_identity
         // indices (map)
@@ -853,13 +851,6 @@ inl main() =
     test2((1 <<< 7), (1 <<< 6)) "test2/b/"
     test3((1 <<< 4)) "test3/a"
     test3((1 <<< 8)) "test3/b"
-    test4((1 <<< 7), (1 <<< 6)) "test4/b/"
-    test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    test4((1 <<< 7), (1 <<< 6)) "test2/b/"
+    test4((1 <<< 6), (1 <<< 7)) "test2/a/"
     
-    // cupy.set_random_seed(cupy.constant_seed())
-    // inl input : _ (int * int) float = cupy.random_normal{mean=0; std=1} (5,5)
-    // console.write_ln input
-
-    // cupy.set_random_seed(cupy.constant_seed())
-    // inl input : _ (int * int) float = cupy.random_normal{mean=0; std=1} (5,5)
-    // console.write_ln input
