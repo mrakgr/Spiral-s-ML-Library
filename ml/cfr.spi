@@ -280,6 +280,3 @@ inl test1() =
             apply_updates grid model
 
 inl main() = test1()
-
-// TODOs:
-// * adapt this to a restricted number of threads instead of the full block
