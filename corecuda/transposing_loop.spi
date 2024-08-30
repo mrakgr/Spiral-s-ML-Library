@@ -12,11 +12,11 @@ inl free_vars_replace forall a b. (a : a) (b : b) : a = !!!!FreeVarsReplace(a,b)
 type config passthrough dim =
     {
         passthrough : passthrough
-        dim_outer : int
         dim_inner : dim
+        // dim_outer : int // See the comment below for why this has been removed.
     }
 
-// TODO (8/30/2024): We should remove the dim_outer from the two loops.
+// Note(8/30/2024):
 // After some thought, I've concluded that it'd be a fool's errand trying to program with partial
 // blocks. It's a temptation to get you to squeeze a bit extra performance, but it'd destroy the
 // the architecture of the program and make reasoning about it 100 times harder.
@@ -25,30 +25,33 @@ type config passthrough dim =
 // GPUs have no preemption mechanism to make use of dropped off threads. So once a block's threads diverge
 // it's computational capability gets cut accordingly. Block syncing would stop working, and we'd
 // get all kinds of undefined behavior.
+// 
+// When doing RL, it'd be better to use action sharing, or suitable algorithms and games, to make sure that
+// all the threads in a block are always flowing in lockstep.
+
 
 // Uses a shared tensor to transpose all the free variables in shared memory before running the function.
 // The variables passed through `passthrough` won't be transposed and will be passed into the kernel directly.
 // Uses a projective loop under the hood.
 // The return value from the given function should be the same for every thread in the output dimension.
 // If not, the results are undefined.
-// If the number of threads per block is greater than dim_outer then the return is undefined for those threads.
 // 
 // Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
 // It does block sync at the end. Any grid sync potentially needed would need to be done manually.
-inl projective forall shared dim t. ({dim_outer passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
-    assert (dim_outer <= threads_per_block()) "The outer dimension needs to be <= the number of threads per block."
+inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
+    inl dim_outer = threads_per_block()
     inl body forall el. (fv : el) : t = 
         inl shared_in : tensor int el = tensor_create_shared dim_outer
         inl shared_out : tensor int t = tensor_create_shared dim_outer
         inl tid = thread_index()
-        if dim_outer = threads_per_block() || tid < dim_outer then tensor_set tid fv shared_in
+        tensor_set tid fv shared_in
         barrier_cta_sync 0
         loop.projective threads_in_block(dim_outer, dim_inner) fun thread_id, dim =>
             tensor_set thread_id
                 (free_vars_replace f (tensor_index thread_id shared_in) passthrough (block_index() * threads_per_block() + thread_id) dim)
                 shared_out
         barrier_cta_sync 0
-        inl x = if dim_outer = threads_per_block() || tid < dim_outer then tensor_index tid shared_out else undefined
+        inl x = tensor_index tid shared_out
         barrier_cta_sync 0
         x
     real
@@ -62,17 +65,16 @@ inl projective forall shared dim t. ({dim_outer passthrough dim_inner} : config 
 // The inner dimension must be divisible by the number of threads per block.
 // The return value from the given function should be the same for every thread in the output dimension.
 // If not, the results are undefined.
-// If the number of threads per block is greater than dim_outer then the return is undefined for those threads.
 // 
 // Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
 // It does block sync at the end. Any grid sync potentially needed would need to be done manually.
-inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
-    assert (dim_outer <= threads_per_block()) "The outer dimension needs to be <= the number of threads per block."
+inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
+    inl dim_outer = threads_per_block()
     inl body forall el. (fv : el) : t = 
         inl shared_in : tensor int el = tensor_create_shared dim_outer
         inl shared_out : tensor int t = tensor_create_shared dim_outer
         inl tid = thread_index()
-        if dim_outer = threads_per_block() || tid < dim_outer then tensor_set tid fv shared_in
+        tensor_set tid fv shared_in
         barrier_cta_sync 0
 
         inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (dim_outer, dim_inner)
@@ -89,7 +91,7 @@ inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shar
                 (free_vars_replace f (tensor_index index_block' shared_in) passthrough (block_index() * threads_per_block() + thread_id) index_inner)
                 shared_out
         barrier_cta_sync 0
-        inl x = if dim_outer = threads_per_block() || tid < dim_outer then tensor_index tid shared_out else undefined
+        inl x = tensor_index tid shared_out
         barrier_cta_sync 0
         x
     real
