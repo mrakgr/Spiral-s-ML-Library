@@ -2,17 +2,12 @@ open corebase
 open coreext
 open layers
 open tensorm
-
-type size = // The block and thread dimensions should match blocks_per_grid and threads_per_block
-    {
-        ensemble : int
-    }
-
 open corecuda
 open rangem
 
 // The noinline prefix will force the __noinline__ annotation in the generated code.
 inl noinline_run forall inp out.
+        rng
         (exists t. model : exists t. model t) 
         (action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool)
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
@@ -76,13 +71,14 @@ inl noinline_run forall inp out.
     inl cfr_model = (key_extract model .cfr_model : cfr.model)
 
     // Extract the output index.
-    inl _,output_id = cfr.get_action action_mask cfr_model (ensemble_id, conv world_id)
+    inl _,output_id = cfr.get_action rng action_mask cfr_model (ensemble_id, conv world_id)
 
     output output_id
 
 nominal cfr_game_graph inp out =
     {
         graph : exists mid. graph mid
+        sizes : cfr.sizes
         action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool
         input : exists t. (inp -> t) * pickler.pu t
         output : int -> out
@@ -91,25 +87,26 @@ nominal cfr_game_graph inp out =
 nominal cfr_game_model inp out = 
     {
         model : exists mid. model mid
+        sizes : cfr.sizes
         action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool
         input : exists t. (inp -> t) * pickler.pu t
         output : int -> out
     }
 
-inl run forall inp out. (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = noinline_run model action_mask input output
+inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = noinline_run rng model action_mask input output
 
 inl to_model_data forall a b. (cfr_game_model {model=exists t. model} : cfr_game_model a b) : layers.model_data = model_to_model_data model
-inl from_model_data forall inp out. 
-        (cfr_game_graph {graph=(exists t. graph) input output action_mask} : cfr_game_graph inp out) 
+inl from_model_data forall inp out.
+        (cfr_game_graph {graph=(exists t. graph) sizes input output action_mask} : cfr_game_graph inp out) 
         (x : layers.model_data) 
         : cfr_game_model inp out = 
     inl model : exists t. model t = exists model_data_to_model graph x
-    cfr_game_model {model action_mask input output}
+    cfr_game_model {model sizes action_mask input output}
 
-inl init forall a b. (cfr_game_graph {graph=(exists t. graph) action_mask input output} : cfr_game_graph a b) : cfr_game_model a b = 
+inl init forall a b. (cfr_game_graph {graph=(exists t. graph) sizes action_mask input output} : cfr_game_graph a b) : cfr_game_model a b = 
     inl model = create_model graph
     param_init model
-    cfr_game_model { input output action_mask model = exists model }
+    cfr_game_model { sizes input output action_mask model = exists model }
 
 // Returns the amount of shared memory being used by the graph.
 inl smem_used (cfr_game_graph {graph=exists t. graph}) : int = pass_calculate_dynamic_shared_memory graph |> conv

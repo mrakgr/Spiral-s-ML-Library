@@ -20,6 +20,11 @@ inl fromList forall t. (x : list t) : tensor int t =
     inl array : array t = arraym.fromList x
     tensor {dim = listm.length x; bodies = real tensor_body `int `t {array stride = 1; offset = 0}}
 
+// Create a tensor from a indexable collection.
+inl from forall (l : * -> *) {index; length} t. (x : l t) : tensor int t = 
+    inl array : array t = arraym.init (length x) (index x)
+    tensor {dim = length x; bodies = real tensor_body `int `t {array stride = 1; offset = 0}}
+
 // Overloads the ;[] array constructor.
 inl array forall t. (x : array_base t) : tensor int t = fromArray (array x)
 

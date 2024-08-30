@@ -66,19 +66,20 @@ inl possible_actions () =
         AA_Raise(limit.max, 1)
     ]
 
+inl nlholdem_sizes() : ml.cfr.sizes =
+    {
+        ensemble_id = 4
+        world_id = 1 <<< 12
+        player_id = 2
+        action_id = 1 <<< 4
+        seq_id = 1 <<< 7
+        thread_id = threads_per_block()
+    }
+
 inl nlholdem_graph() =
     open ml.layers
     inl pu_history = nlholdem_pickler()
-
-    inl cfr_sizes : ml.cfr.sizes =
-        {
-            ensemble_id = 4
-            world_id = 1 <<< 12
-            player_id = 2
-            action_id = 1 <<< 4
-            seq_id = 1 <<< 7
-            thread_id = threads_per_block()
-        }
+    inl cfr_sizes = nlholdem_sizes()
     assert (length possible_actions() <= cfr_sizes.action_id) "The sizes of action in the table must be >= the length of possible actions."
     inl sizes = {
         ensemble = cfr_sizes.ensemble_id // The third dimension of each weight layer.
@@ -131,6 +132,7 @@ open ml.cfr_models
 inl game_graph() : cfr_game_graph _ _ =
     cfr_game_graph {
         graph = exists nlholdem_graph()
+        sizes = nlholdem_sizes()
         action_mask = fun _ _ _ action_id => action_id < length possible_actions()
         input = exists nlholdem_conv, nlholdem_pickler()
         output = nlholdem_output

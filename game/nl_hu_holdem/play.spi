@@ -75,17 +75,19 @@ type state_internal =
         game : refm.ref (option game_node)
         deck : refm.ref deck
         messages : refm.ref messages
+        rng : refm.ref random.philox_state
     }
 
 // Converts the given state to internal one.
 // The refs will point to the original locations.
-inl state_to_internal (state : state_game) : state_internal =
+inl state_to_internal rng (state : state_game) : state_internal =
     {
         ui_game_state = refm.from_local state.public.ui_game_state
         pl_type = refm.from_local state.public.pl_type
         game = refm.from_local state.private.game
         deck = refm.from_local state.private.deck
         messages = refm.from_local state.public.messages
+        rng
     }
 
 // Sets the internal state to the values held by the regular one.
@@ -177,7 +179,7 @@ let play_loop rng (neural : state_neural) (state : state_internal) node =
                 inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
                 inl data = table, refm.to_local state.messages
                 console.write_ln "Running the GPU model."
-                inl action = ml.cfr_models.run model (Some data) |> action_conv table
+                inl action = ml.cfr_models.run state.rng model (Some data) |> action_conv table
                 console.write "The action is: "
                 console.write_ln action
                 inl msg = PlayerAction(player_turn, action)
@@ -249,19 +251,20 @@ inl main() =
             inl p : f64 = $"time.perf_counter()"
 
             run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
+                inl rng = random.init {seed = $"clock64()"; subsequence=conv rangem.threads_in_grid().from; offset=0}
                 inl c : _ int = refm.create_shared_var (const threads_per_block())
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
                     inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
                     // When converting the state to internal form, the refs will point to the original.
-                    event_loop neural (msg, state_to_internal game_state)
+                    event_loop neural (msg, state_to_internal rng game_state)
                     serialize seri.game_state game_state
 
                 // nn model loop
                 intrinsic.atomic_add_ref c -1 |> ignore
                 loop.while' (const true) fun () =>
                     inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-                    ml.cfr_models.run model None |> ignore
+                    ml.cfr_models.run rng model None |> ignore
                     if refm.deref c = 0 then loop.break()
 
             inl p2 : f64 = $"time.perf_counter()"

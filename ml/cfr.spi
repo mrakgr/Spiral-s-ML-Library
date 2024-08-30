@@ -133,10 +133,10 @@ inl get_action_shared rng mask (model : model) ~(world_ids : tensor ensemble_id 
     |> fun policy => {policy sampling action_id}
 
 // Calculates the policy and the value array updates.
-inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) (reward : list reward) =
+inl calculate_updates forall dim. mask (size : sizes) (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) (reward : sam.sa dim reward) =
     open primitives
     inl thread_id = rangem.threads_in_grid().from
-    inl rewards : _ _ reward = tensorm.fromList reward
+    inl rewards : _ _ reward = tensorm.from reward
     assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
 
     loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
@@ -227,9 +227,7 @@ inl apply_updates grid (model : model) =
 
 inl test1() =
         open refm
-
         inl mask config x i j = j < 3
-
         inl sizes : sizes =
             {
                 ensemble_id = 4
@@ -276,7 +274,8 @@ inl test1() =
             push (0, 457, 0)
             push (0, 3447, 1)
 
-            calculate_updates mask sizes model trace (0, #seq_id) [13; -13]
+            inl rewards : sam.sa 2 reward = arraym.fromList [13; -13]
+            calculate_updates mask sizes model trace (0, #seq_id) rewards
             apply_updates grid model
 
 inl main() = test1()

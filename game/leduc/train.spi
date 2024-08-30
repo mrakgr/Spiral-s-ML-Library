@@ -32,6 +32,7 @@ type state_internal =
         deck : refm.ref deck
         messages : refm.ref messages
         rng : refm.ref random.philox_state
+        seq_id : refm.ref int
     }
 
 // Converts the given state to internal one.
@@ -42,9 +43,17 @@ inl state_to_internal pl_type : state_internal =
         deck = refm.from_local deckm.create()
         messages = refm.from_local sa_create
         rng = random.init {seed = $"clock64()"; subsequence=conv rangem.threads_in_grid().from; offset=0}
+        seq_id = refm.ref 0
     }
 
-let play_loop (neural : state_neural) (state : state_internal) node =
+type rewards = sam.sa 2 ml.cfr.reward
+
+inl play_loop (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal) ~node : rewards * ml.cfr.seq_id = join
+    inl rewards : rewards = sa_create
+    inl set_rewards winner_id (chips_won : int) =
+        inl chips_won = conv chips_won
+        set rewards winner_id chips_won
+        set rewards (toggle winner_id) -chips_won
     inl push_message = sa_listm.push (refm.to_local state.messages)
     inl pop_deck () = 
         open refm
@@ -58,9 +67,9 @@ let play_loop (neural : state_neural) (state : state_internal) node =
         | TerminalFold table =>
             inl msg = 
                 inl chips_won = index table.pot table.player_turn
+                set_rewards table.player_turn -chips_won
                 Showdown{cards_shown=table.pl_card; chips_won winner_id=toggle table.player_turn}
             push_message msg
-            // TODO: Should have an optimization effect. Maybe return the reward?
             None
         | TerminalCall table =>
             inl msg =
@@ -70,17 +79,16 @@ let play_loop (neural : state_neural) (state : state_internal) node =
                     | Gt => chips_won, 0
                     | Eq => 0, -1
                     | Lt => chips_won, 1
+                set_rewards (abs winner_id) chips_won
                 Showdown{cards_shown=table.pl_card; chips_won winner_id}
             push_message msg
-            // TODO: Should have an optimization effect. Maybe return the reward?
             None
         | Round table => 
             match index #state.pl_type table.player_turn with
             | Computer =>
                 open model
-                inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
                 inl data = table, refm.to_local state.messages
-                inl action = ml.cfr_models.run model (Some data) |> action_conv table
+                inl action = ml.cfr_models.trace_and_play state.seq_id state.rng cfr_model data |> action_conv table
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
                 Some (game_round table action)
@@ -89,7 +97,7 @@ let play_loop (neural : state_neural) (state : state_internal) node =
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
                 Some (game_round table action)
-        | RoundWithAction(table,action) => 
+        | RoundWithAction(table,action) =>
             inl msg = PlayerAction(table.player_turn, action)
             push_message msg
             Some (game_round table action)
@@ -106,7 +114,9 @@ let play_loop (neural : state_neural) (state : state_internal) node =
     
     loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
 
-inl event_loop state_neural (msg : event) : () =
+    rewards, refm.deref state.seq_id
+
+inl event_loop state_neural (msg : event) =
     open refm
     match msg with
     | StartTraining config =>
@@ -132,24 +142,19 @@ inl main() =
             inl p : f64 = $"time.perf_counter()"
 
             run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
+                inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
                 inl grid = cooperative_groups.create_grid()
-                loop.linear 10i32 fun i =>
-                    open ml.cfr
-                    // When converting the state to internal form, the refs will point to the original.
-                    inl reward : list reward = event_loop neural (deserialize seri.msg)
+                loop.linear (1 <<< 2) fun (_ : int) =>
+                    loop.linear (1 <<< 3) fun (_ : int) =>
+                        // When converting the state to internal form, the refs will point to the original.
+                        event_loop model (deserialize seri.msg)
+                        |> ml.cfr_models.calculate_updates model
                     
-                    calculate_updates model.mask sizes model trace (0, #seq_id) reward
-                
-                apply_updates grid model
-
-
-
+                    ml.cfr_models.apply_updates grid model
 
             inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "
             console.write_ln (p2 - p)
 
-            jsonm.serialize {
-                neural
-                }
+            jsonm.serialize { neural }
     }
