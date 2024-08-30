@@ -16,6 +16,16 @@ type config passthrough dim =
         dim_inner : dim
     }
 
+// TODO (8/30/2024): We should remove the dim_outer from the two loops.
+// After some thought, I've concluded that it'd be a fool's errand trying to program with partial
+// blocks. It's a temptation to get you to squeeze a bit extra performance, but it'd destroy the
+// the architecture of the program and make reasoning about it 100 times harder.
+// 
+// The type system isn't capable of capturing thread divergence in Cuda, and more importantly,
+// GPUs have no preemption mechanism to make use of dropped off threads. So once a block's threads diverge
+// it's computational capability gets cut accordingly. Block syncing would stop working, and we'd
+// get all kinds of undefined behavior.
+
 // Uses a shared tensor to transpose all the free variables in shared memory before running the function.
 // The variables passed through `passthrough` won't be transposed and will be passed into the kernel directly.
 // Uses a projective loop under the hood.
@@ -31,14 +41,14 @@ inl projective forall shared dim t. ({dim_outer passthrough dim_inner} : config 
         inl shared_in : tensor int el = tensor_create_shared dim_outer
         inl shared_out : tensor int t = tensor_create_shared dim_outer
         inl tid = thread_index()
-        if tid < dim_outer then tensor_set tid fv shared_in
+        if dim_outer = threads_per_block() || tid < dim_outer then tensor_set tid fv shared_in
         barrier_cta_sync 0
         loop.projective threads_in_block(dim_outer, dim_inner) fun thread_id, dim =>
             tensor_set thread_id
                 (free_vars_replace f (tensor_index thread_id shared_in) passthrough (block_index() * threads_per_block() + thread_id) dim)
                 shared_out
         barrier_cta_sync 0
-        inl x = if tid < dim_outer then tensor_index tid shared_out else undefined
+        inl x = if dim_outer = threads_per_block() || tid < dim_outer then tensor_index tid shared_out else undefined
         barrier_cta_sync 0
         x
     real
@@ -62,7 +72,7 @@ inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shar
         inl shared_in : tensor int el = tensor_create_shared dim_outer
         inl shared_out : tensor int t = tensor_create_shared dim_outer
         inl tid = thread_index()
-        if tid < dim_outer then tensor_set tid fv shared_in
+        if dim_outer = threads_per_block() || tid < dim_outer then tensor_set tid fv shared_in
         barrier_cta_sync 0
 
         inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (dim_outer, dim_inner)
@@ -79,7 +89,7 @@ inl linear forall shared dim t. ({dim_outer passthrough dim_inner} : config shar
                 (free_vars_replace f (tensor_index index_block' shared_in) passthrough (block_index() * threads_per_block() + thread_id) index_inner)
                 shared_out
         barrier_cta_sync 0
-        inl x = if tid < dim_outer then tensor_index tid shared_out else undefined
+        inl x = if dim_outer = threads_per_block() || tid < dim_outer then tensor_index tid shared_out else undefined
         barrier_cta_sync 0
         x
     real

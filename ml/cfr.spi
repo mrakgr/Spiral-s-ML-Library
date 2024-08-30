@@ -66,17 +66,39 @@ inl graph (size : sizes) : _ (model * trace) =
         |> reorder (fun (actions, log_path_probs) => { actions log_path_probs })
 
     inl init (x : model) : () = real
-        struct.iter (fun x => 
+        struct.iter (fun x =>
             struct.iter (fun x =>
                 $"!(x.array)[:] = 0" : ()
                 ) x.bodies
         ) x
-    layers.pair 
+    layers.pair
         (layers.key_graph .cfr_model layers.Weight(model, init))
         (layers.key_graph .cfr_trace layers.Input(trace))
 
+inl get_prob config (action_id : action_id) (probs : tensor _ (prob * action_id)) =
+    open primitives
+    local_reduce config (0,limit.max) (fun a b =>
+        if snd a = action_id then a
+        elif snd b = action_id then b
+        else a
+        ) probs
+    |> fun prob,i => assert (i <> limit.max) "Expected a valid action id in get_action." . prob
+
+// Samples an action from the model using the average policy (of the first thread) and returns both the action and the probabilities of it being selected.
+inl get_policy_probs mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) (action_id : action_id) : prob = join
+    open primitives
+    model
+    |> apply ensemble_id
+    |> apply world_id
+    |> rezip (fun {policy} => policy.current)
+    |> row_gather_reduce (fun config policy i j_tns =>
+        open random
+        inl policy_probs = local_masked_regret_matching mask config policy i j_tns
+        get_prob config action_id (zip policy_probs j_tns)
+        )
+
 // Samples an action from the model using the average policy and returns both the action and the probabilities of it being selected.
-inl get_action mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) : action_prob * action_id = join
+inl get_action rng mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) : action_prob * action_id = join
     open primitives
     model
     |> apply ensemble_id
@@ -84,20 +106,31 @@ inl get_action mask (model : model) ~(ensemble_id, world_id : ensemble_id * worl
     |> rezip (fun {policy} => policy.average, policy.current)
     |> row_gather_reduce (fun config x i j_tns =>
         open random
-        inl rng : _ philox_state = init {seed = clock64(); subsequence=conv thread_index(); offset=0}
         inl sampling, policy = unzip x
         inl sampling_probs, action_id = local_masked_regret_matching_and_discrete_sampling mask rng config sampling i j_tns
         // console.write_ln {tid=thread_index(); sampling_probs action_id}
         inl policy_probs = local_masked_regret_matching mask config policy i j_tns
-        inl get_prob probs =
-            local_reduce config (0,limit.max) (fun a b =>
-                if snd a = action_id then a
-                elif snd b = action_id then b
-                else a
-                ) (zip probs j_tns)
-            |> fun prob,i => assert (i <> limit.max) "Expected a valid action id in get_action." . prob
+        inl get_prob probs = get_prob config action_id (zip probs j_tns)
+        // TODO: Get rid of returning the policy probs here.
+        // The training loops needs to get all of them from the ensemble anyway, and the play loop does not need probs at all.
         {sampling=get_prob sampling_probs; policy=get_prob policy_probs}, action_id
         )
+
+// Samples an action from the model using the average policy (of the first ensemble, and the first thread) 
+// and returns both the action and the probabilities of it being selected.
+// Takes in a `tensor ensemble_id world_id` as the last argument.
+inl get_action_shared rng mask (model : model) ~(world_ids : tensor ensemble_id world_id) : {policy : tensor int prob; sampling : prob; action_id : action_id} = join
+    open primitives
+    inl {sampling}, action_id = 
+        // TODO: Maybe this would lead to better exploration than just taking the first ensemble.
+        // inl ensemble_id = random.int_range {from=0; nearTo=world_ids.dim} rng |> transposing_loop.shuffle 0
+        inl ensemble_id = 0
+        inl world_id = tensor_index ensemble_id world_ids
+        inl {sampling}, action_id = get_action rng mask model (ensemble_id, world_id)
+        transposing_loop.shuffle 0 ({sampling}, action_id)
+    world_ids
+    |> tensorm.mapi (fun ensemble_id world_id => get_policy_probs mask model (ensemble_id, world_id) action_id)
+    |> fun policy => {policy sampling action_id}
 
 // Calculates the policy and the value array updates.
 inl calculate_updates mask (size : sizes) (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) (reward : list reward) =
@@ -213,6 +246,7 @@ inl test1() =
 
         run fun () =>
             inl grid = cooperative_groups.create_grid()
+            inl rng : _ random.philox_state = random.init {seed = $"clock64()"; subsequence=conv rangem.threads_in_grid().from; offset=0}
             inl model, trace : model * trace = layers.graph_extract model {}
 
             inl thread_id = rangem.threads_in_grid().from
@@ -234,7 +268,7 @@ inl test1() =
                 loop.linear trace_log_path_prob.dim fun i =>
                     tensor_set i (tensor_index i log_path_prob) trace_log_path_prob
 
-            let push (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) = push' (ensemble_id,world_id,player_id) (get_action mask model (ensemble_id, world_id))
+            let push (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) = push' (ensemble_id,world_id,player_id) (get_action rng mask model (ensemble_id, world_id))
             push (0, 235, 0)
             push (0, 212, 1)
             push (0, 790, 0)
