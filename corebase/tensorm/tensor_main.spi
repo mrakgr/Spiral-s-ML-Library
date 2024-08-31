@@ -356,6 +356,16 @@ inl mapi forall dim a b. (f : dim -> a -> b) (t : tensor dim a) : tensor dim b =
     loop.linear t.dim fun i =>
         tensor_set i (f i (tensor_index i t)) out
     out
+    
+// Inplace init. Provides the index as the first argument.
+inl reinit forall dim a. (f : dim -> a) (t : tensor dim a) : () = 
+    loop.linear t.dim fun i =>
+        tensor_set i (f i) t
+
+// Inplace copy. Provides the index as the first argument.
+inl copy forall dim t. {from = (src : tensor dim t)} (a : tensor dim t) : () = 
+    assert (src.dim = a.dim) "The dimensions of the two arrays passed into copy must be equal."
+    reinit (fun i => tensor_index i src) a
 
 // Folds over a tensor using a single thread.
 inl fold forall dim s a. (s : s) (f : s -> a -> s) (t : tensor dim a) : s = 

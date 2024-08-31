@@ -7,9 +7,8 @@ open rangem
 
 // The noinline prefix will force the __noinline__ annotation in the generated code.
 inl trace_and_play forall inp out.
-        (seq_id : refm.ref int)
         rng
-        (exists t. model : exists t. model t) 
+        (model : model (cfr.model * cfr.trace * cfr.trace_state))
         (sizes : cfr.sizes)
         (action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool)
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
@@ -50,11 +49,11 @@ inl trace_and_play forall inp out.
 
     barrier_cta_sync 0
 
+    inl output_id : _ int = refm.ref limit.max
+
     loop.linear ensemble fun ensemble =>
         // Runs the model on the inputs.
         graph_run_device model ls {ensemble}
-
-        barrier_cta_sync 0
 
         // Extract the hash of the input state.
         inl world_id =
@@ -63,16 +62,19 @@ inl trace_and_play forall inp out.
 
         // Extract the CFR model.
         inl cfr_model = (key_extract model .cfr_model : cfr.model)
+        inl cfr_trace_state = (key_extract model .cfr_trace_state : cfr.trace_state)
 
-        // Extract the output index.
-        inl _,output_id = cfr.get_action rng action_mask cfr_model (ensemble, conv world_id)
+        // // Extract the output index.
+        // inl _,output_id = cfr.get_action rng action_mask cfr_model (ensemble, conv world_id)
+        ()
 
-        output output_id
+    // Shares the output_id across all the threads in the block.
+    output (transposing_loop.shuffle 0 (refm.deref output_id))
 
 // The noinline prefix will force the __noinline__ annotation in the generated code.
 inl noinline_run forall inp out.
         rng
-        (exists t. model : exists t. model t) 
+        (exists t. model : exists t. model t)
         (action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool)
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
@@ -141,7 +143,7 @@ inl noinline_run forall inp out.
 
 nominal cfr_game_graph inp out =
     {
-        graph : exists mid. graph mid
+        graph : graph (cfr.model * cfr.trace * cfr.trace_state)
         sizes : cfr.sizes
         action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool
         input : exists t. (inp -> t) * pickler.pu t
@@ -150,7 +152,7 @@ nominal cfr_game_graph inp out =
 
 nominal cfr_game_model inp out = 
     {
-        model : exists mid. model mid
+        model : model (cfr.model * cfr.trace * cfr.trace_state)
         sizes : cfr.sizes
         action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool
         input : exists t. (inp -> t) * pickler.pu t
@@ -159,18 +161,18 @@ nominal cfr_game_model inp out =
 
 inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = noinline_run rng model action_mask input output
 
-inl to_model_data forall a b. (cfr_game_model {model=exists t. model} : cfr_game_model a b) : layers.model_data = model_to_model_data model
+inl to_model_data forall a b. (cfr_game_model {model} : cfr_game_model a b) : layers.model_data = model_to_model_data model
 inl from_model_data forall inp out.
-        (cfr_game_graph {graph=(exists t. graph) sizes input output action_mask} : cfr_game_graph inp out) 
+        (cfr_game_graph {graph sizes input output action_mask} : cfr_game_graph inp out) 
         (x : layers.model_data) 
         : cfr_game_model inp out = 
     inl model : exists t. model t = exists model_data_to_model graph x
     cfr_game_model {model sizes action_mask input output}
 
-inl init forall a b. (cfr_game_graph {graph=(exists t. graph) sizes action_mask input output} : cfr_game_graph a b) : cfr_game_model a b = 
+inl init forall a b. (cfr_game_graph {graph sizes action_mask input output} : cfr_game_graph a b) : cfr_game_model a b = 
     inl model = create_model graph
     param_init model
     cfr_game_model { sizes input output action_mask model = exists model }
 
 // Returns the amount of shared memory being used by the graph.
-inl smem_used (cfr_game_graph {graph=exists t. graph}) : int = pass_calculate_dynamic_shared_memory graph |> conv
+inl smem_used (cfr_game_graph {graph}) : int = pass_calculate_dynamic_shared_memory graph |> conv

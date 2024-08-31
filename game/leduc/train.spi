@@ -32,7 +32,6 @@ type state_internal =
         deck : refm.ref deck
         messages : refm.ref messages
         rng : refm.ref random.philox_state
-        seq_id : refm.ref int
     }
 
 // Converts the given state to internal one.
@@ -43,7 +42,6 @@ inl state_to_internal pl_type : state_internal =
         deck = refm.from_local deckm.create()
         messages = refm.from_local sa_create
         rng = random.init {seed = $"clock64()"; subsequence=conv rangem.threads_in_grid().from; offset=0}
-        seq_id = refm.ref 0
     }
 
 type rewards = sam.sa 2 ml.cfr.reward
@@ -88,7 +86,7 @@ inl play_loop (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_inte
             | Computer =>
                 open model
                 inl data = table, refm.to_local state.messages
-                inl action = ml.cfr_models.trace_and_play state.seq_id state.rng cfr_model data |> action_conv table
+                inl action = ml.cfr_models.trace_and_play state.rng cfr_model data |> action_conv table
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
                 Some (game_round table action)

@@ -47,6 +47,11 @@ type model =
             update : (reward * count)
             }
     }
+type trace_state =
+    {
+        log_path_probs : tensor (ensemble_id * thread_id * player_id) log_path_prob
+        seq_id : tensor (ensemble_id * thread_id) seq_id
+    }
 
 type sizes =
     {
@@ -58,22 +63,27 @@ type sizes =
         thread_id : int
     }
 
-inl graph (size : sizes) : _ (model * trace) =
+inl graph (size : sizes) : _ (model * trace * trace_state) =
     open partitionm
     inl model : partition model = !(size.ensemble_id, size.world_id, size.action_id)
     inl trace : partition trace = 
         !(size.ensemble_id, size.seq_id, size.thread_id) *. !(size.ensemble_id, size.seq_id, size.thread_id, size.player_id)
         |> reorder (fun (actions, log_path_probs) => { actions log_path_probs })
+    inl trace_state : partition trace_state =
+        !(size.ensemble_id, size.thread_id, size.player_id) *. !(size.ensemble_id, size.thread_id)
+        |> reorder (fun (log_path_probs, seq_id) => {log_path_probs seq_id})
 
-    inl init (x : model) : () = real
+    inl init forall t. (x : t) : () = real
         struct.iter (fun x =>
             struct.iter (fun x =>
                 $"!(x.array)[:] = 0" : ()
                 ) x.bodies
         ) x
-    layers.pair
-        (layers.key_graph .cfr_model layers.Weight(model, init))
-        (layers.key_graph .cfr_trace layers.Input(trace))
+
+    inl (<|) a b = layers.pair a b
+    (layers.key_graph .cfr_model layers.Weight(model, init))
+    <| (layers.key_graph .cfr_trace layers.Input(trace))
+    <| (layers.key_graph .cfr_trace_state layers.Weight(trace_state, init))
 
 inl get_prob config (action_id : action_id) (probs : tensor _ (prob * action_id)) =
     open primitives
@@ -133,13 +143,18 @@ inl get_action_shared rng mask (model : model) ~(world_ids : tensor ensemble_id 
     |> fun policy => {policy sampling action_id}
 
 // Calculates the policy and the value array updates.
-inl calculate_updates forall dim. mask (size : sizes) (model : model) (trace : trace) (ensemble_id, seq_id : ensemble_id * seq_id) (reward : sam.sa dim reward) =
+inl calculate_updates forall dim. 
+        mask (size : sizes) 
+        (model : model) (trace : trace) (trace_state : trace_state) 
+        (ensemble_id : ensemble_id) 
+        (reward : sam.sa dim reward) =
     open primitives
     inl thread_id = rangem.threads_in_grid().from
     inl rewards : _ _ reward = tensorm.from reward
     assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
 
-    loop.forDown' {nearFrom=seq_id; to=0} (fun seq_id =>
+    // Calculates the updates.
+    loop.forDown' {nearFrom=tensor_index (ensemble_id, thread_id) trace_state.seq_id; to=0} (fun seq_id =>
         inl {action_id player_id action_sampling_prob world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
         inl reward = tensor_index player_id rewards
         inl model =
@@ -147,13 +162,12 @@ inl calculate_updates forall dim. mask (size : sizes) (model : model) (trace : t
             |> apply ensemble_id
             |> apply world_id
             |> apply_ptr
-        inl log_path_probs =
-            trace.log_path_probs
-            |> apply ensemble_id
-            |> apply seq_id
-            |> apply_ptr
         inl path_prob =
-            inl log_path_probs = log_path_probs |> apply thread_id
+            inl log_path_probs = 
+                trace.log_path_probs
+                |> apply ensemble_id
+                |> apply seq_id
+                |> apply thread_id
             inl log_path_policy_prob =
                 log_path_probs
                 |> rezip (fun x => x.policy)
@@ -195,6 +209,16 @@ inl calculate_updates forall dim. mask (size : sizes) (model : model) (trace : t
             // console.write_ln {rewards}
         )
 
+    // Reset the trace state.
+    inl () =
+        inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id |> apply_ptr
+        // Sets the log_path_probs to 0.
+        (log_path_probs,log_path_probs) ||> row_gather_map (fun config x i j_tns => local_map (const loop.zeroes) x)
+        // Sets the seq_id to 0.
+        tensor_set (ensemble_id, thread_id) 0 trace_state.seq_id
+    ()
+
+
 // Applies the policy and the value array updates.
 // Clamps the average policy vector if applicable.
 inl apply_updates grid (model : model) =
@@ -222,7 +246,7 @@ inl apply_updates grid (model : model) =
             model 
             |> local_map (fun {value={current update}} => loop.add current update) // Adds the value numerator and the denominator.
         (zip policy value_current)
-        |> local_map (fun policy, current => { value = {current update = loop.zeroes}; policy = {policy with update = 0} }) 
+        |> local_map (fun policy, current => { value = {current update = loop.zeroes}; policy = {policy with update = 0}}) 
         )
 
 inl test1() =
@@ -245,28 +269,31 @@ inl test1() =
         run fun () =>
             inl grid = cooperative_groups.create_grid()
             inl rng : _ random.philox_state = random.init {seed = $"clock64()"; subsequence=conv rangem.threads_in_grid().from; offset=0}
-            inl model, trace : model * trace = layers.graph_extract model {}
+            inl model, trace, trace_state : model * trace * trace_state = layers.graph_extract model {}
 
             inl thread_id = rangem.threads_in_grid().from
-            inl seq_id = ref (0 : int)
 
-            inl log_path_prob : _ _ log_path_prob = tensor_create sizes.player_id
-            loop.linear log_path_prob.dim fun i => tensor_set i {sampling=0; policy=0} log_path_prob
-
+            // Pushes the ids into the trace along with the sampling probability for the selected action id.
+            // Increments the seq_id in the trace state and updates the log path probabilities.
             inl push' (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) (action_prob, action_id : action_prob * action_id) : () =
-                inl i = #seq_id
-                seq_id <-# i+1
-                tensor_set (ensemble_id, i, thread_id) {world_id player_id action_id action_sampling_prob=action_prob.sampling} trace.actions
+                inl seq_id = tensor_index (ensemble_id, thread_id) trace_state.seq_id
+                // Increments the seq_id.
+                tensor_set (ensemble_id, thread_id) (seq_id+1) trace_state.seq_id
+                // Pushed the ids into the trace.
+                tensor_set (ensemble_id, seq_id, thread_id) {world_id player_id action_id action_sampling_prob=action_prob.sampling} trace.actions
                 inl v = {
                     sampling = log (conv action_prob.sampling)
                     policy = log (conv action_prob.policy)
                 }
-                tensor_update player_id (loop.add v) log_path_prob
-                inl trace_log_path_prob = trace.log_path_probs |> apply ensemble_id |> apply i |> apply thread_id
-                loop.linear trace_log_path_prob.dim fun i =>
-                    tensor_set i (tensor_index i log_path_prob) trace_log_path_prob
+                inl trace_state_log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id
+                inl trace_log_path_probs = trace.log_path_probs |> apply ensemble_id |> apply seq_id |> apply thread_id
+                // Copies trace_state_log_path_probs into trace_log_path_probs.
+                (trace_state_log_path_probs, trace_log_path_probs) ||> primitives.row_gather_map (fun config x i j_tns => x)
+                // Updates the log path probs in the trace_state.
+                tensor_update player_id (loop.add v) trace_state_log_path_probs
 
-            let push (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) = push' (ensemble_id,world_id,player_id) (get_action rng mask model (ensemble_id, world_id))
+            let push (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) = 
+                push' (ensemble_id,world_id,player_id) (get_action rng mask model (ensemble_id, world_id))
             push (0, 235, 0)
             push (0, 212, 1)
             push (0, 790, 0)
@@ -275,7 +302,7 @@ inl test1() =
             push (0, 3447, 1)
 
             inl rewards : sam.sa 2 reward = arraym.fromList [13; -13]
-            calculate_updates mask sizes model trace (0, #seq_id) rewards
+            calculate_updates mask sizes model trace trace_state 0 rewards
             apply_updates grid model
 
 inl main() = test1()
