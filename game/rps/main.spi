@@ -133,7 +133,7 @@ inl main() =
                 globals()
                 inl from = rangem.threads_in_grid().from
                 if from = 0 then
-                    inl rng : _ philox_state = init {seed = $"clock64()"; subsequence=conv from; offset=0}
+                    inl rng : _ philox_state = init {seed = random.clock64(); subsequence=conv from; offset=0}
                     event_loop (GPU rng) (deserialize seri.msg, deserialize seri.state)
                     |> serialize seri.state
 

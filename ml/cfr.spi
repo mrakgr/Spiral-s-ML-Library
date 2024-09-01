@@ -202,6 +202,7 @@ inl calculate_updates forall dim.
 
 // Applies the policy and the value array updates.
 // Clamps the average policy vector if applicable.
+// Also randomizes the `exploratory_ensemble_id`.
 inl apply_updates grid rng (model : model) =
     open tensor_cuda
     open primitives
@@ -271,7 +272,7 @@ inl test1() =
 
         run fun () =>
             inl grid = cooperative_groups.create_grid()
-            inl rng : _ random.philox_state = random.init {seed = $"clock64()"; subsequence=conv rangem.threads_in_grid().from; offset=0}
+            inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
             inl model, trace, trace_state : model * trace * trace_state = layers.graph_extract model {}
 
             inl thread_id = rangem.threads_in_grid().from

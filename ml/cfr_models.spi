@@ -204,3 +204,18 @@ inl init forall a b. (cfr_game_graph {graph sizes action_mask input output} : cf
 
 // Returns the amount of shared memory being used by the graph.
 inl smem_used (cfr_game_graph {graph}) : int = pass_calculate_dynamic_shared_memory graph |> conv
+
+// Calculates the policy and the value array updates.
+inl calculate_updates forall dim a b.
+        (cfr_game_model {model sizes action_mask input output} : _ a b)
+        (reward : sam.sa dim cfr.reward) =
+    inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {}
+    loop.linear sizes.ensemble_id fun ensemble_id =>
+        cfr.calculate_updates action_mask sizes cfr_model trace trace_state ensemble_id reward
+
+// Applies the policy and the value array updates.
+// Clamps the average policy vector if applicable.
+// Also randomizes the `exploratory_ensemble_id`.
+inl apply_updates forall a b. grid rng (cfr_game_model {model} : _ a b) =
+    inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {}
+    cfr.apply_updates grid rng cfr_model
