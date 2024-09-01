@@ -44,6 +44,7 @@ inl assert_long_length forall dim. (len : int) (dim : dim) =
     }
 
 // Create a tensor of the specified dimensions. The elements of the dimension should be ints.
+// Alternatively, a singleton tensor can be created by passing in an empty record {}.
 inl tensor_create forall dim el. (dim : dim) : tensor dim el = 
     inl stride, len = real calculate_stride_len dim
     assert_long_length len dim
@@ -519,4 +520,10 @@ inl fold forall dim s a. (s : s) (f : s -> a -> s) (t : tensor dim a) : s =
 //     inl t = reshape_snd (2,3 : int * int) t |> reorder (fun a,(b,c) => a,b,c)
 //     index (1,0,0) t, index (0,1,0) t
 
-// inl main() = test()
+// inl test22() = // singleton tensor
+//     inl ar : tensor {} int = tensor_create {}
+//     ()
+
+// inl main() =
+//     inl ar : tensor {} int = tensor_create {}
+//     ()

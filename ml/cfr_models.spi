@@ -13,7 +13,7 @@ inl trace_and_play forall inp out.
         (action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool)
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
-        ~(data : inp) =
+        ~({player_id}, data : {player_id : cfr.player_id} * inp) =
 
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread = (key_extract model .output_world_id : tensor d3 uint).dim
@@ -49,27 +49,52 @@ inl trace_and_play forall inp out.
 
     barrier_cta_sync 0
 
-    inl output_id : _ int = refm.ref limit.max
-
+    // Runs the model on the inputs.
     loop.linear ensemble fun ensemble =>
-        // Runs the model on the inputs.
         graph_run_device model ls {ensemble}
 
-        // Extract the hash of the input state.
+    barrier_cta_sync 0
+
+    // Extract the CFR model.
+    inl cfr_model = (key_extract model .cfr_model : cfr.model)
+
+    // Extract the output index and the sampling probability for it.
+    inl sampling,action_id = 
+        // The ensemble id is held steady between the `apply_updates` calls.
+        inl ensemble_id : int = tensor_index {} cfr_model.exploratory_ensemble_id
+
+        // Extract the hash of the input state for the CFR model.
         inl world_id =
             (key_extract model .output_world_id : tensor d3 uint)
-            |> tensor_index (ensemble, block_index(), thread_index())
+            |> tensor_index (ensemble_id, block_index(), thread_index())
 
-        // Extract the CFR model.
-        inl cfr_model = (key_extract model .cfr_model : cfr.model)
-        inl cfr_trace_state = (key_extract model .cfr_trace_state : cfr.trace_state)
+        cfr.get_action rng action_mask cfr_model (ensemble_id, conv world_id)
+        // Shares the action_id across all the threads in the block.
+        |> transposing_loop.shuffle 0
 
-        // // Extract the output index.
-        // inl _,output_id = cfr.get_action rng action_mask cfr_model (ensemble, conv world_id)
-        ()
+    // Extract the CFR trace state model.
+    inl cfr_trace_state = (key_extract model .cfr_trace_state : cfr.trace_state)
+    
+    // Extract the CFR trace.
+    inl cfr_trace = (key_extract model .cfr_trace : cfr.trace)
 
-    // Shares the output_id across all the threads in the block.
-    output (transposing_loop.shuffle 0 (refm.deref output_id))
+    // Index of the thread in the grid.
+    inl thread_id = rangem.threads_in_grid().from
+
+    loop.linear ensemble fun ensemble_id =>
+        // Extract the hash of the input state for the CFR model.
+        inl world_id =
+            (key_extract model .output_world_id : tensor d3 uint)
+            |> tensor_index (ensemble_id, block_index(), thread_index())
+            |> conv
+
+        // Calculate the policy probability for the given action.
+        inl policy = cfr.get_policy_probs action_mask cfr_model (ensemble_id, world_id) action_id
+
+        // Pushes the data into the trace.
+        cfr.push_trace cfr_trace cfr_trace_state {thread_id ensemble_id world_id player_id} ({policy sampling}, action_id)
+
+    output action_id
 
 // The noinline prefix will force the __noinline__ annotation in the generated code.
 inl noinline_run forall inp out.
