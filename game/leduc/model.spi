@@ -39,7 +39,7 @@ inl leduc_sizes() : ml.cfr.sizes =
         thread_id = threads_per_block()
     }
 
-inl leduc_graph() =
+inl leduc_graph() : ml.layers.graph ml.cfr_models.graph_body =
     open ml.layers
     inl pu_history = leduc_pickler()
 
@@ -83,7 +83,7 @@ inl leduc_output : int -> _ = function
 open ml.cfr_models
 inl game_graph() : cfr_game_graph _ _ =
     cfr_game_graph {
-        graph = exists leduc_graph()
+        graph = leduc_graph()
         sizes = leduc_sizes()
         action_mask = fun _ _ _ action_id => action_id < 3
         input = exists leduc_conv, leduc_pickler()

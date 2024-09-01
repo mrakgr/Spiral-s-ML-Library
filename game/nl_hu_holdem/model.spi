@@ -131,7 +131,7 @@ inl action_conv (table : table) (x : alt_action) : action = // TODO: Need to ret
 open ml.cfr_models
 inl game_graph() : cfr_game_graph _ _ =
     cfr_game_graph {
-        graph = exists nlholdem_graph()
+        graph = nlholdem_graph()
         sizes = nlholdem_sizes()
         action_mask = fun _ _ _ action_id => action_id < length possible_actions()
         input = exists nlholdem_conv, nlholdem_pickler()

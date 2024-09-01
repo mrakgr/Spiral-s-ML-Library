@@ -46,7 +46,7 @@ inl state_to_internal pl_type : state_internal =
 
 type rewards = sam.sa 2 ml.cfr.reward
 
-inl play_loop (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal) ~node : rewards * ml.cfr.seq_id = join
+inl play_loop (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal) ~node : rewards = join
     inl rewards : rewards = sa_create
     inl set_rewards winner_id (chips_won : int) =
         inl chips_won = conv chips_won
@@ -86,7 +86,7 @@ inl play_loop (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_inte
             | Computer =>
                 open model
                 inl data = table, refm.to_local state.messages
-                inl action = ml.cfr_models.trace_and_play state.rng cfr_model data |> action_conv table
+                inl action = ml.cfr_models.trace_and_play state.rng cfr_model ({player_id=table.player_turn}, data) |> action_conv table
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
                 Some (game_round table action)
@@ -112,7 +112,7 @@ inl play_loop (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_inte
     
     loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
 
-    rewards, refm.deref state.seq_id
+    rewards
 
 inl event_loop state_neural (msg : event) =
     open refm
