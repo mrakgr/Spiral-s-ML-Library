@@ -186,6 +186,14 @@ nominal cfr_game_model inp out =
         output : int -> out
     }
 
+inl extract_path_prob forall inp out. (cfr_game_model {model} : cfr_game_model inp out) {ensemble_id player_id} =
+    // Extract the CFR trace state model.
+    inl {policy sampling} = 
+        (key_extract model .cfr_trace_state : cfr.trace_state).log_path_probs
+        |> tensor_index (ensemble_id, rangem.threads_in_grid().from, player_id)
+
+    conv (exp (policy - policy))
+
 inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = noinline_run rng model action_mask input output
 inl trace_and_play forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = noinline_trace_and_play rng model sizes action_mask input output
 

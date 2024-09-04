@@ -22,6 +22,7 @@ inl arange forall dim el. ({from nearTo by} : loop.range dim) : tensor dim el =
     real $"cp.arange(!from,!len,!by,dtype=`(cupy_type el)) # type: ignore" : array el
     |> fromArray |> reshape (const nearTo)
     
+// Creates a tensor of zeroes.
 inl zeros forall dim float. (dim : dim) : tensor dim float =
     template dim (real forall float. len => $"cp.zeros(!len,dtype=`(cupy_type float)) # type: ignore" : array float)
 

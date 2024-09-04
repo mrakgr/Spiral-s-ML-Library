@@ -6,12 +6,23 @@ open coreext
 union player_type = Computer | Random
 type player_types = sam.sa 2 player_type
 
+type event_config =
+    {
+        player_types : player_types
+        // Loop sizes.
+        outer : int
+        inner : int
+    }
+
+inl event_config() : event_config =
+    {
+        player_types = arraym.fromList [Computer; Random]
+        outer = 1 <<< 4
+        inner = 1 <<< 4
+    }
+
 union event =
-    | StartTraining : {
-        player_types : sam.sa 2 player_type
-        pow_outer : int // The number of outer loop iterations will be 2 ** pow_outer.
-        pow_inner : int // The number of inner loop iterations will be 2 ** pow_outer.
-        }
+    | StartTraining
 
 type state_neural =
     {
@@ -136,23 +147,45 @@ inl main() =
             global "import time"
             inl p : f64 = $"time.perf_counter()"
 
+            inl sizes = model.leduc_sizes()
+            inl trace_rewards = 
+                inl config = event_config()
+                cupy.zeros (config.outer, config.inner, sizes.ensemble_id)
+
+            inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
+
             run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
                 inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
                 inl grid = cooperative_groups.create_grid()
                 inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
                 match deserialize seri.msg with
-                | StartTraining config =>
-                    loop.linear (1 <<< config.pow_outer) fun (_ : int) =>
-                        loop.linear (1 <<< config.pow_inner) fun (_ : int) =>
+                | StartTraining =>
+                    inl config = event_config()
+                    loop.linear config.outer fun (outer : int) =>
+                        loop.linear config.inner fun (inner : int) =>
                             inl state_internal = state_to_internal rng config.player_types
-                            play_loop model state_internal game_init()
-                            |> ml.cfr_models.calculate_updates model
-                        
+                            inl rewards = play_loop model state_internal game_init()
+                            inl () = // Adds the rewards to the trace.
+                                inl player_id = 0
+                                inl reward = index rewards player_id
+                                loop.linear sizes.ensemble_id fun ensemble_id =>
+                                    inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id player_id}
+                                    tensor_cuda.tensor_atomic_add (outer,inner,ensemble_id)
+                                        (reward * path_prob, path_prob)
+                                        trace_rewards
+                            ml.cfr_models.calculate_updates model rewards
                         ml.cfr_models.apply_updates grid rng model
+                    ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
 
             inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "
             console.write_ln (p2 - p)
 
-            jsonm.serialize { neural }
+            jsonm.serialize { 
+                neural 
+                frontend_rewards = 
+                    frontend_rewards
+                    |> tensorm.reshape (fun a,b,c => a*b,c)
+                    |> python_listm.from_2d_tensor
+                }
     }

@@ -10,10 +10,10 @@ open tensorm
 // They're all block level primitives (unless otherwise noted.)
 
 // Maps all the elements of a tensor given the mapping function.
-inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
+inl map_ forall dim a b. loop' (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
     assert (from.dim = to.dim) "The dimensions of the two inputs to the map kernel need to be the same."
     inl from,to = factorize_sizeof_16 from, factorize_sizeof_16 to
-    loop.projective threads_in_block(fst from.dim) fun i => 
+    loop' (fst from.dim) fun i => 
         inl from, to = apply i from, apply i to
         inl l_from, l_to = tensor_create from.dim, tensor_create to.dim
         memcpy_sync (l_from, from)
@@ -22,7 +22,13 @@ inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) :
                 tensor_set j (tensor_index j l_from |> f) l_to
         memcpy_sync (to, l_to)
 
-    barrier_cta_sync 0
+// Maps all the elements of a tensor given the mapping function.
+inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
+    map_ (loop.projective << threads_in_block) f from to . barrier_cta_sync 0
+    
+// Maps all the elements of a tensor given the mapping function using the entire grid.
+inl grid_map forall dim a b. grid (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
+    map_ (loop.projective << threads_in_grid) f from to . cooperative_groups.sync grid
 
 // Does a blockwise reduction in shared memory and stores the final result into the 0th index of the tensor.
 inl block_reduce_store forall a. f result (to : tensor int a) = 
