@@ -13,10 +13,9 @@ type Leduc_Train_Serie = {
     data: number[]
 }
 type Public_State = {
-    training_iterations: number
 }
-type UI_Effect = ["GraphAddItem", [Leduc_Train_Label[], Leduc_Train_Serie[]]]
-type Train_Events = ["Train", Public_State]
+type UI_Effect = ["AddRewards", number[][]]
+type Train_Events = ["StartTraining",[]]
 
 class TrainElement extends LitElement {
     dispatch_train_event = (detail: Train_Events) => {
@@ -27,7 +26,6 @@ class TrainElement extends LitElement {
 @customElement('leduc-train-ui')
 class Leduc_Train_UI extends TrainElement {
     @property({ type: Object }) state: Public_State = {
-        training_iterations: 100
     }
 
     socket = io('/leduc_train')
@@ -45,16 +43,17 @@ class Leduc_Train_UI extends TrainElement {
 
     graph_ref = createRef<Training_Chart>()
     process_effects(l: UI_Effect[]) {
-        l.forEach(l => {
-            const [tag, data] = l
-            switch (tag) {
-                case 'GraphAddItem': {
-                    this.graph_ref.value?.add_item(...data)
-                    break;
-                }
-                default: assert_tag_is_never(tag);
-            }
-        })
+        console.log(JSON.stringify(l));
+        // l.forEach(l => {
+        //     const [tag, data] = l
+        //     switch (tag) {
+        //         case 'GraphAddItem': {
+        //             this.graph_ref.value?.add_item(...data)
+        //             break;
+        //         }
+        //         default: assert_tag_is_never(tag);
+        //     }
+        // })
     }
 
     static styles = css`
@@ -79,19 +78,13 @@ class Leduc_Train_UI extends TrainElement {
     render() {
         return html`
             <training-chart ${ref(this.graph_ref)}></training-chart>
-            <sl-input
-                type="number" name="iters" min="0" step="100" 
-                value=${this.state.training_iterations}
-                @sl-input=${(x: any) => this.state = { ...this.state, training_iterations: parseInt(x.target.value) || this.state.training_iterations }}
-                label="Number of iterations:"
-                ></sl-input>
             <br/>
             <sl-button variant="primary" @click=${this.on_train}>Train</sl-button>
             `
     }
 
     on_train() {
-        this.dispatch_train_event(["Train", this.state])
+        this.dispatch_train_event(["StartTraining",[]])
     }
 }
 
@@ -161,9 +154,7 @@ class Training_Chart extends LitElement {
                 type: 'value'
             },
             tooltip: {},
-            xAxis: {
-                data: []
-            },
+            xAxis: { data: [] },
         });
 
         // Without this the chart sizing wouldn't work properly.

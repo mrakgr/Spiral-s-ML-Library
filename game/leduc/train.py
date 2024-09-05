@@ -1260,7 +1260,7 @@ __device__ Union0 f_0(unsigned char * v0){
 }
 __device__ inline bool while_method_0(int v0){
     bool v1;
-    v1 = v0 < 16l;
+    v1 = v0 < 2l;
     return v1;
 }
 __device__ inline bool while_method_1(Union7 v0){
@@ -1371,32 +1371,32 @@ __device__ Tuple0 draw_card_4(curandStatePhilox4_32_10_t & v0, unsigned int v1){
 }
 __device__ inline bool while_method_2(int v0){
     bool v1;
-    v1 = v0 < 2l;
-    return v1;
-}
-__device__ inline bool while_method_3(int v0){
-    bool v1;
     v1 = v0 < 4096l;
     return v1;
 }
-__device__ inline bool while_method_4(int v0, int v1){
+__device__ inline bool while_method_3(int v0, int v1){
     bool v2;
     v2 = v1 < v0;
     return v2;
 }
-__device__ inline bool while_method_5(int v0){
+__device__ inline bool while_method_4(int v0){
     bool v1;
     v1 = v0 < 4l;
     return v1;
 }
-__device__ inline bool while_method_6(int v0){
+__device__ inline bool while_method_5(int v0){
     bool v1;
     v1 = v0 < 8l;
     return v1;
 }
-__device__ inline bool while_method_7(int v0){
+__device__ inline bool while_method_6(int v0){
     bool v1;
     v1 = v0 < 1l;
+    return v1;
+}
+__device__ inline bool while_method_7(int v0){
+    bool v1;
+    v1 = v0 < 16l;
     return v1;
 }
 __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int v5){
@@ -1529,10 +1529,10 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
     wmma::fragment<wmma::accumulator, 16l, 16l, 8l, float> v64[1l];
     int v65;
     v65 = 0l;
-    while (while_method_2(v65)){
+    while (while_method_0(v65)){
         int v67;
         v67 = 0l;
-        while (while_method_6(v67)){
+        while (while_method_5(v67)){
             assert("Tensor range check" && 0 <= v65 && v65 < 2l);
             assert("Tensor range check" && 0 <= v67 && v67 < 8l);
             int v69;
@@ -1549,11 +1549,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
             int v75;
             v75 = 0l;
             #pragma unroll
-            while (while_method_7(v75)){
+            while (while_method_6(v75)){
                 int v77;
                 v77 = 0l;
                 #pragma unroll
-                while (while_method_7(v77)){
+                while (while_method_6(v77)){
                     assert("Tensor range check" && 0 <= v75 && v75 < 1l);
                     assert("Tensor range check" && 0 <= v77 && v77 < 1l);
                     int v79;
@@ -1567,7 +1567,7 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
             int v81;
             v81 = 0l;
             #pragma unroll
-            while (while_method_0(v81)){
+            while (while_method_7(v81)){
                 assert("Tensor range check" && 0 <= v65 && v65 < 2l);
                 int v83;
                 v83 = v71 + v5;
@@ -1629,11 +1629,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                 int v111;
                 v111 = 0l;
                 #pragma unroll
-                while (while_method_7(v111)){
+                while (while_method_6(v111)){
                     int v113;
                     v113 = 0l;
                     #pragma unroll
-                    while (while_method_7(v113)){
+                    while (while_method_6(v113)){
                         assert("Tensor range check" && 0 <= v111 && v111 < 1l);
                         assert("Tensor range check" && 0 <= v113 && v113 < 1l);
                         int v115;
@@ -1650,7 +1650,7 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                         int v121;
                         v121 = 0l;
                         #pragma unroll
-                        while (while_method_5(v121)){
+                        while (while_method_4(v121)){
                             assert("Tensor range check" && 0 <= v121 && v121 < 4l);
                             int v123;
                             v123 = v121 + v119;
@@ -1713,11 +1713,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                 int v146;
                 v146 = 0l;
                 #pragma unroll
-                while (while_method_7(v146)){
+                while (while_method_6(v146)){
                     int v148;
                     v148 = 0l;
                     #pragma unroll
-                    while (while_method_7(v148)){
+                    while (while_method_6(v148)){
                         assert("Tensor range check" && 0 <= v146 && v146 < 1l);
                         assert("Tensor range check" && 0 <= v148 && v148 < 1l);
                         int v150;
@@ -1734,7 +1734,7 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                         int v156;
                         v156 = 0l;
                         #pragma unroll
-                        while (while_method_5(v156)){
+                        while (while_method_4(v156)){
                             assert("Tensor range check" && 0 <= v156 && v156 < 4l);
                             int v158;
                             v158 = v156 + v154;
@@ -1762,11 +1762,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                 int v165;
                 v165 = 0l;
                 #pragma unroll
-                while (while_method_7(v165)){
+                while (while_method_6(v165)){
                     int v167;
                     v167 = 0l;
                     #pragma unroll
-                    while (while_method_7(v167)){
+                    while (while_method_6(v167)){
                         assert("Tensor range check" && 0 <= v165 && v165 < 1l);
                         assert("Tensor range check" && 0 <= v167 && v167 < 1l);
                         int v169;
@@ -1783,11 +1783,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                         int v174;
                         v174 = 0l;
                         #pragma unroll
-                        while (while_method_2(v174)){
+                        while (while_method_0(v174)){
                             int v176;
                             v176 = 0l;
                             #pragma unroll
-                            while (while_method_2(v176)){
+                            while (while_method_0(v176)){
                                 assert("Tensor range check" && 0 <= v174 && v174 < 2l);
                                 assert("Tensor range check" && 0 <= v176 && v176 < 2l);
                                 int v178;
@@ -1848,11 +1848,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                 int v195;
                 v195 = 0l;
                 #pragma unroll
-                while (while_method_7(v195)){
+                while (while_method_6(v195)){
                     int v197;
                     v197 = 0l;
                     #pragma unroll
-                    while (while_method_7(v197)){
+                    while (while_method_6(v197)){
                         assert("Tensor range check" && 0 <= v195 && v195 < 1l);
                         assert("Tensor range check" && 0 <= v197 && v197 < 1l);
                         int v199;
@@ -1869,11 +1869,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                         int v204;
                         v204 = 0l;
                         #pragma unroll
-                        while (while_method_2(v204)){
+                        while (while_method_0(v204)){
                             int v206;
                             v206 = 0l;
                             #pragma unroll
-                            while (while_method_2(v206)){
+                            while (while_method_0(v206)){
                                 assert("Tensor range check" && 0 <= v204 && v204 < 2l);
                                 assert("Tensor range check" && 0 <= v206 && v206 < 2l);
                                 int v208;
@@ -1935,15 +1935,15 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
                 int v225;
                 v225 = 0l;
                 #pragma unroll
-                while (while_method_7(v225)){
+                while (while_method_6(v225)){
                     int v227;
                     v227 = 0l;
                     #pragma unroll
-                    while (while_method_7(v227)){
+                    while (while_method_6(v227)){
                         int v229;
                         v229 = 0l;
                         #pragma unroll
-                        while (while_method_7(v229)){
+                        while (while_method_6(v229)){
                             assert("Tensor range check" && 0 <= v225 && v225 < 1l);
                             assert("Tensor range check" && 0 <= v227 && v227 < 1l);
                             int v231;
@@ -1971,11 +1971,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
             int v237;
             v237 = 0l;
             #pragma unroll
-            while (while_method_7(v237)){
+            while (while_method_6(v237)){
                 int v239;
                 v239 = 0l;
                 #pragma unroll
-                while (while_method_7(v239)){
+                while (while_method_6(v239)){
                     assert("Tensor range check" && 0 <= v237 && v237 < 1l);
                     assert("Tensor range check" && 0 <= v239 && v239 < 1l);
                     int v241;
@@ -2038,11 +2038,11 @@ __device__ void method_6(float * v0, int v1, float * v2, int v3, float * v4, int
             int v266;
             v266 = 0l;
             #pragma unroll
-            while (while_method_2(v266)){
+            while (while_method_0(v266)){
                 int v268;
                 v268 = 0l;
                 #pragma unroll
-                while (while_method_7(v268)){
+                while (while_method_6(v268)){
                     assert("Tensor range check" && 0 <= v266 && v266 < 2l);
                     assert("Tensor range check" && 0 <= v268 && v268 < 1l);
                     int v270;
@@ -2138,7 +2138,7 @@ __device__ void method_7(unsigned int * v0, int v1, float * v2){
         int v27[4l];
         int v28;
         v28 = 0l;
-        while (while_method_7(v28)){
+        while (while_method_6(v28)){
             assert("Tensor range check" && 0 <= v28 && v28 < 1l);
             int v30;
             v30 = 4l * v28;
@@ -2157,10 +2157,10 @@ __device__ void method_7(unsigned int * v0, int v1, float * v2){
         }
         int v35;
         v35 = 0l;
-        while (while_method_7(v35)){
+        while (while_method_6(v35)){
             int v37;
             v37 = 0l;
-            while (while_method_5(v37)){
+            while (while_method_4(v37)){
                 bool v39;
                 v39 = 0l <= v37;
                 bool v41;
@@ -2259,10 +2259,10 @@ __device__ void method_7(unsigned int * v0, int v1, float * v2){
         unsigned int v70[4l];
         int v71;
         v71 = 0l;
-        while (while_method_7(v71)){
+        while (while_method_6(v71)){
             int v73;
             v73 = 0l;
-            while (while_method_5(v73)){
+            while (while_method_4(v73)){
                 assert("Tensor range check" && 0 <= v71 && v71 < 1l);
                 assert("Tensor range check" && 0 <= v73 && v73 < 4l);
                 int v75;
@@ -2294,10 +2294,10 @@ __device__ void method_7(unsigned int * v0, int v1, float * v2){
         v82 = 0ul;
         int v83;
         v83 = 0l;
-        while (while_method_7(v83)){
+        while (while_method_6(v83)){
             int v85;
             v85 = 0l;
-            while (while_method_5(v85)){
+            while (while_method_4(v85)){
                 assert("Tensor range check" && 0 <= v83 && v83 < 1l);
                 assert("Tensor range check" && 0 <= v85 && v85 < 4l);
                 int v87;
@@ -2381,7 +2381,7 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
     assert("Tensor range check" && 0 <= v24 && v24 < 32l);
     int v32;
     v32 = 0l;
-    while (while_method_7(v32)){
+    while (while_method_6(v32)){
         bool v34;
         v34 = v25 && v29;
         bool v35;
@@ -2436,7 +2436,7 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v55[4l];
         int v56;
         v56 = 0l;
-        while (while_method_7(v56)){
+        while (while_method_6(v56)){
             assert("Tensor range check" && 0 <= v56 && v56 < 1l);
             int v58;
             v58 = 4l * v56;
@@ -2459,10 +2459,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         }
         int v64;
         v64 = 0l;
-        while (while_method_7(v64)){
+        while (while_method_6(v64)){
             int v66;
             v66 = 0l;
-            while (while_method_5(v66)){
+            while (while_method_4(v66)){
                 bool v68;
                 v68 = 0l <= v66;
                 bool v70;
@@ -2533,10 +2533,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v89[4l];
         int v90;
         v90 = 0l;
-        while (while_method_7(v90)){
+        while (while_method_6(v90)){
             int v92;
             v92 = 0l;
-            while (while_method_5(v92)){
+            while (while_method_4(v92)){
                 assert("Tensor range check" && 0 <= v90 && v90 < 1l);
                 assert("Tensor range check" && 0 <= v92 && v92 < 4l);
                 int v94;
@@ -2559,10 +2559,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v99[4l];
         int v100;
         v100 = 0l;
-        while (while_method_7(v100)){
+        while (while_method_6(v100)){
             int v102;
             v102 = 0l;
-            while (while_method_5(v102)){
+            while (while_method_4(v102)){
                 assert("Tensor range check" && 0 <= v100 && v100 < 1l);
                 assert("Tensor range check" && 0 <= v102 && v102 < 4l);
                 int v104;
@@ -2596,10 +2596,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v111 = 0.0f;
         int v112;
         v112 = 0l;
-        while (while_method_7(v112)){
+        while (while_method_6(v112)){
             int v114;
             v114 = 0l;
-            while (while_method_5(v114)){
+            while (while_method_4(v114)){
                 assert("Tensor range check" && 0 <= v112 && v112 < 1l);
                 assert("Tensor range check" && 0 <= v114 && v114 < 4l);
                 int v116;
@@ -2625,10 +2625,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v125[4l];
         int v126;
         v126 = 0l;
-        while (while_method_7(v126)){
+        while (while_method_6(v126)){
             int v128;
             v128 = 0l;
-            while (while_method_5(v128)){
+            while (while_method_4(v128)){
                 assert("Tensor range check" && 0 <= v126 && v126 < 1l);
                 assert("Tensor range check" && 0 <= v128 && v128 < 4l);
                 int v130;
@@ -2654,10 +2654,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v134 = 0l;
         int v135;
         v135 = 0l;
-        while (while_method_7(v135)){
+        while (while_method_6(v135)){
             int v137;
             v137 = 0l;
-            while (while_method_5(v137)){
+            while (while_method_4(v137)){
                 assert("Tensor range check" && 0 <= v135 && v135 < 1l);
                 assert("Tensor range check" && 0 <= v137 && v137 < 4l);
                 int v139;
@@ -2687,10 +2687,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v150[4l];
         int v151;
         v151 = 0l;
-        while (while_method_7(v151)){
+        while (while_method_6(v151)){
             int v153;
             v153 = 0l;
-            while (while_method_5(v153)){
+            while (while_method_4(v153)){
                 assert("Tensor range check" && 0 <= v151 && v151 < 1l);
                 assert("Tensor range check" && 0 <= v153 && v153 < 4l);
                 int v155;
@@ -2731,7 +2731,7 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v166 = 0.0f;
         int v167;
         v167 = 0l;
-        while (while_method_7(v167)){
+        while (while_method_6(v167)){
             assert("Tensor range check" && 0 <= v167 && v167 < 1l);
             int v169;
             v169 = 4l * v167;
@@ -2739,7 +2739,7 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
             int v170; float v171;
             Tuple3 tmp4 = Tuple3{0l, 0.0f};
             v170 = tmp4.v0; v171 = tmp4.v1;
-            while (while_method_5(v170)){
+            while (while_method_4(v170)){
                 assert("Tensor range check" && 0 <= v170 && v170 < 4l);
                 int v173;
                 v173 = v170 + v169;
@@ -2774,7 +2774,7 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
             int v186; float v187;
             Tuple3 tmp5 = Tuple3{0l, v185};
             v186 = tmp5.v0; v187 = tmp5.v1;
-            while (while_method_5(v186)){
+            while (while_method_4(v186)){
                 assert("Tensor range check" && 0 <= v186 && v186 < 4l);
                 int v189;
                 v189 = v186 + v169;
@@ -2796,10 +2796,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v194[4l];
         int v195;
         v195 = 0l;
-        while (while_method_7(v195)){
+        while (while_method_6(v195)){
             int v197;
             v197 = 0l;
-            while (while_method_5(v197)){
+            while (while_method_4(v197)){
                 assert("Tensor range check" && 0 <= v195 && v195 < 1l);
                 assert("Tensor range check" && 0 <= v197 && v197 < 4l);
                 int v199;
@@ -2825,10 +2825,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v204 = tmp6.v0; v205 = tmp6.v1;
         int v206;
         v206 = 0l;
-        while (while_method_7(v206)){
+        while (while_method_6(v206)){
             int v208;
             v208 = 0l;
-            while (while_method_5(v208)){
+            while (while_method_4(v208)){
                 assert("Tensor range check" && 0 <= v206 && v206 < 1l);
                 assert("Tensor range check" && 0 <= v208 && v208 < 4l);
                 int v210;
@@ -2885,10 +2885,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v231[4l];
         int v232;
         v232 = 0l;
-        while (while_method_7(v232)){
+        while (while_method_6(v232)){
             int v234;
             v234 = 0l;
-            while (while_method_5(v234)){
+            while (while_method_4(v234)){
                 assert("Tensor range check" && 0 <= v232 && v232 < 1l);
                 assert("Tensor range check" && 0 <= v234 && v234 < 4l);
                 int v236;
@@ -2912,10 +2912,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v240 = tmp8.v0; v241 = tmp8.v1;
         int v242;
         v242 = 0l;
-        while (while_method_7(v242)){
+        while (while_method_6(v242)){
             int v244;
             v244 = 0l;
-            while (while_method_5(v244)){
+            while (while_method_4(v244)){
                 assert("Tensor range check" && 0 <= v242 && v242 < 1l);
                 assert("Tensor range check" && 0 <= v244 && v244 < 4l);
                 int v246;
@@ -2954,10 +2954,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v261[4l];
         int v262;
         v262 = 0l;
-        while (while_method_7(v262)){
+        while (while_method_6(v262)){
             int v264;
             v264 = 0l;
-            while (while_method_5(v264)){
+            while (while_method_4(v264)){
                 assert("Tensor range check" && 0 <= v262 && v262 < 1l);
                 assert("Tensor range check" && 0 <= v264 && v264 < 4l);
                 int v266;
@@ -2993,10 +2993,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v275 = tmp10.v0; v276 = tmp10.v1;
         int v277;
         v277 = 0l;
-        while (while_method_7(v277)){
+        while (while_method_6(v277)){
             int v279;
             v279 = 0l;
-            while (while_method_5(v279)){
+            while (while_method_4(v279)){
                 assert("Tensor range check" && 0 <= v277 && v277 < 1l);
                 assert("Tensor range check" && 0 <= v279 && v279 < 4l);
                 int v281;
@@ -3052,10 +3052,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v301[4l];
         int v302;
         v302 = 0l;
-        while (while_method_7(v302)){
+        while (while_method_6(v302)){
             int v304;
             v304 = 0l;
-            while (while_method_5(v304)){
+            while (while_method_4(v304)){
                 assert("Tensor range check" && 0 <= v302 && v302 < 1l);
                 assert("Tensor range check" && 0 <= v304 && v304 < 4l);
                 int v306;
@@ -3078,10 +3078,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v311[4l];
         int v312;
         v312 = 0l;
-        while (while_method_7(v312)){
+        while (while_method_6(v312)){
             int v314;
             v314 = 0l;
-            while (while_method_5(v314)){
+            while (while_method_4(v314)){
                 assert("Tensor range check" && 0 <= v312 && v312 < 1l);
                 assert("Tensor range check" && 0 <= v314 && v314 < 4l);
                 int v316;
@@ -3115,10 +3115,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v323 = 0.0f;
         int v324;
         v324 = 0l;
-        while (while_method_7(v324)){
+        while (while_method_6(v324)){
             int v326;
             v326 = 0l;
-            while (while_method_5(v326)){
+            while (while_method_4(v326)){
                 assert("Tensor range check" && 0 <= v324 && v324 < 1l);
                 assert("Tensor range check" && 0 <= v326 && v326 < 4l);
                 int v328;
@@ -3143,10 +3143,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v336[4l];
         int v337;
         v337 = 0l;
-        while (while_method_7(v337)){
+        while (while_method_6(v337)){
             int v339;
             v339 = 0l;
-            while (while_method_5(v339)){
+            while (while_method_4(v339)){
                 assert("Tensor range check" && 0 <= v337 && v337 < 1l);
                 assert("Tensor range check" && 0 <= v339 && v339 < 4l);
                 int v341;
@@ -3172,10 +3172,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v345 = 0l;
         int v346;
         v346 = 0l;
-        while (while_method_7(v346)){
+        while (while_method_6(v346)){
             int v348;
             v348 = 0l;
-            while (while_method_5(v348)){
+            while (while_method_4(v348)){
                 assert("Tensor range check" && 0 <= v346 && v346 < 1l);
                 assert("Tensor range check" && 0 <= v348 && v348 < 4l);
                 int v350;
@@ -3204,10 +3204,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v360[4l];
         int v361;
         v361 = 0l;
-        while (while_method_7(v361)){
+        while (while_method_6(v361)){
             int v363;
             v363 = 0l;
-            while (while_method_5(v363)){
+            while (while_method_4(v363)){
                 assert("Tensor range check" && 0 <= v361 && v361 < 1l);
                 assert("Tensor range check" && 0 <= v363 && v363 < 4l);
                 int v365;
@@ -3248,10 +3248,10 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v375 = tmp12.v0; v376 = tmp12.v1;
         int v377;
         v377 = 0l;
-        while (while_method_7(v377)){
+        while (while_method_6(v377)){
             int v379;
             v379 = 0l;
-            while (while_method_5(v379)){
+            while (while_method_4(v379)){
                 assert("Tensor range check" && 0 <= v377 && v377 < 1l);
                 assert("Tensor range check" && 0 <= v379 && v379 < 4l);
                 int v381;
@@ -3302,7 +3302,7 @@ __device__ Tuple2 method_8(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         }
         int v401;
         v401 = 0l;
-        while (while_method_7(v401)){
+        while (while_method_6(v401)){
             assert("Tensor range check" && 0 <= v401 && v401 < 1l);
             assert("Tensor range check" && 0 <= v401 && v401 < 1l);
             v401 += 1l ;
@@ -3364,7 +3364,7 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
     assert("Tensor range check" && 0 <= v20 && v20 < 32l);
     int v28;
     v28 = 0l;
-    while (while_method_7(v28)){
+    while (while_method_6(v28)){
         bool v30;
         v30 = v21 && v25;
         bool v31;
@@ -3416,7 +3416,7 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         int v49[4l];
         int v50;
         v50 = 0l;
-        while (while_method_7(v50)){
+        while (while_method_6(v50)){
             assert("Tensor range check" && 0 <= v50 && v50 < 1l);
             int v52;
             v52 = 4l * v50;
@@ -3433,10 +3433,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         }
         int v56;
         v56 = 0l;
-        while (while_method_7(v56)){
+        while (while_method_6(v56)){
             int v58;
             v58 = 0l;
-            while (while_method_5(v58)){
+            while (while_method_4(v58)){
                 bool v60;
                 v60 = 0l <= v58;
                 bool v62;
@@ -3507,10 +3507,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         bool v81[4l];
         int v82;
         v82 = 0l;
-        while (while_method_7(v82)){
+        while (while_method_6(v82)){
             int v84;
             v84 = 0l;
-            while (while_method_5(v84)){
+            while (while_method_4(v84)){
                 assert("Tensor range check" && 0 <= v82 && v82 < 1l);
                 assert("Tensor range check" && 0 <= v84 && v84 < 4l);
                 int v86;
@@ -3533,10 +3533,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         float v91[4l];
         int v92;
         v92 = 0l;
-        while (while_method_7(v92)){
+        while (while_method_6(v92)){
             int v94;
             v94 = 0l;
-            while (while_method_5(v94)){
+            while (while_method_4(v94)){
                 assert("Tensor range check" && 0 <= v92 && v92 < 1l);
                 assert("Tensor range check" && 0 <= v94 && v94 < 4l);
                 int v96;
@@ -3570,10 +3570,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         v103 = 0.0f;
         int v104;
         v104 = 0l;
-        while (while_method_7(v104)){
+        while (while_method_6(v104)){
             int v106;
             v106 = 0l;
-            while (while_method_5(v106)){
+            while (while_method_4(v106)){
                 assert("Tensor range check" && 0 <= v104 && v104 < 1l);
                 assert("Tensor range check" && 0 <= v106 && v106 < 4l);
                 int v108;
@@ -3599,10 +3599,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         int v117[4l];
         int v118;
         v118 = 0l;
-        while (while_method_7(v118)){
+        while (while_method_6(v118)){
             int v120;
             v120 = 0l;
-            while (while_method_5(v120)){
+            while (while_method_4(v120)){
                 assert("Tensor range check" && 0 <= v118 && v118 < 1l);
                 assert("Tensor range check" && 0 <= v120 && v120 < 4l);
                 int v122;
@@ -3628,10 +3628,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         v126 = 0l;
         int v127;
         v127 = 0l;
-        while (while_method_7(v127)){
+        while (while_method_6(v127)){
             int v129;
             v129 = 0l;
-            while (while_method_5(v129)){
+            while (while_method_4(v129)){
                 assert("Tensor range check" && 0 <= v127 && v127 < 1l);
                 assert("Tensor range check" && 0 <= v129 && v129 < 4l);
                 int v131;
@@ -3661,10 +3661,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         float v142[4l];
         int v143;
         v143 = 0l;
-        while (while_method_7(v143)){
+        while (while_method_6(v143)){
             int v145;
             v145 = 0l;
-            while (while_method_5(v145)){
+            while (while_method_4(v145)){
                 assert("Tensor range check" && 0 <= v143 && v143 < 1l);
                 assert("Tensor range check" && 0 <= v145 && v145 < 4l);
                 int v147;
@@ -3705,10 +3705,10 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         v157 = tmp15.v0; v158 = tmp15.v1;
         int v159;
         v159 = 0l;
-        while (while_method_7(v159)){
+        while (while_method_6(v159)){
             int v161;
             v161 = 0l;
-            while (while_method_5(v161)){
+            while (while_method_4(v161)){
                 assert("Tensor range check" && 0 <= v159 && v159 < 1l);
                 assert("Tensor range check" && 0 <= v161 && v161 < 4l);
                 int v163;
@@ -3759,7 +3759,7 @@ __device__ float method_9(int * v0, float * v1, float * v2, float * v3, float * 
         }
         int v183;
         v183 = 0l;
-        while (while_method_7(v183)){
+        while (while_method_6(v183)){
             assert("Tensor range check" && 0 <= v183 && v183 < 1l);
             assert("Tensor range check" && 0 <= v183 && v183 < 1l);
             v183 += 1l ;
@@ -3956,7 +3956,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                         int v716; int v717;
                         Tuple1 tmp1 = Tuple1{0l, 0l};
                         v716 = tmp1.v0; v717 = tmp1.v1;
-                        while (while_method_2(v716)){
+                        while (while_method_0(v716)){
                             int v719;
                             v719 = v709[v716];
                             bool v721;
@@ -3973,7 +3973,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                         static_array<int,2l> v723;
                         int v725;
                         v725 = 0l;
-                        while (while_method_2(v725)){
+                        while (while_method_0(v725)){
                             v723[v725] = v717;
                             v725 += 1l ;
                         }
@@ -4063,7 +4063,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                 v84 = threadIdx.x;
                                 int v85;
                                 v85 = v84;
-                                while (while_method_3(v85)){
+                                while (while_method_2(v85)){
                                     bool v87;
                                     v87 = 0l <= v85;
                                     bool v88;
@@ -4109,7 +4109,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                 v103 = v63.length;
                                 int v104;
                                 v104 = 0l;
-                                while (while_method_4(v103, v104)){
+                                while (while_method_3(v103, v104)){
                                     Union2 v106;
                                     v106 = v63[v104];
                                     Union9 v125;
@@ -4174,7 +4174,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                 v131 = v101.length;
                                 int v132;
                                 v132 = 0l;
-                                while (while_method_4(v131, v132)){
+                                while (while_method_3(v131, v132)){
                                     Union8 v134;
                                     v134 = v101[v132];
                                     int v136;
@@ -4243,7 +4243,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                 asm("barrier.cta.sync %0;" :: "r"(0l));
                                 int v145;
                                 v145 = 0l;
-                                while (while_method_5(v145)){
+                                while (while_method_4(v145)){
                                     float * v147;
                                     v147 = reinterpret_cast<float *>(&v0[0ull]);
                                     float * v149;
@@ -4394,7 +4394,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                 v251 = v248 + v250;
                                 int v252;
                                 v252 = 0l;
-                                while (while_method_5(v252)){
+                                while (while_method_4(v252)){
                                     unsigned int * v254;
                                     v254 = reinterpret_cast<unsigned int *>(&v0[786432ull]);
                                     int v256;
@@ -4517,7 +4517,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                     assert("Tensor range check" && 0 <= v298 && v298 < 32l);
                                     int v306;
                                     v306 = 0l;
-                                    while (while_method_7(v306)){
+                                    while (while_method_6(v306)){
                                         bool v308;
                                         v308 = v299 && v303;
                                         bool v309;
@@ -4574,7 +4574,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                         int v330[2l];
                                         int v331;
                                         v331 = 0l;
-                                        while (while_method_7(v331)){
+                                        while (while_method_6(v331)){
                                             assert("Tensor range check" && 0 <= v331 && v331 < 1l);
                                             int v333;
                                             v333 = 2l * v331;
@@ -4597,10 +4597,10 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                         }
                                         int v339;
                                         v339 = 0l;
-                                        while (while_method_7(v339)){
+                                        while (while_method_6(v339)){
                                             int v341;
                                             v341 = 0l;
-                                            while (while_method_2(v341)){
+                                            while (while_method_0(v341)){
                                                 bool v343;
                                                 v343 = 0l <= v341;
                                                 bool v345;
@@ -4670,7 +4670,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                         }
                                         int v364;
                                         v364 = 0l;
-                                        while (while_method_7(v364)){
+                                        while (while_method_6(v364)){
                                             assert("Tensor range check" && 0 <= v364 && v364 < 1l);
                                             int v366;
                                             v366 = 2l * v364;
@@ -4748,7 +4748,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                         int v389; int v390;
                                         Tuple1 tmp17 = Tuple1{1l, v387};
                                         v389 = tmp17.v0; v390 = tmp17.v1;
-                                        while (while_method_2(v389)){
+                                        while (while_method_0(v389)){
                                             int v392;
                                             v392 = v58[v389];
                                             bool v394;
@@ -4831,7 +4831,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     int v469; int v470;
                                                     Tuple1 tmp18 = Tuple1{0l, 0l};
                                                     v469 = tmp18.v0; v470 = tmp18.v1;
-                                                    while (while_method_2(v469)){
+                                                    while (while_method_0(v469)){
                                                         int v472;
                                                         v472 = v58[v469];
                                                         bool v474;
@@ -4848,14 +4848,14 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     static_array<int,2l> v476;
                                                     int v478;
                                                     v478 = 0l;
-                                                    while (while_method_2(v478)){
+                                                    while (while_method_0(v478)){
                                                         v476[v478] = v470;
                                                         v478 += 1l ;
                                                     }
                                                     static_array<int,2l> v480;
                                                     int v482;
                                                     v482 = 0l;
-                                                    while (while_method_2(v482)){
+                                                    while (while_method_0(v482)){
                                                         int v484;
                                                         v484 = v476[v482];
                                                         bool v486;
@@ -4902,7 +4902,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     int v416; int v417;
                                                     Tuple1 tmp19 = Tuple1{0l, 0l};
                                                     v416 = tmp19.v0; v417 = tmp19.v1;
-                                                    while (while_method_2(v416)){
+                                                    while (while_method_0(v416)){
                                                         int v419;
                                                         v419 = v58[v416];
                                                         bool v421;
@@ -4919,7 +4919,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     static_array<int,2l> v423;
                                                     int v425;
                                                     v425 = 0l;
-                                                    while (while_method_2(v425)){
+                                                    while (while_method_0(v425)){
                                                         v423[v425] = v417;
                                                         v425 += 1l ;
                                                     }
@@ -4948,7 +4948,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     int v433; int v434;
                                                     Tuple1 tmp20 = Tuple1{0l, 0l};
                                                     v433 = tmp20.v0; v434 = tmp20.v1;
-                                                    while (while_method_2(v433)){
+                                                    while (while_method_0(v433)){
                                                         int v436;
                                                         v436 = v58[v433];
                                                         bool v438;
@@ -4965,14 +4965,14 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     static_array<int,2l> v440;
                                                     int v442;
                                                     v442 = 0l;
-                                                    while (while_method_2(v442)){
+                                                    while (while_method_0(v442)){
                                                         v440[v442] = v434;
                                                         v442 += 1l ;
                                                     }
                                                     static_array<int,2l> v444;
                                                     int v446;
                                                     v446 = 0l;
-                                                    while (while_method_2(v446)){
+                                                    while (while_method_0(v446)){
                                                         int v448;
                                                         v448 = v440[v446];
                                                         bool v450;
@@ -5043,7 +5043,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                 v512 = v511 - 1l;
                                 int v513;
                                 v513 = 0l;
-                                while (while_method_4(v512, v513)){
+                                while (while_method_3(v512, v513)){
                                     int v515;
                                     v515 = v498.length;
                                     int v516;
@@ -5100,7 +5100,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     int v579; int v580;
                                                     Tuple1 tmp21 = Tuple1{0l, 0l};
                                                     v579 = tmp21.v0; v580 = tmp21.v1;
-                                                    while (while_method_2(v579)){
+                                                    while (while_method_0(v579)){
                                                         int v582;
                                                         v582 = v58[v579];
                                                         bool v584;
@@ -5117,14 +5117,14 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     static_array<int,2l> v586;
                                                     int v588;
                                                     v588 = 0l;
-                                                    while (while_method_2(v588)){
+                                                    while (while_method_0(v588)){
                                                         v586[v588] = v580;
                                                         v588 += 1l ;
                                                     }
                                                     static_array<int,2l> v590;
                                                     int v592;
                                                     v592 = 0l;
-                                                    while (while_method_2(v592)){
+                                                    while (while_method_0(v592)){
                                                         int v594;
                                                         v594 = v586[v592];
                                                         bool v596;
@@ -5171,7 +5171,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     int v528; int v529;
                                                     Tuple1 tmp22 = Tuple1{0l, 0l};
                                                     v528 = tmp22.v0; v529 = tmp22.v1;
-                                                    while (while_method_2(v528)){
+                                                    while (while_method_0(v528)){
                                                         int v531;
                                                         v531 = v58[v528];
                                                         bool v533;
@@ -5188,7 +5188,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     static_array<int,2l> v535;
                                                     int v537;
                                                     v537 = 0l;
-                                                    while (while_method_2(v537)){
+                                                    while (while_method_0(v537)){
                                                         v535[v537] = v529;
                                                         v537 += 1l ;
                                                     }
@@ -5215,7 +5215,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     int v544; int v545;
                                                     Tuple1 tmp23 = Tuple1{0l, 0l};
                                                     v544 = tmp23.v0; v545 = tmp23.v1;
-                                                    while (while_method_2(v544)){
+                                                    while (while_method_0(v544)){
                                                         int v547;
                                                         v547 = v58[v544];
                                                         bool v549;
@@ -5232,14 +5232,14 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                                     static_array<int,2l> v551;
                                                     int v553;
                                                     v553 = 0l;
-                                                    while (while_method_2(v553)){
+                                                    while (while_method_0(v553)){
                                                         v551[v553] = v545;
                                                         v553 += 1l ;
                                                     }
                                                     static_array<int,2l> v555;
                                                     int v557;
                                                     v557 = 0l;
-                                                    while (while_method_2(v557)){
+                                                    while (while_method_0(v557)){
                                                         int v559;
                                                         v559 = v551[v557];
                                                         bool v561;
@@ -5327,7 +5327,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                             int v676; int v677;
                                             Tuple1 tmp24 = Tuple1{0l, 0l};
                                             v676 = tmp24.v0; v677 = tmp24.v1;
-                                            while (while_method_2(v676)){
+                                            while (while_method_0(v676)){
                                                 int v679;
                                                 v679 = v614[v676];
                                                 bool v681;
@@ -5344,14 +5344,14 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                             static_array<int,2l> v683;
                                             int v685;
                                             v685 = 0l;
-                                            while (while_method_2(v685)){
+                                            while (while_method_0(v685)){
                                                 v683[v685] = v677;
                                                 v685 += 1l ;
                                             }
                                             static_array<int,2l> v687;
                                             int v689;
                                             v689 = 0l;
-                                            while (while_method_2(v689)){
+                                            while (while_method_0(v689)){
                                                 int v691;
                                                 v691 = v683[v689];
                                                 bool v693;
@@ -5398,7 +5398,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                             int v623; int v624;
                                             Tuple1 tmp25 = Tuple1{0l, 0l};
                                             v623 = tmp25.v0; v624 = tmp25.v1;
-                                            while (while_method_2(v623)){
+                                            while (while_method_0(v623)){
                                                 int v626;
                                                 v626 = v614[v623];
                                                 bool v628;
@@ -5415,7 +5415,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                             static_array<int,2l> v630;
                                             int v632;
                                             v632 = 0l;
-                                            while (while_method_2(v632)){
+                                            while (while_method_0(v632)){
                                                 v630[v632] = v624;
                                                 v632 += 1l ;
                                             }
@@ -5444,7 +5444,7 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                             int v640; int v641;
                                             Tuple1 tmp26 = Tuple1{0l, 0l};
                                             v640 = tmp26.v0; v641 = tmp26.v1;
-                                            while (while_method_2(v640)){
+                                            while (while_method_0(v640)){
                                                 int v643;
                                                 v643 = v614[v640];
                                                 bool v645;
@@ -5461,14 +5461,14 @@ __device__ static_array<float,2l> method_3(unsigned char * v0, unsigned char * v
                                             static_array<int,2l> v647;
                                             int v649;
                                             v649 = 0l;
-                                            while (while_method_2(v649)){
+                                            while (while_method_0(v649)){
                                                 v647[v649] = v641;
                                                 v649 += 1l ;
                                             }
                                             static_array<int,2l> v651;
                                             int v653;
                                             v653 = 0l;
-                                            while (while_method_2(v653)){
+                                            while (while_method_0(v653)){
                                                 int v655;
                                                 v655 = v647[v653];
                                                 bool v657;
@@ -5614,11 +5614,6 @@ __device__ inline bool while_method_10(int v0){
     v1 = v0 < 512l;
     return v1;
 }
-__device__ inline bool while_method_11(int v0){
-    bool v1;
-    v1 = v0 < 256l;
-    return v1;
-}
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsigned long long v2, unsigned char * v3, unsigned long long v4, float * v5, float * v6, float * v7) {
     bool v8;
     v8 = 2101776ull == v4;
@@ -5681,7 +5676,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     v40 = v39[0l];
                     int v42;
                     v42 = 0l;
-                    while (while_method_5(v42)){
+                    while (while_method_4(v42)){
                         double * v44;
                         v44 = reinterpret_cast<double *>(&v3[2097168ull]);
                         double * v46;
@@ -5716,15 +5711,15 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                         v61 = (float)v60;
                         float v62;
                         v62 = v40 * v61;
-                        assert("Tensor range check" && 0 <= v29 && v29 < 16l);
-                        assert("Tensor range check" && 0 <= v31 && v31 < 16l);
+                        assert("Tensor range check" && 0 <= v29 && v29 < 2l);
+                        assert("Tensor range check" && 0 <= v31 && v31 < 2l);
                         assert("Tensor range check" && 0 <= v42 && v42 < 4l);
                         int v63;
                         v63 = 4l * v31;
                         int v64;
                         v64 = v63 + v42;
                         int v65;
-                        v65 = 64l * v29;
+                        v65 = 8l * v29;
                         int v66;
                         v66 = v65 + v64;
                         float * v67;
@@ -5775,7 +5770,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     v107 = reinterpret_cast<int *>(&v3[2101264ull]);
                     int v109;
                     v109 = 0l;
-                    while (while_method_5(v109)){
+                    while (while_method_4(v109)){
                         int v111;
                         v111 = threadIdx.x;
                         int v112;
@@ -5787,7 +5782,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                         float v115[2l];
                         int v116;
                         v116 = 0l;
-                        while (while_method_2(v116)){
+                        while (while_method_0(v116)){
                             float v118;
                             v118 = v39[v116];
                             v115[v116] = v118;
@@ -5865,7 +5860,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             double v156[2l];
                             int v157;
                             v157 = 0l;
-                            while (while_method_2(v157)){
+                            while (while_method_0(v157)){
                                 assert("Tensor range check" && 0 <= v157 && v157 < 2l);
                                 int v159;
                                 v159 = v157 + v155;
@@ -5887,7 +5882,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             v163 = 0.0;
                             int v164;
                             v164 = 0l;
-                            while (while_method_2(v164)){
+                            while (while_method_0(v164)){
                                 assert("Tensor range check" && 0 <= v164 && v164 < 2l);
                                 double v166;
                                 v166 = v156[v164];
@@ -5900,7 +5895,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             v168 = 0.0;
                             int v169;
                             v169 = 0l;
-                            while (while_method_2(v169)){
+                            while (while_method_0(v169)){
                                 assert("Tensor range check" && 0 <= v169 && v169 < 2l);
                                 int v171;
                                 v171 = v169 + v155;
@@ -5978,7 +5973,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             assert("Tensor range check" && 0 <= v200 && v200 < 32l);
                             int v208;
                             v208 = 0l;
-                            while (while_method_7(v208)){
+                            while (while_method_6(v208)){
                                 bool v210;
                                 v210 = v201 && v205;
                                 bool v211;
@@ -6044,7 +6039,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 int v237[4l];
                                 int v238;
                                 v238 = 0l;
-                                while (while_method_7(v238)){
+                                while (while_method_6(v238)){
                                     assert("Tensor range check" && 0 <= v238 && v238 < 1l);
                                     int v240;
                                     v240 = 4l * v238;
@@ -6073,10 +6068,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 }
                                 int v248;
                                 v248 = 0l;
-                                while (while_method_7(v248)){
+                                while (while_method_6(v248)){
                                     int v250;
                                     v250 = 0l;
-                                    while (while_method_5(v250)){
+                                    while (while_method_4(v250)){
                                         bool v252;
                                         v252 = 0l <= v250;
                                         bool v254;
@@ -6147,10 +6142,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 float v273[4l];
                                 int v274;
                                 v274 = 0l;
-                                while (while_method_7(v274)){
+                                while (while_method_6(v274)){
                                     int v276;
                                     v276 = 0l;
-                                    while (while_method_5(v276)){
+                                    while (while_method_4(v276)){
                                         assert("Tensor range check" && 0 <= v274 && v274 < 1l);
                                         assert("Tensor range check" && 0 <= v276 && v276 < 4l);
                                         int v278;
@@ -6183,10 +6178,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 bool v286[4l];
                                 int v287;
                                 v287 = 0l;
-                                while (while_method_7(v287)){
+                                while (while_method_6(v287)){
                                     int v289;
                                     v289 = 0l;
-                                    while (while_method_5(v289)){
+                                    while (while_method_4(v289)){
                                         assert("Tensor range check" && 0 <= v287 && v287 < 1l);
                                         assert("Tensor range check" && 0 <= v289 && v289 < 4l);
                                         int v291;
@@ -6209,10 +6204,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 float v296[4l];
                                 int v297;
                                 v297 = 0l;
-                                while (while_method_7(v297)){
+                                while (while_method_6(v297)){
                                     int v299;
                                     v299 = 0l;
-                                    while (while_method_5(v299)){
+                                    while (while_method_4(v299)){
                                         assert("Tensor range check" && 0 <= v297 && v297 < 1l);
                                         assert("Tensor range check" && 0 <= v299 && v299 < 4l);
                                         int v301;
@@ -6246,10 +6241,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 v308 = 0.0f;
                                 int v309;
                                 v309 = 0l;
-                                while (while_method_7(v309)){
+                                while (while_method_6(v309)){
                                     int v311;
                                     v311 = 0l;
-                                    while (while_method_5(v311)){
+                                    while (while_method_4(v311)){
                                         assert("Tensor range check" && 0 <= v309 && v309 < 1l);
                                         assert("Tensor range check" && 0 <= v311 && v311 < 4l);
                                         int v313;
@@ -6275,10 +6270,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 int v322[4l];
                                 int v323;
                                 v323 = 0l;
-                                while (while_method_7(v323)){
+                                while (while_method_6(v323)){
                                     int v325;
                                     v325 = 0l;
-                                    while (while_method_5(v325)){
+                                    while (while_method_4(v325)){
                                         assert("Tensor range check" && 0 <= v323 && v323 < 1l);
                                         assert("Tensor range check" && 0 <= v325 && v325 < 4l);
                                         int v327;
@@ -6304,10 +6299,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 v331 = 0l;
                                 int v332;
                                 v332 = 0l;
-                                while (while_method_7(v332)){
+                                while (while_method_6(v332)){
                                     int v334;
                                     v334 = 0l;
-                                    while (while_method_5(v334)){
+                                    while (while_method_4(v334)){
                                         assert("Tensor range check" && 0 <= v332 && v332 < 1l);
                                         assert("Tensor range check" && 0 <= v334 && v334 < 4l);
                                         int v336;
@@ -6337,10 +6332,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 float v347[4l];
                                 int v348;
                                 v348 = 0l;
-                                while (while_method_7(v348)){
+                                while (while_method_6(v348)){
                                     int v350;
                                     v350 = 0l;
-                                    while (while_method_5(v350)){
+                                    while (while_method_4(v350)){
                                         assert("Tensor range check" && 0 <= v348 && v348 < 1l);
                                         assert("Tensor range check" && 0 <= v350 && v350 < 4l);
                                         int v352;
@@ -6379,10 +6374,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 float v362[4l];
                                 int v363;
                                 v363 = 0l;
-                                while (while_method_7(v363)){
+                                while (while_method_6(v363)){
                                     int v365;
                                     v365 = 0l;
-                                    while (while_method_5(v365)){
+                                    while (while_method_4(v365)){
                                         assert("Tensor range check" && 0 <= v363 && v363 < 1l);
                                         assert("Tensor range check" && 0 <= v365 && v365 < 4l);
                                         int v367;
@@ -6417,10 +6412,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 float v376[4l];
                                 int v377;
                                 v377 = 0l;
-                                while (while_method_7(v377)){
+                                while (while_method_6(v377)){
                                     int v379;
                                     v379 = 0l;
-                                    while (while_method_5(v379)){
+                                    while (while_method_4(v379)){
                                         assert("Tensor range check" && 0 <= v377 && v377 < 1l);
                                         assert("Tensor range check" && 0 <= v379 && v379 < 4l);
                                         int v381;
@@ -6444,10 +6439,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 v386 = 0.0f;
                                 int v387;
                                 v387 = 0l;
-                                while (while_method_7(v387)){
+                                while (while_method_6(v387)){
                                     int v389;
                                     v389 = 0l;
-                                    while (while_method_5(v389)){
+                                    while (while_method_4(v389)){
                                         assert("Tensor range check" && 0 <= v387 && v387 < 1l);
                                         assert("Tensor range check" && 0 <= v389 && v389 < 4l);
                                         int v391;
@@ -6471,10 +6466,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 v398 = cooperative_groups::reduce(v397, v386, v320);
                                 int v399;
                                 v399 = 0l;
-                                while (while_method_7(v399)){
+                                while (while_method_6(v399)){
                                     int v401;
                                     v401 = 0l;
-                                    while (while_method_5(v401)){
+                                    while (while_method_4(v401)){
                                         assert("Tensor range check" && 0 <= v399 && v399 < 1l);
                                         assert("Tensor range check" && 0 <= v401 && v401 < 4l);
                                         int v403;
@@ -6500,7 +6495,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                 }
                                 int v412;
                                 v412 = 0l;
-                                while (while_method_7(v412)){
+                                while (while_method_6(v412)){
                                     assert("Tensor range check" && 0 <= v412 && v412 < 1l);
                                     assert("Tensor range check" && 0 <= v412 && v412 < 1l);
                                     v412 += 1l ;
@@ -6573,7 +6568,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                         assert("Tensor range check" && 0 <= v436 && v436 < 32l);
                         int v444;
                         v444 = 0l;
-                        while (while_method_7(v444)){
+                        while (while_method_6(v444)){
                             bool v446;
                             v446 = v437 && v441;
                             bool v447;
@@ -6630,7 +6625,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             int v468[2l];
                             int v469;
                             v469 = 0l;
-                            while (while_method_7(v469)){
+                            while (while_method_6(v469)){
                                 assert("Tensor range check" && 0 <= v469 && v469 < 1l);
                                 int v471;
                                 v471 = 2l * v469;
@@ -6653,10 +6648,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             }
                             int v477;
                             v477 = 0l;
-                            while (while_method_7(v477)){
+                            while (while_method_6(v477)){
                                 int v479;
                                 v479 = 0l;
-                                while (while_method_2(v479)){
+                                while (while_method_0(v479)){
                                     bool v481;
                                     v481 = 0l <= v479;
                                     bool v483;
@@ -6728,10 +6723,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             double v503[2l];
                             int v504;
                             v504 = 0l;
-                            while (while_method_7(v504)){
+                            while (while_method_6(v504)){
                                 int v506;
                                 v506 = 0l;
-                                while (while_method_2(v506)){
+                                while (while_method_0(v506)){
                                     assert("Tensor range check" && 0 <= v504 && v504 < 1l);
                                     assert("Tensor range check" && 0 <= v506 && v506 < 2l);
                                     int v508;
@@ -6752,7 +6747,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                             }
                             int v512;
                             v512 = 0l;
-                            while (while_method_7(v512)){
+                            while (while_method_6(v512)){
                                 assert("Tensor range check" && 0 <= v512 && v512 < 1l);
                                 int v514;
                                 v514 = 2l * v512;
@@ -6931,7 +6926,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     int v601[4l];
                     int v602;
                     v602 = 0l;
-                    while (while_method_7(v602)){
+                    while (while_method_6(v602)){
                         assert("Tensor range check" && 0 <= v602 && v602 < 1l);
                         int v604;
                         v604 = 4l * v602;
@@ -6984,10 +6979,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     }
                     int v620;
                     v620 = 0l;
-                    while (while_method_7(v620)){
+                    while (while_method_6(v620)){
                         int v622;
                         v622 = 0l;
-                        while (while_method_5(v622)){
+                        while (while_method_4(v622)){
                             bool v624;
                             v624 = 0l <= v622;
                             bool v626;
@@ -7116,10 +7111,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v666[4l];
                     int v667;
                     v667 = 0l;
-                    while (while_method_7(v667)){
+                    while (while_method_6(v667)){
                         int v669;
                         v669 = 0l;
-                        while (while_method_5(v669)){
+                        while (while_method_4(v669)){
                             assert("Tensor range check" && 0 <= v667 && v667 < 1l);
                             assert("Tensor range check" && 0 <= v669 && v669 < 4l);
                             int v671;
@@ -7150,10 +7145,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v678[4l];
                     int v679;
                     v679 = 0l;
-                    while (while_method_7(v679)){
+                    while (while_method_6(v679)){
                         int v681;
                         v681 = 0l;
-                        while (while_method_5(v681)){
+                        while (while_method_4(v681)){
                             assert("Tensor range check" && 0 <= v679 && v679 < 1l);
                             assert("Tensor range check" && 0 <= v681 && v681 < 4l);
                             int v683;
@@ -7181,10 +7176,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     v688 = 0.0f;
                     int v689;
                     v689 = 0l;
-                    while (while_method_7(v689)){
+                    while (while_method_6(v689)){
                         int v691;
                         v691 = 0l;
-                        while (while_method_5(v691)){
+                        while (while_method_4(v691)){
                             assert("Tensor range check" && 0 <= v689 && v689 < 1l);
                             assert("Tensor range check" && 0 <= v691 && v691 < 4l);
                             int v693;
@@ -7210,10 +7205,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v702[4l];
                     int v703;
                     v703 = 0l;
-                    while (while_method_7(v703)){
+                    while (while_method_6(v703)){
                         int v705;
                         v705 = 0l;
-                        while (while_method_5(v705)){
+                        while (while_method_4(v705)){
                             assert("Tensor range check" && 0 <= v703 && v703 < 1l);
                             assert("Tensor range check" && 0 <= v705 && v705 < 4l);
                             int v707;
@@ -7244,10 +7239,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v714[4l];
                     int v715;
                     v715 = 0l;
-                    while (while_method_7(v715)){
+                    while (while_method_6(v715)){
                         int v717;
                         v717 = 0l;
-                        while (while_method_5(v717)){
+                        while (while_method_4(v717)){
                             assert("Tensor range check" && 0 <= v715 && v715 < 1l);
                             assert("Tensor range check" && 0 <= v717 && v717 < 4l);
                             int v719;
@@ -7270,10 +7265,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v724[4l];
                     int v725;
                     v725 = 0l;
-                    while (while_method_7(v725)){
+                    while (while_method_6(v725)){
                         int v727;
                         v727 = 0l;
-                        while (while_method_5(v727)){
+                        while (while_method_4(v727)){
                             assert("Tensor range check" && 0 <= v725 && v725 < 1l);
                             assert("Tensor range check" && 0 <= v727 && v727 < 4l);
                             int v729;
@@ -7303,10 +7298,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     v735 = 0.0f;
                     int v736;
                     v736 = 0l;
-                    while (while_method_7(v736)){
+                    while (while_method_6(v736)){
                         int v738;
                         v738 = 0l;
-                        while (while_method_5(v738)){
+                        while (while_method_4(v738)){
                             assert("Tensor range check" && 0 <= v736 && v736 < 1l);
                             assert("Tensor range check" && 0 <= v738 && v738 < 4l);
                             int v740;
@@ -7341,10 +7336,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v751[4l];
                     int v752;
                     v752 = 0l;
-                    while (while_method_7(v752)){
+                    while (while_method_6(v752)){
                         int v754;
                         v754 = 0l;
-                        while (while_method_5(v754)){
+                        while (while_method_4(v754)){
                             assert("Tensor range check" && 0 <= v752 && v752 < 1l);
                             assert("Tensor range check" && 0 <= v754 && v754 < 4l);
                             int v756;
@@ -7366,10 +7361,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v761[4l];
                     int v762;
                     v762 = 0l;
-                    while (while_method_7(v762)){
+                    while (while_method_6(v762)){
                         int v764;
                         v764 = 0l;
-                        while (while_method_5(v764)){
+                        while (while_method_4(v764)){
                             assert("Tensor range check" && 0 <= v762 && v762 < 1l);
                             assert("Tensor range check" && 0 <= v764 && v764 < 4l);
                             int v766;
@@ -7411,10 +7406,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     float v783[4l];
                     int v784;
                     v784 = 0l;
-                    while (while_method_7(v784)){
+                    while (while_method_6(v784)){
                         int v786;
                         v786 = 0l;
-                        while (while_method_5(v786)){
+                        while (while_method_4(v786)){
                             assert("Tensor range check" && 0 <= v784 && v784 < 1l);
                             assert("Tensor range check" && 0 <= v786 && v786 < 4l);
                             int v788;
@@ -7446,7 +7441,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                     assert("Tensor range check" && 0 <= v585 && v585 < 128l);
                     int v794;
                     v794 = 0l;
-                    while (while_method_7(v794)){
+                    while (while_method_6(v794)){
                         assert("Tensor range check" && 0 <= v794 && v794 < 1l);
                         int v796;
                         v796 = 4l * v794;
@@ -7512,7 +7507,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
             v815 = v812 + v814;
             int v816;
             v816 = v815;
-            while (while_method_11(v816)){
+            while (while_method_4(v816)){
                 bool v818;
                 v818 = 0l <= v816;
                 bool v819;
@@ -7524,19 +7519,19 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                 int v821;
                 v821 = v816 % 1l;
                 int v822;
-                v822 = v816 % 16l;
+                v822 = v816 % 2l;
                 int v823;
-                v823 = v816 / 16l;
+                v823 = v816 / 2l;
                 bool v824;
-                v824 = v823 < 16l;
+                v824 = v823 < 2l;
                 bool v825;
                 v825 = v824 == false;
                 if (v825){
                     assert("The last element of the projection dimensions needs to be greater than the index remainder." && v824);
                 } else {
                 }
-                assert("Tensor range check" && 0 <= v823 && v823 < 16l);
-                assert("Tensor range check" && 0 <= v822 && v822 < 16l);
+                assert("Tensor range check" && 0 <= v823 && v823 < 2l);
+                assert("Tensor range check" && 0 <= v822 && v822 < 2l);
                 assert("Tensor range check" && 0 <= v821 && v821 < 1l);
                 int v827;
                 v827 = 4l * v821;
@@ -7545,11 +7540,11 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                 int v829;
                 v829 = v828 + v827;
                 int v830;
-                v830 = 64l * v823;
+                v830 = 8l * v823;
                 int v831;
                 v831 = v830 + v829;
-                assert("Tensor range check" && 0 <= v823 && v823 < 16l);
-                assert("Tensor range check" && 0 <= v822 && v822 < 16l);
+                assert("Tensor range check" && 0 <= v823 && v823 < 2l);
+                assert("Tensor range check" && 0 <= v822 && v822 < 2l);
                 assert("Tensor range check" && 0 <= v821 && v821 < 1l);
                 float v832[4l];
                 float v833[4l];
@@ -7570,7 +7565,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                 int v839;
                 v839 = 0l;
                 #pragma unroll
-                while (while_method_5(v839)){
+                while (while_method_4(v839)){
                     assert("Tensor range check" && 0 <= v839 && v839 < 4l);
                     float v841;
                     v841 = v832[v839];
@@ -7680,6 +7675,10 @@ class US1_0(NamedTuple): # Computer
 class US1_1(NamedTuple): # Random
     tag = 1
 US1 = Union[US1_0, US1_1]
+class US2_0(NamedTuple): # AddRewards
+    v0 : list
+    tag = 0
+US2 = US2_0
 def Closure0():
     def inner(v0 : object, v1 : object) -> object:
         v2 = cp.empty(4,dtype=cp.uint8)
@@ -7699,9 +7698,9 @@ def Closure0():
         v18 = US1_1()
         v14[1] = v18
         del v14, v18
-        v19 = cp.zeros(1024,dtype=cp.float32) # type: ignore
-        v20 = cp.zeros(1024,dtype=cp.float32) # type: ignore
-        v21 = cp.empty(1024,dtype=cp.float32)
+        v19 = cp.zeros(16,dtype=cp.float32) # type: ignore
+        v20 = cp.zeros(16,dtype=cp.float32) # type: ignore
+        v21 = cp.empty(16,dtype=cp.float32)
         v22 = cp.cuda.Device().attributes['MultiProcessorCount']
         v23 = v22 == 24
         del v22
@@ -7735,11 +7734,11 @@ def Closure0():
         v40 = v39.get()
         del v39
         v41 = 0
-        while method15(v41):
+        while method16(v41):
             v43 = []
             v44 = 0
             while method16(v44):
-                assert 0 <= v41 < 256, 'Tensor range check'
+                assert 0 <= v41 < 4, 'Tensor range check'
                 assert 0 <= v44 < 4, 'Tensor range check'
                 v46 = 4 * v41
                 v47 = v46 + v44
@@ -7754,7 +7753,12 @@ def Closure0():
             del v43
             v41 += 1 
         del v40, v41
-        return method17(v37, v4, v5, v6, v7)
+        v49 = [None] * 1
+        v50 = US2_0(v37)
+        del v37
+        v49[0] = v50
+        del v50
+        return method17(v4, v5, v6, v7, v49)
     return inner
 def Closure1():
     def inner() -> object:
@@ -7799,7 +7803,7 @@ def Closure1():
         del v26
         v27 = 897024
         v28 = 2101776
-        return method28(v1, v27, v0, v28)
+        return method31(v1, v27, v0, v28)
     return inner
 def method2(v0 : object) -> None:
     assert v0 == [], f'Expected an unit type. Got: {v0}'
@@ -7843,129 +7847,152 @@ def method3(v0 : cp.ndarray, v1 : US0) -> None:
             return method5(v4)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method13(v0 : object) -> cp.ndarray:
+def method8(v0 : object) -> None:
+    v1 = v0["private"] # type: ignore
+    method2(v1)
+    del v1
+    v2 = v0["public"] # type: ignore
+    del v0
+    method2(v2)
+    del v2
+    return 
+def method14(v0 : object) -> cp.ndarray:
     assert isinstance(v0,cp.ndarray), f'The object needs to be the right primitive type. Got: {v0}'
     v1 = v0
     del v0
     return v1
-def method12(v0 : object) -> cp.ndarray:
-    v1 = method13(v0)
+def method13(v0 : object) -> cp.ndarray:
+    v1 = method14(v0)
     del v0
     return v1
-def method14(v0 : object) -> u64:
+def method15(v0 : object) -> u64:
     assert isinstance(v0,u64), f'The object needs to be the right primitive type. Got: {v0}'
     v1 = v0
     del v0
     return v1
-def method11(v0 : object) -> Tuple[cp.ndarray, u64]:
+def method12(v0 : object) -> Tuple[cp.ndarray, u64]:
     v1 = v0[0] # type: ignore
-    v2 = method12(v1)
+    v2 = method13(v1)
     del v1
     v3 = v0[1] # type: ignore
     del v0
-    v4 = method14(v3)
+    v4 = method15(v3)
     del v3
     return v2, v4
-def method10(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
+def method11(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
     v1 = v0["output"] # type: ignore
-    v2, v3 = method11(v1)
+    v2, v3 = method12(v1)
     del v1
     v4 = v0["param"] # type: ignore
     del v0
-    v5, v6 = method11(v4)
+    v5, v6 = method12(v4)
     del v4
     return v2, v3, v5, v6
-def method9(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
-    v1, v2, v3, v4 = method10(v0)
+def method10(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
+    v1, v2, v3, v4 = method11(v0)
     del v0
     return v1, v2, v3, v4
-def method8(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
+def method9(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
     v1 = v0["model_data"] # type: ignore
     del v0
-    v2, v3, v4, v5 = method9(v1)
+    v2, v3, v4, v5 = method10(v1)
     del v1
     return v2, v3, v4, v5
 def method7(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
-    v1 = v0["neural"] # type: ignore
-    del v0
-    v2, v3, v4, v5 = method8(v1)
+    v1 = v0["game"] # type: ignore
+    method8(v1)
     del v1
-    return v2, v3, v4, v5
+    v2 = v0["neural"] # type: ignore
+    del v0
+    v3, v4, v5, v6 = method9(v2)
+    del v2
+    return v3, v4, v5, v6
 def method6(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
     return method7(v0)
-def method15(v0 : i32) -> bool:
-    v1 = v0 < 256
-    del v0
-    return v1
 def method16(v0 : i32) -> bool:
     v1 = v0 < 4
     del v0
     return v1
-def method20(v0 : list) -> object:
+def method21() -> object:
+    v0 = []
+    return v0
+def method20() -> object:
+    v0 = method21()
+    v1 = method21()
+    v2 = {'private': v0, 'public': v1}
+    del v0, v1
+    return v2
+def method27(v0 : cp.ndarray) -> object:
     v1 = v0
     del v0
     return v1
-def method19(v0 : list) -> object:
-    return method20(v0)
 def method26(v0 : cp.ndarray) -> object:
+    return method27(v0)
+def method28(v0 : u64) -> object:
     v1 = v0
     del v0
     return v1
-def method25(v0 : cp.ndarray) -> object:
-    return method26(v0)
-def method27(v0 : u64) -> object:
-    v1 = v0
-    del v0
-    return v1
-def method24(v0 : cp.ndarray, v1 : u64) -> object:
+def method25(v0 : cp.ndarray, v1 : u64) -> object:
     v2 = []
-    v3 = method25(v0)
+    v3 = method26(v0)
     del v0
     v2.append(v3)
     del v3
-    v4 = method27(v1)
+    v4 = method28(v1)
     del v1
     v2.append(v4)
     del v4
     v5 = v2
     del v2
     return v5
-def method23(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method24(v0, v1)
+def method24(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    v4 = method25(v0, v1)
     del v0, v1
-    v5 = method24(v2, v3)
+    v5 = method25(v2, v3)
     del v2, v3
     v6 = {'output': v4, 'param': v5}
     del v4, v5
     return v6
+def method23(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    return method24(v0, v1, v2, v3)
 def method22(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    return method23(v0, v1, v2, v3)
-def method21(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method22(v0, v1, v2, v3)
+    v4 = method23(v0, v1, v2, v3)
     del v0, v1, v2, v3
     v5 = {'model_data': v4}
     del v4
     return v5
-def method18(v0 : list, v1 : cp.ndarray, v2 : u64, v3 : cp.ndarray, v4 : u64) -> object:
-    v5 = method19(v0)
+def method19(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    v4 = method20()
+    v5 = method22(v0, v1, v2, v3)
+    del v0, v1, v2, v3
+    v6 = {'game': v4, 'neural': v5}
+    del v4, v5
+    return v6
+def method30(v0 : list) -> object:
+    v1 = v0
     del v0
-    v6 = method21(v1, v2, v3, v4)
-    del v1, v2, v3, v4
-    v7 = {'frontend_rewards': v5, 'neural': v6}
-    del v5, v6
-    return v7
-def method17(v0 : list, v1 : cp.ndarray, v2 : u64, v3 : cp.ndarray, v4 : u64) -> object:
+    return v1
+def method29(v0 : list) -> object:
+    return method30(v0)
+def method18(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64, v4 : list) -> object:
+    v5 = []
+    v6 = method19(v0, v1, v2, v3)
+    del v0, v1, v2, v3
+    v5.append(v6)
+    del v6
+    v7 = method29(v4)
+    del v4
+    v5.append(v7)
+    del v7
+    v8 = v5
+    del v5
+    return v8
+def method17(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64, v4 : list) -> object:
     v5 = method18(v0, v1, v2, v3, v4)
     del v0, v1, v2, v3, v4
     return v5
-def method29(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method21(v0, v1, v2, v3)
-    del v0, v1, v2, v3
-    v5 = {'neural': v4}
-    del v4
-    return v5
-def method28(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method29(v0, v1, v2, v3)
+def method31(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    v4 = method19(v0, v1, v2, v3)
     del v0, v1, v2, v3
     return v4
 def main_body():

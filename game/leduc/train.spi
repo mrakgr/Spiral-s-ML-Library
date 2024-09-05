@@ -1,10 +1,14 @@
 open game
 open corebase
+open corepython
 open corecuda
 open coreext
 
 union player_type = Computer | Random
 type player_types = sam.sa 2 player_type
+
+union ui_effects =
+    | AddRewards : plist (plist float)
 
 type event_config =
     {
@@ -17,8 +21,8 @@ type event_config =
 inl event_config() : event_config =
     {
         player_types = arraym.fromList [Computer; Random]
-        outer = 1 <<< 4
-        inner = 1 <<< 4
+        outer = 1 <<< 1
+        inner = 1 <<< 1
     }
 
 union event =
@@ -31,11 +35,13 @@ type state_neural =
 
 type state =
     {
+        game : { private : (); public : () }
         neural : state_neural
     }
 
-inl init() : state = 
+inl init() : state =
     {
+        game = { private=(); public=() }
         neural = {
             model_data = model.game_graph() |> ml.cfr_models.init |> ml.cfr_models.to_model_data
         }
@@ -181,11 +187,14 @@ inl main() =
             console.write "The time it took to run the kernel (in seconds) is: "
             console.write_ln (p2 - p)
 
-            jsonm.serialize { 
-                neural 
-                frontend_rewards = 
-                    frontend_rewards
-                    |> tensorm.reshape (fun a,b,c => a*b,c)
-                    |> python_listm.from_2d_tensor
-                }
+            inl a = { neural game = { private=(); public=() } }
+            inl b : plist ui_effects =
+                frontend_rewards
+                |> tensorm.reshape (fun a,b,c => a*b,c)
+                |> plistm.from_2d_tensor
+                |> AddRewards
+                |> listm.singleton
+                |> arraym.fromList
+
+            jsonm.serialize(a, b)
     }

@@ -49,7 +49,7 @@ modules:
         
     corepython/
         base-
-        python_listm
+        plistm
         jsonm
         
     corecuda/

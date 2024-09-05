@@ -2,14 +2,18 @@ open corebase
 
 // Python native object.
 type obj = $"object"
+
+
 // Converts a Spiral record to a Python record.
 inl record forall t {record}. (x : t) : obj = !!!!ToPythonRecord(x)
 // Converts a Spiral record to a Python named tuple.
 inl named_tuple forall t {record}. (n : string) (x : t) : obj = !!!!ToPythonNamedTuple(n,x)
 
-nominal list a = $"list"
+// Python's inbuilt list.
+nominal plist a = $"list"
 
-instance create list = fun size => $"[None]*!size"
-instance index list = fun ar i => $"!ar[!i]"
-instance set list = fun ar i v => $"!ar[!i] = !v"
-instance length list = fun ar => $"len(!ar)"
+instance index plist = fun ar i => $"!ar[!i]"
+instance set plist = fun ar i v => $"!ar[!i] = !v"
+instance length plist = fun ar => $"len(!ar)"
+instance create plist = fun i => $"[None] * !i"
+

@@ -13,18 +13,17 @@ class Leduc_Train_Namespace(Namespace):
     def emit_update(self, data: Any): emit('update', data)
 
     def on_connect(self):
-        print(f'Client connected to Leduc train: {self.sid()}')
+        print(f'Client connected to Leduc trainer: {self.sid()}')
         state = funs.init()
         Leduc_Train_Namespace.user_state[self.sid()] = state
-        self.emit_update([state["public_state"],[]])
+        self.emit_update([state["game"]["public"],[]])
 
     def on_disconnect(self):
         Leduc_Train_Namespace.user_state.pop(self.sid())
         print(f'Client disconnected: {self.sid()}')
 
     def on_update(self, msg : Any):
-        # state = Leduc_Train_Namespace.user_state[self.sid()]
-        # state = spiral_game.event_loop_gpu(msg,state["game_state"])
-        # Leduc_Train_Namespace.user_state[self.sid()] = state
-        # self.emit_update(state["ui_state"])
-        pass
+        state = Leduc_Train_Namespace.user_state[self.sid()]
+        [state,effects] = funs.event_loop_gpu(msg,state)
+        Leduc_Train_Namespace.user_state[self.sid()] = state
+        self.emit_update([state["game"]["public"],effects])

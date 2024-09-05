@@ -1,7 +1,7 @@
 // open corebase
 // open corepython
 
-// type plist t = python_listm.python_list t
+// type plist t = plistm.plist t
 // type public_state = 
 //     {
 //         training_iterations : int

@@ -61,25 +61,25 @@ Error trace on line: 187, column: 21 in module: c:\Spiral_s_ML_Library\game\ledu
 Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
 inl (|>) a b = b a
                ^
-Error trace on line: 42, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+Error trace on line: 42, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
     inl l, x = create', tensor_to_numpy x
     ^
-Error trace on line: 42, column: 25 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+Error trace on line: 42, column: 25 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
     inl l, x = create', tensor_to_numpy x
                         ^
-Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
     inl _ : tensor _ _ = flatten x // Asserts the tensor is contiguous.
     ^
-Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
     inl (tensor {bodies dim}) = x |> apply_ptr
     ^
-Error trace on line: 33, column: 10 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+Error trace on line: 33, column: 10 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
     inl (tensor {bodies dim}) = x |> apply_ptr
          ^
-Error trace on line: 33, column: 17 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+Error trace on line: 33, column: 17 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
     inl (tensor {bodies dim}) = x |> apply_ptr
                 ^
-Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
     tensor { dim bodies = real
     ^
 Type error in nominal constructor.

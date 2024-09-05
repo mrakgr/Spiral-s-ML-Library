@@ -214,9 +214,8 @@ union event =
     | PlayerChanged : sam.sa 2 player_type
     | ActionSelected : action
 
-inl event_loop state_neural (msg, state_internal : event * state_internal) : () =
+inl event_loop rng state_neural (msg, state_internal : event * state_internal) : () =
     open refm
-    inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv corecuda.rangem.threads_in_grid().from; offset=0}
     match msg with
     | StartGame =>
         internal_set state_internal init_game()
@@ -257,7 +256,7 @@ inl main() =
                 if from = 0 then
                     inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
                     // When converting the state to internal form, the refs will point to the original.
-                    event_loop neural (msg, state_to_internal rng game_state)
+                    event_loop rng neural (msg, state_to_internal rng game_state)
                     serialize seri.game_state game_state
 
                 // nn model loop

@@ -79,7 +79,7 @@ let serialize forall t. (x : t) : json t =
             ar
         typecase t' with
         | () => $"[]" : obj
-        | ~a * ~b => f_tuple `t' (python_listm.create' `obj) x
+        | ~a * ~b => f_tuple `t' (plistm.create' `obj) x
         | {} => record_type_map (fun k => forall v. => f `v (x k)) `t' |> fun x => !!!!ToPythonRecord(x)
         | sam.sa ~dim ~el => serialize_sa `(sam.sa dim) `el
         | dam.da ~dim ~el => serialize_sa `(dam.sa dim) `el
@@ -98,14 +98,14 @@ let serialize forall t. (x : t) : json t =
                 f `t'' (nominal_strip x)
             else
                 $"!x" : obj
-    and inl f_tuple forall t'. (l : python_listm.python_list obj) (x : t') : obj = real
+    and inl f_tuple forall t'. (l : plist obj) (x : t') : obj = real
         open real_core
         typecase t' with
         | ~a * ~b => 
-            python_listm.push `obj l (f `a (fst x))
+            plistm.push `obj l (f `a (fst x))
             f_tuple `b l (snd x)
         | _ => 
-            python_listm.push `obj l (f `t' x)
+            plistm.push `obj l (f `t' x)
             $"!l" : obj
     json (f x)
 

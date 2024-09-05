@@ -1,27 +1,21 @@
 open corebase
 
 // Python's list module.
-nominal python_list a = $"list"
 
 // Creates a python list.
-inl create' forall t. : python_list t = $"[]"
+inl create' forall t. : plist t = $"[]"
 
 // Concatenates an array of strings.
-inl join' (sep : string) (l : python_list string) : string = $"!sep.join(!l)"
+inl join' (sep : string) (l : plist string) : string = $"!sep.join(!l)"
 // Removes the element at the given index and returns it.
-inl pop forall el. (l : python_list el) (i : int) : el = $"!l.pop(!i)"
+inl pop forall el. (l : plist el) (i : int) : el = $"!l.pop(!i)"
 // Appends to an array.
-inl push forall el. (l : python_list el) (x : el) : () = $"!l.append(!x)"
+inl push forall el. (l : plist el) (x : el) : () = $"!l.append(!x)"
 // Cleards the array.
-inl clear forall el. (l : python_list el) : () = $"!l.clear()"
-
-instance index python_list = fun ar i => $"!ar[!i]"
-instance set python_list = fun ar i v => $"!ar[!i] = !v"
-instance length python_list = fun ar => $"len(!ar)"
-instance create python_list = fun i => $"[None] * !i"
+inl clear forall el. (l : plist el) : () = $"!l.clear()"
 
 // Does on in-place shuffle of the list.
-inl shuffle forall t. (deck : python_list t) : () =
+inl shuffle forall t. (deck : plist t) : () =
     global "import random"
     $"random.shuffle(!deck)"
 
@@ -39,7 +33,7 @@ inl tensor_to_numpy forall dim el. (x : tensor dim el) : tensor dim el =
             }) bodies
     }
 
-inl from_2d_tensor forall a b t. (x : tensor (a * b) t) : python_list (python_list t) =
+inl from_2d_tensor forall a b t. (x : tensor (a * b) t) : plist (plist t) =
     inl l, x = create', tensor_to_numpy x
     loop.linear (fst x.dim) fun a =>
         inl l' = create'
