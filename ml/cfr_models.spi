@@ -5,6 +5,11 @@ open tensorm
 open corecuda
 open rangem
 
+inl print0 msg =
+    if rangem.threads_in_grid().from = 0 then
+        console.write_ln msg
+    __syncwarp()
+
 type graph_body = tensor d2 uint * cfr.model * cfr.trace * cfr.trace_state
 
 // The noinline prefix will force the __noinline__ annotation in the generated code.
@@ -192,7 +197,7 @@ inl extract_path_prob forall inp out. (cfr_game_model {model} : cfr_game_model i
         (key_extract model .cfr_trace_state : cfr.trace_state).log_path_probs
         |> tensor_index (ensemble_id, rangem.threads_in_grid().from, player_id)
 
-    conv (exp (policy - policy))
+    conv (exp (policy - sampling))
 
 inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = noinline_run rng model action_mask input output
 inl trace_and_play forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = noinline_trace_and_play rng model sizes action_mask input output

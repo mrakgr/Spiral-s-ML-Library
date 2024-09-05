@@ -36,7 +36,7 @@ inl leduc_sizes() : ml.cfr.sizes =
         player_id = 2
         action_id = 1 <<< 2
         seq_id = 1 <<< 4
-        thread_id = threads_per_block()
+        thread_id = threads_per_block() * blocks_per_grid()
     }
 
 inl leduc_graph() : ml.layers.graph ml.cfr_models.graph_body =

@@ -4,6 +4,12 @@ open corepython
 open corecuda
 open coreext
 
+inl print0 msg =
+    if rangem.threads_in_grid().from = 0 then
+        console.write_ln msg
+    __syncwarp()
+
+
 union player_type = Computer | Random
 type player_types = sam.sa 2 player_type
 
@@ -60,7 +66,7 @@ type state_internal =
 inl state_to_internal rng pl_type : state_internal =
     {
         pl_type = refm.from_local pl_type
-        deck = refm.from_local deckm.create()
+        deck = refm.ref deckm.create()
         messages = refm.from_local sa_create
         rng
     }
@@ -103,19 +109,17 @@ inl play_loop (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_inte
             push_message msg
             None
         | Round table => 
-            match index #state.pl_type table.player_turn with
-            | Computer =>
-                open model
-                inl data = table, refm.to_local state.messages
-                inl action = ml.cfr_models.trace_and_play state.rng cfr_model ({player_id=table.player_turn}, data) |> action_conv table
-                inl msg = PlayerAction(table.player_turn, action)
-                push_message msg
-                Some (game_round table action)
-            | Random =>
-                inl action = random_action state.rng table
-                inl msg = PlayerAction(table.player_turn, action)
-                push_message msg
-                Some (game_round table action)
+            inl action = 
+                match index #state.pl_type table.player_turn with
+                | Computer =>
+                    inl data = table, refm.to_local state.messages
+                    ml.cfr_models.trace_and_play state.rng cfr_model ({player_id=table.player_turn}, data) |> model.action_conv table
+                | Random =>
+                    // Important: If the action is shared across the block in Computer it should also be done for the Random player.
+                    random_action state.rng table |> transposing_loop.shuffle 0
+            inl msg = PlayerAction(table.player_turn, action)
+            push_message msg
+            Some (game_round table action)
         | RoundWithAction(table,action) =>
             inl msg = PlayerAction(table.player_turn, action)
             push_message msg
@@ -171,11 +175,13 @@ inl main() =
                         loop.linear config.inner fun (inner : int) =>
                             inl state_internal = state_to_internal rng config.player_types
                             inl rewards = play_loop model state_internal game_init()
+                            // console.write_ln {rewards tid = thread_index()}
                             inl () = // Adds the rewards to the trace.
                                 inl player_id = 0
                                 inl reward = index rewards player_id
                                 loop.linear sizes.ensemble_id fun ensemble_id =>
                                     inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id player_id}
+                                    // console.write_ln {reward path_prob ensemble_id tid = thread_index()}
                                     tensor_cuda.tensor_atomic_add (outer,inner,ensemble_id)
                                         (reward * path_prob, path_prob)
                                         trace_rewards
@@ -184,6 +190,7 @@ inl main() =
                     ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
 
             inl p2 : f64 = $"time.perf_counter()"
+            device_sync()
             console.write "The time it took to run the kernel (in seconds) is: "
             console.write_ln (p2 - p)
 

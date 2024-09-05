@@ -73,7 +73,7 @@ inl nlholdem_sizes() : ml.cfr.sizes =
         player_id = 2
         action_id = 1 <<< 4
         seq_id = 1 <<< 7
-        thread_id = threads_per_block()
+        thread_id = threads_per_block() * blocks_per_grid()
     }
 
 inl nlholdem_graph() =
