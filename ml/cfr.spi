@@ -214,24 +214,32 @@ inl apply_updates grid rng (model : model) =
     __syncwarp() // Converge the first warp.
     
     (table, table) ||> grid_row_map grid (fun config table i j_tns =>
-        inl policy =
-            inl current =
-                table
-                |> rezip (fun {policy={average current update} value} => current, update)
-                |> local_map (fun current, update => max 0 (current + update)) // Clamps the policy array to 0 in addition to adding the policy updates.
-            inl average =
-                inl action_probs = local_regret_matching config current
-                zip (table |> rezip (fun {policy={average}} => average)) 
-                    action_probs
-                |> local_map (fun average,action_prob => average + action_prob)
-                |> local_l1_normalize average_threeshold() config // Decays the average policy if its norm is above the threeshold.
-            zip current average
-            |> rezip (fun current, average => {current average})
-        inl value_current =
-            table 
-            |> local_map (fun {value={current update}} => loop.add current update) // Adds the value numerator and the denominator.
-        (zip policy value_current)
-        |> local_map (fun policy, current => { value = {current update = loop.zeroes}; policy = {policy with update = 0}}) 
+        inl has_been_updated = 
+            table
+            |> rezip (fun x => x.policy.update)
+            |> local_map (fun x => x <> 0)
+            |> local_reduce config false (fun a b => a || b)
+
+        if has_been_updated then // This check here is to avoid adding noise to the average policy.
+            inl policy =
+                inl current =
+                    table
+                    |> rezip (fun {policy={average current update} value} => current, update)
+                    |> local_map (fun current, update => max 0 (current + update)) // Clamps the policy array to 0 in addition to adding the policy updates.
+                inl average =
+                    inl action_probs = local_regret_matching config current
+                    zip (table |> rezip (fun {policy={average}} => average)) 
+                        action_probs
+                    |> local_map (fun average,action_prob => average + action_prob)
+                    |> local_l1_normalize average_threeshold() config // Decays the average policy if its norm is above the threeshold.
+                zip current average
+                |> rezip (fun current, average => {current average})
+            inl value_current =
+                table 
+                |> local_map (fun {value={current update}} => loop.add current update) // Adds the value numerator and the denominator.
+            (zip policy value_current, table)
+            ||> local_map' (fun policy, current => { value = {current update = loop.zeroes}; policy = {policy with update = 0}}) 
+        table
         )
 
 // Pushes the ids into the trace along with the sampling probability for the selected action id.

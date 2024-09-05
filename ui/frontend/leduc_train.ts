@@ -43,17 +43,16 @@ class Leduc_Train_UI extends TrainElement {
 
     graph_ref = createRef<Training_Chart>()
     process_effects(l: UI_Effect[]) {
-        console.log(JSON.stringify(l));
-        // l.forEach(l => {
-        //     const [tag, data] = l
-        //     switch (tag) {
-        //         case 'GraphAddItem': {
-        //             this.graph_ref.value?.add_item(...data)
-        //             break;
-        //         }
-        //         default: assert_tag_is_never(tag);
-        //     }
-        // })
+        l.forEach(l => {
+            const [tag, data] = l
+            switch (tag) {
+                case 'AddRewards': {
+                    this.graph_ref.value?.add_rewards(data)
+                    break;
+                }
+                default: assert_tag_is_never(tag);
+            }
+        })
     }
 
     static styles = css`
@@ -80,12 +79,20 @@ class Leduc_Train_UI extends TrainElement {
             <training-chart ${ref(this.graph_ref)}></training-chart>
             <br/>
             <sl-button variant="primary" @click=${this.on_train}>Train</sl-button>
+            <!-- <sl-button variant="primary" @click=${this.on_add_random}>Add Random</sl-button> -->
             `
     }
 
     on_train() {
         this.dispatch_train_event(["StartTraining",[]])
     }
+
+    // on_add_random(){
+    //     this.graph_ref.value?.add_item(
+    //         ["0","1","2"],
+    //         [{name: "asd", data: [1,4,9]}]
+    //     )
+    // }
 }
 
 const assert_chart_data = (labels: Leduc_Train_Label[], series: Leduc_Train_Serie[]) => {
@@ -113,6 +120,14 @@ class Training_Chart extends LitElement {
     series: Leduc_Train_Serie[] = []
 
     chart?: echarts.ECharts;
+
+    add_rewards(rewards: number[][]) {
+        const labels : Leduc_Train_Label[] = []
+        for (let i = 0; i < rewards[0].length; i++) {
+            labels.push((this.labels.length + i).toString())
+        }
+        this.add_item(labels, rewards.map((data,i) => ({ name: i.toString(), data })))
+    }
 
     add_item(labels: Leduc_Train_Label[], series: Leduc_Train_Serie[]) {
         assert_chart_data(labels, series);

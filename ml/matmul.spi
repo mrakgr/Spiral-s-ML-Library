@@ -234,10 +234,10 @@ inl matmul_tf32_template forall m_frag n_frag k_frag a_layout b_layout.
 
             barrier_cta_sync 0
 
-inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
-    matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
 // inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
-//     matmul_config {m_tile=128; n_tile=128; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
+//     matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
+inl matmul_config_tf32 forall a_layout b_layout. : matmul_config 16 16 8 wmma.tf32 a_layout b_layout f32 = 
+    matmul_config {m_tile=128; n_tile=128; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16}
 inl matmul_tf32' a_transpose b_transpose =
     match a_transpose, b_transpose with
     | false, false => matmul_tf32_template (matmul_config_tf32 : matmul_config _ _ _ _ wmma.row_major wmma.row_major _) 

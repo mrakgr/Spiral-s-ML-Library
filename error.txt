@@ -1,87 +1,151 @@
-Error trace on line: 135, column: 9 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-inl main() =
-        ^
-Error trace on line: 136, column: 5 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-    named_tuple "Leduc_Game" {
+Error trace on line: 66, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match hashmapm.try_get h k with
     ^
-Error trace on line: 138, column: 31 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-        event_loop_gpu = fun (msg, state : _ event * _ state) =>
-                              ^
-Error trace on line: 140, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl seri = {
+Error trace on line: 67, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 68, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+      ^
+Error trace on line: 68, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+              ^
+Error trace on line: 68, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in hashmapm.add h k v . v
+                      ^
+Error trace on line: 381, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            match x with
             ^
-Error trace on line: 143, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            serialize seri.msg (jsonm.deserialize msg)
-            ^
-Error trace on line: 144, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl {neural} = jsonm.deserialize state
-            ^
-Error trace on line: 144, column: 17 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl {neural} = jsonm.deserialize state
+Error trace on line: 382, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. g,a,_) =>
+              ^
+Error trace on line: 387, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. g,a,_) =>
+              ^
+Error trace on line: 392, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. g,a,_) =>
+              ^
+Error trace on line: 397, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. g,a,_) =>
+              ^
+Error trace on line: 402, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) =>
+              ^
+Error trace on line: 402, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) =>
+                          ^
+Error trace on line: 403, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a,b,out = f a, f b, tensor_extract x
                 ^
-Error trace on line: 146, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            console.write_ln "Going to run the Leduc training kernel."
-            ^
-Error trace on line: 147, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            global "import time"
-            ^
-Error trace on line: 148, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl p : f64 = $"time.perf_counter()"
-            ^
-Error trace on line: 150, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl sizes = model.leduc_sizes()
-            ^
-Error trace on line: 151, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl trace_rewards = 
-            ^
-Error trace on line: 155, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
-            ^
-Error trace on line: 157, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
-            ^
-Error trace on line: 180, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            inl p2 : f64 = $"time.perf_counter()"
-            ^
-Error trace on line: 181, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            console.write "The time it took to run the kernel (in seconds) is: "
-            ^
-Error trace on line: 182, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            console.write_ln (p2 - p)
-            ^
-Error trace on line: 184, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            jsonm.serialize { 
-            ^
-Error trace on line: 184, column: 29 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-            jsonm.serialize { 
-                            ^
-Error trace on line: 187, column: 21 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
-                    frontend_rewards
+Error trace on line: 403, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a,b,out = f a, f b, tensor_extract x
                     ^
-Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl (|>) a b = b a
-               ^
-Error trace on line: 42, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
-    inl l, x = create', tensor_to_numpy x
-    ^
-Error trace on line: 42, column: 25 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
-    inl l, x = create', tensor_to_numpy x
-                        ^
-Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
-    inl _ : tensor _ _ = flatten x // Asserts the tensor is contiguous.
-    ^
-Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
-    inl (tensor {bodies dim}) = x |> apply_ptr
-    ^
-Error trace on line: 33, column: 10 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
-    inl (tensor {bodies dim}) = x |> apply_ptr
-         ^
-Error trace on line: 33, column: 17 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
-    inl (tensor {bodies dim}) = x |> apply_ptr
+Error trace on line: 403, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a,b,out = f a, f b, tensor_extract x
+                      ^
+Error trace on line: 404, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl alpha, beta : float * float = 1, 0
                 ^
-Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corepython\plistm.spi.
-    tensor { dim bodies = real
+Error trace on line: 404, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl alpha, beta : float * float = 1, 0
+                    ^
+Error trace on line: 405, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl () =
+                ^
+Error trace on line: 406, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    inl a, out = abi a, abi out
+                    ^
+Error trace on line: 406, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    inl a, out = abi a, abi out
+                        ^
+Error trace on line: 409, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                        typecase t with
+                        ^
+Error trace on line: 411, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl memory, body = matmul.matmul_tf32' false true
+                            ^
+Error trace on line: 411, column: 33 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl memory, body = matmul.matmul_tf32' false true
+                                ^
+Error trace on line: 412, column: 34 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            join body alpha a b beta out
+                                 ^
+Error trace on line: 54, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl div x = loop.div x
+        ^
+Error trace on line: 55, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl _ =
+        ^
+Error trace on line: 64, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_a {m k} (a : tensor (int * int) float) =
+        ^
+Error trace on line: 77, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_b {n k} (b : tensor (int * int) float) =
+        ^
+Error trace on line: 90, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl split_c {m n} (c : tensor (int * int) float) =
+        ^
+Error trace on line: 95, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a = split_a {m=m_tile; k=k_tile} a    
+        ^
+Error trace on line: 96, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl b = split_b {n=n_tile; k=k_tile} b
+        ^
+Error trace on line: 97, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl c = split_c {m=m_tile; n=n_tile} c
+        ^
+Error trace on line: 99, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        global "#include <mma.h>"
+        ^
+Error trace on line: 100, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        global "using namespace nvcuda;"
+        ^
+Error trace on line: 105, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+        ^
+Error trace on line: 105, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+            ^
+Error trace on line: 105, column: 28 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+                           ^
+Error trace on line: 115, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl c_shared_frag = split_c {m=m_frag; n=n_frag} c_shared_tile
+        ^
+Error trace on line: 116, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} = 
+        ^
+Error trace on line: 117, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul.spi.
+            loop.rigid_split' (warps_in_block (fst c_shared_frag.dim))
+            ^
+Error trace on line: 117, column: 31 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl rigid_split' forall dim. ({from nearTo by} : range dim) : {proj_small : dim; dim_small : dim; dim_linear : dim} =
+                              ^
+Error trace on line: 118, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_small, dim_linear = rigid_split by nearTo
     ^
-Type error in nominal constructor.
-Got: {bodies : array f32; dim : i32 * i32}
-Expected: {bodies : tensor_body (i32 * i32) f32; dim : i32 * i32}
+Error trace on line: 118, column: 33 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_small, dim_linear = rigid_split by nearTo
+                                ^
+Error trace on line: 96, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl a, (i : int) = real
+    ^
+Error trace on line: 96, column: 9 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl a, (i : int) = real
+        ^
+Error trace on line: 102, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    assert (i = 1) "The integer length must be distributed in its entirety."
+    ^
+Error trace on line: 131, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 267, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 268, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 268, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+The integer length must be distributed in its entirety.

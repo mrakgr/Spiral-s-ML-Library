@@ -27,8 +27,8 @@ type event_config =
 inl event_config() : event_config =
     {
         player_types = arraym.fromList [Computer; Random]
-        outer = 1 <<< 1
-        inner = 1 <<< 1
+        outer = 1 <<< 10
+        inner = 1 <<< 4
     }
 
 union event =
@@ -160,7 +160,7 @@ inl main() =
             inl sizes = model.leduc_sizes()
             inl trace_rewards = 
                 inl config = event_config()
-                cupy.zeros (config.outer, config.inner, sizes.ensemble_id)
+                cupy.zeros (sizes.ensemble_id, config.outer, config.inner)
 
             inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
 
@@ -182,7 +182,7 @@ inl main() =
                                 loop.linear sizes.ensemble_id fun ensemble_id =>
                                     inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id player_id}
                                     // console.write_ln {reward path_prob ensemble_id tid = thread_index()}
-                                    tensor_cuda.tensor_atomic_add (outer,inner,ensemble_id)
+                                    tensor_cuda.tensor_atomic_add (ensemble_id,outer,inner)
                                         (reward * path_prob, path_prob)
                                         trace_rewards
                             ml.cfr_models.calculate_updates model rewards
@@ -197,7 +197,7 @@ inl main() =
             inl a = { neural game = { private=(); public=() } }
             inl b : plist ui_effects =
                 frontend_rewards
-                |> tensorm.reshape (fun a,b,c => a*b,c)
+                |> tensorm.reshape (fun a,b,c => a,b*c)
                 |> plistm.from_2d_tensor
                 |> AddRewards
                 |> listm.singleton

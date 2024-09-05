@@ -33,6 +33,7 @@ let deserialize forall t. (json x : json t) : t =
                 ) `t'
         | sam.sa ~dim ~el => deserialize_sa `(sam.sa dim) `el
         | dam.da ~dim ~el => deserialize_sa `(dam.da dim) `el
+        | plist ~el => deserialize_sa `plist `el
         | sa_listm.sa_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(sa_listm.sa_list dim) `el
         | da_listm.da_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(da_listm.da_list dim) `el
         | _ -> _ => $"!x" : t'
@@ -83,6 +84,7 @@ let serialize forall t. (x : t) : json t =
         | {} => record_type_map (fun k => forall v. => f `v (x k)) `t' |> fun x => !!!!ToPythonRecord(x)
         | sam.sa ~dim ~el => serialize_sa `(sam.sa dim) `el
         | dam.da ~dim ~el => serialize_sa `(dam.sa dim) `el
+        | plist ~el => serialize_sa `plist `el
         | sa_listm.sa_list ~dim ~el => serialize_sa `(sa_listm.sa_list dim) `el
         | da_listm.da_list ~dim ~el => serialize_sa `(da_listm.da_list dim) `el
         | _ -> _ => $"!x" : obj
