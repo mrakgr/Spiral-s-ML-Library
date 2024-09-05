@@ -1,152 +1,87 @@
-Error trace on line: 44, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-    tensor_write i funs x 
-    ^
-Error trace on line: 5, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-    inl dim_to_list (dim : dim) : list int = real
-    ^
-Error trace on line: 8, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-    inl ~q = 0
-    ^
-Error trace on line: 8, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-    inl ~q = 0
+Error trace on line: 135, column: 9 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+inl main() =
         ^
-Error trace on line: 8, column: 10 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-    inl ~q = 0
-         ^
-Error trace on line: 31, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-    loop' [] (dim_to_list t.dim)
+Error trace on line: 136, column: 5 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+    named_tuple "Leduc_Game" {
     ^
-Error trace on line: 9, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-    inl rec loop' s = function
-                      ^
-Error trace on line: 10, column: 11 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-        | nearTo :: l => 
-          ^
-Error trace on line: 11, column: 13 in module: c:\Spiral_s_ML_Library\coreext\console\tensor.spi.
-            write '['
+Error trace on line: 138, column: 31 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+        event_loop_gpu = fun (msg, state : _ event * _ state) =>
+                              ^
+Error trace on line: 140, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl seri = {
             ^
-Error trace on line: 21, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console.spi.
-        backend_switch {
-        ^
-Error trace on line: 153, column: 82 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl backend_switch forall t. (x : {Cuda : () -> t; Python : () -> t}) : t = real backend_switch `t x
-                                                                                 ^
-Error trace on line: 263, column: 61 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
-inl backend_switch forall t. x = !!!!BackendSwitch(("Cuda", x.Cuda()), ("Python", x.Python()))
-                                                            ^
-Error trace on line: 23, column: 24 in module: c:\Spiral_s_ML_Library\coreext\console\console.spi.
-            Cuda = fun () => console_cuda.write x
-                       ^
-Error trace on line: 23, column: 30 in module: c:\Spiral_s_ML_Library\coreext\console\console.spi.
-            Cuda = fun () => console_cuda.write x
-                             ^
-Error trace on line: 105, column: 15 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-inl write l = write_ utils.create_console_config() false l
-              ^
-Error trace on line: 7, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl get_fmt () = hashmapm.get_with_default h key_fmt ()
-    ^
-Error trace on line: 8, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl get_value () = hashmapm.get_with_default h key_value ()
-    ^
-Error trace on line: 9, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl get_len () : int = real
-    ^
-Error trace on line: 15, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl put_fmt (sep : string) = hashmapm.set h key_fmt (get_fmt(), sep)
-    ^
-Error trace on line: 16, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl flush is_newline =
-    ^
-Error trace on line: 26, column: 5 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl put_value (fmt, str : string * .obj) =
-    ^
-Error trace on line: 83, column: 10 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    real write x
-         ^
-Error trace on line: 34, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        inl p = put_value
-        ^
-Error trace on line: 36, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        match x with // According to Bing it shouldn't matter whether these are %d or %lld in printf.
-        ^
-Error trace on line: 37, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-           ^
-Error trace on line: 37, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                      ^
-Error trace on line: 37, column: 35 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                                  ^
-Error trace on line: 37, column: 47 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : i8) | (x : i16) | (x : i32) | (x : i64) => p ("%d", x)
-                                              ^
-Error trace on line: 38, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-           ^
-Error trace on line: 38, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                      ^
-Error trace on line: 38, column: 35 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                                  ^
-Error trace on line: 38, column: 47 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : u8) | (x : u16) | (x : u32) | (x : u64) => p ("%u", x)
-                                              ^
-Error trace on line: 39, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : f32) | (x : f64) => p ("%f", x)
-           ^
-Error trace on line: 39, column: 24 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : f32) | (x : f64) => p ("%f", x)
-                       ^
-Error trace on line: 40, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : string) => p ("%s", x)
-           ^
-Error trace on line: 41, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : char) => p ("%c", x)
-           ^
-Error trace on line: 41, column: 25 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        | (x : char) => p ("%c", x)
-                        ^
-Error trace on line: 26, column: 20 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl put_value (fmt, str : string * .obj) =
-                   ^
-Error trace on line: 27, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        put_fmt fmt
-        ^
-Error trace on line: 28, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        hashmapm.set h key_value (get_value(), str)
-        ^
-Error trace on line: 31, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        if get_len() >= 32 then flush false
-        ^
-Error trace on line: 31, column: 12 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        if get_len() >= 32 then flush false
-           ^
-Error trace on line: 9, column: 17 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-    inl get_len () : int = real
+Error trace on line: 143, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            serialize seri.msg (jsonm.deserialize msg)
+            ^
+Error trace on line: 144, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl {neural} = jsonm.deserialize state
+            ^
+Error trace on line: 144, column: 17 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl {neural} = jsonm.deserialize state
                 ^
-Error trace on line: 14, column: 9 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        loop 0 get_value()
-        ^
-Error trace on line: 11, column: 26 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        inl rec loop s = function
-                         ^
-Error trace on line: 12, column: 15 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-            | _,xs => loop (1+s) xs
-              ^
-Error trace on line: 12, column: 23 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-            | _,xs => loop (1+s) xs
-                      ^
-Error trace on line: 11, column: 26 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-        inl rec loop s = function
-                         ^
-Error trace on line: 12, column: 15 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-            | _,xs => loop (1+s) xs
-              ^
-Error trace on line: 13, column: 15 in module: c:\Spiral_s_ML_Library\coreext\console\console_cuda.spi.
-            | () => s
-              ^
-Pattern miss.
-Got: [
+Error trace on line: 146, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            console.write_ln "Going to run the Leduc training kernel."
+            ^
+Error trace on line: 147, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            global "import time"
+            ^
+Error trace on line: 148, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl p : f64 = $"time.perf_counter()"
+            ^
+Error trace on line: 150, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl sizes = model.leduc_sizes()
+            ^
+Error trace on line: 151, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl trace_rewards = 
+            ^
+Error trace on line: 155, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
+            ^
+Error trace on line: 157, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
+            ^
+Error trace on line: 180, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            inl p2 : f64 = $"time.perf_counter()"
+            ^
+Error trace on line: 181, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            console.write "The time it took to run the kernel (in seconds) is: "
+            ^
+Error trace on line: 182, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            console.write_ln (p2 - p)
+            ^
+Error trace on line: 184, column: 13 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            jsonm.serialize { 
+            ^
+Error trace on line: 184, column: 29 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+            jsonm.serialize { 
+                            ^
+Error trace on line: 187, column: 21 in module: c:\Spiral_s_ML_Library\game\leduc\train.spi.
+                    frontend_rewards
+                    ^
+Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl (|>) a b = b a
+               ^
+Error trace on line: 42, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+    inl l, x = create', tensor_to_numpy x
+    ^
+Error trace on line: 42, column: 25 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+    inl l, x = create', tensor_to_numpy x
+                        ^
+Error trace on line: 32, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+    inl _ : tensor _ _ = flatten x // Asserts the tensor is contiguous.
+    ^
+Error trace on line: 33, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+    inl (tensor {bodies dim}) = x |> apply_ptr
+    ^
+Error trace on line: 33, column: 10 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+    inl (tensor {bodies dim}) = x |> apply_ptr
+         ^
+Error trace on line: 33, column: 17 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+    inl (tensor {bodies dim}) = x |> apply_ptr
+                ^
+Error trace on line: 34, column: 5 in module: c:\Spiral_s_ML_Library\corepython\python_listm.spi.
+    tensor { dim bodies = real
+    ^
+Type error in nominal constructor.
+Got: {bodies : array f32; dim : i32 * i32}
+Expected: {bodies : tensor_body (i32 * i32) f32; dim : i32 * i32}

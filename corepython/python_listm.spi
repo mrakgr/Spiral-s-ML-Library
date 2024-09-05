@@ -32,10 +32,11 @@ inl tensor_to_numpy forall dim el. (x : tensor dim el) : tensor dim el =
     inl _ : tensor _ _ = flatten x // Asserts the tensor is contiguous.
     inl (tensor {bodies dim}) = x |> apply_ptr
     tensor { dim bodies = real
-        map (fun (tensor_body {array stride offset}) =>
-            typecase `array with
-            | ~ar ~el => $"!array.get()" : ar el // `get` converts the array to a Numpy one, transferring it to host.
-            ) bodies
+        struct.map (fun (tensor_body {array stride offset}) =>
+            typecase `array with ~ar ~el => 
+            tensor_body `dim `el {
+                stride offset array = $"!array.get()" : ar el // `get` converts the array to a Numpy one, transferring it to host.
+            }) bodies
     }
 
 inl from_2d_tensor forall a b t. (x : tensor (a * b) t) : python_list (python_list t) =
