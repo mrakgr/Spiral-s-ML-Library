@@ -266,8 +266,8 @@ inl main() =
                     ml.cfr_models.run rng model None |> ignore
                     if refm.deref c = 0 then loop.break()
 
-            inl p2 : f64 = $"time.perf_counter()"
             console.write "The time it took to run the kernel (in seconds) is: "
+            inl p2 : f64 = $"time.perf_counter()"
             console.write_ln (p2 - p)
 
             jsonm.serialize {

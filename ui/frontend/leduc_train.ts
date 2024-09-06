@@ -47,6 +47,10 @@ class Leduc_Train_UI extends TrainElement {
             const [tag, data] = l
             switch (tag) {
                 case 'AddRewards': {
+                    console.log({
+                        data,
+                        average: data.map(x => x.reduce((a,b) => a+b) / x.length)
+                    });
                     this.graph_ref.value?.add_rewards(data)
                     break;
                 }
@@ -79,7 +83,6 @@ class Leduc_Train_UI extends TrainElement {
             <training-chart ${ref(this.graph_ref)}></training-chart>
             <br/>
             <sl-button variant="primary" @click=${this.on_train}>Train</sl-button>
-            <!-- <sl-button variant="primary" @click=${this.on_add_random}>Add Random</sl-button> -->
             `
     }
 
