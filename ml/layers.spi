@@ -203,44 +203,6 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
     hashmapm.set_immutable(h_offset_output)
     h_offset_output, get_offset()
 
-// Calculates the max of dynamic shared memory used for all the nodes.
-inl pass_calculate_dynamic_shared_memory forall t_top. (x : graph t_top) =
-    inl h = hashmapm.create()
-    inl offset_key = ()
-    inl get_offset () : size = match hashmapm.try_get h offset_key with Some x => x | None => 0
-    inl set_offset (offset : size) : () = hashmapm.set h offset_key offset
-    // Sets the shared memory size to the new value if it's higher than the old one.
-    inl update (size : size) = set_offset (max size get_offset())
-    inl rec g forall t. (x : option (graph t)) : () =
-        match x with
-        | None => ()
-        | Some x => f x
-    and inl f forall t. : graph t -> () =
-        memoize h function
-            | BlockMap(exists a. _,a,out) => f a . g out
-            | BlockRowMap(exists a. _,a,out) => f a . g out
-            | BlockRowReduce(exists a. _,a,out) => f a . g out
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
-            | BlockMatmul(a,b) => 
-                inl memory : size =
-                    inl tf32 () : size = fst(matmul.matmul_tf32' false true).offset_end
-                    real
-                        typecase t with
-                        | tensor _ f32 => tf32()
-                        | _ => 
-                            !!!!PrintStatic(`t)
-                            error_type `(()) "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
-                f a . f b . update memory
-            | Zip(a,b) => f a . f b
-            | Pair(a,b) => f a . f b
-            | Apply(exists a. a,b) => f a . f b
-            | KeyGraph(_,x) => f x
-            | KeyScalar => ()
-            | Weight => ()
-            | Input => ()
-    f x
-    get_offset()
-
 // Initializes the parameters of a NN on the host.
 inl param_init forall t_top. (model {graph param} : model t_top) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
@@ -408,8 +370,7 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
                         open real_core
                         typecase t with
                         | tensor _ f32 =>
-                            inl memory, body = matmul.matmul_tf32' false true
-                            join body alpha a b beta out
+                            join matmul.matmul_tf32' false true alpha a b beta out
                         | _ => 
                             !!!!PrintStatic(`t)
                             error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
@@ -441,12 +402,12 @@ inl create_layer_state() =
 
 // Runs the graph on the host.
 inl graph_run_host forall t_top sizes. (model {graph} & m : model t_top) (sizes : sizes) =
-    run' {shared_mem=conv (pass_calculate_dynamic_shared_memory graph)} fun () =>
+    run' fun () =>
         inl ls : layer_state = create_layer_state()
         loop.linear sizes fun indices =>
             graph_run_device m ls indices
 
-// TODO: Reimplement the rest of the functions so the use row_map and row_reduce instead of the graph nodes directly.
+// TODO: Reimplement the rest of the functions so they use row_map and row_reduce instead of the graph nodes directly.
 inl row_map_ forall dim a b. f out (x : graph (tensor (int * dim * int) a)) : graph (tensor (int * dim * int) b) = 
     BlockRowMap (exists f, x, out)
 

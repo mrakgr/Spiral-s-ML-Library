@@ -249,7 +249,7 @@ inl main() =
             global "import time"
             inl p : f64 = $"time.perf_counter()"
 
-            run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
+            run' fun () =>
                 inl rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
                 inl c : _ int = refm.create_shared_var (const threads_per_block())
                 inl from = rangem.threads_in_grid().from

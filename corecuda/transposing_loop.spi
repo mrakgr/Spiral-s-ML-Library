@@ -30,7 +30,7 @@ type config passthrough dim =
 // all the threads in a block are always flowing in lockstep.
 
 
-// Uses a shared tensor to transpose all the free variables in shared memory before running the function.
+// Uses a tensor in dynamic shared memory to transpose all the free variables in shared memory before running the function.
 // The variables passed through `passthrough` won't be transposed and will be passed into the kernel directly.
 // Uses a projective loop under the hood.
 // The return value from the given function should be the same for every thread in the output dimension.
@@ -38,17 +38,17 @@ type config passthrough dim =
 // 
 // Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
 // It does block sync at the end. Any grid sync potentially needed would need to be done manually.
-inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
+inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : {extern_offset : partitionm.size; passthrough : shared} -> int -> dim -> t) : t =
     inl dim_outer = threads_per_block()
     inl body forall el. (fv : el) : t = 
-        inl shared_in : tensor int el = tensor_create_shared dim_outer
-        inl shared_out : tensor int t = tensor_create_shared dim_outer
+        inl shared_io, extern_offset = tensor_create_extern_shared 0 dim_outer
+        inl shared_in, shared_out : tensor int el * tensor int t = unzip shared_io
         inl tid = thread_index()
         tensor_set tid fv shared_in
         barrier_cta_sync 0
         loop.projective threads_in_block(dim_outer, dim_inner) fun thread_id, dim =>
             tensor_set thread_id
-                (free_vars_replace f (tensor_index thread_id shared_in) passthrough (block_index() * threads_per_block() + thread_id) dim)
+                (free_vars_replace f (tensor_index thread_id shared_in) {extern_offset passthrough} (block_index() * threads_per_block() + thread_id) dim)
                 shared_out
         barrier_cta_sync 0
         inl x = tensor_index tid shared_out
@@ -59,7 +59,7 @@ inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim
         inl fv = free_vars f
         body `(`fv) fv
 
-// Uses a shared tensor to transpose all the free variables in shared memory before running the function.
+// Uses a tensor in dynamic shared memory to transpose all the free variables in shared memory before running the function.
 // The variables passed through `passthrough` won't be transposed and will be passed into the kernel directly.
 // Uses a (restrictive) linear loop under the hood.
 // The inner dimension must be divisible by the number of threads per block.
@@ -68,11 +68,11 @@ inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim
 // 
 // Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
 // It does block sync at the end. Any grid sync potentially needed would need to be done manually.
-inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : shared -> int -> dim -> t) : t =
+inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : {extern_offset : partitionm.size; passthrough : shared} -> int -> dim -> t) : t =
     inl dim_outer = threads_per_block()
     inl body forall el. (fv : el) : t = 
-        inl shared_in : tensor int el = tensor_create_shared dim_outer
-        inl shared_out : tensor int t = tensor_create_shared dim_outer
+        inl shared_io, extern_offset = tensor_create_extern_shared 0 dim_outer
+        inl shared_in, shared_out : tensor int el * tensor int t = unzip shared_io
         inl tid = thread_index()
         tensor_set tid fv shared_in
         barrier_cta_sync 0
@@ -88,7 +88,7 @@ inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f
                 inl index = index_block, index_block'
                 loop.rigid_merge dim index
             tensor_set thread_id
-                (free_vars_replace f (tensor_index index_block' shared_in) passthrough (block_index() * threads_per_block() + thread_id) index_inner)
+                (free_vars_replace f (tensor_index index_block' shared_in) {extern_offset passthrough} (block_index() * threads_per_block() + thread_id) index_inner)
                 shared_out
         barrier_cta_sync 0
         inl x = tensor_index tid shared_out
@@ -100,10 +100,11 @@ inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f
         body `(`fv) fv
 
 // Broadcasts a value to all the threads in the block from a given one.
+// Uses dynamic shared memory, and so shouldn't be composed with functions that use it.
 inl shuffle forall t. (i : int) (v : t) : t =
     open tensor_cuda
     assert (lit_is i) "The index should be known at compile time."
-    inl q = tensor_create_shared 1
+    inl q,_ = tensor_create_extern_shared 0 1
     if thread_index() = i then tensor_set i v q
     barrier_cta_sync 0
     inl x = tensor_index 0 q

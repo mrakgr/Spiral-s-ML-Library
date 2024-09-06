@@ -114,6 +114,3 @@ inl init forall a b. (game_graph {graph=(exists t. graph) input output} : game_g
     inl model = create_model graph
     param_init model
     game_model { input output model = exists model }
-
-// Returns the amount of shared memory being used by the graph.
-inl smem_used (game_graph {graph=exists t. graph}) : int = pass_calculate_dynamic_shared_memory graph |> conv

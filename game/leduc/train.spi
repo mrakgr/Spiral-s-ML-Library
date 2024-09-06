@@ -164,7 +164,7 @@ inl main() =
 
             inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
 
-            run' {shared_mem=model.game_graph() |> ml.cfr_models.smem_used} fun () =>
+            run' fun () =>
                 inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
                 inl grid = cooperative_groups.create_grid()
                 inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}

@@ -215,9 +215,6 @@ inl init forall a b. (cfr_game_graph {graph sizes action_mask input output} : cf
     param_init model
     cfr_game_model { sizes input output action_mask model }
 
-// Returns the amount of shared memory being used by the graph.
-inl smem_used (cfr_game_graph {graph}) : int = pass_calculate_dynamic_shared_memory graph |> conv
-
 // Calculates the policy and the value array updates.
 inl calculate_updates forall dim a b.
         (cfr_game_model {model sizes action_mask input output} : _ a b)

@@ -1,9 +1,0 @@
-Link (not intended to be run): https://github.com/mrakgr/Spiral-s-ML-Library/blob/a677a450bad396e459b54e6d3142f4261cbc47f0/game/leduc/train.py
-
-My project is coming along, and now I've integrated tabular CFR training with the Leduc game. If it wasn't running out of static memory I'd even be able to run it with full thread sizes.
-
-If you open that file and do a search for `__shared__` you'll see a lot of shared arrays being used, and the total size in bytes comes out to 79888 which is why it is erroring out. This is my first time doing a program like this, so I mistakenly thought that perhaps all the barriers between the shared arrays would allow the shared memory to be reused, but as far as I can tell the Cuda compiler doesn't take the barriers into consideration at all and just increments the shared pointers linearly.
-
-On my end, now that I am more familiar with the limitations of static shared memory, I am going to have to redesign all of this so it solely uses dynamic shared memory. It won't be as hard as it seems, maybe a few days of work.
-
-But it would have been great if the Cuda compiler had been helpful and alleviated this burden from me.

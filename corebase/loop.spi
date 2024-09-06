@@ -5,10 +5,10 @@ inl while' (cond : () -> bool) (body : () -> ()) : () = !!!!While((join cond()),
 inl break() = $"break"
 
 inl _dup forall t. (x : t) : t = $"!x"
-inl _set forall t. (a : t) ~(b : t) : () =  real 
+inl _set forall t. (a : t) ~(b : t) : () = real
     inl rec loop = function
         | (a,a'),(b,b') => ($"!a = !b" : ()) . loop (a',b')
-        | (), () => ()
+        | {}, {} => ()
     loop (real_core.free_vars a, real_core.free_vars b)
 inl _add forall t. (x : t) (by : t) : () = $'!x += !by '
 inl _sub forall t. (x : t) (by : t) : () = $'!x -= !by '

@@ -4,7 +4,9 @@ open tensorm
 open struct
 open utils
 
-// Create a tensor of the specified dimensions. The elements of the dimension should be ints.
+// Create a tensor of the specified dimensions in static shared memory. The elements of the dimension should be ints.
+// As the Cuda compiler does not reuse shared memory, it's not recommended to use this function.
+// If possible, use tensors in dynamic shared memory instead. See `tensor_create_extern_shared`.
 inl tensor_create_shared forall dim el. (dim : dim) : tensor dim el = 
     inl stride, len = real calculate_stride_len dim
     assert_long_length len dim
@@ -17,6 +19,42 @@ inl tensor_create_shared forall dim el. (dim : dim) : tensor dim el =
         stride 
         }
     tensor {dim bodies=real infer_map `el create_body}
+
+// Instantiates a partition using dynamic shared memory. Checks that the allocated memory is sufficient.
+inl tensor_create_from_extern_partition' forall t. (memory : partitionm.partition_offsets t) : t * partitionm.size =
+    // !!!!PrintStatic(`t)
+    inl smem_used = conv dynamic_shared_memory_used()
+    assert (memory.offset_end <= smem_used) "The dynamic shared memory is insufficient to allocate the tensor."
+    inl extern = $"extern __shared__ unsigned char \v[]" // Note: we need to use [] instead of * here.
+    partitionm.from_partition_offsets (extern, memory.offset_end) memory, memory.offset_end
+
+// Instantiates a partition using dynamic shared memory. Checks that the allocated memory is sufficient.
+inl tensor_create_from_extern_partition forall t. extern_offset (memory : partitionm.partition t) : t * partitionm.size =
+    open partitionm
+    tensor_create_from_extern_partition' (calculate_offsets extern_offset memory)
+
+// Creates a tensor in dynamic shared memory. The elements of the dimension should be ints.
+// Care must be taken when using this, as separate invocations of this function
+// will create tensors pointing to the same memory location.
+inl tensor_create_extern_shared forall dim' el. extern_offset (dim' : dim') : tensor dim' el * partitionm.size =
+    open partitionm
+    tensor_create_from_extern_partition extern_offset !dim'
+
+// Creates two tensors in dynamic shared memory. The elements of the dimension should be ints.
+// Care must be taken when using this, as separate invocations of this function
+// will create tensors pointing to the same memory location.
+inl tensor_create_extern_shared2 forall dim1 dim2 el1 el2. extern_offset (dim1, dim2 : dim1 * dim2) 
+        : (tensor dim1 el1 * tensor dim2 el2) * partitionm.size =
+    open partitionm
+    tensor_create_from_extern_partition extern_offset (!dim1 *. !dim2)
+
+// Creates 3 tensors in dynamic shared memory. The elements of the dimension should be ints.
+// Care must be taken when using this, as separate invocations of this function
+// will create tensors pointing to the same memory location.
+inl tensor_create_extern_shared3 forall dim1 dim2 dim3 el1 el2 el3. extern_offset (dim1, dim2, dim3 : dim1 * dim2 * dim3) 
+        : (tensor dim1 el1 * tensor dim2 el2 * tensor dim3 el3) * partitionm.size =
+    open partitionm
+    tensor_create_from_extern_partition extern_offset (!dim1 *. (!dim2 *. !dim3))
 
 // Indexes into an tensor. Returns a reference to an element instead of the actual element.
 // Works only on non-compound tensors.
