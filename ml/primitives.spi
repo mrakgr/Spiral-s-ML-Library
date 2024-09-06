@@ -859,6 +859,7 @@ inl test4 (m,n : int * int) head_dir =
         console.tensor.write_ln 1024 output_sampling'
     ()
 inl main() = 
+    // Ran with blocks_per_grid 1 and threads_per_block 32 
     test2((1 <<< 6), (1 <<< 7)) "test2/a/"
     test2((1 <<< 7), (1 <<< 6)) "test2/b/"
     test3((1 <<< 4)) "test3/a"
