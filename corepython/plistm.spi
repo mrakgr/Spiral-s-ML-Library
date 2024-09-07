@@ -41,3 +41,5 @@ inl from_2d_tensor forall a b t. (x : tensor (a * b) t) : plist (plist t) =
             push l' (tensor_index (a,b) x)
         push l l'
     l
+
+inl singleton forall t. (x : t) : plist t = $"[!x]"

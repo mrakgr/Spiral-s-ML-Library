@@ -97,17 +97,24 @@ inl get_prob config (action_id : action_id) (probs : tensor _ (prob * action_id)
     |> fun prob,i => assert (i <> limit.max) "Expected a valid action id in get_action." . prob
 
 // Returns policy probability of an action given the ensemble_id, world_id and the action_id.
-inl get_policy_probs mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) (action_id : action_id) : prob = join
+// If the first argument is true, it does that using the `policy.current` else it uses `policy.average`.
+inl get_policy_probs_ is_current mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) (action_id : action_id) : prob = join
     open primitives
     model.table
     |> apply ensemble_id
     |> apply world_id
-    |> rezip (fun {policy} => policy.current)
+    |> rezip (fun {policy} => if is_current then policy.current else policy.average)
     |> row_gather_reduce () (fun () config policy i j_tns =>
         open random
         inl policy_probs = local_masked_regret_matching mask config policy i j_tns
         get_prob config action_id (zip policy_probs j_tns)
         )
+
+// Returns current policy probability of an action given the ensemble_id, world_id and the action_id.
+inl get_policy_probs x = get_policy_probs_ true x
+
+// Returns average policy probability of an action given the ensemble_id, world_id and the action_id.
+inl get_average_probs x = get_policy_probs_ false x
 
 // Samples an action from the model using the average policy and returns both the action and the probabilities of it being selected.
 inl get_action rng mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) : prob * action_id = join
@@ -125,7 +132,18 @@ inl get_action rng mask (model : model) ~(ensemble_id, world_id : ensemble_id * 
         get_prob sampling_probs, action_id
         )
 
+// Sets the log_path_probs and seq_id to 0.
+inl reset_trace_state (trace_state : trace_state) (ensemble_id : ensemble_id) =
+    open primitives
+    inl thread_id = rangem.threads_in_grid().from
+    inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id |> apply_ptr
+    // Sets the log_path_probs to 0.
+    (log_path_probs,log_path_probs) ||> row_gather_map () (fun () config x i j_tns => local_map (const loop.zeroes) x)
+    // Sets the seq_id to 0.
+    tensor_set (ensemble_id, thread_id) 0 trace_state.seq_id
+
 // Calculates the policy and the value array updates.
+// Resets the trace state afterwards.
 inl calculate_updates forall dim. 
         mask (size : sizes) 
         (model : model) (trace : trace) (trace_state : trace_state) 
@@ -191,14 +209,7 @@ inl calculate_updates forall dim.
             tensor_set player_id reward rewards
         )
 
-    // Reset the trace state.
-    inl () =
-        inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id |> apply_ptr
-        // Sets the log_path_probs to 0.
-        (log_path_probs,log_path_probs) ||> row_gather_map () (fun () config x i j_tns => local_map (const loop.zeroes) x)
-        // Sets the seq_id to 0.
-        tensor_set (ensemble_id, thread_id) 0 trace_state.seq_id
-    ()
+    reset_trace_state trace_state ensemble_id
 
 // Applies the policy and the value array updates.
 // Clamps the average policy vector if applicable.
@@ -242,24 +253,29 @@ inl apply_updates grid rng (model : model) =
         table
         )
 
+// Updates the trace state log path probabilities.
+inl update_trace_state_path_probs (trace_state : trace_state) {thread_id ensemble_id player_id} (action_prob, action_id : action_prob * action_id) : () =
+    inl v = {
+        sampling = log (conv action_prob.sampling)
+        policy = log (conv action_prob.policy)
+    }
+    // Updates the log path probs in the trace_state.
+    tensor_update (ensemble_id, thread_id, player_id) (loop.add v) trace_state.log_path_probs
+
 // Pushes the ids into the trace along with the sampling probability for the selected action id.
 // Increments the seq_id in the trace state and updates the log path probabilities.
 inl push_trace (trace : trace) (trace_state : trace_state) {thread_id ensemble_id world_id player_id} (action_prob, action_id : action_prob * action_id) : () =
     inl seq_id = tensor_index (ensemble_id, thread_id) trace_state.seq_id
     // Increments the seq_id.
     tensor_set (ensemble_id, thread_id) (seq_id+1) trace_state.seq_id
-    // Pushed the ids into the trace.
+    // Pushes the ids into the trace.
     tensor_set (ensemble_id, seq_id, thread_id) {world_id player_id action_id action_sampling_prob=action_prob.sampling} trace.actions
-    inl v = {
-        sampling = log (conv action_prob.sampling)
-        policy = log (conv action_prob.policy)
-    }
     inl trace_state_log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id
     inl trace_log_path_probs = trace.log_path_probs |> apply ensemble_id |> apply seq_id |> apply thread_id
     // Copies trace_state_log_path_probs into trace_log_path_probs.
     (trace_state_log_path_probs, trace_log_path_probs) ||> primitives.row_gather_map () (fun () config x i j_tns => x)
     // Updates the log path probs in the trace_state.
-    tensor_update player_id (loop.add v) trace_state_log_path_probs
+    update_trace_state_path_probs trace_state {thread_id ensemble_id player_id} (action_prob, action_id)
 
 inl test1() =
         open refm

@@ -12,8 +12,8 @@ inl print0 msg =
 
 type graph_body = tensor d2 uint * cfr.model * cfr.trace * cfr.trace_state
 
-// The noinline prefix will force the __noinline__ annotation in the generated code.
-inl noinline_trace_and_play forall inp out.
+inl trace_and_play_ forall inp out.
+        (is_train : bool) // The sampling behavior differs depending on whether the training is being done.
         rng
         (model : model graph_body)
         (sizes : cfr.sizes)
@@ -67,8 +67,14 @@ inl noinline_trace_and_play forall inp out.
 
     // Extract the output index and the sampling probability for it.
     inl sampling,action_id = 
-        // The ensemble id is held steady between the `apply_updates` calls.
-        inl ensemble_id : int = tensor_index {} cfr_model.exploratory_ensemble_id
+        inl ensemble_id : int = 
+            if is_train then
+                // The ensemble id is held steady between the `apply_updates` calls.
+                tensor_index {} cfr_model.exploratory_ensemble_id
+            else
+                // Generates a random ensemble_id and shares it across all the threads in the block.
+                random.int_range {from=0; nearTo=sizes.ensemble_id} rng
+                |> transposing_loop.shuffle 0
 
         // Extract the hash of the input state for the CFR model.
         inl world_id =
@@ -96,10 +102,20 @@ inl noinline_trace_and_play forall inp out.
             |> conv
 
         // Calculate the policy probability for the given action.
-        inl policy = cfr.get_policy_probs action_mask cfr_model (ensemble_id, world_id) action_id
+        inl policy = 
+            if is_train then
+                // During training the policy is the current policy.
+                cfr.get_policy_probs action_mask cfr_model (ensemble_id, world_id) action_id
+            else
+                // During evaluation the policy is the average policy.
+                cfr.get_average_probs action_mask cfr_model (ensemble_id, world_id) action_id
 
-        // Pushes the data into the trace.
-        cfr.push_trace cfr_trace cfr_trace_state {thread_id ensemble_id world_id player_id} ({policy sampling}, action_id)
+        if is_train then
+            // Pushes the data into the trace.
+            cfr.push_trace cfr_trace cfr_trace_state {thread_id ensemble_id world_id player_id} ({policy sampling}, action_id)
+        else
+            // During eval it only updates the path probabilities for the state. It does not push data into the trace to save computation.
+            cfr.update_trace_state_path_probs cfr_trace_state {thread_id ensemble_id player_id} ({policy sampling}, action_id)
 
     output action_id
 
@@ -200,7 +216,11 @@ inl extract_path_prob forall inp out. (cfr_game_model {model} : cfr_game_model i
     conv (exp (policy - sampling))
 
 inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = noinline_run rng model action_mask input output
-inl trace_and_play forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = noinline_trace_and_play rng model sizes action_mask input output
+inl trace_and_train forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = 
+    trace_and_play_ true rng model sizes action_mask input output
+
+inl trace_and_play forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = 
+    trace_and_play_ false rng model sizes action_mask input output
 
 inl to_model_data forall a b. (cfr_game_model {model} : cfr_game_model a b) : layers.model_data = model_to_model_data model
 inl from_model_data forall inp out.
@@ -216,13 +236,20 @@ inl init forall a b. (cfr_game_graph {graph sizes action_mask input output} : cf
     cfr_game_model { sizes input output action_mask model }
 
 // Calculates the policy and the value array updates.
+// Also resets the trace state afterwards.
 inl calculate_updates forall dim a b.
-        (cfr_game_model {model sizes action_mask input output} : _ a b)
+        (cfr_game_model {model sizes action_mask} : _ a b)
         (reward : sam.sa dim cfr.reward) =
     // Since we aren't using the output_world_id we'll pass `ensemble=0` instead of extracting the other nodes one by one.
     inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
     loop.linear sizes.ensemble_id fun ensemble_id =>
         cfr.calculate_updates action_mask sizes cfr_model trace trace_state ensemble_id reward
+
+// Resets the trace state.
+inl reset_trace_state forall a b. (cfr_game_model {model sizes} : _ a b) =
+    inl trace_state = (key_extract model .cfr_trace_state : cfr.trace_state)
+    loop.linear sizes.ensemble_id fun ensemble_id =>
+        cfr.reset_trace_state trace_state ensemble_id
 
 // Applies the policy and the value array updates.
 // Clamps the average policy vector if applicable.
