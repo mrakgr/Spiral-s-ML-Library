@@ -177,7 +177,7 @@ inl vs_rando = fun (msg, state : _ event * _ state) =>
                         inl player_id = 0
                         inl reward = index rewards player_id
                         loop.linear sizes.ensemble_id fun ensemble_id =>
-                            inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id player_id}
+                            inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id}
                             tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
                                 (reward * path_prob, path_prob)
                                 trace_rewards
@@ -235,7 +235,7 @@ inl vs_self = fun (msg, state : _ event * _ state) =>
                         inl player_id = 0
                         inl reward = index rewards player_id
                         loop.linear sizes.ensemble_id fun ensemble_id =>
-                            inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id player_id}
+                            inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id}
                             tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
                                 (reward * path_prob, path_prob)
                                 trace_rewards
