@@ -207,7 +207,35 @@ nominal cfr_game_model inp out =
         output : int -> out
     }
 
-inl extract_path_prob forall inp out. (cfr_game_model {model} : cfr_game_model inp out) {ensemble_id} =
+// Integrates all the path probs.
+inl extract_integrated_path_prob forall inp out. (cfr_game_model {model sizes} : cfr_game_model inp out) : cfr.prob =
+    inl log_path_probs = 
+        (key_extract model .cfr_trace_state : cfr.trace_state).log_path_probs
+        |> reorder (fun ensemble_id,thread_id,player_id => thread_id,player_id,ensemble_id)
+        |> apply rangem.threads_in_grid().from
+    loop.for {from=0; nearTo=sizes.player_id} (fun player_id s =>
+        inl log_path_probs = apply player_id log_path_probs
+        s * loop.for {from=0; nearTo=sizes.ensemble_id} (fun ensemble_id s => 
+            inl {policy sampling} = tensor_index ensemble_id log_path_probs
+            s + (exp (policy - sampling))
+            ) 0
+        ) 1
+    |> conv
+
+    // Imagine there is only one thread. Imagine there are only 2 ensembles.
+    // For HU poker games, the path prob would be:
+    // p(player_id=0,ensemble_id=0) * p(player_id=1,ensemble_id=0)
+    // + p(player_id=0,ensemble_id=0) * p(player_id=1,ensemble_id=1)
+    // + p(player_id=0,ensemble_id=1) * p(player_id=1,ensemble_id=0)
+    // + p(player_id=0,ensemble_id=1) * p(player_id=1,ensemble_id=1)
+    // ---
+    // p(player_id=0,ensemble_id=0) * (p(player_id=1,ensemble_id=0) + p(player_id=1,ensemble_id=1))
+    // + p(player_id=0,ensemble_id=1) * (p(player_id=1,ensemble_id=0) + p(player_id=1,ensemble_id=1))
+    // ---
+    // (p(player_id=0,ensemble_id=0) + p(player_id=0,ensemble_id=1)) * (p(player_id=1,ensemble_id=0) + p(player_id=1,ensemble_id=1))
+
+// Extracts the path prob given an ensemble_id.
+inl extract_ensemble_path_prob forall inp out. (cfr_game_model {model} : cfr_game_model inp out) {ensemble_id} =
     inl log_path_probs = 
         (key_extract model .cfr_trace_state : cfr.trace_state).log_path_probs
         |> apply ensemble_id

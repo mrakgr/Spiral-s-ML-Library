@@ -177,7 +177,7 @@ inl vs_rando = fun (msg, state : _ event * _ state) =>
                         inl player_id = 0
                         inl reward = index rewards player_id
                         loop.linear sizes.ensemble_id fun ensemble_id =>
-                            inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id}
+                            inl path_prob = ml.cfr_models.extract_ensemble_path_prob model {ensemble_id}
                             tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
                                 (reward * path_prob, path_prob)
                                 trace_rewards
@@ -212,7 +212,7 @@ inl vs_self = fun (msg, state : _ event * _ state) =>
     inl player_types = [Computer; Computer]
     inl trace_rewards = 
         inl config = event_config player_types
-        cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
+        cupy.zeros (sizes.player_id, config.outer / config.frontend_divider)
 
     inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
 
@@ -231,14 +231,14 @@ inl vs_self = fun (msg, state : _ event * _ state) =>
 
                     // Does a purely evalutation run, not modifying the trace state.
                     inl rewards = play_loop model (state_to_internal rng config.player_types) game_init()
-                    inl () = // Adds the rewards to the trace.
-                        inl player_id = 0
+                    // Returns the integrate path probability.
+                    inl path_prob = ml.cfr_models.extract_integrated_path_prob model
+                    // Adds the rewards to the trace.
+                    loop.linear sizes.player_id fun player_id =>
                         inl reward = index rewards player_id
-                        loop.linear sizes.ensemble_id fun ensemble_id =>
-                            inl path_prob = ml.cfr_models.extract_path_prob model {ensemble_id}
-                            tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
-                                (reward * path_prob, path_prob)
-                                trace_rewards
+                        tensor_cuda.tensor_atomic_add (player_id,outer / config.frontend_divider)
+                            (reward * path_prob, path_prob)
+                            trace_rewards
                     ml.cfr_models.reset_trace_state model
                 ml.cfr_models.apply_updates grid rng model
             ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
