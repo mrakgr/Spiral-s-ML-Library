@@ -13,13 +13,10 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 setBasePath('/bundles/shoelace/');
 
 import "./rps"; // Needed to import the rps web components.
-import "./leduc";
-import "./leduc_train";
 import "./leduc_full";
 import "./hu_nl_holdem";
 import { LitElement, PropertyValueMap, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { gap } from './utils'
 
 @customElement('games-ui')
 class Games_UI extends LitElement {
@@ -63,18 +60,10 @@ class Games_UI extends LitElement {
         return html`
             <sl-tab-group>
                 <sl-tab slot="nav" panel="rps"><span class="tab">RPS</span></sl-tab>
-                <sl-tab slot="nav" panel="leduc"><span class="tab">Leduc</span></sl-tab>
-                <sl-tab slot="nav" panel="leduc-train"><span class="tab">Leduc (Train)</span></sl-tab>
                 <sl-tab slot="nav" panel="leduc-full" active><span class="tab">Leduc (Full)</span></sl-tab>
                 <sl-tab slot="nav" panel="nl-holdem"><span class="tab">NL Holdem</span></sl-tab>
                 <sl-tab-panel name="rps">
                     <rps-ui></rps-ui>
-                </sl-tab-panel>
-                <sl-tab-panel name="leduc">
-                    <leduc-ui></leduc-ui>
-                </sl-tab-panel>
-                <sl-tab-panel name="leduc-train">
-                    <leduc-train-ui></leduc-train-ui>
                 </sl-tab-panel>
                 <sl-tab-panel name="leduc-full">
                     <leduc-full-ui></leduc-full-ui>

@@ -104,8 +104,6 @@ modules:
             deckm
             game
             model
-            play
-            train
             full
             tests/
                 train

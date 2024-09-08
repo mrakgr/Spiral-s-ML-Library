@@ -398,7 +398,7 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
     inl {game neural} = jsonm.deserialize state
     serialize seri.game_state game
 
-    console.write_ln "Going to run the Leduc game kernel."
+    console.write_ln "Going to run the Leduc full kernel."
     global "import time"
     inl p : f64 = $"time.perf_counter()"
     
@@ -422,7 +422,7 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
     jsonm.serialize (state, effects)
 
 inl main() =
-    named_tuple "Leduc_Game" {
+    named_tuple "Leduc_Full" {
         init = fun () => jsonm.serialize init()
         event_loop_gpu
     }

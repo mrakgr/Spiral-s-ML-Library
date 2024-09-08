@@ -15265,7 +15265,7 @@ def Closure0():
         method37(v3, v5, v6, v7, v8, v9)
         del v5, v6, v7, v8, v9
         v16 = "{}\n"
-        v17 = "Going to run the Leduc game kernel."
+        v17 = "Going to run the Leduc full kernel."
         print(v16.format(v17),end="")
         del v16, v17
         v18 = time.perf_counter()
@@ -17435,7 +17435,7 @@ def method117(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 
 def main_body():
     v0 = Closure0()
     v1 = Closure1()
-    v2 = collections.namedtuple("Leduc_Game",['event_loop_gpu', 'init'])(v0, v1)
+    v2 = collections.namedtuple("Leduc_Full",['event_loop_gpu', 'init'])(v0, v1)
     del v0, v1
     return v2
 

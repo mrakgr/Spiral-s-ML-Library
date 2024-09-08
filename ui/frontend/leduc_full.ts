@@ -59,7 +59,7 @@ type UI_State = {
 
 class GameElement extends LitElement {
     dispatch_game_event = (detail : Game_Events) => {
-        this.dispatchEvent(new CustomEvent('game', {bubbles: true, composed: true, detail}))
+        this.dispatchEvent(new CustomEvent('full', {bubbles: true, composed: true, detail}))
     }
 }
 
@@ -70,21 +70,6 @@ class Leduc_UI extends GameElement {
         ui_game_state: ["GameNotStarted", []],
         messages: []
     };
-
-    // static styles = css`
-    //     :host {
-    //         padding: 0 50px;
-    //         display: flex;
-    //         flex-direction: column;
-    //         box-sizing: border-box;
-    //         height: 100%;
-    //         width: 100%;
-    //     }
-    //     sl-input, sl-button {
-    //         width: fit-content;
-    //     }
-    // `
-
 
     on_train_vs_rando = () => this.dispatch_game_event(["StartTrainingVsRando",[]])
     on_train_vs_self = () => this.dispatch_game_event(["StartTrainingVsSelf",[]])

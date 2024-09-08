@@ -1,8 +1,7 @@
 from .core import socketio, app
 from .routes import main_page
 from .namespace.rps_game import RPS_Namespace
-from .namespace.leduc_game import Leduc_Namespace
-from .namespace.leduc_train import Leduc_Train_Namespace
+from .namespace.leduc_full import Leduc_Full_Namespace
 from .namespace.hu_nl_holdem_game import HU_NL_Holdem_Namespace
 
 def run_debug(): 
@@ -13,8 +12,7 @@ def run_debug():
     
 app.register_blueprint(main_page)
 socketio.on_namespace(RPS_Namespace('/rps_game'))
-socketio.on_namespace(Leduc_Namespace('/leduc_game'))
-socketio.on_namespace(Leduc_Train_Namespace('/leduc_train'))
+socketio.on_namespace(Leduc_Full_Namespace('/leduc_full'))
 socketio.on_namespace(HU_NL_Holdem_Namespace('/hu_nl_holdem_game'))
 
 if __name__ == "__main__": run_debug()
