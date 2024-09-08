@@ -236,7 +236,7 @@ inl main() =
     named_tuple "HU_Holdem_Game" {
         init = fun () => jsonm.serialize init()
         event_loop_gpu = fun (msg, state : jsonm.json event * jsonm.json state) =>
-            open serializer
+            open serializerm
             inl seri = {
                 msg = create_serializer
                 game_state = create_serializer

@@ -143,7 +143,7 @@ inl play_loop x = train_loop_ false x
 
 // Does a training run against the random player.
 inl vs_rando = fun (msg, state : _ event * _ state) =>
-    open serializer
+    open serializerm
     inl seri = {
         msg = create_serializer
     }
@@ -197,7 +197,7 @@ inl vs_rando = fun (msg, state : _ event * _ state) =>
 
 // Does a training run against the self.
 inl vs_self = fun (msg, state : _ event * _ state) =>
-    open serializer
+    open serializerm
     inl seri = {
         msg = create_serializer
     }

@@ -119,7 +119,7 @@ inl main() =
         init = fun () => jsonm.serialize init()
         event_loop_cpu = fun (msg, state) => event_loop CPU (jsonm.deserialize msg, jsonm.deserialize state) |> jsonm.serialize
         event_loop_gpu = fun (msg, state) =>
-            open serializer
+            open serializerm
             inl seri = {
                 msg = create_serializer
                 state = create_serializer

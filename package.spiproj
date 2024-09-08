@@ -41,7 +41,7 @@ modules:
             utils*
             tensor_main-
         partitionm
-        serializer/
+        serializerm/
             types-
             utils*
             seriazer_main-
@@ -105,8 +105,8 @@ modules:
             game
             model
             play
-            train_old
             train
+            full
             tests/
                 train
 
