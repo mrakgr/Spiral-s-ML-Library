@@ -11,3 +11,8 @@ export const clamp = (x : number, _min : number, _max : number) =>
     _min <= _max && !isNaN(x) && !isNaN(_min) && !isNaN(_max) 
     ? min(max(_min,x), _max)
     : (() => {throw Error(`Invalid args in clamp. Got: ${[x,_min,_max]}`)})();
+
+import { html } from 'lit';
+
+// Creates a span with the specified gap in pixels.
+export const gap = (pixels : number) => html`<span style="flex-basis: ${pixels}px;"></span>`
