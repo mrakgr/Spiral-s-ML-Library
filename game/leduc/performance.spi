@@ -111,9 +111,9 @@ type state_internal_train =
 
 // Converts the given state to internal one.
 // The refs will point to the original locations.
-inl state_to_internal_train grid rng pl_type : state_internal_train =
+inl state_to_internal_train grid rng : state_internal_train =
     mut {
-        pl_type = pl_type
+        pl_type = arraym.fromList [T_Random;T_Random]
         deck = deckm.create()
         messages = sa_create
         rewards = arraym.fromList [0;0]
@@ -121,10 +121,13 @@ inl state_to_internal_train grid rng pl_type : state_internal_train =
         rng = refm.to_local rng
     }
 
-inl state_internal_train_reset (x : state_internal_train) : () =
+inl state_internal_train_reset (x : state_internal_train) (player_id : ml.cfr.player_id) : () =
     x.deck <- deckm.create()
     x.rewards <- arraym.fromList [0;0]
     sa_listm.unsafe_set_length x.messages 0
+    inl player_types = arraym.fromList [T_Random;T_Random]
+    set player_types player_id T_Computer
+    x.pl_type <- player_types
 
 inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal_train) ~node : () = join
     inl set_rewards winner_id (chips_won : int) =
@@ -238,15 +241,17 @@ inl vs_rando (neural : state_neural) =
     inl frontend_rewards : _ _ float = tensorm.tensor_create trace_rewards.dim
     run' fun () =>
         inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-        inl grid = cooperative_groups.create_grid()
-        inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+        inl state = 
+            inl grid = cooperative_groups.create_grid()
+            inl rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            state_to_internal_train grid rng 
         loop.linear config.outer fun (outer : int) =>
             loop.linear config.inner fun (inner : int) =>
                 // The noinline prefix will force the __noinline__ annotation in the generated code.
                 inl noinline_train (player_id : int) =
-                    inl player_types = arraym.fromList [T_Random;T_Random]
+                    // inl player_types = arraym.fromList [T_Random;T_Random]
                     // set player_types player_id T_Computer
-                    inl rewards = train_loop true model (state_to_internal_train rng player_types) game_init()
+                    // inl rewards = train_loop true model (state_to_internal_train rng player_types) game_init()
                     ()
                     // Adds the rewards to the trace.
                     // inl reward = index rewards player_id

@@ -1,0 +1,11 @@
+open corebase
+open corecuda
+open coreext
+open tensorm
+open transposing_loop
+
+inl main() =
+    run fun () =>
+        inl x = cooperative_groups.create_grid()
+        console.write_ln (sizeof : _ cooperative_groups.grid_group).value
+        ()

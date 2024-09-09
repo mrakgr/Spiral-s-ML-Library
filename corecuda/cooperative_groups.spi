@@ -54,14 +54,12 @@ inl cg_reduce forall el. (tile : ref coalesced_group) (f : el -> el -> el) (x : 
     global "#include <cooperative_groups/reduce.h>"
     inl f (arg a), (arg b) : el = f a b
     // Note that it is using a butterfly reduction under the hood, so the arguments passed into f will be in arbitrary order.
-    // TODO: We should do our own version that preserves argument order.
     $"cooperative_groups::reduce(!tile, !x, !f)"
 inl cg_inclusive_scan forall el. (tile : ref coalesced_group) (f : el -> el -> el) (x : el) : el = 
     global "#include <cooperative_groups/scan.h>"
     inl f (arg a), (arg b) : el = f a b
     // For the inclusive scan, it's not doing a butterfly reduction, so I am not sure why it's swapping the arguments around, but
     // that still happens.
-    // TODO: We should do our own version that preserves argument order.
     $"cooperative_groups::inclusive_scan(!tile, !x, !f)"
 inl cg_shuffle forall el. (tile : ref coalesced_group) (x : el) (i : int) : el = $"!tile.shfl(!x,!i)"
 // Also returns the sum at the end.
