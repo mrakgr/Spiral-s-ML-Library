@@ -105,6 +105,7 @@ modules:
             game
             model
             full
+            performance
             tests/
                 train
 
