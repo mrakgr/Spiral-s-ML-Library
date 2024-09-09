@@ -34,9 +34,15 @@ instance tileable coalesced_group = fun _ => ()
 inl meta_group_size forall group {tileable}. (cg : ref group) : int = $"!cg.meta_group_size()"
 inl meta_group_rank forall group {tileable}. (cg : ref group) : int = $"!cg.meta_group_rank()"
 
-inl create_grid() : ref grid_group = $"auto \v = cooperative_groups::this_grid()"
-inl create_block() : ref thread_block = $"auto \v = cooperative_groups::this_thread_block()"
-inl create_thread() : ref thread = $"auto \v = cooperative_groups::this_thread()"
+inl create_grid() : ref grid_group = 
+    global "#include <cooperative_groups.h>"
+    $"auto \v = cooperative_groups::this_grid()"
+inl create_block() : ref thread_block = 
+    global "#include <cooperative_groups.h>"
+    $"auto \v = cooperative_groups::this_thread_block()"
+inl create_thread() : ref thread = 
+    global "#include <cooperative_groups.h>"
+    $"auto \v = cooperative_groups::this_thread()"
 
 // These can only be created from tiles of size 32 or less.
 inl create_labeled_partition forall parent {tileable}. (x : ref parent) (i : int) : ref coalesced_group = $"auto \v = cooperative_groups::labeled_partition(!x,!i)"

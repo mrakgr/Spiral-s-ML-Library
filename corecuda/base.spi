@@ -5,7 +5,8 @@ inl sms_per_gpu() : int = 24 // Marko Grdinic: My RTX 4060 has 24 SMs. A RTX 409
 
 inl threads_per_block() : int = 
     // 32 // Debug
-    512 // Release
+    // 512 // Release
+    256 // Release
 
 inl blocks_per_grid() : int = 
     // 1 // Debug
@@ -28,7 +29,7 @@ inl run' f =
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
     // Global statements only get executed once.
     global "options = []"
-    // global "options.append('--define-macro=NDEBUG')" // turns off the macros
+    global "options.append('--define-macro=NDEBUG')" // turns off the macros
     global "options.append('--dopt=on')" // turns on the device optimizations
     global "options.append('--diag-suppress=550,20012,68,39')" // suppresses some warnings
     global "options.append('--restrict')" // assumes all the pointers are restricted
@@ -36,7 +37,7 @@ inl run' f =
     match threads_per_block with
     | 1024 => global "options.append('--maxrregcount=64')"
     | 512 => global "options.append('--maxrregcount=128')"
-    | 256 => global "options.append('--maxrregcount=255')"
+    | 256 => global "options.append('--maxrregcount=256')" // The manual states the max is 255 instead of 256
     | _ => ()
 
     assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" = sms_per_gpu()) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."

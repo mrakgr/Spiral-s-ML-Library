@@ -178,14 +178,14 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
         | Round table => 
             inl action = 
                 match index #state.pl_type table.player_turn with
-                | T_Computer =>
-                    inl data = table, refm.to_local state.messages
-                    if is_train then
-                        ml.cfr_models.trace_and_train state.rng cfr_model ({player_id=table.player_turn}, data) 
-                    else
-                        ml.cfr_models.trace_and_play state.rng cfr_model ({player_id=table.player_turn}, data) 
-                    |> model.action_conv table
-                | T_Random =>
+                // | T_Computer =>
+                //     inl data = table, refm.to_local state.messages
+                //     if is_train then
+                //         ml.cfr_models.trace_and_train state.rng cfr_model ({player_id=table.player_turn}, data) 
+                //     else
+                //         ml.cfr_models.trace_and_play state.rng cfr_model ({player_id=table.player_turn}, data) 
+                //     |> model.action_conv table
+                | T_Computer | T_Random =>
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
                     random_action state.rng table 
                     |> transposing_loop.shuffle 0
@@ -213,36 +213,6 @@ open corecuda
 open corepython
 open coreext
 open serializerm
-
-// Does a training run against the random player.
-inl vs_rando (neural : state_neural) =
-    inl sizes = model.leduc_sizes()
-    inl config = event_config()
-    inl trace_rewards = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
-    inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
-    run' fun () =>
-        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-        inl grid = cooperative_groups.create_grid()
-        inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-        loop.linear config.outer fun (outer : int) =>
-            loop.linear config.inner fun (inner : int) =>
-                // The noinline prefix will force the __noinline__ annotation in the generated code.
-                let noinline_train player_id =
-                    inl player_types = arraym.fromList [T_Random;T_Random]
-                    set player_types player_id T_Computer
-                    inl rewards = train_loop true model (state_to_internal_train rng player_types) game_init()
-                    // Adds the rewards to the trace.
-                    // inl reward = index rewards player_id
-                    // loop.linear sizes.ensemble_id fun ensemble_id =>
-                    //     inl path_prob = ml.cfr_models.extract_ensemble_path_prob model {ensemble_id}
-                    //     tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
-                    //         (reward * path_prob, path_prob)
-                    //         trace_rewards
-                    ml.cfr_models.calculate_updates model rewards
-                noinline_train 0 . noinline_train 1
-            ml.cfr_models.apply_updates grid rng model
-        ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
-    frontend_rewards
 
 // Does a training run against the self.
 inl vs_self (neural : state_neural) =
@@ -275,6 +245,39 @@ inl vs_self (neural : state_neural) =
 
     frontend_rewards
 
+// Does a training run against the random player.
+inl vs_rando (neural : state_neural) =
+    inl sizes = model.leduc_sizes()
+    inl config = event_config()
+    inl trace_rewards : _ _ (float * float) = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
+    inl frontend_rewards : _ _ float = tensorm.tensor_create trace_rewards.dim
+    run' fun () =>
+        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+        inl grid = cooperative_groups.create_grid()
+        inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+        loop.linear config.outer fun (outer : int) =>
+            loop.linear config.inner fun (inner : int) =>
+                // The noinline prefix will force the __noinline__ annotation in the generated code.
+                inl noinline_train (player_id : int) =
+                    inl player_types = arraym.fromList [T_Random;T_Random]
+                    // set player_types player_id T_Computer
+                    inl rewards = train_loop true model (state_to_internal_train rng player_types) game_init()
+                    ()
+                    // Adds the rewards to the trace.
+                    // inl reward = index rewards player_id
+                    // loop.linear sizes.ensemble_id fun ensemble_id =>
+                    //     inl path_prob = ml.cfr_models.extract_ensemble_path_prob model {ensemble_id}
+                    //     tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
+                    //         (reward * path_prob, path_prob)
+                    //         trace_rewards
+                    // ml.cfr_models.calculate_updates model rewards
+                noinline_train 0
+                // noinline_train 1
+            // ml.cfr_models.apply_updates grid rng model
+        // ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
+        ()
+    frontend_rewards
+
 inl event_loop_gpu = fun (msg, state : event * state) =>
     open serializerm
     inl seri = {
@@ -291,7 +294,7 @@ inl event_loop_gpu = fun (msg, state : event * state) =>
     inl effects : plist ui_effects = plistm.create'
     match msg with
     | StartTrainingVsRando => vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    | StartTrainingVsSelf => vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    // | StartTrainingVsSelf => vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
 
     device_sync()
 
