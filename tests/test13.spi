@@ -6,4 +6,7 @@ open transposing_loop
 
 inl main() =
     run fun () =>
-        console.write_ln {msg = "Hello"; tid = thread_index()}
+        inl x : heap (int * int * int) = heap (1,2,3)
+        inl a,b,c = !x
+        ()
+        // console.write_ln {msg = "Hello"; tid = thread_index()}

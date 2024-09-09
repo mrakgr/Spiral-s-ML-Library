@@ -1,0 +1,10 @@
+open corebase
+open corecuda
+open coreext
+open tensorm
+open transposing_loop
+
+inl main() =
+    run fun () =>
+        inl x : (int * float) = $"`(int * float) \v"
+        ()

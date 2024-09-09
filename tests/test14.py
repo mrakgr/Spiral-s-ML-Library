@@ -202,19 +202,15 @@ struct dynamic_array_list
     }
 };
 
-struct Heap0;
-struct Heap0 {
-    int refc{0};
+struct Tuple0;
+struct Tuple0 {
     int v0;
-    int v1;
-    int v2;
-    __device__ Heap0() = default;
-    __device__ Heap0(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+    float v1;
+    __device__ Tuple0() = default;
+    __device__ Tuple0(int t0, float t1) : v0(t0), v1(t1) {}
 };
 extern "C" __global__ void entry0() {
-    sptr<Heap0> v0;
-    v0 = sptr<Heap0>{new Heap0{1l, 2l, 3l}};
-    int & v1 = v0.base->v0; int & v2 = v0.base->v1; int & v3 = v0.base->v2;
+    Tuple0 v0[5];;
     return ;
 }
 """

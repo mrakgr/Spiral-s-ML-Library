@@ -100,57 +100,43 @@ type state_internal_play =
     }
 
 type state_internal_train =
-    {
-        pl_type : refm.ref (sam.sa 2 player_type_train)
-        deck : refm.ref deck
-        messages : refm.ref messages
-        rng : refm.ref random.philox_state
+    mut {
+        pl_type : sam.sa 2 player_type_train
+        deck : deck
+        messages : messages
+        rewards : sam.sa 2 ml.cfr.reward
+        grid : cooperative_groups.grid_group
+        rng : random.philox_state
     }
 
 // Converts the given state to internal one.
 // The refs will point to the original locations.
-inl state_to_internal_play rng (state : state_game) : state_internal_play =
-    {
-        ui_game_state = refm.from_local state.public.ui_game_state
-        pl_type = refm.from_local state.public.pl_type
-        game = refm.from_local state.private.game
-        deck = refm.from_local state.private.deck
-        messages = refm.from_local state.public.messages
-        rng
+inl state_to_internal_train grid rng pl_type : state_internal_train =
+    mut {
+        pl_type = pl_type
+        deck = deckm.create()
+        messages = sa_create
+        rewards = arraym.fromList [0;0]
+        grid = refm.to_local grid
+        rng = refm.to_local rng
     }
 
-// Sets the internal state to the values held by the regular one.
-inl internal_set_play (state_internal : state_internal_play) (state : state_game) =
-    open refm
-    state_internal.ui_game_state <-# state.public.ui_game_state
-    state_internal.pl_type <-# state.public.pl_type
-    state_internal.game <-# state.private.game
-    state_internal.deck <-# state.private.deck
-    state_internal.messages <-# state.public.messages
+inl state_internal_train_reset (x : state_internal_train) : () =
+    x.deck <- deckm.create()
+    x.rewards <- arraym.fromList [0;0]
+    sa_listm.unsafe_set_length x.messages 0
 
-// Converts the given state to internal one.
-// The refs will point to the original locations.
-inl state_to_internal_train rng pl_type : state_internal_train =
-    {
-        pl_type = refm.from_local pl_type
-        deck = refm.ref deckm.create()
-        messages = refm.from_local sa_create
-        rng
-    }
-
-type rewards = sam.sa 2 ml.cfr.reward
-
-inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal_train) ~node : rewards = join
-    inl rewards : rewards = sa_create
+inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal_train) ~node : () = join
     inl set_rewards winner_id (chips_won : int) =
         inl chips_won = conv chips_won
+        inl rewards = state.rewards
         set rewards winner_id chips_won
         set rewards (toggle winner_id) -chips_won
-    inl push_message = sa_listm.push (refm.to_local state.messages)
+    inl push_message = sa_listm.push state.messages
     inl pop_deck () =
         open refm
-        inl c,d = deckm.draw_card state.rng #state.deck
-        state.deck <-# d
+        inl c,d = deckm.draw_card (refm.from_local state.rng) state.deck
+        state.deck <- d
         c
 
     inl body node =
@@ -177,7 +163,7 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
             None
         | Round table => 
             inl action = 
-                match index #state.pl_type table.player_turn with
+                match index state.pl_type table.player_turn with
                 // | T_Computer =>
                 //     inl data = table, refm.to_local state.messages
                 //     if is_train then
@@ -187,7 +173,7 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                 //     |> model.action_conv table
                 | T_Computer | T_Random =>
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
-                    random_action state.rng table 
+                    random_action (refm.from_local state.rng) table 
                     |> transposing_loop.shuffle 0
             inl msg = PlayerAction(table.player_turn, action)
             push_message msg
@@ -207,43 +193,42 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
             push_message PlayerGotCard(1, c1)
             Some (game_chance_init (c0,c1))
     loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
-    rewards
 
 open corecuda
 open corepython
 open coreext
 open serializerm
 
-// Does a training run against the self.
-inl vs_self (neural : state_neural) =
-    inl sizes = model.leduc_sizes()
-    inl config = event_config()
-    inl trace_rewards = cupy.zeros (sizes.player_id, config.outer / config.frontend_divider)
-    inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
-    run' fun () =>
-        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-        inl grid = cooperative_groups.create_grid()
-        inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-        loop.linear config.outer fun (outer : int) =>
-            loop.linear config.inner fun (inner : int) =>
-                inl player_types = arraym.fromList [T_Computer; T_Computer]
-                // Does a training run, modifying the trace state.
-                train_loop true model (state_to_internal_train rng player_types) game_init() |> ml.cfr_models.calculate_updates model
-                // Does a purely evalutation run, not modifying the trace state.
-                inl rewards = train_loop false model (state_to_internal_train rng player_types) game_init()
-                // Returns the integrate path probability.
-                inl path_prob = ml.cfr_models.extract_integrated_path_prob model
-                // Adds the rewards to the trace.
-                loop.linear sizes.player_id fun player_id =>
-                    inl reward = index rewards player_id
-                    tensor_cuda.tensor_atomic_add (player_id,outer / config.frontend_divider)
-                        (reward * path_prob, path_prob)
-                        trace_rewards
-                ml.cfr_models.reset_trace_state model
-            ml.cfr_models.apply_updates grid rng model
-        ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
+// // Does a training run against the self.
+// inl vs_self (neural : state_neural) =
+//     inl sizes = model.leduc_sizes()
+//     inl config = event_config()
+//     inl trace_rewards = cupy.zeros (sizes.player_id, config.outer / config.frontend_divider)
+//     inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
+//     run' fun () =>
+//         inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+//         inl grid = cooperative_groups.create_grid()
+//         inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+//         loop.linear config.outer fun (outer : int) =>
+//             loop.linear config.inner fun (inner : int) =>
+//                 inl player_types = arraym.fromList [T_Computer; T_Computer]
+//                 // Does a training run, modifying the trace state.
+//                 train_loop true model (state_to_internal_train rng player_types) game_init() |> ml.cfr_models.calculate_updates model
+//                 // Does a purely evalutation run, not modifying the trace state.
+//                 inl rewards = train_loop false model (state_to_internal_train rng player_types) game_init()
+//                 // Returns the integrate path probability.
+//                 inl path_prob = ml.cfr_models.extract_integrated_path_prob model
+//                 // Adds the rewards to the trace.
+//                 loop.linear sizes.player_id fun player_id =>
+//                     inl reward = index rewards player_id
+//                     tensor_cuda.tensor_atomic_add (player_id,outer / config.frontend_divider)
+//                         (reward * path_prob, path_prob)
+//                         trace_rewards
+//                 ml.cfr_models.reset_trace_state model
+//             ml.cfr_models.apply_updates grid rng model
+//         ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
 
-    frontend_rewards
+//     frontend_rewards
 
 // Does a training run against the random player.
 inl vs_rando (neural : state_neural) =
