@@ -89,16 +89,6 @@ inl init() : state =
         }
     }
 
-type state_internal_play =
-    {
-        ui_game_state : refm.ref ui_game_state
-        pl_type : refm.ref (sam.sa 2 player_type_play)
-        game : refm.ref (option game_node)
-        deck : refm.ref deck
-        messages : refm.ref messages
-        rng : refm.ref random.philox_state
-    }
-
 type state_internal_train =
     mut {
         pl_type : sam.sa 2 player_type_train
@@ -165,19 +155,25 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
             push_message msg
             None
         | Round table => 
-            inl action = 
+            inl action,table =
                 match index state.pl_type table.player_turn with
-                // | T_Computer =>
-                //     inl data = table, refm.to_local state.messages
-                //     if is_train then
-                //         ml.cfr_models.trace_and_train state.rng cfr_model ({player_id=table.player_turn}, data) 
-                //     else
-                //         ml.cfr_models.trace_and_play state.rng cfr_model ({player_id=table.player_turn}, data) 
-                //     |> model.action_conv table
-                | T_Computer | T_Random =>
+                | T_Computer =>
+                    inl data = table, state.messages
+                    let noinline_eval() =
+                        model.AA_Call
+                        // if is_train then
+                        //     ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                        // else
+                        //     ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                    inl action_alt, table = transposing_loop.backup noinline_eval table
+                    inl action = model.action_conv table action_alt
+                    action, table
+                | T_Random =>
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
-                    random_action (refm.from_local state.rng) table 
-                    |> transposing_loop.shuffle 0
+                    inl action =
+                        random_action (refm.from_local state.rng) table 
+                        |> transposing_loop.shuffle 0
+                    action, table
             inl msg = PlayerAction(table.player_turn, action)
             push_message msg
             Some (game_round table action)
@@ -249,9 +245,9 @@ inl vs_rando (neural : state_neural) =
             loop.linear config.inner fun (inner : int) =>
                 // The noinline prefix will force the __noinline__ annotation in the generated code.
                 inl noinline_train (player_id : int) =
-                    // inl player_types = arraym.fromList [T_Random;T_Random]
-                    // set player_types player_id T_Computer
-                    // inl rewards = train_loop true model (state_to_internal_train rng player_types) game_init()
+                    state_internal_train_reset state player_id
+                    train_loop true model state game_init()
+                    inl rewards = loop._dup state.rewards
                     ()
                     // Adds the rewards to the trace.
                     // inl reward = index rewards player_id

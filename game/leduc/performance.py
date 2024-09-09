@@ -209,6 +209,20 @@ struct Union2;
 struct Union3;
 struct Union1;
 struct Mut0;
+struct Union5;
+struct Union4;
+struct Union6;
+struct Tuple0;
+__device__ unsigned int loop_2(unsigned int v0, curandStatePhilox4_32_10_t & v1);
+__device__ Tuple0 draw_card_1(curandStatePhilox4_32_10_t & v0, unsigned int v1);
+struct Tuple1;
+__device__ int int_range_3(int v0, int v1, curandStatePhilox4_32_10_t & v2);
+struct Union7;
+__device__ int tag_5(Union2 v0);
+__device__ bool is_pair_6(int v0, int v1);
+__device__ Tuple1 order_7(int v0, int v1);
+__device__ Union7 compare_hands_4(Union5 v0, bool v1, static_array<Union2,2l> v2, int v3, static_array<int,2l> v4, int v5);
+__device__ void method_0(sptr<Mut0> v0, Union4 v1);
 struct Union0_0 { // T_Computer
 };
 struct Union0_1 { // T_Random
@@ -500,6 +514,338 @@ struct Mut0 {
     __device__ Mut0() = default;
     __device__ Mut0(unsigned int t0, cooperative_groups::grid_group t1, static_array_list<Union1,32l> t2, static_array<Union0,2l> t3, static_array<float,2l> t4, curandStatePhilox4_32_10_t t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
 };
+struct Union5_0 { // None
+};
+struct Union5_1 { // Some
+    Union2 v0;
+    __device__ Union5_1(Union2 t0) : v0(t0) {}
+    __device__ Union5_1() = delete;
+};
+struct Union5 {
+    union {
+        Union5_0 case0; // None
+        Union5_1 case1; // Some
+    };
+    unsigned char tag{255};
+    __device__ Union5() {}
+    __device__ Union5(Union5_0 t) : tag(0), case0(t) {} // None
+    __device__ Union5(Union5_1 t) : tag(1), case1(t) {} // Some
+    __device__ Union5(Union5 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union5_0(x.case0); break; // None
+            case 1: new (&this->case1) Union5_1(x.case1); break; // Some
+        }
+    }
+    __device__ Union5(Union5 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union5_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union5_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __device__ Union5 & operator=(Union5 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union5();
+            new (this) Union5{x};
+        }
+        return *this;
+    }
+    __device__ Union5 & operator=(Union5 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union5();
+            new (this) Union5{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union5() {
+        switch(this->tag){
+            case 0: this->case0.~Union5_0(); break; // None
+            case 1: this->case1.~Union5_1(); break; // Some
+        }
+        this->tag = 255;
+    }
+};
+struct Union4_0 { // ChanceCommunityCard
+    Union5 v0;
+    static_array<Union2,2l> v2;
+    static_array<int,2l> v4;
+    int v3;
+    int v5;
+    bool v1;
+    __device__ Union4_0(Union5 t0, bool t1, static_array<Union2,2l> t2, int t3, static_array<int,2l> t4, int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
+    __device__ Union4_0() = delete;
+};
+struct Union4_1 { // ChanceInit
+};
+struct Union4_2 { // Round
+    Union5 v0;
+    static_array<Union2,2l> v2;
+    static_array<int,2l> v4;
+    int v3;
+    int v5;
+    bool v1;
+    __device__ Union4_2(Union5 t0, bool t1, static_array<Union2,2l> t2, int t3, static_array<int,2l> t4, int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
+    __device__ Union4_2() = delete;
+};
+struct Union4_3 { // RoundWithAction
+    Union5 v0;
+    static_array<Union2,2l> v2;
+    static_array<int,2l> v4;
+    Union3 v6;
+    int v3;
+    int v5;
+    bool v1;
+    __device__ Union4_3(Union5 t0, bool t1, static_array<Union2,2l> t2, int t3, static_array<int,2l> t4, int t5, Union3 t6) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5), v6(t6) {}
+    __device__ Union4_3() = delete;
+};
+struct Union4_4 { // TerminalCall
+    Union5 v0;
+    static_array<Union2,2l> v2;
+    static_array<int,2l> v4;
+    int v3;
+    int v5;
+    bool v1;
+    __device__ Union4_4(Union5 t0, bool t1, static_array<Union2,2l> t2, int t3, static_array<int,2l> t4, int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
+    __device__ Union4_4() = delete;
+};
+struct Union4_5 { // TerminalFold
+    Union5 v0;
+    static_array<Union2,2l> v2;
+    static_array<int,2l> v4;
+    int v3;
+    int v5;
+    bool v1;
+    __device__ Union4_5(Union5 t0, bool t1, static_array<Union2,2l> t2, int t3, static_array<int,2l> t4, int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
+    __device__ Union4_5() = delete;
+};
+struct Union4 {
+    union {
+        Union4_0 case0; // ChanceCommunityCard
+        Union4_1 case1; // ChanceInit
+        Union4_2 case2; // Round
+        Union4_3 case3; // RoundWithAction
+        Union4_4 case4; // TerminalCall
+        Union4_5 case5; // TerminalFold
+    };
+    unsigned char tag{255};
+    __device__ Union4() {}
+    __device__ Union4(Union4_0 t) : tag(0), case0(t) {} // ChanceCommunityCard
+    __device__ Union4(Union4_1 t) : tag(1), case1(t) {} // ChanceInit
+    __device__ Union4(Union4_2 t) : tag(2), case2(t) {} // Round
+    __device__ Union4(Union4_3 t) : tag(3), case3(t) {} // RoundWithAction
+    __device__ Union4(Union4_4 t) : tag(4), case4(t) {} // TerminalCall
+    __device__ Union4(Union4_5 t) : tag(5), case5(t) {} // TerminalFold
+    __device__ Union4(Union4 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union4_0(x.case0); break; // ChanceCommunityCard
+            case 1: new (&this->case1) Union4_1(x.case1); break; // ChanceInit
+            case 2: new (&this->case2) Union4_2(x.case2); break; // Round
+            case 3: new (&this->case3) Union4_3(x.case3); break; // RoundWithAction
+            case 4: new (&this->case4) Union4_4(x.case4); break; // TerminalCall
+            case 5: new (&this->case5) Union4_5(x.case5); break; // TerminalFold
+        }
+    }
+    __device__ Union4(Union4 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union4_0(std::move(x.case0)); break; // ChanceCommunityCard
+            case 1: new (&this->case1) Union4_1(std::move(x.case1)); break; // ChanceInit
+            case 2: new (&this->case2) Union4_2(std::move(x.case2)); break; // Round
+            case 3: new (&this->case3) Union4_3(std::move(x.case3)); break; // RoundWithAction
+            case 4: new (&this->case4) Union4_4(std::move(x.case4)); break; // TerminalCall
+            case 5: new (&this->case5) Union4_5(std::move(x.case5)); break; // TerminalFold
+        }
+    }
+    __device__ Union4 & operator=(Union4 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // ChanceCommunityCard
+                case 1: this->case1 = x.case1; break; // ChanceInit
+                case 2: this->case2 = x.case2; break; // Round
+                case 3: this->case3 = x.case3; break; // RoundWithAction
+                case 4: this->case4 = x.case4; break; // TerminalCall
+                case 5: this->case5 = x.case5; break; // TerminalFold
+            }
+        } else {
+            this->~Union4();
+            new (this) Union4{x};
+        }
+        return *this;
+    }
+    __device__ Union4 & operator=(Union4 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // ChanceCommunityCard
+                case 1: this->case1 = std::move(x.case1); break; // ChanceInit
+                case 2: this->case2 = std::move(x.case2); break; // Round
+                case 3: this->case3 = std::move(x.case3); break; // RoundWithAction
+                case 4: this->case4 = std::move(x.case4); break; // TerminalCall
+                case 5: this->case5 = std::move(x.case5); break; // TerminalFold
+            }
+        } else {
+            this->~Union4();
+            new (this) Union4{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union4() {
+        switch(this->tag){
+            case 0: this->case0.~Union4_0(); break; // ChanceCommunityCard
+            case 1: this->case1.~Union4_1(); break; // ChanceInit
+            case 2: this->case2.~Union4_2(); break; // Round
+            case 3: this->case3.~Union4_3(); break; // RoundWithAction
+            case 4: this->case4.~Union4_4(); break; // TerminalCall
+            case 5: this->case5.~Union4_5(); break; // TerminalFold
+        }
+        this->tag = 255;
+    }
+};
+struct Union6_0 { // None
+};
+struct Union6_1 { // Some
+    Union4 v0;
+    __device__ Union6_1(Union4 t0) : v0(t0) {}
+    __device__ Union6_1() = delete;
+};
+struct Union6 {
+    union {
+        Union6_0 case0; // None
+        Union6_1 case1; // Some
+    };
+    unsigned char tag{255};
+    __device__ Union6() {}
+    __device__ Union6(Union6_0 t) : tag(0), case0(t) {} // None
+    __device__ Union6(Union6_1 t) : tag(1), case1(t) {} // Some
+    __device__ Union6(Union6 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union6_0(x.case0); break; // None
+            case 1: new (&this->case1) Union6_1(x.case1); break; // Some
+        }
+    }
+    __device__ Union6(Union6 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union6_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union6_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __device__ Union6 & operator=(Union6 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union6();
+            new (this) Union6{x};
+        }
+        return *this;
+    }
+    __device__ Union6 & operator=(Union6 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union6();
+            new (this) Union6{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union6() {
+        switch(this->tag){
+            case 0: this->case0.~Union6_0(); break; // None
+            case 1: this->case1.~Union6_1(); break; // Some
+        }
+        this->tag = 255;
+    }
+};
+struct Tuple0 {
+    Union2 v0;
+    unsigned int v1;
+    __device__ Tuple0() = default;
+    __device__ Tuple0(Union2 t0, unsigned int t1) : v0(t0), v1(t1) {}
+};
+struct Tuple1 {
+    int v0;
+    int v1;
+    __device__ Tuple1() = default;
+    __device__ Tuple1(int t0, int t1) : v0(t0), v1(t1) {}
+};
+struct Union7_0 { // Eq
+};
+struct Union7_1 { // Gt
+};
+struct Union7_2 { // Lt
+};
+struct Union7 {
+    union {
+        Union7_0 case0; // Eq
+        Union7_1 case1; // Gt
+        Union7_2 case2; // Lt
+    };
+    unsigned char tag{255};
+    __device__ Union7() {}
+    __device__ Union7(Union7_0 t) : tag(0), case0(t) {} // Eq
+    __device__ Union7(Union7_1 t) : tag(1), case1(t) {} // Gt
+    __device__ Union7(Union7_2 t) : tag(2), case2(t) {} // Lt
+    __device__ Union7(Union7 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union7_0(x.case0); break; // Eq
+            case 1: new (&this->case1) Union7_1(x.case1); break; // Gt
+            case 2: new (&this->case2) Union7_2(x.case2); break; // Lt
+        }
+    }
+    __device__ Union7(Union7 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union7_0(std::move(x.case0)); break; // Eq
+            case 1: new (&this->case1) Union7_1(std::move(x.case1)); break; // Gt
+            case 2: new (&this->case2) Union7_2(std::move(x.case2)); break; // Lt
+        }
+    }
+    __device__ Union7 & operator=(Union7 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Eq
+                case 1: this->case1 = x.case1; break; // Gt
+                case 2: this->case2 = x.case2; break; // Lt
+            }
+        } else {
+            this->~Union7();
+            new (this) Union7{x};
+        }
+        return *this;
+    }
+    __device__ Union7 & operator=(Union7 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Eq
+                case 1: this->case1 = std::move(x.case1); break; // Gt
+                case 2: this->case2 = std::move(x.case2); break; // Lt
+            }
+        } else {
+            this->~Union7();
+            new (this) Union7{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union7() {
+        switch(this->tag){
+            case 0: this->case0.~Union7_0(); break; // Eq
+            case 1: this->case1.~Union7_1(); break; // Gt
+            case 2: this->case2.~Union7_2(); break; // Lt
+        }
+        this->tag = 255;
+    }
+};
 __device__ inline bool while_method_0(int v0){
     bool v1;
     v1 = v0 < 4l;
@@ -509,6 +855,1117 @@ __device__ inline bool while_method_1(int v0){
     bool v1;
     v1 = v0 < 16l;
     return v1;
+}
+__device__ inline bool while_method_2(Union6 v0){
+    switch (v0.tag) {
+        case 0: { // None
+            return false;
+            break;
+        }
+        case 1: { // Some
+            Union4 v1 = v0.case1.v0;
+            return true;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false); __trap();
+        }
+    }
+}
+__device__ unsigned int loop_2(unsigned int v0, curandStatePhilox4_32_10_t & v1){
+    unsigned int v2;
+    v2 = curand(&v1);
+    unsigned int v3;
+    v3 = v2 % v0;
+    unsigned int v4;
+    v4 = v2 - v3;
+    unsigned int v5;
+    v5 = 0ul - v0;
+    bool v6;
+    v6 = v4 <= v5;
+    if (v6){
+        return v3;
+    } else {
+        return loop_2(v0, v1);
+    }
+}
+__device__ Tuple0 draw_card_1(curandStatePhilox4_32_10_t & v0, unsigned int v1){
+    int v2;
+    v2 = __popc(v1);
+    unsigned int v3;
+    v3 = (unsigned int)v2;
+    unsigned int v4;
+    v4 = loop_2(v3, v0);
+    int v5;
+    v5 = (int)v4;
+    int v6;
+    v6 = __popc(v1);
+    bool v7;
+    v7 = v5 < v6;
+    unsigned int v12;
+    if (v7){
+        int v8;
+        v8 = v5 + 1l;
+        unsigned int v9;
+        v9 = __fns(v1,0ul,v8);
+        v12 = v9;
+    } else {
+        int v10;
+        v10 = v5 - v6;
+        printf("%s\n", "Cannot find the n-th set bit.");
+        __trap();
+    }
+    bool v13;
+    v13 = 0ul == v12;
+    Union2 v31;
+    if (v13){
+        v31 = Union2{Union2_1{}};
+    } else {
+        bool v15;
+        v15 = 1ul == v12;
+        if (v15){
+            v31 = Union2{Union2_1{}};
+        } else {
+            bool v17;
+            v17 = 2ul == v12;
+            if (v17){
+                v31 = Union2{Union2_2{}};
+            } else {
+                bool v19;
+                v19 = 3ul == v12;
+                if (v19){
+                    v31 = Union2{Union2_2{}};
+                } else {
+                    bool v21;
+                    v21 = 4ul == v12;
+                    if (v21){
+                        v31 = Union2{Union2_0{}};
+                    } else {
+                        bool v23;
+                        v23 = 5ul == v12;
+                        if (v23){
+                            v31 = Union2{Union2_0{}};
+                        } else {
+                            printf("%s\n", "Invalid int in int_to_card.");
+                            __trap();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    int v32;
+    v32 = (int)v12;
+    unsigned int v33;
+    v33 = 1ul << v32;
+    unsigned int v34;
+    v34 = v1 ^ v33;
+    return Tuple0{v31, v34};
+}
+__device__ inline bool while_method_3(int v0){
+    bool v1;
+    v1 = v0 < 2l;
+    return v1;
+}
+__device__ inline bool while_method_4(int v0, int v1){
+    bool v2;
+    v2 = v1 < v0;
+    return v2;
+}
+__device__ int int_range_3(int v0, int v1, curandStatePhilox4_32_10_t & v2){
+    int v3;
+    v3 = v0 - v1;
+    unsigned int v4;
+    v4 = (unsigned int)v3;
+    unsigned int v5;
+    v5 = loop_2(v4, v2);
+    unsigned int v6;
+    v6 = (unsigned int)v1;
+    unsigned int v7;
+    v7 = v5 + v6;
+    int v8;
+    v8 = (int)v7;
+    return v8;
+}
+__device__ int tag_5(Union2 v0){
+    switch (v0.tag) {
+        case 0: { // Jack
+            return 0l;
+            break;
+        }
+        case 1: { // King
+            return 2l;
+            break;
+        }
+        case 2: { // Queen
+            return 1l;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false); __trap();
+        }
+    }
+}
+__device__ bool is_pair_6(int v0, int v1){
+    bool v2;
+    v2 = v1 == v0;
+    return v2;
+}
+__device__ Tuple1 order_7(int v0, int v1){
+    bool v2;
+    v2 = v1 > v0;
+    if (v2){
+        return Tuple1{v1, v0};
+    } else {
+        return Tuple1{v0, v1};
+    }
+}
+__device__ Union7 compare_hands_4(Union5 v0, bool v1, static_array<Union2,2l> v2, int v3, static_array<int,2l> v4, int v5){
+    switch (v0.tag) {
+        case 0: { // None
+            printf("%s\n", "Expected the community card to be present in the table.");
+            __trap();
+            break;
+        }
+        case 1: { // Some
+            Union2 v7 = v0.case1.v0;
+            int v8;
+            v8 = tag_5(v7);
+            Union2 v9;
+            v9 = v2[0l];
+            int v11;
+            v11 = tag_5(v9);
+            Union2 v12;
+            v12 = v2[1l];
+            int v14;
+            v14 = tag_5(v12);
+            bool v15;
+            v15 = is_pair_6(v8, v11);
+            bool v16;
+            v16 = is_pair_6(v8, v14);
+            if (v15){
+                if (v16){
+                    bool v17;
+                    v17 = v11 < v14;
+                    if (v17){
+                        return Union7{Union7_2{}};
+                    } else {
+                        bool v19;
+                        v19 = v11 > v14;
+                        if (v19){
+                            return Union7{Union7_1{}};
+                        } else {
+                            return Union7{Union7_0{}};
+                        }
+                    }
+                } else {
+                    return Union7{Union7_1{}};
+                }
+            } else {
+                if (v16){
+                    return Union7{Union7_2{}};
+                } else {
+                    int v27; int v28;
+                    Tuple1 tmp10 = order_7(v8, v11);
+                    v27 = tmp10.v0; v28 = tmp10.v1;
+                    int v29; int v30;
+                    Tuple1 tmp11 = order_7(v8, v14);
+                    v29 = tmp11.v0; v30 = tmp11.v1;
+                    bool v31;
+                    v31 = v27 < v29;
+                    Union7 v37;
+                    if (v31){
+                        v37 = Union7{Union7_2{}};
+                    } else {
+                        bool v33;
+                        v33 = v27 > v29;
+                        if (v33){
+                            v37 = Union7{Union7_1{}};
+                        } else {
+                            v37 = Union7{Union7_0{}};
+                        }
+                    }
+                    bool v38;
+                    switch (v37.tag) {
+                        case 0: { // Eq
+                            v38 = true;
+                            break;
+                        }
+                        default: {
+                            v38 = false;
+                        }
+                    }
+                    if (v38){
+                        bool v39;
+                        v39 = v28 < v30;
+                        if (v39){
+                            return Union7{Union7_2{}};
+                        } else {
+                            bool v41;
+                            v41 = v28 > v30;
+                            if (v41){
+                                return Union7{Union7_1{}};
+                            } else {
+                                return Union7{Union7_0{}};
+                            }
+                        }
+                    } else {
+                        return v37;
+                    }
+                }
+            }
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false); __trap();
+        }
+    }
+}
+__device__ void method_0(sptr<Mut0> v0, Union4 v1){
+    static_array_list<Union1,32l> v2;
+    v2 = v0.base->v2;
+    Union6 v3;
+    v3 = Union6{Union6_1{v1}};
+    Union6 v4;
+    v4 = v3;
+    while (while_method_2(v4)){
+        Union6 v378;
+        switch (v4.tag) {
+            case 0: { // None
+                v378 = Union6{Union6_0{}};
+                break;
+            }
+            case 1: { // Some
+                Union4 v6 = v4.case1.v0;
+                switch (v6.tag) {
+                    case 0: { // ChanceCommunityCard
+                        Union5 v323 = v6.case0.v0; bool v324 = v6.case0.v1; static_array<Union2,2l> v325 = v6.case0.v2; int v326 = v6.case0.v3; static_array<int,2l> v327 = v6.case0.v4; int v328 = v6.case0.v5;
+                        curandStatePhilox4_32_10_t v329;
+                        v329 = v0.base->v5;
+                        curandStatePhilox4_32_10_t & v330 = v329;
+                        unsigned int v331;
+                        v331 = v0.base->v0;
+                        Union2 v332; unsigned int v333;
+                        Tuple0 tmp0 = draw_card_1(v330, v331);
+                        v332 = tmp0.v0; v333 = tmp0.v1;
+                        v0.base->v0 = v333;
+                        Union1 v334;
+                        v334 = Union1{Union1_0{v332}};
+                        v2.push(v334);
+                        int v335;
+                        v335 = 2l;
+                        int v336; int v337;
+                        Tuple1 tmp1 = Tuple1{0l, 0l};
+                        v336 = tmp1.v0; v337 = tmp1.v1;
+                        while (while_method_3(v336)){
+                            int v339;
+                            v339 = v327[v336];
+                            bool v341;
+                            v341 = v337 >= v339;
+                            int v342;
+                            if (v341){
+                                v342 = v337;
+                            } else {
+                                v342 = v339;
+                            }
+                            v337 = v342;
+                            v336 += 1l ;
+                        }
+                        static_array<int,2l> v343;
+                        int v345;
+                        v345 = 0l;
+                        while (while_method_3(v345)){
+                            v343[v345] = v337;
+                            v345 += 1l ;
+                        }
+                        Union5 v347;
+                        v347 = Union5{Union5_1{v332}};
+                        Union4 v348;
+                        v348 = Union4{Union4_2{v347, true, v325, 0l, v343, v335}};
+                        v378 = Union6{Union6_1{v348}};
+                        break;
+                    }
+                    case 1: { // ChanceInit
+                        curandStatePhilox4_32_10_t v350;
+                        v350 = v0.base->v5;
+                        curandStatePhilox4_32_10_t & v351 = v350;
+                        unsigned int v352;
+                        v352 = v0.base->v0;
+                        Union2 v353; unsigned int v354;
+                        Tuple0 tmp2 = draw_card_1(v351, v352);
+                        v353 = tmp2.v0; v354 = tmp2.v1;
+                        v0.base->v0 = v354;
+                        curandStatePhilox4_32_10_t v355;
+                        v355 = v0.base->v5;
+                        curandStatePhilox4_32_10_t & v356 = v355;
+                        unsigned int v357;
+                        v357 = v0.base->v0;
+                        Union2 v358; unsigned int v359;
+                        Tuple0 tmp3 = draw_card_1(v356, v357);
+                        v358 = tmp3.v0; v359 = tmp3.v1;
+                        v0.base->v0 = v359;
+                        Union1 v360;
+                        v360 = Union1{Union1_2{0l, v353}};
+                        v2.push(v360);
+                        Union1 v361;
+                        v361 = Union1{Union1_2{1l, v358}};
+                        v2.push(v361);
+                        int v362;
+                        v362 = 2l;
+                        static_array<int,2l> v363;
+                        v363[0l] = 1l;
+                        v363[1l] = 1l;
+                        static_array<Union2,2l> v365;
+                        v365[0l] = v353;
+                        v365[1l] = v358;
+                        Union5 v367;
+                        v367 = Union5{Union5_0{}};
+                        Union4 v368;
+                        v368 = Union4{Union4_2{v367, true, v365, 0l, v363, v362}};
+                        v378 = Union6{Union6_1{v368}};
+                        break;
+                    }
+                    case 2: { // Round
+                        Union5 v49 = v6.case2.v0; bool v50 = v6.case2.v1; static_array<Union2,2l> v51 = v6.case2.v2; int v52 = v6.case2.v3; static_array<int,2l> v53 = v6.case2.v4; int v54 = v6.case2.v5;
+                        static_array<Union0,2l> v55;
+                        v55 = v0.base->v3;
+                        Union0 v56;
+                        v56 = v55[v52];
+                        Union3 v139;
+                        switch (v56.tag) {
+                            case 0: { // T_Computer
+                                curandStatePhilox4_32_10_t v58;
+                                v58 = v0.base->v5;
+                                curandStatePhilox4_32_10_t & v59 = v58;
+                                static_array_list<Union3,3l> v60;
+                                v60 = static_array_list<Union3,3l>{};
+                                v60.unsafe_set_length(1l);
+                                Union3 v62;
+                                v62 = Union3{Union3_0{}};
+                                v60[0l] = v62;
+                                int v64;
+                                v64 = v53[0l];
+                                int v66;
+                                v66 = v53[1l];
+                                bool v68;
+                                v68 = v64 == v66;
+                                bool v69;
+                                v69 = v68 != true;
+                                if (v69){
+                                    Union3 v70;
+                                    v70 = Union3{Union3_1{}};
+                                    v60.push(v70);
+                                } else {
+                                }
+                                bool v71;
+                                v71 = v54 > 0l;
+                                if (v71){
+                                    Union3 v72;
+                                    v72 = Union3{Union3_2{}};
+                                    v60.push(v72);
+                                } else {
+                                }
+                                int v73;
+                                v73 = v60.length;
+                                int v74;
+                                v74 = v73 - 1l;
+                                int v75;
+                                v75 = 0l;
+                                while (while_method_4(v74, v75)){
+                                    int v77;
+                                    v77 = v60.length;
+                                    int v78;
+                                    v78 = int_range_3(v77, v75, v59);
+                                    Union3 v79;
+                                    v79 = v60[v75];
+                                    Union3 v81;
+                                    v81 = v60[v78];
+                                    v60[v75] = v81;
+                                    v60[v78] = v79;
+                                    v75 += 1l ;
+                                }
+                                Union3 v83;
+                                v83 = v60.pop();
+                                int v84;
+                                v84 = sizeof(Union3);
+                                unsigned long long v85;
+                                v85 = (unsigned long long)v84;
+                                bool v86;
+                                v86 = v85 <= 81920ull;
+                                bool v87;
+                                v87 = v86 == false;
+                                if (v87){
+                                    assert("The dynamic shared memory is insufficient to allocate the tensor." && v86);
+                                } else {
+                                }
+                                extern __shared__ unsigned char v89[];
+                                bool v90;
+                                v90 = v85 <= v85;
+                                bool v91;
+                                v91 = v90 == false;
+                                if (v91){
+                                    assert("The length of the partition has to be less than or equal to the length of the base array." && v90);
+                                } else {
+                                }
+                                Union3 * v93;
+                                v93 = reinterpret_cast<Union3 *>(&v89[0ull]);
+                                int v95;
+                                v95 = threadIdx.x;
+                                bool v96;
+                                v96 = v95 == 0l;
+                                if (v96){
+                                    v93[0l] = v83;
+                                } else {
+                                }
+                                asm("barrier.cta.sync %0;" :: "r"(0l));
+                                Union3 v97;
+                                v97 = v93[0l];
+                                asm("barrier.cta.sync %0;" :: "r"(0l));
+                                v139 = v97;
+                                break;
+                            }
+                            case 1: { // T_Random
+                                curandStatePhilox4_32_10_t v98;
+                                v98 = v0.base->v5;
+                                curandStatePhilox4_32_10_t & v99 = v98;
+                                static_array_list<Union3,3l> v100;
+                                v100 = static_array_list<Union3,3l>{};
+                                v100.unsafe_set_length(1l);
+                                Union3 v102;
+                                v102 = Union3{Union3_0{}};
+                                v100[0l] = v102;
+                                int v104;
+                                v104 = v53[0l];
+                                int v106;
+                                v106 = v53[1l];
+                                bool v108;
+                                v108 = v104 == v106;
+                                bool v109;
+                                v109 = v108 != true;
+                                if (v109){
+                                    Union3 v110;
+                                    v110 = Union3{Union3_1{}};
+                                    v100.push(v110);
+                                } else {
+                                }
+                                bool v111;
+                                v111 = v54 > 0l;
+                                if (v111){
+                                    Union3 v112;
+                                    v112 = Union3{Union3_2{}};
+                                    v100.push(v112);
+                                } else {
+                                }
+                                int v113;
+                                v113 = v100.length;
+                                int v114;
+                                v114 = v113 - 1l;
+                                int v115;
+                                v115 = 0l;
+                                while (while_method_4(v114, v115)){
+                                    int v117;
+                                    v117 = v100.length;
+                                    int v118;
+                                    v118 = int_range_3(v117, v115, v99);
+                                    Union3 v119;
+                                    v119 = v100[v115];
+                                    Union3 v121;
+                                    v121 = v100[v118];
+                                    v100[v115] = v121;
+                                    v100[v118] = v119;
+                                    v115 += 1l ;
+                                }
+                                Union3 v123;
+                                v123 = v100.pop();
+                                int v124;
+                                v124 = sizeof(Union3);
+                                unsigned long long v125;
+                                v125 = (unsigned long long)v124;
+                                bool v126;
+                                v126 = v125 <= 81920ull;
+                                bool v127;
+                                v127 = v126 == false;
+                                if (v127){
+                                    assert("The dynamic shared memory is insufficient to allocate the tensor." && v126);
+                                } else {
+                                }
+                                extern __shared__ unsigned char v129[];
+                                bool v130;
+                                v130 = v125 <= v125;
+                                bool v131;
+                                v131 = v130 == false;
+                                if (v131){
+                                    assert("The length of the partition has to be less than or equal to the length of the base array." && v130);
+                                } else {
+                                }
+                                Union3 * v133;
+                                v133 = reinterpret_cast<Union3 *>(&v129[0ull]);
+                                int v135;
+                                v135 = threadIdx.x;
+                                bool v136;
+                                v136 = v135 == 0l;
+                                if (v136){
+                                    v133[0l] = v123;
+                                } else {
+                                }
+                                asm("barrier.cta.sync %0;" :: "r"(0l));
+                                Union3 v137;
+                                v137 = v133[0l];
+                                asm("barrier.cta.sync %0;" :: "r"(0l));
+                                v139 = v137;
+                                break;
+                            }
+                            default: {
+                                assert("Invalid tag." && false); __trap();
+                            }
+                        }
+                        Union1 v140;
+                        v140 = Union1{Union1_1{v52, v139}};
+                        v2.push(v140);
+                        Union4 v226;
+                        switch (v49.tag) {
+                            case 0: { // None
+                                switch (v139.tag) {
+                                    case 0: { // Call
+                                        if (v50){
+                                            bool v190;
+                                            v190 = v52 == 0l;
+                                            int v191;
+                                            if (v190){
+                                                v191 = 1l;
+                                            } else {
+                                                v191 = 0l;
+                                            }
+                                            v226 = Union4{Union4_2{v49, false, v51, v191, v53, v54}};
+                                        } else {
+                                            v226 = Union4{Union4_0{v49, v50, v51, v52, v53, v54}};
+                                        }
+                                        break;
+                                    }
+                                    case 1: { // Fold
+                                        v226 = Union4{Union4_5{v49, v50, v51, v52, v53, v54}};
+                                        break;
+                                    }
+                                    case 2: { // Raise
+                                        bool v195;
+                                        v195 = v54 > 0l;
+                                        if (v195){
+                                            bool v196;
+                                            v196 = v52 == 0l;
+                                            int v197;
+                                            if (v196){
+                                                v197 = 1l;
+                                            } else {
+                                                v197 = 0l;
+                                            }
+                                            int v198;
+                                            v198 = -1l + v54;
+                                            int v199; int v200;
+                                            Tuple1 tmp4 = Tuple1{0l, 0l};
+                                            v199 = tmp4.v0; v200 = tmp4.v1;
+                                            while (while_method_3(v199)){
+                                                int v202;
+                                                v202 = v53[v199];
+                                                bool v204;
+                                                v204 = v200 >= v202;
+                                                int v205;
+                                                if (v204){
+                                                    v205 = v200;
+                                                } else {
+                                                    v205 = v202;
+                                                }
+                                                v200 = v205;
+                                                v199 += 1l ;
+                                            }
+                                            static_array<int,2l> v206;
+                                            int v208;
+                                            v208 = 0l;
+                                            while (while_method_3(v208)){
+                                                v206[v208] = v200;
+                                                v208 += 1l ;
+                                            }
+                                            static_array<int,2l> v210;
+                                            int v212;
+                                            v212 = 0l;
+                                            while (while_method_3(v212)){
+                                                int v214;
+                                                v214 = v206[v212];
+                                                bool v216;
+                                                v216 = v212 == v52;
+                                                int v218;
+                                                if (v216){
+                                                    int v217;
+                                                    v217 = v214 + 2l;
+                                                    v218 = v217;
+                                                } else {
+                                                    v218 = v214;
+                                                }
+                                                v210[v212] = v218;
+                                                v212 += 1l ;
+                                            }
+                                            v226 = Union4{Union4_2{v49, false, v51, v197, v210, v198}};
+                                        } else {
+                                            printf("%s\n", "Invalid action. The number of raises left is not positive.");
+                                            __trap();
+                                        }
+                                        break;
+                                    }
+                                    default: {
+                                        assert("Invalid tag." && false); __trap();
+                                    }
+                                }
+                                break;
+                            }
+                            case 1: { // Some
+                                Union2 v141 = v49.case1.v0;
+                                switch (v139.tag) {
+                                    case 0: { // Call
+                                        if (v50){
+                                            bool v143;
+                                            v143 = v52 == 0l;
+                                            int v144;
+                                            if (v143){
+                                                v144 = 1l;
+                                            } else {
+                                                v144 = 0l;
+                                            }
+                                            v226 = Union4{Union4_2{v49, false, v51, v144, v53, v54}};
+                                        } else {
+                                            int v146; int v147;
+                                            Tuple1 tmp5 = Tuple1{0l, 0l};
+                                            v146 = tmp5.v0; v147 = tmp5.v1;
+                                            while (while_method_3(v146)){
+                                                int v149;
+                                                v149 = v53[v146];
+                                                bool v151;
+                                                v151 = v147 >= v149;
+                                                int v152;
+                                                if (v151){
+                                                    v152 = v147;
+                                                } else {
+                                                    v152 = v149;
+                                                }
+                                                v147 = v152;
+                                                v146 += 1l ;
+                                            }
+                                            static_array<int,2l> v153;
+                                            int v155;
+                                            v155 = 0l;
+                                            while (while_method_3(v155)){
+                                                v153[v155] = v147;
+                                                v155 += 1l ;
+                                            }
+                                            v226 = Union4{Union4_4{v49, v50, v51, v52, v153, v54}};
+                                        }
+                                        break;
+                                    }
+                                    case 1: { // Fold
+                                        v226 = Union4{Union4_5{v49, v50, v51, v52, v53, v54}};
+                                        break;
+                                    }
+                                    case 2: { // Raise
+                                        bool v159;
+                                        v159 = v54 > 0l;
+                                        if (v159){
+                                            bool v160;
+                                            v160 = v52 == 0l;
+                                            int v161;
+                                            if (v160){
+                                                v161 = 1l;
+                                            } else {
+                                                v161 = 0l;
+                                            }
+                                            int v162;
+                                            v162 = -1l + v54;
+                                            int v163; int v164;
+                                            Tuple1 tmp6 = Tuple1{0l, 0l};
+                                            v163 = tmp6.v0; v164 = tmp6.v1;
+                                            while (while_method_3(v163)){
+                                                int v166;
+                                                v166 = v53[v163];
+                                                bool v168;
+                                                v168 = v164 >= v166;
+                                                int v169;
+                                                if (v168){
+                                                    v169 = v164;
+                                                } else {
+                                                    v169 = v166;
+                                                }
+                                                v164 = v169;
+                                                v163 += 1l ;
+                                            }
+                                            static_array<int,2l> v170;
+                                            int v172;
+                                            v172 = 0l;
+                                            while (while_method_3(v172)){
+                                                v170[v172] = v164;
+                                                v172 += 1l ;
+                                            }
+                                            static_array<int,2l> v174;
+                                            int v176;
+                                            v176 = 0l;
+                                            while (while_method_3(v176)){
+                                                int v178;
+                                                v178 = v170[v176];
+                                                bool v180;
+                                                v180 = v176 == v52;
+                                                int v182;
+                                                if (v180){
+                                                    int v181;
+                                                    v181 = v178 + 4l;
+                                                    v182 = v181;
+                                                } else {
+                                                    v182 = v178;
+                                                }
+                                                v174[v176] = v182;
+                                                v176 += 1l ;
+                                            }
+                                            v226 = Union4{Union4_2{v49, false, v51, v161, v174, v162}};
+                                        } else {
+                                            printf("%s\n", "Invalid action. The number of raises left is not positive.");
+                                            __trap();
+                                        }
+                                        break;
+                                    }
+                                    default: {
+                                        assert("Invalid tag." && false); __trap();
+                                    }
+                                }
+                                break;
+                            }
+                            default: {
+                                assert("Invalid tag." && false); __trap();
+                            }
+                        }
+                        v378 = Union6{Union6_1{v226}};
+                        break;
+                    }
+                    case 3: { // RoundWithAction
+                        Union5 v228 = v6.case3.v0; bool v229 = v6.case3.v1; static_array<Union2,2l> v230 = v6.case3.v2; int v231 = v6.case3.v3; static_array<int,2l> v232 = v6.case3.v4; int v233 = v6.case3.v5; Union3 v234 = v6.case3.v6;
+                        Union1 v235;
+                        v235 = Union1{Union1_1{v231, v234}};
+                        v2.push(v235);
+                        Union4 v321;
+                        switch (v228.tag) {
+                            case 0: { // None
+                                switch (v234.tag) {
+                                    case 0: { // Call
+                                        if (v229){
+                                            bool v285;
+                                            v285 = v231 == 0l;
+                                            int v286;
+                                            if (v285){
+                                                v286 = 1l;
+                                            } else {
+                                                v286 = 0l;
+                                            }
+                                            v321 = Union4{Union4_2{v228, false, v230, v286, v232, v233}};
+                                        } else {
+                                            v321 = Union4{Union4_0{v228, v229, v230, v231, v232, v233}};
+                                        }
+                                        break;
+                                    }
+                                    case 1: { // Fold
+                                        v321 = Union4{Union4_5{v228, v229, v230, v231, v232, v233}};
+                                        break;
+                                    }
+                                    case 2: { // Raise
+                                        bool v290;
+                                        v290 = v233 > 0l;
+                                        if (v290){
+                                            bool v291;
+                                            v291 = v231 == 0l;
+                                            int v292;
+                                            if (v291){
+                                                v292 = 1l;
+                                            } else {
+                                                v292 = 0l;
+                                            }
+                                            int v293;
+                                            v293 = -1l + v233;
+                                            int v294; int v295;
+                                            Tuple1 tmp7 = Tuple1{0l, 0l};
+                                            v294 = tmp7.v0; v295 = tmp7.v1;
+                                            while (while_method_3(v294)){
+                                                int v297;
+                                                v297 = v232[v294];
+                                                bool v299;
+                                                v299 = v295 >= v297;
+                                                int v300;
+                                                if (v299){
+                                                    v300 = v295;
+                                                } else {
+                                                    v300 = v297;
+                                                }
+                                                v295 = v300;
+                                                v294 += 1l ;
+                                            }
+                                            static_array<int,2l> v301;
+                                            int v303;
+                                            v303 = 0l;
+                                            while (while_method_3(v303)){
+                                                v301[v303] = v295;
+                                                v303 += 1l ;
+                                            }
+                                            static_array<int,2l> v305;
+                                            int v307;
+                                            v307 = 0l;
+                                            while (while_method_3(v307)){
+                                                int v309;
+                                                v309 = v301[v307];
+                                                bool v311;
+                                                v311 = v307 == v231;
+                                                int v313;
+                                                if (v311){
+                                                    int v312;
+                                                    v312 = v309 + 2l;
+                                                    v313 = v312;
+                                                } else {
+                                                    v313 = v309;
+                                                }
+                                                v305[v307] = v313;
+                                                v307 += 1l ;
+                                            }
+                                            v321 = Union4{Union4_2{v228, false, v230, v292, v305, v293}};
+                                        } else {
+                                            printf("%s\n", "Invalid action. The number of raises left is not positive.");
+                                            __trap();
+                                        }
+                                        break;
+                                    }
+                                    default: {
+                                        assert("Invalid tag." && false); __trap();
+                                    }
+                                }
+                                break;
+                            }
+                            case 1: { // Some
+                                Union2 v236 = v228.case1.v0;
+                                switch (v234.tag) {
+                                    case 0: { // Call
+                                        if (v229){
+                                            bool v238;
+                                            v238 = v231 == 0l;
+                                            int v239;
+                                            if (v238){
+                                                v239 = 1l;
+                                            } else {
+                                                v239 = 0l;
+                                            }
+                                            v321 = Union4{Union4_2{v228, false, v230, v239, v232, v233}};
+                                        } else {
+                                            int v241; int v242;
+                                            Tuple1 tmp8 = Tuple1{0l, 0l};
+                                            v241 = tmp8.v0; v242 = tmp8.v1;
+                                            while (while_method_3(v241)){
+                                                int v244;
+                                                v244 = v232[v241];
+                                                bool v246;
+                                                v246 = v242 >= v244;
+                                                int v247;
+                                                if (v246){
+                                                    v247 = v242;
+                                                } else {
+                                                    v247 = v244;
+                                                }
+                                                v242 = v247;
+                                                v241 += 1l ;
+                                            }
+                                            static_array<int,2l> v248;
+                                            int v250;
+                                            v250 = 0l;
+                                            while (while_method_3(v250)){
+                                                v248[v250] = v242;
+                                                v250 += 1l ;
+                                            }
+                                            v321 = Union4{Union4_4{v228, v229, v230, v231, v248, v233}};
+                                        }
+                                        break;
+                                    }
+                                    case 1: { // Fold
+                                        v321 = Union4{Union4_5{v228, v229, v230, v231, v232, v233}};
+                                        break;
+                                    }
+                                    case 2: { // Raise
+                                        bool v254;
+                                        v254 = v233 > 0l;
+                                        if (v254){
+                                            bool v255;
+                                            v255 = v231 == 0l;
+                                            int v256;
+                                            if (v255){
+                                                v256 = 1l;
+                                            } else {
+                                                v256 = 0l;
+                                            }
+                                            int v257;
+                                            v257 = -1l + v233;
+                                            int v258; int v259;
+                                            Tuple1 tmp9 = Tuple1{0l, 0l};
+                                            v258 = tmp9.v0; v259 = tmp9.v1;
+                                            while (while_method_3(v258)){
+                                                int v261;
+                                                v261 = v232[v258];
+                                                bool v263;
+                                                v263 = v259 >= v261;
+                                                int v264;
+                                                if (v263){
+                                                    v264 = v259;
+                                                } else {
+                                                    v264 = v261;
+                                                }
+                                                v259 = v264;
+                                                v258 += 1l ;
+                                            }
+                                            static_array<int,2l> v265;
+                                            int v267;
+                                            v267 = 0l;
+                                            while (while_method_3(v267)){
+                                                v265[v267] = v259;
+                                                v267 += 1l ;
+                                            }
+                                            static_array<int,2l> v269;
+                                            int v271;
+                                            v271 = 0l;
+                                            while (while_method_3(v271)){
+                                                int v273;
+                                                v273 = v265[v271];
+                                                bool v275;
+                                                v275 = v271 == v231;
+                                                int v277;
+                                                if (v275){
+                                                    int v276;
+                                                    v276 = v273 + 4l;
+                                                    v277 = v276;
+                                                } else {
+                                                    v277 = v273;
+                                                }
+                                                v269[v271] = v277;
+                                                v271 += 1l ;
+                                            }
+                                            v321 = Union4{Union4_2{v228, false, v230, v256, v269, v257}};
+                                        } else {
+                                            printf("%s\n", "Invalid action. The number of raises left is not positive.");
+                                            __trap();
+                                        }
+                                        break;
+                                    }
+                                    default: {
+                                        assert("Invalid tag." && false); __trap();
+                                    }
+                                }
+                                break;
+                            }
+                            default: {
+                                assert("Invalid tag." && false); __trap();
+                            }
+                        }
+                        v378 = Union6{Union6_1{v321}};
+                        break;
+                    }
+                    case 4: { // TerminalCall
+                        Union5 v24 = v6.case4.v0; bool v25 = v6.case4.v1; static_array<Union2,2l> v26 = v6.case4.v2; int v27 = v6.case4.v3; static_array<int,2l> v28 = v6.case4.v4; int v29 = v6.case4.v5;
+                        int v30;
+                        v30 = v28[v27];
+                        Union7 v32;
+                        v32 = compare_hands_4(v24, v25, v26, v27, v28, v29);
+                        int v37; int v38;
+                        switch (v32.tag) {
+                            case 0: { // Eq
+                                v37 = 0l; v38 = -1l;
+                                break;
+                            }
+                            case 1: { // Gt
+                                v37 = v30; v38 = 0l;
+                                break;
+                            }
+                            case 2: { // Lt
+                                v37 = v30; v38 = 1l;
+                                break;
+                            }
+                            default: {
+                                assert("Invalid tag." && false); __trap();
+                            }
+                        }
+                        int v39;
+                        v39 = -v38;
+                        bool v40;
+                        v40 = v38 >= v39;
+                        int v41;
+                        if (v40){
+                            v41 = v38;
+                        } else {
+                            v41 = v39;
+                        }
+                        float v42;
+                        v42 = (float)v37;
+                        static_array<float,2l> v43;
+                        v43 = v0.base->v4;
+                        v43[v41] = v42;
+                        bool v44;
+                        v44 = v41 == 0l;
+                        int v45;
+                        if (v44){
+                            v45 = 1l;
+                        } else {
+                            v45 = 0l;
+                        }
+                        float v46;
+                        v46 = -v42;
+                        v43[v45] = v46;
+                        Union1 v47;
+                        v47 = Union1{Union1_3{v26, v37, v38}};
+                        v2.push(v47);
+                        v378 = Union6{Union6_0{}};
+                        break;
+                    }
+                    case 5: { // TerminalFold
+                        Union5 v7 = v6.case5.v0; bool v8 = v6.case5.v1; static_array<Union2,2l> v9 = v6.case5.v2; int v10 = v6.case5.v3; static_array<int,2l> v11 = v6.case5.v4; int v12 = v6.case5.v5;
+                        int v13;
+                        v13 = v11[v10];
+                        int v15;
+                        v15 = -v13;
+                        float v16;
+                        v16 = (float)v15;
+                        static_array<float,2l> v17;
+                        v17 = v0.base->v4;
+                        v17[v10] = v16;
+                        bool v18;
+                        v18 = v10 == 0l;
+                        int v19;
+                        if (v18){
+                            v19 = 1l;
+                        } else {
+                            v19 = 0l;
+                        }
+                        float v20;
+                        v20 = -v16;
+                        v17[v19] = v20;
+                        int v21;
+                        if (v18){
+                            v21 = 1l;
+                        } else {
+                            v21 = 0l;
+                        }
+                        Union1 v22;
+                        v22 = Union1{Union1_3{v9, v13, v21}};
+                        v2.push(v22);
+                        v378 = Union6{Union6_0{}};
+                        break;
+                    }
+                    default: {
+                        assert("Invalid tag." && false); __trap();
+                    }
+                }
+                break;
+            }
+            default: {
+                assert("Invalid tag." && false); __trap();
+            }
+        }
+        v4 = v378;
+    }
+    return ;
 }
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
     auto v2 = cooperative_groups::this_grid();
@@ -548,6 +2005,32 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
         int v25;
         v25 = 0l;
         while (while_method_1(v25)){
+            v22.base->v0 = 63ul;
+            static_array<float,2l> v27;
+            v27[0l] = 0.0f;
+            v27[1l] = 0.0f;
+            v22.base->v4 = v27;
+            static_array_list<Union1,32l> v29;
+            v29 = v22.base->v2;
+            v29.unsafe_set_length(0l);
+            static_array<Union0,2l> v30;
+            Union0 v32;
+            v32 = Union0{Union0_1{}};
+            v30[0l] = v32;
+            Union0 v34;
+            v34 = Union0{Union0_1{}};
+            v30[1l] = v34;
+            Union0 v36;
+            v36 = Union0{Union0_0{}};
+            v30[0l] = v36;
+            v22.base->v3 = v30;
+            Union4 v38;
+            v38 = Union4{Union4_1{}};
+            method_0(v22, v38);
+            static_array<float,2l> v39;
+            v39 = v22.base->v4;
+            static_array<float,2l> v40;
+            v40 = v39;
             v25 += 1l ;
         }
         v23 += 1l ;
