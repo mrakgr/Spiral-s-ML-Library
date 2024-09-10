@@ -223,7 +223,7 @@ __device__ Tuple0 draw_card_1(curandStatePhilox4_32_10_t & v0, unsigned int v1);
 struct Tuple1;
 struct Union8;
 struct Union9;
-__device__ void method_4(float * v0, int v1, float * v2, int v3, float * v4, int v5);
+__device__ void noinline_graph_run_matmul_4(float * v0, int v1, float * v2, int v3, float * v4, int v5);
 __device__ void method_5(unsigned int * v0, int v1, float * v2);
 __device__ void noinline_run_nn_model_3(unsigned char * v0, unsigned char * v1, curandStatePhilox4_32_10_t & v2);
 struct Tuple2;
@@ -1408,7 +1408,7 @@ __device__ inline bool while_method_7(int v0){
     v1 = v0 < 8l;
     return v1;
 }
-__device__ void method_4(float * v0, int v1, float * v2, int v3, float * v4, int v5){
+__device__ __noinline__ void noinline_graph_run_matmul_4(float * v0, int v1, float * v2, int v3, float * v4, int v5){
     extern __shared__ unsigned char v6[];
     float * v7;
     v7 = reinterpret_cast<float *>(&v6[0ull]);
@@ -2366,7 +2366,7 @@ __device__ __noinline__ void noinline_run_nn_model_3(unsigned char * v0, unsigne
         assert("Tensor range check" && 0 <= v14 && v14 < 24l);
         int v15;
         v15 = 32768l * v14;
-        method_4(v7, v9, v10, v15, v5, v13);
+        noinline_graph_run_matmul_4(v7, v9, v10, v15, v5, v13);
         unsigned int * v16;
         v16 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
         assert("Tensor range check" && 0 <= v3 && v3 < 4l);

@@ -370,7 +370,8 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
                         open real_core
                         typecase t with
                         | tensor _ f32 =>
-                            join matmul.matmul_tf32' false true alpha a b beta out
+                            let noinline_graph_run_matmul () = matmul.matmul_tf32' false true alpha a b beta out
+                            noinline_graph_run_matmul()
                         | _ => 
                             !!!!PrintStatic(`t)
                             error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
