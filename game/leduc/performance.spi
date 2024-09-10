@@ -160,7 +160,8 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                 | T_Computer =>
                     inl data = table, state.messages
                     let noinline_eval() =
-                        model.AA_Call
+                        inl x : sam.sa 3 _ = arraym.fromList [model.AA_Fold; model.AA_Call; model.AA_Raise]
+                        index x (random.int_range {from=0; nearTo=length x} (refm.from_local state.rng))
                         // if is_train then
                         //     ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
                         // else
