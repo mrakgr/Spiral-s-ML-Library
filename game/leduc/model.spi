@@ -72,7 +72,7 @@ inl action_conv (table : table) (x : alt_action) : action =
         inl pot_size_needed_to_call = arraym.reduce max table.pot
         if index table.pot table.player_turn = pot_size_needed_to_call then Call else Fold
     | AA_Call => Call
-    | AA_Raise ratio => if table.raises_left > 0 then Raise else Call
+    | AA_Raise => if table.raises_left > 0 then Raise else Call
 
 inl leduc_output : int -> _ = function
     | 0 => AA_Fold

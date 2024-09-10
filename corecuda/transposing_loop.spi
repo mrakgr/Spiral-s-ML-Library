@@ -117,3 +117,9 @@ inl backup forall a b. (eval : () -> a) (env : b) : a * b =
     inl ar : array b = $"static `b \v[!by]"
     set ar from env
     eval(), index ar rangem.threads_in_grid().from
+
+open refm
+// Backs up the second argument in a reference before running the closure, and returning the result of that as well as the backed up value.
+inl backup' forall a b. (eval : () -> a) (env, r : b * ref (option b)) : a * b =
+    r <-# Some env
+    eval(), match #r with Some env => env | None => failwith "Expect the env to be backedu up in the reference."
