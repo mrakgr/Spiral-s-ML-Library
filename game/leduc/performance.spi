@@ -161,7 +161,7 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                 match index state.pl_type table.player_turn with
                 | T_Computer =>
                     inl data = table, state.messages
-                    let noinline_eval() =
+                    inl noinline_eval() =
                         // inl x : sam.sa 3 _ = arraym.fromList [model.AA_Fold; model.AA_Call; model.AA_Raise]
                         // index x (random.int_range {from=0; nearTo=length x} (refm.from_local state.rng))
                         // |> transposing_loop.shuffle 0

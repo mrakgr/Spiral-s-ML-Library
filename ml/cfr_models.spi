@@ -56,11 +56,14 @@ inl trace_and_play_ forall inp out.
 
     barrier_cta_sync 0
 
-    // Runs the model on the inputs.
-    loop.linear ensemble fun ensemble =>
-        graph_run_device model ls {ensemble}
+    let noinline_run_nn_model() =
+        // Runs the model on the inputs.
+        loop.linear ensemble fun ensemble =>
+            graph_run_device model ls {ensemble}
 
-    barrier_cta_sync 0
+        barrier_cta_sync 0
+
+    noinline_run_nn_model()
 
     // Extract the CFR model.
     inl cfr_model = (key_extract model .cfr_model : cfr.model)
