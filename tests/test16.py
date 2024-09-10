@@ -1,3 +1,6 @@
+# Link: https://www.programiz.com/online-compiler/7lO3J91OWXy4w
+# It works with a regular C++ compiler.
+
 kernel = r"""
 #include <new>
 #include <assert.h>
