@@ -157,28 +157,28 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
             push_message msg
             None
         | Round table => 
-            inl action =
+            inl action,table =
                 match index state.pl_type table.player_turn with
                 | T_Computer =>
                     inl data = table, state.messages
                     let noinline_eval() =
-                        inl x : sam.sa 3 _ = arraym.fromList [model.AA_Fold; model.AA_Call; model.AA_Raise]
-                        index x (random.int_range {from=0; nearTo=length x} (refm.from_local state.rng))
-                        |> transposing_loop.shuffle 0
-                        // if is_train then
-                        //     ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
-                        // else
-                        //     ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
-                    // inl action_alt, table = transposing_loop.backup' noinline_eval (table, refm.from_local state.backup_table)
-                    inl action_alt = noinline_eval()
+                        // inl x : sam.sa 3 _ = arraym.fromList [model.AA_Fold; model.AA_Call; model.AA_Raise]
+                        // index x (random.int_range {from=0; nearTo=length x} (refm.from_local state.rng))
+                        // |> transposing_loop.shuffle 0
+                        if is_train then
+                            ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                        else
+                            ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                    inl action_alt, table = transposing_loop.backup' noinline_eval (table, refm.from_local state.backup_table)
+                    // inl action_alt = noinline_eval()
                     inl action = model.action_conv table action_alt
-                    action
+                    action, table
                 | T_Random =>
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
                     inl action =
                         random_action (refm.from_local state.rng) table 
                         |> transposing_loop.shuffle 0
-                    action
+                    action,table
             inl msg = PlayerAction(table.player_turn, action)
             push_message msg
             Some (game_round table action)
@@ -261,10 +261,10 @@ inl vs_rando (neural : state_neural) =
                     //     tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
                     //         (reward * path_prob, path_prob)
                     //         trace_rewards
-                    // ml.cfr_models.calculate_updates model rewards
+                    ml.cfr_models.calculate_updates model rewards
                 noinline_train 0
                 // noinline_train 1
-            // ml.cfr_models.apply_updates grid rng model
+            ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
         // ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
         ()
     frontend_rewards
