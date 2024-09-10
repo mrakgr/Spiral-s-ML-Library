@@ -1,0 +1,11 @@
+open corebase
+open corecuda
+open coreext
+open tensorm
+open transposing_loop
+
+inl main() =
+    run fun () =>
+        inl x : option int = Some 1
+        inl _ = transposing_loop.backup (fun () => ()) x
+        ()
