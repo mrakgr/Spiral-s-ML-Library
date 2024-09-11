@@ -8,7 +8,7 @@
 
 // Notes:
 // The default int and float for this project should be: i32 and f32.
-// It hasn't been tested with any other values.
+// It hasn't been tested with any other default types.
 
 // packages: |core
 
@@ -117,6 +117,8 @@ modules:
             game
             model
             play
+
+    cutlass
 
     tests/
         test1
