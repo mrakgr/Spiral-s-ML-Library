@@ -118,8 +118,6 @@ modules:
             model
             play
 
-    cutlass
-
     tests/
         test1
         test2
@@ -138,3 +136,5 @@ modules:
         test15
         test16
         
+        cutlass/
+            test1
