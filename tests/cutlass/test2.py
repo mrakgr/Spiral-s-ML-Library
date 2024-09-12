@@ -11,7 +11,7 @@ using namespace cute;
 #include <cuda/semaphore>
 __device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
 
-extern "C" __global__ void qwert_entry0() {
+__global__ void qwert_entry0() {
     int v0;
     v0 = threadIdx.x;
     int v1;
@@ -64,7 +64,7 @@ def main_body():
     else:
         pass
     del v1, v2
-    v5 = raw_module.get_function(f"qwert_entry0")
+    v5 = raw_module.get_function("qwert_entry0")
     v5.max_dynamic_shared_size_bytes = 81920 
     v5((24,),(256,),(),shared_mem=81920)
     del v5
