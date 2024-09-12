@@ -1,0 +1,8 @@
+open corebase
+open corecuda
+open coreext
+open tensorm
+
+inl main() =
+    run fun () =>
+        ()
