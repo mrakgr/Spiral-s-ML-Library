@@ -45,8 +45,8 @@ inl run' f =
     // Cutlass related
     global "options.append('-I\"G:/cutlass-3.5.1/include\"')"
     global "options.append('-I\"G:/cutlass-3.5.1/tools/util/include\"')"
-    global "options.append('-I\"G:/cutlass-3.5.1/test/unit/common\"')"
-    global "options.append('-I\"G:/cutlass-3.5.1/build/include\"')"
+    // global "options.append('-I\"G:/cutlass-3.5.1/test/unit/common\"')"
+    // global "options.append('-I\"G:/cutlass-3.5.1/build/include\"')"
 
     // global "options.append('-I\"G:\\cutlass-3.5.1\\tools\\util\\include\"')"
     //   -I"G:\cutlass-3.5.1\examples\common" -I"G:\cutlass-3.5.1\build\include" -I\include -I\examples
