@@ -55,6 +55,15 @@ inl run' f =
     // \examples;
     // G:\cutlass-3.5.1\tools\util\include;
 
+    // G:\cutlass-3.5.1\include;
+    // G:\cutlass-3.5.1\test\unit\common;
+    // G:\cutlass-3.5.1\build\include;
+    // \include;\examples;
+    // G:\cutlass-3.5.1\tools\util\include;
+    // C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.6\include;
+    // G:\cutlass-3.5.1\build\_deps\googletest-src\googletest\include;
+    // G:\cutlass-3.5.1\build\_deps\googletest-src\googletest;
+
     inl compiler = NVCC
     match compiler with
     | NVRTC => global "raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))"

@@ -1,4 +1,4 @@
-// Do more advanced example work? No. But I'll leave it here becuase a lot of the stuff here could be useful.
+// Does the advanced quickstart example work? No. But I'll leave it here becuase a lot of the stuff here could be useful.
 
 open corebase
 open corecuda
