@@ -5,7 +5,6 @@ kernel = r"""
 #include <cutlass/cutlass.h>
 #include <cutlass/numeric_types.h>
 #include "cutlass/gemm/device/gemm_universal_adapter.h"
-#include "cutlass/gemm/kernel/gemm_universal.hpp"
 using namespace cute;
 
 #include <cooperative_groups.h>
