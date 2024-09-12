@@ -138,3 +138,5 @@ modules:
         
         cutlass/
             test1
+            test2
+            
