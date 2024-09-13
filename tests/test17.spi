@@ -1,0 +1,16 @@
+open corebase
+open corecuda
+open coreext
+
+inl main() =
+    run fun () =>
+        let noinline_qwe() : () = 
+            __syncthreads()
+            $'printf("hello\\n")'
+        if thread_index() < 15 then
+            $'printf("true\\n")'
+            noinline_qwe()
+        else
+            $'printf("false\\n")'
+            noinline_qwe()
+        

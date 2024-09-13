@@ -10,6 +10,9 @@
 // The default int and float for this project should be: i32 and f32.
 // It hasn't been tested with any other default types.
 
+// TODO(9/13/2024): After finishing Cutlass integration, look into adding noise to the average policy. Some of the weird behavior like 
+// the trained Leduc agent folding King preflop might not be simply due to model bias, but inefficient exploration as well.
+
 // packages: |core
 
 modules:
@@ -135,6 +138,7 @@ modules:
         test14
         test15
         test16
+        test17
         
         cutlass/
             test1
