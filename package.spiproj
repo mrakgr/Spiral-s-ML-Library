@@ -143,6 +143,8 @@ modules:
         showcase1
         showcase2
         showcase3
+        showcase4
+        
         
         cutlass/
             test1
