@@ -43,8 +43,8 @@ inl run' f =
     assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" = sms_per_gpu()) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
 
     // Cutlass related
-    global "options.append('-I\"G:/cutlass-3.5.1/include\"')"
-    global "options.append('-I\"G:/cutlass-3.5.1/tools/util/include\"')"
+    // global "options.append('-I\"G:/cutlass-3.5.1/include\"')"
+    // global "options.append('-I\"G:/cutlass-3.5.1/tools/util/include\"')"
     // global "options.append('-I\"G:/cutlass-3.5.1/test/unit/common\"')"
     // global "options.append('-I\"G:/cutlass-3.5.1/build/include\"')"
 
