@@ -1,0 +1,14 @@
+open corebase
+open corecuda
+open coreext
+
+open tensorm
+
+inl main() =
+    inl t : tensor (int * int) float = cupy.random_normal {mean=0; std=1} (5,5)
+    console.write_ln "Printing this on host."
+    console.write_ln t
+    run fun () =>
+        inl tid = rangem.threads_in_grid().from
+        if tid < 4 then
+            console.write_ln {tensor=t; tid}
