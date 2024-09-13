@@ -204,11 +204,6 @@ struct dynamic_array_list
 
 __device__ inline bool while_method_0(int v0){
     bool v1;
-    v1 = v0 < 8l;
-    return v1;
-}
-__device__ inline bool while_method_1(int v0){
-    bool v1;
     v1 = v0 < 4l;
     return v1;
 }
@@ -231,14 +226,14 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         int v9;
         v9 = v3 / 2l;
         bool v10;
-        v10 = v9 < 4l;
+        v10 = v9 < 2l;
         bool v11;
         v11 = v10 == false;
         if (v11){
             assert("The last element of the projection dimensions needs to be greater than the index remainder." && v10);
         } else {
         }
-        assert("Tensor range check" && 0 <= v9 && v9 < 4l);
+        assert("Tensor range check" && 0 <= v9 && v9 < 2l);
         assert("Tensor range check" && 0 <= v8 && v8 < 2l);
         int v13;
         v13 = 4l * v8;
@@ -246,7 +241,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         v14 = 8l * v9;
         int v15;
         v15 = v14 + v13;
-        assert("Tensor range check" && 0 <= v9 && v9 < 4l);
+        assert("Tensor range check" && 0 <= v9 && v9 < 2l);
         assert("Tensor range check" && 0 <= v8 && v8 < 2l);
         float v16[4l];
         float v17[4l];
@@ -260,7 +255,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         int v20;
         v20 = 0l;
         #pragma unroll
-        while (while_method_1(v20)){
+        while (while_method_0(v20)){
             assert("Tensor range check" && 0 <= v20 && v20 < 4l);
             float v22;
             v22 = v16[v20];
@@ -345,7 +340,7 @@ options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
 def method0(v0 : i32) -> bool:
-    v1 = v0 < 4
+    v1 = v0 < 2
     del v0
     return v1
 def method1(v0 : i32) -> bool:
@@ -353,8 +348,8 @@ def method1(v0 : i32) -> bool:
     del v0
     return v1
 def main_body():
-    v0 = cp.zeros(32,dtype=cp.float32) # type: ignore
-    v1 = cp.empty(32,dtype=cp.float32)
+    v0 = cp.zeros(16,dtype=cp.float32) # type: ignore
+    v1 = cp.empty(16,dtype=cp.float32)
     v2 = cp.cuda.Device().attributes['MultiProcessorCount']
     v3 = v2 == 24
     del v2
@@ -517,7 +512,7 @@ def main_body():
     print(v71.format(']'),end="")
     del v71
     v96 = "}}\n"
-    print(v96,end="")
+    print(v96.format(),end="")
     del v96
     return 
 

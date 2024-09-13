@@ -15,7 +15,7 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
         inl str = get_value()
         real
             match str with
-            | () => $'print(!fmt,end="")' : ()
+            | () => $'print(!fmt.format(),end="")' : ()
             | (), _ => $'print(!fmt.format(!str),end="")' : ()
             | _, _ => $'print(!fmt.format!str,end="")' : ()
         hashmapm.remove h key_fmt |> ignore
