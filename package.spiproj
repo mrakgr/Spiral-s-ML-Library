@@ -140,18 +140,4 @@ modules:
         test16
         test17
 
-        showcase1
-        showcase2
-        showcase3
-        showcase4
-        showcase5
-        showcase6
-        showcase7
-        showcase8
-
         
-        cutlass/
-            test1
-            test2
-            test3
-            
