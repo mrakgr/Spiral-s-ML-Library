@@ -142,4 +142,5 @@ modules:
 
         async_loads/
             test1
+            test2
             

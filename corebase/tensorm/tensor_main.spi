@@ -31,13 +31,13 @@ inl array forall t. (x : array_base t) : tensor int t = fromArray (array x)
 // Asserts that the tensor length calculated using the default integer matches that of the 64 bit integer. 
 // Also asserts that all the elements of its dimension are positive.
 inl assert_long_length forall dim. (len : int) (dim : dim) = 
-    inl () = real 
+    inl () = real
         open real_core
         iter (fun a => assert (0 < a) "All the dimensions of a tensor have to be positive.") dim
     backend_switch {
         Python = fun () => assert (len <= limit.max) "The tensors full length cannot be adequately represented by the default integer."
-        Cuda = fun () => 
-            inl safe_prod : u64 = real 
+        Cuda = fun () =>
+            inl safe_prod : u64 = real
                 open real_core
                 foldBack (fun a s => conv `u64 a * s) dim 1u64
             assert (conv len = safe_prod) "The tensors full length cannot be adequately represented by the default integer."
@@ -109,7 +109,7 @@ inl apply_templ forall dim a b el. (fst : dim -> a) (snd : dim -> b) (i : a) (te
     assert_indices i (fst dim)
     tensor `b `el {
         dim = snd dim
-        bodies = 
+        bodies =
             map (fun (tensor_body {array stride offset} as x) =>
                 typecase `x with
                 | tensor_body dim ~el => tensor_body `b `el {
@@ -245,11 +245,12 @@ inl reshape_snd forall a b dim el. (dim : b -> dim) : tensor (a * b) el -> tenso
 // Reshapes the tensor dimensions. For this to work, the tensor must be contiguous.
 inl reshape forall a b el. (dim : a -> b) : tensor a el -> tensor b el = reorder (fun x => x, ()) >> reshape_fst dim >> reorder fst
 
-// Splits a tensor along the last dimension.
-inl factorize forall a el. (i : int) (t : tensor a el) : tensor (a * int) el =
+// Splits the first dimension of a tensor along the last dimension.
+inl factorize_fst forall a b el. (i : int) (t : tensor (a * b) el) : tensor ((a * int) * b) el =
+    inl t : tensor (b * a) el = reorder (fun a,b => b,a) t
     // Don't try to factorize if the last dimension of the input tensor is less than the target.
     inl i = if (real utils.last) t.dim < i then 1 else i
-    tensor {
+    inl t : tensor ((b * a) * int) el = tensor {
         dim = real
             open real_core
             mapFoldBack (fun x s =>
@@ -260,9 +261,15 @@ inl factorize forall a el. (i : int) (t : tensor a el) : tensor (a * int) el =
             open real_core
             map (fun (tensor_body r as x) =>
                 typecase `x with
-                | tensor_body a ~el => tensor_body `(a * int) `el {r with stride #= fun x => mapFoldBack (fun x s => x * s, 1) x i}
+                | tensor_body ~ba ~el => tensor_body `(ba * int) `el {r with stride #= fun x => 
+                    mapFoldBack (fun x s => x * s, 1) x i |> fst, utils.last x
+                    }
                 ) t.bodies
     }
+    reorder (fun (b,a),c => (a,c),b) t
+
+// Splits a tensor along the last dimension.
+inl factorize forall a el. (i : int) (t : tensor a el) : tensor (a * int) el = t |> reorder (fun x => x,{}) |> factorize_fst i |> reorder (fun (a,b),{} => a,b)
 
 // Splits a tensor along the last dimension so that the innermost dimension is the requisite number of bytes divided upward.
 inl factorize_sizeof forall a el. (target_size : int) (t : tensor a el) : tensor (a * int) el = factorize (real sizeof_factorize `el target_size) t
@@ -396,7 +403,6 @@ inl fold forall dim s a. (s : s) (f : s -> a -> s) (t : tensor dim a) : s =
 
 // // Replicates the tensor dimension for an arbitrary amount of times with a stride of 0.
 // inl replicate forall a b el. (dim : b) : tensor a el -> tensor (a * b) el = reorder (fun x => x, ()) >> replicate_fst dim >> reorder fst
-
 
 // Tests
 // 

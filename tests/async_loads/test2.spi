@@ -16,10 +16,14 @@ open rangem
 open tensorm
 
 // Maps all the elements of a tensor given the mapping function.
-inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () =
-    assert (from.dim = to.dim) "The dimensions of the two inputs to the map kernel need to be the same."
-    inl from,to = factorize_sizeof_16 from, factorize_sizeof_16 to
-    loop.projective threads_in_grid(fst from.dim) fun i =>
+inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
+    open pipeline
+    inl pipe = make_pipeline_thread()
+    inl io = 
+        zip from to
+        |> factorize_sizeof_16
+        |> factorize_fst threads_per_block()
+    loop.projective blocks_in_grid(fst from.dim) fun i => 
         inl from, to = apply i from, apply i to
         inl l_from, l_to = tensor_create from.dim, tensor_create to.dim
         memcpy_sync (l_from, from)
