@@ -140,4 +140,6 @@ modules:
         test16
         test17
 
-        
+        async_loads/
+            test1
+            
