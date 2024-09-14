@@ -1,4 +1,7 @@
 open corebase
+
+// Controls the asserts
+inl debug_mode() = true
 type warp_size = 32
 inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
 inl sms_per_gpu() : int = 24 // Marko Grdinic: My RTX 4060 has 24 SMs. A RTX 4090 for example would have 128. This should be changed to reflect your configuration.
@@ -29,7 +32,8 @@ inl run' f =
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
     // Global statements only get executed once.
     global "options = []"
-    global "options.append('--define-macro=NDEBUG')" // turns off the macros
+    if debug_mode() = false then
+        global "options.append('--define-macro=NDEBUG')" // turns off the macros
     global "options.append('--dopt=on')" // turns on the device optimizations
     global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
     global "options.append('--restrict')" // assumes all the pointers are restricted

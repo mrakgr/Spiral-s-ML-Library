@@ -134,14 +134,13 @@ inl rigid_merge forall dim. (dim : dim * dim) (index : dim * dim) : dim = real
 inl projective forall dim. ({from nearTo by} : range dim) (body : dim -> ()) : () =
     forBy' {from by nearTo=prod nearTo} (proj nearTo >> body)
 
-inl lookahead forall dim. ({from nearTo by} : range dim) {on_init on_loop} : () =
+inl lookahead forall dim. ({from nearTo by} : range dim) on_loop : () =
     inl length = prod nearTo
     inl i = _dup from
-    if i < length then
-        on_init (proj nearTo from)
     while' (fun () => i < length) fun () =>
         inl i' = i + by
-        on_loop (if i' < length then Some (proj nearTo i') else None)
+        // TODO: It might be good to find a way to rematerialize the `from` rather than keeping it in regs...
+        on_loop (i = from) (proj nearTo from) (if i' < length then Some (proj nearTo i') else None)
         _set i i'
 
 inl linear forall dim. (dim : dim) body : () = 

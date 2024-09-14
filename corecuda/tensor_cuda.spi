@@ -22,7 +22,6 @@ inl tensor_create_shared forall dim el. (dim : dim) : tensor dim el =
 
 // Instantiates a partition using dynamic shared memory. Checks that the allocated memory is sufficient.
 inl tensor_create_from_extern_partition' forall t. (memory : partitionm.partition_offsets t) : t * partitionm.size =
-    // !!!!PrintStatic(`t)
     inl smem_used = conv dynamic_shared_memory_used()
     assert (memory.offset_end <= smem_used) "The dynamic shared memory is insufficient to allocate the tensor."
     inl extern = $"extern __shared__ unsigned char \v[]" // Note: we need to use [] instead of * here.
