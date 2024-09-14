@@ -136,3 +136,8 @@ inl reinterpret_cast_value forall a b. (x : a) : b =
 
 // Created an undefined variable for the given type.
 inl undefined forall t. : t = index (create 1 : array t) 0
+
+// Suspends the thread for a sleep duration of approximately ns nanoseconds. The maximum sleep duration is approximately 1 millisecond.
+inl nanosleep (ns : int) = 
+    assert (ns <= 1_000_000) "The maximum sleep duration is approximately 1 millisecond."
+    $"__nanosleep(!ns)"

@@ -1,0 +1,38 @@
+// Every time I try out Cutlass it feels like I waste nearly a week before giving up. I am depressed that I'll be doing a matrix multiply on my own again. Anyway, I'll be investigating async loads again.
+
+// Here we have an example that mostly writes and reads from memory.
+
+// If I add that `nanosleep 300` call, in Nsight Compute the memory occupancy drop from 92% to 37% and the runtime goes from 8ms to 23ms.
+
+// Ordinarily there'd be no way to speed this up, but if I interleaved memory loads with computation, I should be able to double the memory occupancy...
+
+open corebase
+open corecuda
+open coreext
+open refm
+open rangem
+open tensorm
+
+// Maps all the elements of a tensor given the mapping function.
+inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
+    assert (from.dim = to.dim) "The dimensions of the two inputs to the map kernel need to be the same."
+    inl from,to = factorize_sizeof_16 from, factorize_sizeof_16 to
+    loop.projective threads_in_grid(fst from.dim) fun i => 
+        inl from, to = apply i from, apply i to
+        inl l_from, l_to = tensor_create from.dim, tensor_create to.dim
+        memcpy_sync (l_from, from)
+        pragma.unroll fun _ =>
+            loop.linear from.dim fun j => 
+                tensor_set j f(tensor_index j l_from) l_to
+        memcpy_sync (to, l_to)
+
+inl main() =
+    inl in_ : tensor int float = cupy.ones (1 <<< 28)
+    inl out : tensor int float = tensor_create in_.dim
+    run fun () =>
+        // loop.linear (1 <<< 8) fun (_ : int) =>
+            map (fun x => 
+                nanosleep 300 // Reduces memory occupancy from 92 to 37%
+                x * 10
+                ) in_ out
+    console.write_ln (view (const {from=0; nearTo=16}) out)
