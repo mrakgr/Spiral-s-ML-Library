@@ -29,6 +29,7 @@ inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) :
         memcpy_sync (to, l_to)
 
 inl main() =
+    console.write_ln "Running test 1"
     inl in_ : tensor int float = cupy.ones (1 <<< 28)
     inl out : tensor int float = tensor_create in_.dim
     run fun () =>

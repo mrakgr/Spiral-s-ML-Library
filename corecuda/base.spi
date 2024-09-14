@@ -1,7 +1,8 @@
 open corebase
 
-// Controls the asserts
-inl debug_mode() = true
+// Controls the asserts. Easier to change this than to comment out the option directly.
+inl debug_mode() = false
+
 type warp_size = 32
 inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
 inl sms_per_gpu() : int = 24 // Marko Grdinic: My RTX 4060 has 24 SMs. A RTX 4090 for example would have 128. This should be changed to reflect your configuration.

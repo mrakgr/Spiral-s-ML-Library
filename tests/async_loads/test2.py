@@ -267,7 +267,7 @@ struct Union0 {
 };
 __device__ inline bool while_method_0(int v0){
     bool v1;
-    v1 = v0 < 1l;
+    v1 = v0 < 262144l;
     return v1;
 }
 __device__ inline bool while_method_1(int v0){
@@ -310,7 +310,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         } else {
         }
         bool v20;
-        v20 = v12 < 1l;
+        v20 = v12 < 262144l;
         bool v21;
         v21 = v20 == false;
         if (v21){
@@ -318,7 +318,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         } else {
         }
         bool v23;
-        v23 = v15 < 1l;
+        v23 = v15 < 262144l;
         Union0 v29;
         if (v23){
             bool v24;
@@ -333,7 +333,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         } else {
             v29 = Union0{Union0_0{}};
         }
-        assert("Tensor range check" && 0 <= v12 && v12 < 1l);
+        assert("Tensor range check" && 0 <= v12 && v12 < 262144l);
         int v30;
         v30 = 1024l * v12;
         int v31;
@@ -361,7 +361,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
             case 1: { // Some
                 int v35 = v29.case1.v0;
                 v2.producer_acquire();
-                assert("Tensor range check" && 0 <= v35 && v35 < 1l);
+                assert("Tensor range check" && 0 <= v35 && v35 < 262144l);
                 int v36;
                 v36 = 1024l * v35;
                 int v37;
@@ -456,6 +456,7 @@ from typing import NamedTuple, Union, Callable, Tuple
 i8 = int; i16 = int; i32 = int; i64 = int; u8 = int; u16 = int; u32 = int; u64 = int; f32 = float; f64 = float; char = str; string = str
 
 options = []
+options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
 options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
@@ -468,65 +469,69 @@ def method0(v0 : i32) -> bool:
     del v0
     return v1
 def main_body():
-    v0 = cp.ones(1024,dtype=cp.float32) # type: ignore
-    v1 = cp.empty(1024,dtype=cp.float32)
-    v2 = cp.cuda.Device().attributes['MultiProcessorCount']
-    v3 = v2 == 24
-    del v2
-    v4 = v3 == False
-    if v4:
-        v5 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-        assert v3, v5
-        del v5
+    v2 = "{}\n"
+    v3 = "Running test 2"
+    print(v2.format(v3),end="")
+    del v2, v3
+    v4 = cp.ones(268435456,dtype=cp.float32) # type: ignore
+    v5 = cp.empty(268435456,dtype=cp.float32)
+    v6 = cp.cuda.Device().attributes['MultiProcessorCount']
+    v7 = v6 == 24
+    del v6
+    v8 = v7 == False
+    if v8:
+        v9 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+        assert v7, v9
+        del v9
     else:
         pass
-    del v3, v4
-    v6 = 0
-    v7 = raw_module.get_function(f"entry{v6}")
-    del v6
-    v7.max_dynamic_shared_size_bytes = 81920 
-    v7((24,),(256,),(v0, v1),shared_mem=81920)
-    del v0, v7
-    v19 = 0
-    v20 = "{}"
-    print(v20.format('['),end="")
-    v21 = 0
-    while method0(v21):
-        v23 = v19
-        v24 = v23 >= 100
-        del v23
-        if v24:
-            v25 = " ..."
-            print(v20.format(v25),end="")
-            del v25
+    del v7, v8
+    v10 = 0
+    v11 = raw_module.get_function(f"entry{v10}")
+    del v10
+    v11.max_dynamic_shared_size_bytes = 81920 
+    v11((24,),(256,),(v4, v5),shared_mem=81920)
+    del v4, v11
+    v23 = 0
+    v24 = "{}"
+    print(v24.format('['),end="")
+    v25 = 0
+    while method0(v25):
+        v27 = v23
+        v28 = v27 >= 100
+        del v27
+        if v28:
+            v29 = " ..."
+            print(v24.format(v29),end="")
+            del v29
             break
         else:
             pass
-        del v24
-        v26 = v21 == 0
-        v27 = v26 != True
-        del v26
-        if v27:
-            v28 = "; "
-            print(v20.format(v28),end="")
-            del v28
+        del v28
+        v30 = v25 == 0
+        v31 = v30 != True
+        del v30
+        if v31:
+            v32 = "; "
+            print(v24.format(v32),end="")
+            del v32
         else:
             pass
-        del v27
-        v29 = v19 + 1
-        v19 = v29
-        del v29
-        v30 = v1[v21].item()
-        v31 = "{:.6f}"
-        print(v31.format(v30),end="")
-        del v30, v31
-        v21 += 1 
-    del v1, v19, v21
-    print(v20.format(']'),end="")
-    del v20
-    v32 = "\n"
-    print(v32.format(),end="")
-    del v32
+        del v31
+        v33 = v23 + 1
+        v23 = v33
+        del v33
+        v34 = v5[v25].item()
+        v35 = "{:.6f}"
+        print(v35.format(v34),end="")
+        del v34, v35
+        v25 += 1 
+    del v5, v23, v25
+    print(v24.format(']'),end="")
+    del v24
+    v36 = "\n"
+    print(v36.format(),end="")
+    del v36
     return 
 
 def main():

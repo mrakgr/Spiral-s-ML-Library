@@ -16,7 +16,7 @@ open rangem
 open tensorm
 
 // Maps all the elements of a tensor given the mapping function.
-inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
+inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () =
     open pipeline
     inl pipe = make_pipeline_thread()
     inl io = 
@@ -41,18 +41,19 @@ inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) :
                 inl from, to = io |> apply i |> unzip
                 memcpy_async pipe (s_from, from)
         pragma.unroll fun _ =>
-            loop.linear from.dim fun j => 
+            loop.linear from.dim fun j =>
                 tensor_set j f(tensor_index j l_from) l_to
         // console.write_ln {i l_to tid = rangem.threads_in_grid().from}
         memcpy_sync (to, l_to)
 
 inl main() =
-    inl in_ : tensor int float = cupy.ones (1 <<< 10)
+    console.write_ln "Running test 2"
+    inl in_ : tensor int float = cupy.ones (1 <<< 28)
     inl out : tensor int float = tensor_create in_.dim
     run fun () =>
         // loop.linear (1 <<< 8) fun (_ : int) =>
             map (fun x => 
-                nanosleep 300 // Reduces memory occupancy from 92 to 37%
+                nanosleep 300 // Reduces memory occupancy from 92 to ...
                 x * 10
                 ) in_ out
     console.write_ln (view (const {from=0; nearTo=16}) out)

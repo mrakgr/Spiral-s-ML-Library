@@ -204,77 +204,39 @@ struct dynamic_array_list
 
 __device__ inline bool while_method_0(int v0){
     bool v1;
-    v1 = v0 < 67108864l;
+    v1 = v0 < 268435456l;
     return v1;
 }
-__device__ inline bool while_method_1(int v0){
-    bool v1;
-    v1 = v0 < 4l;
-    return v1;
-}
-extern "C" __global__ void entry0(float * v0, float * v1) {
+extern "C" __global__ void entry0() {
+    int v0;
+    v0 = threadIdx.x;
+    int v1;
+    v1 = blockIdx.x;
     int v2;
-    v2 = threadIdx.x;
+    v2 = v1 * 256l;
     int v3;
-    v3 = blockIdx.x;
+    v3 = v0 + v2;
     int v4;
-    v4 = v3 * 256l;
-    int v5;
-    v5 = v2 + v4;
-    int v6;
-    v6 = v5;
-    while (while_method_0(v6)){
-        bool v8;
-        v8 = 0l <= v6;
+    v4 = v3;
+    while (while_method_0(v4)){
+        bool v6;
+        v6 = 0l <= v4;
+        bool v7;
+        v7 = v6 == false;
+        if (v7){
+            assert("The index needs to be zero or positive." && v6);
+        } else {
+        }
         bool v9;
-        v9 = v8 == false;
-        if (v9){
-            assert("The index needs to be zero or positive." && v8);
+        v9 = v4 < 268435456l;
+        bool v10;
+        v10 = v9 == false;
+        if (v10){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v9);
         } else {
         }
-        bool v11;
-        v11 = v6 < 67108864l;
-        bool v12;
-        v12 = v11 == false;
-        if (v12){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v11);
-        } else {
-        }
-        assert("Tensor range check" && 0 <= v6 && v6 < 67108864l);
-        int v14;
-        v14 = 4l * v6;
-        assert("Tensor range check" && 0 <= v6 && v6 < 67108864l);
-        float v15[4l];
-        float v16[4l];
-        int4* v17;
-        v17 = reinterpret_cast<int4*>(v0 + v14);
-        int4* v18;
-        v18 = reinterpret_cast<int4*>(v15 + 0l);
-        assert("Pointer alignment check" && (unsigned long long)(v17) % 4l == 0 && (unsigned long long)(v18) % 4l == 0);
-        *v18 = *v17;
-        // Pushing the loop unrolling to: 0
-        int v19;
-        v19 = 0l;
-        #pragma unroll
-        while (while_method_1(v19)){
-            assert("Tensor range check" && 0 <= v19 && v19 < 4l);
-            float v21;
-            v21 = v15[v19];
-            __nanosleep(300l);
-            float v22;
-            v22 = v21 * 10.0f;
-            assert("Tensor range check" && 0 <= v19 && v19 < 4l);
-            v16[v19] = v22;
-            v19 += 1l ;
-        }
-        // Poping the loop unrolling to: 0
-        int4* v23;
-        v23 = reinterpret_cast<int4*>(v16 + 0l);
-        int4* v24;
-        v24 = reinterpret_cast<int4*>(v1 + v14);
-        assert("Pointer alignment check" && (unsigned long long)(v23) % 4l == 0 && (unsigned long long)(v24) % 4l == 0);
-        *v24 = *v23;
-        v6 += 6144l ;
+        __nanosleep(64l);
+        v4 += 6144l ;
     }
     return ;
 }
@@ -340,74 +302,29 @@ options.append('--maxrregcount=256')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
-def method0(v0 : i32) -> bool:
-    v1 = v0 < 16
-    del v0
-    return v1
 def main_body():
     v2 = "{}\n"
-    v3 = "Running test 1"
+    v3 = "Running test 3"
     print(v2.format(v3),end="")
     del v2, v3
-    v4 = cp.ones(268435456,dtype=cp.float32) # type: ignore
-    v5 = cp.empty(268435456,dtype=cp.float32)
-    v6 = cp.cuda.Device().attributes['MultiProcessorCount']
-    v7 = v6 == 24
-    del v6
-    v8 = v7 == False
-    if v8:
-        v9 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-        assert v7, v9
-        del v9
+    v4 = cp.cuda.Device().attributes['MultiProcessorCount']
+    v5 = v4 == 24
+    del v4
+    v6 = v5 == False
+    if v6:
+        v7 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+        assert v5, v7
+        del v7
     else:
         pass
-    del v7, v8
-    v10 = 0
-    v11 = raw_module.get_function(f"entry{v10}")
-    del v10
-    v11.max_dynamic_shared_size_bytes = 81920 
-    v11((24,),(256,),(v4, v5),shared_mem=81920)
-    del v4, v11
-    v23 = 0
-    v24 = "{}"
-    print(v24.format('['),end="")
-    v25 = 0
-    while method0(v25):
-        v27 = v23
-        v28 = v27 >= 100
-        del v27
-        if v28:
-            v29 = " ..."
-            print(v24.format(v29),end="")
-            del v29
-            break
-        else:
-            pass
-        del v28
-        v30 = v25 == 0
-        v31 = v30 != True
-        del v30
-        if v31:
-            v32 = "; "
-            print(v24.format(v32),end="")
-            del v32
-        else:
-            pass
-        del v31
-        v33 = v23 + 1
-        v23 = v33
-        del v33
-        v34 = v5[v25].item()
-        v35 = "{:.6f}"
-        print(v35.format(v34),end="")
-        del v34, v35
-        v25 += 1 
-    del v5, v23, v25
-    print(v24.format(']'),end="")
-    del v24
-    v36 = "\n"
-    print(v36.format(),end="")
-    del v36
+    del v5, v6
+    v8 = 0
+    v9 = raw_module.get_function(f"entry{v8}")
+    del v8
+    v9.max_dynamic_shared_size_bytes = 81920 
+    v9((24,),(256,),(),shared_mem=81920)
+    del v9
+    cp.cuda.get_current_stream().synchronize()
     return 
 
 def main():

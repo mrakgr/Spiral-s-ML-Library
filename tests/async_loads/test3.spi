@@ -1,0 +1,15 @@
+// Without any IO how long does the nanosleep take?
+
+open corebase
+open corecuda
+open coreext
+open refm
+open rangem
+open tensorm
+
+inl main() =
+    console.write_ln "Running test 3"
+    run fun () =>
+        loop.projective threads_in_grid(1i32 <<< 28) fun _ =>
+            nanosleep (1 <<< 6)
+    device_sync()
