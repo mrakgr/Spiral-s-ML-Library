@@ -12,7 +12,7 @@ open tensorm
 inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () =
     open pipeline
     inl pipe = make_pipeline_thread()
-    inl io = 
+    inl io =
         zip from to
         |> factorize_sizeof_16
         |> factorize_fst threads_per_block()

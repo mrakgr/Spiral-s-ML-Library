@@ -33,8 +33,7 @@ inl run' f =
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
     // Global statements only get executed once.
     global "options = []"
-    if debug_mode() = false then
-        global "options.append('--define-macro=NDEBUG')" // turns off the macros
+    if debug_mode() = false then global "options.append('--define-macro=NDEBUG')" // turns off the macros
     global "options.append('--dopt=on')" // turns on the device optimizations
     global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
     global "options.append('--restrict')" // assumes all the pointers are restricted
@@ -42,7 +41,7 @@ inl run' f =
     match threads_per_block with
     | 1024 => global "options.append('--maxrregcount=64')"
     | 512 => global "options.append('--maxrregcount=128')"
-    | 256 => global "options.append('--maxrregcount=256')" // The manual states the max is 255 instead of 256
+    | 256 => global "options.append('--maxrregcount=255')" // The manual states the max is 255 instead of 256
     | _ => ()
 
     assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" = sms_per_gpu()) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
@@ -65,6 +64,8 @@ inl run' f =
     inl entry = $'raw_module.get_function(f"entry{!kernel_i}")' : $"cp.RawKernel"
     inl shared_mem = dynamic_shared_memory_used()
     $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
+    if debug_mode() then $"print(f'DEBUG MODE. Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
+    else $"print(f'Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
     real
         match vars with
         | _,_ => $'!entry((!blocks_per_grid,),(!threads_per_block,),!vars,shared_mem=!shared_mem)' : ()

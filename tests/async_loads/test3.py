@@ -460,7 +460,7 @@ options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
 options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
-options.append('--maxrregcount=256')
+options.append('--maxrregcount=255')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
@@ -490,6 +490,7 @@ def main_body():
     v11 = raw_module.get_function(f"entry{v10}")
     del v10
     v11.max_dynamic_shared_size_bytes = 81920 
+    print(f'Threads per block, blocks per grid: {256}, {24}')
     v11((24,),(256,),(v4, v5),shared_mem=81920)
     del v4, v11
     v23 = 0
