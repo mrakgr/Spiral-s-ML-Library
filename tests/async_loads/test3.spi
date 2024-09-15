@@ -1,4 +1,5 @@
-// Without any IO how long does the nanosleep take?
+// This version works the best, but only when the debug mode is false.
+// TODO: Replace the primitives map with this version.
 
 open corebase
 open corecuda
@@ -7,9 +8,43 @@ open refm
 open rangem
 open tensorm
 
+// Maps all the elements of a tensor given the mapping function.
+inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () =
+    open pipeline
+    inl pipe = make_pipeline_thread()
+    inl io = 
+        zip from to
+        |> factorize_sizeof_16
+        |> factorize_fst threads_per_block()
+        |> reorder (fun ((outer,tid),sizeof_4) => tid,outer,sizeof_4)
+    assert (fst io.dim = threads_per_block()) "fst io.dim = threads_per_block()"
+    inl io = io |> apply thread_index()
+    inl s_from,_ = tensor_cuda.tensor_create_extern_shared 0 (threads_per_block(), snd io.dim)
+    inl s_from = s_from |> apply thread_index()
+    inl l_from, l_to = tensor_create (snd io.dim) |> unzip
+    loop.lookahead blocks_in_grid(fst io.dim) fun is_init i future_i =>
+        inl from, to = io |> apply i |> unzip
+        if is_init then
+            producer_phase pipe fun () =>
+                memcpy_async pipe (s_from, from)
+        consumer_phase pipe fun () =>
+            memcpy_sync (l_from, s_from)
+        future_i |> optionm.iter fun i =>
+            producer_phase pipe fun () =>
+                inl from, to = io |> apply i |> unzip
+                memcpy_async pipe (s_from, from)
+        pragma.unroll fun _ =>
+            loop.linear from.dim fun j =>
+                tensor_set j f(tensor_index j l_from) l_to
+        memcpy_sync (to, l_to)
+
 inl main() =
-    console.write_ln "Running test 3"
+    console.write_ln "Running test 3. Asynchronous loads."
+    inl in_ : tensor int float = cupy.ones _2_pow_28()
+    inl out : tensor int float = tensor_create in_.dim
     run fun () =>
-        loop.projective threads_in_grid(1i32 <<< 28) fun _ =>
-            nanosleep (1 <<< 6)
-    device_sync()
+        map (fun x => 
+            nanosleep_128()
+            x + 10
+            ) in_ out
+    console.write_ln (view (const {from=0; nearTo=16}) out)

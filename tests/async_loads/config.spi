@@ -1,0 +1,5 @@
+open corebase
+open corecuda
+
+inl _2_pow_28() : i32 = 1 <<< 28
+inl nanosleep_128() = nanosleep 128

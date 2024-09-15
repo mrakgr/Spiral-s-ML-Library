@@ -141,6 +141,8 @@ modules:
         test17
 
         async_loads/
+            config-
+            test0
             test1
             test2
             test3

@@ -2,6 +2,8 @@ kernel = r"""
 #include <new>
 #include <assert.h>
 #include <stdio.h>
+#include <cuda/pipeline>
+#include <cooperative_groups/memcpy_async.h>
 using default_int = int;
 using default_uint = unsigned int;
 template <typename el>
@@ -202,41 +204,201 @@ struct dynamic_array_list
     }
 };
 
+struct Union0;
+struct Union0_0 { // None
+};
+struct Union0_1 { // Some
+    int v0;
+    __device__ Union0_1(int t0) : v0(t0) {}
+    __device__ Union0_1() = delete;
+};
+struct Union0 {
+    union {
+        Union0_0 case0; // None
+        Union0_1 case1; // Some
+    };
+    unsigned char tag{255};
+    __device__ Union0() {}
+    __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // None
+    __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // Some
+    __device__ Union0(Union0 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(x.case0); break; // None
+            case 1: new (&this->case1) Union0_1(x.case1); break; // Some
+        }
+    }
+    __device__ Union0(Union0 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __device__ Union0 & operator=(Union0 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
+        }
+        return *this;
+    }
+    __device__ Union0 & operator=(Union0 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union0() {
+        switch(this->tag){
+            case 0: this->case0.~Union0_0(); break; // None
+            case 1: this->case1.~Union0_1(); break; // Some
+        }
+        this->tag = 255;
+    }
+};
 __device__ inline bool while_method_0(int v0){
     bool v1;
-    v1 = v0 < 268435456l;
+    v1 = v0 < 262144l;
     return v1;
 }
-extern "C" __global__ void entry0() {
-    int v0;
-    v0 = threadIdx.x;
-    int v1;
-    v1 = blockIdx.x;
-    int v2;
-    v2 = v1 * 256l;
+__device__ inline bool while_method_1(int v0){
+    bool v1;
+    v1 = v0 < 4l;
+    return v1;
+}
+extern "C" __global__ void entry0(float * v0, float * v1) {
+    cuda::pipeline<cuda::thread_scope_thread> v2 = cuda::make_pipeline();
     int v3;
-    v3 = v0 + v2;
+    v3 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v3 && v3 < 256l);
     int v4;
-    v4 = v3;
-    while (while_method_0(v4)){
-        bool v6;
-        v6 = 0l <= v4;
-        bool v7;
-        v7 = v6 == false;
-        if (v7){
-            assert("The index needs to be zero or positive." && v6);
+    v4 = 4l * v3;
+    extern __shared__ unsigned char v5[];
+    float * v6;
+    v6 = reinterpret_cast<float *>(&v5[0ull]);
+    int v8;
+    v8 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v8 && v8 < 256l);
+    int v9;
+    v9 = 4l * v8;
+    float v10[4l];
+    float v11[4l];
+    int v12;
+    v12 = blockIdx.x;
+    int v13;
+    v13 = v12;
+    while (while_method_0(v13)){
+        int v15;
+        v15 = v13 + 24l;
+        bool v16;
+        v16 = v13 == v12;
+        bool v17;
+        v17 = 0l <= v13;
+        bool v18;
+        v18 = v17 == false;
+        if (v18){
+            assert("The index needs to be zero or positive." && v17);
         } else {
         }
-        bool v9;
-        v9 = v4 < 268435456l;
-        bool v10;
-        v10 = v9 == false;
-        if (v10){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v9);
+        bool v20;
+        v20 = v13 < 262144l;
+        bool v21;
+        v21 = v20 == false;
+        if (v21){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v20);
         } else {
         }
-        __nanosleep(64l);
-        v4 += 6144l ;
+        bool v23;
+        v23 = v15 < 262144l;
+        Union0 v29;
+        if (v23){
+            bool v24;
+            v24 = 0l <= v15;
+            bool v25;
+            v25 = v24 == false;
+            if (v25){
+                assert("The index needs to be zero or positive." && v24);
+            } else {
+            }
+            v29 = Union0{Union0_1{v15}};
+        } else {
+            v29 = Union0{Union0_0{}};
+        }
+        assert("Tensor range check" && 0 <= v13 && v13 < 262144l);
+        int v30;
+        v30 = 1024l * v13;
+        int v31;
+        v31 = v30 + v4;
+        if (v16){
+            v2.producer_acquire();
+            constexpr int v32 = sizeof(float) * 4l;
+            assert("Pointer alignment check" && (unsigned long long)(v0 + v31) % v32 == 0 && (unsigned long long)(v6 + v9) % v32 == 0);
+            cuda::memcpy_async(v6 + v9, v0 + v31, cuda::aligned_size_t<v32>(v32), v2);
+            v2.producer_commit();
+        } else {
+        }
+        cuda::pipeline_consumer_wait_prior<0>(v2);;
+        int4* v33;
+        v33 = reinterpret_cast<int4*>(v6 + v9);
+        int4* v34;
+        v34 = reinterpret_cast<int4*>(v10 + 0l);
+        assert("Pointer alignment check" && (unsigned long long)(v33) % 4l == 0 && (unsigned long long)(v34) % 4l == 0);
+        *v34 = *v33;
+        v2.consumer_release();
+        switch (v29.tag) {
+            case 0: { // None
+                break;
+            }
+            case 1: { // Some
+                int v35 = v29.case1.v0;
+                v2.producer_acquire();
+                assert("Tensor range check" && 0 <= v35 && v35 < 262144l);
+                int v36;
+                v36 = 1024l * v35;
+                int v37;
+                v37 = v36 + v4;
+                constexpr int v38 = sizeof(float) * 4l;
+                assert("Pointer alignment check" && (unsigned long long)(v0 + v37) % v38 == 0 && (unsigned long long)(v6 + v9) % v38 == 0);
+                cuda::memcpy_async(v6 + v9, v0 + v37, cuda::aligned_size_t<v38>(v38), v2);
+                v2.producer_commit();
+                break;
+            }
+            default: {
+                assert("Invalid tag." && false); __trap();
+            }
+        }
+        // Pushing the loop unrolling to: 0
+        int v39;
+        v39 = 0l;
+        #pragma unroll
+        while (while_method_1(v39)){
+            assert("Tensor range check" && 0 <= v39 && v39 < 4l);
+            float v41;
+            v41 = v10[v39];
+            __nanosleep(128ul);
+            float v42;
+            v42 = v41 + 10.0f;
+            assert("Tensor range check" && 0 <= v39 && v39 < 4l);
+            v11[v39] = v42;
+            v39 += 1l ;
+        }
+        // Poping the loop unrolling to: 0
+        int4* v43;
+        v43 = reinterpret_cast<int4*>(v11 + 0l);
+        int4* v44;
+        v44 = reinterpret_cast<int4*>(v1 + v31);
+        assert("Pointer alignment check" && (unsigned long long)(v43) % 4l == 0 && (unsigned long long)(v44) % 4l == 0);
+        *v44 = *v43;
+        v13 = v15;
     }
     return ;
 }
@@ -302,29 +464,74 @@ options.append('--maxrregcount=256')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
+def method0(v0 : i32) -> bool:
+    v1 = v0 < 16
+    del v0
+    return v1
 def main_body():
     v2 = "{}\n"
-    v3 = "Running test 3"
+    v3 = "Running test 3. Asynchronous loads."
     print(v2.format(v3),end="")
     del v2, v3
-    v4 = cp.cuda.Device().attributes['MultiProcessorCount']
-    v5 = v4 == 24
-    del v4
-    v6 = v5 == False
-    if v6:
-        v7 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-        assert v5, v7
-        del v7
+    v4 = cp.ones(268435456,dtype=cp.float32) # type: ignore
+    v5 = cp.empty(268435456,dtype=cp.float32)
+    v6 = cp.cuda.Device().attributes['MultiProcessorCount']
+    v7 = v6 == 24
+    del v6
+    v8 = v7 == False
+    if v8:
+        v9 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+        assert v7, v9
+        del v9
     else:
         pass
-    del v5, v6
-    v8 = 0
-    v9 = raw_module.get_function(f"entry{v8}")
-    del v8
-    v9.max_dynamic_shared_size_bytes = 81920 
-    v9((24,),(256,),(),shared_mem=81920)
-    del v9
-    cp.cuda.get_current_stream().synchronize()
+    del v7, v8
+    v10 = 0
+    v11 = raw_module.get_function(f"entry{v10}")
+    del v10
+    v11.max_dynamic_shared_size_bytes = 81920 
+    v11((24,),(256,),(v4, v5),shared_mem=81920)
+    del v4, v11
+    v23 = 0
+    v24 = "{}"
+    print(v24.format('['),end="")
+    v25 = 0
+    while method0(v25):
+        v27 = v23
+        v28 = v27 >= 100
+        del v27
+        if v28:
+            v29 = " ..."
+            print(v24.format(v29),end="")
+            del v29
+            break
+        else:
+            pass
+        del v28
+        v30 = v25 == 0
+        v31 = v30 != True
+        del v30
+        if v31:
+            v32 = "; "
+            print(v24.format(v32),end="")
+            del v32
+        else:
+            pass
+        del v31
+        v33 = v23 + 1
+        v23 = v33
+        del v33
+        v34 = v5[v25].item()
+        v35 = "{:.6f}"
+        print(v35.format(v34),end="")
+        del v34, v35
+        v25 += 1 
+    del v5, v23, v25
+    print(v24.format(']'),end="")
+    del v24
+    v36 = "\n"
+    print(v36.format(),end="")
+    del v36
     return 
 
 def main():
