@@ -139,8 +139,7 @@ inl lookahead forall dim. ({from nearTo by} : range dim) on_loop : () =
     inl i = _dup from
     while' (fun () => i < length) fun () =>
         inl i' = i + by
-        // TODO: It might be good to find a way to rematerialize the `from` rather than keeping it in regs...
-        on_loop (i = from) (proj nearTo from) (if i' < length then Some (proj nearTo i') else None)
+        on_loop (i = from) (proj nearTo i) (if i' < length then Some (proj nearTo i') else None)
         _set i i'
 
 inl linear forall dim. (dim : dim) body : () = 
