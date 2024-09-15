@@ -64,6 +64,7 @@ inl run' f =
     inl entry = $'raw_module.get_function(f"entry{!kernel_i}")' : $"cp.RawKernel"
     inl shared_mem = dynamic_shared_memory_used()
     $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
+    // It's easy to forget whether the debug mode is on or off.
     if debug_mode() then $"print(f'DEBUG MODE. Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
     else $"print(f'Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
     real
