@@ -169,51 +169,49 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                 inl b = apply n b |> apply k |> apply_ptr
 
                 // Loads the data from global to shared memory.
-                tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip b_shared_tile b)
-                tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip a_shared_tile a)
+                pragma.unroll fun _ =>
+                    tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip b_shared_tile b)
+                    tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip a_shared_tile a)
                 barrier_cta_sync 0
 
                 inl (exists a_trans. _), (exists b_trans. _) = tlit a_trans, tlit b_trans
                 inl a_frag, b_frag : _ _ (fragment matrix_a m_frag n_frag k_frag (layout a_trans) tf32)
                                 * _ _ (fragment matrix_b m_frag n_frag k_frag (layout b_trans) tf32) =
-                    tensor_create (m_local,k_local),
-                    tensor_create (n_local,k_local)
-
-                // Loads from shared memory into registers.
-                loop.linear (m_local, k_local) fun m,k =>
-                    inl a_frag = tensor_ref_index (m,k) a_frag
-                    load_matrix_sync_tf32 a_frag (a_shared_frag |> apply m |> apply k)
-                    
-                // Loads from shared memory into registers.
-                loop.linear (n_local, k_local) fun n,k =>
-                    inl b_frag = tensor_ref_index (n,k) b_frag
-                    load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
-
-                barrier_cta_sync 0
+                    tensor_create {},
+                    tensor_create {}
 
                 // Does the matrix multiplication and accumulates the results in the fragment.
-                loop.linear (m_local, n_local, k_local) fun m,n,k =>
-                    inl c_frag = tensor_ref_index (m,n) c_frag
-                    inl a_frag = tensor_ref_index (m,k) a_frag
-                    inl b_frag = tensor_ref_index (n,k) b_frag
-                    mma_sync c_frag a_frag b_frag c_frag
+                loop.linear m_local fun m => 
+                    pragma.unroll fun _ =>
+                        loop.linear n_local fun n =>
+                            inl c_frag = tensor_ref_index (m,n) c_frag
+                            loop.linear k_local fun k =>
+                                inl a_frag = tensor_ref_index {} a_frag
+                                load_matrix_sync_tf32 a_frag (a_shared_frag |> apply m |> apply k)
+                                inl b_frag = tensor_ref_index {} b_frag
+                                load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
+                                mma_sync c_frag a_frag b_frag c_frag
+
+                barrier_cta_sync 0 // Without this barrier the threads will loop around and change the shared memory that the rest are still loading.
 
             // Adds the accumulated result to the output in shared memory.
-            loop.linear (fst c_shared_frag.dim) fun m,n =>
-                inl c_frag = tensor_ref_index (m,n) c_frag
+            pragma.unroll fun _ =>
+                loop.linear (fst c_shared_frag.dim) fun m,n =>
+                    inl c_frag = tensor_ref_index (m,n) c_frag
 
-                // A + (beta / alpha) * B = C / alpha =>
-                // alpha * A + beta * B = C
-                if alpha <> 1 then
-                    loop.linear (fragment_length c_frag) fun i =>
-                        fragment_set c_frag i (alpha * fragment_index c_frag i)
+                    // A + (beta / alpha) * B = C / alpha =>
+                    // alpha * A + beta * B = C
+                    if alpha <> 1 then
+                        loop.linear (fragment_length c_frag) fun i =>
+                            fragment_set c_frag i (alpha * fragment_index c_frag i)
 
-                inl c = apply (m,n) c_shared_frag
-                store_matrix_sync c c_frag
+                    inl c = apply (m,n) c_shared_frag
+                    store_matrix_sync c c_frag
 
             barrier_cta_sync 0
 
             // Stores the end result into global memory.
-            tensor_memcpy_sync chunk_size threads_in_block(zip c c_shared_tile)
+            pragma.unroll fun _ =>
+                tensor_memcpy_sync chunk_size threads_in_block(zip c c_shared_tile)
 
             barrier_cta_sync 0
