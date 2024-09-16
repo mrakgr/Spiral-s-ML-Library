@@ -197,7 +197,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                                 inl b_frag = tensor_ref_index (n,k) b_frag
                                 mma_sync c_frag a_frag b_frag c_frag
 
-                barrier_cta_sync 0 // Without this barrier the threads will loop around and change the shared memory that the rest are still loading.
+                barrier_cta_sync 0 // Without this barrier some of the threads will loop around and change the shared memory that the rest are still loading from.
 
             // Adds the accumulated result to the output in shared memory.
             pragma.unroll fun _ =>
