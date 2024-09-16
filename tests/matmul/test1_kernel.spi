@@ -187,13 +187,13 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                         load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
 
                 // Does the matrix multiplication and accumulates the results in the fragment.
-                loop.linear m_local fun m => 
-                    pragma.unroll fun _ =>
-                        loop.linear n_local fun n =>
-                            inl c_frag = tensor_ref_index (m,n) c_frag
-                            loop.linear k_local fun k =>
-                                inl a_frag = tensor_ref_index {} a_frag
-                                load_matrix_sync_tf32 a_frag (a_shared_frag |> apply m |> apply k)
+                pragma.unroll fun _ => // Need to unroll everything otherwise c_frag won't be held in regs.
+                    loop.linear m_local fun m => 
+                        loop.linear k_local fun k =>
+                            inl a_frag = tensor_ref_index {} a_frag
+                            load_matrix_sync_tf32 a_frag (a_shared_frag |> apply m |> apply k)
+                            loop.linear n_local fun n =>
+                                inl c_frag = tensor_ref_index (m,n) c_frag
                                 inl b_frag = tensor_ref_index (n,k) b_frag
                                 mma_sync c_frag a_frag b_frag c_frag
 

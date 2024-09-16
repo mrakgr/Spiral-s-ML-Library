@@ -9,8 +9,8 @@ inl sms_per_gpu() : int = 24 // Marko Grdinic: My RTX 4060 has 24 SMs. A RTX 409
 
 inl threads_per_block() : int = 
     // 32 // Debug
-    // 512 // Release
-    256 // Release
+    512 // Release
+    // 256 // Release
 
 inl blocks_per_grid() : int = 
     // 1 // Debug
