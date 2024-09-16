@@ -181,9 +181,10 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                     tensor_create (n_local, k_local)
 
                 // Loads the B matrix's shared tile into local memory                
-                loop.linear (n_local, k_local) fun n,k =>
-                    inl b_frag = tensor_ref_index (n,k) b_frag
-                    load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
+                pragma.unroll fun _ =>
+                    loop.linear (n_local, k_local) fun n,k =>
+                        inl b_frag = tensor_ref_index (n,k) b_frag
+                        load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
 
                 // Does the matrix multiplication and accumulates the results in the fragment.
                 loop.linear m_local fun m => 
