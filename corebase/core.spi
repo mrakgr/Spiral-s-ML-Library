@@ -120,6 +120,16 @@ inl to_fptr forall a b. (x : a -> b) : fptr a b = !!!!ToFunPtr(x)
 // C++ backend specific. Turns the function into a heap allocated closure. This should be done before dyning.
 inl to_closure forall a b. (x : a -> b) : closure a b = !!!!ToFunClosure(x)
 
+// Converts a literal into a existential containing the type literal and its type.
+inl tlit forall q. (x : q) : exists t. t = real
+    open real_core
+    inl t = lit_to_type_lit x
+    typecase `t with ~t =>
+    exists [t] t
+
+// Converts an integer literal into a existential containing the type literal and its type.
+inl tint (x : int) = tlit x
+
 open real_core
 // Structural polymorphic equality for every type in the language (apart from functions.)
 inl (=) forall t. (a : t) (b : t) : bool = real a = b

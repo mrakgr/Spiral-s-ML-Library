@@ -1,0 +1,53 @@
+open corebase
+open corecuda
+open refm
+open tensorm
+open rangem
+open test1_kernel
+
+// Tiny tiles for testing purposes.
+inl matmul_config_tf32 a_trans b_trans =
+    inl m_frag, n_frag, k_frag = 16, 16, 8
+    matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16; a_trans b_trans m_frag n_frag k_frag}
+
+// Big tiles for release.
+inl matmul_config_tf32 a_trans b_trans =
+    inl m_frag, n_frag, k_frag = 16, 16, 8
+    matmul_config {m_tile=64; n_tile=64; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16; a_trans b_trans m_frag n_frag k_frag}
+
+inl matmul_tf32' a_transpose b_transpose = matmul_tf32_template (matmul_config_tf32 a_transpose b_transpose)
+inl matmul_tf32 a_transpose b_transpose (alpha : float) (a : tensor (int * int) f32) (b : tensor (int * int) f32) (beta : float) (c : tensor (int * int) f32) = 
+    inl body = matmul_tf32' a_transpose b_transpose
+    run' fun () => body alpha a b beta c
+
+inl main() =
+    inl get_body forall dim el. (x : tensor dim el) : array el =
+        real struct.map (fun (tensor_body {array}) => array) x.bodies : array el
+
+    inl swap (a,b) x = if x then b,a else a,b
+    inl cp_matmul (a : tensor (int * int) float * bool) (b : tensor (int * int) float * bool) (c : tensor (int * int) float) : tensor (int * int) float =
+        inl transpose a_trans (x : array float) : array float = if a_trans then $"cp.transpose(!x)" else x
+        inl f (a_trans : bool) (a_body : array float) (a_dim : int * int) : array float = 
+            inl x : array float = $"!a_body.reshape(!a_dim)"
+            transpose a_trans x
+        inl g (a,a_trans : tensor (int * int) float * bool) = f a_trans (get_body a) a.dim
+        inl a_body,b_body,c_body : array float * array float * array float = g a, g b, f false (get_body c) c.dim
+        
+        $"(cp.matmul(!a_body,!b_body) + !c_body).flatten()"
+        |> fromArray |> reshape (const c.dim)
+
+    inl m,n,k : int * int * int = 512 * 16, 512 * 16, 512 * 8
+    // inl m,n,k : int * int * int = 512, 512, 512
+    // inl m,n,k : int * int * int = 16, 16, 8
+
+    inl a_trans = false
+    inl b_trans = true
+
+    inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
+    // inl [ma; mb; mc] = listm.map (fun a,b => cupy.arange{from=0; nearTo=a,b; by=1}) ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
+
+    inl d = cp_matmul (ma,a_trans) (mb,b_trans) mc
+    inl threads_per_block = threads_per_block()
+    matmul_tf32 a_trans b_trans 1 ma mb 1 mc
+    inl d,c = get_body d, get_body mc
+    $"cp.max(cp.abs(!c-!d))" : float
