@@ -178,7 +178,12 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                 inl a_frag, b_frag : _ _ (fragment matrix_a m_frag n_frag k_frag (layout a_trans) tf32)
                                 * _ _ (fragment matrix_b m_frag n_frag k_frag (layout b_trans) tf32) =
                     tensor_create {},
-                    tensor_create {}
+                    tensor_create (n_local, k_local)
+
+                // Loads the B matrix's shared tile into local memory                
+                loop.linear (n_local, k_local) fun n,k =>
+                    inl b_frag = tensor_ref_index (n,k) b_frag
+                    load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
 
                 // Does the matrix multiplication and accumulates the results in the fragment.
                 loop.linear m_local fun m => 
@@ -188,8 +193,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                             loop.linear k_local fun k =>
                                 inl a_frag = tensor_ref_index {} a_frag
                                 load_matrix_sync_tf32 a_frag (a_shared_frag |> apply m |> apply k)
-                                inl b_frag = tensor_ref_index {} b_frag
-                                load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
+                                inl b_frag = tensor_ref_index (n,k) b_frag
                                 mma_sync c_frag a_frag b_frag c_frag
 
                 barrier_cta_sync 0 // Without this barrier the threads will loop around and change the shared memory that the rest are still loading.
