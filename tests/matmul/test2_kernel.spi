@@ -170,14 +170,15 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
             loop.lookahead rangem.linear((snd >> fst) a.dim) fun {is_init ping} k future_k =>
                 inl a = apply m a
                 inl b = apply n b
+                inl ping = 0
                 // Loads the data from global to shared memory (for the first iteration) into the ping buffer.
-                if is_init then
-                    inl a = apply k a |> apply_ptr
-                    inl b = apply k b |> apply_ptr
-                    pragma.unroll fun _ =>
-                        producer_phase pipe fun () =>
-                            tensor_memcpy_async chunk_size pipe threads_in_block(zip (apply ping a_shared_tile) a)
-                            tensor_memcpy_async chunk_size pipe threads_in_block(zip b_shared_tile b)
+                // if is_init then
+                inl a = apply k a |> apply_ptr
+                inl b = apply k b |> apply_ptr
+                pragma.unroll fun _ =>
+                    producer_phase pipe fun () =>
+                        tensor_memcpy_async chunk_size pipe threads_in_block(zip (apply ping a_shared_tile) a)
+                        tensor_memcpy_async chunk_size pipe threads_in_block(zip b_shared_tile b)
 
                 inl (exists a_trans. _), (exists b_trans. _) = tlit a_trans, tlit b_trans
                 inl a_frag, b_frag : _ _ (fragment matrix_a m_frag n_frag k_frag (layout a_trans) tf32)
@@ -193,27 +194,27 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                             inl b_frag = tensor_ref_index (n,k) b_frag
                             load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
                 
-                // Loads the data from global to shared memory (for the next iteration) into the pong buffer.
-                future_k |> optionm.iter fun k =>
-                    inl a = apply k a |> apply_ptr
-                    inl b = apply k b |> apply_ptr
-                    pragma.unroll fun _ =>
-                        producer_phase pipe fun () =>
-                            tensor_memcpy_async chunk_size pipe threads_in_block(zip (apply (ping ^^^ 1) a_shared_tile) a)
-                            tensor_memcpy_async chunk_size pipe threads_in_block(zip b_shared_tile b)
+                // // Loads the data from global to shared memory (for the next iteration) into the pong buffer.
+                // future_k |> optionm.iter fun k =>
+                //     inl a = apply k a |> apply_ptr
+                //     inl b = apply k b |> apply_ptr
+                //     pragma.unroll fun _ =>
+                //         producer_phase pipe fun () =>
+                //             tensor_memcpy_async chunk_size pipe threads_in_block(zip (apply (ping ^^^ 1) a_shared_tile) a)
+                //             tensor_memcpy_async chunk_size pipe threads_in_block(zip b_shared_tile b)
 
-                // Does the matrix multiplication and accumulates the results in the fragment.
-                pragma.unroll fun _ => // Need to unroll everything otherwise c_frag won't be held in regs.
-                    loop.linear m_local fun m => 
-                        loop.linear k_local fun k =>
-                            inl a_frag = tensor_ref_index {} a_frag
-                            load_matrix_sync_tf32 a_frag (a_shared_frag ping |> apply m |> apply k)
-                            loop.linear n_local fun n =>
-                                inl c_frag = tensor_ref_index (m,n) c_frag
-                                inl b_frag = tensor_ref_index (n,k) b_frag
-                                mma_sync c_frag a_frag b_frag c_frag
+                    // Does the matrix multiplication and accumulates the results in the fragment.
+                    pragma.unroll fun _ => // Need to unroll everything otherwise c_frag won't be held in regs.
+                        loop.linear m_local fun m => 
+                            loop.linear k_local fun k =>
+                                inl a_frag = tensor_ref_index {} a_frag
+                                load_matrix_sync_tf32 a_frag (a_shared_frag ping |> apply m |> apply k)
+                                loop.linear n_local fun n =>
+                                    inl c_frag = tensor_ref_index (m,n) c_frag
+                                    inl b_frag = tensor_ref_index (n,k) b_frag
+                                    mma_sync c_frag a_frag b_frag c_frag
 
-                barrier_cta_sync 0 // Without this barrier some of the threads will loop around and change the shared memory that the rest are still loading from.
+                    barrier_cta_sync 0 // Without this barrier some of the threads will loop around and change the shared memory that the rest are still loading from.
 
             // Adds the accumulated result to the output in shared memory.
             pragma.unroll fun _ =>
