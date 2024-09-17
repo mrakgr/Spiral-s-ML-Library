@@ -170,8 +170,8 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
 
                 // Loads the data from global to shared memory.
                 pragma.unroll fun _ =>
-                    tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip b_shared_tile b)
-                    tensor_memcpy_sync_tf32 chunk_size threads_in_block(zip a_shared_tile a)
+                    tensor_memcpy_sync chunk_size threads_in_block(zip b_shared_tile b)
+                    tensor_memcpy_sync chunk_size threads_in_block(zip a_shared_tile a)
                 barrier_cta_sync 0
 
                 inl (exists a_trans. _), (exists b_trans. _) = tlit a_trans, tlit b_trans

@@ -200,9 +200,9 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
 
                 // Loads the B matrix's shared tile into local memory.
                 consumer_phase pipe fun () =>
-                    pragma.unroll fun _ =>
-                        convert_tf32_inplace (apply ping a_shared_tile)
-                        convert_tf32_inplace b_shared_tile
+                    // pragma.unroll fun _ =>
+                    //     convert_tf32_inplace (apply ping a_shared_tile)
+                    //     convert_tf32_inplace b_shared_tile
 
                     barrier_cta_sync 0
 

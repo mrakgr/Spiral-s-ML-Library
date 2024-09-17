@@ -74,12 +74,13 @@ inl load_matrix_sync forall use m n k layout frag_in t. (f : ref (fragment use m
         | _ => real_core.error_type "This type is not supported."
 
 // Cuda's native `load_matrix_sync` function is extremely poorly done for A and B matrices so we are using this as a workaround.
+// Does conversion to tf32 format.
 inl load_matrix_sync_tf32 forall use m n k layout. (f : ref (fragment use m n k layout tf32)) (t : tensor (int * int) f32) : () =
     loop.linear t.dim fun i =>
         inl x = tensor_index i t
         inl i = loop.proj_rev t.dim i
-        // $"!f.x[!i] = wmma::__float_to_tf32(!x)"
-        $"!f.x[!i] = !x"
+        $"!f.x[!i] = wmma::__float_to_tf32(!x)"
+        // $"!f.x[!i] = !x"
 
 inl store_matrix_sync_array forall use m n k layout t. (ar : array t) (f : ref (fragment use m n k layout t)) (ldm : int) : () = 
     real
@@ -107,25 +108,33 @@ inl mma_sync forall m n k a_layout b_layout out_layout t_in t_out.
 // Converts a f32 element to tf32.
 inl conv_tf32 (x : f32) : f32 = $"wmma::__float_to_tf32(!x)"
 
-
 // Note (4/17/2024): What the hell is going on here. This commented out function has uncoalesced accesses, and
 // accidentally uses 32-bit loads, but is much fater than the correct version.
-
-// Does the conversion to tf32 in transit from global to shared memory.
-inl tensor_memcpy_sync_tf32 access_size (r : loop.range (tensor (int * int) (f32 * f32))) = 
-    loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> fun to, from => 
-        inl x = tensor_create from.dim
-        loop.linear x.dim fun i => 
-            tensor_set i (tensor_index i from |> conv_tf32) x
-        memcpy_sync (to,x)
-        )
 
 // // Does the conversion to tf32 in transit from global to shared memory.
 // inl tensor_memcpy_sync_tf32 access_size (r : loop.range (tensor (int * int) (f32 * f32))) = 
 //     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> fun to, from => 
 //         inl x = tensor_create from.dim
-//         memcpy_sync (x,from)
 //         loop.linear x.dim fun i => 
-//             tensor_set i conv_tf32(tensor_index i x) x
+//             tensor_set i (tensor_index i from |> conv_tf32) x
 //         memcpy_sync (to,x)
+//         )
+
+
+// Note (4/17/2024): 
+// Finally got something usable. The sync version works best, probably due to being able to use large tiles.
+// I think the crazy version only worked so due to the some lucky compiler optimizations. As far as I can tell 
+// it's not good to convert to the tf32 format in transit. It's better to convert after loading from shared into 
+// local even if it takes more computation than having an intermediate step.
+
+
+
+// inl tensor_memcpy_sync_tf32 access_size (r : loop.range (tensor (int * int) (f32 * f32))) = 
+//     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> fun to, from => 
+//         memcpy_sync (to,from)
+//         // inl x = tensor_create from.dim
+//         // memcpy_sync (x,from)
+//         // loop.linear x.dim fun i => 
+//         //     tensor_set i conv_tf32(tensor_index i x) x
+//         // memcpy_sync (to,x)
 //         )
