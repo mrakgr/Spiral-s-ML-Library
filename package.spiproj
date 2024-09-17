@@ -151,3 +151,7 @@ modules:
         matmul/
             test1_kernel
             test1_run
+
+            test2_kernel
+            test2_run
+            

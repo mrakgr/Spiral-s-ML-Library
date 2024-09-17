@@ -22,9 +22,9 @@ inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) :
     inl s_from,_ = tensor_cuda.tensor_create_extern_shared 0 (threads_per_block(), snd io.dim)
     inl s_from = s_from |> apply thread_index()
     inl l_from, l_to = tensor_create (snd io.dim) |> unzip
-    loop.lookahead blocks_in_grid(fst io.dim) fun is_init i future_i =>
+    loop.lookahead blocks_in_grid(fst io.dim) fun flags i future_i =>
         inl from, to = io |> apply i |> unzip
-        if is_init then
+        if flags.is_init then
             producer_phase pipe fun () =>
                 memcpy_async pipe (s_from, from)
         consumer_phase pipe fun () =>

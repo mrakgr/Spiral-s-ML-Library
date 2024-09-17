@@ -19,7 +19,7 @@ inl blocks_per_grid() : int =
 // Returns the dynamic shared memory that should be used in bytes.
 inl dynamic_shared_memory_used() : int = 
     // On a RTX 4060, 99kb is the limit, but we'll take only 80kb in case static shared memory needs to be used.
-    96 * (1 <<< 10)
+    85 * (1 <<< 10)
 
 // Synchronizes the device on the host. Should be used on the Python side.
 inl device_sync() : () = $"cp.cuda.get_current_stream().synchronize()"
