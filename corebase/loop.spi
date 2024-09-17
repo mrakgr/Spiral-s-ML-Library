@@ -141,14 +141,20 @@ inl projective forall dim. ({from nearTo by} : range dim) (body : dim -> ()) : (
 inl checkerboard forall dim. ({from nearTo by} : range dim) (body : bool -> dim -> ()) : () =
     forBy' {from by nearTo=prod nearTo} (fun i => body (i % 2 = 1) (proj nearTo i))
 
+// Projects the index and the one after that (if within bounds) into a higher dimension.
+// is_init is true during the first iteration, and false otherwise.
+// The ping argument continually toogles between true and false.
+// Useful for reversing inner array directions and ping pong buffer indexing.
 inl lookahead forall dim. ({from nearTo by} : range dim) on_loop : () =
     inl length = prod nearTo
     inl i = _dup from
     while' (fun () => i < length) fun () =>
         inl i' = i + by
-        on_loop (i = from) (proj nearTo i) (if i' < length then Some (proj nearTo i') else None)
+        on_loop {is_init=i = from; ping=i % 2 = 1} (proj nearTo i) (if i' < length then Some (proj nearTo i') else None)
         _set i i'
 
+// Linearly increases the indices. Unlike the projective loops which use a single index and module and division operations to project it
+// into the higher dimensional spaces, this function compiles into nested loops.
 inl linear forall dim. (dim : dim) body : () = 
     inl dim_to_list (dim : dim) : list int = real
         open struct

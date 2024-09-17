@@ -140,7 +140,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
         inl (exists m_frag. _), (exists n_frag. _), (exists k_frag. _) = tlit m_frag, tlit n_frag, tlit k_frag
         inl c_frag : _ _ (fragment accumulator m_frag n_frag k_frag row_major f32) = tensor_create (m_local, n_local)
 
-        loop.checkerboard blocks_in_grid(fst a.dim, fst b.dim) fun ping m,n => 
+        loop.projective blocks_in_grid(fst a.dim, fst b.dim) fun m,n => 
             inl c = apply (m,n) c |> apply_ptr
 
             pragma.unroll fun _ =>
@@ -163,10 +163,8 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                             loop.linear (fragment_length c_frag) fun i =>
                                 fragment_set c_frag i (beta / alpha * fragment_index c_frag i)
                     barrier_cta_sync 0
-
-            inl {k=dim_k} = (snd >> fst) a.dim
-            loop.linear dim_k fun k =>
-                inl k = {k = if ping then dim_k - k - 1 else k} // Does every other iteration in reverse to improve cache utilization.
+            
+            loop.linear ((snd >> fst) a.dim) fun k =>
                 inl a = apply m a |> apply k |> apply_ptr
                 inl b = apply n b |> apply k |> apply_ptr
 
