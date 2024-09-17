@@ -131,8 +131,15 @@ inl rigid_merge forall dim. (dim : dim * dim) (index : dim * dim) : dim = real
     inl b = fst index
     struct.map2 (+) a b
 
+// Projects the index into a higher dimension.
 inl projective forall dim. ({from nearTo by} : range dim) (body : dim -> ()) : () =
     forBy' {from by nearTo=prod nearTo} (proj nearTo >> body)
+
+// Projects the index into a higher dimension.
+// The bool argument continually toogles between true and false.
+// Useful for reversing inner array directions and ping pong buffer indexing.
+inl checkerboard forall dim. ({from nearTo by} : range dim) (body : bool -> dim -> ()) : () =
+    forBy' {from by nearTo=prod nearTo} (fun i => body (i % 2 = 1) (proj nearTo i))
 
 inl lookahead forall dim. ({from nearTo by} : range dim) on_loop : () =
     inl length = prod nearTo

@@ -36,8 +36,8 @@ inl main() =
         $"(cp.matmul(!a_body,!b_body) + !c_body).flatten()"
         |> fromArray |> reshape (const c.dim)
 
-    inl m,n,k : int * int * int = 512 * 16, 512 * 16, 512 * 8
-    // inl m,n,k : int * int * int = 512, 512, 512
+    // inl m,n,k : int * int * int = 512 * 16, 512 * 16, 512 * 8
+    inl m,n,k : int * int * int = 512, 512, 512
     // inl m,n,k : int * int * int = 16, 16, 8
 
     inl a_trans = false
