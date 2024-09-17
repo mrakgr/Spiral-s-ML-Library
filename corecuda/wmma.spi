@@ -104,6 +104,7 @@ inl mma_sync forall m n k a_layout b_layout out_layout t_in t_out.
         : () =
     $"wmma::mma_sync(!d, !a, !b, !c)"
 
+// Converts a f32 element to tf32.
 inl conv_tf32 (x : f32) : f32 = $"wmma::__float_to_tf32(!x)"
 
 // Does the conversion to tf32 in transit from global to shared memory.
