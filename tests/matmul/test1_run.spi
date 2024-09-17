@@ -5,14 +5,11 @@ open tensorm
 open rangem
 open test1_kernel
 
-// Tiny tiles for testing purposes.
 inl matmul_config_tf32 a_trans b_trans =
     inl m_frag, n_frag, k_frag = 16, 16, 8
-    matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16; a_trans b_trans m_frag n_frag k_frag}
-
-// Big tiles for release.
-inl matmul_config_tf32 a_trans b_trans =
-    inl m_frag, n_frag, k_frag = 16, 16, 8
+    // Tiny tiles for testing purposes.
+    // matmul_config {m_tile=16; n_tile=16; k_tile=8; m_skew=8; n_skew=8; k_skew=4; chunk_size=16; a_trans b_trans m_frag n_frag k_frag}
+    // Big tiles for release.
     matmul_config {m_tile=128; n_tile=128; k_tile=64; m_skew=8; n_skew=8; k_skew=4; chunk_size=16; a_trans b_trans m_frag n_frag k_frag}
 
 inl matmul_tf32' a_transpose b_transpose = matmul_tf32_template (matmul_config_tf32 a_transpose b_transpose)

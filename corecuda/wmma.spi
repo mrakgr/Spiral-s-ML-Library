@@ -111,7 +111,8 @@ inl conv_tf32 (x : f32) : f32 = $"wmma::__float_to_tf32(!x)"
 inl tensor_memcpy_sync_tf32 access_size (r : loop.range (tensor (int * int) (f32 * f32))) = 
     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> fun to, from => 
         inl x = tensor_create from.dim
+        memcpy_sync (x,from)
         loop.linear x.dim fun i => 
-            tensor_set i (tensor_index i from |> conv_tf32) x
+            tensor_set i conv_tf32(tensor_index i x) x
         memcpy_sync (to,x)
         )

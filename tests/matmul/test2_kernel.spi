@@ -47,6 +47,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
             assert (alpha <> 0) "The alpha must not be zero."
 
         inl convert_tf32_inplace forall dim. (x : tensor dim f32) =
+            // print_static x
             inl x = factorize_sizeof chunk_size x
             loop.projective threads_in_block(fst x.dim) fun i =>
                 inl x = apply i x
@@ -91,6 +92,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
         inl a = split_a {m=m_tile; k=k_tile} a    
         inl b = split_b {n=n_tile; k=k_tile} b
         inl c = split_c {m=m_tile; n=n_tile} c
+        print_static b
 
         global "#include <mma.h>"
         global "using namespace nvcuda;"
