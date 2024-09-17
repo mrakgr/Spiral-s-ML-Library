@@ -107,12 +107,25 @@ inl mma_sync forall m n k a_layout b_layout out_layout t_in t_out.
 // Converts a f32 element to tf32.
 inl conv_tf32 (x : f32) : f32 = $"wmma::__float_to_tf32(!x)"
 
+
+// Note (4/17/2024): What the hell is going on here. This commented out function has uncoalesced accesses, and
+// accidentally uses 32-bit loads, but is much fater than the correct version.
+
 // Does the conversion to tf32 in transit from global to shared memory.
 inl tensor_memcpy_sync_tf32 access_size (r : loop.range (tensor (int * int) (f32 * f32))) = 
     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> fun to, from => 
         inl x = tensor_create from.dim
-        memcpy_sync (x,from)
         loop.linear x.dim fun i => 
-            tensor_set i conv_tf32(tensor_index i x) x
+            tensor_set i (tensor_index i from |> conv_tf32) x
         memcpy_sync (to,x)
         )
+
+// // Does the conversion to tf32 in transit from global to shared memory.
+// inl tensor_memcpy_sync_tf32 access_size (r : loop.range (tensor (int * int) (f32 * f32))) = 
+//     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> fun to, from => 
+//         inl x = tensor_create from.dim
+//         memcpy_sync (x,from)
+//         loop.linear x.dim fun i => 
+//             tensor_set i conv_tf32(tensor_index i x) x
+//         memcpy_sync (to,x)
+//         )
