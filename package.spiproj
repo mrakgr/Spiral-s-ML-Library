@@ -89,7 +89,9 @@ modules:
         pickler
 
     ml/
-        matmul
+        matmul/
+            kernel
+            run-
         primitives
         layers
         cfr

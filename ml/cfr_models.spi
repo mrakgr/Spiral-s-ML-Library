@@ -56,7 +56,7 @@ inl trace_and_play_ forall inp out.
 
     barrier_cta_sync 0
 
-    let noinline_run_nn_model() =
+    inl noinline_run_nn_model() =
         // Runs the model on the inputs.
         loop.linear ensemble fun ensemble =>
             graph_run_device model ls {ensemble}

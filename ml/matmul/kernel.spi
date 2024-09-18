@@ -1,0 +1,240 @@
+// Async version of the matmult kernel without the ping pong buffers. Worse than the synchronous version.
+
+open corebase
+open corecuda
+open refm
+open tensorm
+open rangem
+
+nominal matmul_config = 
+    {
+        m_frag : int; n_frag : int; k_frag : int; 
+        m_tile : int; n_tile : int; k_tile : int; 
+        a_trans : bool; b_trans : bool
+        m_skew : int; n_skew : int; k_skew : int
+        chunk_size : int
+    }
+
+nominal layout trans = `(
+    typecase trans with
+    | false => ``(wmma.row_major)
+    | true => ``(wmma.col_major)
+    )
+
+inl swap x (a,b) = if x then b,a else a,b
+inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_frag m_tile n_tile k_tile a_trans b_trans chunk_size}) =
+    inl padding =
+        {
+            a = swap a_trans (m_skew, k_skew) |> snd
+            b = swap b_trans (k_skew, n_skew) |> snd
+            c = n_skew
+        }
+    inl memory =
+        open partitionm
+        inl pad p (a, b) = a, b + p 
+        inl a : partition (tensor (int * int) float) = !(swap a_trans (m_tile, k_tile) |> pad padding.a)
+        inl b : partition (tensor (int * int) float) = !(swap b_trans (k_tile, n_tile) |> pad padding.b)
+        inl c : partition (tensor (int * int) float) = !((m_tile, n_tile) |> pad padding.c)
+        #(a *. b) +. #c
+        
+    fun (alpha : f32) (a : tensor (int * int) f32) (b : tensor (int * int) f32) (beta : f32) (c : tensor (int * int) f32) =>
+        inl div x = loop.div x
+        inl _ =
+            inl a_dim = swap a_trans a.dim
+            inl b_dim = swap b_trans b.dim
+            inl c_dim = c.dim
+            assert (snd a_dim = fst b_dim) "The K dimension of the A and B tensors must match."
+            assert (fst a_dim = fst c_dim) "The M dimension of the A and C tensors must match."
+            assert (snd b_dim = snd c_dim) "The N dimension of the B and C tensors must match."
+            assert (alpha <> 0) "The alpha must not be zero."
+
+        inl split_a {m k} (a : tensor (int * int) float) =
+            if a_trans then
+                inl y = {k}, {m}
+                a |> reorder (fun k,m => {k},{m})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {k},{m} => k,m)
+                |> reorder_fst (fun k,m => m,k)
+            else
+                inl y = {m}, {k}
+                a |> reorder (fun m,k => {m},{k})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {m},{k} => m,k)
+            |> curry_fst
+        inl split_b {n k} (b : tensor (int * int) float) =
+            if b_trans then
+                inl y = {n}, {k}
+                b |> reorder (fun n,k => {n},{k})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {n},{k} => n,k)
+            else
+                inl y = {k}, {n}
+                b |> reorder (fun k,n => {k},{n})
+                |> split_into (loop.div_fst_by y)
+                |> reorder_snd (fun {k},{n} => k,n)
+                |> reorder_fst (fun k,n => n,k)
+            |> curry_fst
+        inl split_c {m n} (c : tensor (int * int) float) =
+            inl y = {m}, {n}
+            c |> reorder (fun m,n => {m},{n})
+            |> split_into (loop.div_fst_by y)
+            |> reorder_snd (fun {m},{n} => m,n)
+        inl a = split_a {m=m_tile; k=k_tile} a    
+        inl b = split_b {n=n_tile; k=k_tile} b
+        inl c = split_c {m=m_tile; n=n_tile} c
+
+        global "#include <mma.h>"
+        global "using namespace nvcuda;"
+
+        open cooperative_groups
+        open pipeline
+        open tensor_cuda
+
+        inl pipe = make_pipeline_thread()
+
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+            inl ((a, b), c), _ = tensor_create_from_extern_partition' memory
+
+            a |> view_snd (fun nearTo => {from=0; nearTo=nearTo - padding.a}),
+            b |> view_snd (fun nearTo => {from=0; nearTo=nearTo - padding.b}),
+            c |> view_snd (fun nearTo => {from=0; nearTo=nearTo - padding.c})
+
+        inl c_shared_frag = split_c {m=m_frag; n=n_frag} c_shared_tile
+        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} =
+            loop.rigid_split' (warps_in_block (fst c_shared_frag.dim))
+        inl k_local = {k=k_tile / k_frag}
+        inl c_shared_frag =
+            split_into_fst const((m_warp, n_warp),(m_local, n_local)) c_shared_frag
+            |> curry_fst
+            |> apply (m_proj_warp, n_proj_warp)
+            |> apply_ptr
+
+        inl a_shared_frag =
+            inl y = 2,2
+            split_a {m=m_frag; k=k_frag} a_shared_tile
+            |> reshape_fst const(m_warp, m_local)
+            |> curry_fst
+            |> apply m_proj_warp
+            |> reorder (fun m,k,rest => rest,m,k)
+            |> split_into_fst (loop.div_snd_by y)
+            |> reorder_fst (fun a,b => swap a_trans b, swap (not a_trans) a)
+            |> curry_fst
+            |> threads_in_warp 
+            |> apply_proj 
+            |> tensorm.swap
+            |> curry_fst
+            |> apply_ptr
+
+        inl b_shared_frag = 
+            inl y = 2,2
+            split_b {n=n_frag; k=k_frag} b_shared_tile
+            |> reshape_fst const(n_warp, n_local)
+            |> curry_fst
+            |> apply n_proj_warp
+            |> reorder (fun n,k,rest => rest,n,k)
+            |> split_into_fst (loop.div_snd_by y)
+            |> reorder_fst (fun a,b => swap (not b_trans) b, swap (not b_trans) a)
+            |> curry_fst
+            |> threads_in_warp 
+            |> apply_proj 
+            |> tensorm.swap
+            |> curry_fst
+            |> apply_ptr
+
+        open wmma
+        inl (exists m_frag. _), (exists n_frag. _), (exists k_frag. _) = tlit m_frag, tlit n_frag, tlit k_frag
+        inl c_frag : _ _ (fragment accumulator m_frag n_frag k_frag row_major f32) = tensor_create (m_local, n_local)
+
+        loop.projective blocks_in_grid(fst a.dim, fst b.dim) fun m,n => 
+            inl c = apply (m,n) c |> apply_ptr
+
+            pragma.unroll fun _ =>
+                if beta = 0 then
+                    // Not functionally correct since multiplying the C matrix filled with Nans by zero should still result in Nans.
+                    // But it is good enough for a machine learning.
+                    loop.linear c_frag.dim fun m,n => 
+                        fill_fragment (tensor_ref_index (m,n) c_frag) 0
+                else 
+                    tensor_memcpy_sync chunk_size threads_in_block(zip c_shared_tile c)
+                    barrier_cta_sync 0
+
+                    loop.linear c_frag.dim fun m,n =>
+                        inl c_frag = tensor_ref_index (m,n) c_frag
+                        inl c = apply (m,n) c_shared_frag
+                        load_matrix_sync c_frag c
+                        // alpha * A + beta * B =` C =>
+                        // A + (beta / alpha) * B = C / alpha
+                        if beta / alpha <> 1 then
+                            loop.linear (fragment_length c_frag) fun i =>
+                                fragment_set c_frag i (beta / alpha * fragment_index c_frag i)
+                    barrier_cta_sync 0
+            
+            loop.lookahead rangem.linear((snd >> fst) a.dim) fun {is_init} k future_k =>
+                inl a = apply m a |> apply k |> apply_ptr
+                inl b = apply n b
+                if is_init then
+                    inl b = apply k b |> apply_ptr
+                    pragma.unroll fun _ =>
+                        producer_phase pipe fun () =>
+                            tensor_memcpy_async chunk_size pipe threads_in_block(zip b_shared_tile b)
+                
+                pragma.unroll fun _ =>
+                    tensor_memcpy_sync chunk_size threads_in_block(zip a_shared_tile a)
+
+                inl (exists a_trans. _), (exists b_trans. _) = tlit a_trans, tlit b_trans
+                inl a_frag, b_frag : _ _ (fragment matrix_a m_frag n_frag k_frag (layout a_trans) tf32)
+                                * _ _ (fragment matrix_b m_frag n_frag k_frag (layout b_trans) tf32) =
+                    tensor_create {}, 
+                    tensor_create (n_local, k_local)
+
+                // Loads the B matrix's shared tile into local memory.
+                consumer_phase pipe fun () =>
+                    barrier_cta_sync 0
+
+                    pragma.unroll fun _ =>
+                        loop.linear (n_local, k_local) fun n,k =>
+                            inl b_frag = tensor_ref_index (n,k) b_frag
+                            load_matrix_sync_tf32 b_frag (b_shared_frag |> apply n |> apply k)
+                
+                // Loads the data from global to shared memory (for the next iteration) into the pong buffer.
+                future_k |> optionm.iter fun k =>
+                    inl b = apply k b |> apply_ptr
+                    barrier_cta_sync 0
+                    pragma.unroll fun _ =>
+                        producer_phase pipe fun () =>
+                            tensor_memcpy_async chunk_size pipe threads_in_block(zip b_shared_tile b)
+
+                // Does the matrix multiplication and accumulates the results in the fragment.
+                pragma.unroll fun _ => // Need to unroll everything otherwise c_frag won't be held in regs.
+                    loop.linear m_local fun m => 
+                        loop.linear k_local fun k =>
+                            inl a_frag = tensor_ref_index {} a_frag
+                            load_matrix_sync_tf32 a_frag (a_shared_frag |> apply m |> apply k)
+                            loop.linear n_local fun n =>
+                                inl c_frag = tensor_ref_index (m,n) c_frag
+                                inl b_frag = tensor_ref_index (n,k) b_frag
+                                mma_sync c_frag a_frag b_frag c_frag
+
+                barrier_cta_sync 0 // Without this barrier some of the threads will loop around and change the shared memory that the rest are still loading from.
+
+            // Adds the accumulated result to the output in shared memory.
+            pragma.unroll fun _ =>
+                loop.linear (fst c_shared_frag.dim) fun m,n =>
+                    inl c_frag = tensor_ref_index (m,n) c_frag
+
+                    // A + (beta / alpha) * B = C / alpha =>
+                    // alpha * A + beta * B = C
+                    if alpha <> 1 then
+                        loop.linear (fragment_length c_frag) fun i =>
+                            fragment_set c_frag i (alpha * fragment_index c_frag i)
+
+                    inl c = apply (m,n) c_shared_frag
+                    store_matrix_sync c c_frag
+
+            barrier_cta_sync 0
+
+            // Stores the end result into global memory.
+            pragma.unroll fun _ =>
+                tensor_memcpy_sync chunk_size threads_in_block(zip c c_shared_tile)
+
+            barrier_cta_sync 0

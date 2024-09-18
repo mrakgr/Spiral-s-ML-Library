@@ -370,7 +370,7 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
                         open real_core
                         typecase t with
                         | tensor _ f32 =>
-                            let noinline_graph_run_matmul () = matmul.matmul_tf32' false true alpha a b beta out
+                            inl noinline_graph_run_matmul () = matmul.matmul_tf32' false true alpha a b beta out
                             noinline_graph_run_matmul()
                         | _ => 
                             !!!!PrintStatic(`t)
