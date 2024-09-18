@@ -48,18 +48,6 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
             assert (snd b_dim = snd c_dim) "The N dimension of the B and C tensors must match."
             assert (alpha <> 0) "The alpha must not be zero."
 
-        inl convert_tf32_inplace forall dim. (x : tensor dim f32) =
-            // print_static x
-            inl x = factorize_sizeof chunk_size x
-            loop.projective threads_in_block(fst x.dim) fun i =>
-                inl x = apply i x
-                inl l = tensor_create x.dim
-                memcpy_sync (l, x)
-                pragma.unroll fun _ =>
-                    loop.linear x.dim fun i => 
-                        tensor_index i l |> wmma.conv_tf32 |> fun v => tensor_set i v l
-                memcpy_sync (x, l)
-                
         inl split_a {m k} (a : tensor (int * int) float) =
             if a_trans then
                 inl y = {k}, {m}
@@ -190,7 +178,8 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                         producer_phase pipe fun () =>
                             tensor_memcpy_async chunk_size pipe threads_in_block(zip b_shared_tile b)
                 
-                tensor_memcpy_sync chunk_size threads_in_block(zip a_shared_tile a)
+                pragma.unroll fun _ =>
+                    tensor_memcpy_sync chunk_size threads_in_block(zip a_shared_tile a)
 
                 inl (exists a_trans. _), (exists b_trans. _) = tlit a_trans, tlit b_trans
                 inl a_frag, b_frag : _ _ (fragment matrix_a m_frag n_frag k_frag (layout a_trans) tf32)

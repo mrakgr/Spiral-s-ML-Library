@@ -681,6 +681,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                 // Poping the loop unrolling to: 0
             } else {
             }
+            // Pushing the loop unrolling to: 0
             int v170;
             v170 = threadIdx.x;
             bool v171;
@@ -721,9 +722,11 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
             v186 = v136+v183;
             int v188;
             v188 = 0;
+            #pragma unroll
             while (while_method_3(v188)){
                 int v190;
                 v190 = 0;
+                #pragma unroll
                 while (while_method_2(v190)){
                     assert("Tensor range check" && 0 <= v188 && v188 < 8);
                     assert("Tensor range check" && 0 <= v190 && v190 < 1);
@@ -747,6 +750,7 @@ extern "C" __global__ void entry0(float * v0, float * v1, float * v2) {
                 }
                 v188 += 1 ;
             }
+            // Poping the loop unrolling to: 0
             wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v199[1];
             wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v200[8];
             cuda::pipeline_consumer_wait_prior<0>(v3);;
