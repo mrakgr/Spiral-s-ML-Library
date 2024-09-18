@@ -155,3 +155,5 @@ modules:
             test2_kernel
             test2_run
             
+            test3_kernel
+            test3_run
