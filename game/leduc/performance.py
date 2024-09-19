@@ -1394,12 +1394,12 @@ __device__ inline bool while_method_5(int v0, int v1){
 }
 __device__ inline bool while_method_6(int v0){
     bool v1;
-    v1 = v0 < 8;
+    v1 = v0 < 1;
     return v1;
 }
 __device__ inline bool while_method_7(int v0){
     bool v1;
-    v1 = v0 < 1;
+    v1 = v0 < 8;
     return v1;
 }
 __device__ inline bool while_method_8(int v0){
@@ -1472,7 +1472,7 @@ __device__ void method_3(unsigned int * v0, int v1, float * v2){
         int v27[4];
         int v28;
         v28 = 0;
-        while (while_method_7(v28)){
+        while (while_method_6(v28)){
             assert("Tensor range check" && 0 <= v28 && v28 < 1);
             int v30;
             v30 = 4 * v28;
@@ -1491,7 +1491,7 @@ __device__ void method_3(unsigned int * v0, int v1, float * v2){
         }
         int v35;
         v35 = 0;
-        while (while_method_7(v35)){
+        while (while_method_6(v35)){
             int v37;
             v37 = 0;
             while (while_method_0(v37)){
@@ -1595,7 +1595,7 @@ __device__ void method_3(unsigned int * v0, int v1, float * v2){
         unsigned int v71[4];
         int v72;
         v72 = 0;
-        while (while_method_7(v72)){
+        while (while_method_6(v72)){
             int v74;
             v74 = 0;
             while (while_method_0(v74)){
@@ -1630,7 +1630,7 @@ __device__ void method_3(unsigned int * v0, int v1, float * v2){
         v83 = 0u;
         int v84;
         v84 = 0;
-        while (while_method_7(v84)){
+        while (while_method_6(v84)){
             int v86;
             v86 = 0;
             while (while_method_0(v86)){
@@ -1772,7 +1772,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
     assert("Tensor range check" && 0 <= v51 && v51 < 256);
     int v59;
     v59 = 0;
-    while (while_method_7(v59)){
+    while (while_method_6(v59)){
         bool v61;
         v61 = v52 && v56;
         bool v62;
@@ -1824,7 +1824,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v81[4];
         int v82;
         v82 = 0;
-        while (while_method_7(v82)){
+        while (while_method_6(v82)){
             assert("Tensor range check" && 0 <= v82 && v82 < 1);
             int v84;
             v84 = 4 * v82;
@@ -1847,7 +1847,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         }
         int v90;
         v90 = 0;
-        while (while_method_7(v90)){
+        while (while_method_6(v90)){
             int v92;
             v92 = 0;
             while (while_method_0(v92)){
@@ -1921,7 +1921,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v115[4];
         int v116;
         v116 = 0;
-        while (while_method_7(v116)){
+        while (while_method_6(v116)){
             int v118;
             v118 = 0;
             while (while_method_0(v118)){
@@ -1947,7 +1947,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v125[4];
         int v126;
         v126 = 0;
-        while (while_method_7(v126)){
+        while (while_method_6(v126)){
             int v128;
             v128 = 0;
             while (while_method_0(v128)){
@@ -1984,7 +1984,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v137 = 0.0f;
         int v138;
         v138 = 0;
-        while (while_method_7(v138)){
+        while (while_method_6(v138)){
             int v140;
             v140 = 0;
             while (while_method_0(v140)){
@@ -2013,7 +2013,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v151[4];
         int v152;
         v152 = 0;
-        while (while_method_7(v152)){
+        while (while_method_6(v152)){
             int v154;
             v154 = 0;
             while (while_method_0(v154)){
@@ -2042,7 +2042,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v160 = 0;
         int v161;
         v161 = 0;
-        while (while_method_7(v161)){
+        while (while_method_6(v161)){
             int v163;
             v163 = 0;
             while (while_method_0(v163)){
@@ -2075,7 +2075,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v176[4];
         int v177;
         v177 = 0;
-        while (while_method_7(v177)){
+        while (while_method_6(v177)){
             int v179;
             v179 = 0;
             while (while_method_0(v179)){
@@ -2119,7 +2119,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v192 = 0.0f;
         int v193;
         v193 = 0;
-        while (while_method_7(v193)){
+        while (while_method_6(v193)){
             assert("Tensor range check" && 0 <= v193 && v193 < 1);
             int v195;
             v195 = 4 * v193;
@@ -2184,7 +2184,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v220[4];
         int v221;
         v221 = 0;
-        while (while_method_7(v221)){
+        while (while_method_6(v221)){
             int v223;
             v223 = 0;
             while (while_method_0(v223)){
@@ -2213,7 +2213,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v230 = tmp6.v0; v231 = tmp6.v1;
         int v232;
         v232 = 0;
-        while (while_method_7(v232)){
+        while (while_method_6(v232)){
             int v234;
             v234 = 0;
             while (while_method_0(v234)){
@@ -2273,7 +2273,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v257[4];
         int v258;
         v258 = 0;
-        while (while_method_7(v258)){
+        while (while_method_6(v258)){
             int v260;
             v260 = 0;
             while (while_method_0(v260)){
@@ -2300,7 +2300,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v266 = tmp8.v0; v267 = tmp8.v1;
         int v268;
         v268 = 0;
-        while (while_method_7(v268)){
+        while (while_method_6(v268)){
             int v270;
             v270 = 0;
             while (while_method_0(v270)){
@@ -2342,7 +2342,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v287[4];
         int v288;
         v288 = 0;
-        while (while_method_7(v288)){
+        while (while_method_6(v288)){
             int v290;
             v290 = 0;
             while (while_method_0(v290)){
@@ -2381,7 +2381,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v301 = tmp10.v0; v302 = tmp10.v1;
         int v303;
         v303 = 0;
-        while (while_method_7(v303)){
+        while (while_method_6(v303)){
             int v305;
             v305 = 0;
             while (while_method_0(v305)){
@@ -2440,7 +2440,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         bool v327[4];
         int v328;
         v328 = 0;
-        while (while_method_7(v328)){
+        while (while_method_6(v328)){
             int v330;
             v330 = 0;
             while (while_method_0(v330)){
@@ -2466,7 +2466,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v337[4];
         int v338;
         v338 = 0;
-        while (while_method_7(v338)){
+        while (while_method_6(v338)){
             int v340;
             v340 = 0;
             while (while_method_0(v340)){
@@ -2503,7 +2503,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v349 = 0.0f;
         int v350;
         v350 = 0;
-        while (while_method_7(v350)){
+        while (while_method_6(v350)){
             int v352;
             v352 = 0;
             while (while_method_0(v352)){
@@ -2531,7 +2531,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         int v362[4];
         int v363;
         v363 = 0;
-        while (while_method_7(v363)){
+        while (while_method_6(v363)){
             int v365;
             v365 = 0;
             while (while_method_0(v365)){
@@ -2560,7 +2560,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v371 = 0;
         int v372;
         v372 = 0;
-        while (while_method_7(v372)){
+        while (while_method_6(v372)){
             int v374;
             v374 = 0;
             while (while_method_0(v374)){
@@ -2592,7 +2592,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         float v386[4];
         int v387;
         v387 = 0;
-        while (while_method_7(v387)){
+        while (while_method_6(v387)){
             int v389;
             v389 = 0;
             while (while_method_0(v389)){
@@ -2636,7 +2636,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         v401 = tmp12.v0; v402 = tmp12.v1;
         int v403;
         v403 = 0;
-        while (while_method_7(v403)){
+        while (while_method_6(v403)){
             int v405;
             v405 = 0;
             while (while_method_0(v405)){
@@ -2690,7 +2690,7 @@ __device__ Tuple2 method_4(curandStatePhilox4_32_10_t & v0, int * v1, float * v2
         }
         int v427;
         v427 = 0;
-        while (while_method_7(v427)){
+        while (while_method_6(v427)){
             assert("Tensor range check" && 0 <= v427 && v427 < 1);
             assert("Tensor range check" && 0 <= v427 && v427 < 1);
             v427 += 1 ;
@@ -2788,7 +2788,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
     assert("Tensor range check" && 0 <= v38 && v38 < 256);
     int v46;
     v46 = 0;
-    while (while_method_7(v46)){
+    while (while_method_6(v46)){
         bool v48;
         v48 = v39 && v43;
         bool v49;
@@ -2839,7 +2839,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         int v67[4];
         int v68;
         v68 = 0;
-        while (while_method_7(v68)){
+        while (while_method_6(v68)){
             assert("Tensor range check" && 0 <= v68 && v68 < 1);
             int v70;
             v70 = 4 * v68;
@@ -2856,7 +2856,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         }
         int v74;
         v74 = 0;
-        while (while_method_7(v74)){
+        while (while_method_6(v74)){
             int v76;
             v76 = 0;
             while (while_method_0(v76)){
@@ -2930,7 +2930,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         bool v99[4];
         int v100;
         v100 = 0;
-        while (while_method_7(v100)){
+        while (while_method_6(v100)){
             int v102;
             v102 = 0;
             while (while_method_0(v102)){
@@ -2956,7 +2956,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         float v109[4];
         int v110;
         v110 = 0;
-        while (while_method_7(v110)){
+        while (while_method_6(v110)){
             int v112;
             v112 = 0;
             while (while_method_0(v112)){
@@ -2993,7 +2993,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         v121 = 0.0f;
         int v122;
         v122 = 0;
-        while (while_method_7(v122)){
+        while (while_method_6(v122)){
             int v124;
             v124 = 0;
             while (while_method_0(v124)){
@@ -3022,7 +3022,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         int v135[4];
         int v136;
         v136 = 0;
-        while (while_method_7(v136)){
+        while (while_method_6(v136)){
             int v138;
             v138 = 0;
             while (while_method_0(v138)){
@@ -3051,7 +3051,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         v144 = 0;
         int v145;
         v145 = 0;
-        while (while_method_7(v145)){
+        while (while_method_6(v145)){
             int v147;
             v147 = 0;
             while (while_method_0(v147)){
@@ -3084,7 +3084,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         float v160[4];
         int v161;
         v161 = 0;
-        while (while_method_7(v161)){
+        while (while_method_6(v161)){
             int v163;
             v163 = 0;
             while (while_method_0(v163)){
@@ -3128,7 +3128,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         v175 = tmp15.v0; v176 = tmp15.v1;
         int v177;
         v177 = 0;
-        while (while_method_7(v177)){
+        while (while_method_6(v177)){
             int v179;
             v179 = 0;
             while (while_method_0(v179)){
@@ -3182,7 +3182,7 @@ __device__ float method_5(int * v0, float * v1, float * v2, float * v3, float * 
         }
         int v201;
         v201 = 0;
-        while (while_method_7(v201)){
+        while (while_method_6(v201)){
             assert("Tensor range check" && 0 <= v201 && v201 < 1);
             assert("Tensor range check" && 0 <= v201 && v201 < 1);
             v201 += 1 ;
@@ -3354,94 +3354,94 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
     Union6 v6;
     v6 = v5;
     while (while_method_2(v6)){
-        Union6 v1024;
+        Union6 v1018;
         switch (v6.tag) {
             case 0: { // None
-                v1024 = Union6{Union6_0{}};
+                v1018 = Union6{Union6_0{}};
                 break;
             }
             case 1: { // Some
                 Union4 v8 = v6.case1.v0;
                 switch (v8.tag) {
                     case 0: { // ChanceCommunityCard
-                        Union5 v969 = v8.case0.v0; bool v970 = v8.case0.v1; static_array<Union2,2> v971 = v8.case0.v2; int v972 = v8.case0.v3; static_array<int,2> v973 = v8.case0.v4; int v974 = v8.case0.v5;
-                        curandStatePhilox4_32_10_t & v975 = v2.base->v5;
-                        curandStatePhilox4_32_10_t & v976 = v975;
-                        unsigned int & v977 = v2.base->v0;
-                        Union2 v978; unsigned int v979;
-                        Tuple0 tmp0 = draw_card_1(v976, v977);
-                        v978 = tmp0.v0; v979 = tmp0.v1;
-                        v2.base->v0 = v979;
-                        Union1 v980;
-                        v980 = Union1{Union1_0{v978}};
-                        v4.push(v980);
-                        int v981;
-                        v981 = 2;
-                        int v982; int v983;
+                        Union5 v963 = v8.case0.v0; bool v964 = v8.case0.v1; static_array<Union2,2> v965 = v8.case0.v2; int v966 = v8.case0.v3; static_array<int,2> v967 = v8.case0.v4; int v968 = v8.case0.v5;
+                        curandStatePhilox4_32_10_t & v969 = v2.base->v5;
+                        curandStatePhilox4_32_10_t & v970 = v969;
+                        unsigned int & v971 = v2.base->v0;
+                        Union2 v972; unsigned int v973;
+                        Tuple0 tmp0 = draw_card_1(v970, v971);
+                        v972 = tmp0.v0; v973 = tmp0.v1;
+                        v2.base->v0 = v973;
+                        Union1 v974;
+                        v974 = Union1{Union1_0{v972}};
+                        v4.push(v974);
+                        int v975;
+                        v975 = 2;
+                        int v976; int v977;
                         Tuple1 tmp1 = Tuple1{0, 0};
-                        v982 = tmp1.v0; v983 = tmp1.v1;
-                        while (while_method_3(v982)){
-                            int v985;
-                            v985 = v973[v982];
-                            bool v987;
-                            v987 = v983 >= v985;
-                            int v988;
-                            if (v987){
-                                v988 = v983;
+                        v976 = tmp1.v0; v977 = tmp1.v1;
+                        while (while_method_3(v976)){
+                            int v979;
+                            v979 = v967[v976];
+                            bool v981;
+                            v981 = v977 >= v979;
+                            int v982;
+                            if (v981){
+                                v982 = v977;
                             } else {
-                                v988 = v985;
+                                v982 = v979;
                             }
-                            v983 = v988;
-                            v982 += 1 ;
+                            v977 = v982;
+                            v976 += 1 ;
                         }
-                        static_array<int,2> v989;
-                        int v991;
-                        v991 = 0;
-                        while (while_method_3(v991)){
-                            v989[v991] = v983;
-                            v991 += 1 ;
+                        static_array<int,2> v983;
+                        int v985;
+                        v985 = 0;
+                        while (while_method_3(v985)){
+                            v983[v985] = v977;
+                            v985 += 1 ;
                         }
-                        Union5 v993;
-                        v993 = Union5{Union5_1{v978}};
-                        Union4 v994;
-                        v994 = Union4{Union4_2{v993, true, v971, 0, v989, v981}};
-                        v1024 = Union6{Union6_1{v994}};
+                        Union5 v987;
+                        v987 = Union5{Union5_1{v972}};
+                        Union4 v988;
+                        v988 = Union4{Union4_2{v987, true, v965, 0, v983, v975}};
+                        v1018 = Union6{Union6_1{v988}};
                         break;
                     }
                     case 1: { // ChanceInit
-                        curandStatePhilox4_32_10_t & v996 = v2.base->v5;
-                        curandStatePhilox4_32_10_t & v997 = v996;
-                        unsigned int & v998 = v2.base->v0;
-                        Union2 v999; unsigned int v1000;
-                        Tuple0 tmp2 = draw_card_1(v997, v998);
-                        v999 = tmp2.v0; v1000 = tmp2.v1;
-                        v2.base->v0 = v1000;
-                        curandStatePhilox4_32_10_t & v1001 = v2.base->v5;
-                        curandStatePhilox4_32_10_t & v1002 = v1001;
-                        unsigned int & v1003 = v2.base->v0;
-                        Union2 v1004; unsigned int v1005;
-                        Tuple0 tmp3 = draw_card_1(v1002, v1003);
-                        v1004 = tmp3.v0; v1005 = tmp3.v1;
-                        v2.base->v0 = v1005;
-                        Union1 v1006;
-                        v1006 = Union1{Union1_2{0, v999}};
-                        v4.push(v1006);
-                        Union1 v1007;
-                        v1007 = Union1{Union1_2{1, v1004}};
-                        v4.push(v1007);
-                        int v1008;
-                        v1008 = 2;
-                        static_array<int,2> v1009;
-                        v1009[0] = 1;
-                        v1009[1] = 1;
-                        static_array<Union2,2> v1011;
-                        v1011[0] = v999;
-                        v1011[1] = v1004;
-                        Union5 v1013;
-                        v1013 = Union5{Union5_0{}};
-                        Union4 v1014;
-                        v1014 = Union4{Union4_2{v1013, true, v1011, 0, v1009, v1008}};
-                        v1024 = Union6{Union6_1{v1014}};
+                        curandStatePhilox4_32_10_t & v990 = v2.base->v5;
+                        curandStatePhilox4_32_10_t & v991 = v990;
+                        unsigned int & v992 = v2.base->v0;
+                        Union2 v993; unsigned int v994;
+                        Tuple0 tmp2 = draw_card_1(v991, v992);
+                        v993 = tmp2.v0; v994 = tmp2.v1;
+                        v2.base->v0 = v994;
+                        curandStatePhilox4_32_10_t & v995 = v2.base->v5;
+                        curandStatePhilox4_32_10_t & v996 = v995;
+                        unsigned int & v997 = v2.base->v0;
+                        Union2 v998; unsigned int v999;
+                        Tuple0 tmp3 = draw_card_1(v996, v997);
+                        v998 = tmp3.v0; v999 = tmp3.v1;
+                        v2.base->v0 = v999;
+                        Union1 v1000;
+                        v1000 = Union1{Union1_2{0, v993}};
+                        v4.push(v1000);
+                        Union1 v1001;
+                        v1001 = Union1{Union1_2{1, v998}};
+                        v4.push(v1001);
+                        int v1002;
+                        v1002 = 2;
+                        static_array<int,2> v1003;
+                        v1003[0] = 1;
+                        v1003[1] = 1;
+                        static_array<Union2,2> v1005;
+                        v1005[0] = v993;
+                        v1005[1] = v998;
+                        Union5 v1007;
+                        v1007 = Union5{Union5_0{}};
+                        Union4 v1008;
+                        v1008 = Union4{Union4_2{v1007, true, v1005, 0, v1003, v1002}};
+                        v1018 = Union6{Union6_1{v1008}};
                         break;
                     }
                     case 2: { // Round
@@ -3449,7 +3449,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                         static_array<Union0,2> & v57 = v2.base->v3;
                         Union0 v58;
                         v58 = v57[v54];
-                        Union3 v785;
+                        Union3 v779;
                         switch (v58.tag) {
                             case 0: { // T_Computer
                                 static_array_list<Union1,32> & v60 = v2.base->v2;
@@ -3812,1230 +3812,1215 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                     v210 = v161+v209;
                                     wmma::fragment<wmma::accumulator, 16, 16, 8, float> v212[8];
                                     int v213;
-                                    v213 = blockIdx.x;
-                                    int v214;
-                                    v214 = v213;
-                                    while (while_method_3(v214)){
-                                        bool v216;
-                                        v216 = 0 <= v214;
-                                        bool v217;
-                                        v217 = v216 == false;
-                                        if (v217){
-                                            assert("The index needs to be zero or positive." && v216);
-                                        } else {
-                                        }
-                                        int v219;
-                                        v219 = v214 % 1;
-                                        bool v220;
-                                        v220 = v214 < 2;
-                                        bool v221;
-                                        v221 = v220 == false;
-                                        if (v221){
-                                            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v220);
-                                        } else {
-                                        }
-                                        assert("Tensor range check" && 0 <= v214 && v214 < 2);
-                                        assert("Tensor range check" && 0 <= v219 && v219 < 1);
-                                        int v223;
-                                        v223 = 128 * v219;
-                                        int v224;
-                                        v224 = v223 + v156;
-                                        int v225;
-                                        v225 = 16384 * v214;
-                                        int v226;
-                                        v226 = v225 + v224;
-                                        float * v227;
-                                        v227 = v151+v226;
-                                        // Pushing the loop unrolling to: 0
-                                        int v229;
-                                        v229 = 0;
-                                        #pragma unroll
-                                        while (while_method_6(v229)){
-                                            int v231;
-                                            v231 = 0;
+                                    v213 = 0;
+                                    while (while_method_3(v213)){
+                                        int v215;
+                                        v215 = 0;
+                                        while (while_method_6(v215)){
+                                            assert("Tensor range check" && 0 <= v213 && v213 < 2);
+                                            assert("Tensor range check" && 0 <= v215 && v215 < 1);
+                                            int v217;
+                                            v217 = 128 * v215;
+                                            int v218;
+                                            v218 = v217 + v156;
+                                            int v219;
+                                            v219 = 16384 * v213;
+                                            int v220;
+                                            v220 = v219 + v218;
+                                            float * v221;
+                                            v221 = v151+v220;
+                                            // Pushing the loop unrolling to: 0
+                                            int v223;
+                                            v223 = 0;
                                             #pragma unroll
-                                            while (while_method_7(v231)){
-                                                assert("Tensor range check" && 0 <= v229 && v229 < 8);
-                                                assert("Tensor range check" && 0 <= v231 && v231 < 1);
+                                            while (while_method_7(v223)){
+                                                int v225;
+                                                v225 = 0;
+                                                #pragma unroll
+                                                while (while_method_6(v225)){
+                                                    assert("Tensor range check" && 0 <= v223 && v223 < 8);
+                                                    assert("Tensor range check" && 0 <= v225 && v225 < 1);
+                                                    int v227;
+                                                    v227 = v223 + v225;
+                                                    wmma::fragment<wmma::accumulator, 16, 16, 8, float> & v228 = v212[v227];
+                                                    wmma::fill_fragment(v228, 0.0f);
+                                                    v225 += 1 ;
+                                                }
+                                                v223 += 1 ;
+                                            }
+                                            // Poping the loop unrolling to: 0
+                                            int v229;
+                                            v229 = 0;
+                                            while (while_method_8(v229)){
+                                                int v231;
+                                                v231 = v229 + 1;
+                                                bool v232;
+                                                v232 = v229 == 0;
                                                 int v233;
-                                                v233 = v229 + v231;
-                                                wmma::fragment<wmma::accumulator, 16, 16, 8, float> & v234 = v212[v233];
-                                                wmma::fill_fragment(v234, 0.0f);
-                                                v231 += 1 ;
-                                            }
-                                            v229 += 1 ;
-                                        }
-                                        // Poping the loop unrolling to: 0
-                                        int v235;
-                                        v235 = 0;
-                                        while (while_method_8(v235)){
-                                            int v237;
-                                            v237 = v235 + 1;
-                                            bool v238;
-                                            v238 = v235 == 0;
-                                            int v239;
-                                            v239 = v235 % 2;
-                                            bool v240;
-                                            v240 = 0 <= v235;
-                                            bool v241;
-                                            v241 = v240 == false;
-                                            if (v241){
-                                                assert("The index needs to be zero or positive." && v240);
-                                            } else {
-                                            }
-                                            bool v243;
-                                            v243 = v235 < 2;
-                                            bool v244;
-                                            v244 = v243 == false;
-                                            if (v244){
-                                                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v243);
-                                            } else {
-                                            }
-                                            bool v246;
-                                            v246 = v237 < 2;
-                                            Union9 v252;
-                                            if (v246){
-                                                bool v247;
-                                                v247 = 0 <= v237;
-                                                bool v248;
-                                                v248 = v247 == false;
-                                                if (v248){
-                                                    assert("The index needs to be zero or positive." && v247);
+                                                v233 = v229 % 2;
+                                                bool v234;
+                                                v234 = 0 <= v229;
+                                                bool v235;
+                                                v235 = v234 == false;
+                                                if (v235){
+                                                    assert("The index needs to be zero or positive." && v234);
                                                 } else {
                                                 }
-                                                v252 = Union9{Union9_1{v237}};
-                                            } else {
-                                                v252 = Union9{Union9_0{}};
-                                            }
-                                            assert("Tensor range check" && 0 <= v214 && v214 < 2);
-                                            int v253;
-                                            v253 = v225 + v154;
-                                            assert("Tensor range check" && 0 <= v235 && v235 < 2);
-                                            int v254;
-                                            v254 = 64 * v235;
-                                            int v255;
-                                            v255 = v254 + v253;
-                                            float * v256;
-                                            v256 = v146+v255;
-                                            assert("Tensor range check" && 0 <= v219 && v219 < 1);
-                                            int v258;
-                                            v258 = 16384 * v219;
-                                            int v259;
-                                            v259 = v258 + v150;
-                                            if (v238){
-                                                assert("Tensor range check" && 0 <= v235 && v235 < 2);
-                                                int v260;
-                                                v260 = v254 + v259;
-                                                float * v261;
-                                                v261 = v148+v260;
-                                                // Pushing the loop unrolling to: 0
-                                                v157.producer_acquire();
-                                                int v263;
-                                                v263 = threadIdx.x;
-                                                bool v264;
-                                                v264 = 0 <= v263;
-                                                bool v265;
-                                                v265 = v264 == false;
-                                                if (v265){
-                                                    assert("The index needs to be zero or positive." && v264);
+                                                bool v237;
+                                                v237 = v229 < 2;
+                                                bool v238;
+                                                v238 = v237 == false;
+                                                if (v238){
+                                                    assert("The last element of the projection dimensions needs to be greater than the index remainder." && v237);
                                                 } else {
                                                 }
-                                                int v267;
-                                                v267 = v263 % 16;
-                                                int v268;
-                                                v268 = v263 / 16;
-                                                bool v269;
-                                                v269 = v268 < 16;
-                                                bool v270;
-                                                v270 = v269 == false;
-                                                if (v270){
-                                                    assert("The last element of the projection dimensions needs to be greater than the index remainder." && v269);
-                                                } else {
-                                                }
-                                                assert("Tensor range check" && 0 <= v268 && v268 < 16);
-                                                assert("Tensor range check" && 0 <= v267 && v267 < 16);
-                                                int v272;
-                                                v272 = 4 * v267;
-                                                int v273;
-                                                v273 = 68 * v268;
-                                                int v274;
-                                                v274 = v273 + v272;
-                                                int v275;
-                                                v275 = 128 * v268;
-                                                int v276;
-                                                v276 = v275 + v272;
-                                                float * v277;
-                                                v277 = v161+v274;
-                                                float * v279;
-                                                v279 = v261+v276;
-                                                int v281;
-                                                v281 = 0;
-                                                #pragma unroll
-                                                while (while_method_6(v281)){
-                                                    int v283;
-                                                    v283 = 0;
-                                                    #pragma unroll
-                                                    while (while_method_7(v283)){
-                                                        assert("Tensor range check" && 0 <= v281 && v281 < 8);
-                                                        assert("Tensor range check" && 0 <= v283 && v283 < 1);
-                                                        int v285;
-                                                        v285 = 64 * v283;
-                                                        int v286;
-                                                        v286 = 1088 * v281;
-                                                        int v287;
-                                                        v287 = v286 + v285;
-                                                        int v288;
-                                                        v288 = 2048 * v281;
-                                                        int v289;
-                                                        v289 = v288 + v285;
-                                                        constexpr int v290 = sizeof(float) * 4;
-                                                        assert("Pointer alignment check" && (unsigned long long)(v279 + v289) % v290 == 0 && (unsigned long long)(v277 + v287) % v290 == 0);
-                                                        cuda::memcpy_async(v277 + v287, v279 + v289, cuda::aligned_size_t<v290>(v290), v157);
-                                                        v283 += 1 ;
+                                                bool v240;
+                                                v240 = v231 < 2;
+                                                Union9 v246;
+                                                if (v240){
+                                                    bool v241;
+                                                    v241 = 0 <= v231;
+                                                    bool v242;
+                                                    v242 = v241 == false;
+                                                    if (v242){
+                                                        assert("The index needs to be zero or positive." && v241);
+                                                    } else {
                                                     }
-                                                    v281 += 1 ;
+                                                    v246 = Union9{Union9_1{v231}};
+                                                } else {
+                                                    v246 = Union9{Union9_0{}};
                                                 }
-                                                v157.producer_commit();
-                                                // Poping the loop unrolling to: 0
-                                            } else {
-                                            }
-                                            // Pushing the loop unrolling to: 0
-                                            int v291;
-                                            v291 = threadIdx.x;
-                                            bool v292;
-                                            v292 = 0 <= v291;
-                                            bool v293;
-                                            v293 = v292 == false;
-                                            if (v293){
-                                                assert("The index needs to be zero or positive." && v292);
-                                            } else {
-                                            }
-                                            int v295;
-                                            v295 = v291 % 16;
-                                            int v296;
-                                            v296 = v291 / 16;
-                                            bool v297;
-                                            v297 = v296 < 16;
-                                            bool v298;
-                                            v298 = v297 == false;
-                                            if (v298){
-                                                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v297);
-                                            } else {
-                                            }
-                                            assert("Tensor range check" && 0 <= v296 && v296 < 16);
-                                            assert("Tensor range check" && 0 <= v295 && v295 < 16);
-                                            int v300;
-                                            v300 = 4 * v295;
-                                            int v301;
-                                            v301 = 68 * v296;
-                                            int v302;
-                                            v302 = v301 + v300;
-                                            int v303;
-                                            v303 = 128 * v296;
-                                            int v304;
-                                            v304 = v303 + v300;
-                                            float * v305;
-                                            v305 = v159+v302;
-                                            float * v307;
-                                            v307 = v256+v304;
-                                            int v309;
-                                            v309 = 0;
-                                            #pragma unroll
-                                            while (while_method_6(v309)){
-                                                int v311;
-                                                v311 = 0;
-                                                #pragma unroll
-                                                while (while_method_7(v311)){
-                                                    assert("Tensor range check" && 0 <= v309 && v309 < 8);
-                                                    assert("Tensor range check" && 0 <= v311 && v311 < 1);
-                                                    int v313;
-                                                    v313 = 64 * v311;
-                                                    int v314;
-                                                    v314 = 1088 * v309;
-                                                    int v315;
-                                                    v315 = v314 + v313;
-                                                    int v316;
-                                                    v316 = 2048 * v309;
-                                                    int v317;
-                                                    v317 = v316 + v313;
-                                                    int4* v318;
-                                                    v318 = reinterpret_cast<int4*>(v307 + v317);
-                                                    int4* v319;
-                                                    v319 = reinterpret_cast<int4*>(v305 + v315);
-                                                    assert("Pointer alignment check" && (unsigned long long)(v318) % 4 == 0 && (unsigned long long)(v319) % 4 == 0);
-                                                    *v319 = *v318;
-                                                    v311 += 1 ;
-                                                }
-                                                v309 += 1 ;
-                                            }
-                                            // Poping the loop unrolling to: 0
-                                            wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v320[1];
-                                            wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v321[8];
-                                            cuda::pipeline_consumer_wait_prior<0>(v157);;
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
-                                            // Pushing the loop unrolling to: 0
-                                            int v322;
-                                            v322 = 0;
-                                            #pragma unroll
-                                            while (while_method_7(v322)){
-                                                int v324;
-                                                v324 = 0;
-                                                #pragma unroll
-                                                while (while_method_6(v324)){
-                                                    assert("Tensor range check" && 0 <= v322 && v322 < 1);
-                                                    assert("Tensor range check" && 0 <= v324 && v324 < 8);
-                                                    int v326;
-                                                    v326 = 8 * v322;
-                                                    int v327;
-                                                    v327 = v326 + v324;
-                                                    wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> & v328 = v321[v327];
-                                                    assert("Tensor range check" && 0 <= v322 && v322 < 1);
-                                                    int v329;
-                                                    v329 = 1088 * v322;
-                                                    assert("Tensor range check" && 0 <= v324 && v324 < 8);
-                                                    int v330;
-                                                    v330 = 8 * v324;
-                                                    int v331;
-                                                    v331 = v330 + v329;
-                                                    int v332;
-                                                    v332 = 0;
-                                                    #pragma unroll
-                                                    while (while_method_3(v332)){
-                                                        int v334;
-                                                        v334 = 0;
-                                                        #pragma unroll
-                                                        while (while_method_3(v334)){
-                                                            assert("Tensor range check" && 0 <= v332 && v332 < 2);
-                                                            assert("Tensor range check" && 0 <= v334 && v334 < 2);
-                                                            int v336;
-                                                            v336 = 4 * v334;
-                                                            int v337;
-                                                            v337 = v336 + v331;
-                                                            int v338;
-                                                            v338 = 544 * v332;
-                                                            int v339;
-                                                            v339 = v338 + v337;
-                                                            float v340;
-                                                            v340 = v210[v339];
-                                                            bool v341;
-                                                            v341 = 0 <= v334;
-                                                            bool v343;
-                                                            if (v341){
-                                                                bool v342;
-                                                                v342 = v334 < 2;
-                                                                v343 = v342;
-                                                            } else {
-                                                                v343 = false;
-                                                            }
-                                                            bool v344;
-                                                            v344 = v343 == false;
-                                                            if (v344){
-                                                                assert("The indices should be inside the range of the dimension." && v343);
-                                                            } else {
-                                                            }
-                                                            bool v346;
-                                                            v346 = 0 <= v332;
-                                                            bool v348;
-                                                            if (v346){
-                                                                bool v347;
-                                                                v347 = v332 < 2;
-                                                                v348 = v347;
-                                                            } else {
-                                                                v348 = false;
-                                                            }
-                                                            bool v349;
-                                                            v349 = v348 == false;
-                                                            if (v349){
-                                                                assert("The indices should be inside the range of the dimension." && v348);
-                                                            } else {
-                                                            }
-                                                            int v351;
-                                                            v351 = v332 * 2;
-                                                            int v352;
-                                                            v352 = v334 + v351;
-                                                            v328.x[v352] = wmma::__float_to_tf32(v340);
-                                                            v334 += 1 ;
-                                                        }
-                                                        v332 += 1 ;
-                                                    }
-                                                    v324 += 1 ;
-                                                }
-                                                v322 += 1 ;
-                                            }
-                                            // Poping the loop unrolling to: 0
-                                            v157.consumer_release();
-                                            switch (v252.tag) {
-                                                case 0: { // None
-                                                    break;
-                                                }
-                                                case 1: { // Some
-                                                    int v353 = v252.case1.v0;
-                                                    assert("Tensor range check" && 0 <= v353 && v353 < 2);
-                                                    int v354;
-                                                    v354 = 64 * v353;
-                                                    int v355;
-                                                    v355 = v354 + v259;
-                                                    float * v356;
-                                                    v356 = v148+v355;
-                                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                                assert("Tensor range check" && 0 <= v213 && v213 < 2);
+                                                int v247;
+                                                v247 = v219 + v154;
+                                                assert("Tensor range check" && 0 <= v229 && v229 < 2);
+                                                int v248;
+                                                v248 = 64 * v229;
+                                                int v249;
+                                                v249 = v248 + v247;
+                                                float * v250;
+                                                v250 = v146+v249;
+                                                assert("Tensor range check" && 0 <= v215 && v215 < 1);
+                                                int v252;
+                                                v252 = 16384 * v215;
+                                                int v253;
+                                                v253 = v252 + v150;
+                                                if (v232){
+                                                    assert("Tensor range check" && 0 <= v229 && v229 < 2);
+                                                    int v254;
+                                                    v254 = v248 + v253;
+                                                    float * v255;
+                                                    v255 = v148+v254;
                                                     // Pushing the loop unrolling to: 0
                                                     v157.producer_acquire();
-                                                    int v358;
-                                                    v358 = threadIdx.x;
-                                                    bool v359;
-                                                    v359 = 0 <= v358;
-                                                    bool v360;
-                                                    v360 = v359 == false;
-                                                    if (v360){
-                                                        assert("The index needs to be zero or positive." && v359);
+                                                    int v257;
+                                                    v257 = threadIdx.x;
+                                                    bool v258;
+                                                    v258 = 0 <= v257;
+                                                    bool v259;
+                                                    v259 = v258 == false;
+                                                    if (v259){
+                                                        assert("The index needs to be zero or positive." && v258);
                                                     } else {
                                                     }
-                                                    int v362;
-                                                    v362 = v358 % 16;
-                                                    int v363;
-                                                    v363 = v358 / 16;
-                                                    bool v364;
-                                                    v364 = v363 < 16;
-                                                    bool v365;
-                                                    v365 = v364 == false;
-                                                    if (v365){
-                                                        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v364);
+                                                    int v261;
+                                                    v261 = v257 % 16;
+                                                    int v262;
+                                                    v262 = v257 / 16;
+                                                    bool v263;
+                                                    v263 = v262 < 16;
+                                                    bool v264;
+                                                    v264 = v263 == false;
+                                                    if (v264){
+                                                        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v263);
                                                     } else {
                                                     }
-                                                    assert("Tensor range check" && 0 <= v363 && v363 < 16);
-                                                    assert("Tensor range check" && 0 <= v362 && v362 < 16);
-                                                    int v367;
-                                                    v367 = 4 * v362;
-                                                    int v368;
-                                                    v368 = 68 * v363;
-                                                    int v369;
-                                                    v369 = v368 + v367;
-                                                    int v370;
-                                                    v370 = 128 * v363;
-                                                    int v371;
-                                                    v371 = v370 + v367;
-                                                    float * v372;
-                                                    v372 = v161+v369;
-                                                    float * v374;
-                                                    v374 = v356+v371;
-                                                    int v376;
-                                                    v376 = 0;
+                                                    assert("Tensor range check" && 0 <= v262 && v262 < 16);
+                                                    assert("Tensor range check" && 0 <= v261 && v261 < 16);
+                                                    int v266;
+                                                    v266 = 4 * v261;
+                                                    int v267;
+                                                    v267 = 68 * v262;
+                                                    int v268;
+                                                    v268 = v267 + v266;
+                                                    int v269;
+                                                    v269 = 128 * v262;
+                                                    int v270;
+                                                    v270 = v269 + v266;
+                                                    float * v271;
+                                                    v271 = v161+v268;
+                                                    float * v273;
+                                                    v273 = v255+v270;
+                                                    int v275;
+                                                    v275 = 0;
                                                     #pragma unroll
-                                                    while (while_method_6(v376)){
-                                                        int v378;
-                                                        v378 = 0;
+                                                    while (while_method_7(v275)){
+                                                        int v277;
+                                                        v277 = 0;
                                                         #pragma unroll
-                                                        while (while_method_7(v378)){
-                                                            assert("Tensor range check" && 0 <= v376 && v376 < 8);
-                                                            assert("Tensor range check" && 0 <= v378 && v378 < 1);
-                                                            int v380;
-                                                            v380 = 64 * v378;
-                                                            int v381;
-                                                            v381 = 1088 * v376;
-                                                            int v382;
-                                                            v382 = v381 + v380;
-                                                            int v383;
-                                                            v383 = 2048 * v376;
-                                                            int v384;
-                                                            v384 = v383 + v380;
-                                                            constexpr int v385 = sizeof(float) * 4;
-                                                            assert("Pointer alignment check" && (unsigned long long)(v374 + v384) % v385 == 0 && (unsigned long long)(v372 + v382) % v385 == 0);
-                                                            cuda::memcpy_async(v372 + v382, v374 + v384, cuda::aligned_size_t<v385>(v385), v157);
-                                                            v378 += 1 ;
+                                                        while (while_method_6(v277)){
+                                                            assert("Tensor range check" && 0 <= v275 && v275 < 8);
+                                                            assert("Tensor range check" && 0 <= v277 && v277 < 1);
+                                                            int v279;
+                                                            v279 = 64 * v277;
+                                                            int v280;
+                                                            v280 = 1088 * v275;
+                                                            int v281;
+                                                            v281 = v280 + v279;
+                                                            int v282;
+                                                            v282 = 2048 * v275;
+                                                            int v283;
+                                                            v283 = v282 + v279;
+                                                            constexpr int v284 = sizeof(float) * 4;
+                                                            assert("Pointer alignment check" && (unsigned long long)(v273 + v283) % v284 == 0 && (unsigned long long)(v271 + v281) % v284 == 0);
+                                                            cuda::memcpy_async(v271 + v281, v273 + v283, cuda::aligned_size_t<v284>(v284), v157);
+                                                            v277 += 1 ;
                                                         }
-                                                        v376 += 1 ;
+                                                        v275 += 1 ;
                                                     }
                                                     v157.producer_commit();
                                                     // Poping the loop unrolling to: 0
-                                                    break;
+                                                } else {
                                                 }
-                                                default: {
-                                                    assert("Invalid tag." && false); __trap();
+                                                // Pushing the loop unrolling to: 0
+                                                int v285;
+                                                v285 = threadIdx.x;
+                                                bool v286;
+                                                v286 = 0 <= v285;
+                                                bool v287;
+                                                v287 = v286 == false;
+                                                if (v287){
+                                                    assert("The index needs to be zero or positive." && v286);
+                                                } else {
                                                 }
+                                                int v289;
+                                                v289 = v285 % 16;
+                                                int v290;
+                                                v290 = v285 / 16;
+                                                bool v291;
+                                                v291 = v290 < 16;
+                                                bool v292;
+                                                v292 = v291 == false;
+                                                if (v292){
+                                                    assert("The last element of the projection dimensions needs to be greater than the index remainder." && v291);
+                                                } else {
+                                                }
+                                                assert("Tensor range check" && 0 <= v290 && v290 < 16);
+                                                assert("Tensor range check" && 0 <= v289 && v289 < 16);
+                                                int v294;
+                                                v294 = 4 * v289;
+                                                int v295;
+                                                v295 = 68 * v290;
+                                                int v296;
+                                                v296 = v295 + v294;
+                                                int v297;
+                                                v297 = 128 * v290;
+                                                int v298;
+                                                v298 = v297 + v294;
+                                                float * v299;
+                                                v299 = v159+v296;
+                                                float * v301;
+                                                v301 = v250+v298;
+                                                int v303;
+                                                v303 = 0;
+                                                #pragma unroll
+                                                while (while_method_7(v303)){
+                                                    int v305;
+                                                    v305 = 0;
+                                                    #pragma unroll
+                                                    while (while_method_6(v305)){
+                                                        assert("Tensor range check" && 0 <= v303 && v303 < 8);
+                                                        assert("Tensor range check" && 0 <= v305 && v305 < 1);
+                                                        int v307;
+                                                        v307 = 64 * v305;
+                                                        int v308;
+                                                        v308 = 1088 * v303;
+                                                        int v309;
+                                                        v309 = v308 + v307;
+                                                        int v310;
+                                                        v310 = 2048 * v303;
+                                                        int v311;
+                                                        v311 = v310 + v307;
+                                                        int4* v312;
+                                                        v312 = reinterpret_cast<int4*>(v301 + v311);
+                                                        int4* v313;
+                                                        v313 = reinterpret_cast<int4*>(v299 + v309);
+                                                        assert("Pointer alignment check" && (unsigned long long)(v312) % 4 == 0 && (unsigned long long)(v313) % 4 == 0);
+                                                        *v313 = *v312;
+                                                        v305 += 1 ;
+                                                    }
+                                                    v303 += 1 ;
+                                                }
+                                                // Poping the loop unrolling to: 0
+                                                wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v314[1];
+                                                wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v315[8];
+                                                cuda::pipeline_consumer_wait_prior<0>(v157);;
+                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                // Pushing the loop unrolling to: 0
+                                                int v316;
+                                                v316 = 0;
+                                                #pragma unroll
+                                                while (while_method_6(v316)){
+                                                    int v318;
+                                                    v318 = 0;
+                                                    #pragma unroll
+                                                    while (while_method_7(v318)){
+                                                        assert("Tensor range check" && 0 <= v316 && v316 < 1);
+                                                        assert("Tensor range check" && 0 <= v318 && v318 < 8);
+                                                        int v320;
+                                                        v320 = 8 * v316;
+                                                        int v321;
+                                                        v321 = v320 + v318;
+                                                        wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> & v322 = v315[v321];
+                                                        assert("Tensor range check" && 0 <= v316 && v316 < 1);
+                                                        int v323;
+                                                        v323 = 1088 * v316;
+                                                        assert("Tensor range check" && 0 <= v318 && v318 < 8);
+                                                        int v324;
+                                                        v324 = 8 * v318;
+                                                        int v325;
+                                                        v325 = v324 + v323;
+                                                        int v326;
+                                                        v326 = 0;
+                                                        #pragma unroll
+                                                        while (while_method_3(v326)){
+                                                            int v328;
+                                                            v328 = 0;
+                                                            #pragma unroll
+                                                            while (while_method_3(v328)){
+                                                                assert("Tensor range check" && 0 <= v326 && v326 < 2);
+                                                                assert("Tensor range check" && 0 <= v328 && v328 < 2);
+                                                                int v330;
+                                                                v330 = 4 * v328;
+                                                                int v331;
+                                                                v331 = v330 + v325;
+                                                                int v332;
+                                                                v332 = 544 * v326;
+                                                                int v333;
+                                                                v333 = v332 + v331;
+                                                                float v334;
+                                                                v334 = v210[v333];
+                                                                bool v335;
+                                                                v335 = 0 <= v328;
+                                                                bool v337;
+                                                                if (v335){
+                                                                    bool v336;
+                                                                    v336 = v328 < 2;
+                                                                    v337 = v336;
+                                                                } else {
+                                                                    v337 = false;
+                                                                }
+                                                                bool v338;
+                                                                v338 = v337 == false;
+                                                                if (v338){
+                                                                    assert("The indices should be inside the range of the dimension." && v337);
+                                                                } else {
+                                                                }
+                                                                bool v340;
+                                                                v340 = 0 <= v326;
+                                                                bool v342;
+                                                                if (v340){
+                                                                    bool v341;
+                                                                    v341 = v326 < 2;
+                                                                    v342 = v341;
+                                                                } else {
+                                                                    v342 = false;
+                                                                }
+                                                                bool v343;
+                                                                v343 = v342 == false;
+                                                                if (v343){
+                                                                    assert("The indices should be inside the range of the dimension." && v342);
+                                                                } else {
+                                                                }
+                                                                int v345;
+                                                                v345 = v326 * 2;
+                                                                int v346;
+                                                                v346 = v328 + v345;
+                                                                v322.x[v346] = wmma::__float_to_tf32(v334);
+                                                                v328 += 1 ;
+                                                            }
+                                                            v326 += 1 ;
+                                                        }
+                                                        v318 += 1 ;
+                                                    }
+                                                    v316 += 1 ;
+                                                }
+                                                // Poping the loop unrolling to: 0
+                                                v157.consumer_release();
+                                                switch (v246.tag) {
+                                                    case 0: { // None
+                                                        break;
+                                                    }
+                                                    case 1: { // Some
+                                                        int v347 = v246.case1.v0;
+                                                        assert("Tensor range check" && 0 <= v347 && v347 < 2);
+                                                        int v348;
+                                                        v348 = 64 * v347;
+                                                        int v349;
+                                                        v349 = v348 + v253;
+                                                        float * v350;
+                                                        v350 = v148+v349;
+                                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                                        // Pushing the loop unrolling to: 0
+                                                        v157.producer_acquire();
+                                                        int v352;
+                                                        v352 = threadIdx.x;
+                                                        bool v353;
+                                                        v353 = 0 <= v352;
+                                                        bool v354;
+                                                        v354 = v353 == false;
+                                                        if (v354){
+                                                            assert("The index needs to be zero or positive." && v353);
+                                                        } else {
+                                                        }
+                                                        int v356;
+                                                        v356 = v352 % 16;
+                                                        int v357;
+                                                        v357 = v352 / 16;
+                                                        bool v358;
+                                                        v358 = v357 < 16;
+                                                        bool v359;
+                                                        v359 = v358 == false;
+                                                        if (v359){
+                                                            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v358);
+                                                        } else {
+                                                        }
+                                                        assert("Tensor range check" && 0 <= v357 && v357 < 16);
+                                                        assert("Tensor range check" && 0 <= v356 && v356 < 16);
+                                                        int v361;
+                                                        v361 = 4 * v356;
+                                                        int v362;
+                                                        v362 = 68 * v357;
+                                                        int v363;
+                                                        v363 = v362 + v361;
+                                                        int v364;
+                                                        v364 = 128 * v357;
+                                                        int v365;
+                                                        v365 = v364 + v361;
+                                                        float * v366;
+                                                        v366 = v161+v363;
+                                                        float * v368;
+                                                        v368 = v350+v365;
+                                                        int v370;
+                                                        v370 = 0;
+                                                        #pragma unroll
+                                                        while (while_method_7(v370)){
+                                                            int v372;
+                                                            v372 = 0;
+                                                            #pragma unroll
+                                                            while (while_method_6(v372)){
+                                                                assert("Tensor range check" && 0 <= v370 && v370 < 8);
+                                                                assert("Tensor range check" && 0 <= v372 && v372 < 1);
+                                                                int v374;
+                                                                v374 = 64 * v372;
+                                                                int v375;
+                                                                v375 = 1088 * v370;
+                                                                int v376;
+                                                                v376 = v375 + v374;
+                                                                int v377;
+                                                                v377 = 2048 * v370;
+                                                                int v378;
+                                                                v378 = v377 + v374;
+                                                                constexpr int v379 = sizeof(float) * 4;
+                                                                assert("Pointer alignment check" && (unsigned long long)(v368 + v378) % v379 == 0 && (unsigned long long)(v366 + v376) % v379 == 0);
+                                                                cuda::memcpy_async(v366 + v376, v368 + v378, cuda::aligned_size_t<v379>(v379), v157);
+                                                                v372 += 1 ;
+                                                            }
+                                                            v370 += 1 ;
+                                                        }
+                                                        v157.producer_commit();
+                                                        // Poping the loop unrolling to: 0
+                                                        break;
+                                                    }
+                                                    default: {
+                                                        assert("Invalid tag." && false); __trap();
+                                                    }
+                                                }
+                                                // Pushing the loop unrolling to: 0
+                                                int v380;
+                                                v380 = 0;
+                                                #pragma unroll
+                                                while (while_method_7(v380)){
+                                                    int v382;
+                                                    v382 = 0;
+                                                    #pragma unroll
+                                                    while (while_method_7(v382)){
+                                                        wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> & v384 = v314[0];
+                                                        assert("Tensor range check" && 0 <= v380 && v380 < 8);
+                                                        int v385;
+                                                        v385 = 1088 * v380;
+                                                        assert("Tensor range check" && 0 <= v382 && v382 < 8);
+                                                        int v386;
+                                                        v386 = 8 * v382;
+                                                        int v387;
+                                                        v387 = v386 + v385;
+                                                        int v388;
+                                                        v388 = 0;
+                                                        #pragma unroll
+                                                        while (while_method_3(v388)){
+                                                            int v390;
+                                                            v390 = 0;
+                                                            #pragma unroll
+                                                            while (while_method_3(v390)){
+                                                                assert("Tensor range check" && 0 <= v388 && v388 < 2);
+                                                                assert("Tensor range check" && 0 <= v390 && v390 < 2);
+                                                                int v392;
+                                                                v392 = 544 * v390;
+                                                                int v393;
+                                                                v393 = v392 + v387;
+                                                                int v394;
+                                                                v394 = 4 * v388;
+                                                                int v395;
+                                                                v395 = v394 + v393;
+                                                                float v396;
+                                                                v396 = v194[v395];
+                                                                bool v397;
+                                                                v397 = 0 <= v390;
+                                                                bool v399;
+                                                                if (v397){
+                                                                    bool v398;
+                                                                    v398 = v390 < 2;
+                                                                    v399 = v398;
+                                                                } else {
+                                                                    v399 = false;
+                                                                }
+                                                                bool v400;
+                                                                v400 = v399 == false;
+                                                                if (v400){
+                                                                    assert("The indices should be inside the range of the dimension." && v399);
+                                                                } else {
+                                                                }
+                                                                bool v402;
+                                                                v402 = 0 <= v388;
+                                                                bool v404;
+                                                                if (v402){
+                                                                    bool v403;
+                                                                    v403 = v388 < 2;
+                                                                    v404 = v403;
+                                                                } else {
+                                                                    v404 = false;
+                                                                }
+                                                                bool v405;
+                                                                v405 = v404 == false;
+                                                                if (v405){
+                                                                    assert("The indices should be inside the range of the dimension." && v404);
+                                                                } else {
+                                                                }
+                                                                int v407;
+                                                                v407 = v388 * 2;
+                                                                int v408;
+                                                                v408 = v390 + v407;
+                                                                v384.x[v408] = wmma::__float_to_tf32(v396);
+                                                                v390 += 1 ;
+                                                            }
+                                                            v388 += 1 ;
+                                                        }
+                                                        int v409;
+                                                        v409 = 0;
+                                                        #pragma unroll
+                                                        while (while_method_6(v409)){
+                                                            assert("Tensor range check" && 0 <= v380 && v380 < 8);
+                                                            assert("Tensor range check" && 0 <= v409 && v409 < 1);
+                                                            int v411;
+                                                            v411 = v380 + v409;
+                                                            wmma::fragment<wmma::accumulator, 16, 16, 8, float> & v412 = v212[v411];
+                                                            assert("Tensor range check" && 0 <= v409 && v409 < 1);
+                                                            assert("Tensor range check" && 0 <= v382 && v382 < 8);
+                                                            int v413;
+                                                            v413 = 8 * v409;
+                                                            int v414;
+                                                            v414 = v413 + v382;
+                                                            wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> & v415 = v315[v414];
+                                                            wmma::mma_sync(v412, v384, v415, v412);
+                                                            v409 += 1 ;
+                                                        }
+                                                        v382 += 1 ;
+                                                    }
+                                                    v380 += 1 ;
+                                                }
+                                                // Poping the loop unrolling to: 0
+                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                v229 = v231;
                                             }
                                             // Pushing the loop unrolling to: 0
-                                            int v386;
-                                            v386 = 0;
+                                            int v416;
+                                            v416 = 0;
                                             #pragma unroll
-                                            while (while_method_6(v386)){
-                                                int v388;
-                                                v388 = 0;
+                                            while (while_method_7(v416)){
+                                                int v418;
+                                                v418 = 0;
                                                 #pragma unroll
-                                                while (while_method_6(v388)){
-                                                    wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> & v390 = v320[0];
-                                                    assert("Tensor range check" && 0 <= v386 && v386 < 8);
-                                                    int v391;
-                                                    v391 = 1088 * v386;
-                                                    assert("Tensor range check" && 0 <= v388 && v388 < 8);
-                                                    int v392;
-                                                    v392 = 8 * v388;
-                                                    int v393;
-                                                    v393 = v392 + v391;
-                                                    int v394;
-                                                    v394 = 0;
-                                                    #pragma unroll
-                                                    while (while_method_3(v394)){
-                                                        int v396;
-                                                        v396 = 0;
-                                                        #pragma unroll
-                                                        while (while_method_3(v396)){
-                                                            assert("Tensor range check" && 0 <= v394 && v394 < 2);
-                                                            assert("Tensor range check" && 0 <= v396 && v396 < 2);
-                                                            int v398;
-                                                            v398 = 544 * v396;
-                                                            int v399;
-                                                            v399 = v398 + v393;
-                                                            int v400;
-                                                            v400 = 4 * v394;
-                                                            int v401;
-                                                            v401 = v400 + v399;
-                                                            float v402;
-                                                            v402 = v194[v401];
-                                                            bool v403;
-                                                            v403 = 0 <= v396;
-                                                            bool v405;
-                                                            if (v403){
-                                                                bool v404;
-                                                                v404 = v396 < 2;
-                                                                v405 = v404;
-                                                            } else {
-                                                                v405 = false;
-                                                            }
-                                                            bool v406;
-                                                            v406 = v405 == false;
-                                                            if (v406){
-                                                                assert("The indices should be inside the range of the dimension." && v405);
-                                                            } else {
-                                                            }
-                                                            bool v408;
-                                                            v408 = 0 <= v394;
-                                                            bool v410;
-                                                            if (v408){
-                                                                bool v409;
-                                                                v409 = v394 < 2;
-                                                                v410 = v409;
-                                                            } else {
-                                                                v410 = false;
-                                                            }
-                                                            bool v411;
-                                                            v411 = v410 == false;
-                                                            if (v411){
-                                                                assert("The indices should be inside the range of the dimension." && v410);
-                                                            } else {
-                                                            }
-                                                            int v413;
-                                                            v413 = v394 * 2;
-                                                            int v414;
-                                                            v414 = v396 + v413;
-                                                            v390.x[v414] = wmma::__float_to_tf32(v402);
-                                                            v396 += 1 ;
-                                                        }
-                                                        v394 += 1 ;
-                                                    }
-                                                    int v415;
-                                                    v415 = 0;
-                                                    #pragma unroll
-                                                    while (while_method_7(v415)){
-                                                        assert("Tensor range check" && 0 <= v386 && v386 < 8);
-                                                        assert("Tensor range check" && 0 <= v415 && v415 < 1);
-                                                        int v417;
-                                                        v417 = v386 + v415;
-                                                        wmma::fragment<wmma::accumulator, 16, 16, 8, float> & v418 = v212[v417];
-                                                        assert("Tensor range check" && 0 <= v415 && v415 < 1);
-                                                        assert("Tensor range check" && 0 <= v388 && v388 < 8);
-                                                        int v419;
-                                                        v419 = 8 * v415;
-                                                        int v420;
-                                                        v420 = v419 + v388;
-                                                        wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> & v421 = v321[v420];
-                                                        wmma::mma_sync(v418, v390, v421, v418);
-                                                        v415 += 1 ;
-                                                    }
-                                                    v388 += 1 ;
+                                                while (while_method_6(v418)){
+                                                    assert("Tensor range check" && 0 <= v416 && v416 < 8);
+                                                    assert("Tensor range check" && 0 <= v418 && v418 < 1);
+                                                    int v420;
+                                                    v420 = v416 + v418;
+                                                    wmma::fragment<wmma::accumulator, 16, 16, 8, float> & v421 = v212[v420];
+                                                    assert("Tensor range check" && 0 <= v416 && v416 < 8);
+                                                    assert("Tensor range check" && 0 <= v418 && v418 < 1);
+                                                    int v422;
+                                                    v422 = 16 * v418;
+                                                    int v423;
+                                                    v423 = 2176 * v416;
+                                                    int v424;
+                                                    v424 = v423 + v422;
+                                                    float * v425;
+                                                    v425 = v178+v424;
+                                                    wmma::store_matrix_sync(v425, v421, 136, wmma::mem_row_major);
+                                                    v418 += 1 ;
                                                 }
-                                                v386 += 1 ;
+                                                v416 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
                                             asm("barrier.cta.sync %0;" :: "r"(0));
-                                            v235 = v237;
-                                        }
-                                        // Pushing the loop unrolling to: 0
-                                        int v422;
-                                        v422 = 0;
-                                        #pragma unroll
-                                        while (while_method_6(v422)){
-                                            int v424;
-                                            v424 = 0;
-                                            #pragma unroll
-                                            while (while_method_7(v424)){
-                                                assert("Tensor range check" && 0 <= v422 && v422 < 8);
-                                                assert("Tensor range check" && 0 <= v424 && v424 < 1);
-                                                int v426;
-                                                v426 = v422 + v424;
-                                                wmma::fragment<wmma::accumulator, 16, 16, 8, float> & v427 = v212[v426];
-                                                assert("Tensor range check" && 0 <= v422 && v422 < 8);
-                                                assert("Tensor range check" && 0 <= v424 && v424 < 1);
-                                                int v428;
-                                                v428 = 16 * v424;
-                                                int v429;
-                                                v429 = 2176 * v422;
-                                                int v430;
-                                                v430 = v429 + v428;
-                                                float * v431;
-                                                v431 = v178+v430;
-                                                wmma::store_matrix_sync(v431, v427, 136, wmma::mem_row_major);
-                                                v424 += 1 ;
+                                            // Pushing the loop unrolling to: 0
+                                            int v427;
+                                            v427 = threadIdx.x;
+                                            bool v428;
+                                            v428 = 0 <= v427;
+                                            bool v429;
+                                            v429 = v428 == false;
+                                            if (v429){
+                                                assert("The index needs to be zero or positive." && v428);
+                                            } else {
                                             }
-                                            v422 += 1 ;
-                                        }
-                                        // Poping the loop unrolling to: 0
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
-                                        // Pushing the loop unrolling to: 0
-                                        int v433;
-                                        v433 = threadIdx.x;
-                                        bool v434;
-                                        v434 = 0 <= v433;
-                                        bool v435;
-                                        v435 = v434 == false;
-                                        if (v435){
-                                            assert("The index needs to be zero or positive." && v434);
-                                        } else {
-                                        }
-                                        int v437;
-                                        v437 = v433 % 32;
-                                        int v438;
-                                        v438 = v433 / 32;
-                                        bool v439;
-                                        v439 = v438 < 8;
-                                        bool v440;
-                                        v440 = v439 == false;
-                                        if (v440){
-                                            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v439);
-                                        } else {
-                                        }
-                                        assert("Tensor range check" && 0 <= v438 && v438 < 8);
-                                        assert("Tensor range check" && 0 <= v437 && v437 < 32);
-                                        int v442;
-                                        v442 = 4 * v437;
-                                        int v443;
-                                        v443 = 128 * v438;
-                                        int v444;
-                                        v444 = v443 + v442;
-                                        int v445;
-                                        v445 = 136 * v438;
-                                        int v446;
-                                        v446 = v445 + v442;
-                                        float * v447;
-                                        v447 = v227+v444;
-                                        float * v449;
-                                        v449 = v163+v446;
-                                        int v451;
-                                        v451 = 0;
-                                        #pragma unroll
-                                        while (while_method_1(v451)){
-                                            int v453;
-                                            v453 = 0;
-                                            #pragma unroll
-                                            while (while_method_7(v453)){
-                                                assert("Tensor range check" && 0 <= v451 && v451 < 16);
-                                                assert("Tensor range check" && 0 <= v453 && v453 < 1);
-                                                int v455;
-                                                v455 = 128 * v453;
-                                                int v456;
-                                                v456 = 1024 * v451;
-                                                int v457;
-                                                v457 = v456 + v455;
-                                                int v458;
-                                                v458 = 1088 * v451;
-                                                int v459;
-                                                v459 = v458 + v455;
-                                                int4* v460;
-                                                v460 = reinterpret_cast<int4*>(v449 + v459);
-                                                int4* v461;
-                                                v461 = reinterpret_cast<int4*>(v447 + v457);
-                                                assert("Pointer alignment check" && (unsigned long long)(v460) % 4 == 0 && (unsigned long long)(v461) % 4 == 0);
-                                                *v461 = *v460;
-                                                v453 += 1 ;
+                                            int v431;
+                                            v431 = v427 % 32;
+                                            int v432;
+                                            v432 = v427 / 32;
+                                            bool v433;
+                                            v433 = v432 < 8;
+                                            bool v434;
+                                            v434 = v433 == false;
+                                            if (v434){
+                                                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v433);
+                                            } else {
                                             }
-                                            v451 += 1 ;
+                                            assert("Tensor range check" && 0 <= v432 && v432 < 8);
+                                            assert("Tensor range check" && 0 <= v431 && v431 < 32);
+                                            int v436;
+                                            v436 = 4 * v431;
+                                            int v437;
+                                            v437 = 128 * v432;
+                                            int v438;
+                                            v438 = v437 + v436;
+                                            int v439;
+                                            v439 = 136 * v432;
+                                            int v440;
+                                            v440 = v439 + v436;
+                                            float * v441;
+                                            v441 = v221+v438;
+                                            float * v443;
+                                            v443 = v163+v440;
+                                            int v445;
+                                            v445 = 0;
+                                            #pragma unroll
+                                            while (while_method_1(v445)){
+                                                int v447;
+                                                v447 = 0;
+                                                #pragma unroll
+                                                while (while_method_6(v447)){
+                                                    assert("Tensor range check" && 0 <= v445 && v445 < 16);
+                                                    assert("Tensor range check" && 0 <= v447 && v447 < 1);
+                                                    int v449;
+                                                    v449 = 128 * v447;
+                                                    int v450;
+                                                    v450 = 1024 * v445;
+                                                    int v451;
+                                                    v451 = v450 + v449;
+                                                    int v452;
+                                                    v452 = 1088 * v445;
+                                                    int v453;
+                                                    v453 = v452 + v449;
+                                                    int4* v454;
+                                                    v454 = reinterpret_cast<int4*>(v443 + v453);
+                                                    int4* v455;
+                                                    v455 = reinterpret_cast<int4*>(v441 + v451);
+                                                    assert("Pointer alignment check" && (unsigned long long)(v454) % 4 == 0 && (unsigned long long)(v455) % 4 == 0);
+                                                    *v455 = *v454;
+                                                    v447 += 1 ;
+                                                }
+                                                v445 += 1 ;
+                                            }
+                                            // Poping the loop unrolling to: 0
+                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            v215 += 1 ;
                                         }
-                                        // Poping the loop unrolling to: 0
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
-                                        v214 += 24 ;
+                                        v213 += 1 ;
                                     }
-                                    unsigned int * v462;
-                                    v462 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
+                                    unsigned int * v456;
+                                    v456 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
                                     assert("Tensor range check" && 0 <= v144 && v144 < 4);
-                                    int v464;
-                                    v464 = 6144 * v144;
-                                    method_3(v462, v464, v151);
-                                    int * v465;
-                                    v465 = reinterpret_cast<int *>(&v1[262144ull]);
+                                    int v458;
+                                    v458 = 6144 * v144;
+                                    method_3(v456, v458, v151);
+                                    int * v459;
+                                    v459 = reinterpret_cast<int *>(&v1[262144ull]);
+                                    float * v461;
+                                    v461 = reinterpret_cast<float *>(&v1[262160ull]);
+                                    float * v463;
+                                    v463 = reinterpret_cast<float *>(&v1[524304ull]);
+                                    float * v465;
+                                    v465 = reinterpret_cast<float *>(&v1[786448ull]);
                                     float * v467;
-                                    v467 = reinterpret_cast<float *>(&v1[262160ull]);
+                                    v467 = reinterpret_cast<float *>(&v1[1048592ull]);
                                     float * v469;
-                                    v469 = reinterpret_cast<float *>(&v1[524304ull]);
+                                    v469 = reinterpret_cast<float *>(&v1[1310736ull]);
                                     float * v471;
-                                    v471 = reinterpret_cast<float *>(&v1[786448ull]);
+                                    v471 = reinterpret_cast<float *>(&v1[1572880ull]);
                                     float * v473;
-                                    v473 = reinterpret_cast<float *>(&v1[1048592ull]);
-                                    float * v475;
-                                    v475 = reinterpret_cast<float *>(&v1[1310736ull]);
+                                    v473 = reinterpret_cast<float *>(&v1[1835024ull]);
+                                    int * v475;
+                                    v475 = reinterpret_cast<int *>(&v0[6389760ull]);
                                     float * v477;
-                                    v477 = reinterpret_cast<float *>(&v1[1572880ull]);
-                                    float * v479;
-                                    v479 = reinterpret_cast<float *>(&v1[1835024ull]);
+                                    v477 = reinterpret_cast<float *>(&v0[7962624ull]);
+                                    int * v479;
+                                    v479 = reinterpret_cast<int *>(&v0[9535488ull]);
                                     int * v481;
-                                    v481 = reinterpret_cast<int *>(&v0[6389760ull]);
-                                    float * v483;
-                                    v483 = reinterpret_cast<float *>(&v0[7962624ull]);
-                                    int * v485;
-                                    v485 = reinterpret_cast<int *>(&v0[9535488ull]);
-                                    int * v487;
-                                    v487 = reinterpret_cast<int *>(&v0[11108352ull]);
+                                    v481 = reinterpret_cast<int *>(&v0[11108352ull]);
+                                    double * v483;
+                                    v483 = reinterpret_cast<double *>(&v0[12681216ull]);
+                                    double * v485;
+                                    v485 = reinterpret_cast<double *>(&v0[18972672ull]);
+                                    double * v487;
+                                    v487 = reinterpret_cast<double *>(&v1[2097168ull]);
                                     double * v489;
-                                    v489 = reinterpret_cast<double *>(&v0[12681216ull]);
-                                    double * v491;
-                                    v491 = reinterpret_cast<double *>(&v0[18972672ull]);
-                                    double * v493;
-                                    v493 = reinterpret_cast<double *>(&v1[2097168ull]);
-                                    double * v495;
-                                    v495 = reinterpret_cast<double *>(&v1[2490384ull]);
-                                    int * v497;
-                                    v497 = reinterpret_cast<int *>(&v1[2883600ull]);
+                                    v489 = reinterpret_cast<double *>(&v1[2490384ull]);
+                                    int * v491;
+                                    v491 = reinterpret_cast<int *>(&v1[2883600ull]);
                                     v144 += 1 ;
                                 }
                                 asm("barrier.cta.sync %0;" :: "r"(0));
-                                int * v499;
-                                v499 = reinterpret_cast<int *>(&v1[262144ull]);
+                                int * v493;
+                                v493 = reinterpret_cast<int *>(&v1[262144ull]);
+                                float * v495;
+                                v495 = reinterpret_cast<float *>(&v1[262160ull]);
+                                float * v497;
+                                v497 = reinterpret_cast<float *>(&v1[524304ull]);
+                                float * v499;
+                                v499 = reinterpret_cast<float *>(&v1[786448ull]);
                                 float * v501;
-                                v501 = reinterpret_cast<float *>(&v1[262160ull]);
+                                v501 = reinterpret_cast<float *>(&v1[1048592ull]);
                                 float * v503;
-                                v503 = reinterpret_cast<float *>(&v1[524304ull]);
+                                v503 = reinterpret_cast<float *>(&v1[1310736ull]);
                                 float * v505;
-                                v505 = reinterpret_cast<float *>(&v1[786448ull]);
+                                v505 = reinterpret_cast<float *>(&v1[1572880ull]);
                                 float * v507;
-                                v507 = reinterpret_cast<float *>(&v1[1048592ull]);
-                                float * v509;
-                                v509 = reinterpret_cast<float *>(&v1[1310736ull]);
-                                float * v511;
-                                v511 = reinterpret_cast<float *>(&v1[1572880ull]);
-                                float * v513;
-                                v513 = reinterpret_cast<float *>(&v1[1835024ull]);
+                                v507 = reinterpret_cast<float *>(&v1[1835024ull]);
+                                int v509;
+                                v509 = v493[0];
+                                unsigned int * v510;
+                                v510 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
+                                int v512;
+                                v512 = blockIdx.x;
+                                int v513;
+                                v513 = threadIdx.x;
+                                assert("Tensor range check" && 0 <= v509 && v509 < 4);
+                                assert("Tensor range check" && 0 <= v512 && v512 < 24);
+                                assert("Tensor range check" && 0 <= v513 && v513 < 256);
+                                int v514;
+                                v514 = 256 * v512;
                                 int v515;
-                                v515 = v499[0];
-                                unsigned int * v516;
-                                v516 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
-                                int v518;
-                                v518 = blockIdx.x;
+                                v515 = v514 + v513;
+                                int v516;
+                                v516 = 6144 * v509;
+                                int v517;
+                                v517 = v516 + v515;
+                                unsigned int v518;
+                                v518 = v510[v517];
                                 int v519;
-                                v519 = threadIdx.x;
-                                assert("Tensor range check" && 0 <= v515 && v515 < 4);
-                                assert("Tensor range check" && 0 <= v518 && v518 < 24);
-                                assert("Tensor range check" && 0 <= v519 && v519 < 256);
-                                int v520;
-                                v520 = 256 * v518;
-                                int v521;
-                                v521 = v520 + v519;
-                                int v522;
-                                v522 = 6144 * v515;
-                                int v523;
-                                v523 = v522 + v521;
-                                unsigned int v524;
-                                v524 = v516[v523];
-                                int v525;
-                                v525 = (int)v524;
-                                float v526; int v527;
-                                Tuple2 tmp14 = method_4(v62, v499, v501, v503, v505, v507, v509, v511, v513, v525, v515);
-                                v526 = tmp14.v0; v527 = tmp14.v1;
-                                extern __shared__ unsigned char v528[];
-                                float * v529;
-                                v529 = reinterpret_cast<float *>(&v528[0ull]);
-                                int * v531;
-                                v531 = reinterpret_cast<int *>(&v528[16ull]);
-                                int v533;
-                                v533 = threadIdx.x;
-                                bool v534;
-                                v534 = v533 == 0;
-                                if (v534){
-                                    v529[0] = v526;
-                                    v531[0] = v527;
+                                v519 = (int)v518;
+                                float v520; int v521;
+                                Tuple2 tmp14 = method_4(v62, v493, v495, v497, v499, v501, v503, v505, v507, v519, v509);
+                                v520 = tmp14.v0; v521 = tmp14.v1;
+                                extern __shared__ unsigned char v522[];
+                                float * v523;
+                                v523 = reinterpret_cast<float *>(&v522[0ull]);
+                                int * v525;
+                                v525 = reinterpret_cast<int *>(&v522[16ull]);
+                                int v527;
+                                v527 = threadIdx.x;
+                                bool v528;
+                                v528 = v527 == 0;
+                                if (v528){
+                                    v523[0] = v520;
+                                    v525[0] = v521;
                                 } else {
                                 }
                                 asm("barrier.cta.sync %0;" :: "r"(0));
-                                float v535;
-                                v535 = v529[0];
-                                int v536;
-                                v536 = v531[0];
+                                float v529;
+                                v529 = v523[0];
+                                int v530;
+                                v530 = v525[0];
                                 asm("barrier.cta.sync %0;" :: "r"(0));
-                                double * v537;
-                                v537 = reinterpret_cast<double *>(&v1[2097168ull]);
-                                double * v539;
-                                v539 = reinterpret_cast<double *>(&v1[2490384ull]);
+                                double * v531;
+                                v531 = reinterpret_cast<double *>(&v1[2097168ull]);
+                                double * v533;
+                                v533 = reinterpret_cast<double *>(&v1[2490384ull]);
+                                int * v535;
+                                v535 = reinterpret_cast<int *>(&v1[2883600ull]);
+                                int * v537;
+                                v537 = reinterpret_cast<int *>(&v0[6389760ull]);
+                                float * v539;
+                                v539 = reinterpret_cast<float *>(&v0[7962624ull]);
                                 int * v541;
-                                v541 = reinterpret_cast<int *>(&v1[2883600ull]);
+                                v541 = reinterpret_cast<int *>(&v0[9535488ull]);
                                 int * v543;
-                                v543 = reinterpret_cast<int *>(&v0[6389760ull]);
-                                float * v545;
-                                v545 = reinterpret_cast<float *>(&v0[7962624ull]);
-                                int * v547;
-                                v547 = reinterpret_cast<int *>(&v0[9535488ull]);
-                                int * v549;
-                                v549 = reinterpret_cast<int *>(&v0[11108352ull]);
-                                double * v551;
-                                v551 = reinterpret_cast<double *>(&v0[12681216ull]);
-                                double * v553;
-                                v553 = reinterpret_cast<double *>(&v0[18972672ull]);
-                                int v555;
-                                v555 = threadIdx.x;
-                                int v556;
-                                v556 = blockIdx.x;
-                                int v557;
-                                v557 = v556 * 256;
-                                int v558;
-                                v558 = v555 + v557;
-                                int v559;
-                                v559 = 0;
-                                while (while_method_0(v559)){
-                                    unsigned int * v561;
-                                    v561 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
-                                    int v563;
-                                    v563 = blockIdx.x;
+                                v543 = reinterpret_cast<int *>(&v0[11108352ull]);
+                                double * v545;
+                                v545 = reinterpret_cast<double *>(&v0[12681216ull]);
+                                double * v547;
+                                v547 = reinterpret_cast<double *>(&v0[18972672ull]);
+                                int v549;
+                                v549 = threadIdx.x;
+                                int v550;
+                                v550 = blockIdx.x;
+                                int v551;
+                                v551 = v550 * 256;
+                                int v552;
+                                v552 = v549 + v551;
+                                int v553;
+                                v553 = 0;
+                                while (while_method_0(v553)){
+                                    unsigned int * v555;
+                                    v555 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
+                                    int v557;
+                                    v557 = blockIdx.x;
+                                    int v558;
+                                    v558 = threadIdx.x;
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
+                                    assert("Tensor range check" && 0 <= v557 && v557 < 24);
+                                    assert("Tensor range check" && 0 <= v558 && v558 < 256);
+                                    int v559;
+                                    v559 = 256 * v557;
+                                    int v560;
+                                    v560 = v559 + v558;
+                                    int v561;
+                                    v561 = 6144 * v553;
+                                    int v562;
+                                    v562 = v561 + v560;
+                                    unsigned int v563;
+                                    v563 = v555[v562];
                                     int v564;
-                                    v564 = threadIdx.x;
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
-                                    assert("Tensor range check" && 0 <= v563 && v563 < 24);
-                                    assert("Tensor range check" && 0 <= v564 && v564 < 256);
-                                    int v565;
-                                    v565 = 256 * v563;
+                                    v564 = (int)v563;
+                                    float v565;
+                                    v565 = method_5(v493, v495, v497, v499, v501, v503, v505, v507, v564, v553, v530);
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
+                                    assert("Tensor range check" && 0 <= v552 && v552 < 6144);
                                     int v566;
-                                    v566 = v565 + v564;
+                                    v566 = v561 + v552;
                                     int v567;
-                                    v567 = 6144 * v559;
+                                    v567 = v535[v566];
                                     int v568;
-                                    v568 = v567 + v566;
-                                    unsigned int v569;
-                                    v569 = v561[v568];
+                                    v568 = v567 + 1;
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
+                                    assert("Tensor range check" && 0 <= v552 && v552 < 6144);
+                                    v535[v566] = v568;
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
+                                    assert("Tensor range check" && 0 <= v567 && v567 < 16);
+                                    assert("Tensor range check" && 0 <= v552 && v552 < 6144);
+                                    int v569;
+                                    v569 = 6144 * v567;
                                     int v570;
-                                    v570 = (int)v569;
-                                    float v571;
-                                    v571 = method_5(v499, v501, v503, v505, v507, v509, v511, v513, v570, v559, v536);
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
-                                    assert("Tensor range check" && 0 <= v558 && v558 < 6144);
+                                    v570 = v569 + v552;
+                                    int v571;
+                                    v571 = 98304 * v553;
                                     int v572;
-                                    v572 = v567 + v558;
+                                    v572 = v571 + v570;
+                                    v537[v572] = v530;
+                                    v539[v572] = v529;
+                                    v541[v572] = v54;
+                                    v543[v572] = v564;
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
                                     int v573;
-                                    v573 = v541[v572];
+                                    v573 = 12288 * v553;
+                                    assert("Tensor range check" && 0 <= v552 && v552 < 6144);
                                     int v574;
-                                    v574 = v573 + 1;
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
-                                    assert("Tensor range check" && 0 <= v558 && v558 < 6144);
-                                    v541[v572] = v574;
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
-                                    assert("Tensor range check" && 0 <= v573 && v573 < 16);
-                                    assert("Tensor range check" && 0 <= v558 && v558 < 6144);
+                                    v574 = 2 * v552;
                                     int v575;
-                                    v575 = 6144 * v573;
+                                    v575 = v574 + v573;
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
                                     int v576;
-                                    v576 = v575 + v558;
+                                    v576 = 196608 * v553;
+                                    assert("Tensor range check" && 0 <= v567 && v567 < 16);
                                     int v577;
-                                    v577 = 98304 * v559;
+                                    v577 = 12288 * v567;
                                     int v578;
                                     v578 = v577 + v576;
-                                    v543[v578] = v536;
-                                    v545[v578] = v535;
-                                    v547[v578] = v54;
-                                    v549[v578] = v570;
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
+                                    assert("Tensor range check" && 0 <= v552 && v552 < 6144);
                                     int v579;
-                                    v579 = 12288 * v559;
-                                    assert("Tensor range check" && 0 <= v558 && v558 < 6144);
-                                    int v580;
-                                    v580 = 2 * v558;
-                                    int v581;
-                                    v581 = v580 + v579;
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
-                                    int v582;
-                                    v582 = 196608 * v559;
-                                    assert("Tensor range check" && 0 <= v573 && v573 < 16);
-                                    int v583;
-                                    v583 = 12288 * v573;
-                                    int v584;
-                                    v584 = v583 + v582;
-                                    assert("Tensor range check" && 0 <= v558 && v558 < 6144);
-                                    int v585;
-                                    v585 = v580 + v584;
+                                    v579 = v574 + v578;
+                                    double * v580;
+                                    v580 = v531+v575;
+                                    double * v582;
+                                    v582 = v533+v575;
+                                    double * v584;
+                                    v584 = v545+v579;
                                     double * v586;
-                                    v586 = v537+v581;
-                                    double * v588;
-                                    v588 = v539+v581;
-                                    double * v590;
-                                    v590 = v551+v585;
-                                    double * v592;
-                                    v592 = v553+v585;
-                                    int v594;
-                                    v594 = sizeof(double *);
+                                    v586 = v547+v579;
+                                    int v588;
+                                    v588 = sizeof(double *);
+                                    unsigned long long v589;
+                                    v589 = (unsigned long long)v588;
+                                    unsigned long long v590;
+                                    v590 = 256ull * v589;
+                                    unsigned long long v591;
+                                    v591 = v590 + 16ull;
+                                    unsigned long long v592;
+                                    v592 = v591 - 1ull;
+                                    unsigned long long v593;
+                                    v593 = v592 % 16ull;
+                                    unsigned long long v594;
+                                    v594 = v592 - v593;
                                     unsigned long long v595;
-                                    v595 = (unsigned long long)v594;
+                                    v595 = v594 + v590;
                                     unsigned long long v596;
-                                    v596 = 256ull * v595;
+                                    v596 = v595 + 16ull;
                                     unsigned long long v597;
-                                    v597 = v596 + 16ull;
+                                    v597 = v596 - 1ull;
                                     unsigned long long v598;
-                                    v598 = v597 - 1ull;
+                                    v598 = v597 % 16ull;
                                     unsigned long long v599;
-                                    v599 = v598 % 16ull;
+                                    v599 = v597 - v598;
                                     unsigned long long v600;
-                                    v600 = v598 - v599;
+                                    v600 = v599 + v590;
                                     unsigned long long v601;
-                                    v601 = v600 + v596;
+                                    v601 = v600 + 16ull;
                                     unsigned long long v602;
-                                    v602 = v601 + 16ull;
+                                    v602 = v601 - 1ull;
                                     unsigned long long v603;
-                                    v603 = v602 - 1ull;
+                                    v603 = v602 % 16ull;
                                     unsigned long long v604;
-                                    v604 = v603 % 16ull;
+                                    v604 = v602 - v603;
                                     unsigned long long v605;
-                                    v605 = v603 - v604;
-                                    unsigned long long v606;
-                                    v606 = v605 + v596;
-                                    unsigned long long v607;
-                                    v607 = v606 + 16ull;
-                                    unsigned long long v608;
-                                    v608 = v607 - 1ull;
-                                    unsigned long long v609;
-                                    v609 = v608 % 16ull;
-                                    unsigned long long v610;
-                                    v610 = v608 - v609;
-                                    unsigned long long v611;
-                                    v611 = v610 + v596;
-                                    bool v612;
-                                    v612 = v611 <= 98304ull;
-                                    bool v613;
-                                    v613 = v612 == false;
-                                    if (v613){
-                                        assert("The dynamic shared memory is insufficient to allocate the tensor." && v612);
+                                    v605 = v604 + v590;
+                                    bool v606;
+                                    v606 = v605 <= 98304ull;
+                                    bool v607;
+                                    v607 = v606 == false;
+                                    if (v607){
+                                        assert("The dynamic shared memory is insufficient to allocate the tensor." && v606);
                                     } else {
                                     }
-                                    extern __shared__ unsigned char v615[];
-                                    bool v616;
-                                    v616 = v611 <= v611;
-                                    bool v617;
-                                    v617 = v616 == false;
-                                    if (v617){
-                                        assert("The length of the partition has to be less than or equal to the length of the base array." && v616);
+                                    extern __shared__ unsigned char v609[];
+                                    bool v610;
+                                    v610 = v605 <= v605;
+                                    bool v611;
+                                    v611 = v610 == false;
+                                    if (v611){
+                                        assert("The length of the partition has to be less than or equal to the length of the base array." && v610);
                                     } else {
                                     }
+                                    double * * v613;
+                                    v613 = reinterpret_cast<double * *>(&v609[0ull]);
+                                    double * * v615;
+                                    v615 = reinterpret_cast<double * *>(&v609[v594]);
+                                    double * * v617;
+                                    v617 = reinterpret_cast<double * *>(&v609[v599]);
                                     double * * v619;
-                                    v619 = reinterpret_cast<double * *>(&v615[0ull]);
-                                    double * * v621;
-                                    v621 = reinterpret_cast<double * *>(&v615[v600]);
-                                    double * * v623;
-                                    v623 = reinterpret_cast<double * *>(&v615[v605]);
-                                    double * * v625;
-                                    v625 = reinterpret_cast<double * *>(&v615[v610]);
-                                    int v627;
-                                    v627 = threadIdx.x;
-                                    assert("Tensor range check" && 0 <= v627 && v627 < 256);
-                                    v619[v627] = v586;
-                                    v621[v627] = v588;
-                                    v623[v627] = v590;
-                                    v625[v627] = v592;
+                                    v619 = reinterpret_cast<double * *>(&v609[v604]);
+                                    int v621;
+                                    v621 = threadIdx.x;
+                                    assert("Tensor range check" && 0 <= v621 && v621 < 256);
+                                    v613[v621] = v580;
+                                    v615[v621] = v582;
+                                    v617[v621] = v584;
+                                    v619[v621] = v586;
                                     asm("barrier.cta.sync %0;" :: "r"(0));
-                                    bool v628;
-                                    v628 = 0 <= v627;
-                                    bool v629;
-                                    v629 = v628 == false;
-                                    if (v629){
-                                        assert("The index needs to be zero or positive." && v628);
+                                    bool v622;
+                                    v622 = 0 <= v621;
+                                    bool v623;
+                                    v623 = v622 == false;
+                                    if (v623){
+                                        assert("The index needs to be zero or positive." && v622);
                                     } else {
                                     }
-                                    int v631;
-                                    v631 = v627 % 1;
-                                    bool v632;
-                                    v632 = v627 < 256;
-                                    bool v633;
-                                    v633 = v632 == false;
-                                    if (v633){
-                                        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v632);
+                                    int v625;
+                                    v625 = v621 % 1;
+                                    bool v626;
+                                    v626 = v621 < 256;
+                                    bool v627;
+                                    v627 = v626 == false;
+                                    if (v627){
+                                        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v626);
                                     } else {
                                     }
-                                    assert("Tensor range check" && 0 <= v627 && v627 < 256);
-                                    int v635;
-                                    v635 = 0;
-                                    while (while_method_7(v635)){
+                                    assert("Tensor range check" && 0 <= v621 && v621 < 256);
+                                    int v629;
+                                    v629 = 0;
+                                    while (while_method_6(v629)){
+                                        bool v631;
+                                        v631 = v622 && v626;
+                                        bool v632;
+                                        v632 = v631 == false;
+                                        if (v632){
+                                            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v631);
+                                        } else {
+                                        }
+                                        bool v634;
+                                        v634 = 0 <= v629;
+                                        bool v636;
+                                        if (v634){
+                                            bool v635;
+                                            v635 = v629 < 1;
+                                            v636 = v635;
+                                        } else {
+                                            v636 = false;
+                                        }
                                         bool v637;
-                                        v637 = v628 && v632;
-                                        bool v638;
-                                        v638 = v637 == false;
-                                        if (v638){
-                                            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v637);
+                                        v637 = v636 == false;
+                                        if (v637){
+                                            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v636);
                                         } else {
                                         }
-                                        bool v640;
-                                        v640 = 0 <= v635;
-                                        bool v642;
-                                        if (v640){
-                                            bool v641;
-                                            v641 = v635 < 1;
-                                            v642 = v641;
-                                        } else {
-                                            v642 = false;
-                                        }
-                                        bool v643;
-                                        v643 = v642 == false;
-                                        if (v643){
-                                            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v642);
-                                        } else {
-                                        }
-                                        int v645;
-                                        v645 = v635 * 256;
-                                        int v646;
-                                        v646 = v645 + v627;
-                                        assert("Tensor range check" && 0 <= v635 && v635 < 1);
+                                        int v639;
+                                        v639 = v629 * 256;
+                                        int v640;
+                                        v640 = v639 + v621;
+                                        assert("Tensor range check" && 0 <= v629 && v629 < 1);
+                                        int v641;
+                                        v641 = 256 * v629;
+                                        int v642;
+                                        v642 = v641 + v621;
+                                        double * v643;
+                                        v643 = v613[v642];
+                                        double * v644;
+                                        v644 = v615[v642];
+                                        double * v645;
+                                        v645 = v617[v642];
+                                        double * v646;
+                                        v646 = v619[v642];
                                         int v647;
-                                        v647 = 256 * v635;
+                                        v647 = blockIdx.x;
                                         int v648;
-                                        v648 = v647 + v627;
-                                        double * v649;
-                                        v649 = v619[v648];
-                                        double * v650;
-                                        v650 = v621[v648];
-                                        double * v651;
-                                        v651 = v623[v648];
-                                        double * v652;
-                                        v652 = v625[v648];
-                                        int v653;
-                                        v653 = blockIdx.x;
+                                        v648 = v647 * 256;
+                                        int v649;
+                                        v649 = v648 + v640;
+                                        assert("Tensor range check" && 0 <= v625 && v625 < 1);
+                                        int v650;
+                                        v650 = 2 * v625;
+                                        double v651[2];
+                                        double v652[2];
+                                        int v653[2];
                                         int v654;
-                                        v654 = v653 * 256;
-                                        int v655;
-                                        v655 = v654 + v646;
-                                        assert("Tensor range check" && 0 <= v631 && v631 < 1);
-                                        int v656;
-                                        v656 = 2 * v631;
-                                        double v657[2];
-                                        double v658[2];
-                                        int v659[2];
-                                        int v660;
-                                        v660 = 0;
-                                        while (while_method_7(v660)){
-                                            assert("Tensor range check" && 0 <= v660 && v660 < 1);
-                                            int v662;
-                                            v662 = 2 * v660;
-                                            assert("Tensor range check" && 0 <= v660 && v660 < 1);
-                                            int v663;
-                                            v663 = v662 + v656;
-                                            int4* v664;
-                                            v664 = reinterpret_cast<int4*>(v649 + v663);
-                                            int4* v665;
-                                            v665 = reinterpret_cast<int4*>(v657 + v662);
-                                            assert("Pointer alignment check" && (unsigned long long)(v664) % 2 == 0 && (unsigned long long)(v665) % 2 == 0);
-                                            *v665 = *v664;
-                                            int4* v666;
-                                            v666 = reinterpret_cast<int4*>(v650 + v663);
-                                            int4* v667;
-                                            v667 = reinterpret_cast<int4*>(v658 + v662);
-                                            assert("Pointer alignment check" && (unsigned long long)(v666) % 2 == 0 && (unsigned long long)(v667) % 2 == 0);
-                                            *v667 = *v666;
-                                            v660 += 1 ;
+                                        v654 = 0;
+                                        while (while_method_6(v654)){
+                                            assert("Tensor range check" && 0 <= v654 && v654 < 1);
+                                            int v656;
+                                            v656 = 2 * v654;
+                                            assert("Tensor range check" && 0 <= v654 && v654 < 1);
+                                            int v657;
+                                            v657 = v656 + v650;
+                                            int4* v658;
+                                            v658 = reinterpret_cast<int4*>(v643 + v657);
+                                            int4* v659;
+                                            v659 = reinterpret_cast<int4*>(v651 + v656);
+                                            assert("Pointer alignment check" && (unsigned long long)(v658) % 2 == 0 && (unsigned long long)(v659) % 2 == 0);
+                                            *v659 = *v658;
+                                            int4* v660;
+                                            v660 = reinterpret_cast<int4*>(v644 + v657);
+                                            int4* v661;
+                                            v661 = reinterpret_cast<int4*>(v652 + v656);
+                                            assert("Pointer alignment check" && (unsigned long long)(v660) % 2 == 0 && (unsigned long long)(v661) % 2 == 0);
+                                            *v661 = *v660;
+                                            v654 += 1 ;
                                         }
-                                        int v668;
-                                        v668 = 0;
-                                        while (while_method_7(v668)){
-                                            int v670;
-                                            v670 = 0;
-                                            while (while_method_3(v670)){
-                                                bool v672;
-                                                v672 = 0 <= v670;
+                                        int v662;
+                                        v662 = 0;
+                                        while (while_method_6(v662)){
+                                            int v664;
+                                            v664 = 0;
+                                            while (while_method_3(v664)){
+                                                bool v666;
+                                                v666 = 0 <= v664;
+                                                bool v668;
+                                                if (v666){
+                                                    bool v667;
+                                                    v667 = v664 < 2;
+                                                    v668 = v667;
+                                                } else {
+                                                    v668 = false;
+                                                }
+                                                bool v669;
+                                                v669 = v668 == false;
+                                                if (v669){
+                                                    assert("The indices should be inside the range of the dimension." && v668);
+                                                } else {
+                                                }
+                                                bool v671;
+                                                v671 = 0 <= v625;
+                                                bool v673;
+                                                if (v671){
+                                                    bool v672;
+                                                    v672 = v625 < 1;
+                                                    v673 = v672;
+                                                } else {
+                                                    v673 = false;
+                                                }
                                                 bool v674;
-                                                if (v672){
-                                                    bool v673;
-                                                    v673 = v670 < 2;
-                                                    v674 = v673;
-                                                } else {
-                                                    v674 = false;
-                                                }
-                                                bool v675;
-                                                v675 = v674 == false;
-                                                if (v675){
-                                                    assert("The indices should be inside the range of the dimension." && v674);
+                                                v674 = v673 == false;
+                                                if (v674){
+                                                    assert("The indices should be inside the range of the dimension." && v673);
                                                 } else {
                                                 }
-                                                bool v677;
-                                                v677 = 0 <= v631;
-                                                bool v679;
-                                                if (v677){
-                                                    bool v678;
-                                                    v678 = v631 < 1;
-                                                    v679 = v678;
-                                                } else {
-                                                    v679 = false;
-                                                }
+                                                int v676;
+                                                v676 = v625 * 2;
+                                                int v677;
+                                                v677 = v664 + v676;
+                                                bool v678;
+                                                v678 = 0 <= v662;
                                                 bool v680;
-                                                v680 = v679 == false;
-                                                if (v680){
-                                                    assert("The indices should be inside the range of the dimension." && v679);
+                                                if (v678){
+                                                    bool v679;
+                                                    v679 = v662 < 1;
+                                                    v680 = v679;
+                                                } else {
+                                                    v680 = false;
+                                                }
+                                                bool v681;
+                                                v681 = v680 == false;
+                                                if (v681){
+                                                    assert("The indices should be inside the range of the dimension." && v680);
                                                 } else {
                                                 }
-                                                int v682;
-                                                v682 = v631 * 2;
                                                 int v683;
-                                                v683 = v670 + v682;
-                                                bool v684;
-                                                v684 = 0 <= v668;
-                                                bool v686;
-                                                if (v684){
-                                                    bool v685;
-                                                    v685 = v668 < 1;
-                                                    v686 = v685;
-                                                } else {
-                                                    v686 = false;
-                                                }
-                                                bool v687;
-                                                v687 = v686 == false;
-                                                if (v687){
-                                                    assert("The indices should be inside the range of the dimension." && v686);
-                                                } else {
-                                                }
-                                                int v689;
-                                                v689 = v668 * 2;
-                                                int v690;
-                                                v690 = v683 + v689;
-                                                assert("Tensor range check" && 0 <= v668 && v668 < 1);
-                                                assert("Tensor range check" && 0 <= v670 && v670 < 2);
-                                                int v691;
-                                                v691 = 2 * v668;
-                                                int v692;
-                                                v692 = v691 + v670;
-                                                v659[v692] = v690;
-                                                v670 += 1 ;
+                                                v683 = v662 * 2;
+                                                int v684;
+                                                v684 = v677 + v683;
+                                                assert("Tensor range check" && 0 <= v662 && v662 < 1);
+                                                assert("Tensor range check" && 0 <= v664 && v664 < 2);
+                                                int v685;
+                                                v685 = 2 * v662;
+                                                int v686;
+                                                v686 = v685 + v664;
+                                                v653[v686] = v684;
+                                                v664 += 1 ;
                                             }
-                                            v668 += 1 ;
+                                            v662 += 1 ;
                                         }
-                                        int v693;
-                                        v693 = 0;
-                                        while (while_method_7(v693)){
-                                            assert("Tensor range check" && 0 <= v693 && v693 < 1);
-                                            int v695;
-                                            v695 = 2 * v693;
-                                            int v696;
-                                            v696 = v695 + v656;
-                                            assert("Tensor range check" && 0 <= v693 && v693 < 1);
-                                            int4* v697;
-                                            v697 = reinterpret_cast<int4*>(v657 + v695);
-                                            int4* v698;
-                                            v698 = reinterpret_cast<int4*>(v651 + v696);
-                                            assert("Pointer alignment check" && (unsigned long long)(v697) % 2 == 0 && (unsigned long long)(v698) % 2 == 0);
-                                            *v698 = *v697;
-                                            int4* v699;
-                                            v699 = reinterpret_cast<int4*>(v658 + v695);
-                                            int4* v700;
-                                            v700 = reinterpret_cast<int4*>(v652 + v696);
-                                            assert("Pointer alignment check" && (unsigned long long)(v699) % 2 == 0 && (unsigned long long)(v700) % 2 == 0);
-                                            *v700 = *v699;
-                                            v693 += 1 ;
+                                        int v687;
+                                        v687 = 0;
+                                        while (while_method_6(v687)){
+                                            assert("Tensor range check" && 0 <= v687 && v687 < 1);
+                                            int v689;
+                                            v689 = 2 * v687;
+                                            int v690;
+                                            v690 = v689 + v650;
+                                            assert("Tensor range check" && 0 <= v687 && v687 < 1);
+                                            int4* v691;
+                                            v691 = reinterpret_cast<int4*>(v651 + v689);
+                                            int4* v692;
+                                            v692 = reinterpret_cast<int4*>(v645 + v690);
+                                            assert("Pointer alignment check" && (unsigned long long)(v691) % 2 == 0 && (unsigned long long)(v692) % 2 == 0);
+                                            *v692 = *v691;
+                                            int4* v693;
+                                            v693 = reinterpret_cast<int4*>(v652 + v689);
+                                            int4* v694;
+                                            v694 = reinterpret_cast<int4*>(v646 + v690);
+                                            assert("Pointer alignment check" && (unsigned long long)(v693) % 2 == 0 && (unsigned long long)(v694) % 2 == 0);
+                                            *v694 = *v693;
+                                            v687 += 1 ;
                                         }
-                                        assert("Tensor range check" && 0 <= v646 && v646 < 256);
-                                        v635 += 1 ;
+                                        assert("Tensor range check" && 0 <= v640 && v640 < 256);
+                                        v629 += 1 ;
                                     }
                                     asm("barrier.cta.sync %0;" :: "r"(0));
-                                    assert("Tensor range check" && 0 <= v627 && v627 < 256);
+                                    assert("Tensor range check" && 0 <= v621 && v621 < 256);
                                     asm("barrier.cta.sync %0;" :: "r"(0));
+                                    double v695;
+                                    v695 = (double)v529;
+                                    double v696;
+                                    v696 = log(v695);
+                                    double v697;
+                                    v697 = (double)v565;
+                                    double v698;
+                                    v698 = log(v697);
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
+                                    assert("Tensor range check" && 0 <= v552 && v552 < 6144);
+                                    assert("Tensor range check" && 0 <= v54 && v54 < 2);
+                                    int v699;
+                                    v699 = v574 + v54;
+                                    int v700;
+                                    v700 = v573 + v699;
                                     double v701;
-                                    v701 = (double)v535;
+                                    v701 = v531[v700];
                                     double v702;
-                                    v702 = log(v701);
+                                    v702 = v533[v700];
                                     double v703;
-                                    v703 = (double)v571;
+                                    v703 = v698 + v701;
                                     double v704;
-                                    v704 = log(v703);
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
-                                    assert("Tensor range check" && 0 <= v558 && v558 < 6144);
+                                    v704 = v696 + v702;
+                                    assert("Tensor range check" && 0 <= v553 && v553 < 4);
+                                    assert("Tensor range check" && 0 <= v552 && v552 < 6144);
                                     assert("Tensor range check" && 0 <= v54 && v54 < 2);
-                                    int v705;
-                                    v705 = v580 + v54;
-                                    int v706;
-                                    v706 = v579 + v705;
-                                    double v707;
-                                    v707 = v537[v706];
-                                    double v708;
-                                    v708 = v539[v706];
-                                    double v709;
-                                    v709 = v704 + v707;
-                                    double v710;
-                                    v710 = v702 + v708;
-                                    assert("Tensor range check" && 0 <= v559 && v559 < 4);
-                                    assert("Tensor range check" && 0 <= v558 && v558 < 6144);
-                                    assert("Tensor range check" && 0 <= v54 && v54 < 2);
-                                    v537[v706] = v709;
-                                    v539[v706] = v710;
-                                    v559 += 1 ;
+                                    v531[v700] = v703;
+                                    v533[v700] = v704;
+                                    v553 += 1 ;
                                 }
-                                bool v711;
-                                v711 = 0 == v536;
-                                Union10 v720;
-                                if (v711){
-                                    v720 = Union10{Union10_1{}};
+                                bool v705;
+                                v705 = 0 == v530;
+                                Union10 v714;
+                                if (v705){
+                                    v714 = Union10{Union10_1{}};
                                 } else {
-                                    bool v713;
-                                    v713 = 1 == v536;
-                                    if (v713){
-                                        v720 = Union10{Union10_0{}};
+                                    bool v707;
+                                    v707 = 1 == v530;
+                                    if (v707){
+                                        v714 = Union10{Union10_0{}};
                                     } else {
-                                        bool v715;
-                                        v715 = 2 == v536;
-                                        if (v715){
-                                            v720 = Union10{Union10_2{}};
+                                        bool v709;
+                                        v709 = 2 == v530;
+                                        if (v709){
+                                            v714 = Union10{Union10_2{}};
                                         } else {
                                             printf("%s\n", "Invalid output id in the Leduc model.");
                                             __trap();
                                         }
                                     }
                                 }
-                                switch (v720.tag) {
+                                switch (v714.tag) {
                                     case 0: { // AA_Call
-                                        v785 = Union3{Union3_0{}};
+                                        v779 = Union3{Union3_0{}};
                                         break;
                                     }
                                     case 1: { // AA_Fold
-                                        int v721;
-                                        v721 = v55[0];
-                                        int v723; int v724;
-                                        Tuple1 tmp17 = Tuple1{1, v721};
-                                        v723 = tmp17.v0; v724 = tmp17.v1;
-                                        while (while_method_3(v723)){
-                                            int v726;
-                                            v726 = v55[v723];
-                                            bool v728;
-                                            v728 = v724 >= v726;
-                                            int v729;
-                                            if (v728){
-                                                v729 = v724;
+                                        int v715;
+                                        v715 = v55[0];
+                                        int v717; int v718;
+                                        Tuple1 tmp17 = Tuple1{1, v715};
+                                        v717 = tmp17.v0; v718 = tmp17.v1;
+                                        while (while_method_3(v717)){
+                                            int v720;
+                                            v720 = v55[v717];
+                                            bool v722;
+                                            v722 = v718 >= v720;
+                                            int v723;
+                                            if (v722){
+                                                v723 = v718;
                                             } else {
-                                                v729 = v726;
+                                                v723 = v720;
                                             }
-                                            v724 = v729;
-                                            v723 += 1 ;
+                                            v718 = v723;
+                                            v717 += 1 ;
                                         }
-                                        int v730;
-                                        v730 = v55[v54];
-                                        bool v732;
-                                        v732 = v730 == v724;
-                                        if (v732){
-                                            v785 = Union3{Union3_0{}};
+                                        int v724;
+                                        v724 = v55[v54];
+                                        bool v726;
+                                        v726 = v724 == v718;
+                                        if (v726){
+                                            v779 = Union3{Union3_0{}};
                                         } else {
-                                            v785 = Union3{Union3_1{}};
+                                            v779 = Union3{Union3_1{}};
                                         }
                                         break;
                                     }
                                     case 2: { // AA_Raise
-                                        bool v737;
-                                        v737 = v56 > 0;
-                                        if (v737){
-                                            v785 = Union3{Union3_2{}};
+                                        bool v731;
+                                        v731 = v56 > 0;
+                                        if (v731){
+                                            v779 = Union3{Union3_2{}};
                                         } else {
-                                            v785 = Union3{Union3_0{}};
+                                            v779 = Union3{Union3_0{}};
                                         }
                                         break;
                                     }
@@ -5046,108 +5031,130 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                 break;
                             }
                             case 1: { // T_Random
-                                curandStatePhilox4_32_10_t & v744 = v2.base->v5;
-                                curandStatePhilox4_32_10_t & v745 = v744;
-                                static_array_list<Union3,3> v746;
-                                v746 = static_array_list<Union3,3>{};
-                                v746.unsafe_set_length(1);
-                                Union3 v748;
-                                v748 = Union3{Union3_0{}};
-                                v746[0] = v748;
-                                int v750;
-                                v750 = v55[0];
-                                int v752;
-                                v752 = v55[1];
-                                bool v754;
-                                v754 = v750 == v752;
-                                bool v755;
-                                v755 = v754 != true;
-                                if (v755){
-                                    Union3 v756;
-                                    v756 = Union3{Union3_1{}};
-                                    v746.push(v756);
+                                curandStatePhilox4_32_10_t & v738 = v2.base->v5;
+                                curandStatePhilox4_32_10_t & v739 = v738;
+                                static_array_list<Union3,3> v740;
+                                v740 = static_array_list<Union3,3>{};
+                                v740.unsafe_set_length(1);
+                                Union3 v742;
+                                v742 = Union3{Union3_0{}};
+                                v740[0] = v742;
+                                int v744;
+                                v744 = v55[0];
+                                int v746;
+                                v746 = v55[1];
+                                bool v748;
+                                v748 = v744 == v746;
+                                bool v749;
+                                v749 = v748 != true;
+                                if (v749){
+                                    Union3 v750;
+                                    v750 = Union3{Union3_1{}};
+                                    v740.push(v750);
                                 } else {
                                 }
-                                bool v757;
-                                v757 = v56 > 0;
-                                if (v757){
-                                    Union3 v758;
-                                    v758 = Union3{Union3_2{}};
-                                    v746.push(v758);
+                                bool v751;
+                                v751 = v56 > 0;
+                                if (v751){
+                                    Union3 v752;
+                                    v752 = Union3{Union3_2{}};
+                                    v740.push(v752);
                                 } else {
                                 }
-                                int v759;
-                                v759 = v746.length;
-                                int v760;
-                                v760 = v759 - 1;
-                                int v761;
-                                v761 = 0;
-                                while (while_method_5(v760, v761)){
-                                    int v763;
-                                    v763 = v746.length;
-                                    int v764;
-                                    v764 = int_range_6(v763, v761, v745);
-                                    Union3 v765;
-                                    v765 = v746[v761];
-                                    Union3 v767;
-                                    v767 = v746[v764];
-                                    v746[v761] = v767;
-                                    v746[v764] = v765;
-                                    v761 += 1 ;
+                                int v753;
+                                v753 = v740.length;
+                                int v754;
+                                v754 = v753 - 1;
+                                int v755;
+                                v755 = 0;
+                                while (while_method_5(v754, v755)){
+                                    int v757;
+                                    v757 = v740.length;
+                                    int v758;
+                                    v758 = int_range_6(v757, v755, v739);
+                                    Union3 v759;
+                                    v759 = v740[v755];
+                                    Union3 v761;
+                                    v761 = v740[v758];
+                                    v740[v755] = v761;
+                                    v740[v758] = v759;
+                                    v755 += 1 ;
                                 }
-                                Union3 v769;
-                                v769 = v746.pop();
-                                int v770;
-                                v770 = sizeof(Union3);
-                                unsigned long long v771;
-                                v771 = (unsigned long long)v770;
-                                bool v772;
-                                v772 = v771 <= 98304ull;
-                                bool v773;
-                                v773 = v772 == false;
-                                if (v773){
-                                    assert("The dynamic shared memory is insufficient to allocate the tensor." && v772);
+                                Union3 v763;
+                                v763 = v740.pop();
+                                int v764;
+                                v764 = sizeof(Union3);
+                                unsigned long long v765;
+                                v765 = (unsigned long long)v764;
+                                bool v766;
+                                v766 = v765 <= 98304ull;
+                                bool v767;
+                                v767 = v766 == false;
+                                if (v767){
+                                    assert("The dynamic shared memory is insufficient to allocate the tensor." && v766);
                                 } else {
                                 }
-                                extern __shared__ unsigned char v775[];
+                                extern __shared__ unsigned char v769[];
+                                bool v770;
+                                v770 = v765 <= v765;
+                                bool v771;
+                                v771 = v770 == false;
+                                if (v771){
+                                    assert("The length of the partition has to be less than or equal to the length of the base array." && v770);
+                                } else {
+                                }
+                                Union3 * v773;
+                                v773 = reinterpret_cast<Union3 *>(&v769[0ull]);
+                                int v775;
+                                v775 = threadIdx.x;
                                 bool v776;
-                                v776 = v771 <= v771;
-                                bool v777;
-                                v777 = v776 == false;
-                                if (v777){
-                                    assert("The length of the partition has to be less than or equal to the length of the base array." && v776);
-                                } else {
-                                }
-                                Union3 * v779;
-                                v779 = reinterpret_cast<Union3 *>(&v775[0ull]);
-                                int v781;
-                                v781 = threadIdx.x;
-                                bool v782;
-                                v782 = v781 == 0;
-                                if (v782){
-                                    v779[0] = v769;
+                                v776 = v775 == 0;
+                                if (v776){
+                                    v773[0] = v763;
                                 } else {
                                 }
                                 asm("barrier.cta.sync %0;" :: "r"(0));
-                                Union3 v783;
-                                v783 = v779[0];
+                                Union3 v777;
+                                v777 = v773[0];
                                 asm("barrier.cta.sync %0;" :: "r"(0));
-                                v785 = v783;
+                                v779 = v777;
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        Union1 v786;
-                        v786 = Union1{Union1_1{v54, v785}};
-                        v4.push(v786);
-                        Union4 v872;
+                        Union1 v780;
+                        v780 = Union1{Union1_1{v54, v779}};
+                        v4.push(v780);
+                        Union4 v866;
                         switch (v51.tag) {
                             case 0: { // None
-                                switch (v785.tag) {
+                                switch (v779.tag) {
                                     case 0: { // Call
                                         if (v52){
+                                            bool v830;
+                                            v830 = v54 == 0;
+                                            int v831;
+                                            if (v830){
+                                                v831 = 1;
+                                            } else {
+                                                v831 = 0;
+                                            }
+                                            v866 = Union4{Union4_2{v51, false, v53, v831, v55, v56}};
+                                        } else {
+                                            v866 = Union4{Union4_0{v51, v52, v53, v54, v55, v56}};
+                                        }
+                                        break;
+                                    }
+                                    case 1: { // Fold
+                                        v866 = Union4{Union4_5{v51, v52, v53, v54, v55, v56}};
+                                        break;
+                                    }
+                                    case 2: { // Raise
+                                        bool v835;
+                                        v835 = v56 > 0;
+                                        if (v835){
                                             bool v836;
                                             v836 = v54 == 0;
                                             int v837;
@@ -5156,74 +5163,52 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                             } else {
                                                 v837 = 0;
                                             }
-                                            v872 = Union4{Union4_2{v51, false, v53, v837, v55, v56}};
-                                        } else {
-                                            v872 = Union4{Union4_0{v51, v52, v53, v54, v55, v56}};
-                                        }
-                                        break;
-                                    }
-                                    case 1: { // Fold
-                                        v872 = Union4{Union4_5{v51, v52, v53, v54, v55, v56}};
-                                        break;
-                                    }
-                                    case 2: { // Raise
-                                        bool v841;
-                                        v841 = v56 > 0;
-                                        if (v841){
-                                            bool v842;
-                                            v842 = v54 == 0;
-                                            int v843;
-                                            if (v842){
-                                                v843 = 1;
-                                            } else {
-                                                v843 = 0;
-                                            }
-                                            int v844;
-                                            v844 = -1 + v56;
-                                            int v845; int v846;
+                                            int v838;
+                                            v838 = -1 + v56;
+                                            int v839; int v840;
                                             Tuple1 tmp18 = Tuple1{0, 0};
-                                            v845 = tmp18.v0; v846 = tmp18.v1;
-                                            while (while_method_3(v845)){
-                                                int v848;
-                                                v848 = v55[v845];
-                                                bool v850;
-                                                v850 = v846 >= v848;
-                                                int v851;
-                                                if (v850){
-                                                    v851 = v846;
+                                            v839 = tmp18.v0; v840 = tmp18.v1;
+                                            while (while_method_3(v839)){
+                                                int v842;
+                                                v842 = v55[v839];
+                                                bool v844;
+                                                v844 = v840 >= v842;
+                                                int v845;
+                                                if (v844){
+                                                    v845 = v840;
                                                 } else {
-                                                    v851 = v848;
+                                                    v845 = v842;
                                                 }
-                                                v846 = v851;
-                                                v845 += 1 ;
+                                                v840 = v845;
+                                                v839 += 1 ;
                                             }
-                                            static_array<int,2> v852;
-                                            int v854;
-                                            v854 = 0;
-                                            while (while_method_3(v854)){
-                                                v852[v854] = v846;
-                                                v854 += 1 ;
+                                            static_array<int,2> v846;
+                                            int v848;
+                                            v848 = 0;
+                                            while (while_method_3(v848)){
+                                                v846[v848] = v840;
+                                                v848 += 1 ;
                                             }
-                                            static_array<int,2> v856;
-                                            int v858;
-                                            v858 = 0;
-                                            while (while_method_3(v858)){
-                                                int v860;
-                                                v860 = v852[v858];
-                                                bool v862;
-                                                v862 = v858 == v54;
-                                                int v864;
-                                                if (v862){
-                                                    int v863;
-                                                    v863 = v860 + 2;
-                                                    v864 = v863;
+                                            static_array<int,2> v850;
+                                            int v852;
+                                            v852 = 0;
+                                            while (while_method_3(v852)){
+                                                int v854;
+                                                v854 = v846[v852];
+                                                bool v856;
+                                                v856 = v852 == v54;
+                                                int v858;
+                                                if (v856){
+                                                    int v857;
+                                                    v857 = v854 + 2;
+                                                    v858 = v857;
                                                 } else {
-                                                    v864 = v860;
+                                                    v858 = v854;
                                                 }
-                                                v856[v858] = v864;
-                                                v858 += 1 ;
+                                                v850[v852] = v858;
+                                                v852 += 1 ;
                                             }
-                                            v872 = Union4{Union4_2{v51, false, v53, v843, v856, v844}};
+                                            v866 = Union4{Union4_2{v51, false, v53, v837, v850, v838}};
                                         } else {
                                             printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                             __trap();
@@ -5237,110 +5222,110 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                 break;
                             }
                             case 1: { // Some
-                                Union2 v787 = v51.case1.v0;
-                                switch (v785.tag) {
+                                Union2 v781 = v51.case1.v0;
+                                switch (v779.tag) {
                                     case 0: { // Call
                                         if (v52){
-                                            bool v789;
-                                            v789 = v54 == 0;
-                                            int v790;
-                                            if (v789){
-                                                v790 = 1;
+                                            bool v783;
+                                            v783 = v54 == 0;
+                                            int v784;
+                                            if (v783){
+                                                v784 = 1;
                                             } else {
-                                                v790 = 0;
+                                                v784 = 0;
                                             }
-                                            v872 = Union4{Union4_2{v51, false, v53, v790, v55, v56}};
+                                            v866 = Union4{Union4_2{v51, false, v53, v784, v55, v56}};
                                         } else {
-                                            int v792; int v793;
+                                            int v786; int v787;
                                             Tuple1 tmp19 = Tuple1{0, 0};
-                                            v792 = tmp19.v0; v793 = tmp19.v1;
-                                            while (while_method_3(v792)){
-                                                int v795;
-                                                v795 = v55[v792];
-                                                bool v797;
-                                                v797 = v793 >= v795;
-                                                int v798;
-                                                if (v797){
-                                                    v798 = v793;
+                                            v786 = tmp19.v0; v787 = tmp19.v1;
+                                            while (while_method_3(v786)){
+                                                int v789;
+                                                v789 = v55[v786];
+                                                bool v791;
+                                                v791 = v787 >= v789;
+                                                int v792;
+                                                if (v791){
+                                                    v792 = v787;
                                                 } else {
-                                                    v798 = v795;
+                                                    v792 = v789;
                                                 }
-                                                v793 = v798;
-                                                v792 += 1 ;
+                                                v787 = v792;
+                                                v786 += 1 ;
                                             }
-                                            static_array<int,2> v799;
-                                            int v801;
-                                            v801 = 0;
-                                            while (while_method_3(v801)){
-                                                v799[v801] = v793;
-                                                v801 += 1 ;
+                                            static_array<int,2> v793;
+                                            int v795;
+                                            v795 = 0;
+                                            while (while_method_3(v795)){
+                                                v793[v795] = v787;
+                                                v795 += 1 ;
                                             }
-                                            v872 = Union4{Union4_4{v51, v52, v53, v54, v799, v56}};
+                                            v866 = Union4{Union4_4{v51, v52, v53, v54, v793, v56}};
                                         }
                                         break;
                                     }
                                     case 1: { // Fold
-                                        v872 = Union4{Union4_5{v51, v52, v53, v54, v55, v56}};
+                                        v866 = Union4{Union4_5{v51, v52, v53, v54, v55, v56}};
                                         break;
                                     }
                                     case 2: { // Raise
-                                        bool v805;
-                                        v805 = v56 > 0;
-                                        if (v805){
-                                            bool v806;
-                                            v806 = v54 == 0;
-                                            int v807;
-                                            if (v806){
-                                                v807 = 1;
+                                        bool v799;
+                                        v799 = v56 > 0;
+                                        if (v799){
+                                            bool v800;
+                                            v800 = v54 == 0;
+                                            int v801;
+                                            if (v800){
+                                                v801 = 1;
                                             } else {
-                                                v807 = 0;
+                                                v801 = 0;
                                             }
-                                            int v808;
-                                            v808 = -1 + v56;
-                                            int v809; int v810;
+                                            int v802;
+                                            v802 = -1 + v56;
+                                            int v803; int v804;
                                             Tuple1 tmp20 = Tuple1{0, 0};
-                                            v809 = tmp20.v0; v810 = tmp20.v1;
-                                            while (while_method_3(v809)){
-                                                int v812;
-                                                v812 = v55[v809];
-                                                bool v814;
-                                                v814 = v810 >= v812;
-                                                int v815;
-                                                if (v814){
-                                                    v815 = v810;
+                                            v803 = tmp20.v0; v804 = tmp20.v1;
+                                            while (while_method_3(v803)){
+                                                int v806;
+                                                v806 = v55[v803];
+                                                bool v808;
+                                                v808 = v804 >= v806;
+                                                int v809;
+                                                if (v808){
+                                                    v809 = v804;
                                                 } else {
-                                                    v815 = v812;
+                                                    v809 = v806;
                                                 }
-                                                v810 = v815;
-                                                v809 += 1 ;
+                                                v804 = v809;
+                                                v803 += 1 ;
                                             }
-                                            static_array<int,2> v816;
-                                            int v818;
-                                            v818 = 0;
-                                            while (while_method_3(v818)){
-                                                v816[v818] = v810;
-                                                v818 += 1 ;
+                                            static_array<int,2> v810;
+                                            int v812;
+                                            v812 = 0;
+                                            while (while_method_3(v812)){
+                                                v810[v812] = v804;
+                                                v812 += 1 ;
                                             }
-                                            static_array<int,2> v820;
-                                            int v822;
-                                            v822 = 0;
-                                            while (while_method_3(v822)){
-                                                int v824;
-                                                v824 = v816[v822];
-                                                bool v826;
-                                                v826 = v822 == v54;
-                                                int v828;
-                                                if (v826){
-                                                    int v827;
-                                                    v827 = v824 + 4;
-                                                    v828 = v827;
+                                            static_array<int,2> v814;
+                                            int v816;
+                                            v816 = 0;
+                                            while (while_method_3(v816)){
+                                                int v818;
+                                                v818 = v810[v816];
+                                                bool v820;
+                                                v820 = v816 == v54;
+                                                int v822;
+                                                if (v820){
+                                                    int v821;
+                                                    v821 = v818 + 4;
+                                                    v822 = v821;
                                                 } else {
-                                                    v828 = v824;
+                                                    v822 = v818;
                                                 }
-                                                v820[v822] = v828;
-                                                v822 += 1 ;
+                                                v814[v816] = v822;
+                                                v816 += 1 ;
                                             }
-                                            v872 = Union4{Union4_2{v51, false, v53, v807, v820, v808}};
+                                            v866 = Union4{Union4_2{v51, false, v53, v801, v814, v802}};
                                         } else {
                                             printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                             __trap();
@@ -5357,96 +5342,96 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        v1024 = Union6{Union6_1{v872}};
+                        v1018 = Union6{Union6_1{v866}};
                         break;
                     }
                     case 3: { // RoundWithAction
-                        Union5 v874 = v8.case3.v0; bool v875 = v8.case3.v1; static_array<Union2,2> v876 = v8.case3.v2; int v877 = v8.case3.v3; static_array<int,2> v878 = v8.case3.v4; int v879 = v8.case3.v5; Union3 v880 = v8.case3.v6;
-                        Union1 v881;
-                        v881 = Union1{Union1_1{v877, v880}};
-                        v4.push(v881);
-                        Union4 v967;
-                        switch (v874.tag) {
+                        Union5 v868 = v8.case3.v0; bool v869 = v8.case3.v1; static_array<Union2,2> v870 = v8.case3.v2; int v871 = v8.case3.v3; static_array<int,2> v872 = v8.case3.v4; int v873 = v8.case3.v5; Union3 v874 = v8.case3.v6;
+                        Union1 v875;
+                        v875 = Union1{Union1_1{v871, v874}};
+                        v4.push(v875);
+                        Union4 v961;
+                        switch (v868.tag) {
                             case 0: { // None
-                                switch (v880.tag) {
+                                switch (v874.tag) {
                                     case 0: { // Call
-                                        if (v875){
+                                        if (v869){
+                                            bool v925;
+                                            v925 = v871 == 0;
+                                            int v926;
+                                            if (v925){
+                                                v926 = 1;
+                                            } else {
+                                                v926 = 0;
+                                            }
+                                            v961 = Union4{Union4_2{v868, false, v870, v926, v872, v873}};
+                                        } else {
+                                            v961 = Union4{Union4_0{v868, v869, v870, v871, v872, v873}};
+                                        }
+                                        break;
+                                    }
+                                    case 1: { // Fold
+                                        v961 = Union4{Union4_5{v868, v869, v870, v871, v872, v873}};
+                                        break;
+                                    }
+                                    case 2: { // Raise
+                                        bool v930;
+                                        v930 = v873 > 0;
+                                        if (v930){
                                             bool v931;
-                                            v931 = v877 == 0;
+                                            v931 = v871 == 0;
                                             int v932;
                                             if (v931){
                                                 v932 = 1;
                                             } else {
                                                 v932 = 0;
                                             }
-                                            v967 = Union4{Union4_2{v874, false, v876, v932, v878, v879}};
-                                        } else {
-                                            v967 = Union4{Union4_0{v874, v875, v876, v877, v878, v879}};
-                                        }
-                                        break;
-                                    }
-                                    case 1: { // Fold
-                                        v967 = Union4{Union4_5{v874, v875, v876, v877, v878, v879}};
-                                        break;
-                                    }
-                                    case 2: { // Raise
-                                        bool v936;
-                                        v936 = v879 > 0;
-                                        if (v936){
-                                            bool v937;
-                                            v937 = v877 == 0;
-                                            int v938;
-                                            if (v937){
-                                                v938 = 1;
-                                            } else {
-                                                v938 = 0;
-                                            }
-                                            int v939;
-                                            v939 = -1 + v879;
-                                            int v940; int v941;
+                                            int v933;
+                                            v933 = -1 + v873;
+                                            int v934; int v935;
                                             Tuple1 tmp21 = Tuple1{0, 0};
-                                            v940 = tmp21.v0; v941 = tmp21.v1;
-                                            while (while_method_3(v940)){
-                                                int v943;
-                                                v943 = v878[v940];
-                                                bool v945;
-                                                v945 = v941 >= v943;
-                                                int v946;
-                                                if (v945){
-                                                    v946 = v941;
+                                            v934 = tmp21.v0; v935 = tmp21.v1;
+                                            while (while_method_3(v934)){
+                                                int v937;
+                                                v937 = v872[v934];
+                                                bool v939;
+                                                v939 = v935 >= v937;
+                                                int v940;
+                                                if (v939){
+                                                    v940 = v935;
                                                 } else {
-                                                    v946 = v943;
+                                                    v940 = v937;
                                                 }
-                                                v941 = v946;
-                                                v940 += 1 ;
+                                                v935 = v940;
+                                                v934 += 1 ;
                                             }
-                                            static_array<int,2> v947;
-                                            int v949;
-                                            v949 = 0;
-                                            while (while_method_3(v949)){
-                                                v947[v949] = v941;
-                                                v949 += 1 ;
+                                            static_array<int,2> v941;
+                                            int v943;
+                                            v943 = 0;
+                                            while (while_method_3(v943)){
+                                                v941[v943] = v935;
+                                                v943 += 1 ;
                                             }
-                                            static_array<int,2> v951;
-                                            int v953;
-                                            v953 = 0;
-                                            while (while_method_3(v953)){
-                                                int v955;
-                                                v955 = v947[v953];
-                                                bool v957;
-                                                v957 = v953 == v877;
-                                                int v959;
-                                                if (v957){
-                                                    int v958;
-                                                    v958 = v955 + 2;
-                                                    v959 = v958;
+                                            static_array<int,2> v945;
+                                            int v947;
+                                            v947 = 0;
+                                            while (while_method_3(v947)){
+                                                int v949;
+                                                v949 = v941[v947];
+                                                bool v951;
+                                                v951 = v947 == v871;
+                                                int v953;
+                                                if (v951){
+                                                    int v952;
+                                                    v952 = v949 + 2;
+                                                    v953 = v952;
                                                 } else {
-                                                    v959 = v955;
+                                                    v953 = v949;
                                                 }
-                                                v951[v953] = v959;
-                                                v953 += 1 ;
+                                                v945[v947] = v953;
+                                                v947 += 1 ;
                                             }
-                                            v967 = Union4{Union4_2{v874, false, v876, v938, v951, v939}};
+                                            v961 = Union4{Union4_2{v868, false, v870, v932, v945, v933}};
                                         } else {
                                             printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                             __trap();
@@ -5460,110 +5445,110 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                 break;
                             }
                             case 1: { // Some
-                                Union2 v882 = v874.case1.v0;
-                                switch (v880.tag) {
+                                Union2 v876 = v868.case1.v0;
+                                switch (v874.tag) {
                                     case 0: { // Call
-                                        if (v875){
-                                            bool v884;
-                                            v884 = v877 == 0;
-                                            int v885;
-                                            if (v884){
-                                                v885 = 1;
+                                        if (v869){
+                                            bool v878;
+                                            v878 = v871 == 0;
+                                            int v879;
+                                            if (v878){
+                                                v879 = 1;
                                             } else {
-                                                v885 = 0;
+                                                v879 = 0;
                                             }
-                                            v967 = Union4{Union4_2{v874, false, v876, v885, v878, v879}};
+                                            v961 = Union4{Union4_2{v868, false, v870, v879, v872, v873}};
                                         } else {
-                                            int v887; int v888;
+                                            int v881; int v882;
                                             Tuple1 tmp22 = Tuple1{0, 0};
-                                            v887 = tmp22.v0; v888 = tmp22.v1;
-                                            while (while_method_3(v887)){
-                                                int v890;
-                                                v890 = v878[v887];
-                                                bool v892;
-                                                v892 = v888 >= v890;
-                                                int v893;
-                                                if (v892){
-                                                    v893 = v888;
+                                            v881 = tmp22.v0; v882 = tmp22.v1;
+                                            while (while_method_3(v881)){
+                                                int v884;
+                                                v884 = v872[v881];
+                                                bool v886;
+                                                v886 = v882 >= v884;
+                                                int v887;
+                                                if (v886){
+                                                    v887 = v882;
                                                 } else {
-                                                    v893 = v890;
+                                                    v887 = v884;
                                                 }
-                                                v888 = v893;
-                                                v887 += 1 ;
+                                                v882 = v887;
+                                                v881 += 1 ;
                                             }
-                                            static_array<int,2> v894;
-                                            int v896;
-                                            v896 = 0;
-                                            while (while_method_3(v896)){
-                                                v894[v896] = v888;
-                                                v896 += 1 ;
+                                            static_array<int,2> v888;
+                                            int v890;
+                                            v890 = 0;
+                                            while (while_method_3(v890)){
+                                                v888[v890] = v882;
+                                                v890 += 1 ;
                                             }
-                                            v967 = Union4{Union4_4{v874, v875, v876, v877, v894, v879}};
+                                            v961 = Union4{Union4_4{v868, v869, v870, v871, v888, v873}};
                                         }
                                         break;
                                     }
                                     case 1: { // Fold
-                                        v967 = Union4{Union4_5{v874, v875, v876, v877, v878, v879}};
+                                        v961 = Union4{Union4_5{v868, v869, v870, v871, v872, v873}};
                                         break;
                                     }
                                     case 2: { // Raise
-                                        bool v900;
-                                        v900 = v879 > 0;
-                                        if (v900){
-                                            bool v901;
-                                            v901 = v877 == 0;
-                                            int v902;
-                                            if (v901){
-                                                v902 = 1;
+                                        bool v894;
+                                        v894 = v873 > 0;
+                                        if (v894){
+                                            bool v895;
+                                            v895 = v871 == 0;
+                                            int v896;
+                                            if (v895){
+                                                v896 = 1;
                                             } else {
-                                                v902 = 0;
+                                                v896 = 0;
                                             }
-                                            int v903;
-                                            v903 = -1 + v879;
-                                            int v904; int v905;
+                                            int v897;
+                                            v897 = -1 + v873;
+                                            int v898; int v899;
                                             Tuple1 tmp23 = Tuple1{0, 0};
-                                            v904 = tmp23.v0; v905 = tmp23.v1;
-                                            while (while_method_3(v904)){
-                                                int v907;
-                                                v907 = v878[v904];
-                                                bool v909;
-                                                v909 = v905 >= v907;
-                                                int v910;
-                                                if (v909){
-                                                    v910 = v905;
+                                            v898 = tmp23.v0; v899 = tmp23.v1;
+                                            while (while_method_3(v898)){
+                                                int v901;
+                                                v901 = v872[v898];
+                                                bool v903;
+                                                v903 = v899 >= v901;
+                                                int v904;
+                                                if (v903){
+                                                    v904 = v899;
                                                 } else {
-                                                    v910 = v907;
+                                                    v904 = v901;
                                                 }
-                                                v905 = v910;
-                                                v904 += 1 ;
+                                                v899 = v904;
+                                                v898 += 1 ;
                                             }
-                                            static_array<int,2> v911;
-                                            int v913;
-                                            v913 = 0;
-                                            while (while_method_3(v913)){
-                                                v911[v913] = v905;
-                                                v913 += 1 ;
+                                            static_array<int,2> v905;
+                                            int v907;
+                                            v907 = 0;
+                                            while (while_method_3(v907)){
+                                                v905[v907] = v899;
+                                                v907 += 1 ;
                                             }
-                                            static_array<int,2> v915;
-                                            int v917;
-                                            v917 = 0;
-                                            while (while_method_3(v917)){
-                                                int v919;
-                                                v919 = v911[v917];
-                                                bool v921;
-                                                v921 = v917 == v877;
-                                                int v923;
-                                                if (v921){
-                                                    int v922;
-                                                    v922 = v919 + 4;
-                                                    v923 = v922;
+                                            static_array<int,2> v909;
+                                            int v911;
+                                            v911 = 0;
+                                            while (while_method_3(v911)){
+                                                int v913;
+                                                v913 = v905[v911];
+                                                bool v915;
+                                                v915 = v911 == v871;
+                                                int v917;
+                                                if (v915){
+                                                    int v916;
+                                                    v916 = v913 + 4;
+                                                    v917 = v916;
                                                 } else {
-                                                    v923 = v919;
+                                                    v917 = v913;
                                                 }
-                                                v915[v917] = v923;
-                                                v917 += 1 ;
+                                                v909[v911] = v917;
+                                                v911 += 1 ;
                                             }
-                                            v967 = Union4{Union4_2{v874, false, v876, v902, v915, v903}};
+                                            v961 = Union4{Union4_2{v868, false, v870, v896, v909, v897}};
                                         } else {
                                             printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                             __trap();
@@ -5580,7 +5565,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        v1024 = Union6{Union6_1{v967}};
+                        v1018 = Union6{Union6_1{v961}};
                         break;
                     }
                     case 4: { // TerminalCall
@@ -5635,7 +5620,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                         Union1 v49;
                         v49 = Union1{Union1_3{v28, v39, v40}};
                         v4.push(v49);
-                        v1024 = Union6{Union6_0{}};
+                        v1018 = Union6{Union6_0{}};
                         break;
                     }
                     case 5: { // TerminalFold
@@ -5668,7 +5653,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                         Union1 v24;
                         v24 = Union1{Union1_3{v11, v15, v23}};
                         v4.push(v24);
-                        v1024 = Union6{Union6_0{}};
+                        v1018 = Union6{Union6_0{}};
                         break;
                     }
                     default: {
@@ -5681,7 +5666,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                 assert("Invalid tag." && false); __trap();
             }
         }
-        v6 = v1024;
+        v6 = v1018;
     }
     return ;
 }
@@ -6070,7 +6055,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                     assert("Tensor range check" && 0 <= v207 && v207 < 256);
                     int v215;
                     v215 = 0;
-                    while (while_method_7(v215)){
+                    while (while_method_6(v215)){
                         bool v217;
                         v217 = v208 && v212;
                         bool v218;
@@ -6135,7 +6120,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         int v244[4];
                         int v245;
                         v245 = 0;
-                        while (while_method_7(v245)){
+                        while (while_method_6(v245)){
                             assert("Tensor range check" && 0 <= v245 && v245 < 1);
                             int v247;
                             v247 = 4 * v245;
@@ -6164,7 +6149,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         }
                         int v255;
                         v255 = 0;
-                        while (while_method_7(v255)){
+                        while (while_method_6(v255)){
                             int v257;
                             v257 = 0;
                             while (while_method_0(v257)){
@@ -6238,7 +6223,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         float v280[4];
                         int v281;
                         v281 = 0;
-                        while (while_method_7(v281)){
+                        while (while_method_6(v281)){
                             int v283;
                             v283 = 0;
                             while (while_method_0(v283)){
@@ -6274,7 +6259,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         bool v293[4];
                         int v294;
                         v294 = 0;
-                        while (while_method_7(v294)){
+                        while (while_method_6(v294)){
                             int v296;
                             v296 = 0;
                             while (while_method_0(v296)){
@@ -6300,7 +6285,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         float v303[4];
                         int v304;
                         v304 = 0;
-                        while (while_method_7(v304)){
+                        while (while_method_6(v304)){
                             int v306;
                             v306 = 0;
                             while (while_method_0(v306)){
@@ -6337,7 +6322,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         v315 = 0.0f;
                         int v316;
                         v316 = 0;
-                        while (while_method_7(v316)){
+                        while (while_method_6(v316)){
                             int v318;
                             v318 = 0;
                             while (while_method_0(v318)){
@@ -6366,7 +6351,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         int v329[4];
                         int v330;
                         v330 = 0;
-                        while (while_method_7(v330)){
+                        while (while_method_6(v330)){
                             int v332;
                             v332 = 0;
                             while (while_method_0(v332)){
@@ -6395,7 +6380,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         v338 = 0;
                         int v339;
                         v339 = 0;
-                        while (while_method_7(v339)){
+                        while (while_method_6(v339)){
                             int v341;
                             v341 = 0;
                             while (while_method_0(v341)){
@@ -6428,7 +6413,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         float v354[4];
                         int v355;
                         v355 = 0;
-                        while (while_method_7(v355)){
+                        while (while_method_6(v355)){
                             int v357;
                             v357 = 0;
                             while (while_method_0(v357)){
@@ -6470,7 +6455,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         float v369[4];
                         int v370;
                         v370 = 0;
-                        while (while_method_7(v370)){
+                        while (while_method_6(v370)){
                             int v372;
                             v372 = 0;
                             while (while_method_0(v372)){
@@ -6508,7 +6493,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         float v383[4];
                         int v384;
                         v384 = 0;
-                        while (while_method_7(v384)){
+                        while (while_method_6(v384)){
                             int v386;
                             v386 = 0;
                             while (while_method_0(v386)){
@@ -6535,7 +6520,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         v393 = 0.0f;
                         int v394;
                         v394 = 0;
-                        while (while_method_7(v394)){
+                        while (while_method_6(v394)){
                             int v396;
                             v396 = 0;
                             while (while_method_0(v396)){
@@ -6562,7 +6547,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         v405 = cooperative_groups::reduce(v404, v393, v327);
                         int v406;
                         v406 = 0;
-                        while (while_method_7(v406)){
+                        while (while_method_6(v406)){
                             int v408;
                             v408 = 0;
                             while (while_method_0(v408)){
@@ -6591,7 +6576,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                         }
                         int v419;
                         v419 = 0;
-                        while (while_method_7(v419)){
+                        while (while_method_6(v419)){
                             assert("Tensor range check" && 0 <= v419 && v419 < 1);
                             assert("Tensor range check" && 0 <= v419 && v419 < 1);
                             v419 += 1 ;
@@ -6726,7 +6711,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 assert("Tensor range check" && 0 <= v474 && v474 < 256);
                 int v482;
                 v482 = 0;
-                while (while_method_7(v482)){
+                while (while_method_6(v482)){
                     bool v484;
                     v484 = v475 && v479;
                     bool v485;
@@ -6782,7 +6767,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                     int v506[2];
                     int v507;
                     v507 = 0;
-                    while (while_method_7(v507)){
+                    while (while_method_6(v507)){
                         assert("Tensor range check" && 0 <= v507 && v507 < 1);
                         int v509;
                         v509 = 2 * v507;
@@ -6805,7 +6790,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                     }
                     int v515;
                     v515 = 0;
-                    while (while_method_7(v515)){
+                    while (while_method_6(v515)){
                         int v517;
                         v517 = 0;
                         while (while_method_3(v517)){
@@ -6880,7 +6865,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                     double v541[2];
                     int v542;
                     v542 = 0;
-                    while (while_method_7(v542)){
+                    while (while_method_6(v542)){
                         int v544;
                         v544 = 0;
                         while (while_method_3(v544)){
@@ -6904,7 +6889,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                     }
                     int v550;
                     v550 = 0;
-                    while (while_method_7(v550)){
+                    while (while_method_6(v550)){
                         assert("Tensor range check" && 0 <= v550 && v550 < 1);
                         int v552;
                         v552 = 2 * v550;
@@ -7087,7 +7072,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             int v644[4];
             int v645;
             v645 = 0;
-            while (while_method_7(v645)){
+            while (while_method_6(v645)){
                 assert("Tensor range check" && 0 <= v645 && v645 < 1);
                 int v647;
                 v647 = 4 * v645;
@@ -7140,7 +7125,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             }
             int v663;
             v663 = 0;
-            while (while_method_7(v663)){
+            while (while_method_6(v663)){
                 int v665;
                 v665 = 0;
                 while (while_method_0(v665)){
@@ -7272,7 +7257,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             bool v709[4];
             int v710;
             v710 = 0;
-            while (while_method_7(v710)){
+            while (while_method_6(v710)){
                 int v712;
                 v712 = 0;
                 while (while_method_0(v712)){
@@ -7299,7 +7284,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             v719 = false;
             int v720;
             v720 = 0;
-            while (while_method_7(v720)){
+            while (while_method_6(v720)){
                 int v722;
                 v722 = 0;
                 while (while_method_0(v722)){
@@ -7329,7 +7314,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 float v733[4];
                 int v734;
                 v734 = 0;
-                while (while_method_7(v734)){
+                while (while_method_6(v734)){
                     int v736;
                     v736 = 0;
                     while (while_method_0(v736)){
@@ -7363,7 +7348,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 float v745[4];
                 int v746;
                 v746 = 0;
-                while (while_method_7(v746)){
+                while (while_method_6(v746)){
                     int v748;
                     v748 = 0;
                     while (while_method_0(v748)){
@@ -7394,7 +7379,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 v755 = 0.0f;
                 int v756;
                 v756 = 0;
-                while (while_method_7(v756)){
+                while (while_method_6(v756)){
                     int v758;
                     v758 = 0;
                     while (while_method_0(v758)){
@@ -7423,7 +7408,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 float v769[4];
                 int v770;
                 v770 = 0;
-                while (while_method_7(v770)){
+                while (while_method_6(v770)){
                     int v772;
                     v772 = 0;
                     while (while_method_0(v772)){
@@ -7457,7 +7442,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 float v781[4];
                 int v782;
                 v782 = 0;
-                while (while_method_7(v782)){
+                while (while_method_6(v782)){
                     int v784;
                     v784 = 0;
                     while (while_method_0(v784)){
@@ -7483,7 +7468,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 float v791[4];
                 int v792;
                 v792 = 0;
-                while (while_method_7(v792)){
+                while (while_method_6(v792)){
                     int v794;
                     v794 = 0;
                     while (while_method_0(v794)){
@@ -7516,7 +7501,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 v802 = 0.0f;
                 int v803;
                 v803 = 0;
-                while (while_method_7(v803)){
+                while (while_method_6(v803)){
                     int v805;
                     v805 = 0;
                     while (while_method_0(v805)){
@@ -7554,7 +7539,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 float v818[4];
                 int v819;
                 v819 = 0;
-                while (while_method_7(v819)){
+                while (while_method_6(v819)){
                     int v821;
                     v821 = 0;
                     while (while_method_0(v821)){
@@ -7579,7 +7564,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 float v828[4];
                 int v829;
                 v829 = 0;
-                while (while_method_7(v829)){
+                while (while_method_6(v829)){
                     int v831;
                     v831 = 0;
                     while (while_method_0(v831)){
@@ -7617,7 +7602,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
                 }
                 int v844;
                 v844 = 0;
-                while (while_method_7(v844)){
+                while (while_method_6(v844)){
                     int v846;
                     v846 = 0;
                     while (while_method_0(v846)){
@@ -7654,7 +7639,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             assert("Tensor range check" && 0 <= v628 && v628 < 16);
             int v854;
             v854 = 0;
-            while (while_method_7(v854)){
+            while (while_method_6(v854)){
                 assert("Tensor range check" && 0 <= v854 && v854 < 1);
                 int v856;
                 v856 = 4 * v854;

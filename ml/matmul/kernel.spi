@@ -145,7 +145,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
         inl (exists m_frag. _), (exists n_frag. _), (exists k_frag. _) = tlit m_frag, tlit n_frag, tlit k_frag
         inl c_frag : _ _ (fragment accumulator m_frag n_frag k_frag row_major f32) = tensor_create (m_local, n_local)
 
-        loop.projective blocks_in_grid(fst a.dim, fst b.dim) fun m,n => 
+        loop.linear (fst a.dim, fst b.dim) fun m,n => 
             inl c = apply (m,n) c |> apply_ptr
 
             pragma.unroll fun _ =>
