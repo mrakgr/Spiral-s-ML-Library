@@ -214,7 +214,7 @@ struct Union0;
 struct Union2;
 struct Union3;
 struct Union1;
-struct Mut0;
+struct StackMut0;
 struct Union5;
 struct Union4;
 struct Union6;
@@ -239,7 +239,7 @@ __device__ int tag_8(Union2 v0);
 __device__ bool is_pair_9(int v0, int v1);
 __device__ Tuple1 order_10(int v0, int v1);
 __device__ Union11 compare_hands_7(Union5 v0, bool v1, static_array<Union2,2> v2, int v3, static_array<int,2> v4, int v5);
-__device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, Union4 v3);
+__device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2, Union4 v3);
 struct Union0_0 { // T_Computer
 };
 struct Union0_1 { // T_Random
@@ -520,16 +520,15 @@ struct Union1 {
         this->tag = 255;
     }
 };
-struct Mut0 {
-    int refc{0};
+struct StackMut0 {
     cooperative_groups::grid_group v1;
     static_array_list<Union1,32> v2;
     static_array<Union0,2> v3;
     static_array<float,2> v4;
     curandStatePhilox4_32_10_t v5;
     unsigned int v0;
-    __device__ Mut0() = default;
-    __device__ Mut0(unsigned int t0, cooperative_groups::grid_group t1, static_array_list<Union1,32> t2, static_array<Union0,2> t3, static_array<float,2> t4, curandStatePhilox4_32_10_t t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
+    __device__ StackMut0() = default;
+    __device__ StackMut0(unsigned int t0, cooperative_groups::grid_group t1, static_array_list<Union1,32> t2, static_array<Union0,2> t3, static_array<float,2> t4, curandStatePhilox4_32_10_t t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
 };
 struct Union5_0 { // None
 };
@@ -3347,8 +3346,8 @@ __device__ Union11 compare_hands_7(Union5 v0, bool v1, static_array<Union2,2> v2
         }
     }
 }
-__device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, Union4 v3){
-    static_array_list<Union1,32> & v4 = v2.base->v2;
+__device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2, Union4 v3){
+    static_array_list<Union1,32> & v4 = v2.v2;
     Union6 v5;
     v5 = Union6{Union6_1{v3}};
     Union6 v6;
@@ -3365,13 +3364,13 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                 switch (v8.tag) {
                     case 0: { // ChanceCommunityCard
                         Union5 v963 = v8.case0.v0; bool v964 = v8.case0.v1; static_array<Union2,2> v965 = v8.case0.v2; int v966 = v8.case0.v3; static_array<int,2> v967 = v8.case0.v4; int v968 = v8.case0.v5;
-                        curandStatePhilox4_32_10_t & v969 = v2.base->v5;
+                        curandStatePhilox4_32_10_t & v969 = v2.v5;
                         curandStatePhilox4_32_10_t & v970 = v969;
-                        unsigned int & v971 = v2.base->v0;
+                        unsigned int & v971 = v2.v0;
                         Union2 v972; unsigned int v973;
                         Tuple0 tmp0 = draw_card_1(v970, v971);
                         v972 = tmp0.v0; v973 = tmp0.v1;
-                        v2.base->v0 = v973;
+                        v2.v0 = v973;
                         Union1 v974;
                         v974 = Union1{Union1_0{v972}};
                         v4.push(v974);
@@ -3409,20 +3408,20 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                         break;
                     }
                     case 1: { // ChanceInit
-                        curandStatePhilox4_32_10_t & v990 = v2.base->v5;
+                        curandStatePhilox4_32_10_t & v990 = v2.v5;
                         curandStatePhilox4_32_10_t & v991 = v990;
-                        unsigned int & v992 = v2.base->v0;
+                        unsigned int & v992 = v2.v0;
                         Union2 v993; unsigned int v994;
                         Tuple0 tmp2 = draw_card_1(v991, v992);
                         v993 = tmp2.v0; v994 = tmp2.v1;
-                        v2.base->v0 = v994;
-                        curandStatePhilox4_32_10_t & v995 = v2.base->v5;
+                        v2.v0 = v994;
+                        curandStatePhilox4_32_10_t & v995 = v2.v5;
                         curandStatePhilox4_32_10_t & v996 = v995;
-                        unsigned int & v997 = v2.base->v0;
+                        unsigned int & v997 = v2.v0;
                         Union2 v998; unsigned int v999;
                         Tuple0 tmp3 = draw_card_1(v996, v997);
                         v998 = tmp3.v0; v999 = tmp3.v1;
-                        v2.base->v0 = v999;
+                        v2.v0 = v999;
                         Union1 v1000;
                         v1000 = Union1{Union1_2{0, v993}};
                         v4.push(v1000);
@@ -3446,14 +3445,14 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                     }
                     case 2: { // Round
                         Union5 v51 = v8.case2.v0; bool v52 = v8.case2.v1; static_array<Union2,2> v53 = v8.case2.v2; int v54 = v8.case2.v3; static_array<int,2> v55 = v8.case2.v4; int v56 = v8.case2.v5;
-                        static_array<Union0,2> & v57 = v2.base->v3;
+                        static_array<Union0,2> & v57 = v2.v3;
                         Union0 v58;
                         v58 = v57[v54];
                         Union3 v779;
                         switch (v58.tag) {
                             case 0: { // T_Computer
-                                static_array_list<Union1,32> & v60 = v2.base->v2;
-                                curandStatePhilox4_32_10_t & v61 = v2.base->v5;
+                                static_array_list<Union1,32> & v60 = v2.v2;
+                                curandStatePhilox4_32_10_t & v61 = v2.v5;
                                 curandStatePhilox4_32_10_t & v62 = v61;
                                 unsigned int * v63;
                                 v63 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
@@ -5031,7 +5030,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                                 break;
                             }
                             case 1: { // T_Random
-                                curandStatePhilox4_32_10_t & v738 = v2.base->v5;
+                                curandStatePhilox4_32_10_t & v738 = v2.v5;
                                 curandStatePhilox4_32_10_t & v739 = v738;
                                 static_array_list<Union3,3> v740;
                                 v740 = static_array_list<Union3,3>{};
@@ -5604,7 +5603,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                         }
                         float v44;
                         v44 = (float)v39;
-                        static_array<float,2> & v45 = v2.base->v4;
+                        static_array<float,2> & v45 = v2.v4;
                         v45[v43] = v44;
                         bool v46;
                         v46 = v43 == 0;
@@ -5631,7 +5630,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, sptr<Mut0> v2, 
                         v17 = -v15;
                         float v18;
                         v18 = (float)v17;
-                        static_array<float,2> & v19 = v2.base->v4;
+                        static_array<float,2> & v19 = v2.v4;
                         v19[v12] = v18;
                         bool v20;
                         v20 = v12 == 0;
@@ -5710,20 +5709,19 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
     v18[1] = 0.0f;
     cooperative_groups::grid_group & v20 = v2;
     curandStatePhilox4_32_10_t & v21 = v9;
-    sptr<Mut0> v22;
-    v22 = sptr<Mut0>{new Mut0{63u, v20, v16, v10, v18, v21}};
+    StackMut0 v22{63u, v20, v16, v10, v18, v21};
     int v23;
     v23 = 0;
     while (while_method_0(v23)){
         int v25;
         v25 = 0;
         while (while_method_1(v25)){
-            v22.base->v0 = 63u;
+            v22.v0 = 63u;
             static_array<float,2> v27;
             v27[0] = 0.0f;
             v27[1] = 0.0f;
-            v22.base->v4 = v27;
-            static_array_list<Union1,32> & v29 = v22.base->v2;
+            v22.v4 = v27;
+            static_array_list<Union1,32> & v29 = v22.v2;
             v29.unsafe_set_length(0);
             static_array<Union0,2> v30;
             Union0 v32;
@@ -5735,11 +5733,11 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             Union0 v36;
             v36 = Union0{Union0_0{}};
             v30[0] = v36;
-            v22.base->v3 = v30;
+            v22.v3 = v30;
             Union4 v38;
             v38 = Union4{Union4_1{}};
             method_0(v0, v1, v22, v38);
-            static_array<float,2> & v39 = v22.base->v4;
+            static_array<float,2> & v39 = v22.v4;
             static_array<float,2> v40;
             v40 = v39;
             unsigned int * v41;
@@ -6925,9 +6923,9 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1) {
             }
             v25 += 1 ;
         }
-        cooperative_groups::grid_group & v559 = v22.base->v1;
+        cooperative_groups::grid_group & v559 = v22.v1;
         cooperative_groups::grid_group & v560 = v559;
-        curandStatePhilox4_32_10_t & v561 = v22.base->v5;
+        curandStatePhilox4_32_10_t & v561 = v22.v5;
         curandStatePhilox4_32_10_t & v562 = v561;
         unsigned int * v563;
         v563 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
@@ -8316,7 +8314,7 @@ def main_body():
     method0(v35, v36, v37, v7, v1, v38)
     del v1, v7, v35, v36, v37, v38
     v41 = "{}\n"
-    v42 = "Going to run the Leduc full kernel."
+    v42 = "Going to run the Leduc full kernel (performance)."
     print(v41.format(v42),end="")
     del v41, v42
     v43 = time.perf_counter()

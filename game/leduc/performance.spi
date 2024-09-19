@@ -90,7 +90,7 @@ inl init() : state =
     }
 
 type state_internal_train =
-    mut {
+    stack_mut {
         pl_type : sam.sa 2 player_type_train
         deck : deck
         messages : messages
@@ -102,7 +102,7 @@ type state_internal_train =
 // Converts the given state to internal one.
 // The refs will point to the original locations.
 inl state_to_internal_train grid rng : state_internal_train =
-    mut {
+    stack_mut {
         pl_type = arraym.fromList [T_Random;T_Random]
         deck = deckm.create()
         messages = sa_create
@@ -266,10 +266,6 @@ inl vs_rando (neural : state_neural) =
         ()
     frontend_rewards
 
-inl foo() =
-    inl qwe : _ = mut (1i32,2i32)
-    qwe <- (3,4)
-
 inl event_loop_gpu = fun (msg, state : event * state) =>
     open serializerm
     inl seri = {
@@ -279,7 +275,7 @@ inl event_loop_gpu = fun (msg, state : event * state) =>
     inl {game neural} = state
     serialize seri.game_state game
 
-    console.write_ln "Going to run the Leduc full kernel."
+    console.write_ln "Going to run the Leduc full kernel (performance)."
     global "import time"
     inl p : f64 = $"time.perf_counter()"
     
