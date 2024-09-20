@@ -7,8 +7,8 @@ open serializerm
 inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
     inl msg, {game neural} = jsonm.deserialize msg, jsonm.deserialize state
     inl seri = {
-        msg = create_serializer
-        game_state = create_serializer
+        msg = create_serializer : serializer event
+        game_state = create_serializer : serializer state_game
     }
 
     serialize seri.game_state game
@@ -20,8 +20,9 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
     inl effects : plist ui_effects = plistm.create'
     match msg with
     | StartTrainingVsRando => train.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
-    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
+    | _ => failwith "Temporarily disabled for the fast_compile bug report."
+    // | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    // | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
 
     device_sync()
 
