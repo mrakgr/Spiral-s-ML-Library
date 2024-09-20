@@ -18,7 +18,7 @@ inl blocks_per_grid() : int =
 
 // Returns the dynamic shared memory that should be used in bytes.
 inl dynamic_shared_memory_used() : int = 
-    // On a RTX 4060, 99kb is the limit, but we'll take only 80kb in case static shared memory needs to be used.
+    // On a RTX 4060, 99kb is the limit. 1 kb = 1024 bytes.
     96 * (1 <<< 10)
 
 // Synchronizes the device on the host. Should be used on the Python side.

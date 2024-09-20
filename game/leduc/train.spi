@@ -1,13 +1,10 @@
-// For debugging the performance of full.spi.
-
 open game
 open corebase
 open corepython
 open corecuda
 open coreext
 
-union player_type_play = Computer | Random | Human
-union player_type_train = T_Computer | T_Random
+union player_type = Computer | Random | Human
 
 union event =
     | StartTrainingVsSelf
@@ -41,7 +38,7 @@ inl event_config () : event_config =
 type state_public =
     {
         ui_game_state : ui_game_state
-        pl_type : sam.sa 2 player_type_play
+        pl_type : sam.sa 2 player_type
         messages : messages
     }
 
@@ -91,7 +88,7 @@ inl init() : state =
 
 type state_internal_train =
     stack_mut {
-        pl_type : sam.sa 2 player_type_train
+        pl_type : sam.sa 2 player_type
         deck : deck
         messages : messages
         rewards : sam.sa 2 ml.cfr.reward
@@ -103,7 +100,7 @@ type state_internal_train =
 // The refs will point to the original locations.
 inl state_to_internal_train grid rng : state_internal_train =
     stack_mut {
-        pl_type = arraym.fromList [T_Random;T_Random]
+        pl_type = arraym.fromList [Random;Random]
         deck = deckm.create()
         messages = sa_create
         rewards = arraym.fromList [0;0]
@@ -111,15 +108,19 @@ inl state_to_internal_train grid rng : state_internal_train =
         rng = refm.to_local rng
     }
 
-inl state_internal_train_reset (x : state_internal_train) (player_id : ml.cfr.player_id) : () =
+inl state_internal_train_reset (x : state_internal_train) (player_id : option ml.cfr.player_id) : () =
     x.deck <- deckm.create()
     x.rewards <- arraym.fromList [0;0]
     sa_listm.unsafe_set_length x.messages 0
-    inl player_types = arraym.fromList [T_Random;T_Random]
-    set player_types player_id T_Computer
+    inl player_types = arraym.fromList [Computer;Computer]
+    player_id |> optionm.iter fun player_id =>
+        set player_types (player_id ^^^ 1) Random
     x.pl_type <- player_types
 
-inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal_train) ~node : () = join
+// (is_train : bool) controls whether the run updates the trace and trace state, and whether the average or the current strategy is used for evaluation.
+// (player_id : option int) controls which player is the Computer, and the other is Random. If None then both are Computer players.
+inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal_train) player_id ~node : () = join
+    state_internal_train_reset state player_id
     inl set_rewards winner_id (chips_won : int) =
         inl chips_won = conv chips_won
         inl rewards = state.rewards
@@ -157,25 +158,18 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
         | Round table => 
             inl action =
                 match index state.pl_type table.player_turn with
-                | T_Computer =>
+                | Human => failwith "Humans not allowed during training."
+                | Computer =>
                     inl data = table, state.messages
-                    inl noinline_eval() =
-                        // inl x : sam.sa 3 _ = arraym.fromList [model.AA_Fold; model.AA_Call; model.AA_Raise]
-                        // index x (random.int_range {from=0; nearTo=length x} (refm.from_local state.rng))
-                        // |> transposing_loop.shuffle 0
-                        if is_train then
-                            ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
-                        else
-                            ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
-                    inl action_alt = noinline_eval()
-                    inl action = model.action_conv table action_alt
-                    action
-                | T_Random =>
+                    if is_train then
+                        ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                    else
+                        ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                    |> model.action_conv table
+                | Random =>
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
-                    inl action =
-                        random_action (refm.from_local state.rng) table 
-                        |> transposing_loop.shuffle 0
-                    action
+                    random_action (refm.from_local state.rng) table 
+                    |> transposing_loop.shuffle 0
             inl msg = PlayerAction(table.player_turn, action)
             push_message msg
             Some (game_round table action)
@@ -200,36 +194,38 @@ open corepython
 open coreext
 open serializerm
 
-// // Does a training run against the self.
-// inl vs_self (neural : state_neural) =
-//     inl sizes = model.leduc_sizes()
-//     inl config = event_config()
-//     inl trace_rewards = cupy.zeros (sizes.player_id, config.outer / config.frontend_divider)
-//     inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
-//     run' fun () =>
-//         inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-//         inl grid = cooperative_groups.create_grid()
-//         inl rng : _ random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-//         loop.linear config.outer fun (outer : int) =>
-//             loop.linear config.inner fun (inner : int) =>
-//                 inl player_types = arraym.fromList [T_Computer; T_Computer]
-//                 // Does a training run, modifying the trace state.
-//                 train_loop true model (state_to_internal_train rng player_types) game_init() |> ml.cfr_models.calculate_updates model
-//                 // Does a purely evalutation run, not modifying the trace state.
-//                 inl rewards = train_loop false model (state_to_internal_train rng player_types) game_init()
-//                 // Returns the integrate path probability.
-//                 inl path_prob = ml.cfr_models.extract_integrated_path_prob model
-//                 // Adds the rewards to the trace.
-//                 loop.linear sizes.player_id fun player_id =>
-//                     inl reward = index rewards player_id
-//                     tensor_cuda.tensor_atomic_add (player_id,outer / config.frontend_divider)
-//                         (reward * path_prob, path_prob)
-//                         trace_rewards
-//                 ml.cfr_models.reset_trace_state model
-//             ml.cfr_models.apply_updates grid rng model
-//         ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
+// Does a training run against the self.
+inl vs_self (neural : state_neural) =
+    inl sizes = model.leduc_sizes()
+    inl config = event_config()
+    inl trace_rewards = cupy.zeros (sizes.player_id, config.outer / config.frontend_divider)
+    inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
+    run' fun () =>
+        inl state =
+            inl grid = cooperative_groups.create_grid()
+            random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            |> state_to_internal_train grid
+        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+        loop.linear config.outer fun (outer : int) =>
+            loop.linear config.inner fun (inner : int) =>
+                // Does a training run, modifying the trace state.
+                train_loop true model state None game_init() 
+                ml.cfr_models.calculate_updates model state.rewards
+                // Does a purely evalutation run, not modifying the trace state.
+                inl rewards = train_loop false model state None game_init()
+                // Returns the integrate path probability.
+                inl path_prob = ml.cfr_models.extract_integrated_path_prob model
+                // Adds the rewards to the trace.
+                loop.linear sizes.player_id fun player_id =>
+                    inl reward = index state.rewards player_id
+                    tensor_cuda.tensor_atomic_add (player_id,outer / config.frontend_divider)
+                        (reward * path_prob, path_prob)
+                        trace_rewards
+                ml.cfr_models.reset_trace_state model
+            ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
+        ml.primitives.grid_map (refm.from_local state.grid) (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
 
-//     frontend_rewards
+    frontend_rewards
 
 // Does a training run against the random player.
 inl vs_rando (neural : state_neural) =
@@ -238,53 +234,43 @@ inl vs_rando (neural : state_neural) =
     inl trace_rewards : _ _ (float * float) = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
     inl frontend_rewards : _ _ float = tensorm.tensor_create trace_rewards.dim
     run' fun () =>
-        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-        inl state = 
+        inl state =
             inl grid = cooperative_groups.create_grid()
-            inl rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-            state_to_internal_train grid rng 
+            random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            |> state_to_internal_train grid
+        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
         loop.linear config.outer fun (outer : int) =>
             loop.linear config.inner fun (inner : int) =>
-                // The noinline prefix will force the __noinline__ annotation in the generated code.
-                inl noinline_train (player_id : int) =
-                    state_internal_train_reset state player_id
-                    train_loop true model state game_init()
-                    inl rewards = loop._dup state.rewards
-                    ()
-                    // Adds the rewards to the trace.
-                    // inl reward = index rewards player_id
-                    // loop.linear sizes.ensemble_id fun ensemble_id =>
-                    //     inl path_prob = ml.cfr_models.extract_ensemble_path_prob model {ensemble_id}
-                    //     tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
-                    //         (reward * path_prob, path_prob)
-                    //         trace_rewards
-                    ml.cfr_models.calculate_updates model rewards
-                // The loop is better than a noinline function.
+                // The loop uses less registers than a noinline function.
                 // Regular functions it always inlines causing the number of instructions in the full program to double.
                 // TODO: Mention this in a video.
-                loop.linear 2 noinline_train
+                loop.linear 2 fun (player_id : int) =>
+                    // Does a training run, modifying the trace state.
+                    train_loop true model state (Some player_id) game_init()
+                    // Adds the rewards to the trace.
+                    inl reward = index state.rewards player_id
+                    loop.linear sizes.ensemble_id fun ensemble_id =>
+                        inl path_prob = ml.cfr_models.extract_ensemble_path_prob model {ensemble_id} // TODO: Upgrade the extract_ensemble_path_prob function.
+                        tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
+                            (reward * path_prob, path_prob)
+                            trace_rewards
+                    ml.cfr_models.calculate_updates model state.rewards
             ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
-        // ml.primitives.grid_map grid (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
-        ()
+        ml.primitives.grid_map (refm.from_local state.grid) (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
     frontend_rewards
 
-inl event_loop_gpu = fun (msg, state : event * state) =>
+inl event_loop_gpu = fun (msg, state : event * state) : state * plist ui_effects =>
     open serializerm
-    inl seri = {
-        game_state = create_serializer
-    }
+    inl {neural} = state
 
-    inl {game neural} = state
-    serialize seri.game_state game
-
-    console.write_ln "Going to run the Leduc full kernel (performance)."
+    console.write_ln "Going to run the Leduc train kernel."
     global "import time"
     inl p : f64 = $"time.perf_counter()"
     
     inl effects : plist ui_effects = plistm.create'
     match msg with
     | StartTrainingVsRando => vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    // | StartTrainingVsSelf => vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    | StartTrainingVsSelf => vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
 
     device_sync()
 
@@ -292,11 +278,4 @@ inl event_loop_gpu = fun (msg, state : event * state) =>
     inl p2 : f64 = $"time.perf_counter()"
     console.write_ln (p2 - p)
 
-    // inl state = {
-    //     game = deserialize seri.game_state
-    //     neural
-    //     }
-
-    // jsonm.serialize (state, effects)
-
-inl main() = event_loop_gpu(StartTrainingVsRando, init())
+    state, effects
