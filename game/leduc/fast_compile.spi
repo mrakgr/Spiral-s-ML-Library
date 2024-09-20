@@ -1,5 +1,0 @@
-open corebase
-open corepython
-open full
-
-inl main() = event_loop_gpu(jsonm.serialize StartTrainingVsRando, jsonm.serialize init())

@@ -37,8 +37,8 @@ inl run' f =
     global "options.append('--dopt=on')" // turns on the device optimizations
     global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
     global "options.append('--restrict')" // assumes all the pointers are restricted
-    if debug_mode() <> false then
-        global "options.append('--Ofast-compile=max')" // experimental fast compilation option
+    // if debug_mode() <> false then // Doesn't work well currently.
+    //     global "options.append('--Ofast-compile=max')" // experimental fast compilation option
     
     match threads_per_block with
     | 1024 => global "options.append('--maxrregcount=64')"
