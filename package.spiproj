@@ -114,6 +114,7 @@ modules:
             play
             train
             full
+            fast_compile
             tests/
                 train
 

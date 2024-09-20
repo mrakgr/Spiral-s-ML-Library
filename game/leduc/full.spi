@@ -25,8 +25,8 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
 
     device_sync()
 
-    console.write "The time it took to run the kernel (in seconds) is: "
     inl p2 : f64 = $"time.perf_counter()"
+    console.write "The time it took to run the kernel (in seconds) is: "
     console.write_ln (p2 - p)
 
     inl state = {

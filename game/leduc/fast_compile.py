@@ -19056,7 +19056,6 @@ options.append('--maxrregcount=255')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
-import collections
 class US1_0(NamedTuple): # Call
     tag = 0
 class US1_1(NamedTuple): # Fold
@@ -19190,269 +19189,506 @@ class US9_1(NamedTuple): # AddRewardsSelf
     v0 : list
     tag = 1
 US9 = Union[US9_0, US9_1]
-def Closure0():
-    def inner(v0 : object, v1 : object) -> object:
-        v2 = method0(v0)
-        v3, v4, v5, v6, v7, v8, v9, v10, v11 = method7(v1)
-        v12 = cp.empty(16,dtype=cp.uint8)
-        v13 = cp.empty(1184,dtype=cp.uint8)
-        method37(v13, v3, v4, v5, v6, v7)
-        del v3, v4, v5, v6, v7
-        v16 = "{}\n"
-        v17 = "Going to run the Leduc full kernel."
-        print(v16.format(v17),end="")
-        del v16, v17
-        v18 = time.perf_counter()
-        v19 = []
-        match v2:
-            case US0_0(_): # ActionSelected
-                method55(v12, v2)
-                v78 = cp.cuda.Device().attributes['MultiProcessorCount']
-                v79 = v78 == 24
-                del v78
-                v80 = v79 == False
-                if v80:
-                    v81 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-                    assert v79, v81
-                    del v81
-                else:
-                    pass
-                del v79, v80
-                v82 = 0
-                v83 = raw_module.get_function(f"entry{v82}")
-                del v82
-                v83.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
-                v83((24,),(256,),(v13, v12, v8, v9, v10, v11),shared_mem=98304)
-                del v83
-            case US0_1(_): # PlayerChanged
-                method55(v12, v2)
-                v71 = cp.cuda.Device().attributes['MultiProcessorCount']
-                v72 = v71 == 24
-                del v71
-                v73 = v72 == False
-                if v73:
-                    v74 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-                    assert v72, v74
-                    del v74
-                else:
-                    pass
-                del v72, v73
-                v75 = 0
-                v76 = raw_module.get_function(f"entry{v75}")
-                del v75
-                v76.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
-                v76((24,),(256,),(v13, v12, v8, v9, v10, v11),shared_mem=98304)
-                del v76
-            case US0_2(): # StartGame
-                method55(v12, v2)
-                v64 = cp.cuda.Device().attributes['MultiProcessorCount']
-                v65 = v64 == 24
-                del v64
-                v66 = v65 == False
-                if v66:
-                    v67 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-                    assert v65, v67
-                    del v67
-                else:
-                    pass
-                del v65, v66
-                v68 = 0
-                v69 = raw_module.get_function(f"entry{v68}")
-                del v68
-                v69.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
-                v69((24,),(256,),(v13, v12, v8, v9, v10, v11),shared_mem=98304)
-                del v69
-            case US0_3(): # StartTrainingVsRando
-                v20 = cp.zeros(16,dtype=cp.float32) # type: ignore
-                v21 = cp.zeros(16,dtype=cp.float32) # type: ignore
-                v22 = cp.empty(16,dtype=cp.float32)
-                v23 = cp.cuda.Device().attributes['MultiProcessorCount']
-                v24 = v23 == 24
-                del v23
-                v25 = v24 == False
-                if v25:
-                    v26 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-                    assert v24, v26
-                    del v26
-                else:
-                    pass
-                del v24, v25
-                v27 = 1
-                v28 = raw_module.get_function(f"entry{v27}")
-                del v27
-                v28.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
-                v28((24,),(256,),(v8, v9, v10, v11, v20, v21, v22),shared_mem=98304)
-                del v20, v21, v28
-                v29 = []
-                v31 = v22[0:]
-                del v22
-                v32 = v31.get()
-                del v31
-                v33 = 0
-                while method58(v33):
-                    v35 = []
-                    v36 = 0
-                    while method58(v36):
-                        assert 0 <= v33 < 4, 'Tensor range check'
-                        assert 0 <= v36 < 4, 'Tensor range check'
-                        v38 = 4 * v33
-                        v39 = v38 + v36
-                        del v38
-                        v40 = v32[v39].item()
-                        del v39
-                        v35.append(v40)
-                        del v40
-                        v36 += 1 
-                    del v36
-                    v29.append(v35)
-                    del v35
-                    v33 += 1 
-                del v32, v33
-                v41 = US9_0(v29)
-                del v29
-                v19.append(v41)
-                del v41
-            case US0_4(): # StartTrainingVsSelf
-                v42 = cp.zeros(8,dtype=cp.float32) # type: ignore
-                v43 = cp.zeros(8,dtype=cp.float32) # type: ignore
-                v44 = cp.empty(8,dtype=cp.float32)
-                v45 = cp.cuda.Device().attributes['MultiProcessorCount']
-                v46 = v45 == 24
-                del v45
-                v47 = v46 == False
-                if v47:
-                    v48 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-                    assert v46, v48
-                    del v48
-                else:
-                    pass
-                del v46, v47
-                v49 = 2
-                v50 = raw_module.get_function(f"entry{v49}")
-                del v49
-                v50.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
-                v50((24,),(256,),(v8, v9, v10, v11, v42, v43, v44),shared_mem=98304)
-                del v42, v43, v50
-                v51 = []
-                v53 = v44[0:]
-                del v44
-                v54 = v53.get()
-                del v53
-                v55 = 0
-                while method45(v55):
-                    v57 = []
-                    v58 = 0
-                    while method58(v58):
-                        assert 0 <= v55 < 2, 'Tensor range check'
-                        assert 0 <= v58 < 4, 'Tensor range check'
-                        v60 = 4 * v55
-                        v61 = v60 + v58
-                        del v60
-                        v62 = v54[v61].item()
-                        del v61
-                        v57.append(v62)
-                        del v62
-                        v58 += 1 
-                    del v58
-                    v51.append(v57)
-                    del v57
-                    v55 += 1 
-                del v54, v55
-                v63 = US9_1(v51)
-                del v51
-                v19.append(v63)
-                del v63
-            case t:
-                raise Exception(f'Pattern matching miss. Got: {t}')
-        del v2, v12
-        cp.cuda.get_current_stream().synchronize()
-        v84 = time.perf_counter()
-        v87 = "{}"
-        v88 = "The time it took to run the kernel (in seconds) is: "
-        print(v87.format(v88),end="")
-        del v87, v88
-        v89 = v84 - v18
-        del v18, v84
-        v92 = "{:.6f}\n"
-        print(v92.format(v89),end="")
-        del v89, v92
-        v93, v94, v95, v96, v97 = method59(v13)
-        del v13
-        return method76(v93, v94, v95, v96, v97, v8, v9, v10, v11, v19)
-    return inner
-def Closure1():
-    def inner() -> object:
-        v1 = static_array(2)
-        v3 = US2_0()
-        v1[0] = v3
-        del v3
-        v5 = US2_1()
-        v1[1] = v5
+def method3() -> object:
+    v0 = []
+    return v0
+def method2(v0 : US1) -> object:
+    match v0:
+        case US1_0(): # Call
+            del v0
+            v1 = method3()
+            v2 = "Call"
+            v3 = [v2,v1]
+            del v1, v2
+            return v3
+        case US1_1(): # Fold
+            del v0
+            v4 = method3()
+            v5 = "Fold"
+            v6 = [v5,v4]
+            del v4, v5
+            return v6
+        case US1_2(): # Raise
+            del v0
+            v7 = method3()
+            v8 = "Raise"
+            v9 = [v8,v7]
+            del v7, v8
+            return v9
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method5(v0 : i32) -> bool:
+    v1 = v0 < 2
+    del v0
+    return v1
+def method6(v0 : US2) -> object:
+    match v0:
+        case US2_0(): # Computer
+            del v0
+            v1 = method3()
+            v2 = "Computer"
+            v3 = [v2,v1]
+            del v1, v2
+            return v3
+        case US2_1(): # Human
+            del v0
+            v4 = method3()
+            v5 = "Human"
+            v6 = [v5,v4]
+            del v4, v5
+            return v6
+        case US2_2(): # Random
+            del v0
+            v7 = method3()
+            v8 = "Random"
+            v9 = [v8,v7]
+            del v7, v8
+            return v9
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method4(v0 : static_array) -> object:
+    v1 = []
+    v2 = 0
+    while method5(v2):
+        v5 = v0[v2]
+        v6 = method6(v5)
         del v5
-        v7 = static_array_list(32)
-        v8 = cp.empty(2981904,dtype=cp.uint8)
-        v9 = cp.empty(25264128,dtype=cp.uint8)
-        v11 = v8[0:0+4*65536].view(cp.float32)
-        v12 = cp.random.normal(0.0,0.00390625,65536,dtype=cp.float32) # type: ignore
-        cp.copyto(v11[0:0+65536],v12[0:0+65536])
-        del v11, v12
-        v14 = v8[262144:262144+4*1].view(cp.int32)
-        v16 = v8[262160:262160+4*65536].view(cp.float32)
-        v18 = v8[524304:524304+4*65536].view(cp.float32)
-        v20 = v8[786448:786448+4*65536].view(cp.float32)
-        v22 = v8[1048592:1048592+4*65536].view(cp.float32)
-        v24 = v8[1310736:1310736+4*65536].view(cp.float32)
-        v26 = v8[1572880:1572880+4*65536].view(cp.float32)
-        v28 = v8[1835024:1835024+4*65536].view(cp.float32)
-        v14[:] = 0
-        del v14
-        v16[:] = 0
-        del v16
-        v18[:] = 0
-        del v18
-        v20[:] = 0
-        del v20
-        v22[:] = 0
-        del v22
-        v24[:] = 0
-        del v24
-        v26[:] = 0
-        del v26
-        v28[:] = 0
-        del v28
-        v30 = v8[2097168:2097168+8*49152].view(cp.float64)
-        v32 = v8[2490384:2490384+8*49152].view(cp.float64)
-        v34 = v8[2883600:2883600+4*24576].view(cp.int32)
-        v30[:] = 0
-        del v30
-        v32[:] = 0
-        del v32
-        v34[:] = 0
-        del v34
-        v35 = 63
-        v36 = US3_0()
-        v37 = US7_0()
-        v38 = 25264128
-        v39 = 2981904
-        return method116(v35, v36, v7, v1, v37, v9, v38, v8, v39)
-    return inner
-def method3(v0 : object) -> None:
+        v1.append(v6)
+        del v6
+        v2 += 1 
+    del v0, v2
+    return v1
+def method1(v0 : US0) -> object:
+    match v0:
+        case US0_0(v1): # ActionSelected
+            del v0
+            v2 = method2(v1)
+            del v1
+            v3 = "ActionSelected"
+            v4 = [v3,v2]
+            del v2, v3
+            return v4
+        case US0_1(v5): # PlayerChanged
+            del v0
+            v6 = method4(v5)
+            del v5
+            v7 = "PlayerChanged"
+            v8 = [v7,v6]
+            del v6, v7
+            return v8
+        case US0_2(): # StartGame
+            del v0
+            v9 = method3()
+            v10 = "StartGame"
+            v11 = [v10,v9]
+            del v9, v10
+            return v11
+        case US0_3(): # StartTrainingVsRando
+            del v0
+            v12 = method3()
+            v13 = "StartTrainingVsRando"
+            v14 = [v13,v12]
+            del v12, v13
+            return v14
+        case US0_4(): # StartTrainingVsSelf
+            del v0
+            v15 = method3()
+            v16 = "StartTrainingVsSelf"
+            v17 = [v16,v15]
+            del v15, v16
+            return v17
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method0(v0 : US0) -> object:
+    v1 = method1(v0)
+    del v0
+    return v1
+def method12(v0 : u32) -> object:
+    v1 = v0
+    del v0
+    return v1
+def method11(v0 : u32) -> object:
+    return method12(v0)
+def method17(v0 : US6) -> object:
+    match v0:
+        case US6_0(): # Jack
+            del v0
+            v1 = method3()
+            v2 = "Jack"
+            v3 = [v2,v1]
+            del v1, v2
+            return v3
+        case US6_1(): # King
+            del v0
+            v4 = method3()
+            v5 = "King"
+            v6 = [v5,v4]
+            del v4, v5
+            return v6
+        case US6_2(): # Queen
+            del v0
+            v7 = method3()
+            v8 = "Queen"
+            v9 = [v8,v7]
+            del v7, v8
+            return v9
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method16(v0 : US5) -> object:
+    match v0:
+        case US5_0(): # None
+            del v0
+            v1 = method3()
+            v2 = "None"
+            v3 = [v2,v1]
+            del v1, v2
+            return v3
+        case US5_1(v4): # Some
+            del v0
+            v5 = method17(v4)
+            del v4
+            v6 = "Some"
+            v7 = [v6,v5]
+            del v5, v6
+            return v7
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method18(v0 : bool) -> object:
+    v1 = v0
+    del v0
+    return v1
+def method19(v0 : static_array) -> object:
+    v1 = []
+    v2 = 0
+    while method5(v2):
+        v5 = v0[v2]
+        v6 = method17(v5)
+        del v5
+        v1.append(v6)
+        del v6
+        v2 += 1 
+    del v0, v2
+    return v1
+def method20(v0 : i32) -> object:
+    v1 = v0
+    del v0
+    return v1
+def method21(v0 : static_array) -> object:
+    v1 = []
+    v2 = 0
+    while method5(v2):
+        v5 = v0[v2]
+        v6 = method20(v5)
+        del v5
+        v1.append(v6)
+        del v6
+        v2 += 1 
+    del v0, v2
+    return v1
+def method15(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32) -> object:
+    v6 = method16(v0)
+    del v0
+    v7 = method18(v1)
+    del v1
+    v8 = method19(v2)
+    del v2
+    v9 = method20(v3)
+    del v3
+    v10 = method21(v4)
+    del v4
+    v11 = method20(v5)
+    del v5
+    v12 = {'community_card': v6, 'is_button_s_first_move': v7, 'pl_card': v8, 'player_turn': v9, 'pot': v10, 'raises_left': v11}
+    del v6, v7, v8, v9, v10, v11
+    return v12
+def method22(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32, v6 : US1) -> object:
+    v7 = []
+    v8 = method15(v0, v1, v2, v3, v4, v5)
+    del v0, v1, v2, v3, v4, v5
+    v7.append(v8)
+    del v8
+    v9 = method2(v6)
+    del v6
+    v7.append(v9)
+    del v9
+    v10 = v7
+    del v7
+    return v10
+def method14(v0 : US4) -> object:
+    match v0:
+        case US4_0(v1, v2, v3, v4, v5, v6): # ChanceCommunityCard
+            del v0
+            v7 = method15(v1, v2, v3, v4, v5, v6)
+            del v1, v2, v3, v4, v5, v6
+            v8 = "ChanceCommunityCard"
+            v9 = [v8,v7]
+            del v7, v8
+            return v9
+        case US4_1(): # ChanceInit
+            del v0
+            v10 = method3()
+            v11 = "ChanceInit"
+            v12 = [v11,v10]
+            del v10, v11
+            return v12
+        case US4_2(v13, v14, v15, v16, v17, v18): # Round
+            del v0
+            v19 = method15(v13, v14, v15, v16, v17, v18)
+            del v13, v14, v15, v16, v17, v18
+            v20 = "Round"
+            v21 = [v20,v19]
+            del v19, v20
+            return v21
+        case US4_3(v22, v23, v24, v25, v26, v27, v28): # RoundWithAction
+            del v0
+            v29 = method22(v22, v23, v24, v25, v26, v27, v28)
+            del v22, v23, v24, v25, v26, v27, v28
+            v30 = "RoundWithAction"
+            v31 = [v30,v29]
+            del v29, v30
+            return v31
+        case US4_4(v32, v33, v34, v35, v36, v37): # TerminalCall
+            del v0
+            v38 = method15(v32, v33, v34, v35, v36, v37)
+            del v32, v33, v34, v35, v36, v37
+            v39 = "TerminalCall"
+            v40 = [v39,v38]
+            del v38, v39
+            return v40
+        case US4_5(v41, v42, v43, v44, v45, v46): # TerminalFold
+            del v0
+            v47 = method15(v41, v42, v43, v44, v45, v46)
+            del v41, v42, v43, v44, v45, v46
+            v48 = "TerminalFold"
+            v49 = [v48,v47]
+            del v47, v48
+            return v49
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method13(v0 : US3) -> object:
+    match v0:
+        case US3_0(): # None
+            del v0
+            v1 = method3()
+            v2 = "None"
+            v3 = [v2,v1]
+            del v1, v2
+            return v3
+        case US3_1(v4): # Some
+            del v0
+            v5 = method14(v4)
+            del v4
+            v6 = "Some"
+            v7 = [v6,v5]
+            del v5, v6
+            return v7
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method10(v0 : u32, v1 : US3) -> object:
+    v2 = method11(v0)
+    del v0
+    v3 = method13(v1)
+    del v1
+    v4 = {'deck': v2, 'game': v3}
+    del v2, v3
+    return v4
+def method25(v0 : i32, v1 : i32) -> bool:
+    v2 = v1 < v0
+    del v0, v1
+    return v2
+def method27(v0 : i32, v1 : US1) -> object:
+    v2 = []
+    v3 = method20(v0)
+    del v0
+    v2.append(v3)
+    del v3
+    v4 = method2(v1)
+    del v1
+    v2.append(v4)
+    del v4
+    v5 = v2
+    del v2
+    return v5
+def method28(v0 : i32, v1 : US6) -> object:
+    v2 = []
+    v3 = method20(v0)
+    del v0
+    v2.append(v3)
+    del v3
+    v4 = method17(v1)
+    del v1
+    v2.append(v4)
+    del v4
+    v5 = v2
+    del v2
+    return v5
+def method29(v0 : static_array, v1 : i32, v2 : i32) -> object:
+    v3 = method19(v0)
+    del v0
+    v4 = method20(v1)
+    del v1
+    v5 = method20(v2)
+    del v2
+    v6 = {'cards_shown': v3, 'chips_won': v4, 'winner_id': v5}
+    del v3, v4, v5
+    return v6
+def method26(v0 : US8) -> object:
+    match v0:
+        case US8_0(v1): # CommunityCardIs
+            del v0
+            v2 = method17(v1)
+            del v1
+            v3 = "CommunityCardIs"
+            v4 = [v3,v2]
+            del v2, v3
+            return v4
+        case US8_1(v5, v6): # PlayerAction
+            del v0
+            v7 = method27(v5, v6)
+            del v5, v6
+            v8 = "PlayerAction"
+            v9 = [v8,v7]
+            del v7, v8
+            return v9
+        case US8_2(v10, v11): # PlayerGotCard
+            del v0
+            v12 = method28(v10, v11)
+            del v10, v11
+            v13 = "PlayerGotCard"
+            v14 = [v13,v12]
+            del v12, v13
+            return v14
+        case US8_3(v15, v16, v17): # Showdown
+            del v0
+            v18 = method29(v15, v16, v17)
+            del v15, v16, v17
+            v19 = "Showdown"
+            v20 = [v19,v18]
+            del v18, v19
+            return v20
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method24(v0 : static_array_list) -> object:
+    v1 = []
+    v2 = v0.length
+    v3 = 0
+    while method25(v2, v3):
+        v6 = v0[v3]
+        v7 = method26(v6)
+        del v6
+        v1.append(v7)
+        del v7
+        v3 += 1 
+    del v0, v2, v3
+    return v1
+def method30(v0 : US7) -> object:
+    match v0:
+        case US7_0(): # GameNotStarted
+            del v0
+            v1 = method3()
+            v2 = "GameNotStarted"
+            v3 = [v2,v1]
+            del v1, v2
+            return v3
+        case US7_1(v4, v5, v6, v7, v8, v9): # GameOver
+            del v0
+            v10 = method15(v4, v5, v6, v7, v8, v9)
+            del v4, v5, v6, v7, v8, v9
+            v11 = "GameOver"
+            v12 = [v11,v10]
+            del v10, v11
+            return v12
+        case US7_2(v13, v14, v15, v16, v17, v18): # WaitingForActionFromPlayerId
+            del v0
+            v19 = method15(v13, v14, v15, v16, v17, v18)
+            del v13, v14, v15, v16, v17, v18
+            v20 = "WaitingForActionFromPlayerId"
+            v21 = [v20,v19]
+            del v19, v20
+            return v21
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+def method23(v0 : static_array_list, v1 : static_array, v2 : US7) -> object:
+    v3 = method24(v0)
+    del v0
+    v4 = method4(v1)
+    del v1
+    v5 = method30(v2)
+    del v2
+    v6 = {'messages': v3, 'pl_type': v4, 'ui_game_state': v5}
+    del v3, v4, v5
+    return v6
+def method9(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7) -> object:
+    v5 = method10(v0, v1)
+    del v0, v1
+    v6 = method23(v2, v3, v4)
+    del v2, v3, v4
+    v7 = {'private': v5, 'public': v6}
+    del v5, v6
+    return v7
+def method36(v0 : cp.ndarray) -> object:
+    v1 = v0
+    del v0
+    return v1
+def method35(v0 : cp.ndarray) -> object:
+    return method36(v0)
+def method37(v0 : u64) -> object:
+    v1 = v0
+    del v0
+    return v1
+def method34(v0 : cp.ndarray, v1 : u64) -> object:
+    v2 = []
+    v3 = method35(v0)
+    del v0
+    v2.append(v3)
+    del v3
+    v4 = method37(v1)
+    del v1
+    v2.append(v4)
+    del v4
+    v5 = v2
+    del v2
+    return v5
+def method33(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    v4 = method34(v0, v1)
+    del v0, v1
+    v5 = method34(v2, v3)
+    del v2, v3
+    v6 = {'output': v4, 'param': v5}
+    del v4, v5
+    return v6
+def method32(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    return method33(v0, v1, v2, v3)
+def method31(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    v4 = method32(v0, v1, v2, v3)
+    del v0, v1, v2, v3
+    v5 = {'model_data': v4}
+    del v4
+    return v5
+def method8(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
+    v9 = method9(v0, v1, v2, v3, v4)
+    del v0, v1, v2, v3, v4
+    v10 = method31(v5, v6, v7, v8)
+    del v5, v6, v7, v8
+    v11 = {'game': v9, 'neural': v10}
+    del v9, v10
+    return v11
+def method7(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
+    v9 = method8(v0, v1, v2, v3, v4, v5, v6, v7, v8)
+    del v0, v1, v2, v3, v4, v5, v6, v7, v8
+    return v9
+def method41(v0 : object) -> None:
     assert v0 == [], f'Expected an unit type. Got: {v0}'
     del v0
     return 
-def method2(v0 : object) -> US1:
+def method40(v0 : object) -> US1:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "Call" == v1
     if v3:
         del v1, v3
-        method3(v2)
+        method41(v2)
         del v2
         return US1_0()
     else:
@@ -19460,7 +19696,7 @@ def method2(v0 : object) -> US1:
         v5 = "Fold" == v1
         if v5:
             del v1, v5
-            method3(v2)
+            method41(v2)
             del v2
             return US1_1()
         else:
@@ -19468,7 +19704,7 @@ def method2(v0 : object) -> US1:
             v7 = "Raise" == v1
             if v7:
                 del v1, v7
-                method3(v2)
+                method41(v2)
                 del v2
                 return US1_2()
             else:
@@ -19476,18 +19712,14 @@ def method2(v0 : object) -> US1:
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
-def method5(v0 : i32, v1 : i32) -> bool:
-    v2 = v1 < v0
-    del v0, v1
-    return v2
-def method6(v0 : object) -> US2:
+def method43(v0 : object) -> US2:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "Computer" == v1
     if v3:
         del v1, v3
-        method3(v2)
+        method41(v2)
         del v2
         return US2_0()
     else:
@@ -19495,7 +19727,7 @@ def method6(v0 : object) -> US2:
         v5 = "Human" == v1
         if v5:
             del v1, v5
-            method3(v2)
+            method41(v2)
             del v2
             return US2_1()
         else:
@@ -19503,7 +19735,7 @@ def method6(v0 : object) -> US2:
             v7 = "Random" == v1
             if v7:
                 del v1, v7
-                method3(v2)
+                method41(v2)
                 del v2
                 return US2_2()
             else:
@@ -19511,7 +19743,7 @@ def method6(v0 : object) -> US2:
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
-def method4(v0 : object) -> static_array:
+def method42(v0 : object) -> static_array:
     assert isinstance(v0,list), f'The object needs to be a Python list. Got: {v0}'
     v1 = len(v0) # type: ignore
     v2 = 2 == v1
@@ -19525,23 +19757,23 @@ def method4(v0 : object) -> static_array:
     del v2, v3
     v6 = static_array(2)
     v7 = 0
-    while method5(v1, v7):
+    while method25(v1, v7):
         v9 = v0[v7]
-        v10 = method6(v9)
+        v10 = method43(v9)
         del v9
         v6[v7] = v10
         del v10
         v7 += 1 
     del v0, v1, v7
     return v6
-def method1(v0 : object) -> US0:
+def method39(v0 : object) -> US0:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "ActionSelected" == v1
     if v3:
         del v1, v3
-        v4 = method2(v2)
+        v4 = method40(v2)
         del v2
         return US0_0(v4)
     else:
@@ -19549,7 +19781,7 @@ def method1(v0 : object) -> US0:
         v6 = "PlayerChanged" == v1
         if v6:
             del v1, v6
-            v7 = method4(v2)
+            v7 = method42(v2)
             del v2
             return US0_1(v7)
         else:
@@ -19557,7 +19789,7 @@ def method1(v0 : object) -> US0:
             v9 = "StartGame" == v1
             if v9:
                 del v1, v9
-                method3(v2)
+                method41(v2)
                 del v2
                 return US0_2()
             else:
@@ -19565,7 +19797,7 @@ def method1(v0 : object) -> US0:
                 v11 = "StartTrainingVsRando" == v1
                 if v11:
                     del v1, v11
-                    method3(v2)
+                    method41(v2)
                     del v2
                     return US0_3()
                 else:
@@ -19573,7 +19805,7 @@ def method1(v0 : object) -> US0:
                     v13 = "StartTrainingVsSelf" == v1
                     if v13:
                         del v1, v13
-                        method3(v2)
+                        method41(v2)
                         del v2
                         return US0_4()
                     else:
@@ -19581,25 +19813,25 @@ def method1(v0 : object) -> US0:
                         raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                         del v1
                         raise Exception("Error")
-def method0(v0 : object) -> US0:
-    return method1(v0)
-def method12(v0 : object) -> u32:
+def method38(v0 : object) -> US0:
+    return method39(v0)
+def method49(v0 : object) -> u32:
     assert isinstance(v0,u32), f'The object needs to be the right primitive type. Got: {v0}'
     v1 = v0
     del v0
     return v1
-def method11(v0 : object) -> u32:
-    v1 = method12(v0)
+def method48(v0 : object) -> u32:
+    v1 = method49(v0)
     del v0
     return v1
-def method17(v0 : object) -> US6:
+def method54(v0 : object) -> US6:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "Jack" == v1
     if v3:
         del v1, v3
-        method3(v2)
+        method41(v2)
         del v2
         return US6_0()
     else:
@@ -19607,7 +19839,7 @@ def method17(v0 : object) -> US6:
         v5 = "King" == v1
         if v5:
             del v1, v5
-            method3(v2)
+            method41(v2)
             del v2
             return US6_1()
         else:
@@ -19615,7 +19847,7 @@ def method17(v0 : object) -> US6:
             v7 = "Queen" == v1
             if v7:
                 del v1, v7
-                method3(v2)
+                method41(v2)
                 del v2
                 return US6_2()
             else:
@@ -19623,14 +19855,14 @@ def method17(v0 : object) -> US6:
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
-def method16(v0 : object) -> US5:
+def method53(v0 : object) -> US5:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "None" == v1
     if v3:
         del v1, v3
-        method3(v2)
+        method41(v2)
         del v2
         return US5_0()
     else:
@@ -19638,7 +19870,7 @@ def method16(v0 : object) -> US5:
         v5 = "Some" == v1
         if v5:
             del v1, v5
-            v6 = method17(v2)
+            v6 = method54(v2)
             del v2
             return US5_1(v6)
         else:
@@ -19646,12 +19878,12 @@ def method16(v0 : object) -> US5:
             raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
             del v1
             raise Exception("Error")
-def method18(v0 : object) -> bool:
+def method55(v0 : object) -> bool:
     assert isinstance(v0,bool), f'The object needs to be the right primitive type. Got: {v0}'
     v1 = v0
     del v0
     return v1
-def method19(v0 : object) -> static_array:
+def method56(v0 : object) -> static_array:
     assert isinstance(v0,list), f'The object needs to be a Python list. Got: {v0}'
     v1 = len(v0) # type: ignore
     v2 = 2 == v1
@@ -19665,21 +19897,21 @@ def method19(v0 : object) -> static_array:
     del v2, v3
     v6 = static_array(2)
     v7 = 0
-    while method5(v1, v7):
+    while method25(v1, v7):
         v9 = v0[v7]
-        v10 = method17(v9)
+        v10 = method54(v9)
         del v9
         v6[v7] = v10
         del v10
         v7 += 1 
     del v0, v1, v7
     return v6
-def method20(v0 : object) -> i32:
+def method57(v0 : object) -> i32:
     assert isinstance(v0,i32), f'The object needs to be the right primitive type. Got: {v0}'
     v1 = v0
     del v0
     return v1
-def method21(v0 : object) -> static_array:
+def method58(v0 : object) -> static_array:
     assert isinstance(v0,list), f'The object needs to be a Python list. Got: {v0}'
     v1 = len(v0) # type: ignore
     v2 = 2 == v1
@@ -19693,53 +19925,53 @@ def method21(v0 : object) -> static_array:
     del v2, v3
     v6 = static_array(2)
     v7 = 0
-    while method5(v1, v7):
+    while method25(v1, v7):
         v9 = v0[v7]
-        v10 = method20(v9)
+        v10 = method57(v9)
         del v9
         v6[v7] = v10
         del v10
         v7 += 1 
     del v0, v1, v7
     return v6
-def method15(v0 : object) -> Tuple[US5, bool, static_array, i32, static_array, i32]:
+def method52(v0 : object) -> Tuple[US5, bool, static_array, i32, static_array, i32]:
     v1 = v0["community_card"] # type: ignore
-    v2 = method16(v1)
+    v2 = method53(v1)
     del v1
     v3 = v0["is_button_s_first_move"] # type: ignore
-    v4 = method18(v3)
+    v4 = method55(v3)
     del v3
     v5 = v0["pl_card"] # type: ignore
-    v6 = method19(v5)
+    v6 = method56(v5)
     del v5
     v7 = v0["player_turn"] # type: ignore
-    v8 = method20(v7)
+    v8 = method57(v7)
     del v7
     v9 = v0["pot"] # type: ignore
-    v10 = method21(v9)
+    v10 = method58(v9)
     del v9
     v11 = v0["raises_left"] # type: ignore
     del v0
-    v12 = method20(v11)
+    v12 = method57(v11)
     del v11
     return v2, v4, v6, v8, v10, v12
-def method22(v0 : object) -> Tuple[US5, bool, static_array, i32, static_array, i32, US1]:
+def method59(v0 : object) -> Tuple[US5, bool, static_array, i32, static_array, i32, US1]:
     v1 = v0[0] # type: ignore
-    v2, v3, v4, v5, v6, v7 = method15(v1)
+    v2, v3, v4, v5, v6, v7 = method52(v1)
     del v1
     v8 = v0[1] # type: ignore
     del v0
-    v9 = method2(v8)
+    v9 = method40(v8)
     del v8
     return v2, v3, v4, v5, v6, v7, v9
-def method14(v0 : object) -> US4:
+def method51(v0 : object) -> US4:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "ChanceCommunityCard" == v1
     if v3:
         del v1, v3
-        v4, v5, v6, v7, v8, v9 = method15(v2)
+        v4, v5, v6, v7, v8, v9 = method52(v2)
         del v2
         return US4_0(v4, v5, v6, v7, v8, v9)
     else:
@@ -19747,7 +19979,7 @@ def method14(v0 : object) -> US4:
         v11 = "ChanceInit" == v1
         if v11:
             del v1, v11
-            method3(v2)
+            method41(v2)
             del v2
             return US4_1()
         else:
@@ -19755,7 +19987,7 @@ def method14(v0 : object) -> US4:
             v13 = "Round" == v1
             if v13:
                 del v1, v13
-                v14, v15, v16, v17, v18, v19 = method15(v2)
+                v14, v15, v16, v17, v18, v19 = method52(v2)
                 del v2
                 return US4_2(v14, v15, v16, v17, v18, v19)
             else:
@@ -19763,7 +19995,7 @@ def method14(v0 : object) -> US4:
                 v21 = "RoundWithAction" == v1
                 if v21:
                     del v1, v21
-                    v22, v23, v24, v25, v26, v27, v28 = method22(v2)
+                    v22, v23, v24, v25, v26, v27, v28 = method59(v2)
                     del v2
                     return US4_3(v22, v23, v24, v25, v26, v27, v28)
                 else:
@@ -19771,7 +20003,7 @@ def method14(v0 : object) -> US4:
                     v30 = "TerminalCall" == v1
                     if v30:
                         del v1, v30
-                        v31, v32, v33, v34, v35, v36 = method15(v2)
+                        v31, v32, v33, v34, v35, v36 = method52(v2)
                         del v2
                         return US4_4(v31, v32, v33, v34, v35, v36)
                     else:
@@ -19779,7 +20011,7 @@ def method14(v0 : object) -> US4:
                         v38 = "TerminalFold" == v1
                         if v38:
                             del v1, v38
-                            v39, v40, v41, v42, v43, v44 = method15(v2)
+                            v39, v40, v41, v42, v43, v44 = method52(v2)
                             del v2
                             return US4_5(v39, v40, v41, v42, v43, v44)
                         else:
@@ -19787,14 +20019,14 @@ def method14(v0 : object) -> US4:
                             raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                             del v1
                             raise Exception("Error")
-def method13(v0 : object) -> US3:
+def method50(v0 : object) -> US3:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "None" == v1
     if v3:
         del v1, v3
-        method3(v2)
+        method41(v2)
         del v2
         return US3_0()
     else:
@@ -19802,7 +20034,7 @@ def method13(v0 : object) -> US3:
         v5 = "Some" == v1
         if v5:
             del v1, v5
-            v6 = method14(v2)
+            v6 = method51(v2)
             del v2
             return US3_1(v6)
         else:
@@ -19810,53 +20042,53 @@ def method13(v0 : object) -> US3:
             raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
             del v1
             raise Exception("Error")
-def method10(v0 : object) -> Tuple[u32, US3]:
+def method47(v0 : object) -> Tuple[u32, US3]:
     v1 = v0["deck"] # type: ignore
-    v2 = method11(v1)
+    v2 = method48(v1)
     del v1
     v3 = v0["game"] # type: ignore
     del v0
-    v4 = method13(v3)
+    v4 = method50(v3)
     del v3
     return v2, v4
-def method26(v0 : object) -> Tuple[i32, US1]:
+def method63(v0 : object) -> Tuple[i32, US1]:
     v1 = v0[0] # type: ignore
-    v2 = method20(v1)
+    v2 = method57(v1)
     del v1
     v3 = v0[1] # type: ignore
     del v0
-    v4 = method2(v3)
+    v4 = method40(v3)
     del v3
     return v2, v4
-def method27(v0 : object) -> Tuple[i32, US6]:
+def method64(v0 : object) -> Tuple[i32, US6]:
     v1 = v0[0] # type: ignore
-    v2 = method20(v1)
+    v2 = method57(v1)
     del v1
     v3 = v0[1] # type: ignore
     del v0
-    v4 = method17(v3)
+    v4 = method54(v3)
     del v3
     return v2, v4
-def method28(v0 : object) -> Tuple[static_array, i32, i32]:
+def method65(v0 : object) -> Tuple[static_array, i32, i32]:
     v1 = v0["cards_shown"] # type: ignore
-    v2 = method19(v1)
+    v2 = method56(v1)
     del v1
     v3 = v0["chips_won"] # type: ignore
-    v4 = method20(v3)
+    v4 = method57(v3)
     del v3
     v5 = v0["winner_id"] # type: ignore
     del v0
-    v6 = method20(v5)
+    v6 = method57(v5)
     del v5
     return v2, v4, v6
-def method25(v0 : object) -> US8:
+def method62(v0 : object) -> US8:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "CommunityCardIs" == v1
     if v3:
         del v1, v3
-        v4 = method17(v2)
+        v4 = method54(v2)
         del v2
         return US8_0(v4)
     else:
@@ -19864,7 +20096,7 @@ def method25(v0 : object) -> US8:
         v6 = "PlayerAction" == v1
         if v6:
             del v1, v6
-            v7, v8 = method26(v2)
+            v7, v8 = method63(v2)
             del v2
             return US8_1(v7, v8)
         else:
@@ -19872,7 +20104,7 @@ def method25(v0 : object) -> US8:
             v10 = "PlayerGotCard" == v1
             if v10:
                 del v1, v10
-                v11, v12 = method27(v2)
+                v11, v12 = method64(v2)
                 del v2
                 return US8_2(v11, v12)
             else:
@@ -19880,7 +20112,7 @@ def method25(v0 : object) -> US8:
                 v14 = "Showdown" == v1
                 if v14:
                     del v1, v14
-                    v15, v16, v17 = method28(v2)
+                    v15, v16, v17 = method65(v2)
                     del v2
                     return US8_3(v15, v16, v17)
                 else:
@@ -19888,7 +20120,7 @@ def method25(v0 : object) -> US8:
                     raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                     del v1
                     raise Exception("Error")
-def method24(v0 : object) -> static_array_list:
+def method61(v0 : object) -> static_array_list:
     v1 = len(v0) # type: ignore
     assert (32 >= v1), f'The length of the original object has to be greater than or equal to the static array dimension.\nExpected: 32\nGot: {v1} '
     del v1
@@ -19906,23 +20138,23 @@ def method24(v0 : object) -> static_array_list:
     v7 = static_array_list(32)
     v7.unsafe_set_length(v2)
     v8 = 0
-    while method5(v2, v8):
+    while method25(v2, v8):
         v10 = v0[v8]
-        v11 = method25(v10)
+        v11 = method62(v10)
         del v10
         v7[v8] = v11
         del v11
         v8 += 1 
     del v0, v2, v8
     return v7
-def method29(v0 : object) -> US7:
+def method66(v0 : object) -> US7:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
     v3 = "GameNotStarted" == v1
     if v3:
         del v1, v3
-        method3(v2)
+        method41(v2)
         del v2
         return US7_0()
     else:
@@ -19930,7 +20162,7 @@ def method29(v0 : object) -> US7:
         v5 = "GameOver" == v1
         if v5:
             del v1, v5
-            v6, v7, v8, v9, v10, v11 = method15(v2)
+            v6, v7, v8, v9, v10, v11 = method52(v2)
             del v2
             return US7_1(v6, v7, v8, v9, v10, v11)
         else:
@@ -19938,7 +20170,7 @@ def method29(v0 : object) -> US7:
             v13 = "WaitingForActionFromPlayerId" == v1
             if v13:
                 del v1, v13
-                v14, v15, v16, v17, v18, v19 = method15(v2)
+                v14, v15, v16, v17, v18, v19 = method52(v2)
                 del v2
                 return US7_2(v14, v15, v16, v17, v18, v19)
             else:
@@ -19946,133 +20178,129 @@ def method29(v0 : object) -> US7:
                 raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
                 del v1
                 raise Exception("Error")
-def method23(v0 : object) -> Tuple[static_array_list, static_array, US7]:
+def method60(v0 : object) -> Tuple[static_array_list, static_array, US7]:
     v1 = v0["messages"] # type: ignore
-    v2 = method24(v1)
+    v2 = method61(v1)
     del v1
     v3 = v0["pl_type"] # type: ignore
-    v4 = method4(v3)
+    v4 = method42(v3)
     del v3
     v5 = v0["ui_game_state"] # type: ignore
     del v0
-    v6 = method29(v5)
+    v6 = method66(v5)
     del v5
     return v2, v4, v6
-def method9(v0 : object) -> Tuple[u32, US3, static_array_list, static_array, US7]:
+def method46(v0 : object) -> Tuple[u32, US3, static_array_list, static_array, US7]:
     v1 = v0["private"] # type: ignore
-    v2, v3 = method10(v1)
+    v2, v3 = method47(v1)
     del v1
     v4 = v0["public"] # type: ignore
     del v0
-    v5, v6, v7 = method23(v4)
+    v5, v6, v7 = method60(v4)
     del v4
     return v2, v3, v5, v6, v7
-def method35(v0 : object) -> cp.ndarray:
+def method72(v0 : object) -> cp.ndarray:
     assert isinstance(v0,cp.ndarray), f'The object needs to be the right primitive type. Got: {v0}'
     v1 = v0
     del v0
     return v1
-def method34(v0 : object) -> cp.ndarray:
-    v1 = method35(v0)
+def method71(v0 : object) -> cp.ndarray:
+    v1 = method72(v0)
     del v0
     return v1
-def method36(v0 : object) -> u64:
+def method73(v0 : object) -> u64:
     assert isinstance(v0,u64), f'The object needs to be the right primitive type. Got: {v0}'
     v1 = v0
     del v0
     return v1
-def method33(v0 : object) -> Tuple[cp.ndarray, u64]:
+def method70(v0 : object) -> Tuple[cp.ndarray, u64]:
     v1 = v0[0] # type: ignore
-    v2 = method34(v1)
+    v2 = method71(v1)
     del v1
     v3 = v0[1] # type: ignore
     del v0
-    v4 = method36(v3)
+    v4 = method73(v3)
     del v3
     return v2, v4
-def method32(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
+def method69(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
     v1 = v0["output"] # type: ignore
-    v2, v3 = method33(v1)
+    v2, v3 = method70(v1)
     del v1
     v4 = v0["param"] # type: ignore
     del v0
-    v5, v6 = method33(v4)
+    v5, v6 = method70(v4)
     del v4
     return v2, v3, v5, v6
-def method31(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
-    v1, v2, v3, v4 = method32(v0)
+def method68(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
+    v1, v2, v3, v4 = method69(v0)
     del v0
     return v1, v2, v3, v4
-def method30(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
+def method67(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
     v1 = v0["model_data"] # type: ignore
     del v0
-    v2, v3, v4, v5 = method31(v1)
+    v2, v3, v4, v5 = method68(v1)
     del v1
     return v2, v3, v4, v5
-def method8(v0 : object) -> Tuple[u32, US3, static_array_list, static_array, US7, cp.ndarray, u64, cp.ndarray, u64]:
+def method45(v0 : object) -> Tuple[u32, US3, static_array_list, static_array, US7, cp.ndarray, u64, cp.ndarray, u64]:
     v1 = v0["game"] # type: ignore
-    v2, v3, v4, v5, v6 = method9(v1)
+    v2, v3, v4, v5, v6 = method46(v1)
     del v1
     v7 = v0["neural"] # type: ignore
     del v0
-    v8, v9, v10, v11 = method30(v7)
+    v8, v9, v10, v11 = method67(v7)
     del v7
     return v2, v3, v4, v5, v6, v8, v9, v10, v11
-def method7(v0 : object) -> Tuple[u32, US3, static_array_list, static_array, US7, cp.ndarray, u64, cp.ndarray, u64]:
-    return method8(v0)
-def method38(v0 : cp.ndarray, v1 : u32) -> None:
+def method44(v0 : object) -> Tuple[u32, US3, static_array_list, static_array, US7, cp.ndarray, u64, cp.ndarray, u64]:
+    return method45(v0)
+def method75(v0 : cp.ndarray, v1 : u32) -> None:
     v3 = v0[0:].view(cp.uint32)
     del v0
     v3[0] = v1
     del v1, v3
     return 
-def method39(v0 : cp.ndarray, v1 : i32) -> None:
+def method76(v0 : cp.ndarray, v1 : i32) -> None:
     v3 = v0[4:].view(cp.int32)
     del v0
     v3[0] = v1
     del v1, v3
     return 
-def method40(v0 : cp.ndarray) -> None:
+def method77(v0 : cp.ndarray) -> None:
     del v0
     return 
-def method42(v0 : cp.ndarray, v1 : i32) -> None:
+def method79(v0 : cp.ndarray, v1 : i32) -> None:
     v3 = v0[0:].view(cp.int32)
     del v0
     v3[0] = v1
     del v1, v3
     return 
-def method44(v0 : cp.ndarray, v1 : US6) -> None:
+def method81(v0 : cp.ndarray, v1 : US6) -> None:
     v2 = v1.tag
-    method42(v0, v2)
+    method79(v0, v2)
     del v2
     v4 = v0[4:].view(cp.uint8)
     del v0
     match v1:
         case US6_0(): # Jack
             del v1
-            return method40(v4)
+            return method77(v4)
         case US6_1(): # King
             del v1
-            return method40(v4)
+            return method77(v4)
         case US6_2(): # Queen
             del v1
-            return method40(v4)
+            return method77(v4)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method45(v0 : i32) -> bool:
-    v1 = v0 < 2
-    del v0
-    return v1
-def method43(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, v5 : static_array, v6 : i32) -> None:
+def method80(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, v5 : static_array, v6 : i32) -> None:
     v7 = v1.tag
-    method42(v0, v7)
+    method79(v0, v7)
     del v7
     v9 = v0[4:].view(cp.uint8)
     match v1:
         case US5_0(): # None
-            method40(v9)
+            method77(v9)
         case US5_1(v10): # Some
-            method44(v9, v10)
+            method81(v9, v10)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
     del v1, v9
@@ -20080,7 +20308,7 @@ def method43(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
     v12[0] = v2
     del v2, v12
     v13 = 0
-    while method45(v13):
+    while method5(v13):
         v15 = u64(v13)
         v16 = v15 * 4
         del v15
@@ -20089,7 +20317,7 @@ def method43(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
         v19 = v0[v17:].view(cp.uint8)
         del v17
         v21 = v3[v13]
-        method44(v19, v21)
+        method81(v19, v21)
         del v19, v21
         v13 += 1 
     del v3, v13
@@ -20097,7 +20325,7 @@ def method43(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
     v23[0] = v4
     del v4, v23
     v24 = 0
-    while method45(v24):
+    while method5(v24):
         v26 = u64(v24)
         v27 = v26 * 4
         del v26
@@ -20106,7 +20334,7 @@ def method43(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
         v30 = v0[v28:].view(cp.uint8)
         del v28
         v32 = v5[v24]
-        method42(v30, v32)
+        method79(v30, v32)
         del v30, v32
         v24 += 1 
     del v5, v24
@@ -20115,22 +20343,22 @@ def method43(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
     v34[0] = v6
     del v6, v34
     return 
-def method47(v0 : cp.ndarray, v1 : i32) -> None:
+def method83(v0 : cp.ndarray, v1 : i32) -> None:
     v3 = v0[36:].view(cp.int32)
     del v0
     v3[0] = v1
     del v1, v3
     return 
-def method46(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, v5 : static_array, v6 : i32, v7 : US1) -> None:
+def method82(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, v5 : static_array, v6 : i32, v7 : US1) -> None:
     v8 = v1.tag
-    method42(v0, v8)
+    method79(v0, v8)
     del v8
     v10 = v0[4:].view(cp.uint8)
     match v1:
         case US5_0(): # None
-            method40(v10)
+            method77(v10)
         case US5_1(v11): # Some
-            method44(v10, v11)
+            method81(v10, v11)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
     del v1, v10
@@ -20138,7 +20366,7 @@ def method46(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
     v13[0] = v2
     del v2, v13
     v14 = 0
-    while method45(v14):
+    while method5(v14):
         v16 = u64(v14)
         v17 = v16 * 4
         del v16
@@ -20147,7 +20375,7 @@ def method46(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
         v20 = v0[v18:].view(cp.uint8)
         del v18
         v22 = v3[v14]
-        method44(v20, v22)
+        method81(v20, v22)
         del v20, v22
         v14 += 1 
     del v3, v14
@@ -20155,7 +20383,7 @@ def method46(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
     v24[0] = v4
     del v4, v24
     v25 = 0
-    while method45(v25):
+    while method5(v25):
         v27 = u64(v25)
         v28 = v27 * 4
         del v27
@@ -20164,7 +20392,7 @@ def method46(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
         v31 = v0[v29:].view(cp.uint8)
         del v29
         v33 = v5[v25]
-        method42(v31, v33)
+        method79(v31, v33)
         del v31, v33
         v25 += 1 
     del v5, v25
@@ -20172,107 +20400,107 @@ def method46(v0 : cp.ndarray, v1 : US5, v2 : bool, v3 : static_array, v4 : i32, 
     v35[0] = v6
     del v6, v35
     v36 = v7.tag
-    method47(v0, v36)
+    method83(v0, v36)
     del v36
     v38 = v0[40:].view(cp.uint8)
     del v0
     match v7:
         case US1_0(): # Call
             del v7
-            return method40(v38)
+            return method77(v38)
         case US1_1(): # Fold
             del v7
-            return method40(v38)
+            return method77(v38)
         case US1_2(): # Raise
             del v7
-            return method40(v38)
+            return method77(v38)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method41(v0 : cp.ndarray, v1 : US4) -> None:
+def method78(v0 : cp.ndarray, v1 : US4) -> None:
     v2 = v1.tag
-    method42(v0, v2)
+    method79(v0, v2)
     del v2
     v4 = v0[16:].view(cp.uint8)
     del v0
     match v1:
         case US4_0(v5, v6, v7, v8, v9, v10): # ChanceCommunityCard
             del v1
-            return method43(v4, v5, v6, v7, v8, v9, v10)
+            return method80(v4, v5, v6, v7, v8, v9, v10)
         case US4_1(): # ChanceInit
             del v1
-            return method40(v4)
+            return method77(v4)
         case US4_2(v11, v12, v13, v14, v15, v16): # Round
             del v1
-            return method43(v4, v11, v12, v13, v14, v15, v16)
+            return method80(v4, v11, v12, v13, v14, v15, v16)
         case US4_3(v17, v18, v19, v20, v21, v22, v23): # RoundWithAction
             del v1
-            return method46(v4, v17, v18, v19, v20, v21, v22, v23)
+            return method82(v4, v17, v18, v19, v20, v21, v22, v23)
         case US4_4(v24, v25, v26, v27, v28, v29): # TerminalCall
             del v1
-            return method43(v4, v24, v25, v26, v27, v28, v29)
+            return method80(v4, v24, v25, v26, v27, v28, v29)
         case US4_5(v30, v31, v32, v33, v34, v35): # TerminalFold
             del v1
-            return method43(v4, v30, v31, v32, v33, v34, v35)
+            return method80(v4, v30, v31, v32, v33, v34, v35)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method48(v0 : cp.ndarray, v1 : i32) -> None:
+def method84(v0 : cp.ndarray, v1 : i32) -> None:
     v3 = v0[80:].view(cp.int32)
     del v0
     v3[0] = v1
     del v1, v3
     return 
-def method50(v0 : cp.ndarray, v1 : i32, v2 : US1) -> None:
+def method86(v0 : cp.ndarray, v1 : i32, v2 : US1) -> None:
     v4 = v0[0:].view(cp.int32)
     v4[0] = v1
     del v1, v4
     v5 = v2.tag
-    method39(v0, v5)
+    method76(v0, v5)
     del v5
     v7 = v0[8:].view(cp.uint8)
     del v0
     match v2:
         case US1_0(): # Call
             del v2
-            return method40(v7)
+            return method77(v7)
         case US1_1(): # Fold
             del v2
-            return method40(v7)
+            return method77(v7)
         case US1_2(): # Raise
             del v2
-            return method40(v7)
+            return method77(v7)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method51(v0 : cp.ndarray, v1 : i32, v2 : US6) -> None:
+def method87(v0 : cp.ndarray, v1 : i32, v2 : US6) -> None:
     v4 = v0[0:].view(cp.int32)
     v4[0] = v1
     del v1, v4
     v5 = v2.tag
-    method39(v0, v5)
+    method76(v0, v5)
     del v5
     v7 = v0[8:].view(cp.uint8)
     del v0
     match v2:
         case US6_0(): # Jack
             del v2
-            return method40(v7)
+            return method77(v7)
         case US6_1(): # King
             del v2
-            return method40(v7)
+            return method77(v7)
         case US6_2(): # Queen
             del v2
-            return method40(v7)
+            return method77(v7)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method52(v0 : cp.ndarray, v1 : static_array, v2 : i32, v3 : i32) -> None:
+def method88(v0 : cp.ndarray, v1 : static_array, v2 : i32, v3 : i32) -> None:
     v4 = 0
-    while method45(v4):
+    while method5(v4):
         v6 = u64(v4)
         v7 = v6 * 4
         del v6
         v9 = v0[v7:].view(cp.uint8)
         del v7
         v11 = v1[v4]
-        method44(v9, v11)
+        method81(v9, v11)
         del v9, v11
         v4 += 1 
     del v1, v4
@@ -20284,72 +20512,72 @@ def method52(v0 : cp.ndarray, v1 : static_array, v2 : i32, v3 : i32) -> None:
     v15[0] = v3
     del v3, v15
     return 
-def method49(v0 : cp.ndarray, v1 : US8) -> None:
+def method85(v0 : cp.ndarray, v1 : US8) -> None:
     v2 = v1.tag
-    method42(v0, v2)
+    method79(v0, v2)
     del v2
     v4 = v0[16:].view(cp.uint8)
     del v0
     match v1:
         case US8_0(v5): # CommunityCardIs
             del v1
-            return method44(v4, v5)
+            return method81(v4, v5)
         case US8_1(v6, v7): # PlayerAction
             del v1
-            return method50(v4, v6, v7)
+            return method86(v4, v6, v7)
         case US8_2(v8, v9): # PlayerGotCard
             del v1
-            return method51(v4, v8, v9)
+            return method87(v4, v8, v9)
         case US8_3(v10, v11, v12): # Showdown
             del v1
-            return method52(v4, v10, v11, v12)
+            return method88(v4, v10, v11, v12)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method53(v0 : cp.ndarray, v1 : US2) -> None:
+def method89(v0 : cp.ndarray, v1 : US2) -> None:
     v2 = v1.tag
-    method42(v0, v2)
+    method79(v0, v2)
     del v2
     v4 = v0[4:].view(cp.uint8)
     del v0
     match v1:
         case US2_0(): # Computer
             del v1
-            return method40(v4)
+            return method77(v4)
         case US2_1(): # Human
             del v1
-            return method40(v4)
+            return method77(v4)
         case US2_2(): # Random
             del v1
-            return method40(v4)
+            return method77(v4)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method54(v0 : cp.ndarray, v1 : i32) -> None:
+def method90(v0 : cp.ndarray, v1 : i32) -> None:
     v3 = v0[1128:].view(cp.int32)
     del v0
     v3[0] = v1
     del v1, v3
     return 
-def method37(v0 : cp.ndarray, v1 : u32, v2 : US3, v3 : static_array_list, v4 : static_array, v5 : US7) -> None:
-    method38(v0, v1)
+def method74(v0 : cp.ndarray, v1 : u32, v2 : US3, v3 : static_array_list, v4 : static_array, v5 : US7) -> None:
+    method75(v0, v1)
     del v1
     v6 = v2.tag
-    method39(v0, v6)
+    method76(v0, v6)
     del v6
     v8 = v0[16:].view(cp.uint8)
     match v2:
         case US3_0(): # None
-            method40(v8)
+            method77(v8)
         case US3_1(v9): # Some
-            method41(v8, v9)
+            method78(v8, v9)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
     del v2, v8
     v10 = v3.length
-    method48(v0, v10)
+    method84(v0, v10)
     del v10
     v11 = v3.length
     v12 = 0
-    while method5(v11, v12):
+    while method25(v11, v12):
         v14 = u64(v12)
         v15 = v14 * 32
         del v14
@@ -20358,12 +20586,12 @@ def method37(v0 : cp.ndarray, v1 : u32, v2 : US3, v3 : static_array_list, v4 : s
         v18 = v0[v16:].view(cp.uint8)
         del v16
         v20 = v3[v12]
-        method49(v18, v20)
+        method85(v18, v20)
         del v18, v20
         v12 += 1 
     del v3, v11, v12
     v21 = 0
-    while method45(v21):
+    while method5(v21):
         v23 = u64(v21)
         v24 = v23 * 4
         del v23
@@ -20372,138 +20600,138 @@ def method37(v0 : cp.ndarray, v1 : u32, v2 : US3, v3 : static_array_list, v4 : s
         v27 = v0[v25:].view(cp.uint8)
         del v25
         v29 = v4[v21]
-        method53(v27, v29)
+        method89(v27, v29)
         del v27, v29
         v21 += 1 
     del v4, v21
     v30 = v5.tag
-    method54(v0, v30)
+    method90(v0, v30)
     del v30
     v32 = v0[1136:].view(cp.uint8)
     del v0
     match v5:
         case US7_0(): # GameNotStarted
             del v5
-            return method40(v32)
+            return method77(v32)
         case US7_1(v33, v34, v35, v36, v37, v38): # GameOver
             del v5
-            return method43(v32, v33, v34, v35, v36, v37, v38)
+            return method80(v32, v33, v34, v35, v36, v37, v38)
         case US7_2(v39, v40, v41, v42, v43, v44): # WaitingForActionFromPlayerId
             del v5
-            return method43(v32, v39, v40, v41, v42, v43, v44)
+            return method80(v32, v39, v40, v41, v42, v43, v44)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method56(v0 : cp.ndarray, v1 : US1) -> None:
+def method92(v0 : cp.ndarray, v1 : US1) -> None:
     v2 = v1.tag
-    method42(v0, v2)
+    method79(v0, v2)
     del v2
     v4 = v0[4:].view(cp.uint8)
     del v0
     match v1:
         case US1_0(): # Call
             del v1
-            return method40(v4)
+            return method77(v4)
         case US1_1(): # Fold
             del v1
-            return method40(v4)
+            return method77(v4)
         case US1_2(): # Raise
             del v1
-            return method40(v4)
+            return method77(v4)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method57(v0 : cp.ndarray, v1 : static_array) -> None:
+def method93(v0 : cp.ndarray, v1 : static_array) -> None:
     v2 = 0
-    while method45(v2):
+    while method5(v2):
         v4 = u64(v2)
         v5 = v4 * 4
         del v4
         v7 = v0[v5:].view(cp.uint8)
         del v5
         v9 = v1[v2]
-        method53(v7, v9)
+        method89(v7, v9)
         del v7, v9
         v2 += 1 
     del v0, v1, v2
     return 
-def method55(v0 : cp.ndarray, v1 : US0) -> None:
+def method91(v0 : cp.ndarray, v1 : US0) -> None:
     v2 = v1.tag
-    method42(v0, v2)
+    method79(v0, v2)
     del v2
     v4 = v0[8:].view(cp.uint8)
     del v0
     match v1:
         case US0_0(v5): # ActionSelected
             del v1
-            return method56(v4, v5)
+            return method92(v4, v5)
         case US0_1(v6): # PlayerChanged
             del v1
-            return method57(v4, v6)
+            return method93(v4, v6)
         case US0_2(): # StartGame
             del v1
-            return method40(v4)
+            return method77(v4)
         case US0_3(): # StartTrainingVsRando
             del v1
-            return method40(v4)
+            return method77(v4)
         case US0_4(): # StartTrainingVsSelf
             del v1
-            return method40(v4)
+            return method77(v4)
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method58(v0 : i32) -> bool:
+def method94(v0 : i32) -> bool:
     v1 = v0 < 4
     del v0
     return v1
-def method60(v0 : cp.ndarray) -> u32:
+def method96(v0 : cp.ndarray) -> u32:
     v2 = v0[0:].view(cp.uint32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method61(v0 : cp.ndarray) -> i32:
+def method97(v0 : cp.ndarray) -> i32:
     v2 = v0[4:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method62(v0 : cp.ndarray) -> None:
+def method98(v0 : cp.ndarray) -> None:
     del v0
     return 
-def method64(v0 : cp.ndarray) -> i32:
+def method100(v0 : cp.ndarray) -> i32:
     v2 = v0[0:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method66(v0 : cp.ndarray) -> US6:
-    v1 = method64(v0)
+def method102(v0 : cp.ndarray) -> US6:
+    v1 = method100(v0)
     v3 = v0[4:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        method62(v3)
+        method98(v3)
         del v3
         return US6_0()
     elif v1 == 1:
         del v1
-        method62(v3)
+        method98(v3)
         del v3
         return US6_1()
     elif v1 == 2:
         del v1
-        method62(v3)
+        method98(v3)
         del v3
         return US6_2()
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32]:
-    v1 = method64(v0)
+def method101(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32]:
+    v1 = method100(v0)
     v3 = v0[4:].view(cp.uint8)
     if v1 == 0:
-        method62(v3)
+        method98(v3)
         v8 = US5_0()
     elif v1 == 1:
-        v6 = method66(v3)
+        v6 = method102(v3)
         v8 = US5_1(v6)
     else:
         raise Exception("Invalid tag.")
@@ -20513,7 +20741,7 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     del v10
     v13 = static_array(2)
     v14 = 0
-    while method45(v14):
+    while method5(v14):
         v16 = u64(v14)
         v17 = v16 * 4
         del v16
@@ -20521,7 +20749,7 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v17
         v20 = v0[v18:].view(cp.uint8)
         del v18
-        v21 = method66(v20)
+        v21 = method102(v20)
         del v20
         v13[v14] = v21
         del v21
@@ -20532,7 +20760,7 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     del v23
     v26 = static_array(2)
     v27 = 0
-    while method45(v27):
+    while method5(v27):
         v29 = u64(v27)
         v30 = v29 * 4
         del v29
@@ -20540,7 +20768,7 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v30
         v33 = v0[v31:].view(cp.uint8)
         del v31
-        v34 = method64(v33)
+        v34 = method100(v33)
         del v33
         v26[v27] = v34
         del v34
@@ -20551,20 +20779,20 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     v37 = v36[0].item()
     del v36
     return v8, v11, v13, v24, v26, v37
-def method68(v0 : cp.ndarray) -> i32:
+def method104(v0 : cp.ndarray) -> i32:
     v2 = v0[36:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32, US1]:
-    v1 = method64(v0)
+def method103(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32, US1]:
+    v1 = method100(v0)
     v3 = v0[4:].view(cp.uint8)
     if v1 == 0:
-        method62(v3)
+        method98(v3)
         v8 = US5_0()
     elif v1 == 1:
-        v6 = method66(v3)
+        v6 = method102(v3)
         v8 = US5_1(v6)
     else:
         raise Exception("Invalid tag.")
@@ -20574,7 +20802,7 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     del v10
     v13 = static_array(2)
     v14 = 0
-    while method45(v14):
+    while method5(v14):
         v16 = u64(v14)
         v17 = v16 * 4
         del v16
@@ -20582,7 +20810,7 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v17
         v20 = v0[v18:].view(cp.uint8)
         del v18
-        v21 = method66(v20)
+        v21 = method102(v20)
         del v20
         v13[v14] = v21
         del v21
@@ -20593,7 +20821,7 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     del v23
     v26 = static_array(2)
     v27 = 0
-    while method45(v27):
+    while method5(v27):
         v29 = u64(v27)
         v30 = v29 * 4
         del v29
@@ -20601,7 +20829,7 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v30
         v33 = v0[v31:].view(cp.uint8)
         del v31
-        v34 = method64(v33)
+        v34 = method100(v33)
         del v33
         v26[v27] = v34
         del v34
@@ -20610,115 +20838,115 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     v36 = v0[32:].view(cp.int32)
     v37 = v36[0].item()
     del v36
-    v38 = method68(v0)
+    v38 = method104(v0)
     v40 = v0[40:].view(cp.uint8)
     del v0
     if v38 == 0:
-        method62(v40)
+        method98(v40)
         v45 = US1_0()
     elif v38 == 1:
-        method62(v40)
+        method98(v40)
         v45 = US1_1()
     elif v38 == 2:
-        method62(v40)
+        method98(v40)
         v45 = US1_2()
     else:
         raise Exception("Invalid tag.")
     del v38, v40
     return v8, v11, v13, v24, v26, v37, v45
-def method63(v0 : cp.ndarray) -> US4:
-    v1 = method64(v0)
+def method99(v0 : cp.ndarray) -> US4:
+    v1 = method100(v0)
     v3 = v0[16:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        v5, v6, v7, v8, v9, v10 = method65(v3)
+        v5, v6, v7, v8, v9, v10 = method101(v3)
         del v3
         return US4_0(v5, v6, v7, v8, v9, v10)
     elif v1 == 1:
         del v1
-        method62(v3)
+        method98(v3)
         del v3
         return US4_1()
     elif v1 == 2:
         del v1
-        v13, v14, v15, v16, v17, v18 = method65(v3)
+        v13, v14, v15, v16, v17, v18 = method101(v3)
         del v3
         return US4_2(v13, v14, v15, v16, v17, v18)
     elif v1 == 3:
         del v1
-        v20, v21, v22, v23, v24, v25, v26 = method67(v3)
+        v20, v21, v22, v23, v24, v25, v26 = method103(v3)
         del v3
         return US4_3(v20, v21, v22, v23, v24, v25, v26)
     elif v1 == 4:
         del v1
-        v28, v29, v30, v31, v32, v33 = method65(v3)
+        v28, v29, v30, v31, v32, v33 = method101(v3)
         del v3
         return US4_4(v28, v29, v30, v31, v32, v33)
     elif v1 == 5:
         del v1
-        v35, v36, v37, v38, v39, v40 = method65(v3)
+        v35, v36, v37, v38, v39, v40 = method101(v3)
         del v3
         return US4_5(v35, v36, v37, v38, v39, v40)
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method69(v0 : cp.ndarray) -> i32:
+def method105(v0 : cp.ndarray) -> i32:
     v2 = v0[80:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method71(v0 : cp.ndarray) -> Tuple[i32, US1]:
+def method107(v0 : cp.ndarray) -> Tuple[i32, US1]:
     v2 = v0[0:].view(cp.int32)
     v3 = v2[0].item()
     del v2
-    v4 = method61(v0)
+    v4 = method97(v0)
     v6 = v0[8:].view(cp.uint8)
     del v0
     if v4 == 0:
-        method62(v6)
+        method98(v6)
         v11 = US1_0()
     elif v4 == 1:
-        method62(v6)
+        method98(v6)
         v11 = US1_1()
     elif v4 == 2:
-        method62(v6)
+        method98(v6)
         v11 = US1_2()
     else:
         raise Exception("Invalid tag.")
     del v4, v6
     return v3, v11
-def method72(v0 : cp.ndarray) -> Tuple[i32, US6]:
+def method108(v0 : cp.ndarray) -> Tuple[i32, US6]:
     v2 = v0[0:].view(cp.int32)
     v3 = v2[0].item()
     del v2
-    v4 = method61(v0)
+    v4 = method97(v0)
     v6 = v0[8:].view(cp.uint8)
     del v0
     if v4 == 0:
-        method62(v6)
+        method98(v6)
         v11 = US6_0()
     elif v4 == 1:
-        method62(v6)
+        method98(v6)
         v11 = US6_1()
     elif v4 == 2:
-        method62(v6)
+        method98(v6)
         v11 = US6_2()
     else:
         raise Exception("Invalid tag.")
     del v4, v6
     return v3, v11
-def method73(v0 : cp.ndarray) -> Tuple[static_array, i32, i32]:
+def method109(v0 : cp.ndarray) -> Tuple[static_array, i32, i32]:
     v2 = static_array(2)
     v3 = 0
-    while method45(v3):
+    while method5(v3):
         v5 = u64(v3)
         v6 = v5 * 4
         del v5
         v8 = v0[v6:].view(cp.uint8)
         del v6
-        v9 = method66(v8)
+        v9 = method102(v8)
         del v8
         v2[v3] = v9
         del v9
@@ -20732,81 +20960,81 @@ def method73(v0 : cp.ndarray) -> Tuple[static_array, i32, i32]:
     v15 = v14[0].item()
     del v14
     return v2, v12, v15
-def method70(v0 : cp.ndarray) -> US8:
-    v1 = method64(v0)
+def method106(v0 : cp.ndarray) -> US8:
+    v1 = method100(v0)
     v3 = v0[16:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        v5 = method66(v3)
+        v5 = method102(v3)
         del v3
         return US8_0(v5)
     elif v1 == 1:
         del v1
-        v7, v8 = method71(v3)
+        v7, v8 = method107(v3)
         del v3
         return US8_1(v7, v8)
     elif v1 == 2:
         del v1
-        v10, v11 = method72(v3)
+        v10, v11 = method108(v3)
         del v3
         return US8_2(v10, v11)
     elif v1 == 3:
         del v1
-        v13, v14, v15 = method73(v3)
+        v13, v14, v15 = method109(v3)
         del v3
         return US8_3(v13, v14, v15)
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method74(v0 : cp.ndarray) -> US2:
-    v1 = method64(v0)
+def method110(v0 : cp.ndarray) -> US2:
+    v1 = method100(v0)
     v3 = v0[4:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        method62(v3)
+        method98(v3)
         del v3
         return US2_0()
     elif v1 == 1:
         del v1
-        method62(v3)
+        method98(v3)
         del v3
         return US2_1()
     elif v1 == 2:
         del v1
-        method62(v3)
+        method98(v3)
         del v3
         return US2_2()
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method75(v0 : cp.ndarray) -> i32:
+def method111(v0 : cp.ndarray) -> i32:
     v2 = v0[1128:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method59(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array, US7]:
-    v1 = method60(v0)
-    v2 = method61(v0)
+def method95(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array, US7]:
+    v1 = method96(v0)
+    v2 = method97(v0)
     v4 = v0[16:].view(cp.uint8)
     if v2 == 0:
-        method62(v4)
+        method98(v4)
         v9 = US3_0()
     elif v2 == 1:
-        v7 = method63(v4)
+        v7 = method99(v4)
         v9 = US3_1(v7)
     else:
         raise Exception("Invalid tag.")
     del v2, v4
     v11 = static_array_list(32)
-    v12 = method69(v0)
+    v12 = method105(v0)
     v11.unsafe_set_length(v12)
     del v12
     v13 = v11.length
     v14 = 0
-    while method5(v13, v14):
+    while method25(v13, v14):
         v16 = u64(v14)
         v17 = v16 * 32
         del v16
@@ -20814,7 +21042,7 @@ def method59(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array
         del v17
         v20 = v0[v18:].view(cp.uint8)
         del v18
-        v21 = method70(v20)
+        v21 = method106(v20)
         del v20
         v11[v14] = v21
         del v21
@@ -20822,7 +21050,7 @@ def method59(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array
     del v13, v14
     v23 = static_array(2)
     v24 = 0
-    while method45(v24):
+    while method5(v24):
         v26 = u64(v24)
         v27 = v26 * 4
         del v26
@@ -20830,468 +21058,83 @@ def method59(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array
         del v27
         v30 = v0[v28:].view(cp.uint8)
         del v28
-        v31 = method74(v30)
+        v31 = method110(v30)
         del v30
         v23[v24] = v31
         del v31
         v24 += 1 
     del v24
-    v32 = method75(v0)
+    v32 = method111(v0)
     v34 = v0[1136:].view(cp.uint8)
     del v0
     if v32 == 0:
-        method62(v34)
+        method98(v34)
         v51 = US7_0()
     elif v32 == 1:
-        v37, v38, v39, v40, v41, v42 = method65(v34)
+        v37, v38, v39, v40, v41, v42 = method101(v34)
         v51 = US7_1(v37, v38, v39, v40, v41, v42)
     elif v32 == 2:
-        v44, v45, v46, v47, v48, v49 = method65(v34)
+        v44, v45, v46, v47, v48, v49 = method101(v34)
         v51 = US7_2(v44, v45, v46, v47, v48, v49)
     else:
         raise Exception("Invalid tag.")
     del v32, v34
     return v1, v9, v11, v23, v51
-def method82(v0 : u32) -> object:
+def method118(v0 : f32) -> object:
     v1 = v0
     del v0
     return v1
-def method81(v0 : u32) -> object:
-    return method82(v0)
-def method84() -> object:
-    v0 = []
-    return v0
-def method88(v0 : US6) -> object:
-    match v0:
-        case US6_0(): # Jack
-            del v0
-            v1 = method84()
-            v2 = "Jack"
-            v3 = [v2,v1]
-            del v1, v2
-            return v3
-        case US6_1(): # King
-            del v0
-            v4 = method84()
-            v5 = "King"
-            v6 = [v5,v4]
-            del v4, v5
-            return v6
-        case US6_2(): # Queen
-            del v0
-            v7 = method84()
-            v8 = "Queen"
-            v9 = [v8,v7]
-            del v7, v8
-            return v9
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method87(v0 : US5) -> object:
-    match v0:
-        case US5_0(): # None
-            del v0
-            v1 = method84()
-            v2 = "None"
-            v3 = [v2,v1]
-            del v1, v2
-            return v3
-        case US5_1(v4): # Some
-            del v0
-            v5 = method88(v4)
-            del v4
-            v6 = "Some"
-            v7 = [v6,v5]
-            del v5, v6
-            return v7
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method89(v0 : bool) -> object:
-    v1 = v0
-    del v0
-    return v1
-def method90(v0 : static_array) -> object:
+def method117(v0 : list) -> object:
     v1 = []
-    v2 = 0
-    while method45(v2):
-        v5 = v0[v2]
-        v6 = method88(v5)
-        del v5
-        v1.append(v6)
-        del v6
-        v2 += 1 
-    del v0, v2
-    return v1
-def method91(v0 : i32) -> object:
-    v1 = v0
-    del v0
-    return v1
-def method92(v0 : static_array) -> object:
-    v1 = []
-    v2 = 0
-    while method45(v2):
-        v5 = v0[v2]
-        v6 = method91(v5)
-        del v5
-        v1.append(v6)
-        del v6
-        v2 += 1 
-    del v0, v2
-    return v1
-def method86(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32) -> object:
-    v6 = method87(v0)
-    del v0
-    v7 = method89(v1)
-    del v1
-    v8 = method90(v2)
-    del v2
-    v9 = method91(v3)
-    del v3
-    v10 = method92(v4)
-    del v4
-    v11 = method91(v5)
-    del v5
-    v12 = {'community_card': v6, 'is_button_s_first_move': v7, 'pl_card': v8, 'player_turn': v9, 'pot': v10, 'raises_left': v11}
-    del v6, v7, v8, v9, v10, v11
-    return v12
-def method94(v0 : US1) -> object:
-    match v0:
-        case US1_0(): # Call
-            del v0
-            v1 = method84()
-            v2 = "Call"
-            v3 = [v2,v1]
-            del v1, v2
-            return v3
-        case US1_1(): # Fold
-            del v0
-            v4 = method84()
-            v5 = "Fold"
-            v6 = [v5,v4]
-            del v4, v5
-            return v6
-        case US1_2(): # Raise
-            del v0
-            v7 = method84()
-            v8 = "Raise"
-            v9 = [v8,v7]
-            del v7, v8
-            return v9
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method93(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32, v6 : US1) -> object:
-    v7 = []
-    v8 = method86(v0, v1, v2, v3, v4, v5)
-    del v0, v1, v2, v3, v4, v5
-    v7.append(v8)
-    del v8
-    v9 = method94(v6)
-    del v6
-    v7.append(v9)
-    del v9
-    v10 = v7
-    del v7
-    return v10
-def method85(v0 : US4) -> object:
-    match v0:
-        case US4_0(v1, v2, v3, v4, v5, v6): # ChanceCommunityCard
-            del v0
-            v7 = method86(v1, v2, v3, v4, v5, v6)
-            del v1, v2, v3, v4, v5, v6
-            v8 = "ChanceCommunityCard"
-            v9 = [v8,v7]
-            del v7, v8
-            return v9
-        case US4_1(): # ChanceInit
-            del v0
-            v10 = method84()
-            v11 = "ChanceInit"
-            v12 = [v11,v10]
-            del v10, v11
-            return v12
-        case US4_2(v13, v14, v15, v16, v17, v18): # Round
-            del v0
-            v19 = method86(v13, v14, v15, v16, v17, v18)
-            del v13, v14, v15, v16, v17, v18
-            v20 = "Round"
-            v21 = [v20,v19]
-            del v19, v20
-            return v21
-        case US4_3(v22, v23, v24, v25, v26, v27, v28): # RoundWithAction
-            del v0
-            v29 = method93(v22, v23, v24, v25, v26, v27, v28)
-            del v22, v23, v24, v25, v26, v27, v28
-            v30 = "RoundWithAction"
-            v31 = [v30,v29]
-            del v29, v30
-            return v31
-        case US4_4(v32, v33, v34, v35, v36, v37): # TerminalCall
-            del v0
-            v38 = method86(v32, v33, v34, v35, v36, v37)
-            del v32, v33, v34, v35, v36, v37
-            v39 = "TerminalCall"
-            v40 = [v39,v38]
-            del v38, v39
-            return v40
-        case US4_5(v41, v42, v43, v44, v45, v46): # TerminalFold
-            del v0
-            v47 = method86(v41, v42, v43, v44, v45, v46)
-            del v41, v42, v43, v44, v45, v46
-            v48 = "TerminalFold"
-            v49 = [v48,v47]
-            del v47, v48
-            return v49
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method83(v0 : US3) -> object:
-    match v0:
-        case US3_0(): # None
-            del v0
-            v1 = method84()
-            v2 = "None"
-            v3 = [v2,v1]
-            del v1, v2
-            return v3
-        case US3_1(v4): # Some
-            del v0
-            v5 = method85(v4)
-            del v4
-            v6 = "Some"
-            v7 = [v6,v5]
-            del v5, v6
-            return v7
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method80(v0 : u32, v1 : US3) -> object:
-    v2 = method81(v0)
-    del v0
-    v3 = method83(v1)
-    del v1
-    v4 = {'deck': v2, 'game': v3}
-    del v2, v3
-    return v4
-def method98(v0 : i32, v1 : US1) -> object:
-    v2 = []
-    v3 = method91(v0)
-    del v0
-    v2.append(v3)
-    del v3
-    v4 = method94(v1)
-    del v1
-    v2.append(v4)
-    del v4
-    v5 = v2
-    del v2
-    return v5
-def method99(v0 : i32, v1 : US6) -> object:
-    v2 = []
-    v3 = method91(v0)
-    del v0
-    v2.append(v3)
-    del v3
-    v4 = method88(v1)
-    del v1
-    v2.append(v4)
-    del v4
-    v5 = v2
-    del v2
-    return v5
-def method100(v0 : static_array, v1 : i32, v2 : i32) -> object:
-    v3 = method90(v0)
-    del v0
-    v4 = method91(v1)
-    del v1
-    v5 = method91(v2)
-    del v2
-    v6 = {'cards_shown': v3, 'chips_won': v4, 'winner_id': v5}
-    del v3, v4, v5
-    return v6
-def method97(v0 : US8) -> object:
-    match v0:
-        case US8_0(v1): # CommunityCardIs
-            del v0
-            v2 = method88(v1)
-            del v1
-            v3 = "CommunityCardIs"
-            v4 = [v3,v2]
-            del v2, v3
-            return v4
-        case US8_1(v5, v6): # PlayerAction
-            del v0
-            v7 = method98(v5, v6)
-            del v5, v6
-            v8 = "PlayerAction"
-            v9 = [v8,v7]
-            del v7, v8
-            return v9
-        case US8_2(v10, v11): # PlayerGotCard
-            del v0
-            v12 = method99(v10, v11)
-            del v10, v11
-            v13 = "PlayerGotCard"
-            v14 = [v13,v12]
-            del v12, v13
-            return v14
-        case US8_3(v15, v16, v17): # Showdown
-            del v0
-            v18 = method100(v15, v16, v17)
-            del v15, v16, v17
-            v19 = "Showdown"
-            v20 = [v19,v18]
-            del v18, v19
-            return v20
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method96(v0 : static_array_list) -> object:
-    v1 = []
-    v2 = v0.length
+    v2 = len(v0)
     v3 = 0
-    while method5(v2, v3):
-        v6 = v0[v3]
-        v7 = method97(v6)
+    while method25(v2, v3):
+        v5 = v0[v3]
+        v6 = method118(v5)
+        del v5
+        v1.append(v6)
         del v6
-        v1.append(v7)
-        del v7
         v3 += 1 
     del v0, v2, v3
     return v1
-def method102(v0 : US2) -> object:
-    match v0:
-        case US2_0(): # Computer
-            del v0
-            v1 = method84()
-            v2 = "Computer"
-            v3 = [v2,v1]
-            del v1, v2
-            return v3
-        case US2_1(): # Human
-            del v0
-            v4 = method84()
-            v5 = "Human"
-            v6 = [v5,v4]
-            del v4, v5
-            return v6
-        case US2_2(): # Random
-            del v0
-            v7 = method84()
-            v8 = "Random"
-            v9 = [v8,v7]
-            del v7, v8
-            return v9
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method101(v0 : static_array) -> object:
+def method116(v0 : list) -> object:
     v1 = []
-    v2 = 0
-    while method45(v2):
-        v5 = v0[v2]
-        v6 = method102(v5)
+    v2 = len(v0)
+    v3 = 0
+    while method25(v2, v3):
+        v5 = v0[v3]
+        v6 = method117(v5)
         del v5
         v1.append(v6)
         del v6
-        v2 += 1 
-    del v0, v2
+        v3 += 1 
+    del v0, v2, v3
     return v1
-def method103(v0 : US7) -> object:
+def method115(v0 : US9) -> object:
     match v0:
-        case US7_0(): # GameNotStarted
+        case US9_0(v1): # AddRewardsRando
             del v0
-            v1 = method84()
-            v2 = "GameNotStarted"
-            v3 = [v2,v1]
-            del v1, v2
-            return v3
-        case US7_1(v4, v5, v6, v7, v8, v9): # GameOver
+            v2 = method116(v1)
+            del v1
+            v3 = "AddRewardsRando"
+            v4 = [v3,v2]
+            del v2, v3
+            return v4
+        case US9_1(v5): # AddRewardsSelf
             del v0
-            v10 = method86(v4, v5, v6, v7, v8, v9)
-            del v4, v5, v6, v7, v8, v9
-            v11 = "GameOver"
-            v12 = [v11,v10]
-            del v10, v11
-            return v12
-        case US7_2(v13, v14, v15, v16, v17, v18): # WaitingForActionFromPlayerId
-            del v0
-            v19 = method86(v13, v14, v15, v16, v17, v18)
-            del v13, v14, v15, v16, v17, v18
-            v20 = "WaitingForActionFromPlayerId"
-            v21 = [v20,v19]
-            del v19, v20
-            return v21
+            v6 = method116(v5)
+            del v5
+            v7 = "AddRewardsSelf"
+            v8 = [v7,v6]
+            del v6, v7
+            return v8
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method95(v0 : static_array_list, v1 : static_array, v2 : US7) -> object:
-    v3 = method96(v0)
-    del v0
-    v4 = method101(v1)
-    del v1
-    v5 = method103(v2)
-    del v2
-    v6 = {'messages': v3, 'pl_type': v4, 'ui_game_state': v5}
-    del v3, v4, v5
-    return v6
-def method79(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7) -> object:
-    v5 = method80(v0, v1)
-    del v0, v1
-    v6 = method95(v2, v3, v4)
-    del v2, v3, v4
-    v7 = {'private': v5, 'public': v6}
-    del v5, v6
-    return v7
-def method109(v0 : cp.ndarray) -> object:
-    v1 = v0
-    del v0
-    return v1
-def method108(v0 : cp.ndarray) -> object:
-    return method109(v0)
-def method110(v0 : u64) -> object:
-    v1 = v0
-    del v0
-    return v1
-def method107(v0 : cp.ndarray, v1 : u64) -> object:
-    v2 = []
-    v3 = method108(v0)
-    del v0
-    v2.append(v3)
-    del v3
-    v4 = method110(v1)
-    del v1
-    v2.append(v4)
-    del v4
-    v5 = v2
-    del v2
-    return v5
-def method106(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method107(v0, v1)
-    del v0, v1
-    v5 = method107(v2, v3)
-    del v2, v3
-    v6 = {'output': v4, 'param': v5}
-    del v4, v5
-    return v6
-def method105(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    return method106(v0, v1, v2, v3)
-def method104(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method105(v0, v1, v2, v3)
-    del v0, v1, v2, v3
-    v5 = {'model_data': v4}
-    del v4
-    return v5
-def method78(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
-    v9 = method79(v0, v1, v2, v3, v4)
-    del v0, v1, v2, v3, v4
-    v10 = method104(v5, v6, v7, v8)
-    del v5, v6, v7, v8
-    v11 = {'game': v9, 'neural': v10}
-    del v9, v10
-    return v11
-def method115(v0 : f32) -> object:
-    v1 = v0
-    del v0
-    return v1
 def method114(v0 : list) -> object:
     v1 = []
     v2 = len(v0)
     v3 = 0
-    while method5(v2, v3):
+    while method25(v2, v3):
         v5 = v0[v3]
         v6 = method115(v5)
         del v5
@@ -21300,79 +21143,275 @@ def method114(v0 : list) -> object:
         v3 += 1 
     del v0, v2, v3
     return v1
-def method113(v0 : list) -> object:
-    v1 = []
-    v2 = len(v0)
-    v3 = 0
-    while method5(v2, v3):
-        v5 = v0[v3]
-        v6 = method114(v5)
-        del v5
-        v1.append(v6)
-        del v6
-        v3 += 1 
-    del v0, v2, v3
-    return v1
-def method112(v0 : US9) -> object:
-    match v0:
-        case US9_0(v1): # AddRewardsRando
-            del v0
-            v2 = method113(v1)
-            del v1
-            v3 = "AddRewardsRando"
-            v4 = [v3,v2]
-            del v2, v3
-            return v4
-        case US9_1(v5): # AddRewardsSelf
-            del v0
-            v6 = method113(v5)
-            del v5
-            v7 = "AddRewardsSelf"
-            v8 = [v7,v6]
-            del v6, v7
-            return v8
-        case t:
-            raise Exception(f'Pattern matching miss. Got: {t}')
-def method111(v0 : list) -> object:
-    v1 = []
-    v2 = len(v0)
-    v3 = 0
-    while method5(v2, v3):
-        v5 = v0[v3]
-        v6 = method112(v5)
-        del v5
-        v1.append(v6)
-        del v6
-        v3 += 1 
-    del v0, v2, v3
-    return v1
-def method77(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
+def method113(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
     v10 = []
-    v11 = method78(v0, v1, v2, v3, v4, v5, v6, v7, v8)
+    v11 = method8(v0, v1, v2, v3, v4, v5, v6, v7, v8)
     del v0, v1, v2, v3, v4, v5, v6, v7, v8
     v10.append(v11)
     del v11
-    v12 = method111(v9)
+    v12 = method114(v9)
     del v9
     v10.append(v12)
     del v12
     v13 = v10
     del v10
     return v13
-def method76(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
-    v10 = method77(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)
+def method112(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
+    v10 = method113(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)
     del v0, v1, v2, v3, v4, v5, v6, v7, v8, v9
     return v10
-def method116(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
-    v9 = method78(v0, v1, v2, v3, v4, v5, v6, v7, v8)
-    del v0, v1, v2, v3, v4, v5, v6, v7, v8
-    return v9
 def main_body():
-    v0 = Closure0()
-    v1 = Closure1()
-    v2 = collections.namedtuple("Leduc_Full",['event_loop_gpu', 'init'])(v0, v1)
-    del v0, v1
-    return v2
+    v0 = US0_3()
+    v1 = method0(v0)
+    del v0
+    v3 = static_array(2)
+    v5 = US2_0()
+    v3[0] = v5
+    del v5
+    v7 = US2_1()
+    v3[1] = v7
+    del v7
+    v9 = static_array_list(32)
+    v10 = cp.empty(2981904,dtype=cp.uint8)
+    v11 = cp.empty(25264128,dtype=cp.uint8)
+    v13 = v10[0:0+4*65536].view(cp.float32)
+    v14 = cp.random.normal(0.0,0.00390625,65536,dtype=cp.float32) # type: ignore
+    cp.copyto(v13[0:0+65536],v14[0:0+65536])
+    del v13, v14
+    v16 = v10[262144:262144+4*1].view(cp.int32)
+    v18 = v10[262160:262160+4*65536].view(cp.float32)
+    v20 = v10[524304:524304+4*65536].view(cp.float32)
+    v22 = v10[786448:786448+4*65536].view(cp.float32)
+    v24 = v10[1048592:1048592+4*65536].view(cp.float32)
+    v26 = v10[1310736:1310736+4*65536].view(cp.float32)
+    v28 = v10[1572880:1572880+4*65536].view(cp.float32)
+    v30 = v10[1835024:1835024+4*65536].view(cp.float32)
+    v16[:] = 0
+    del v16
+    v18[:] = 0
+    del v18
+    v20[:] = 0
+    del v20
+    v22[:] = 0
+    del v22
+    v24[:] = 0
+    del v24
+    v26[:] = 0
+    del v26
+    v28[:] = 0
+    del v28
+    v30[:] = 0
+    del v30
+    v32 = v10[2097168:2097168+8*49152].view(cp.float64)
+    v34 = v10[2490384:2490384+8*49152].view(cp.float64)
+    v36 = v10[2883600:2883600+4*24576].view(cp.int32)
+    v32[:] = 0
+    del v32
+    v34[:] = 0
+    del v34
+    v36[:] = 0
+    del v36
+    v37 = 63
+    v38 = US3_0()
+    v39 = US7_0()
+    v40 = 25264128
+    v41 = 2981904
+    v42 = method7(v37, v38, v9, v3, v39, v11, v40, v10, v41)
+    del v3, v9, v10, v11, v37, v38, v39, v40, v41
+    v43 = method38(v1)
+    del v1
+    v44, v45, v46, v47, v48, v49, v50, v51, v52 = method44(v42)
+    del v42
+    v53 = cp.empty(16,dtype=cp.uint8)
+    v54 = cp.empty(1184,dtype=cp.uint8)
+    method74(v54, v44, v45, v46, v47, v48)
+    del v44, v45, v46, v47, v48
+    v57 = "{}\n"
+    v58 = "Going to run the Leduc full kernel."
+    print(v57.format(v58),end="")
+    del v57, v58
+    v59 = time.perf_counter()
+    v60 = []
+    match v43:
+        case US0_0(_): # ActionSelected
+            method91(v53, v43)
+            v119 = cp.cuda.Device().attributes['MultiProcessorCount']
+            v120 = v119 == 24
+            del v119
+            v121 = v120 == False
+            if v121:
+                v122 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+                assert v120, v122
+                del v122
+            else:
+                pass
+            del v120, v121
+            v123 = 0
+            v124 = raw_module.get_function(f"entry{v123}")
+            del v123
+            v124.max_dynamic_shared_size_bytes = 98304 
+            print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+            v124((24,),(256,),(v54, v53, v49, v50, v51, v52),shared_mem=98304)
+            del v124
+        case US0_1(_): # PlayerChanged
+            method91(v53, v43)
+            v112 = cp.cuda.Device().attributes['MultiProcessorCount']
+            v113 = v112 == 24
+            del v112
+            v114 = v113 == False
+            if v114:
+                v115 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+                assert v113, v115
+                del v115
+            else:
+                pass
+            del v113, v114
+            v116 = 0
+            v117 = raw_module.get_function(f"entry{v116}")
+            del v116
+            v117.max_dynamic_shared_size_bytes = 98304 
+            print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+            v117((24,),(256,),(v54, v53, v49, v50, v51, v52),shared_mem=98304)
+            del v117
+        case US0_2(): # StartGame
+            method91(v53, v43)
+            v105 = cp.cuda.Device().attributes['MultiProcessorCount']
+            v106 = v105 == 24
+            del v105
+            v107 = v106 == False
+            if v107:
+                v108 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+                assert v106, v108
+                del v108
+            else:
+                pass
+            del v106, v107
+            v109 = 0
+            v110 = raw_module.get_function(f"entry{v109}")
+            del v109
+            v110.max_dynamic_shared_size_bytes = 98304 
+            print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+            v110((24,),(256,),(v54, v53, v49, v50, v51, v52),shared_mem=98304)
+            del v110
+        case US0_3(): # StartTrainingVsRando
+            v61 = cp.zeros(16,dtype=cp.float32) # type: ignore
+            v62 = cp.zeros(16,dtype=cp.float32) # type: ignore
+            v63 = cp.empty(16,dtype=cp.float32)
+            v64 = cp.cuda.Device().attributes['MultiProcessorCount']
+            v65 = v64 == 24
+            del v64
+            v66 = v65 == False
+            if v66:
+                v67 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+                assert v65, v67
+                del v67
+            else:
+                pass
+            del v65, v66
+            v68 = 1
+            v69 = raw_module.get_function(f"entry{v68}")
+            del v68
+            v69.max_dynamic_shared_size_bytes = 98304 
+            print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+            v69((24,),(256,),(v49, v50, v51, v52, v61, v62, v63),shared_mem=98304)
+            del v61, v62, v69
+            v70 = []
+            v72 = v63[0:]
+            del v63
+            v73 = v72.get()
+            del v72
+            v74 = 0
+            while method94(v74):
+                v76 = []
+                v77 = 0
+                while method94(v77):
+                    assert 0 <= v74 < 4, 'Tensor range check'
+                    assert 0 <= v77 < 4, 'Tensor range check'
+                    v79 = 4 * v74
+                    v80 = v79 + v77
+                    del v79
+                    v81 = v73[v80].item()
+                    del v80
+                    v76.append(v81)
+                    del v81
+                    v77 += 1 
+                del v77
+                v70.append(v76)
+                del v76
+                v74 += 1 
+            del v73, v74
+            v82 = US9_0(v70)
+            del v70
+            v60.append(v82)
+            del v82
+        case US0_4(): # StartTrainingVsSelf
+            v83 = cp.zeros(8,dtype=cp.float32) # type: ignore
+            v84 = cp.zeros(8,dtype=cp.float32) # type: ignore
+            v85 = cp.empty(8,dtype=cp.float32)
+            v86 = cp.cuda.Device().attributes['MultiProcessorCount']
+            v87 = v86 == 24
+            del v86
+            v88 = v87 == False
+            if v88:
+                v89 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+                assert v87, v89
+                del v89
+            else:
+                pass
+            del v87, v88
+            v90 = 2
+            v91 = raw_module.get_function(f"entry{v90}")
+            del v90
+            v91.max_dynamic_shared_size_bytes = 98304 
+            print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+            v91((24,),(256,),(v49, v50, v51, v52, v83, v84, v85),shared_mem=98304)
+            del v83, v84, v91
+            v92 = []
+            v94 = v85[0:]
+            del v85
+            v95 = v94.get()
+            del v94
+            v96 = 0
+            while method5(v96):
+                v98 = []
+                v99 = 0
+                while method94(v99):
+                    assert 0 <= v96 < 2, 'Tensor range check'
+                    assert 0 <= v99 < 4, 'Tensor range check'
+                    v101 = 4 * v96
+                    v102 = v101 + v99
+                    del v101
+                    v103 = v95[v102].item()
+                    del v102
+                    v98.append(v103)
+                    del v103
+                    v99 += 1 
+                del v99
+                v92.append(v98)
+                del v98
+                v96 += 1 
+            del v95, v96
+            v104 = US9_1(v92)
+            del v92
+            v60.append(v104)
+            del v104
+        case t:
+            raise Exception(f'Pattern matching miss. Got: {t}')
+    del v43, v53
+    cp.cuda.get_current_stream().synchronize()
+    v125 = time.perf_counter()
+    v128 = "{}"
+    v129 = "The time it took to run the kernel (in seconds) is: "
+    print(v128.format(v129),end="")
+    del v128, v129
+    v130 = v125 - v59
+    del v59, v125
+    v133 = "{:.6f}\n"
+    print(v133.format(v130),end="")
+    del v130, v133
+    v134, v135, v136, v137, v138 = method95(v54)
+    del v54
+    return method112(v134, v135, v136, v137, v138, v49, v50, v51, v52, v60)
 
 def main():
     r = main_body()
