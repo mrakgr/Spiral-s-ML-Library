@@ -109,8 +109,8 @@ modules:
             deckm
             game
             model
-            full_old
             performance
+            types-
             play
             train
             full

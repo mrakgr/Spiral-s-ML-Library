@@ -4,21 +4,6 @@ open corepython
 open corecuda
 open coreext
 
-union player_type = Computer | Random | Human
-
-union event =
-    | StartTrainingVsSelf
-    | StartTrainingVsRando
-
-union ui_game_state = 
-    | GameNotStarted
-    | WaitingForActionFromPlayerId : table
-    | GameOver : table
-
-union ui_effects =
-    | AddRewardsRando : plist (plist float)
-    | AddRewardsSelf : plist (plist float)
-
 type event_config =
     {
         // Loop sizes.
@@ -32,58 +17,6 @@ inl event_config () : event_config =
         outer = 1 <<< 2
         inner = 1 <<< 3
         frontend_divider = 1
-    }
-
-// Whether the state is public or private depends whether it is being sent over the wire.
-type state_public =
-    {
-        ui_game_state : ui_game_state
-        pl_type : sam.sa 2 player_type
-        messages : messages
-    }
-
-type state_private =
-    {
-        game : option game_node
-        deck : deck
-    }
-
-type state_neural =
-    {
-        model_data : ml.layers.model_data
-    }
-
-type state_game = 
-    {
-        private : state_private
-        public : state_public
-    }
-
-type state =
-    {
-        game : state_game
-        neural : state_neural
-    }
-
-inl init_game() =
-    {
-        public = {
-            ui_game_state = GameNotStarted
-            pl_type = arraym.fromList [Computer; Human]
-            messages = sa_create
-        }
-        private = {
-            deck = deckm.create()
-            game = None
-        }
-    }
-
-inl init() : state = 
-    {
-        game = init_game()
-        neural = {
-            model_data = model.game_graph() |> ml.cfr_models.init |> ml.cfr_models.to_model_data
-        }
     }
 
 type state_internal_train =
@@ -258,24 +191,3 @@ inl vs_rando (neural : state_neural) =
             ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
         ml.primitives.grid_map (refm.from_local state.grid) (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
     frontend_rewards
-
-inl event_loop_gpu = fun (msg, state : event * state) : state * plist ui_effects =>
-    open serializerm
-    inl {neural} = state
-
-    console.write_ln "Going to run the Leduc train kernel."
-    global "import time"
-    inl p : f64 = $"time.perf_counter()"
-    
-    inl effects : plist ui_effects = plistm.create'
-    match msg with
-    | StartTrainingVsRando => vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    | StartTrainingVsSelf => vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
-
-    device_sync()
-
-    console.write "The time it took to run the kernel (in seconds) is: "
-    inl p2 : f64 = $"time.perf_counter()"
-    console.write_ln (p2 - p)
-
-    state, effects

@@ -123,16 +123,13 @@ inl trace_and_play_ forall inp out.
 
     output action_id
 
-// The noinline prefix will force the __noinline__ annotation in the generated code.
-inl noinline_run forall inp out.
+inl run_ forall inp out.
         rng
         (model : model graph_body)
         (action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool)
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
-        ~(data : option inp) = join
-    // All the threads will be waiting on this barrier until the game threads call on it with the inputs.
-    barrier_cta_sync 0
+        (data : inp) =
 
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread = (key_extract model .output_world_id : tensor d3 uint).dim
@@ -160,10 +157,8 @@ inl noinline_run forall inp out.
 
     barrier_cta_sync 0
 
-    // Serializes the data into the input tensor if there is any data being passed into the model.
-    // If there is no data being passed into run here, the individual threads for which that is the case can 
-    // still contribute by doing computation. They contribute to the functioning of the entire block.
-    data |> optionm.iter fun data =>
+    // Serializes the data into the input tensor.
+    inl () =
         open pickler
         inl tns_input = apply thread_index() x
         snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
@@ -254,7 +249,7 @@ inl extract_ensemble_path_prob forall inp out. (cfr_game_model {model} : cfr_gam
         |> tensorm.fold 0 (+)
     conv (exp (log_path_policy_prob - log_path_sampling_prob))
 
-inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = noinline_run rng model action_mask input output
+inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = run_ rng model action_mask input output
 inl trace_and_train forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = 
     trace_and_play_ true rng model sizes action_mask input output
 
