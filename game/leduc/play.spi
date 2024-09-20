@@ -77,6 +77,20 @@ inl state_to_internal_play (state : state_game) : state_internal_play =
         rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0} |> refm.to_local
     }
 
+// Converts the given state to internal one.
+inl internal_play_to_state (state : state_internal_play) : state_game =
+    {
+        public = {
+            ui_game_state = state.ui_game_state
+            pl_type = state.pl_type
+            messages = state.messages
+        }
+        private = {
+            game = state.game
+            deck = state.deck
+        }
+    }
+
 // Sets the internal state to the values held by the regular one.
 inl internal_set_play (state_internal : state_internal_play) (state : state_game) =
     open refm
@@ -124,12 +138,9 @@ inl play_loop (neural : state_neural) (state : state_internal_play) node =
                 open model
                 inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
                 inl data = table, state.messages
-                console.write_ln "Running the GPU model."
                 inl action = 
                     ml.cfr_models.run (refm.from_local state.rng) model data |> action_conv table
                     |> transposing_loop.shuffle 0
-                console.write "The action is: "
-                console.write_ln action
                 inl msg = PlayerAction(table.player_turn, action)
                 push_message msg
                 Some (game_round table action)
@@ -189,6 +200,7 @@ open serializerm
 inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural) =
     run' fun () =>
         inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
-        event_loop_play neural (msg, state_to_internal_play game_state)
+        inl state = state_to_internal_play game_state
+        event_loop_play neural (msg, state)
         if rangem.threads_in_grid().from = 0 then
-            serialize seri.game_state game_state
+            serialize seri.game_state (internal_play_to_state state)
