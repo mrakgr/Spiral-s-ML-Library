@@ -55,8 +55,8 @@ type Action =
     | ["A_Raise",number] 
     | ["A_Call",[]] 
     | ["A_Fold",[]]
-type Players = ["Computer",[]] | ["Human",[]]
-const players : Players[] = [["Computer",[]], ["Human",[]]]
+type Players = ["Computer",[]] | ["Human",[]] | ["Random",[]]
+const players : Players[] = [["Computer",[]], ["Human",[]], ["Random",[]]]
 
 type Street =
     | ["Preflop", []]
@@ -96,6 +96,10 @@ type UI_State = {
     messages : Message[];
 }
 
+type UI_Effect = 
+    | ["AddRewardsRando", number[][]]
+    | ["AddRewardsSelf", number[][]]
+
 // Creates a span with the specified gap in pixels.
 const gap = (pixels : number) => html`<span style="flex-basis: ${pixels}px;"></span>`
 
@@ -111,12 +115,41 @@ class UI extends LitElement {
 
     constructor(){
         super()
-        this.socket.on('update', (state : UI_State) => {
-            this.state = state;
+        this.socket.on('update', (x : [UI_State, UI_Effect[]]) => {
+            this.state = x[0];
+            this.process_effects(x[1])
         });
         this.addEventListener('game', (ev) => {
             ev.stopPropagation();
             this.socket.emit('update', (ev as CustomEvent<Game_Events>).detail);
+        })
+    }
+
+    process_effects(l: UI_Effect[]) {
+        const average = (data : number[][]) => data.map(x => x.reduce((a,b) => a+b) / x.length)
+        l.forEach(l => {
+            const [tag, data] = l
+            switch (tag) {
+                case 'AddRewardsRando': {
+                    console.log({
+                        rando_data: data,
+                        rando_average: average(data)
+                    });
+                    // TODO
+                    // this.vs_rando_chart.value?.add_rewards(data)
+                    break;
+                }
+                case 'AddRewardsSelf': {
+                    console.log({
+                        self_data: data,
+                        self_average: average(data)
+                    });
+                    // TODO
+                    // this.vs_self_chart.value?.add_rewards(data)
+                    break;
+                }
+                default: assert_tag_is_never(tag);
+            }
         })
     }
 
@@ -218,6 +251,7 @@ class Menu extends GameElement {
             <div>
                 <sl-select name="pl1" id="pl1" .value=${this.pl_type[0][0]} @sl-change=${this.on_change(0)}>
                     <div slot="label">Player 0:</div>
+                    <sl-option value="Random">Random</sl-option>
                     <sl-option value="Computer">Computer</sl-option>
                     <sl-option value="Human">Human</sl-option>
                 </sl-select>
@@ -226,6 +260,7 @@ class Menu extends GameElement {
             <div>
                 <sl-select name="pl2" id="pl2" .value=${this.pl_type[1][0]} @sl-change=${this.on_change(1)}>
                     <div slot="label">Player 1:</div>
+                    <sl-option value="Random">Random</sl-option>
                     <sl-option value="Computer">Computer</sl-option>
                     <sl-option value="Human">Human</sl-option>
                 </sl-select>

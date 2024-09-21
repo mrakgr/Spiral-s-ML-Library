@@ -1,0 +1,43 @@
+open corebase
+open corecuda
+open corepython
+open coreext
+open serializerm
+
+inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
+    inl msg, {game neural} = jsonm.deserialize msg, jsonm.deserialize state
+    inl seri = {
+        msg = create_serializer : serializer event
+        game_state = create_serializer : serializer state_game
+    }
+
+    serialize seri.game_state game
+
+    console.write_ln "Going to run the NL Holdem full kernel."
+    global "import time"
+    inl p : f64 = $"time.perf_counter()"
+
+    inl effects : plist ui_effects = plistm.create'
+    match msg with
+    // | StartTrainingVsRando => train.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
+    // | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
+
+    device_sync()
+
+    inl p2 : f64 = $"time.perf_counter()"
+    console.write "The time it took to run the kernel (in seconds) is: "
+    console.write_ln (p2 - p)
+
+    inl state = {
+        game = deserialize seri.game_state
+        neural
+        }
+
+    jsonm.serialize (state, effects)
+
+inl main() =
+    named_tuple "Leduc_Full" {
+        init = fun () => jsonm.serialize init()
+        event_loop_gpu
+    }

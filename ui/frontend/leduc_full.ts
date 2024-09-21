@@ -33,7 +33,7 @@ type Game_State =
     | ["GameNotStarted", []]
     | ["WaitingForActionFromPlayerId", Table]
     | ["GameOver", Table]
-    
+
 type Message =
     | ["PlayerGotCard", [number, Card]]
     | ["CommunityCardIs", Card]
@@ -44,8 +44,6 @@ type Leduc_Train_Label = string
 type Leduc_Train_Serie = {
     name: string
     data: number[]
-}
-type Public_State = {
 }
 type UI_Effect = 
     | ["AddRewardsRando", number[][]]

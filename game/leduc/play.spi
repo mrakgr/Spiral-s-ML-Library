@@ -4,58 +4,6 @@ open corepython
 open corecuda
 open coreext
 
-// Whether the state is public or private depends whether it is being sent over the wire.
-type state_public =
-    {
-        ui_game_state : ui_game_state
-        pl_type : sam.sa 2 player_type
-        messages : messages
-    }
-
-type state_private =
-    {
-        game : option game_node
-        deck : deck
-    }
-
-type state_neural =
-    {
-        model_data : ml.layers.model_data
-    }
-
-type state_game = 
-    {
-        private : state_private
-        public : state_public
-    }
-
-type state =
-    {
-        game : state_game
-        neural : state_neural
-    }
-
-inl init_game() =
-    {
-        public = {
-            ui_game_state = GameNotStarted
-            pl_type = arraym.fromList [Computer; Human]
-            messages = sa_create
-        }
-        private = {
-            deck = deckm.create()
-            game = None
-        }
-    }
-
-inl init() : state = 
-    {
-        game = init_game()
-        neural = {
-            model_data = model.game_graph() |> ml.cfr_models.init |> ml.cfr_models.to_model_data
-        }
-    }
-
 type state_internal_play =
     stack_mut {
         ui_game_state : ui_game_state
@@ -77,7 +25,7 @@ inl state_to_internal_play (state : state_game) : state_internal_play =
         rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0} |> refm.to_local
     }
 
-// Converts the given state to internal one.
+// Converts the given internal into the serializable state.
 inl internal_play_to_state (state : state_internal_play) : state_game =
     {
         public = {
@@ -189,7 +137,6 @@ inl event_loop_play state_neural (msg, state_internal : event * state_internal_p
             | _ => failwith "Unexpected game node in ActionSelected."
         | None => failwith "The game hasn't been started in ActionSelected."
     | StartTrainingVsRando | StartTrainingVsSelf => failwith "Training is not supported in the `event_loop_play` function."
-    // TODO: Mention in the vid I took off the let, and factored it out like this.
     |> optionm.iter (play_loop state_neural state_internal)
 
 open corecuda

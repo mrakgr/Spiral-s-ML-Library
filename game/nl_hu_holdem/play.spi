@@ -1,103 +1,51 @@
 open corebase
 open coreext
 open game
-
-
-union player_type =
-    | Computer
-    | Random
-    | Human
-
-type player_types = sam.sa 2 player_type
-
-union ui_game_state =
-    | GameNotStarted
-    | WaitingForActionFromPlayerId : table
-    | GameOver : table
-
-type state_public =
-    {
-        ui_game_state : ui_game_state
-        pl_type : player_types
-        messages : messages
-    }
-
-type state_private = 
-    {
-        game : option game_node
-        deck : deck
-    }
-
-type state_neural =
-    {
-        model_data : ml.layers.model_data
-    }
-
-type state_game = 
-    {
-        private : state_private
-        public : state_public
-    }
-
-type state =
-    {
-        game : state_game
-        neural : state_neural
-    }
-
-inl init_game() =
-    {
-        public = {
-            ui_game_state = GameNotStarted
-            pl_type = arraym.fromList [Computer; Human]
-            messages = sa_create
-        }
-        private = {
-            deck = lib.deckm.create()
-            game = None
-        }
-    }
-
-inl init() : state = 
-    {
-        game = init_game()
-        neural = {
-            model_data = model.game_graph() |> ml.cfr_models.init |> ml.cfr_models.to_model_data
-        }
-    }
-
 open corecuda
 
 type state_internal =
-    {
-        ui_game_state : refm.ref ui_game_state
-        pl_type : refm.ref player_types
-        game : refm.ref (option game_node)
-        deck : refm.ref deck
-        messages : refm.ref messages
-        rng : refm.ref random.philox_state
+    stack_mut {
+        ui_game_state : ui_game_state
+        pl_type : player_types
+        game : option game_node
+        deck : deck
+        messages : messages
+        rng : random.philox_state
     }
 
 // Converts the given state to internal one.
-// The refs will point to the original locations.
-inl state_to_internal rng (state : state_game) : state_internal =
+inl state_to_internal_play (state : state_game) : state_internal =
+    stack_mut {
+        ui_game_state = state.public.ui_game_state
+        pl_type = state.public.pl_type
+        game = state.private.game
+        deck = state.private.deck
+        messages = state.public.messages
+        rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0} |> refm.to_local
+    }
+
+// Converts the given internal into the serializable state.
+inl internal_play_to_state (state : state_internal) : state_game =
     {
-        ui_game_state = refm.from_local state.public.ui_game_state
-        pl_type = refm.from_local state.public.pl_type
-        game = refm.from_local state.private.game
-        deck = refm.from_local state.private.deck
-        messages = refm.from_local state.public.messages
-        rng
+        public = {
+            ui_game_state = state.ui_game_state
+            pl_type = state.pl_type
+            messages = state.messages
+        }
+        private = {
+            game = state.game
+            deck = state.deck
+        }
     }
 
 // Sets the internal state to the values held by the regular one.
 inl internal_set (state_internal : state_internal) (state : state_game) =
     open refm
-    state_internal.ui_game_state <-# state.public.ui_game_state
-    state_internal.pl_type <-# state.public.pl_type
-    state_internal.game <-# state.private.game
-    state_internal.deck <-# state.private.deck
-    state_internal.messages <-# state.public.messages
+    state_internal.ui_game_state <- state.public.ui_game_state
+    state_internal.pl_type <- state.public.pl_type
+    state_internal.game <- state.private.game
+    state_internal.deck <- state.private.deck
+    state_internal.messages <- state.public.messages
 
 inl random_action = fun rng (table : table) =>
     inl player_turn = player_turn table
@@ -119,14 +67,14 @@ inl random_action = fun rng (table : table) =>
         ]
     random.sample_discrete actions rng
     
-let play_loop rng (neural : state_neural) (state : state_internal) node =
+let play_loop (neural : state_neural) (state : state_internal) node =
     open refm
-    inl push_message = da_listm.push (to_local state.messages)
-    inl deck = to_local state.deck
+    inl push_message = da_listm.push state.messages
+    inl deck = state.deck
     inl pop_deck () = 
         open random
-        inl cards, deck = lib.deckm.draw_cards rng deck
-        refm.setref state.deck deck
+        inl cards, deck = lib.deckm.draw_cards (from_local state.rng) deck
+        state.deck <- deck
         cards
     let get_community_cards street new_cards = 
         inl ar = sa_create
@@ -151,8 +99,8 @@ let play_loop rng (neural : state_neural) (state : state_internal) node =
                 inl chips_won = index table.pot (player_turn table)
                 Fold {chips_won winner_id=next_turn table.round_turn % num_players()}
             push_message msg
-            state.ui_game_state <-# GameOver(table)
-            state.game <-# None
+            state.ui_game_state <- GameOver(table)
+            state.game <- None
             None
         | G_Showdown table => 
             inl msg =
@@ -168,29 +116,30 @@ let play_loop rng (neural : state_neural) (state : state_internal) node =
                 inl hands_shown = arraym.fromList [s0; s1]
                 Showdown {hands_shown chips_won winner_id}
             push_message msg
-            state.ui_game_state <-# GameOver(table)
-            state.game <-# None
+            state.ui_game_state <- GameOver(table)
+            state.game <- None
             None
         | G_Round table =>
             inl player_turn = player_turn table
-            match index #state.pl_type player_turn with
+            match index state.pl_type player_turn with
             | Computer =>
                 open model
                 inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-                inl data = table, refm.to_local state.messages
-                console.write_ln "Running the GPU model."
-                inl action = ml.cfr_models.run state.rng model data |> action_conv table
-                console.write "The action is: "
-                console.write_ln action
+                inl data = table, state.messages
+                inl action = 
+                    ml.cfr_models.run (from_local state.rng) model data |> action_conv table
+                    |> transposing_loop.shuffle 0
                 inl msg = PlayerAction(player_turn, action)
                 push_message msg
                 Some (round table action)
             | Human =>
-                state.ui_game_state <-# WaitingForActionFromPlayerId(table)
-                state.game <-# Some node
+                state.ui_game_state <- WaitingForActionFromPlayerId(table)
+                state.game <- Some node
                 None
             | Random =>
-                inl action = random_action rng table
+                inl action = 
+                    random_action (from_local state.rng) table
+                    |> transposing_loop.shuffle 0
                 inl msg = PlayerAction(player_turn, action)
                 push_message msg
                 Some (round table action)
@@ -209,70 +158,29 @@ let play_loop rng (neural : state_neural) (state : state_internal) node =
     
     loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
 
-union event = 
-    | StartGame
-    | PlayerChanged : sam.sa 2 player_type
-    | ActionSelected : action
-
-inl event_loop rng state_neural (msg, state_internal : event * state_internal) : () =
+inl event_loop_play state_neural (msg, state_internal : event * state_internal) : () =
     open refm
     match msg with
     | StartGame =>
         internal_set state_internal init_game()
-        play_loop rng state_neural state_internal start()
+        start() |> Some
     | PlayerChanged pl_type =>
-        state_internal.pl_type <-# pl_type
+        state_internal.pl_type <- pl_type
+        None
     | ActionSelected action =>
-        match #state_internal.game with
+        match state_internal.game with
         | Some game =>
             match game with
-            | G_Round table => play_loop rng state_neural state_internal G_Round'(table, action)
+            | G_Round table => G_Round'(table, action) |> Some
             | _ => failwith "Unexpected game node in ActionSelected."
         | None => failwith "The game hasn't been started in ActionSelected."
+    |> optionm.iter (play_loop state_neural state_internal)
 
-open corepython
-open coreext
-inl main() =
-    named_tuple "HU_Holdem_Game" {
-        init = fun () => jsonm.serialize init()
-        event_loop_gpu = fun (msg, state : jsonm.json event * jsonm.json state) =>
-            open serializerm
-            inl seri = {
-                msg = create_serializer
-                game_state = create_serializer
-            }
-            serialize seri.msg (jsonm.deserialize msg)
-            inl {game neural} = jsonm.deserialize state
-            serialize seri.game_state game
-
-            console.write_ln "Going to run the NL Holdem game kernel."
-            global "import time"
-            inl p : f64 = $"time.perf_counter()"
-
-            run' fun () =>
-                failwith "TODO"
-                // inl rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-                // inl c : _ int = refm.create_shared_var (const threads_per_block())
-                // inl from = rangem.threads_in_grid().from
-                // if from = 0 then
-                //     inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
-                //     // When converting the state to internal form, the refs will point to the original.
-                //     event_loop rng neural (msg, state_to_internal rng game_state)
-                //     serialize seri.game_state game_state
-
-                // // nn model loop
-                // intrinsic.atomic_add_ref c -1 |> ignore
-                // loop.while' (const true) fun () =>
-                //     inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
-                //     ml.cfr_models.run rng model None |> ignore
-                //     if refm.deref c = 0 then loop.break()
-
-            console.write "The time it took to run the kernel (in seconds) is: "
-            inl p2 : f64 = $"time.perf_counter()"
-            console.write_ln (p2 - p)
-
-            jsonm.serialize {
-                game = deserialize seri.game_state
-                neural
-                }
-    }
+open serializerm
+inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural) =
+    run' fun () =>
+        inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
+        inl state = state_to_internal_play game_state
+        event_loop_play neural (msg, state)
+        if rangem.threads_in_grid().from = 0 then
+            serialize seri.game_state (internal_play_to_state state)

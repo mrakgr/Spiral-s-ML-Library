@@ -176,7 +176,6 @@ inl vs_rando (neural : state_neural) =
             loop.linear config.inner fun (inner : int) =>
                 // The loop uses less registers than a noinline function.
                 // Regular functions it always inlines causing the number of instructions in the full program to double.
-                // TODO: Mention this in a video.
                 loop.linear 2 fun (player_id : int) =>
                     // Does a training run, modifying the trace state.
                     train_loop true model state (Some player_id) game_init()

@@ -1,0 +1,73 @@
+open corebase
+open corepython
+open coreext
+open game
+
+union player_type = Computer | Random | Human
+type player_types = sam.sa 2 player_type
+
+union ui_game_state =
+    | GameNotStarted
+    | WaitingForActionFromPlayerId : table
+    | GameOver : table
+
+union event = 
+    // play events
+    | StartGame
+    | PlayerChanged : sam.sa 2 player_type
+    | ActionSelected : action
+
+union ui_effects =
+    | AddRewardsRando : plist (plist float)
+    | AddRewardsSelf : plist (plist float)
+
+type state_public =
+    {
+        ui_game_state : ui_game_state
+        pl_type : player_types
+        messages : messages
+    }
+
+type state_private = 
+    {
+        game : option game_node
+        deck : deck
+    }
+
+type state_neural =
+    {
+        model_data : ml.layers.model_data
+    }
+
+type state_game = 
+    {
+        private : state_private
+        public : state_public
+    }
+
+type state =
+    {
+        game : state_game
+        neural : state_neural
+    }
+
+inl init_game() =
+    {
+        public = {
+            ui_game_state = GameNotStarted
+            pl_type = arraym.fromList [Computer; Human]
+            messages = sa_create
+        }
+        private = {
+            deck = lib.deckm.create()
+            game = None
+        }
+    }
+
+inl init() : state = 
+    {
+        game = init_game()
+        neural = {
+            model_data = model.game_graph() |> ml.cfr_models.init |> ml.cfr_models.to_model_data
+        }
+    }

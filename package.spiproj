@@ -124,7 +124,9 @@ modules:
                 hand_rankerm
             game
             model
+            types-
             play
+            full
 
     tests/
         test1
