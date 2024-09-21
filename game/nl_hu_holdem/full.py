@@ -60,17 +60,6 @@ struct sptr // Shared pointer for the Spiral datatypes. They have to have the re
     }
 };
 
-template <typename el>
-struct csptr : public sptr<el>
-{ // Shared pointer for closures specifically.
-    using sptr<el>::sptr;
-    template <typename... Args>
-    __device__ auto operator()(Args... args) -> decltype(this->base->operator()(args...))
-    {
-        return this->base->operator()(args...);
-    }
-};
-
 template <typename el, default_int max_length>
 struct static_array
 {
@@ -110,33 +99,6 @@ struct static_array_list
     __device__ void unsafe_set_length(default_int i) {
         assert("The new length should be in range." && 0 <= i && i <= max_length);
         this->length = i;
-    }
-};
-
-template <typename el, default_int max_length>
-struct dynamic_array_base
-{
-    int refc{ 0 };
-    el* ptr;
-
-    __device__ dynamic_array_base() : ptr(new el[max_length]) {}
-    __device__ ~dynamic_array_base() { delete[] this->ptr; }
-
-    __device__ el& operator[](default_int i) {
-        assert("The index has to be in range." && 0 <= i && i < this->length);
-        return this->ptr[i];
-    }
-};
-
-template <typename el, default_int max_length>
-struct dynamic_array
-{
-    sptr<dynamic_array_base<el, max_length>> ptr;
-
-    __device__ dynamic_array() = default;
-    __device__ dynamic_array(bool t) : ptr(new dynamic_array_base<el, max_length>()) {}
-    __device__ el& operator[](default_int i) {
-        return this->ptr.base->operator[](i);
     }
 };
 
