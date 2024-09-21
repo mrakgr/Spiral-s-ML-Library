@@ -3,11 +3,12 @@ open corepython
 open game
 
 union player_type = Computer | Random | Human
+type player_types = sam.sa 2 player_type
 
 union event =
     // play events
     | StartGame
-    | PlayerChanged : sam.sa 2 player_type
+    | PlayerChanged : player_types
     | ActionSelected : action
     // train events
     | StartTrainingVsSelf
@@ -26,7 +27,7 @@ union ui_effects =
 type state_public =
     {
         ui_game_state : ui_game_state
-        pl_type : sam.sa 2 player_type
+        pl_type : player_types
         messages : messages
     }
 

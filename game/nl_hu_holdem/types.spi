@@ -14,7 +14,7 @@ union ui_game_state =
 union event = 
     // play events
     | StartGame
-    | PlayerChanged : sam.sa 2 player_type
+    | PlayerChanged : player_types
     | ActionSelected : action
 
 union ui_effects =

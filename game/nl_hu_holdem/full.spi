@@ -21,7 +21,9 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
     match msg with
     // | StartTrainingVsRando => train.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
     // | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
-    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
+    | StartGame | PlayerChanged | ActionSelected => 
+        serialize seri.msg msg
+        play.vs_human seri neural
 
     device_sync()
 
@@ -37,7 +39,7 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
     jsonm.serialize (state, effects)
 
 inl main() =
-    named_tuple "Leduc_Full" {
+    named_tuple "Holdem_Full" {
         init = fun () => jsonm.serialize init()
         event_loop_gpu
     }
