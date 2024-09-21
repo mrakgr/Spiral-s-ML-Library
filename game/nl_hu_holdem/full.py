@@ -1,4 +1,4 @@
-# Gives an illegal memory access error when I run this online.
+# Gives an illegal memory access error when I run this from the command line.
 
 kernel = r"""
 #include <new>
