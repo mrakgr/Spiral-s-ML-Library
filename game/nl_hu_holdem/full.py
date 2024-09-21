@@ -1,3 +1,5 @@
+# Gives an illegal memory access error when I run this online.
+
 kernel = r"""
 #include <new>
 #include <assert.h>
