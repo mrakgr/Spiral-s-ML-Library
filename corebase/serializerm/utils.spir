@@ -37,7 +37,7 @@ inl calculate_offsets forall el. =
                 (exists [el] {base_offset=s; dim_offset el_offsets el_size}), s + dim * el_size
             typecase el with
             | sa ~dim ~el' => case_sa `dim `el'
-            | dam.da ~dim ~el' => case_sa `dim `el'
+            | da ~dim ~el' => case_sa `dim `el'
             | sa_list ~dim ~el' => case_sa_list `dim `el'
             | da_list ~dim ~el' => case_sa_list `dim `el'
             | _ =>
@@ -84,7 +84,7 @@ inl serialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) (v : el
                     f ptr el_offsets (index `array `el v i)
             typecase el with
             | sa ~dim ~el' => serialize_sa `(sa dim) `el'
-            | dam.da ~dim ~el' => serialize_sa `(dam.sa dim) `el'
+            | da ~dim ~el' => serialize_sa `(dam.sa dim) `el'
             | sa_list ~dim ~el' => 
                 f ptr offset.dim_offset (length `(sa_list dim) `el v)
                 serialize_sa `(sa_list dim) `el'
@@ -127,9 +127,9 @@ inl deserialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) : el 
                 sa_listm.unsafe_set_length `dim `el' ar (f ptr offset.dim_offset)
                 deserialize_sa `(sa_list dim) `el' ar
                 ar
-            | dam.da ~dim ~el' => 
-                inl ar = sa_create `(dam.da) `dim `el'
-                deserialize_sa `(dam.da dim) `el' ar
+            | da ~dim ~el' => 
+                inl ar = sa_create `(da) `dim `el'
+                deserialize_sa `(da dim) `el' ar
                 ar
             | da_list ~dim ~el' =>
                 inl ar = sa_create `(da_list) `dim `el'
