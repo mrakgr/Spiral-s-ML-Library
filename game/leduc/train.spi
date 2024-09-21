@@ -21,10 +21,10 @@ inl event_config () : event_config =
 
 type state_internal_train =
     stack_mut {
-        pl_type : sam.sa 2 player_type
+        pl_type : sa 2 player_type
         deck : deck
         messages : messages
-        rewards : sam.sa 2 ml.cfr.reward
+        rewards : sa 2 ml.cfr.reward
         grid : cooperative_groups.grid_group
         rng : random.philox_state
     }

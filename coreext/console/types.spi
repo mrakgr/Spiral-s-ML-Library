@@ -1,8 +1,8 @@
-open corebase.compile_time
+open corebase
 
 nominal console_config =
     {
-        h : hashmapm.hashmap
+        h : compile_time.hashmap
         key_fmt : .fmt
         key_value : .value
     }

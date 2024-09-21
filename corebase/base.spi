@@ -80,3 +80,35 @@ type printable_funs =
     }
 
 prototype printable t : printable_funs -> t -> ()
+
+nominal some = ()
+nominal none = ()
+
+union dep_option g t =
+    | Some' :: forall t. t -> dep_option some t
+    | None' :: forall t. dep_option none t
+
+// Statically sized array with a type literal for a dimension.
+// They are intended to be value types on the Cuda side, and them even existing on the Python
+// side is merely a convenience for serialization. They aren't intended to be used in anger there.
+nominal sa dim el = $"backend_switch `({Cuda : $"static_array<`el,@dim>"; Python : $"static_array"})"
+
+// The `da` is similar to `sa` except it is allocated using dynamic memory. The purpose of this is to both improve
+// compilation speed as well as not have the data be spread across all the threads in a block.
+// The reason it has a type literal for a dimension is so it can be easily serialized.
+nominal da dim el = $"backend_switch `({Cuda : $"dymanic_array<`el,@dim>"; Python : $"dynamic_array"})"
+
+// Resizable arrays based on the static ones. The dim in the type determines their max length.
+// Is intended to be a value type on the Cuda backend, and how it works on the Python backend, is merely a serialization convenience.
+nominal sa_list dim el = $"backend_switch `({Python : $"static_array_list"; Cuda : $"static_array_list<`el,@dim>"})"
+
+// Resizable arrays based on the static ones. The dim in the type determines their max length.
+// Is intended to be a value type on the Cuda backend, and how it works on the Python backend, is merely a serialization convenience.
+nominal da_list dim el = $"backend_switch `({Python : $"dynamic_array_list"; Cuda : $"dynamic_array_list<`el,@dim>"})"
+
+// The stand'in for the pointer type.
+type ptr = array u8
+// Sizes are 64-bit unsigned ints.
+type size = u64
+
+type range dim = {from : int; nearTo : dim; by : int}

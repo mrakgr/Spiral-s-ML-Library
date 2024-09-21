@@ -3,9 +3,9 @@ open corecuda
 open tensorm
 open game
 
-type history = da_listm.da_list 128 (option action) // The game history. RL agents need this one.
+type history = sa_list 128 (option action) // The game history. RL agents need this one.
 
-inl nlholdem_pickler() : pickler.pu {history : history; pot : sam.sa 2 int; stack : sam.sa 2 int; player_cards : sam.sa 2 card; community_cards : sa_listm.sa_list 5 card} =
+inl nlholdem_pickler() : pickler.pu {history : history; pot : sa 2 int; stack : sa 2 int; player_cards : sa 2 card; community_cards : sa_list 5 card} =
     open pickler
 
     inl card =
@@ -19,23 +19,23 @@ inl nlholdem_pickler() : pickler.pu {history : history; pot : sam.sa 2 int; stac
         A_Raise = bin_int {from=1; nearTo=(1 <<< 10) - 1}
     }
     inl history : pu history = sa_list (option action)
-    inl pot : pu (sam.sa 2 int) = sa (bin_int {from=0; nearTo=(1 <<< 10) - 1})
-    inl stack : pu (sam.sa 2 int) = pot
-    inl player_cards : pu (sam.sa 2 card) = sa card
-    inl community_cards : pu (sa_listm.sa_list 5 card) = sa_list card
+    inl pot : pu (sa 2 int) = sa (bin_int {from=0; nearTo=(1 <<< 10) - 1})
+    inl stack : pu (sa 2 int) = pot
+    inl player_cards : pu (sa 2 card) = sa card
+    inl community_cards : pu (sa_list 5 card) = sa_list card
     wrap {
         out = fun history,pot,stack,player_cards,community_cards => {history pot stack player_cards community_cards}
         inp = fun {history pot stack player_cards community_cards} => history,pot,stack,player_cards,community_cards
     } (history ** pot ** stack ** player_cards ** community_cards)
 
 inl extract_community_cards (table : table) =
-    inl community_cards = sa_create : sa_listm.sa_list 5 card
+    inl community_cards = sa_create : sa_list 5 card
     inl f cards = arraym.iter (sa_listm.push community_cards) cards
     match table.street with Preflop => () | Flop cards => f cards | Turn cards => f cards | River cards => f cards
     community_cards
 
 inl nlholdem_conv (table, messages : table * messages) =
-    inl rotate_left forall dim t. (i' : int) (x : sam.sa dim t) : sam.sa dim t = sam.init (fun i => index x (i + i' % length x))
+    inl rotate_left forall dim t. (i' : int) (x : sa dim t) : sa dim t = sam.init (fun i => index x (i + i' % length x))
     {
         history = messages |> arraym.map function
             | PlayerAction(id,action) => Some(action)

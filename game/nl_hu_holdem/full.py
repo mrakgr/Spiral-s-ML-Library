@@ -358,6 +358,7 @@ struct Union6 {
         this->tag = 255;
     }
 };
+
 extern "C" __global__ void entry0() {
     if (threadIdx.x == 0 && blockIdx.x == 0) {
         printf("111\n");

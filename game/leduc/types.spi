@@ -3,7 +3,7 @@ open corepython
 open game
 
 union player_type = Computer | Random | Human
-type player_types = sam.sa 2 player_type
+type player_types = sa 2 player_type
 
 union event =
     // play events

@@ -1,8 +1,3 @@
-// The `da` is similar to `sa` except it is allocated using dynamic memory. The purpose of this is to both improve
-// compilation speed as well as not have the data be spread across all the threads in a block.
-// The reason it has a type literal for a dimension is so it can be easily serialized.
-nominal da dim el = $"backend_switch `({Cuda : $"dymanic_array<`el,@dim>"; Python : $"dynamic_array"})"
-
 // Creates an empty array.
 instance sa_create da = 
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."

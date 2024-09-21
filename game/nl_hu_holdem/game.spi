@@ -10,33 +10,33 @@ union action =
 
 union street =
     | Preflop
-    | Flop : sam.sa 3 card
-    | Turn : sam.sa 4 card
-    | River : sam.sa 5 card
+    | Flop : sa 3 card
+    | Turn : sa 4 card
+    | River : sa 5 card
 
 type table =
     {
-        pot : sam.sa 2 int
-        stack : sam.sa 2 int
+        pot : sa 2 int
+        stack : sa 2 int
         street : street
-        pl_card : sam.sa 2 (sam.sa 2 card)
+        pl_card : sa 2 (sa 2 card)
         round_turn : int
         min_raise : int
     }
 
 union message =
-    | PlayerGotCards : int * sam.sa 2 card
-    | CommunityCardsAre : sa_listm.sa_list 5 card
+    | PlayerGotCards : int * sa 2 card
+    | CommunityCardsAre : sa_list 5 card
     | PlayerAction : int * action
-    | Showdown : {winner_id : int; chips_won : int; hands_shown : sam.sa 2 lib.hand_rankerm.hand_score}
+    | Showdown : {winner_id : int; chips_won : int; hands_shown : sa 2 lib.hand_rankerm.hand_score}
     | Fold : {winner_id : int; chips_won : int}
 
 type deck = lib.deckm.deck
-type messages = da_listm.da_list 128 message
+type messages = sa_list 128 message
 
 inl bb() = 2 : int
 inl sb() = 1 : int
-inl init_table (pl_card : sam.sa 2 (sam.sa 2 card)) : table =
+inl init_table (pl_card : sa 2 (sa 2 card)) : table =
     inl pot = arraym.fromList [bb(); sb()]
     inl stack_size = 100
     {
@@ -130,25 +130,25 @@ inl round (table : table) (action : action) =
             round_turn #= next_turn
             }        
 
-inl flop (table : table) (cards : sam.sa 3 card) =
+inl flop (table : table) (cards : sa 3 card) =
     try_round {table with 
         round_turn = 0
         min_raise = bb()
         street #= function Preflop => Flop cards | _ => failwith "Invalid street in flop."
         }
-inl turn (table : table) (cards : sam.sa 1 card) =
+inl turn (table : table) (cards : sa 1 card) =
     try_round {table with 
         round_turn = 0
         min_raise = bb()
         street #= function Flop x => Turn (sam.merge x cards |> nominal_recreate) | _ => failwith "Invalid street in turn."
         }
-inl river (table : table) (cards : sam.sa 1 card) =
+inl river (table : table) (cards : sa 1 card) =
     try_round {table with 
         round_turn = 0
         min_raise = bb()
         street #= function Turn x => River (sam.merge x cards |> nominal_recreate) | _ => failwith "Invalid street in river."
         }
-inl preflop (pl_card : sam.sa 2 (sam.sa 2 card)) = try_round (init_table pl_card)
+inl preflop (pl_card : sa 2 (sa 2 card)) = try_round (init_table pl_card)
 inl fold (table : table) = G_Fold table
 inl showdown (table : table) = G_Showdown table
 inl start () = G_Preflop

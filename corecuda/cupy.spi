@@ -17,7 +17,7 @@ inl template forall dim float. (dim : dim) (op : .fun) : tensor dim float =
     } |> reshape (const dim)
 
 // Can only be used to create single arrays.
-inl arange forall dim el. ({from nearTo by} : loop.range dim) : tensor dim el = 
+inl arange forall dim el. ({from nearTo by} : range dim) : tensor dim el = 
     inl len : int = loop.prod nearTo * by
     real $"cp.arange(!from,!len,!by,dtype=`(cupy_type el)) # type: ignore" : array el
     |> fromArray |> reshape (const nearTo)

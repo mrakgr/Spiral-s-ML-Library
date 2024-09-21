@@ -41,7 +41,7 @@ inl event_config () : event_config =
 type state_public =
     {
         ui_game_state : ui_game_state
-        pl_type : sam.sa 2 player_type_play
+        pl_type : sa 2 player_type_play
         messages : messages
     }
 
@@ -91,10 +91,10 @@ inl init() : state =
 
 type state_internal_train =
     stack_mut {
-        pl_type : sam.sa 2 player_type_train
+        pl_type : sa 2 player_type_train
         deck : deck
         messages : messages
-        rewards : sam.sa 2 ml.cfr.reward
+        rewards : sa 2 ml.cfr.reward
         grid : cooperative_groups.grid_group
         rng : random.philox_state
     }
@@ -160,7 +160,7 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                 | T_Computer =>
                     inl data = table, state.messages
                     inl noinline_eval() =
-                        // inl x : sam.sa 3 _ = arraym.fromList [model.AA_Fold; model.AA_Call; model.AA_Raise]
+                        // inl x : sa 3 _ = arraym.fromList [model.AA_Fold; model.AA_Call; model.AA_Raise]
                         // index x (random.int_range {from=0; nearTo=length x} (refm.from_local state.rng))
                         // |> transposing_loop.shuffle 0
                         if is_train then

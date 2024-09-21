@@ -24,6 +24,7 @@ modules:
         type_arith*
         core-
         compile_time/
+            types-
             hashsetm
             hashmapm
             typed/
@@ -45,10 +46,10 @@ modules:
             tensor_main-
         partitionm
         serializerm/
-            types-
             utils*
             seriazer_main-
         pickler
+        types-
         
     corepython/
         base-

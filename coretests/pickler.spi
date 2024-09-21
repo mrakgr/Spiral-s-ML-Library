@@ -10,7 +10,7 @@ type game_state = {
     stack : int
     pot : int
     card : card 
-    action_history : sa_listm.sa_list 5 action
+    action_history : sa_list 5 action
     }
 
 inl main() =

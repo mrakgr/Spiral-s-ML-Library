@@ -19,7 +19,7 @@ let draw_card rng deck : card * deck =
     card (conv i), toggle deck (conv i)
 
 // Draws an array of cards from a deck.
-let draw_cards forall dim. rng deck : sam.sa dim card * deck =
+let draw_cards forall dim. rng deck : sa dim card * deck =
     open sam
     inl out : sa dim card = sa_create
     out, loop.for {from=0; nearTo=length out} (fun i deck =>

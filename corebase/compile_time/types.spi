@@ -1,0 +1,2 @@
+// The compiler time hashmap's type is a symbol placeholder.
+type hashmap = exists. .hashmap

@@ -132,7 +132,7 @@ inl memcpy_sync forall float. (to, from : tensor int float * tensor int float) =
             | _ => default()
             ) from.bodies to.bodies
 
-inl tensor_memcpy_sync forall float a. access_size (r : loop.range (tensor a (float * float))) : () =
+inl tensor_memcpy_sync forall float a. access_size (r : range (tensor a (float * float))) : () =
     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> memcpy_sync)
 
 // Reinterpters a value of one type as another. It doesn't do any conversion, but simply preserves the addresses of the values being converted.
@@ -150,3 +150,6 @@ inl undefined forall t. : t = index (create 1 : array t) 0
 inl nanosleep (ns : u32) : () = 
     assert (ns <= 1_000_000) "The maximum sleep duration is approximately 1 millisecond."
     $"__nanosleep(!ns)"
+
+// Base reference type
+nominal ref t = $"`t &"

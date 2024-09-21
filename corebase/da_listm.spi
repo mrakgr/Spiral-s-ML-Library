@@ -1,7 +1,3 @@
-// Resizable arrays based on the static ones. The dim in the type determines their max length.
-// Is intended to be a value type on the Cuda backend, and how it works on the Python backend, is merely a serialization convenience.
-nominal da_list dim el = $"backend_switch `({Python : $"dynamic_array_list"; Cuda : $"dynamic_array_list<`el,@dim>"})"
-
 // Creates an empty array.
 instance sa_create da_list =
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."

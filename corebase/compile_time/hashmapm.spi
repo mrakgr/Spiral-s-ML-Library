@@ -1,5 +1,3 @@
-type hashmap = exists. .hashmap
-
 // Creates a compile time HashMap. These data structures cannot be turned to types or passed through join
 // points. Their primary purpose is for type extensions.
 // The symbol .hashmap here is a standin for its nonexistent type.

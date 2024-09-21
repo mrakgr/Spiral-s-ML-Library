@@ -89,7 +89,7 @@ inl local_iter forall a. f (from : tensor (int * int) a) : () =
 
 nominal row_config = {
     threads_per_miniblock : int
-    extern_offset : partitionm.size
+    extern_offset : size
     }
 
 // Does a 2d reduction of the result across all the threads of the miniblock in shared memory

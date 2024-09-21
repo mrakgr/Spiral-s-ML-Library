@@ -38,7 +38,7 @@ type config passthrough dim =
 // 
 // Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
 // It does block sync at the end. Any grid sync potentially needed would need to be done manually.
-inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : {extern_offset : partitionm.size; passthrough : shared} -> int -> dim -> t) : t =
+inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : {extern_offset : size; passthrough : shared} -> int -> dim -> t) : t =
     inl dim_outer = threads_per_block()
     inl body forall el. (fv : el) : t = 
         inl shared_io, extern_offset = tensor_create_extern_shared 0 dim_outer
@@ -68,7 +68,7 @@ inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim
 // 
 // Even though the loop itself is blockwise in design, the thread id it passes into the lambda body is the thread id in the grid instead of the block.
 // It does block sync at the end. Any grid sync potentially needed would need to be done manually.
-inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : {extern_offset : partitionm.size; passthrough : shared} -> int -> dim -> t) : t =
+inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f : {extern_offset : size; passthrough : shared} -> int -> dim -> t) : t =
     inl dim_outer = threads_per_block()
     inl body forall el. (fv : el) : t = 
         inl shared_io, extern_offset = tensor_create_extern_shared 0 dim_outer

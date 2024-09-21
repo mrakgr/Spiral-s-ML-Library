@@ -7,7 +7,7 @@ open coreext
 type state_internal_play =
     stack_mut {
         ui_game_state : ui_game_state
-        pl_type : sam.sa 2 player_type
+        pl_type : sa 2 player_type
         game : option game_node
         deck : deck
         messages : messages

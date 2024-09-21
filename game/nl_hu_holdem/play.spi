@@ -57,7 +57,7 @@ inl random_action = fun rng (table : table) =>
     inl raise x = // Only do the raise if there are enough chips in the stack after calling.
         inl prob = if table.min_raise <= x && x < index stack_after_calling player_turn then 1 else 0
         A_Raise x, prob
-    inl actions : sam.sa 6 (action * f32) = arraym.fromList [
+    inl actions : sa 6 (action * f32) = arraym.fromList [
         A_Fold, if index table.pot player_turn < pot_size_needed_to_call then 1 else 0
         A_Call, 4
         raise (pot_bet_size / 3)
@@ -69,7 +69,7 @@ inl random_action = fun rng (table : table) =>
     
 let play_loop (neural : state_neural) (state : state_internal) node =
     open refm
-    inl push_message = da_listm.push state.messages
+    inl push_message = sa_listm.push state.messages
     inl deck = state.deck
     inl pop_deck () = 
         open random
@@ -85,7 +85,7 @@ let play_loop (neural : state_neural) (state : state_internal) node =
         | Turn cards => push cards
         | River cards => push cards
         push new_cards
-        ar : sa_listm.sa_list 5 _
+        ar : sa_list 5 _
     inl go_street (table : table) flop =
         inl new_cards = pop_deck()
         inl msg = CommunityCardsAre (get_community_cards table.street new_cards)
@@ -105,7 +105,7 @@ let play_loop (neural : state_neural) (state : state_internal) node =
         | G_Showdown table => 
             inl msg =
                 inl community_cards = match table.street with River cards => cards | _ => failwith "Invalid street in showdown."
-                inl h i : sam.sa 7 card = sam.merge (index table.pl_card i) community_cards |> nominal_recreate
+                inl h i : sa 7 card = sam.merge (index table.pl_card i) community_cards |> nominal_recreate
                 inl s0, s1 = lib.hand_rankerm.score (h 0), lib.hand_rankerm.score (h 1)
                 inl chips_won, winner_id =
                     inl chips_won = index table.pot (player_turn table)
@@ -179,14 +179,8 @@ inl event_loop_play state_neural (msg, state_internal : event * state_internal) 
 open serializerm
 inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural) =
     run' fun () =>
-        ml.cfr_models.print0 "In the kernel."
-        inl msg = deserialize seri.msg
-        ml.cfr_models.print0 "Hello 1"
-        inl game_state = deserialize seri.game_state
-        ml.cfr_models.print0 "Hello 2"
+        inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
         inl state = state_to_internal_play game_state
-        ml.cfr_models.print0 "Hello 3"
-        // event_loop_play neural (msg, state)
-        // if rangem.threads_in_grid().from = 0 then
-        //     serialize seri.game_state (internal_play_to_state state)
-        ()
+        event_loop_play neural (msg, state)
+        if rangem.threads_in_grid().from = 0 then
+            serialize seri.game_state (internal_play_to_state state)

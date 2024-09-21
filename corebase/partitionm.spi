@@ -1,7 +1,5 @@
 // Functionality for a partitioning raw pointer arrays into tensors.
 
-type ptr = array u8
-type size = u64
 inl min_align() : size = 16
 inl align (s : size) = modup s min_align()
 

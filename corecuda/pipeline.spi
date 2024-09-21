@@ -39,5 +39,5 @@ inl memcpy_async forall float. (pipe : ref (pipeline thread_scope_thread)) (to, 
             $"cuda::memcpy_async(!to + !to_offset, !from + !from_offset, cuda::aligned_size_t<!dim>(!dim), !pipe)" : ()
             ) from.bodies to.bodies
 
-inl tensor_memcpy_async forall float a. access_size (pipe : ref (pipeline thread_scope_thread)) (r : loop.range (tensor a (float * float))) : () =
+inl tensor_memcpy_async forall float a. access_size (pipe : ref (pipeline thread_scope_thread)) (r : range (tensor a (float * float))) : () =
     loop_rigid {r with nearTo#=factorize_sizeof access_size} (unzip >> memcpy_async pipe)

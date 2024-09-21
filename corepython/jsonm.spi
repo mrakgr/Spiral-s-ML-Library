@@ -5,8 +5,6 @@
 
 open corebase
 
-nominal json t = obj
-
 let deserialize forall t. (json x : json t) : t =
     let rec f forall t'. (x : obj) : t' = real
         open real_core
@@ -31,11 +29,11 @@ let deserialize forall t. (json x : json t) : t =
                 typecase `k with ~k =>
                 f `v ($'!x["@k"] # type: ignore' : obj)
                 ) `t'
-        | sam.sa ~dim ~el => deserialize_sa `(sam.sa dim) `el
+        | sa ~dim ~el => deserialize_sa `(sa dim) `el
         | dam.da ~dim ~el => deserialize_sa `(dam.da dim) `el
         | plist ~el => deserialize_sa `plist `el
-        | sa_listm.sa_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(sa_listm.sa_list dim) `el
-        | da_listm.da_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(da_listm.da_list dim) `el
+        | sa_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(sa_list dim) `el
+        | da_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(da_list dim) `el
         | _ -> _ => $"!x" : t'
         | _ =>
             if union_type_is `t' then 
@@ -82,11 +80,11 @@ let serialize forall t. (x : t) : json t =
         | () => $"[]" : obj
         | ~a * ~b => f_tuple `t' (plistm.create' `obj) x
         | {} => record_type_map (fun k => forall v. => f `v (x k)) `t' |> fun x => !!!!ToPythonRecord(x)
-        | sam.sa ~dim ~el => serialize_sa `(sam.sa dim) `el
+        | sa ~dim ~el => serialize_sa `(sa dim) `el
         | dam.da ~dim ~el => serialize_sa `(dam.sa dim) `el
         | plist ~el => serialize_sa `plist `el
-        | sa_listm.sa_list ~dim ~el => serialize_sa `(sa_listm.sa_list dim) `el
-        | da_listm.da_list ~dim ~el => serialize_sa `(da_listm.da_list dim) `el
+        | sa_list ~dim ~el => serialize_sa `(sa_list dim) `el
+        | da_list ~dim ~el => serialize_sa `(da_list dim) `el
         | _ -> _ => $"!x" : obj
         | _ =>
             if union_type_is `t' then 
@@ -111,7 +109,7 @@ let serialize forall t. (x : t) : json t =
             $"!l" : obj
     json (f x)
 
-type t = (int * int) * {a : option int; b : option int; c : int} * ((float * float) *  bool * bool) * list string * sa_listm.sa_list 16 (int * float)
+type t = (int * int) * {a : option int; b : option int; c : int} * ((float * float) *  bool * bool) * list string * sa_list 16 (int * float)
 inl data() : t = (1, 2), {a=Some 1; b=None; c=3},((55.34,66.23), true, false), ["qwe"; "asd"], arraym.fromList [1,2;3,4;5,6]
 
 // inl test1() =

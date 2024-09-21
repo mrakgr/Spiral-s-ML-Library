@@ -1,8 +1,3 @@
-// Statically sized array with a type literal for a dimension.
-// They are intended to be value types on the Cuda side, and them even existing on the Python
-// side is merely a convenience for serialization. They aren't intended to be used in anger there.
-nominal sa dim el = $"backend_switch `({Cuda : $"static_array<`el,@dim>"; Python : $"static_array"})"
-
 instance sa_create sa =
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
     backend_switch {

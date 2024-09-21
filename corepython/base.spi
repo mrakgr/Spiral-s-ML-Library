@@ -17,3 +17,4 @@ instance set plist = fun ar i v => $"!ar[!i] = !v"
 instance length plist = fun ar => $"len(!ar)"
 instance create plist = fun i => $"[None] * !i"
 
+nominal json t = obj

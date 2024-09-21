@@ -5,9 +5,9 @@ union action = Raise | Call | Fold
 
 type table = // The complete game state.
     {
-        pot : sam.sa 2 int
+        pot : sa 2 int
         community_card : option card
-        pl_card : sam.sa 2 card
+        pl_card : sa 2 card
         raises_left : int
         is_button_s_first_move : bool
         player_turn : int
@@ -17,10 +17,10 @@ union message =
     | PlayerGotCard : int * card
     | CommunityCardIs : card
     | PlayerAction : int * action
-    | Showdown : {winner_id : int; chips_won : int; cards_shown : sam.sa 2 card}
+    | Showdown : {winner_id : int; chips_won : int; cards_shown : sa 2 card}
 
 type deck = deckm.deck
-type messages = sa_listm.sa_list 32 message
+type messages = sa_list 32 message
 
 union game_node =
     | TerminalFold : table
@@ -40,7 +40,7 @@ inl random_action rng (table : table) =
     pop actions
 
 // Returns the max value of both pots in an static array.
-inl pot_call (pot : sam.sa 2 int) : sam.sa 2 int = sam.init (const (arraym.fold max 0 pot))
+inl pot_call (pot : sa 2 int) : sa 2 int = sam.init (const (arraym.fold max 0 pot))
 
 // Compares the hands of the two players.
 // Needs to be called after the community card has been dealt.
@@ -61,7 +61,7 @@ let compare_hands (table : table) =
         | _ => comp (order a) (order b)
 
 inl toggle (player_turn : int) : int = if player_turn = 0 then 1 else 0
-inl raise_by (id : int) (amount : int) : sam.sa 2 int -> sam.sa 2 int = arraym.mapi (fun i pot => if i = id then pot + amount else pot)
+inl raise_by (id : int) (amount : int) : sa 2 int -> sa 2 int = arraym.mapi (fun i pot => if i = id then pot + amount else pot)
 inl game_round (table : table) action =
     match table.community_card with
     | Some community_card => // round two

@@ -2,18 +2,16 @@ open corebase
 open corecuda
 open coreext
 open tensorm
-open compile_time
 
-type ptr = partitionm.ptr
-type size = partitionm.size
+type size = size
 type graph_array = ptr * size
-type graph_dims = hashmapm.hashmap
-type graph_offset = hashmapm.hashmap * size
+type graph_dims = compile_time.hashmap
+type graph_offset = compile_time.hashmap * size
 type graph_data = {array : graph_array; offset : graph_offset}
 
 nominal layer_state = 
     {
-        rng : refm.ref random.philox_state
+        rng : ref random.philox_state
     }
 
 union rec graph t =
@@ -62,10 +60,10 @@ nominal model t =
         param : graph_data
     }
 
-inl memoize (h : hashmapm.hashmap) f k =
-    match hashmapm.try_get h k with
+inl memoize (h : compile_time.hashmap) f k =
+    match compile_time.hashmapm.try_get h k with
     | Some v => v
-    | None => inl v = f k in hashmapm.add h k v . v
+    | None => inl v = f k in compile_time.hashmapm.add h k v . v
 
 // Returns the top level dimension for an arbitrary graph type. Takes in a hashmap for memoization purposes.
 // Results in a type errors error on the KeyScalar node.
@@ -128,11 +126,11 @@ and inl get_dim forall dim t. (h : graph_dims) (x : graph (tensor dim t)) : dim 
 
 // Calculates the parameter offsets.
 inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
-    inl h_offset_param = hashmapm.create() // stores the offsets pointing to the start of the weight parameter array for each node
-    inl h = hashmapm.create()
+    inl h_offset_param = compile_time.hashmapm.create() // stores the offsets pointing to the start of the weight parameter array for each node
+    inl h = compile_time.hashmapm.create()
     inl offset_key = ()
-    inl get_offset () : size = match hashmapm.try_get h offset_key with Some x => x | None => 0
-    inl set_offset (offset : size) : () = hashmapm.set h offset_key offset
+    inl get_offset () : size = match compile_time.hashmapm.try_get h offset_key with Some x => x | None => 0
+    inl set_offset (offset : size) : () = compile_time.hashmapm.set h offset_key offset
     inl get_dim x = get_dim dims x
     inl rec g forall t. (out : option (graph t)) : () =
         match out with
@@ -149,23 +147,23 @@ inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : grap
             | Pair(a,b) => f a . f b
             | Weight(p,init) as k =>
                 inl partition_offsets : _ t = p |> partitionm.calculate_offsets get_offset()
-                hashmapm.add h_offset_param k partition_offsets
+                compile_time.hashmapm.add h_offset_param k partition_offsets
                 set_offset partition_offsets.offset_end
             | Apply(exists a. a,b) => f a . f b
             | KeyGraph(_,x) => f x
             | KeyScalar => ()
             | Input => ()
     f x
-    hashmapm.set_immutable(h_offset_param)
+    compile_time.hashmapm.set_immutable(h_offset_param)
     h_offset_param, get_offset()
 
 // Calculates the output node offsets.
 inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
-    inl h_offset_output = hashmapm.create() // stores the offsets pointing to the start of the output array for each node
-    inl h = hashmapm.create()
+    inl h_offset_output = compile_time.hashmapm.create() // stores the offsets pointing to the start of the output array for each node
+    inl h = compile_time.hashmapm.create()
     inl offset_key = ()
-    inl get_offset () : size = match hashmapm.try_get h offset_key with Some x => x | None => 0
-    inl set_offset (offset : size) : () = hashmapm.set h offset_key offset
+    inl get_offset () : size = match compile_time.hashmapm.try_get h offset_key with Some x => x | None => 0
+    inl set_offset (offset : size) : () = compile_time.hashmapm.set h offset_key offset
     inl get_dim x = get_dim dims x
     inl get_dim_pair x = get_dim_pair dims x
     inl rec g forall t. (k : graph t) (out : option (graph t)) : () =
@@ -179,7 +177,7 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
                     inl partition_offsets = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset()
                     set_offset partition_offsets.offset_end
                     P_D partition_offsets
-            hashmapm.add h_offset_output k (loop (get_dim_pair k))
+            compile_time.hashmapm.add h_offset_output k (loop (get_dim_pair k))
     and inl f forall t. : graph t -> () =
         memoize h fun k =>
             match k with
@@ -194,19 +192,19 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
             | Apply(exists a. a,b) => f a . f b // passthrough
             | Input(p) =>
                 inl partition_offsets : _ t = partitionm.calculate_offsets get_offset() p
-                hashmapm.add h_offset_output k (P_D partition_offsets)
+                compile_time.hashmapm.add h_offset_output k (P_D partition_offsets)
                 set_offset partition_offsets.offset_end
             | KeyGraph(_,x) => f x // passthrough
             | KeyScalar(_) => ()
         
     f x
-    hashmapm.set_immutable(h_offset_output)
+    compile_time.hashmapm.set_immutable(h_offset_output)
     h_offset_output, get_offset()
 
 // Initializes the parameters of a NN on the host.
 inl param_init forall t_top. (model {graph param} : model t_top) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-    inl h = hashmapm.create()
+    inl h = compile_time.hashmapm.create()
     inl rec g forall t. : option (graph t) -> () = function
         | None => ()
         | Some x => f x
@@ -219,7 +217,7 @@ inl param_init forall t_top. (model {graph param} : model t_top) =
             | BlockMatmul(a,b) => f a . f b
             | Zip(a,b) => f a . f b
             | Pair(a,b) => f a . f b
-            | Weight(_, init) as k => partitionm.from_partition_offsets param.array (hashmapm.get (fst param.offset) k) |> init . ()
+            | Weight(_, init) as k => partitionm.from_partition_offsets param.array (compile_time.hashmapm.get (fst param.offset) k) |> init . ()
             | Apply(exists a. a,b) => f a . f b
             | KeyGraph(_,x) => f x
             | KeyScalar => ()
@@ -229,8 +227,8 @@ inl param_init forall t_top. (model {graph param} : model t_top) =
 // Prints all the weight layers.
 inl param_print forall t_top. (model {graph param} : model t_top) =
     assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-    inl h = hashmapm.create()
-    inl get_partition forall t. (k : graph t) : t = partitionm.from_partition_offsets param.array (hashmapm.get (fst param.offset) k)
+    inl h = compile_time.hashmapm.create()
+    inl get_partition forall t. (k : graph t) : t = partitionm.from_partition_offsets param.array (compile_time.hashmapm.get (fst param.offset) k)
     inl rec g forall t. : option (graph t) -> () = function
         | None => ()
         | Some x => f x
@@ -272,10 +270,10 @@ inl graph_extract forall t_top indices. (model {graph param output} : model t_to
             | _ => real_core.error_type "Cannot extract the node for the graph due to the missing key."
         | KeyGraph(_,x) => loop x
         | _ =>
-            match hashmapm.try_get (fst param.offset) graph with
+            match compile_time.hashmapm.try_get (fst param.offset) graph with
             | Some x => partitionm.from_partition_offsets param.array x
             | None =>
-                match hashmapm.try_get (fst output.offset) graph with
+                match compile_time.hashmapm.try_get (fst output.offset) graph with
                 | Some (x : partition_of t) => 
                     inl rec f forall t'. : partition_of t' -> t' = function
                         | P_D x => partitionm.from_partition_offsets output.array x
@@ -289,7 +287,7 @@ inl graph_extract forall t_top indices. (model {graph param output} : model t_to
 // Extracts the input tensor from the Key node given the key.
 inl key_extract forall t_top key{symbol} input. (model ({graph param output} & m) : model t_top) (_ : key) : input =
     assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-    inl h = hashmapm.create()
+    inl h = compile_time.hashmapm.create()
     inl rec g forall t. (x : option input) (out : option (graph t)) : option input =
         match x with
         | Some => x
@@ -327,7 +325,7 @@ inl key_extract forall t_top key{symbol} input. (model ({graph param output} & m
 // Does not do any safety checking and is intended for internal use in other graph_run functions.
 // Inserts the block index into the indices variable automatically.
 inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
-    inl h = hashmapm.create()
+    inl h = compile_time.hashmapm.create()
     inl abi t = apply block_index() t
     inl tensor_extract forall t. (graph : graph t) : t = graph_extract (model {m with graph}) indices
     inl rec f forall t. : graph t -> t =
@@ -499,22 +497,22 @@ inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : g
 inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)
 
 inl create_model forall t. (graph : graph t) =
-    inl dims = hashmapm.create()
+    inl dims = compile_time.hashmapm.create()
     inl param = create_graph_data (pass_offset_param graph dims)
     inl output = create_graph_data (pass_offset_output graph dims)
-    hashmapm.set_immutable(dims)
+    compile_time.hashmapm.set_immutable(dims)
     model {graph param output dims}
 
 nominal model_data = {param : ptr * size; output : ptr * size}
 
 inl model_to_model_data (x : model _) = model_data {param=x.param.array; output=x.output.array}
 inl model_data_to_model (graph : graph _) (d : model_data) =
-    inl dims = hashmapm.create()
+    inl dims = compile_time.hashmapm.create()
     inl param = pass_offset_param graph dims
     assert (snd param = snd d.param) "The params needs to have matching offsets."
     inl output = pass_offset_output graph dims
     assert (snd output = snd d.output) "The outputs needs to have matching offsets."
-    hashmapm.set_immutable(dims)
+    compile_time.hashmapm.set_immutable(dims)
     model { graph dims
         param = { array = fst d.param, snd param; offset = param }
         output = { array = fst d.output, snd output; offset = output }

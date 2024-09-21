@@ -148,7 +148,7 @@ inl calculate_updates forall dim.
         mask (size : sizes) 
         (model : model) (trace : trace) (trace_state : trace_state) 
         (ensemble_id : ensemble_id) 
-        (reward : sam.sa dim reward) =
+        (reward : sa dim reward) =
     open primitives
     inl thread_id = rangem.threads_in_grid().from
     inl rewards : _ _ reward = tensorm.from reward
@@ -313,7 +313,7 @@ inl test1() =
             push (0, 457, 0)
             push (0, 3447, 1)
 
-            inl rewards : sam.sa 2 reward = arraym.fromList [13; -13]
+            inl rewards : sa 2 reward = arraym.fromList [13; -13]
             calculate_updates mask sizes model trace trace_state 0 rewards
             apply_updates grid rng model
 

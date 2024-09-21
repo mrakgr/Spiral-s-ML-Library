@@ -5,7 +5,7 @@ open tensor_cuda
 
 inl main() =
     run fun () =>
-        inl a,_ : tensorm.tensor int () * partitionm.size = tensor_create_extern_shared 0 16
+        inl a,_ : tensorm.tensor int () * size = tensor_create_extern_shared 0 16
         tensor_index 0 a
         tensor_set 0 () a
         tensor_set 0 () a

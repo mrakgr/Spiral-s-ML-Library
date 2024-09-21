@@ -2,9 +2,6 @@
 
 open corebase
 
-// Base reference type
-nominal ref t = $"`t &"
-
 // Creates a reference from a value type. The reference does not point to the original, the argument is copied by value instead
 // and the reference points to the adress of the copy.
 inl ref forall t. (x : t) : ref t = $"`t \v = !x"

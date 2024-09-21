@@ -23,7 +23,7 @@ type ui_state = {
     }
 
 type game_state = {
-    past_actions : sam.sa 2 (option action)
+    past_actions : sa 2 (option action)
     }
 
 type state = {
@@ -34,7 +34,7 @@ type state = {
 nominal backend_state = state
 
 union backend = 
-    | GPU : refm.ref random.philox_state
+    | GPU : ref random.philox_state
     | CPU
 
 inl rec game_step backend ~(action : option action) ~(state : state) : state = join
@@ -42,13 +42,13 @@ inl rec game_step backend ~(action : option action) ~(state : state) : state = j
     inl random_action() : action = 
         match backend with
         | GPU rng =>
-            inl actions : sam.sa 3 _ = arraym.fromList [Rock, 1; Paper, 1; Scissors, 1]
+            inl actions : sa 3 _ = arraym.fromList [Rock, 1; Paper, 1; Scissors, 1]
             random.sample_discrete actions rng
         | CPU =>
             global "import random"
             $'random.choice([!Rock, !Paper, !Scissors])'
-    inl update_action forall dim. i x : sam.sa dim (option action) -> sam.sa dim (option action) = arraym.mapi (fun i' x' => if i = i' then Some x else x')
-    inl clear_actions forall dim. : sam.sa dim (option action) = sam.init (fun i => None)
+    inl update_action forall dim. i x : sa dim (option action) -> sa dim (option action) = arraym.mapi (fun i' x' => if i = i' then Some x else x')
+    inl clear_actions forall dim. : sa dim (option action) = sam.init (fun i => None)
     match state.ui_state.game_state with
     | GameNotStarted | GameOver => state
     | WaitingForActionFromPlayerId id when id < 2 =>

@@ -4,7 +4,7 @@ open tensorm
 open cardm
 open game
 
-type history = sa_listm.sa_list 10 (choice2 action card) // The game history. RL agents need this one.
+type history = sa_list 10 (choice2 action card) // The game history. RL agents need this one.
 
 inl leduc_pickler() : pickler.pu history =
     open pickler

@@ -273,7 +273,7 @@ inl init forall a b. (cfr_game_graph {graph sizes action_mask input output} : cf
 // Also resets the trace state afterwards.
 inl calculate_updates forall dim a b.
         (cfr_game_model {model sizes action_mask} : _ a b)
-        (reward : sam.sa dim cfr.reward) =
+        (reward : sa dim cfr.reward) =
     // Since we aren't using the output_world_id we'll pass `ensemble=0` instead of extracting the other nodes one by one.
     inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
     loop.linear sizes.ensemble_id fun ensemble_id =>

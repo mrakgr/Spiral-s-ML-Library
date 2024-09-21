@@ -36,10 +36,10 @@ inl calculate_offsets forall el. =
                 inl dim = conv `size (type_lit_to_lit `dim)
                 (exists [el] {base_offset=s; dim_offset el_offsets el_size}), s + dim * el_size
             typecase el with
-            | sam.sa ~dim ~el' => case_sa `dim `el'
+            | sa ~dim ~el' => case_sa `dim `el'
             | dam.da ~dim ~el' => case_sa `dim `el'
-            | sa_listm.sa_list ~dim ~el' => case_sa_list `dim `el'
-            | da_listm.da_list ~dim ~el' => case_sa_list `dim `el'
+            | sa_list ~dim ~el' => case_sa_list `dim `el'
+            | da_list ~dim ~el' => case_sa_list `dim `el'
             | _ =>
                 if singleton_type_is `el then (exists [el] s), s
                 elif union_type_is `el then
@@ -83,14 +83,14 @@ inl serialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) (v : el
                     inl ptr = ptr_at_offset ptr (exists [u8] base_offset + conv `size i * el_size)
                     f ptr el_offsets (index `array `el v i)
             typecase el with
-            | sam.sa ~dim ~el' => serialize_sa `(sam.sa dim) `el'
+            | sa ~dim ~el' => serialize_sa `(sa dim) `el'
             | dam.da ~dim ~el' => serialize_sa `(dam.sa dim) `el'
-            | sa_listm.sa_list ~dim ~el' => 
-                f ptr offset.dim_offset (length `(sa_listm.sa_list dim) `el v)
-                serialize_sa `(sa_listm.sa_list dim) `el'
-            | da_listm.da_list ~dim ~el' => 
-                f ptr offset.dim_offset (length `(da_listm.da_list dim) `el v)
-                serialize_sa `(da_listm.da_list dim) `el'
+            | sa_list ~dim ~el' => 
+                f ptr offset.dim_offset (length `(sa_list dim) `el v)
+                serialize_sa `(sa_list dim) `el'
+            | da_list ~dim ~el' => 
+                f ptr offset.dim_offset (length `(da_list dim) `el v)
+                serialize_sa `(da_list dim) `el'
             | _ =>
                 if singleton_type_is `el then ()
                 elif union_type_is `el then
@@ -118,23 +118,23 @@ inl deserialize forall el. (offsets (offsets, _) : offsets el) (ptr : ptr) : el 
                     inl ptr = ptr_at_offset ptr (exists [u8] base_offset + conv `size i * el_size)
                     set `array `el ar i (f ptr el_offsets)
             typecase el with
-            | sam.sa ~dim ~el' => 
-                inl ar = sa_create `(sam.sa) `dim `el'
-                deserialize_sa `(sam.sa dim) `el' ar
+            | sa ~dim ~el' => 
+                inl ar = sa_create `(sa) `dim `el'
+                deserialize_sa `(sa dim) `el' ar
                 ar
-            | sa_listm.sa_list ~dim ~el' =>
-                inl ar = sa_create `(sa_listm.sa_list) `dim `el'
+            | sa_list ~dim ~el' =>
+                inl ar = sa_create `(sa_list) `dim `el'
                 sa_listm.unsafe_set_length `dim `el' ar (f ptr offset.dim_offset)
-                deserialize_sa `(sa_listm.sa_list dim) `el' ar
+                deserialize_sa `(sa_list dim) `el' ar
                 ar
             | dam.da ~dim ~el' => 
                 inl ar = sa_create `(dam.da) `dim `el'
                 deserialize_sa `(dam.da dim) `el' ar
                 ar
-            | da_listm.da_list ~dim ~el' =>
-                inl ar = sa_create `(da_listm.da_list) `dim `el'
+            | da_list ~dim ~el' =>
+                inl ar = sa_create `(da_list) `dim `el'
                 da_listm.unsafe_set_length `dim `el' ar (f ptr offset.dim_offset)
-                deserialize_sa `(da_listm.da_list dim) `el' ar
+                deserialize_sa `(da_list dim) `el' ar
                 ar
             | _ =>
                 if singleton_type_is `el then
