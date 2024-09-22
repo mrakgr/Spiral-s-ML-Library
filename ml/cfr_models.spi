@@ -156,7 +156,7 @@ inl run_ forall inp out.
 
     // Randomly pick an ensemble id for each thread.
     inl ensemble_id : int = 
-        random.int_range {from=0; nearTo=ensemble} ls.rng
+        random.int_range {from=0; nearTo=ensemble} rng
         |> transposing_loop.shuffle 0
 
     // Creates the layer state.
