@@ -1,5 +1,6 @@
 open corebase
 open coreext
+open lib
 open game
 open corecuda
 
@@ -66,7 +67,7 @@ inl random_action = fun rng (table : table) =>
         A_All_In, 1
         ]
     random.sample_discrete actions rng
-    
+
 let play_loop (neural : state_neural) (state : state_internal) node =
     open refm
     inl push_message = sa_listm.push state.messages
@@ -163,7 +164,7 @@ inl event_loop_play state_neural (msg, state_internal : event * state_internal) 
     match msg with
     | StartGame =>
         internal_set state_internal init_game()
-        start() |> Some
+        game_start() |> Some
     | PlayerChanged pl_type =>
         state_internal.pl_type <- pl_type
         None

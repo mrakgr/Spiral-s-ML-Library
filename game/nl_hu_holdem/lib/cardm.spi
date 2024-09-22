@@ -1,10 +1,6 @@
 open corebase
 open corecuda
 
-type card_t = u8
-
-nominal card = u8
-
 prototype suit t : t -> card_t
 prototype rank t : t -> card_t
 prototype full t : t -> card_t

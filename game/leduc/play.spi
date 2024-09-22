@@ -125,7 +125,7 @@ inl event_loop_play state_neural (msg, state_internal : event * state_internal_p
     match msg with
     | StartGame =>
         internal_set_play state_internal init_game()
-        game_init() |> Some
+        game_start() |> Some
     | PlayerChanged pl_type => 
         state_internal.pl_type <- pl_type
         None

@@ -1,6 +1,5 @@
 open corebase
-
-type card = lib.cardm.card
+open lib
 
 union action =
     | A_All_In
@@ -31,7 +30,6 @@ union message =
     | Showdown : {winner_id : int; chips_won : int; hands_shown : sa 2 lib.hand_rankerm.hand_score}
     | Fold : {winner_id : int; chips_won : int}
 
-type deck = lib.deckm.deck
 type messages = sa_list 128 message
 
 inl bb() = 2 : int
@@ -66,8 +64,9 @@ let go_next_street (table : table) =
     | River => G_Showdown table
 
 inl num_players() = 2 : int
-inl next_turn (player_turn : int) : int = player_turn + 1
+inl next_turn (round_turn : int) : int = round_turn + 1
 inl player_turn (table : table) = table.round_turn % num_players()
+// inl toggle (round_turn : int) : int = player_turn round_turn ^^^ 1
 let try_round (table : table) =
     let player_can_act (table : table) =
         inl player_turn = player_turn table
@@ -151,5 +150,5 @@ inl river (table : table) (cards : sa 1 card) =
 inl preflop (pl_card : sa 2 (sa 2 card)) = try_round (init_table pl_card)
 inl fold (table : table) = G_Fold table
 inl showdown (table : table) = G_Showdown table
-inl start () = G_Preflop
+inl game_start() = G_Preflop
 

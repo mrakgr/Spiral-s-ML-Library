@@ -106,6 +106,7 @@ modules:
             main
 
         leduc/
+            base-
             cardm
             deckm
             game
@@ -120,6 +121,7 @@ modules:
 
         nl_hu_holdem/
             lib/
+                types-
                 cardm
                 deckm
                 hand_rankerm
@@ -127,6 +129,7 @@ modules:
             model
             types-
             play
+            train
             full
 
     tests/

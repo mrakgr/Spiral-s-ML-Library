@@ -1,6 +1,7 @@
 open corebase
 open corecuda
 open tensorm
+open lib
 open game
 
 type history = sa_list 128 (option action) // The game history. RL agents need this one.

@@ -1,6 +1,7 @@
 open corebase
 open corepython
 open coreext
+open lib
 open game
 
 union player_type = Computer | Random | Human

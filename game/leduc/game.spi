@@ -19,7 +19,6 @@ union message =
     | PlayerAction : int * action
     | Showdown : {winner_id : int; chips_won : int; cards_shown : sa 2 card}
 
-type deck = deckm.deck
 type messages = sa_list 32 message
 
 union game_node =
@@ -60,7 +59,7 @@ let compare_hands (table : table) =
         | false, true => lt()
         | _ => comp (order a) (order b)
 
-inl toggle (player_turn : int) : int = if player_turn = 0 then 1 else 0
+inl toggle (player_turn : int) : int = player_turn ^^^ 1
 inl raise_by (id : int) (amount : int) : sa 2 int -> sa 2 int = arraym.mapi (fun i pot => if i = id then pot + amount else pot)
 inl game_round (table : table) action =
     match table.community_card with
@@ -80,4 +79,4 @@ inl game_round (table : table) action =
         | Raise => failwith "Invalid action. The number of raises left is not positive."
 inl game_chance_community_card (table : table) card = Round {table with is_button_s_first_move=true; player_turn=0; raises_left=dyn 2; community_card=Some card; pot#=pot_call}
 inl game_chance_init (c0,c1) = Round {is_button_s_first_move=true; player_turn=0; raises_left=dyn 2; community_card=None; pot=arraym.fromList [1;1]; pl_card=arraym.fromList [c0;c1]}
-inl game_init() = ChanceInit
+inl game_start() = ChanceInit

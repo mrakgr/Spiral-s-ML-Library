@@ -1,6 +1,5 @@
 open corebase
 
-union card = King | Queen | Jack
 inl u32_to_card (i : u32) =
     match i with
     | 0 | 1 => King

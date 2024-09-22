@@ -1,0 +1,4 @@
+type card_t = u8
+nominal card = card_t
+nominal deck = u64
+
