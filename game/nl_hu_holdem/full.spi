@@ -20,8 +20,9 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
     inl effects : plist ui_effects = plistm.create'
     match msg with
     | StartTrainingVsRando => train.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
-    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
+    | _ => failwith "Temporarily disabled for debugging."
+    // | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    // | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
 
     device_sync()
 

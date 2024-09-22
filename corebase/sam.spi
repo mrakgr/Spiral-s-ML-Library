@@ -14,6 +14,7 @@ instance length sa dim = fun ar => real real_core.type_lit_to_lit `dim : int
 
 // Indexes into an array.
 instance index sa dim = fun ar i => 
+    assert (0 <= i && i < length ar) "Index must be in range."
     backend_switch {
         Cuda = fun () => $"!ar[!i]"
         Python = fun () => $"!ar[!i]"
