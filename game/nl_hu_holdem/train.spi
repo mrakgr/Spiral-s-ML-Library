@@ -82,12 +82,18 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
         inl msg = CommunityCardsAre (get_community_cards table.street new_cards)
         push_message msg
         T_some (flop table new_cards)
+    inl set_rewards winner_id (chips_won : int) =
+        inl chips_won = conv chips_won
+        inl rewards = state.rewards
+        set rewards winner_id chips_won
+        set rewards (winner_id ^^^ 1) -chips_won
 
     inl body node =
         match node with
         | G_Fold table =>
             inl msg =
                 inl chips_won = index table.pot (player_turn table)
+                set_rewards (table.round_turn % num_players()) -chips_won
                 Fold {chips_won winner_id=next_turn table.round_turn % num_players()}
             push_message msg
             T_none
@@ -102,6 +108,7 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                     | Gt => chips_won, 0
                     | Eq => 0, -1
                     | Lt => chips_won, 1
+                set_rewards (abs winner_id) chips_won
                 inl hands_shown = arraym.fromList [s0; s1]
                 Showdown {hands_shown chips_won winner_id}
             push_message msg
