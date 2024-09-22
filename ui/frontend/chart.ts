@@ -1,4 +1,4 @@
-import echarts from "echarts/types/dist/echarts";
+import * as echarts from 'echarts';
 import { css, html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { assert } from "./utils";

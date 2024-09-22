@@ -166,9 +166,13 @@ class UI extends GameElement {
     static styles = css`
         :host {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             box-sizing: border-box;
-            height: 100%;
+            height: 300%;
+        }
+
+        training-full-chart {
+            flex: 1;
         }
         
         nl-holdem-menu {

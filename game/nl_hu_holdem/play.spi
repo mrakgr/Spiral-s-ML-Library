@@ -175,6 +175,7 @@ inl event_loop_play state_neural (msg, state_internal : event * state_internal) 
             | G_Round table => G_Round'(table, action) |> Some
             | _ => failwith "Unexpected game node in ActionSelected."
         | None => failwith "The game hasn't been started in ActionSelected."
+    | StartTrainingVsRando | StartTrainingVsSelf => failwith "Training is not supported in the `event_loop_play` function."
     |> optionm.iter (play_loop state_neural state_internal)
 
 open serializerm
