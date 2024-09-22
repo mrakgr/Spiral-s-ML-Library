@@ -17,6 +17,9 @@ union event =
     | StartGame
     | PlayerChanged : player_types
     | ActionSelected : action
+    // train events
+    | StartTrainingVsSelf
+    | StartTrainingVsRando
 
 union ui_effects =
     | AddRewardsRando : plist (plist float)

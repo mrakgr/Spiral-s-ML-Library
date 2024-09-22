@@ -5,6 +5,8 @@ import { map } from 'lit/directives/map.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { io } from 'socket.io-client'
 import { assert_tag_is_never, min, max, clamp } from './utils'
+import { createRef, ref } from 'lit/directives/ref.js';
+import { Training_Chart } from './chart';
 
 
 enum Hand_Rank {
@@ -77,6 +79,8 @@ type Game_Events =
     | ['StartGame', []]
     | ['PlayerChanged', Players[]]
     | ['ActionSelected', Action]
+    | ["StartTrainingVsRando",[]]
+    | ["StartTrainingVsSelf",[]]
 
 type Game_State =
     | ["GameNotStarted", []]
@@ -103,8 +107,14 @@ type UI_Effect =
 // Creates a span with the specified gap in pixels.
 const gap = (pixels : number) => html`<span style="flex-basis: ${pixels}px;"></span>`
 
+class GameElement extends LitElement {
+    dispatch_game_event = (detail : Game_Events) => {
+        this.dispatchEvent(new CustomEvent('game', {bubbles: true, composed: true, detail}))
+    }
+}
+
 @customElement('nl-holdem-ui')
-class UI extends LitElement {
+class UI extends GameElement {
     @property({type: Object}) state : UI_State = {
         pl_type: players,
         ui_game_state: ["GameNotStarted", []],
@@ -125,6 +135,8 @@ class UI extends LitElement {
         })
     }
 
+    vs_rando_chart = createRef<Training_Chart>()
+    vs_self_chart = createRef<Training_Chart>()
     process_effects(l: UI_Effect[]) {
         const average = (data : number[][]) => data.map(x => x.reduce((a,b) => a+b) / x.length)
         l.forEach(l => {
@@ -135,8 +147,7 @@ class UI extends LitElement {
                         rando_data: data,
                         rando_average: average(data)
                     });
-                    // TODO
-                    // this.vs_rando_chart.value?.add_rewards(data)
+                    this.vs_rando_chart.value?.add_rewards(data)
                     break;
                 }
                 case 'AddRewardsSelf': {
@@ -144,8 +155,7 @@ class UI extends LitElement {
                         self_data: data,
                         self_average: average(data)
                     });
-                    // TODO
-                    // this.vs_self_chart.value?.add_rewards(data)
+                    this.vs_self_chart.value?.add_rewards(data)
                     break;
                 }
                 default: assert_tag_is_never(tag);
@@ -164,11 +174,26 @@ class UI extends LitElement {
         nl-holdem-menu {
             flex: 1;
         }
+
+        .play_area {
+            display: flex;
+            flex-direction: row;
+            box-sizing: border-box;
+            height: 100%;
+        }
         
         .game_area {
             display: flex;
             flex-direction: column;
             flex: 5;
+        }
+
+        .train_area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 5px;
+            border: solid 5px black;
         }
 
         nl-holdem-game {
@@ -180,22 +205,33 @@ class UI extends LitElement {
         }
     `
 
+    on_train_vs_rando = () => this.dispatch_game_event(["StartTrainingVsRando",[]])
+    on_train_vs_self = () => this.dispatch_game_event(["StartTrainingVsSelf",[]])
+
     render(){ 
         return html`
-            <nl-holdem-menu .pl_type=${this.state.pl_type}></nl-holdem-menu>
-            ${gap(10)}
-            <div class="game_area">
-                <nl-holdem-game .state=${this.state.ui_game_state}></nl-holdem-game>
+            <div class="play_area">
+                <nl-holdem-menu .pl_type=${this.state.pl_type}></nl-holdem-menu>
                 ${gap(10)}
-                <nl-holdem-history .messages=${this.state.messages}></nl-holdem-history>
+                <div class="game_area">
+                    <nl-holdem-game .state=${this.state.ui_game_state}></nl-holdem-game>
+                    ${gap(10)}
+                    <nl-holdem-history .messages=${this.state.messages}></nl-holdem-history>
+                </div>
+            </div>
+            ${gap(10)}
+            <div class="train_area">
+                <training-full-chart ${ref(this.vs_rando_chart)}></training-full-chart>
+                <br/>
+                <sl-button variant="primary" @click=${this.on_train_vs_rando}>Train (vs Random)</sl-button>
+            </div>
+            ${gap(10)}
+            <div class="train_area">
+                <training-full-chart ${ref(this.vs_self_chart)}></training-full-chart>
+                <br/>
+                <sl-button variant="primary" @click=${this.on_train_vs_self}>Train (vs Self)</sl-button>
             </div>
         `
-    }
-}
-
-class GameElement extends LitElement {
-    dispatch_game_event = (detail : Game_Events) => {
-        this.dispatchEvent(new CustomEvent('game', {bubbles: true, composed: true, detail}))
     }
 }
 

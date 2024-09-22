@@ -13,6 +13,7 @@ import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.j
 setBasePath('/bundles/shoelace/');
 
 import "./rps"; // Needed to import the rps web components.
+import "./chart";
 import "./leduc_full";
 import "./hu_nl_holdem";
 import { LitElement, PropertyValueMap, css, html } from 'lit';
