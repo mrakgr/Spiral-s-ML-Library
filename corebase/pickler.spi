@@ -111,7 +111,7 @@ inl sa_list forall (sa_list : * -> * -> * ) {sa_index; sa_set; sa_length; sa_cre
     inl pickle (x : sa_list dim t) (i,s : state) =
         if sa_length x = 0 then set s i 1 // Sets the array emptiness flag if its empty.
         inl i = i + 1
-        loop.for' {from=0; nearTo=sa_length x} fun idx => 
+        loop.for' {from=0; nearTo=sa_length x} fun idx =>
             el.pickle (sa_index x idx) (i + idx * el.size,s)
 
     pu { pickle unpickle size = size * el.size + 1 }
@@ -147,6 +147,7 @@ inl sa forall (sa : * -> * -> * ) {sa_index; sa_set; sa_length; sa_create} dim t
         if sa_length x = 0 then set s i 1 // Sets the array emptiness flag if its empty.
         inl i = i + 1
         loop.for' {from=0; nearTo=sa_length x} fun idx => 
+            $"// 222"
             el.pickle (sa_index x idx) (i + idx * el.size,s)
 
     pu { pickle unpickle size = size * el.size + 1 }

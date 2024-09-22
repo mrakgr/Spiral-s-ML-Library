@@ -36,7 +36,7 @@ inl extract_community_cards (table : table) =
     community_cards
 
 inl nlholdem_conv (table, messages : table * messages) =
-    inl rotate_left forall dim t. (i' : int) (x : sa dim t) : sa dim t = sam.init (fun i => index x (i + i' % length x))
+    inl rotate_left forall dim t. (i' : int) (x : sa dim t) : sa dim t = sam.init (fun i => index x ((i + i') % length x))
     {
         history = messages |> arraym.map function
             | PlayerAction(id,action) => Some(action)

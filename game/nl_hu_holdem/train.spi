@@ -113,7 +113,6 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                 | Human => failwith "Humans aren't allowed during training."
                 | Computer =>
                     inl data = table, state.messages
-                    $"// qwe"
                     if is_train then
                         ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=player_turn}, data) 
                     else
