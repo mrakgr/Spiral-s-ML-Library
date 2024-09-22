@@ -393,16 +393,16 @@ inl graph_run_device forall t_top indices. (model {graph param output} & m : mod
     ()
 
 // Creates the layer state.
-inl create_layer_state() =
-    open random
+inl create_layer_state rng =
     layer_state {
-        rng = init {seed = cupy.constant_seed(); subsequence = conv rangem.threads_in_grid().from; offset=0}
+        rng
     }
 
 // Runs the graph on the host.
 inl graph_run_host forall t_top sizes. (model {graph} & m : model t_top) (sizes : sizes) =
     run' fun () =>
-        inl ls : layer_state = create_layer_state()
+        inl rng = random.init {seed = cupy.constant_seed(); subsequence = conv rangem.threads_in_grid().from; offset=0}
+        inl ls : layer_state = create_layer_state rng
         loop.linear sizes fun indices =>
             graph_run_device m ls indices
 

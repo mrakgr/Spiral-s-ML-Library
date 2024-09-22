@@ -66,7 +66,6 @@ let go_next_street (table : table) =
 inl num_players() = 2 : int
 inl next_turn (round_turn : int) : int = round_turn + 1
 inl player_turn (table : table) = table.round_turn % num_players()
-// inl toggle (round_turn : int) : int = player_turn round_turn ^^^ 1
 let try_round (table : table) =
     let player_can_act (table : table) =
         inl player_turn = player_turn table

@@ -30,17 +30,11 @@ inl noinline_run forall inp out.
         inl ensemble',block',thread' = (key_extract model .output_indices : tensor d3 int).dim
         assert ((ensemble,block,thread) = (ensemble',block',thread')) "The dimensions of the output indices tensor have to match."
 
-    // Creates the layer state.
-    inl ls = create_layer_state()
-
     // Extract the input tensor.
     inl x = (key_extract model .input : tensor d3 float)
     assert (block = fst x.dim) "The first dimension of the input tensor has to equal the number of blocks per grid."
     inl x = x |> apply block_index()
     assert (thread = fst x.dim) "The second dimension of the input tensor has to equal number threads per block."
-
-    // Creates the layer state.
-    inl ls = create_layer_state()
 
     // Sets the input tensor to 0.
     loop.projective threads_in_block(x.dim) fun i =>
@@ -57,6 +51,9 @@ inl noinline_run forall inp out.
         snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
 
     barrier_cta_sync 0
+
+    // Creates the layer state.
+    inl ls = create_layer_state rng
 
     // Runs the model on the inputs.
     loop.linear ensemble fun ensemble =>
