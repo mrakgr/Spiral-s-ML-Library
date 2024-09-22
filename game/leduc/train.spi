@@ -192,10 +192,11 @@ inl vs_rando (neural : state_neural) =
                     train_loop true model state (Some player_id) game_start()
                     // Adds the rewards to the trace.
                     inl reward = index state.rewards player_id
+                    inl total_path_prob = ml.cfr_models.extract_integrated_path_prob model
                     loop.linear sizes.ensemble_id fun ensemble_id =>
-                        inl path_prob = ml.cfr_models.extract_ensemble_path_prob model {ensemble_id} // TODO: Upgrade the extract_ensemble_path_prob function.
+                        inl ensemble_path_prob = total_path_prob - ml.cfr_models.extract_integrated_path_prob_excluding model {ensemble_id}
                         tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
-                            (reward * path_prob, path_prob)
+                            (reward * ensemble_path_prob, ensemble_path_prob)
                             trace_rewards
                     ml.cfr_models.calculate_updates model state.rewards
             ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model

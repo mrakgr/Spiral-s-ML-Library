@@ -206,7 +206,10 @@ nominal cfr_game_model inp out =
         output : int -> out
     }
 
-// Integrates all the path probs.
+// Integrates all the path probabilities. Integrates out the ensemble id before multiplyting the player probabilities.
+// 
+// Pseudo-code: 
+// prod (fun player_id => sum (fun ensemble_id => p(player_id,ensemble_id)))
 inl extract_integrated_path_prob forall inp out. (cfr_game_model {model sizes} : cfr_game_model inp out) : cfr.prob =
     inl log_path_probs = 
         (key_extract model .cfr_trace_state : cfr.trace_state).log_path_probs
@@ -216,38 +219,30 @@ inl extract_integrated_path_prob forall inp out. (cfr_game_model {model sizes} :
         inl log_path_probs = apply player_id log_path_probs
         s * loop.for {from=0; nearTo=sizes.ensemble_id} (fun ensemble_id s => 
             inl {policy sampling} = tensor_index ensemble_id log_path_probs
-            s + (exp (policy - sampling))
+            s + exp (policy - sampling)
             ) 0
         ) 1
     |> conv
 
-    // Imagine there is only one thread. Imagine there are only 2 ensembles.
-    // For HU poker games, the path prob would be:
-    // p(player_id=0,ensemble_id=0) * p(player_id=1,ensemble_id=0)
-    // + p(player_id=0,ensemble_id=0) * p(player_id=1,ensemble_id=1)
-    // + p(player_id=0,ensemble_id=1) * p(player_id=1,ensemble_id=0)
-    // + p(player_id=0,ensemble_id=1) * p(player_id=1,ensemble_id=1)
-    // ---
-    // p(player_id=0,ensemble_id=0) * (p(player_id=1,ensemble_id=0) + p(player_id=1,ensemble_id=1))
-    // + p(player_id=0,ensemble_id=1) * (p(player_id=1,ensemble_id=0) + p(player_id=1,ensemble_id=1))
-    // ---
-    // (p(player_id=0,ensemble_id=0) + p(player_id=0,ensemble_id=1)) * (p(player_id=1,ensemble_id=0) + p(player_id=1,ensemble_id=1))
-
-// Extracts the path prob given an ensemble_id.
-inl extract_ensemble_path_prob forall inp out. (cfr_game_model {model} : cfr_game_model inp out) {ensemble_id} =
+// Excludes the ensemble from the path probability calculations.
+inl extract_integrated_path_prob_excluding forall inp out. (cfr_game_model {model sizes} : cfr_game_model inp out) {ensemble_id} : cfr.prob =
     inl log_path_probs = 
         (key_extract model .cfr_trace_state : cfr.trace_state).log_path_probs
-        |> apply ensemble_id
+        |> reorder (fun ensemble_id,thread_id,player_id => thread_id,player_id,ensemble_id)
         |> apply rangem.threads_in_grid().from
-    inl log_path_policy_prob =
-        log_path_probs
-        |> rezip (fun x => x.policy)
-        |> tensorm.fold 0 (+)
-    inl log_path_sampling_prob =
-        log_path_probs
-        |> rezip (fun x => x.sampling)
-        |> tensorm.fold 0 (+)
-    conv (exp (log_path_policy_prob - log_path_sampling_prob))
+    loop.for {from=0; nearTo=sizes.player_id} (fun player_id s =>
+        inl log_path_probs = apply player_id log_path_probs
+        s * loop.for {from=0; nearTo=sizes.ensemble_id} (fun ensemble_id' s => 
+            inl {policy sampling} = tensor_index ensemble_id' log_path_probs
+            inl p = exp (policy - sampling)
+            s + (if ensemble_id <> ensemble_id' then p else 0)
+            ) 0
+        ) 1
+    |> conv
+
+// Extracts the path probability conditioned on an ensemble_id.
+inl extract_ensemble_path_prob forall inp out. (m : cfr_game_model inp out) ensemble_id =
+    extract_integrated_path_prob m - extract_integrated_path_prob_excluding m ensemble_id
 
 inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = run_ rng model action_mask input output
 inl trace_and_train forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = 
