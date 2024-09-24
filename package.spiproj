@@ -131,6 +131,7 @@ modules:
             play
             train
             full
+            performance
 
     tests/
         test1

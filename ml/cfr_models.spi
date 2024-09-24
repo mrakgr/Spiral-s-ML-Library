@@ -36,7 +36,6 @@ inl trace_and_play_ forall inp out.
     inl x = x |> apply block_index()
     assert (thread = fst x.dim) "The second dimension of the input tensor has to equal number threads per block."
 
-
     // Sets the input tensor to 0.
     loop.projective threads_in_block(x.dim) fun i =>
         tensor_set i 0 x

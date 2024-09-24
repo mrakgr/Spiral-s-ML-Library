@@ -1,0 +1,222 @@
+open corebase
+open corepython
+open corecuda
+open coreext
+open lib
+open game
+
+type event_config =
+    {
+        // Loop sizes.
+        frontend_divider : int
+        outer : int
+        inner : int
+    }
+
+inl event_config () : event_config =
+    {
+        outer = 1 <<< 2
+        inner = 1 <<< 3
+        frontend_divider = 1
+    }
+
+type state_internal_train =
+    stack_mut {
+        pl_type : sa 2 player_type
+        deck : deck
+        messages : messages
+        rewards : sa 2 ml.cfr.reward
+        grid : cooperative_groups.grid_group
+        rng : random.philox_state
+    }
+
+// Converts the given state to internal one.
+// The refs will point to the original locations.
+inl state_to_internal_train grid rng : state_internal_train =
+    stack_mut {
+        pl_type = arraym.fromList [Random;Random]
+        deck = lib.deckm.create()
+        messages = sa_create
+        rewards = arraym.fromList [0;0]
+        grid = refm.to_local grid
+        rng = refm.to_local rng
+    }
+
+inl state_internal_train_reset (x : state_internal_train) (player_id : option ml.cfr.player_id) : () =
+    x.deck <- lib.deckm.create()
+    x.rewards <- arraym.fromList [0;0]
+    sa_listm.unsafe_set_length x.messages 0
+    inl player_types = arraym.fromList [Computer;Computer]
+    player_id |> optionm.iter fun player_id =>
+        set player_types (player_id ^^^ 1) Random
+    x.pl_type <- player_types
+
+union training_nodes =
+    | T_round : table * action
+    | T_some : game_node
+    | T_none
+
+// (is_train : bool) controls whether the run updates the trace or just the path probs, and whether the average or the current strategy is used for evaluation.
+// (player_id : option int) controls which player is the Computer, and the other is Random. If None then both are Computer players.
+inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : state_internal_train) player_id ~node : () = join
+    state_internal_train_reset state player_id
+    inl push_message = sa_listm.push state.messages
+    inl deck = state.deck
+    inl pop_deck () = 
+        open random
+        inl cards, deck = lib.deckm.draw_cards (refm.from_local state.rng) deck
+        state.deck <- deck
+        cards
+    let get_community_cards street new_cards = 
+        inl ar = sa_create
+        inl push cards = arraym.iter (sa_listm.push ar) cards 
+        match street with
+        | Preflop => ()
+        | Flop cards => push cards
+        | Turn cards => push cards
+        | River cards => push cards
+        push new_cards
+        ar : sa_list 5 _
+    inl go_street (table : table) flop =
+        inl new_cards = pop_deck()
+        inl msg = CommunityCardsAre (get_community_cards table.street new_cards)
+        push_message msg
+        T_some (flop table new_cards)
+    inl set_rewards winner_id (chips_won : int) =
+        inl chips_won = conv chips_won
+        inl rewards = state.rewards
+        set rewards winner_id chips_won
+        set rewards (winner_id ^^^ 1) -chips_won
+
+    inl body node =
+        match node with
+        | G_Fold table =>
+            inl msg =
+                inl chips_won = index table.pot (player_turn table)
+                set_rewards (table.round_turn % num_players()) -chips_won
+                Fold {chips_won winner_id=next_turn table.round_turn % num_players()}
+            push_message msg
+            T_none
+        | G_Showdown table => 
+            inl msg =
+                inl community_cards = match table.street with River cards => cards | _ => failwith "Invalid street in showdown."
+                inl h i : sa 7 card = sam.merge (index table.pl_card i) community_cards |> nominal_recreate
+                inl s0, s1 = lib.hand_rankerm.score (h 0), lib.hand_rankerm.score (h 1)
+                inl chips_won, winner_id =
+                    inl chips_won = index table.pot (player_turn table)
+                    match comp s0 s1 with
+                    | Gt => chips_won, 0
+                    | Eq => 0, -1
+                    | Lt => chips_won, 1
+                set_rewards (abs winner_id) chips_won
+                inl hands_shown = arraym.fromList [s0; s1]
+                Showdown {hands_shown chips_won winner_id}
+            push_message msg
+            T_none
+        | G_Round table =>
+            inl player_turn = player_turn table
+            inl action =
+                match index state.pl_type player_turn with
+                | Human => failwith "Humans aren't allowed during training."
+                | Computer =>
+                    inl data = table, state.messages
+                    if is_train then
+                        ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=player_turn}, data) 
+                    else
+                        ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=player_turn}, data) 
+                    |> model.action_conv table
+                | Random =>
+                    // Important: If the action is shared across the block in Computer it should also be done for the Random player.
+                    play.random_action (refm.from_local state.rng) table 
+                    |> transposing_loop.shuffle 0
+            inl msg = PlayerAction(player_turn, action)
+            push_message msg
+            T_round (table, action)
+        | G_Round'(table,action) =>
+            inl msg = PlayerAction(player_turn table, action)
+            push_message msg
+            T_round (table, action)
+        | G_Flop table => go_street table flop
+        | G_Turn table => go_street table turn
+        | G_River table => go_street table river
+        | G_Preflop => 
+            inl c0,c1 = pop_deck(), pop_deck()
+            push_message PlayerGotCards(0, c0)
+            push_message PlayerGotCards(1, c1)
+            T_some (preflop (arraym.fromList [c0; c1]))
+        |> function // This is so game_round only gets generated once instead of 3 times in the compiled code.
+        | T_none => None
+        | T_some node => Some node
+        | T_round(a,b) => Some(round a b)
+    
+    loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
+
+open corecuda
+open corepython
+open coreext
+open serializerm
+
+// Does a training run against the random player.
+inl vs_rando (neural : state_neural) =
+    inl sizes = model.nlholdem_sizes()
+    inl config = event_config()
+    inl trace_rewards : _ _ (float * float) = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
+    inl frontend_rewards : _ _ float = tensorm.tensor_create trace_rewards.dim
+    run' fun () =>
+        inl state =
+            inl grid = cooperative_groups.create_grid()
+            random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            |> state_to_internal_train grid
+        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+        loop.linear config.outer fun (outer : int) =>
+            loop.linear config.inner fun (inner : int) =>
+                // The loop uses less registers than a noinline function.
+                // Regular functions it always inlines causing the number of instructions in the full program to double.
+                loop.linear 2 fun (player_id : int) =>
+                    // Does a training run, modifying the trace state.
+                    train_loop true model state (Some player_id) game_start()
+                    // Adds the rewards to the trace.
+                    inl reward = index state.rewards player_id
+                    inl total_path_prob = ml.cfr_models.extract_integrated_path_prob model
+                    loop.linear sizes.ensemble_id fun ensemble_id =>
+                        inl ensemble_path_prob = total_path_prob - ml.cfr_models.extract_integrated_path_prob_excluding model {ensemble_id}
+                        tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
+                            (reward * ensemble_path_prob, ensemble_path_prob)
+                            trace_rewards
+                    ml.cfr_models.calculate_updates model state.rewards
+            ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
+        ml.primitives.grid_map (refm.from_local state.grid) (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
+    // frontend_rewards
+
+inl event_loop_gpu = fun (msg, state : event * state) =>
+    inl msg, {game neural} = msg, state
+    inl seri = {
+        msg = create_serializer : serializer event
+        game_state = create_serializer : serializer state_game
+    }
+
+    serialize seri.game_state game
+
+    console.write_ln "Going to run the NL Holdem pefromance kernel."
+    global "import time"
+    inl p : f64 = $"time.perf_counter()"
+
+    inl effects : plist ui_effects = plistm.create'
+    match msg with
+    | StartTrainingVsRando => vs_rando neural
+    | _ => failwith "This module is just for discretely analysing the performance."
+
+    device_sync()
+
+    inl p2 : f64 = $"time.perf_counter()"
+    console.write "The time it took to run the kernel (in seconds) is: "
+    console.write_ln (p2 - p)
+
+    inl state = {
+        game = deserialize seri.game_state
+        neural
+        }
+
+    jsonm.serialize (state, effects)
+
+inl main() = event_loop_gpu(StartTrainingVsRando, init())
