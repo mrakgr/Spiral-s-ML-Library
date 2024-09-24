@@ -2732,7 +2732,7 @@ __device__ void method_13(unsigned int * v0, int v1, float * v2){
         v0[v100] = v98;
         v22 += 1 ;
     }
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     return ;
 }
 __device__ Tuple8 method_14(curandStatePhilox4_32_10_t & v0, int * v1, float * v2, float * v3, float * v4, float * v5, float * v6, float * v7, float * v8, int v9, int v10){
@@ -2814,7 +2814,7 @@ __device__ Tuple8 method_14(curandStatePhilox4_32_10_t & v0, int * v1, float * v
     assert("Tensor range check" && 0 <= v51 && v51 < 256);
     v43[v51] = v14;
     v45[v51] = v16;
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     bool v52;
     v52 = 0 <= v51;
     bool v53;
@@ -3788,13 +3788,13 @@ __device__ Tuple8 method_14(curandStatePhilox4_32_10_t & v0, int * v1, float * v
         v49[v72] = v332;
         v60 += 1 ;
     }
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     assert("Tensor range check" && 0 <= v51 && v51 < 256);
     float v441;
     v441 = v47[v51];
     int v442;
     v442 = v49[v51];
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     return Tuple8{v441, v442};
 }
 __device__ float method_15(int * v0, float * v1, float * v2, float * v3, float * v4, float * v5, float * v6, float * v7, int v8, int v9, int v10){
@@ -3854,7 +3854,7 @@ __device__ float method_15(int * v0, float * v1, float * v2, float * v3, float *
     assert("Tensor range check" && 0 <= v38 && v38 < 256);
     v32[v38] = v10;
     v34[v38] = v14;
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     bool v39;
     v39 = 0 <= v38;
     bool v40;
@@ -4291,11 +4291,11 @@ __device__ float method_15(int * v0, float * v1, float * v2, float * v3, float *
         v36[v59] = v201;
         v47 += 1 ;
     }
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     assert("Tensor range check" && 0 <= v38 && v38 < 256);
     float v209;
     v209 = v36[v38];
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     return v209;
 }
 __device__ inline bool while_method_14(int v0){
@@ -8166,7 +8166,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                     v188[v205] = 0.0f;
                                     v193 += 256 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v206;
                                 v206 = threadIdx.x;
                                 assert("Tensor range check" && 0 <= v206 && v206 < 256);
@@ -8683,7 +8683,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                     v288[v399] = 1.0f;
                                     v377 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v400;
                                 v400 = 0;
                                 while (while_method_0(v400)){
@@ -9069,7 +9069,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                                 wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v571[1];
                                                 wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v572[8];
                                                 cuda::pipeline_consumer_wait_prior<0>(v413);;
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 // Pushing the loop unrolling to: 0
                                                 int v573;
                                                 v573 = 0;
@@ -9174,7 +9174,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                                         v606 = v605 + v510;
                                                         float * v607;
                                                         v607 = v404+v606;
-                                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                                        __syncthreads();
                                                         // Pushing the loop unrolling to: 0
                                                         v413.producer_acquire();
                                                         int v609;
@@ -9353,7 +9353,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                                     v637 += 1 ;
                                                 }
                                                 // Poping the loop unrolling to: 0
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 v485 = v487;
                                             }
                                             // Pushing the loop unrolling to: 0
@@ -9386,7 +9386,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                                 v673 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             // Pushing the loop unrolling to: 0
                                             int v684;
                                             v684 = threadIdx.x;
@@ -9457,7 +9457,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                                 v702 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             v471 += 1 ;
                                         }
                                         v469 += 1 ;
@@ -9504,7 +9504,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                     v748 = reinterpret_cast<int *>(&v1[12320784ull]);
                                     v400 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int * v750;
                                 v750 = reinterpret_cast<int *>(&v1[4194304ull]);
                                 float * v752;
@@ -9561,12 +9561,12 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                     v782[0] = v778;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 float v786;
                                 v786 = v780[0];
                                 int v787;
                                 v787 = v782[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 double * v788;
                                 v788 = reinterpret_cast<double *>(&v1[11534352ull]);
                                 double * v790;
@@ -9740,7 +9740,7 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                     v872[v878] = v839;
                                     v874[v878] = v841;
                                     v876[v878] = v843;
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     bool v879;
                                     v879 = 0 <= v878;
                                     bool v880;
@@ -9938,9 +9938,9 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                         assert("Tensor range check" && 0 <= v897 && v897 < 256);
                                         v886 += 1 ;
                                     }
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     assert("Tensor range check" && 0 <= v878 && v878 < 256);
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     double v952;
                                     v952 = (double)v786;
                                     double v953;
@@ -10749,10 +10749,10 @@ __device__ void method_0(unsigned char * v0, unsigned char * v1, StackMut0 & v2,
                                     v1274[0] = v1264;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 Union2 v1278;
                                 v1278 = v1274[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 v1281 = v1278;
                                 break;
                             }
@@ -12557,7 +12557,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, float 
                         v274[v282] = v227;
                         v276[v282] = v229;
                         v278[v282] = v231;
-                        asm("barrier.cta.sync %0;" :: "r"(0));
+                        __syncthreads();
                         bool v283;
                         v283 = 0 <= v282;
                         bool v284;
@@ -13121,11 +13121,11 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, float 
                             v280[v303] = v486;
                             v291 += 1 ;
                         }
-                        asm("barrier.cta.sync %0;" :: "r"(0));
+                        __syncthreads();
                         assert("Tensor range check" && 0 <= v282 && v282 < 256);
                         float v502;
                         v502 = v280[v282];
-                        asm("barrier.cta.sync %0;" :: "r"(0));
+                        __syncthreads();
                         assert("Tensor range check" && 0 <= v174 && v174 < 2);
                         v153[v174] = v502;
                     }
@@ -13225,7 +13225,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, float 
                     v549[v555] = v516;
                     v551[v555] = v518;
                     v553[v555] = v520;
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     bool v556;
                     v556 = 0 <= v555;
                     bool v557;
@@ -13449,9 +13449,9 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, float 
                         assert("Tensor range check" && 0 <= v574 && v574 < 256);
                         v563 += 1 ;
                     }
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     assert("Tensor range check" && 0 <= v555 && v555 < 256);
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     assert("Tensor range check" && 0 <= v147 && v147 < 4);
                     assert("Tensor range check" && 0 <= v506 && v506 < 6144);
                     int v639;
