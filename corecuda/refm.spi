@@ -34,9 +34,9 @@ instance ref_index array = fun array i => $"`el & \v = !array[!i]"
 // Creates a variable in shared memory. Does block synchronization.
 inl create_shared_var forall a b. (con : () -> a) : ref b =
     inl x = $"__shared__ `b \v"
-    barrier_cta_sync 0
+    __syncthreads()
     if thread_index() = 0 then $"new(&!x) `b{!(con())}"
-    barrier_cta_sync 0
+    __syncthreads()
     x
 
 // Creates a variable in local scope.

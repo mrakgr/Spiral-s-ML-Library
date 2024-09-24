@@ -45,14 +45,14 @@ inl projective forall shared dim t. ({passthrough dim_inner} : config shared dim
         inl shared_in, shared_out : tensor int el * tensor int t = unzip shared_io
         inl tid = thread_index()
         tensor_set tid fv shared_in
-        barrier_cta_sync 0
+        __syncthreads()
         loop.projective threads_in_block(dim_outer, dim_inner) fun thread_id, dim =>
             tensor_set thread_id
                 (free_vars_replace f (tensor_index thread_id shared_in) {extern_offset passthrough} (block_index() * threads_per_block() + thread_id) dim)
                 shared_out
-        barrier_cta_sync 0
+        __syncthreads()
         inl x = tensor_index tid shared_out
-        barrier_cta_sync 0
+        __syncthreads()
         x
     real
         open real_core
@@ -75,7 +75,7 @@ inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f
         inl shared_in, shared_out : tensor int el * tensor int t = unzip shared_io
         inl tid = thread_index()
         tensor_set tid fv shared_in
-        barrier_cta_sync 0
+        __syncthreads()
 
         inl (dim_block,dim_inner),(dim_block',dim_inner') = loop.rigid_split threads_per_block() (dim_outer, dim_inner)
         assert (loop.prod dim_inner' = 1) "The threads per block need to be divisible by the inner dimension."
@@ -90,9 +90,9 @@ inl linear forall shared dim t. ({passthrough dim_inner} : config shared dim) (f
             tensor_set thread_id
                 (free_vars_replace f (tensor_index index_block' shared_in) {extern_offset passthrough} (block_index() * threads_per_block() + thread_id) index_inner)
                 shared_out
-        barrier_cta_sync 0
+        __syncthreads()
         inl x = tensor_index tid shared_out
-        barrier_cta_sync 0
+        __syncthreads()
         x
     real
         open real_core
@@ -106,7 +106,7 @@ inl shuffle forall t. (i : int) (v : t) : t =
     assert (lit_is i) "The index should be known at compile time."
     inl q,_ = tensor_create_extern_shared 0 1
     if thread_index() = i then tensor_set i v q
-    barrier_cta_sync 0
+    __syncthreads()
     inl x = tensor_index 0 q
-    barrier_cta_sync 0
+    __syncthreads()
     x

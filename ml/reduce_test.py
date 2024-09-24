@@ -509,7 +509,7 @@ extern "C" __global__ void entry0(int * v0, int * v1) {
         }
         v14 += 1l ;
     }
-    barrier_cta_sync 0;
+    __syncthreads();
     return ;
 }
 """

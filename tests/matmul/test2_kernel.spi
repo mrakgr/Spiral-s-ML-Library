@@ -168,7 +168,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                         fill_fragment (tensor_ref_index (m,n) c_frag) 0
                 else 
                     tensor_memcpy_sync chunk_size threads_in_block(zip c_shared_tile c)
-                    barrier_cta_sync 0
+                    __syncthreads()
 
                     loop.linear c_frag.dim fun m,n =>
                         inl c_frag = tensor_ref_index (m,n) c_frag
@@ -179,7 +179,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                         if beta / alpha <> 1 then
                             loop.linear (fragment_length c_frag) fun i =>
                                 fragment_set c_frag i (beta / alpha * fragment_index c_frag i)
-                    barrier_cta_sync 0
+                    __syncthreads()
             
             loop.lookahead rangem.linear((snd >> fst) a.dim) fun {is_init ping} k future_k =>
                 inl a = apply m a
@@ -205,7 +205,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                     //     convert_tf32_inplace (apply ping a_shared_tile)
                     //     convert_tf32_inplace b_shared_tile
 
-                    barrier_cta_sync 0
+                    __syncthreads()
 
                     pragma.unroll fun _ =>
                         loop.linear (n_local, k_local) fun n,k =>
@@ -216,7 +216,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                 future_k |> optionm.iter fun k =>
                     inl a = apply k a |> apply_ptr
                     inl b = apply k b |> apply_ptr
-                    barrier_cta_sync 0
+                    __syncthreads()
                     pragma.unroll fun _ =>
                         producer_phase pipe fun () =>
                             tensor_memcpy_async chunk_size pipe threads_in_block(zip (apply (ping ^^^ 1) a_shared_tile) a)
@@ -233,7 +233,7 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                                 inl b_frag = tensor_ref_index (n,k) b_frag
                                 mma_sync c_frag a_frag b_frag c_frag
 
-                barrier_cta_sync 0 // Without this barrier some of the threads will loop around and change the shared memory that the rest are still loading from.
+                __syncthreads() // Without this barrier some of the threads will loop around and change the shared memory that the rest are still loading from.
 
             // Adds the accumulated result to the output in shared memory.
             pragma.unroll fun _ =>
@@ -249,10 +249,10 @@ inl matmul_tf32_template (matmul_config {m_skew n_skew k_skew m_frag n_frag k_fr
                     inl c = apply (m,n) c_shared_frag
                     store_matrix_sync c c_frag
 
-            barrier_cta_sync 0
+            __syncthreads()
 
             // Stores the end result into global memory.
             pragma.unroll fun _ =>
                 tensor_memcpy_sync chunk_size threads_in_block(zip c c_shared_tile)
 
-            barrier_cta_sync 0
+            __syncthreads()

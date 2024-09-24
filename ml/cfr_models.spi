@@ -40,7 +40,7 @@ inl trace_and_play_ forall inp out.
     loop.projective threads_in_block(x.dim) fun i =>
         tensor_set i 0 x
 
-    barrier_cta_sync 0
+    __syncthreads()
 
     // Serializes the data into the input tensor.
     inl () =
@@ -48,7 +48,7 @@ inl trace_and_play_ forall inp out.
         inl tns_input = apply thread_index() x
         snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
 
-    barrier_cta_sync 0
+    __syncthreads()
 
     // Creates the layer state.
     inl ls = create_layer_state rng
@@ -57,7 +57,7 @@ inl trace_and_play_ forall inp out.
     loop.linear ensemble fun ensemble =>
         graph_run_device model ls {ensemble}
 
-    barrier_cta_sync 0
+    __syncthreads()
 
     // Extract the CFR model.
     inl cfr_model = (key_extract model .cfr_model : cfr.model)
@@ -143,7 +143,7 @@ inl run_ forall inp out.
     loop.projective threads_in_block(x.dim) fun i =>
         tensor_set i 0 x
 
-    barrier_cta_sync 0
+    __syncthreads()
 
     // Serializes the data into the input tensor.
     inl () =
@@ -151,7 +151,7 @@ inl run_ forall inp out.
         inl tns_input = apply thread_index() x
         snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
 
-    barrier_cta_sync 0
+    __syncthreads()
 
     // Randomly pick an ensemble id for each thread.
     inl ensemble_id : int = 
@@ -164,7 +164,7 @@ inl run_ forall inp out.
     // Runs the model on the inputs.
     graph_run_device model ls {ensemble=ensemble_id}
 
-    barrier_cta_sync 0
+    __syncthreads()
 
     // Extract the hash of the input state.
     inl world_id =

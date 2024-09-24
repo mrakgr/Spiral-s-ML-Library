@@ -24,7 +24,7 @@ inl map_ forall dim a b. loop' (f : a -> b) (from : tensor dim a) (to : tensor d
 
 // Maps all the elements of a tensor given the mapping function.
 inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
-    map_ (loop.projective << threads_in_block) f from to . barrier_cta_sync 0
+    map_ (loop.projective << threads_in_block) f from to . __syncthreads()
     
 // Maps all the elements of a tensor given the mapping function using the entire grid.
 inl grid_map forall dim a b. grid (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
@@ -47,7 +47,7 @@ inl block_reduce_store forall a. extern_offset f result (to : tensor int a) =
     // All the warps in a block store their intermediate results into the shared tensor.
     tensor_set warps_in_block.from warp_result shared
 
-    barrier_cta_sync 0
+    __syncthreads()
     
     inl threads_in_warp = threads_in_warp()
     assert (shared.dim <= threads_in_warp.by) "The amount of results in their shared array to be reduced should be less than the number of threads in the warp."
@@ -56,7 +56,7 @@ inl block_reduce_store forall a. extern_offset f result (to : tensor int a) =
         inl final_result = cg_reduce create_coalesced_threads() f (tensor_index threads_in_warp.from shared)
         // Stores the final result into global memory.
         tensor_set 0 final_result to
-    barrier_cta_sync 0 // We need to make sure the shared memory isn't reused by other threads.
+    __syncthreads() // We need to make sure the shared memory isn't reused by other threads.
     
 // Reduces all the elements of a tensor to a single one, given the neutral element as well as the reducer function.
 inl reduce forall dim a. extern_offset neutral_element (f : a -> a -> a) (from : tensor dim a) (to : tensor int a) : () =
@@ -123,7 +123,7 @@ inl block_reduce_2d forall b.
         inl threads_in_warp = threads_in_warp()
         inl result = if threads_in_warp.from < snd shared.dim then tensor_index (fst index_warp, threads_in_warp.from) shared else neutral_element
         
-        barrier_cta_sync 0 // We need to make sure the shared memory isn't reused by other threads.
+        __syncthreads() // We need to make sure the shared memory isn't reused by other threads.
         
         cg_reduce group f result
 
@@ -160,7 +160,7 @@ inl block_exclusive_scan_2d forall b.
         inl threads_in_warp = threads_in_warp()
         inl warp_sum = if threads_in_warp.from < snd shared.dim then tensor_index (fst index_warp, threads_in_warp.from) shared else neutral_element
         
-        barrier_cta_sync 0 // We need to make sure the shared memory isn't reused by other threads.
+        __syncthreads() // We need to make sure the shared memory isn't reused by other threads.
 
         inl block_prefix_in_thread,block_sum = cg_exclusive_scan group neutral_element f warp_sum
         f (cg_shuffle group block_prefix_in_thread (snd index_warp)) warp_prefix, block_sum
@@ -367,7 +367,7 @@ inl row_ forall dim a kb b kc c.
             // Stores the result into global memory after reducing it.
             tensor_set i result to
                 
-inl loop_block dim f = loop.linear dim f . barrier_cta_sync 0
+inl loop_block dim f = loop.linear dim f . __syncthreads()
 inl loop_grid (grid : _ cooperative_groups.grid_group) dim f = loop.projective rangem.blocks_in_grid(dim) f . cooperative_groups.sync grid
 
 // A very flexible version of the `map_2d` kernel that allows the user to chain arbitrary local operations inside the mapping function.
@@ -467,7 +467,7 @@ inl reduce_2d forall dim a. neutral_element (f : a -> a -> a) (from : tensor (di
 
         tensor_set i (cg_reduce create_coalesced_threads() f result) to
 
-    barrier_cta_sync 0
+    __syncthreads()
 
 // Does a scan over the innermost element of a tensor. Less flexible than `row_map` since it can only be used to do a single reduction, 
 // but can be used on smaller tensors than `row_map` allows.
@@ -508,7 +508,7 @@ inl scan_2d forall dim a. is_inclusive neutral_element (f : a -> a -> a) (from :
             memcpy_sync (to, l_from)
             loop._set result (f result sum)
 
-    barrier_cta_sync 0
+    __syncthreads()
 
 // Scans the innermost dimension of a given tensor.
 inl inclusive_scan_2d forall dim a. : a -> (a -> a -> a) -> tensor (dim * int) a -> tensor (dim * int) a -> () = scan_2d true

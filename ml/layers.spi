@@ -333,10 +333,10 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
         memoize h fun x =>
             // inl debug str f =
             //     if thread_index() = 0 then console.write_ln str
-            //     barrier_cta_sync 0
+            //     __syncthreads()
             //     inl x = f()
             //     if thread_index() = 0 then console.write_ln "done"
-            //     barrier_cta_sync 0
+            //     __syncthreads()
             //     x
             match x with
             | BlockMap(exists a. g,a,_) =>
