@@ -15,7 +15,7 @@ type event_config =
 
 inl event_config () : event_config =
     {
-        outer = 1 <<< 2
+        outer = 1 <<< 6
         inner = 1 <<< 3
         frontend_divider = 1
     }

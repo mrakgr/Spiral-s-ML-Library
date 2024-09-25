@@ -73,6 +73,7 @@ inl nlholdem_sizes() : ml.cfr.sizes =
         world_id = 1 <<< 12
         player_id = 2
         action_id = 1 <<< 4
+        action_mask = length possible_actions()
         seq_id = 1 <<< 7
         thread_id = threads_per_block() * blocks_per_grid()
     }
@@ -134,7 +135,6 @@ inl game_graph() : cfr_game_graph _ _ =
     cfr_game_graph {
         graph = nlholdem_graph()
         sizes = nlholdem_sizes()
-        action_mask = fun _ _ _ action_id => action_id < length possible_actions()
         input = exists nlholdem_conv, nlholdem_pickler()
         output = nlholdem_output
     }

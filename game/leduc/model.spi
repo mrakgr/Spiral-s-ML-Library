@@ -35,6 +35,7 @@ inl leduc_sizes() : ml.cfr.sizes =
         world_id = 1 <<< 12
         player_id = 2
         action_id = 1 <<< 2
+        action_mask = 3
         seq_id = 1 <<< 4
         thread_id = threads_per_block() * blocks_per_grid()
     }
@@ -85,7 +86,6 @@ inl game_graph() : cfr_game_graph _ _ =
     cfr_game_graph {
         graph = leduc_graph()
         sizes = leduc_sizes()
-        action_mask = fun _ _ _ action_id => action_id < 3
         input = exists leduc_conv, leduc_pickler()
         output = leduc_output
     }

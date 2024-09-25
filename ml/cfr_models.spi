@@ -17,7 +17,6 @@ inl trace_and_play_ forall inp out.
         rng
         (model : model graph_body)
         (sizes : cfr.sizes)
-        (action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool)
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
         ~({player_id}, data : {player_id : cfr.player_id} * inp) =
@@ -78,7 +77,7 @@ inl trace_and_play_ forall inp out.
             (key_extract model .output_world_id : tensor d3 uint)
             |> tensor_index (ensemble_id, block_index(), thread_index())
 
-        cfr.get_action rng action_mask cfr_model (ensemble_id, conv world_id)
+        cfr.get_action rng sizes.action_mask cfr_model (ensemble_id, conv world_id)
         // Shares the action_id across all the threads in the block.
         |> transposing_loop.shuffle 0
 
@@ -103,10 +102,10 @@ inl trace_and_play_ forall inp out.
         inl policy = 
             if is_train then
                 // During training the policy is the current policy.
-                cfr.get_policy_probs action_mask cfr_model (ensemble_id, world_id) action_id
+                cfr.get_policy_probs sizes.action_mask cfr_model (ensemble_id, world_id) action_id
             else
                 // During evaluation the policy is the average policy.
-                cfr.get_average_probs action_mask cfr_model (ensemble_id, world_id) action_id
+                cfr.get_average_probs sizes.action_mask cfr_model (ensemble_id, world_id) action_id
 
         if is_train then
             // Pushes the data into the trace.
@@ -120,7 +119,7 @@ inl trace_and_play_ forall inp out.
 inl run_ forall inp out.
         rng
         (model : model graph_body)
-        (action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool)
+        (sizes : cfr.sizes)
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
         (data : inp) =
@@ -175,7 +174,7 @@ inl run_ forall inp out.
     inl cfr_model = (key_extract model .cfr_model : cfr.model)
 
     // Extract the output index.
-    inl _,output_id = cfr.get_action rng action_mask cfr_model (ensemble_id, conv world_id)
+    inl _,output_id = cfr.get_action rng sizes.action_mask cfr_model (ensemble_id, conv world_id)
 
     output output_id
 
@@ -183,7 +182,6 @@ nominal cfr_game_graph inp out =
     {
         graph : graph graph_body
         sizes : cfr.sizes
-        action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool
         input : exists t. (inp -> t) * pickler.pu t
         output : int -> out
     }
@@ -192,7 +190,6 @@ nominal cfr_game_model inp out =
     {
         model : model graph_body
         sizes : cfr.sizes
-        action_mask : primitives.row_config -> f32 -> i32 -> i32 -> bool
         input : exists t. (inp -> t) * pickler.pu t
         output : int -> out
     }
@@ -235,35 +232,35 @@ inl extract_integrated_path_prob_excluding forall inp out. (cfr_game_model {mode
 inl extract_ensemble_path_prob forall inp out. (m : cfr_game_model inp out) ensemble_id =
     extract_integrated_path_prob m - extract_integrated_path_prob_excluding m ensemble_id
 
-inl run forall inp out. rng (cfr_game_model {model action_mask input output} : cfr_game_model inp out) = run_ rng model action_mask input output
-inl trace_and_train forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = 
-    trace_and_play_ true rng model sizes action_mask input output
+inl run forall inp out. rng (cfr_game_model {model sizes input output} : cfr_game_model inp out) = run_ rng model sizes input output
+inl trace_and_train forall inp out. rng (cfr_game_model {model sizes input output} : cfr_game_model inp out) = 
+    trace_and_play_ true rng model sizes input output
 
-inl trace_and_play forall inp out. rng (cfr_game_model {model sizes action_mask input output} : cfr_game_model inp out) = 
-    trace_and_play_ false rng model sizes action_mask input output
+inl trace_and_play forall inp out. rng (cfr_game_model {model sizes input output} : cfr_game_model inp out) = 
+    trace_and_play_ false rng model sizes input output
 
 inl to_model_data forall a b. (cfr_game_model {model} : cfr_game_model a b) : layers.model_data = model_to_model_data model
 inl from_model_data forall inp out.
-        (cfr_game_graph {graph sizes input output action_mask} : cfr_game_graph inp out) 
+        (cfr_game_graph {graph sizes input output} : cfr_game_graph inp out) 
         (x : layers.model_data) 
         : cfr_game_model inp out = 
     inl model = model_data_to_model graph x
-    cfr_game_model {model sizes action_mask input output}
+    cfr_game_model {model sizes input output}
 
-inl init forall a b. (cfr_game_graph {graph sizes action_mask input output} : cfr_game_graph a b) : cfr_game_model a b = 
+inl init forall a b. (cfr_game_graph {graph sizes input output} : cfr_game_graph a b) : cfr_game_model a b = 
     inl model = create_model graph
     param_init model
-    cfr_game_model { sizes input output action_mask model }
+    cfr_game_model { sizes input output model }
 
 // Calculates the policy and the value array updates.
 // Also resets the trace state afterwards.
 inl calculate_updates forall dim a b.
-        (cfr_game_model {model sizes action_mask} : _ a b)
+        (cfr_game_model {model sizes} : _ a b)
         (reward : sa dim cfr.reward) =
     // Since we aren't using the output_world_id we'll pass `ensemble=0` instead of extracting the other nodes one by one.
     inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
     loop.linear sizes.ensemble_id fun ensemble_id =>
-        cfr.calculate_updates action_mask sizes cfr_model trace trace_state ensemble_id reward
+        cfr.calculate_updates sizes cfr_model trace trace_state ensemble_id reward
 
 // Resets the trace state.
 inl reset_trace_state forall a b. (cfr_game_model {model sizes} : _ a b) =
