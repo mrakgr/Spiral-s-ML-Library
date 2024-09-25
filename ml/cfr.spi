@@ -88,7 +88,7 @@ inl graph (size : sizes) : _ (model * trace * trace_state) =
     inl init_average ({table} : model) : () =
         inl average = table |> rezip (fun x => x.policy.average)
         inl init_value = average_threeshold() / conv size.action_mask
-        $"!(average.bodies)[:] = !init_value"
+        $"!(real average.bodies.array)[:] = !init_value"
 
     inl (<|) a b = layers.pair a b
     (layers.key_graph .cfr_model layers.Weight(model, fun x => init_zero x . init_average x))

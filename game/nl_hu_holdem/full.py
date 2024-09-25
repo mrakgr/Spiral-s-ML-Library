@@ -4929,7 +4929,7 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
         bool v437;
         v437 = v436 == false;
         if (v437){
-            assert("Expected a valid action id in get_action." && v436);
+            assert("Expected a valid action id in get_prob." && v436);
         } else {
         }
         int v439;
@@ -14791,7 +14791,7 @@ __device__ void f_52(unsigned char * v0, unsigned long long v1, Union3 v2, stati
 }
 __device__ inline bool while_method_21(int v0){
     bool v1;
-    v1 = v0 < 64;
+    v1 = v0 < 128;
     return v1;
 }
 __device__ inline bool while_method_22(Union3 v0){
@@ -15532,7 +15532,7 @@ __device__ float method_83(int * v0, float * v1, float * v2, float * v3, float *
         bool v205;
         v205 = v204 == false;
         if (v205){
-            assert("Expected a valid action id in get_action." && v204);
+            assert("Expected a valid action id in get_prob." && v204);
         } else {
         }
         int v207;
@@ -24428,7 +24428,7 @@ __device__ float method_86(int * v0, float * v1, float * v2, float * v3, float *
         bool v205;
         v205 = v204 == false;
         if (v205){
-            assert("Expected a valid action id in get_action." && v204);
+            assert("Expected a valid action id in get_prob." && v204);
         } else {
         }
         int v207;
@@ -28340,6 +28340,11 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
     }
     return ;
 }
+__device__ inline bool while_method_25(int v0){
+    bool v1;
+    v1 = v0 < 64;
+    return v1;
+}
 extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsigned char * v2, unsigned long long v3, unsigned char * v4, unsigned long long v5) {
     Union0 v6;
     v6 = f_0(v1);
@@ -28526,7 +28531,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
     while (while_method_21(v34)){
         int v36;
         v36 = 0;
-        while (while_method_10(v36)){
+        while (while_method_3(v36)){
             int v38;
             v38 = 0;
             while (while_method_0(v38)){
@@ -28676,9 +28681,9 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                     float v109;
                     v109 = v47 * v108;
                     assert("Tensor range check" && 0 <= v76 && v76 < 4);
-                    assert("Tensor range check" && 0 <= v34 && v34 < 64);
+                    assert("Tensor range check" && 0 <= v34 && v34 < 128);
                     int v110;
-                    v110 = 64 * v76;
+                    v110 = 128 * v76;
                     int v111;
                     v111 = v110 + v34;
                     float * v112;
@@ -30709,9 +30714,9 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
         } else {
         }
         int v978;
-        v978 = v973 % 16;
+        v978 = v973 % 32;
         int v979;
-        v979 = v973 / 16;
+        v979 = v973 / 32;
         bool v980;
         v980 = v979 < 4;
         bool v981;
@@ -30721,15 +30726,15 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
         } else {
         }
         assert("Tensor range check" && 0 <= v979 && v979 < 4);
-        assert("Tensor range check" && 0 <= v978 && v978 < 16);
+        assert("Tensor range check" && 0 <= v978 && v978 < 32);
         int v983;
         v983 = 4 * v978;
         int v984;
-        v984 = 64 * v979;
+        v984 = 128 * v979;
         int v985;
         v985 = v984 + v983;
         assert("Tensor range check" && 0 <= v979 && v979 < 4);
-        assert("Tensor range check" && 0 <= v978 && v978 < 16);
+        assert("Tensor range check" && 0 <= v978 && v978 < 32);
         float v986[4];
         float v987[4];
         float v988[4];
@@ -30835,7 +30840,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
     while (while_method_21(v34)){
         int v36;
         v36 = 0;
-        while (while_method_10(v36)){
+        while (while_method_3(v36)){
             Union4 v38;
             v38 = Union4{Union4_2{}};
             method_84(v0, v2, v27, v38);
@@ -32130,9 +32135,9 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                 float v607;
                 v607 = v605 * v596;
                 assert("Tensor range check" && 0 <= v597 && v597 < 2);
-                assert("Tensor range check" && 0 <= v34 && v34 < 64);
+                assert("Tensor range check" && 0 <= v34 && v34 < 128);
                 int v608;
-                v608 = 64 * v597;
+                v608 = 128 * v597;
                 int v609;
                 v609 = v608 + v34;
                 float * v610;
@@ -33282,7 +33287,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
     v1086 = v1083 + v1085;
     int v1087;
     v1087 = v1086;
-    while (while_method_13(v1087)){
+    while (while_method_25(v1087)){
         bool v1089;
         v1089 = 0 <= v1087;
         bool v1090;
@@ -33292,9 +33297,9 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
         } else {
         }
         int v1092;
-        v1092 = v1087 % 16;
+        v1092 = v1087 % 32;
         int v1093;
-        v1093 = v1087 / 16;
+        v1093 = v1087 / 32;
         bool v1094;
         v1094 = v1093 < 2;
         bool v1095;
@@ -33304,15 +33309,15 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
         } else {
         }
         assert("Tensor range check" && 0 <= v1093 && v1093 < 2);
-        assert("Tensor range check" && 0 <= v1092 && v1092 < 16);
+        assert("Tensor range check" && 0 <= v1092 && v1092 < 32);
         int v1097;
         v1097 = 4 * v1092;
         int v1098;
-        v1098 = 64 * v1093;
+        v1098 = 128 * v1093;
         int v1099;
         v1099 = v1098 + v1097;
         assert("Tensor range check" && 0 <= v1093 && v1093 < 2);
-        assert("Tensor range check" && 0 <= v1092 && v1092 < 16);
+        assert("Tensor range check" && 0 <= v1092 && v1092 < 32);
         float v1100[4];
         float v1101[4];
         float v1102[4];
@@ -33661,9 +33666,9 @@ def Closure0():
                 v69((24,),(256,),(v13, v12, v8, v9, v10, v11),shared_mem=98304)
                 del v69
             case US0_3(): # StartTrainingVsRando
-                v20 = cp.zeros(256,dtype=cp.float32) # type: ignore
-                v21 = cp.zeros(256,dtype=cp.float32) # type: ignore
-                v22 = cp.empty(256,dtype=cp.float32)
+                v20 = cp.zeros(512,dtype=cp.float32) # type: ignore
+                v21 = cp.zeros(512,dtype=cp.float32) # type: ignore
+                v22 = cp.empty(512,dtype=cp.float32)
                 v23 = cp.cuda.Device().attributes['MultiProcessorCount']
                 v24 = v23 == 24
                 del v23
@@ -33693,8 +33698,8 @@ def Closure0():
                     v36 = 0
                     while method81(v36):
                         assert 0 <= v33 < 4, 'Tensor range check'
-                        assert 0 <= v36 < 64, 'Tensor range check'
-                        v38 = 64 * v33
+                        assert 0 <= v36 < 128, 'Tensor range check'
+                        v38 = 128 * v33
                         v39 = v38 + v36
                         del v38
                         v40 = v32[v39].item()
@@ -33712,9 +33717,9 @@ def Closure0():
                 v19.append(v41)
                 del v41
             case US0_4(): # StartTrainingVsSelf
-                v42 = cp.zeros(128,dtype=cp.float32) # type: ignore
-                v43 = cp.zeros(128,dtype=cp.float32) # type: ignore
-                v44 = cp.empty(128,dtype=cp.float32)
+                v42 = cp.zeros(256,dtype=cp.float32) # type: ignore
+                v43 = cp.zeros(256,dtype=cp.float32) # type: ignore
+                v44 = cp.empty(256,dtype=cp.float32)
                 v45 = cp.cuda.Device().attributes['MultiProcessorCount']
                 v46 = v45 == 24
                 del v45
@@ -33744,8 +33749,8 @@ def Closure0():
                     v58 = 0
                     while method81(v58):
                         assert 0 <= v55 < 2, 'Tensor range check'
-                        assert 0 <= v58 < 64, 'Tensor range check'
-                        v60 = 64 * v55
+                        assert 0 <= v58 < 128, 'Tensor range check'
+                        v60 = 128 * v55
                         v61 = v60 + v58
                         del v60
                         v62 = v54[v61].item()
@@ -33807,7 +33812,6 @@ def Closure1():
         v14[:] = 0
         del v14
         v16[:] = 0
-        del v16
         v18[:] = 0
         del v18
         v20[:] = 0
@@ -33820,6 +33824,8 @@ def Closure1():
         del v26
         v28[:] = 0
         del v28
+        v16[:] = 9.090909
+        del v16
         v30 = v8[11534352:11534352+8*49152].view(cp.float64)
         v32 = v8[11927568:11927568+8*49152].view(cp.float64)
         v34 = v8[12320784:12320784+4*24576].view(cp.int32)
@@ -35410,7 +35416,7 @@ def method78(v0 : cp.ndarray, v1 : US0) -> None:
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
 def method81(v0 : i32) -> bool:
-    v1 = v0 < 64
+    v1 = v0 < 128
     del v0
     return v1
 def method83(v0 : cp.ndarray) -> u64:
