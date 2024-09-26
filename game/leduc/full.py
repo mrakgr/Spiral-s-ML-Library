@@ -2707,7 +2707,7 @@ __device__ void method_23(unsigned int * v0, int v1, float * v2){
         v0[v100] = v98;
         v22 += 1 ;
     }
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     return ;
 }
 __device__ Tuple8 method_24(curandStatePhilox4_32_10_t & v0, int * v1, float * v2, float * v3, float * v4, float * v5, float * v6, float * v7, float * v8, int v9, int v10){
@@ -2789,7 +2789,7 @@ __device__ Tuple8 method_24(curandStatePhilox4_32_10_t & v0, int * v1, float * v
     assert("Tensor range check" && 0 <= v51 && v51 < 256);
     v43[v51] = v14;
     v45[v51] = v16;
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     bool v52;
     v52 = 0 <= v51;
     bool v53;
@@ -3724,7 +3724,7 @@ __device__ Tuple8 method_24(curandStatePhilox4_32_10_t & v0, int * v1, float * v
         bool v425;
         v425 = v424 == false;
         if (v425){
-            assert("Expected a valid action id in get_action." && v424);
+            assert("Expected a valid action id in get_prob." && v424);
         } else {
         }
         int v427;
@@ -3739,13 +3739,13 @@ __device__ Tuple8 method_24(curandStatePhilox4_32_10_t & v0, int * v1, float * v
         v49[v70] = v323;
         v59 += 1 ;
     }
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     assert("Tensor range check" && 0 <= v51 && v51 < 256);
     float v429;
     v429 = v47[v51];
     int v430;
     v430 = v49[v51];
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     return Tuple8{v429, v430};
 }
 __device__ int tag_26(Union6 v0){
@@ -4518,7 +4518,7 @@ __device__ float method_47(int * v0, float * v1, float * v2, float * v3, float *
     assert("Tensor range check" && 0 <= v38 && v38 < 256);
     v32[v38] = v10;
     v34[v38] = v14;
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     bool v39;
     v39 = 0 <= v38;
     bool v40;
@@ -4929,7 +4929,7 @@ __device__ float method_47(int * v0, float * v1, float * v2, float * v3, float *
         bool v199;
         v199 = v198 == false;
         if (v199){
-            assert("Expected a valid action id in get_action." && v198);
+            assert("Expected a valid action id in get_prob." && v198);
         } else {
         }
         int v201;
@@ -4943,11 +4943,11 @@ __device__ float method_47(int * v0, float * v1, float * v2, float * v3, float *
         v36[v57] = v195;
         v46 += 1 ;
     }
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     assert("Tensor range check" && 0 <= v38 && v38 < 256);
     float v203;
     v203 = v36[v38];
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     return v203;
 }
 __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2, int v3, Union4 v4){
@@ -5100,7 +5100,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v93[v110] = 0.0f;
                                     v98 += 256 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v111;
                                 v111 = threadIdx.x;
                                 assert("Tensor range check" && 0 <= v111 && v111 < 256);
@@ -5245,7 +5245,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     }
                                     v145 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v158;
                                 v158 = 0;
                                 while (while_method_9(v158)){
@@ -5629,7 +5629,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v328[1];
                                                 wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v329[8];
                                                 cuda::pipeline_consumer_wait_prior<0>(v171);;
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 // Pushing the loop unrolling to: 0
                                                 int v330;
                                                 v330 = 0;
@@ -5734,7 +5734,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                         v363 = v362 + v267;
                                                         float * v364;
                                                         v364 = v162+v363;
-                                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                                        __syncthreads();
                                                         // Pushing the loop unrolling to: 0
                                                         v171.producer_acquire();
                                                         int v366;
@@ -5913,7 +5913,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                     v394 += 1 ;
                                                 }
                                                 // Poping the loop unrolling to: 0
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 v243 = v245;
                                             }
                                             // Pushing the loop unrolling to: 0
@@ -5946,7 +5946,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 v430 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             // Pushing the loop unrolling to: 0
                                             int v441;
                                             v441 = threadIdx.x;
@@ -6017,7 +6017,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 v459 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             v229 += 1 ;
                                         }
                                         v227 += 1 ;
@@ -6064,7 +6064,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v505 = reinterpret_cast<int *>(&v1[2883600ull]);
                                     v158 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int * v507;
                                 v507 = reinterpret_cast<int *>(&v1[262144ull]);
                                 float * v509;
@@ -6121,12 +6121,12 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v539[0] = v535;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 float v543;
                                 v543 = v537[0];
                                 int v544;
                                 v544 = v539[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 double * v545;
                                 v545 = reinterpret_cast<double *>(&v1[2097168ull]);
                                 double * v547;
@@ -6300,7 +6300,7 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v629[v635] = v596;
                                     v631[v635] = v598;
                                     v633[v635] = v600;
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     bool v636;
                                     v636 = 0 <= v635;
                                     bool v637;
@@ -6498,9 +6498,9 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         assert("Tensor range check" && 0 <= v654 && v654 < 256);
                                         v643 += 1 ;
                                     }
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     assert("Tensor range check" && 0 <= v635 && v635 < 256);
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     double v709;
                                     v709 = (double)v543;
                                     double v710;
@@ -6722,10 +6722,10 @@ __device__ void method_46(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v796[0] = v786;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 Union1 v800;
                                 v800 = v796[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 v803 = v800;
                                 break;
                             }
@@ -7371,7 +7371,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v89[v106] = 0.0f;
                                     v94 += 256 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v107;
                                 v107 = threadIdx.x;
                                 assert("Tensor range check" && 0 <= v107 && v107 < 256);
@@ -7516,7 +7516,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     }
                                     v141 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v154;
                                 v154 = 0;
                                 while (while_method_9(v154)){
@@ -7900,7 +7900,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v324[1];
                                                 wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v325[8];
                                                 cuda::pipeline_consumer_wait_prior<0>(v167);;
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 // Pushing the loop unrolling to: 0
                                                 int v326;
                                                 v326 = 0;
@@ -8005,7 +8005,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                         v359 = v358 + v263;
                                                         float * v360;
                                                         v360 = v158+v359;
-                                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                                        __syncthreads();
                                                         // Pushing the loop unrolling to: 0
                                                         v167.producer_acquire();
                                                         int v362;
@@ -8184,7 +8184,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                     v390 += 1 ;
                                                 }
                                                 // Poping the loop unrolling to: 0
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 v239 = v241;
                                             }
                                             // Pushing the loop unrolling to: 0
@@ -8217,7 +8217,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 v426 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             // Pushing the loop unrolling to: 0
                                             int v437;
                                             v437 = threadIdx.x;
@@ -8288,7 +8288,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 v455 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             v225 += 1 ;
                                         }
                                         v223 += 1 ;
@@ -8335,7 +8335,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v501 = reinterpret_cast<int *>(&v1[2883600ull]);
                                     v154 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int * v503;
                                 v503 = reinterpret_cast<int *>(&v1[262144ull]);
                                 float * v505;
@@ -8392,12 +8392,12 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v535[0] = v531;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 float v539;
                                 v539 = v533[0];
                                 int v540;
                                 v540 = v535[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 double * v541;
                                 v541 = reinterpret_cast<double *>(&v1[2097168ull]);
                                 double * v543;
@@ -8571,7 +8571,7 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v625[v631] = v592;
                                     v627[v631] = v594;
                                     v629[v631] = v596;
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     bool v632;
                                     v632 = 0 <= v631;
                                     bool v633;
@@ -8769,9 +8769,9 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         assert("Tensor range check" && 0 <= v650 && v650 < 256);
                                         v639 += 1 ;
                                     }
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     assert("Tensor range check" && 0 <= v631 && v631 < 256);
-                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                    __syncthreads();
                                     double v705;
                                     v705 = (double)v539;
                                     double v706;
@@ -8993,10 +8993,10 @@ __device__ void method_48(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v792[0] = v782;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 Union1 v796;
                                 v796 = v792[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 v799 = v796;
                                 break;
                             }
@@ -9544,7 +9544,7 @@ __device__ float method_50(int * v0, float * v1, float * v2, float * v3, float *
     assert("Tensor range check" && 0 <= v38 && v38 < 256);
     v32[v38] = v10;
     v34[v38] = v14;
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     bool v39;
     v39 = 0 <= v38;
     bool v40;
@@ -9955,7 +9955,7 @@ __device__ float method_50(int * v0, float * v1, float * v2, float * v3, float *
         bool v199;
         v199 = v198 == false;
         if (v199){
-            assert("Expected a valid action id in get_action." && v198);
+            assert("Expected a valid action id in get_prob." && v198);
         } else {
         }
         int v201;
@@ -9969,11 +9969,11 @@ __device__ float method_50(int * v0, float * v1, float * v2, float * v3, float *
         v36[v57] = v195;
         v46 += 1 ;
     }
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     assert("Tensor range check" && 0 <= v38 && v38 < 256);
     float v203;
     v203 = v36[v38];
-    asm("barrier.cta.sync %0;" :: "r"(0));
+    __syncthreads();
     return v203;
 }
 __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2, Union4 v3){
@@ -10121,7 +10121,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v89[v106] = 0.0f;
                                     v94 += 256 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v107;
                                 v107 = threadIdx.x;
                                 assert("Tensor range check" && 0 <= v107 && v107 < 256);
@@ -10266,7 +10266,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     }
                                     v141 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v154;
                                 v154 = 0;
                                 while (while_method_9(v154)){
@@ -10650,7 +10650,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v324[1];
                                                 wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v325[8];
                                                 cuda::pipeline_consumer_wait_prior<0>(v167);;
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 // Pushing the loop unrolling to: 0
                                                 int v326;
                                                 v326 = 0;
@@ -10755,7 +10755,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                         v359 = v358 + v263;
                                                         float * v360;
                                                         v360 = v158+v359;
-                                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                                        __syncthreads();
                                                         // Pushing the loop unrolling to: 0
                                                         v167.producer_acquire();
                                                         int v362;
@@ -10934,7 +10934,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                     v390 += 1 ;
                                                 }
                                                 // Poping the loop unrolling to: 0
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 v239 = v241;
                                             }
                                             // Pushing the loop unrolling to: 0
@@ -10967,7 +10967,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 v426 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             // Pushing the loop unrolling to: 0
                                             int v437;
                                             v437 = threadIdx.x;
@@ -11038,7 +11038,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                                 v455 += 1 ;
                                             }
                                             // Poping the loop unrolling to: 0
-                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                            __syncthreads();
                                             v225 += 1 ;
                                         }
                                         v223 += 1 ;
@@ -11085,7 +11085,7 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v501 = reinterpret_cast<int *>(&v1[2883600ull]);
                                     v154 += 1 ;
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int * v503;
                                 v503 = reinterpret_cast<int *>(&v1[262144ull]);
                                 float * v505;
@@ -11119,10 +11119,10 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v523[0] = v521;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 int v527;
                                 v527 = v523[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 unsigned int * v528;
                                 v528 = reinterpret_cast<unsigned int *>(&v0[6291456ull]);
                                 int v530;
@@ -11161,12 +11161,12 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v543[0] = v539;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 float v547;
                                 v547 = v541[0];
                                 int v548;
                                 v548 = v543[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 double * v549;
                                 v549 = reinterpret_cast<double *>(&v1[2097168ull]);
                                 double * v551;
@@ -11444,10 +11444,10 @@ __device__ void method_49(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                     v673[0] = v663;
                                 } else {
                                 }
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 Union1 v677;
                                 v677 = v673[0];
-                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                __syncthreads();
                                 v680 = v677;
                                 break;
                             }
@@ -12245,7 +12245,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                             v133[v150] = 0.0f;
                                             v138 += 256 ;
                                         }
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         int v151;
                                         v151 = threadIdx.x;
                                         assert("Tensor range check" && 0 <= v151 && v151 < 256);
@@ -12253,7 +12253,6 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                         v152 = 128 * v151;
                                         int v153;
                                         v153 = v152 + v136;
-                                        // qzxcv;
                                         static_array_list<Union9,10> v154;
                                         v154 = static_array_list<Union9,10>{};
                                         int v156;
@@ -12391,7 +12390,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                             }
                                             v185 += 1 ;
                                         }
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         int v198;
                                         v198 = 0;
                                         int v199;
@@ -12409,10 +12408,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                             v202[0] = v200;
                                         } else {
                                         }
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         int v206;
                                         v206 = v202[0];
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         float * v207;
                                         v207 = reinterpret_cast<float *>(&v2[0ull]);
                                         float * v209;
@@ -12793,7 +12792,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                                     wmma::fragment<wmma::matrix_a, 16, 16, 8, wmma::precision::tf32, wmma::row_major> v375[1];
                                                     wmma::fragment<wmma::matrix_b, 16, 16, 8, wmma::precision::tf32, wmma::col_major> v376[8];
                                                     cuda::pipeline_consumer_wait_prior<0>(v218);;
-                                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                                    __syncthreads();
                                                     // Pushing the loop unrolling to: 0
                                                     int v377;
                                                     v377 = 0;
@@ -12898,7 +12897,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                                             v410 = v409 + v314;
                                                             float * v411;
                                                             v411 = v209+v410;
-                                                            asm("barrier.cta.sync %0;" :: "r"(0));
+                                                            __syncthreads();
                                                             // Pushing the loop unrolling to: 0
                                                             v218.producer_acquire();
                                                             int v413;
@@ -13077,7 +13076,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                                         v441 += 1 ;
                                                     }
                                                     // Poping the loop unrolling to: 0
-                                                    asm("barrier.cta.sync %0;" :: "r"(0));
+                                                    __syncthreads();
                                                     v290 = v292;
                                                 }
                                                 // Pushing the loop unrolling to: 0
@@ -13110,7 +13109,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                                     v477 += 1 ;
                                                 }
                                                 // Poping the loop unrolling to: 0
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 // Pushing the loop unrolling to: 0
                                                 int v488;
                                                 v488 = threadIdx.x;
@@ -13181,7 +13180,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                                     v506 += 1 ;
                                                 }
                                                 // Poping the loop unrolling to: 0
-                                                asm("barrier.cta.sync %0;" :: "r"(0));
+                                                __syncthreads();
                                                 v276 += 1 ;
                                             }
                                             v274 += 1 ;
@@ -13226,7 +13225,7 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                         v550 = reinterpret_cast<double *>(&v4[2490384ull]);
                                         int * v552;
                                         v552 = reinterpret_cast<int *>(&v4[2883600ull]);
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         unsigned int * v554;
                                         v554 = reinterpret_cast<unsigned int *>(&v2[6291456ull]);
                                         int v556;
@@ -13398,10 +13397,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                             v632[0] = v622;
                                         } else {
                                         }
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         Union1 v636;
                                         v636 = v632[0];
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         Union7 v637;
                                         v637 = Union7{Union7_1{v109, v636}};
                                         v59.push(v637);
@@ -13772,10 +13771,10 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
                                             v784[0] = v774;
                                         } else {
                                         }
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         Union1 v788;
                                         v788 = v784[0];
-                                        asm("barrier.cta.sync %0;" :: "r"(0));
+                                        __syncthreads();
                                         Union7 v789;
                                         v789 = Union7{Union7_1{v109, v788}};
                                         v59.push(v789);
@@ -14508,7 +14507,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
     }
     int v34;
     v34 = 0;
-    while (while_method_9(v34)){
+    while (while_method_8(v34)){
         int v36;
         v36 = 0;
         while (while_method_5(v36)){
@@ -14661,9 +14660,9 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                     float v109;
                     v109 = v47 * v108;
                     assert("Tensor range check" && 0 <= v76 && v76 < 4);
-                    assert("Tensor range check" && 0 <= v34 && v34 < 4);
+                    assert("Tensor range check" && 0 <= v34 && v34 < 32);
                     int v110;
-                    v110 = 4 * v76;
+                    v110 = 32 * v76;
                     int v111;
                     v111 = v110 + v34;
                     float * v112;
@@ -14984,7 +14983,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                         v282[v290] = v235;
                         v284[v290] = v237;
                         v286[v290] = v239;
-                        asm("barrier.cta.sync %0;" :: "r"(0));
+                        __syncthreads();
                         bool v291;
                         v291 = 0 <= v290;
                         bool v292;
@@ -15536,11 +15535,11 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                             v288[v309] = v488;
                             v298 += 1 ;
                         }
-                        asm("barrier.cta.sync %0;" :: "r"(0));
+                        __syncthreads();
                         assert("Tensor range check" && 0 <= v290 && v290 < 256);
                         float v504;
                         v504 = v288[v290];
-                        asm("barrier.cta.sync %0;" :: "r"(0));
+                        __syncthreads();
                         assert("Tensor range check" && 0 <= v182 && v182 < 2);
                         v161[v182] = v504;
                     }
@@ -15640,7 +15639,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                     v551[v557] = v518;
                     v553[v557] = v520;
                     v555[v557] = v522;
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     bool v558;
                     v558 = 0 <= v557;
                     bool v559;
@@ -15864,9 +15863,9 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                         assert("Tensor range check" && 0 <= v576 && v576 < 256);
                         v565 += 1 ;
                     }
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     assert("Tensor range check" && 0 <= v557 && v557 < 256);
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     assert("Tensor range check" && 0 <= v155 && v155 < 4);
                     assert("Tensor range check" && 0 <= v508 && v508 < 6144);
                     int v641;
@@ -16660,7 +16659,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
     v960 = v957 + v959;
     int v961;
     v961 = v960;
-    while (while_method_9(v961)){
+    while (while_method_8(v961)){
         bool v963;
         v963 = 0 <= v961;
         bool v964;
@@ -16670,73 +16669,75 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
         } else {
         }
         int v966;
-        v966 = v961 % 1;
-        bool v967;
-        v967 = v961 < 4;
+        v966 = v961 % 8;
+        int v967;
+        v967 = v961 / 8;
         bool v968;
-        v968 = v967 == false;
-        if (v968){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v967);
+        v968 = v967 < 4;
+        bool v969;
+        v969 = v968 == false;
+        if (v969){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v968);
         } else {
         }
-        assert("Tensor range check" && 0 <= v961 && v961 < 4);
-        assert("Tensor range check" && 0 <= v966 && v966 < 1);
-        int v970;
-        v970 = 4 * v966;
+        assert("Tensor range check" && 0 <= v967 && v967 < 4);
+        assert("Tensor range check" && 0 <= v966 && v966 < 8);
         int v971;
-        v971 = 4 * v961;
+        v971 = 4 * v966;
         int v972;
-        v972 = v971 + v970;
-        assert("Tensor range check" && 0 <= v961 && v961 < 4);
-        assert("Tensor range check" && 0 <= v966 && v966 < 1);
-        float v973[4];
+        v972 = 32 * v967;
+        int v973;
+        v973 = v972 + v971;
+        assert("Tensor range check" && 0 <= v967 && v967 < 4);
+        assert("Tensor range check" && 0 <= v966 && v966 < 8);
         float v974[4];
         float v975[4];
-        int4* v976;
-        v976 = reinterpret_cast<int4*>(v4 + v972);
+        float v976[4];
         int4* v977;
-        v977 = reinterpret_cast<int4*>(v973 + 0);
-        assert("Pointer alignment check" && (unsigned long long)(v976) % 4 == 0 && (unsigned long long)(v977) % 4 == 0);
-        *v977 = *v976;
+        v977 = reinterpret_cast<int4*>(v4 + v973);
         int4* v978;
-        v978 = reinterpret_cast<int4*>(v5 + v972);
+        v978 = reinterpret_cast<int4*>(v974 + 0);
+        assert("Pointer alignment check" && (unsigned long long)(v977) % 4 == 0 && (unsigned long long)(v978) % 4 == 0);
+        *v978 = *v977;
         int4* v979;
-        v979 = reinterpret_cast<int4*>(v974 + 0);
-        assert("Pointer alignment check" && (unsigned long long)(v978) % 4 == 0 && (unsigned long long)(v979) % 4 == 0);
-        *v979 = *v978;
+        v979 = reinterpret_cast<int4*>(v5 + v973);
+        int4* v980;
+        v980 = reinterpret_cast<int4*>(v975 + 0);
+        assert("Pointer alignment check" && (unsigned long long)(v979) % 4 == 0 && (unsigned long long)(v980) % 4 == 0);
+        *v980 = *v979;
         // Pushing the loop unrolling to: 0
-        int v980;
-        v980 = 0;
+        int v981;
+        v981 = 0;
         #pragma unroll
-        while (while_method_9(v980)){
-            assert("Tensor range check" && 0 <= v980 && v980 < 4);
-            float v982;
-            v982 = v973[v980];
+        while (while_method_9(v981)){
+            assert("Tensor range check" && 0 <= v981 && v981 < 4);
             float v983;
-            v983 = v974[v980];
-            bool v984;
-            v984 = v983 == 0.0f;
+            v983 = v974[v981];
+            float v984;
+            v984 = v975[v981];
             bool v985;
-            v985 = v984 != true;
-            float v987;
-            if (v985){
-                float v986;
-                v986 = v982 / v983;
-                v987 = v986;
+            v985 = v984 == 0.0f;
+            bool v986;
+            v986 = v985 != true;
+            float v988;
+            if (v986){
+                float v987;
+                v987 = v983 / v984;
+                v988 = v987;
             } else {
-                v987 = 0.0f;
+                v988 = 0.0f;
             }
-            assert("Tensor range check" && 0 <= v980 && v980 < 4);
-            v975[v980] = v987;
-            v980 += 1 ;
+            assert("Tensor range check" && 0 <= v981 && v981 < 4);
+            v976[v981] = v988;
+            v981 += 1 ;
         }
         // Poping the loop unrolling to: 0
-        int4* v988;
-        v988 = reinterpret_cast<int4*>(v975 + 0);
         int4* v989;
-        v989 = reinterpret_cast<int4*>(v6 + v972);
-        assert("Pointer alignment check" && (unsigned long long)(v988) % 4 == 0 && (unsigned long long)(v989) % 4 == 0);
-        *v989 = *v988;
+        v989 = reinterpret_cast<int4*>(v976 + 0);
+        int4* v990;
+        v990 = reinterpret_cast<int4*>(v6 + v973);
+        assert("Pointer alignment check" && (unsigned long long)(v989) % 4 == 0 && (unsigned long long)(v990) % 4 == 0);
+        *v990 = *v989;
         v961 += 6144 ;
     }
     v956.sync() ;
@@ -16791,7 +16792,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
     }
     int v34;
     v34 = 0;
-    while (while_method_9(v34)){
+    while (while_method_8(v34)){
         int v36;
         v36 = 0;
         while (while_method_5(v36)){
@@ -17106,7 +17107,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                     v203[v211] = v156;
                     v205[v211] = v158;
                     v207[v211] = v160;
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     bool v212;
                     v212 = 0 <= v211;
                     bool v213;
@@ -17658,11 +17659,11 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                         v209[v230] = v409;
                         v219 += 1 ;
                     }
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     assert("Tensor range check" && 0 <= v211 && v211 < 256);
                     float v425;
                     v425 = v209[v211];
-                    asm("barrier.cta.sync %0;" :: "r"(0));
+                    __syncthreads();
                     assert("Tensor range check" && 0 <= v103 && v103 < 2);
                     v82[v103] = v425;
                 }
@@ -17762,7 +17763,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                 v472[v478] = v439;
                 v474[v478] = v441;
                 v476[v478] = v443;
-                asm("barrier.cta.sync %0;" :: "r"(0));
+                __syncthreads();
                 bool v479;
                 v479 = 0 <= v478;
                 bool v480;
@@ -17986,9 +17987,9 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                     assert("Tensor range check" && 0 <= v497 && v497 < 256);
                     v486 += 1 ;
                 }
-                asm("barrier.cta.sync %0;" :: "r"(0));
+                __syncthreads();
                 assert("Tensor range check" && 0 <= v478 && v478 < 256);
-                asm("barrier.cta.sync %0;" :: "r"(0));
+                __syncthreads();
                 assert("Tensor range check" && 0 <= v76 && v76 < 4);
                 assert("Tensor range check" && 0 <= v429 && v429 < 6144);
                 int v562;
@@ -18077,9 +18078,9 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                 float v601;
                 v601 = v599 * v590;
                 assert("Tensor range check" && 0 <= v591 && v591 < 2);
-                assert("Tensor range check" && 0 <= v34 && v34 < 4);
+                assert("Tensor range check" && 0 <= v34 && v34 < 32);
                 int v602;
-                v602 = 4 * v591;
+                v602 = 32 * v591;
                 int v603;
                 v603 = v602 + v34;
                 float * v604;
@@ -18197,7 +18198,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                 v664[v670] = v631;
                 v666[v670] = v633;
                 v668[v670] = v635;
-                asm("barrier.cta.sync %0;" :: "r"(0));
+                __syncthreads();
                 bool v671;
                 v671 = 0 <= v670;
                 bool v672;
@@ -18421,9 +18422,9 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
                     assert("Tensor range check" && 0 <= v689 && v689 < 256);
                     v678 += 1 ;
                 }
-                asm("barrier.cta.sync %0;" :: "r"(0));
+                __syncthreads();
                 assert("Tensor range check" && 0 <= v670 && v670 < 256);
-                asm("barrier.cta.sync %0;" :: "r"(0));
+                __syncthreads();
                 assert("Tensor range check" && 0 <= v616 && v616 < 4);
                 assert("Tensor range check" && 0 <= v621 && v621 < 6144);
                 int v754;
@@ -19217,7 +19218,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
     v1074 = v1071 + v1073;
     int v1075;
     v1075 = v1074;
-    while (while_method_0(v1075)){
+    while (while_method_7(v1075)){
         bool v1077;
         v1077 = 0 <= v1075;
         bool v1078;
@@ -19227,73 +19228,75 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
         } else {
         }
         int v1080;
-        v1080 = v1075 % 1;
-        bool v1081;
-        v1081 = v1075 < 2;
+        v1080 = v1075 % 8;
+        int v1081;
+        v1081 = v1075 / 8;
         bool v1082;
-        v1082 = v1081 == false;
-        if (v1082){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v1081);
+        v1082 = v1081 < 2;
+        bool v1083;
+        v1083 = v1082 == false;
+        if (v1083){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v1082);
         } else {
         }
-        assert("Tensor range check" && 0 <= v1075 && v1075 < 2);
-        assert("Tensor range check" && 0 <= v1080 && v1080 < 1);
-        int v1084;
-        v1084 = 4 * v1080;
+        assert("Tensor range check" && 0 <= v1081 && v1081 < 2);
+        assert("Tensor range check" && 0 <= v1080 && v1080 < 8);
         int v1085;
-        v1085 = 4 * v1075;
+        v1085 = 4 * v1080;
         int v1086;
-        v1086 = v1085 + v1084;
-        assert("Tensor range check" && 0 <= v1075 && v1075 < 2);
-        assert("Tensor range check" && 0 <= v1080 && v1080 < 1);
-        float v1087[4];
+        v1086 = 32 * v1081;
+        int v1087;
+        v1087 = v1086 + v1085;
+        assert("Tensor range check" && 0 <= v1081 && v1081 < 2);
+        assert("Tensor range check" && 0 <= v1080 && v1080 < 8);
         float v1088[4];
         float v1089[4];
-        int4* v1090;
-        v1090 = reinterpret_cast<int4*>(v4 + v1086);
+        float v1090[4];
         int4* v1091;
-        v1091 = reinterpret_cast<int4*>(v1087 + 0);
-        assert("Pointer alignment check" && (unsigned long long)(v1090) % 4 == 0 && (unsigned long long)(v1091) % 4 == 0);
-        *v1091 = *v1090;
+        v1091 = reinterpret_cast<int4*>(v4 + v1087);
         int4* v1092;
-        v1092 = reinterpret_cast<int4*>(v5 + v1086);
+        v1092 = reinterpret_cast<int4*>(v1088 + 0);
+        assert("Pointer alignment check" && (unsigned long long)(v1091) % 4 == 0 && (unsigned long long)(v1092) % 4 == 0);
+        *v1092 = *v1091;
         int4* v1093;
-        v1093 = reinterpret_cast<int4*>(v1088 + 0);
-        assert("Pointer alignment check" && (unsigned long long)(v1092) % 4 == 0 && (unsigned long long)(v1093) % 4 == 0);
-        *v1093 = *v1092;
+        v1093 = reinterpret_cast<int4*>(v5 + v1087);
+        int4* v1094;
+        v1094 = reinterpret_cast<int4*>(v1089 + 0);
+        assert("Pointer alignment check" && (unsigned long long)(v1093) % 4 == 0 && (unsigned long long)(v1094) % 4 == 0);
+        *v1094 = *v1093;
         // Pushing the loop unrolling to: 0
-        int v1094;
-        v1094 = 0;
+        int v1095;
+        v1095 = 0;
         #pragma unroll
-        while (while_method_9(v1094)){
-            assert("Tensor range check" && 0 <= v1094 && v1094 < 4);
-            float v1096;
-            v1096 = v1087[v1094];
+        while (while_method_9(v1095)){
+            assert("Tensor range check" && 0 <= v1095 && v1095 < 4);
             float v1097;
-            v1097 = v1088[v1094];
-            bool v1098;
-            v1098 = v1097 == 0.0f;
+            v1097 = v1088[v1095];
+            float v1098;
+            v1098 = v1089[v1095];
             bool v1099;
-            v1099 = v1098 != true;
-            float v1101;
-            if (v1099){
-                float v1100;
-                v1100 = v1096 / v1097;
-                v1101 = v1100;
+            v1099 = v1098 == 0.0f;
+            bool v1100;
+            v1100 = v1099 != true;
+            float v1102;
+            if (v1100){
+                float v1101;
+                v1101 = v1097 / v1098;
+                v1102 = v1101;
             } else {
-                v1101 = 0.0f;
+                v1102 = 0.0f;
             }
-            assert("Tensor range check" && 0 <= v1094 && v1094 < 4);
-            v1089[v1094] = v1101;
-            v1094 += 1 ;
+            assert("Tensor range check" && 0 <= v1095 && v1095 < 4);
+            v1090[v1095] = v1102;
+            v1095 += 1 ;
         }
         // Poping the loop unrolling to: 0
-        int4* v1102;
-        v1102 = reinterpret_cast<int4*>(v1089 + 0);
         int4* v1103;
-        v1103 = reinterpret_cast<int4*>(v6 + v1086);
-        assert("Pointer alignment check" && (unsigned long long)(v1102) % 4 == 0 && (unsigned long long)(v1103) % 4 == 0);
-        *v1103 = *v1102;
+        v1103 = reinterpret_cast<int4*>(v1090 + 0);
+        int4* v1104;
+        v1104 = reinterpret_cast<int4*>(v6 + v1087);
+        assert("Pointer alignment check" && (unsigned long long)(v1103) % 4 == 0 && (unsigned long long)(v1104) % 4 == 0);
+        *v1104 = *v1103;
         v1075 += 6144 ;
     }
     v1070.sync() ;
@@ -19354,6 +19357,7 @@ i8 = int; i16 = int; i32 = int; i64 = int; u8 = int; u16 = int; u32 = int; u64 =
 
 import time
 options = []
+options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
 options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
@@ -19527,7 +19531,7 @@ def Closure0():
                 v83 = raw_module.get_function(f"entry{v82}")
                 del v82
                 v83.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+                print(f'Threads per block, blocks per grid: {256}, {24}')
                 v83((24,),(256,),(v13, v12, v8, v9, v10, v11),shared_mem=98304)
                 del v83
             case US0_1(_): # PlayerChanged
@@ -19547,7 +19551,7 @@ def Closure0():
                 v76 = raw_module.get_function(f"entry{v75}")
                 del v75
                 v76.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+                print(f'Threads per block, blocks per grid: {256}, {24}')
                 v76((24,),(256,),(v13, v12, v8, v9, v10, v11),shared_mem=98304)
                 del v76
             case US0_2(): # StartGame
@@ -19567,13 +19571,13 @@ def Closure0():
                 v69 = raw_module.get_function(f"entry{v68}")
                 del v68
                 v69.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+                print(f'Threads per block, blocks per grid: {256}, {24}')
                 v69((24,),(256,),(v13, v12, v8, v9, v10, v11),shared_mem=98304)
                 del v69
             case US0_3(): # StartTrainingVsRando
-                v20 = cp.zeros(16,dtype=cp.float32) # type: ignore
-                v21 = cp.zeros(16,dtype=cp.float32) # type: ignore
-                v22 = cp.empty(16,dtype=cp.float32)
+                v20 = cp.zeros(128,dtype=cp.float32) # type: ignore
+                v21 = cp.zeros(128,dtype=cp.float32) # type: ignore
+                v22 = cp.empty(128,dtype=cp.float32)
                 v23 = cp.cuda.Device().attributes['MultiProcessorCount']
                 v24 = v23 == 24
                 del v23
@@ -19589,7 +19593,7 @@ def Closure0():
                 v28 = raw_module.get_function(f"entry{v27}")
                 del v27
                 v28.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+                print(f'Threads per block, blocks per grid: {256}, {24}')
                 v28((24,),(256,),(v8, v9, v10, v11, v20, v21, v22),shared_mem=98304)
                 del v20, v21, v28
                 v29 = []
@@ -19601,10 +19605,10 @@ def Closure0():
                 while method58(v33):
                     v35 = []
                     v36 = 0
-                    while method58(v36):
+                    while method59(v36):
                         assert 0 <= v33 < 4, 'Tensor range check'
-                        assert 0 <= v36 < 4, 'Tensor range check'
-                        v38 = 4 * v33
+                        assert 0 <= v36 < 32, 'Tensor range check'
+                        v38 = 32 * v33
                         v39 = v38 + v36
                         del v38
                         v40 = v32[v39].item()
@@ -19622,9 +19626,9 @@ def Closure0():
                 v19.append(v41)
                 del v41
             case US0_4(): # StartTrainingVsSelf
-                v42 = cp.zeros(8,dtype=cp.float32) # type: ignore
-                v43 = cp.zeros(8,dtype=cp.float32) # type: ignore
-                v44 = cp.empty(8,dtype=cp.float32)
+                v42 = cp.zeros(64,dtype=cp.float32) # type: ignore
+                v43 = cp.zeros(64,dtype=cp.float32) # type: ignore
+                v44 = cp.empty(64,dtype=cp.float32)
                 v45 = cp.cuda.Device().attributes['MultiProcessorCount']
                 v46 = v45 == 24
                 del v45
@@ -19640,7 +19644,7 @@ def Closure0():
                 v50 = raw_module.get_function(f"entry{v49}")
                 del v49
                 v50.max_dynamic_shared_size_bytes = 98304 
-                print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
+                print(f'Threads per block, blocks per grid: {256}, {24}')
                 v50((24,),(256,),(v8, v9, v10, v11, v42, v43, v44),shared_mem=98304)
                 del v42, v43, v50
                 v51 = []
@@ -19652,10 +19656,10 @@ def Closure0():
                 while method45(v55):
                     v57 = []
                     v58 = 0
-                    while method58(v58):
+                    while method59(v58):
                         assert 0 <= v55 < 2, 'Tensor range check'
-                        assert 0 <= v58 < 4, 'Tensor range check'
-                        v60 = 4 * v55
+                        assert 0 <= v58 < 32, 'Tensor range check'
+                        v60 = 32 * v55
                         v61 = v60 + v58
                         del v60
                         v62 = v54[v61].item()
@@ -19686,9 +19690,9 @@ def Closure0():
         v92 = "{:.6f}\n"
         print(v92.format(v89),end="")
         del v89, v92
-        v93, v94, v95, v96, v97 = method59(v13)
+        v93, v94, v95, v96, v97 = method60(v13)
         del v13
-        return method76(v93, v94, v95, v96, v97, v8, v9, v10, v11, v19)
+        return method77(v93, v94, v95, v96, v97, v8, v9, v10, v11, v19)
     return inner
 def Closure1():
     def inner() -> object:
@@ -19717,7 +19721,6 @@ def Closure1():
         v14[:] = 0
         del v14
         v16[:] = 0
-        del v16
         v18[:] = 0
         del v18
         v20[:] = 0
@@ -19730,6 +19733,8 @@ def Closure1():
         del v26
         v28[:] = 0
         del v28
+        v16[:] = 33.333332
+        del v16
         v30 = v8[2097168:2097168+8*49152].view(cp.float64)
         v32 = v8[2490384:2490384+8*49152].view(cp.float64)
         v34 = v8[2883600:2883600+4*24576].view(cp.int32)
@@ -19744,7 +19749,7 @@ def Closure1():
         v37 = US7_0()
         v38 = 25264128
         v39 = 2981904
-        return method116(v35, v36, v7, v1, v37, v9, v38, v8, v39)
+        return method117(v35, v36, v7, v1, v37, v9, v38, v8, v39)
     return inner
 def method3(v0 : object) -> None:
     assert v0 == [], f'Expected an unit type. Got: {v0}'
@@ -20863,57 +20868,61 @@ def method58(v0 : i32) -> bool:
     v1 = v0 < 4
     del v0
     return v1
-def method60(v0 : cp.ndarray) -> u32:
+def method59(v0 : i32) -> bool:
+    v1 = v0 < 32
+    del v0
+    return v1
+def method61(v0 : cp.ndarray) -> u32:
     v2 = v0[0:].view(cp.uint32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method61(v0 : cp.ndarray) -> i32:
+def method62(v0 : cp.ndarray) -> i32:
     v2 = v0[4:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method62(v0 : cp.ndarray) -> None:
+def method63(v0 : cp.ndarray) -> None:
     del v0
     return 
-def method64(v0 : cp.ndarray) -> i32:
+def method65(v0 : cp.ndarray) -> i32:
     v2 = v0[0:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method66(v0 : cp.ndarray) -> US6:
-    v1 = method64(v0)
+def method67(v0 : cp.ndarray) -> US6:
+    v1 = method65(v0)
     v3 = v0[4:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        method62(v3)
+        method63(v3)
         del v3
         return US6_0()
     elif v1 == 1:
         del v1
-        method62(v3)
+        method63(v3)
         del v3
         return US6_1()
     elif v1 == 2:
         del v1
-        method62(v3)
+        method63(v3)
         del v3
         return US6_2()
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32]:
-    v1 = method64(v0)
+def method66(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32]:
+    v1 = method65(v0)
     v3 = v0[4:].view(cp.uint8)
     if v1 == 0:
-        method62(v3)
+        method63(v3)
         v8 = US5_0()
     elif v1 == 1:
-        v6 = method66(v3)
+        v6 = method67(v3)
         v8 = US5_1(v6)
     else:
         raise Exception("Invalid tag.")
@@ -20931,7 +20940,7 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v17
         v20 = v0[v18:].view(cp.uint8)
         del v18
-        v21 = method66(v20)
+        v21 = method67(v20)
         del v20
         v13[v14] = v21
         del v21
@@ -20950,7 +20959,7 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v30
         v33 = v0[v31:].view(cp.uint8)
         del v31
-        v34 = method64(v33)
+        v34 = method65(v33)
         del v33
         v26[v27] = v34
         del v34
@@ -20961,20 +20970,20 @@ def method65(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     v37 = v36[0].item()
     del v36
     return v8, v11, v13, v24, v26, v37
-def method68(v0 : cp.ndarray) -> i32:
+def method69(v0 : cp.ndarray) -> i32:
     v2 = v0[36:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32, US1]:
-    v1 = method64(v0)
+def method68(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_array, i32, US1]:
+    v1 = method65(v0)
     v3 = v0[4:].view(cp.uint8)
     if v1 == 0:
-        method62(v3)
+        method63(v3)
         v8 = US5_0()
     elif v1 == 1:
-        v6 = method66(v3)
+        v6 = method67(v3)
         v8 = US5_1(v6)
     else:
         raise Exception("Invalid tag.")
@@ -20992,7 +21001,7 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v17
         v20 = v0[v18:].view(cp.uint8)
         del v18
-        v21 = method66(v20)
+        v21 = method67(v20)
         del v20
         v13[v14] = v21
         del v21
@@ -21011,7 +21020,7 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
         del v30
         v33 = v0[v31:].view(cp.uint8)
         del v31
-        v34 = method64(v33)
+        v34 = method65(v33)
         del v33
         v26[v27] = v34
         del v34
@@ -21020,106 +21029,106 @@ def method67(v0 : cp.ndarray) -> Tuple[US5, bool, static_array, i32, static_arra
     v36 = v0[32:].view(cp.int32)
     v37 = v36[0].item()
     del v36
-    v38 = method68(v0)
+    v38 = method69(v0)
     v40 = v0[40:].view(cp.uint8)
     del v0
     if v38 == 0:
-        method62(v40)
+        method63(v40)
         v45 = US1_0()
     elif v38 == 1:
-        method62(v40)
+        method63(v40)
         v45 = US1_1()
     elif v38 == 2:
-        method62(v40)
+        method63(v40)
         v45 = US1_2()
     else:
         raise Exception("Invalid tag.")
     del v38, v40
     return v8, v11, v13, v24, v26, v37, v45
-def method63(v0 : cp.ndarray) -> US4:
-    v1 = method64(v0)
+def method64(v0 : cp.ndarray) -> US4:
+    v1 = method65(v0)
     v3 = v0[16:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        v5, v6, v7, v8, v9, v10 = method65(v3)
+        v5, v6, v7, v8, v9, v10 = method66(v3)
         del v3
         return US4_0(v5, v6, v7, v8, v9, v10)
     elif v1 == 1:
         del v1
-        method62(v3)
+        method63(v3)
         del v3
         return US4_1()
     elif v1 == 2:
         del v1
-        v13, v14, v15, v16, v17, v18 = method65(v3)
+        v13, v14, v15, v16, v17, v18 = method66(v3)
         del v3
         return US4_2(v13, v14, v15, v16, v17, v18)
     elif v1 == 3:
         del v1
-        v20, v21, v22, v23, v24, v25, v26 = method67(v3)
+        v20, v21, v22, v23, v24, v25, v26 = method68(v3)
         del v3
         return US4_3(v20, v21, v22, v23, v24, v25, v26)
     elif v1 == 4:
         del v1
-        v28, v29, v30, v31, v32, v33 = method65(v3)
+        v28, v29, v30, v31, v32, v33 = method66(v3)
         del v3
         return US4_4(v28, v29, v30, v31, v32, v33)
     elif v1 == 5:
         del v1
-        v35, v36, v37, v38, v39, v40 = method65(v3)
+        v35, v36, v37, v38, v39, v40 = method66(v3)
         del v3
         return US4_5(v35, v36, v37, v38, v39, v40)
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method69(v0 : cp.ndarray) -> i32:
+def method70(v0 : cp.ndarray) -> i32:
     v2 = v0[80:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method71(v0 : cp.ndarray) -> Tuple[i32, US1]:
+def method72(v0 : cp.ndarray) -> Tuple[i32, US1]:
     v2 = v0[0:].view(cp.int32)
     v3 = v2[0].item()
     del v2
-    v4 = method61(v0)
+    v4 = method62(v0)
     v6 = v0[8:].view(cp.uint8)
     del v0
     if v4 == 0:
-        method62(v6)
+        method63(v6)
         v11 = US1_0()
     elif v4 == 1:
-        method62(v6)
+        method63(v6)
         v11 = US1_1()
     elif v4 == 2:
-        method62(v6)
+        method63(v6)
         v11 = US1_2()
     else:
         raise Exception("Invalid tag.")
     del v4, v6
     return v3, v11
-def method72(v0 : cp.ndarray) -> Tuple[i32, US6]:
+def method73(v0 : cp.ndarray) -> Tuple[i32, US6]:
     v2 = v0[0:].view(cp.int32)
     v3 = v2[0].item()
     del v2
-    v4 = method61(v0)
+    v4 = method62(v0)
     v6 = v0[8:].view(cp.uint8)
     del v0
     if v4 == 0:
-        method62(v6)
+        method63(v6)
         v11 = US6_0()
     elif v4 == 1:
-        method62(v6)
+        method63(v6)
         v11 = US6_1()
     elif v4 == 2:
-        method62(v6)
+        method63(v6)
         v11 = US6_2()
     else:
         raise Exception("Invalid tag.")
     del v4, v6
     return v3, v11
-def method73(v0 : cp.ndarray) -> Tuple[static_array, i32, i32]:
+def method74(v0 : cp.ndarray) -> Tuple[static_array, i32, i32]:
     v2 = static_array(2)
     v3 = 0
     while method45(v3):
@@ -21128,7 +21137,7 @@ def method73(v0 : cp.ndarray) -> Tuple[static_array, i32, i32]:
         del v5
         v8 = v0[v6:].view(cp.uint8)
         del v6
-        v9 = method66(v8)
+        v9 = method67(v8)
         del v8
         v2[v3] = v9
         del v9
@@ -21142,76 +21151,76 @@ def method73(v0 : cp.ndarray) -> Tuple[static_array, i32, i32]:
     v15 = v14[0].item()
     del v14
     return v2, v12, v15
-def method70(v0 : cp.ndarray) -> US8:
-    v1 = method64(v0)
+def method71(v0 : cp.ndarray) -> US8:
+    v1 = method65(v0)
     v3 = v0[16:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        v5 = method66(v3)
+        v5 = method67(v3)
         del v3
         return US8_0(v5)
     elif v1 == 1:
         del v1
-        v7, v8 = method71(v3)
+        v7, v8 = method72(v3)
         del v3
         return US8_1(v7, v8)
     elif v1 == 2:
         del v1
-        v10, v11 = method72(v3)
+        v10, v11 = method73(v3)
         del v3
         return US8_2(v10, v11)
     elif v1 == 3:
         del v1
-        v13, v14, v15 = method73(v3)
+        v13, v14, v15 = method74(v3)
         del v3
         return US8_3(v13, v14, v15)
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method74(v0 : cp.ndarray) -> US2:
-    v1 = method64(v0)
+def method75(v0 : cp.ndarray) -> US2:
+    v1 = method65(v0)
     v3 = v0[4:].view(cp.uint8)
     del v0
     if v1 == 0:
         del v1
-        method62(v3)
+        method63(v3)
         del v3
         return US2_0()
     elif v1 == 1:
         del v1
-        method62(v3)
+        method63(v3)
         del v3
         return US2_1()
     elif v1 == 2:
         del v1
-        method62(v3)
+        method63(v3)
         del v3
         return US2_2()
     else:
         del v1, v3
         raise Exception("Invalid tag.")
-def method75(v0 : cp.ndarray) -> i32:
+def method76(v0 : cp.ndarray) -> i32:
     v2 = v0[1128:].view(cp.int32)
     del v0
     v3 = v2[0].item()
     del v2
     return v3
-def method59(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array, US7]:
-    v1 = method60(v0)
-    v2 = method61(v0)
+def method60(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array, US7]:
+    v1 = method61(v0)
+    v2 = method62(v0)
     v4 = v0[16:].view(cp.uint8)
     if v2 == 0:
-        method62(v4)
+        method63(v4)
         v9 = US3_0()
     elif v2 == 1:
-        v7 = method63(v4)
+        v7 = method64(v4)
         v9 = US3_1(v7)
     else:
         raise Exception("Invalid tag.")
     del v2, v4
     v11 = static_array_list(32)
-    v12 = method69(v0)
+    v12 = method70(v0)
     v11.unsafe_set_length(v12)
     del v12
     v13 = v11.length
@@ -21224,7 +21233,7 @@ def method59(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array
         del v17
         v20 = v0[v18:].view(cp.uint8)
         del v18
-        v21 = method70(v20)
+        v21 = method71(v20)
         del v20
         v11[v14] = v21
         del v21
@@ -21240,74 +21249,74 @@ def method59(v0 : cp.ndarray) -> Tuple[u32, US3, static_array_list, static_array
         del v27
         v30 = v0[v28:].view(cp.uint8)
         del v28
-        v31 = method74(v30)
+        v31 = method75(v30)
         del v30
         v23[v24] = v31
         del v31
         v24 += 1 
     del v24
-    v32 = method75(v0)
+    v32 = method76(v0)
     v34 = v0[1136:].view(cp.uint8)
     del v0
     if v32 == 0:
-        method62(v34)
+        method63(v34)
         v51 = US7_0()
     elif v32 == 1:
-        v37, v38, v39, v40, v41, v42 = method65(v34)
+        v37, v38, v39, v40, v41, v42 = method66(v34)
         v51 = US7_1(v37, v38, v39, v40, v41, v42)
     elif v32 == 2:
-        v44, v45, v46, v47, v48, v49 = method65(v34)
+        v44, v45, v46, v47, v48, v49 = method66(v34)
         v51 = US7_2(v44, v45, v46, v47, v48, v49)
     else:
         raise Exception("Invalid tag.")
     del v32, v34
     return v1, v9, v11, v23, v51
-def method82(v0 : u32) -> object:
+def method83(v0 : u32) -> object:
     v1 = v0
     del v0
     return v1
-def method81(v0 : u32) -> object:
-    return method82(v0)
-def method84() -> object:
+def method82(v0 : u32) -> object:
+    return method83(v0)
+def method85() -> object:
     v0 = []
     return v0
-def method88(v0 : US6) -> object:
+def method89(v0 : US6) -> object:
     match v0:
         case US6_0(): # Jack
             del v0
-            v1 = method84()
+            v1 = method85()
             v2 = "Jack"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US6_1(): # King
             del v0
-            v4 = method84()
+            v4 = method85()
             v5 = "King"
             v6 = [v5,v4]
             del v4, v5
             return v6
         case US6_2(): # Queen
             del v0
-            v7 = method84()
+            v7 = method85()
             v8 = "Queen"
             v9 = [v8,v7]
             del v7, v8
             return v9
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method87(v0 : US5) -> object:
+def method88(v0 : US5) -> object:
     match v0:
         case US5_0(): # None
             del v0
-            v1 = method84()
+            v1 = method85()
             v2 = "None"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US5_1(v4): # Some
             del v0
-            v5 = method88(v4)
+            v5 = method89(v4)
             del v4
             v6 = "Some"
             v7 = [v6,v5]
@@ -21315,11 +21324,11 @@ def method87(v0 : US5) -> object:
             return v7
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method89(v0 : bool) -> object:
+def method90(v0 : bool) -> object:
     v1 = v0
     del v0
     return v1
-def method90(v0 : static_array) -> object:
+def method91(v0 : static_array) -> object:
     v1 = []
     v2 = 0
     while method45(v2):
@@ -21339,18 +21348,18 @@ def method90(v0 : static_array) -> object:
             pass
         del v6, v7
         v10 = v0[v2]
-        v11 = method88(v10)
+        v11 = method89(v10)
         del v10
         v1.append(v11)
         del v11
         v2 += 1 
     del v0, v2
     return v1
-def method91(v0 : i32) -> object:
+def method92(v0 : i32) -> object:
     v1 = v0
     del v0
     return v1
-def method92(v0 : static_array) -> object:
+def method93(v0 : static_array) -> object:
     v1 = []
     v2 = 0
     while method45(v2):
@@ -21370,72 +21379,72 @@ def method92(v0 : static_array) -> object:
             pass
         del v6, v7
         v10 = v0[v2]
-        v11 = method91(v10)
+        v11 = method92(v10)
         del v10
         v1.append(v11)
         del v11
         v2 += 1 
     del v0, v2
     return v1
-def method86(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32) -> object:
-    v6 = method87(v0)
+def method87(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32) -> object:
+    v6 = method88(v0)
     del v0
-    v7 = method89(v1)
+    v7 = method90(v1)
     del v1
-    v8 = method90(v2)
+    v8 = method91(v2)
     del v2
-    v9 = method91(v3)
+    v9 = method92(v3)
     del v3
-    v10 = method92(v4)
+    v10 = method93(v4)
     del v4
-    v11 = method91(v5)
+    v11 = method92(v5)
     del v5
     v12 = {'community_card': v6, 'is_button_s_first_move': v7, 'pl_card': v8, 'player_turn': v9, 'pot': v10, 'raises_left': v11}
     del v6, v7, v8, v9, v10, v11
     return v12
-def method94(v0 : US1) -> object:
+def method95(v0 : US1) -> object:
     match v0:
         case US1_0(): # Call
             del v0
-            v1 = method84()
+            v1 = method85()
             v2 = "Call"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US1_1(): # Fold
             del v0
-            v4 = method84()
+            v4 = method85()
             v5 = "Fold"
             v6 = [v5,v4]
             del v4, v5
             return v6
         case US1_2(): # Raise
             del v0
-            v7 = method84()
+            v7 = method85()
             v8 = "Raise"
             v9 = [v8,v7]
             del v7, v8
             return v9
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method93(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32, v6 : US1) -> object:
+def method94(v0 : US5, v1 : bool, v2 : static_array, v3 : i32, v4 : static_array, v5 : i32, v6 : US1) -> object:
     v7 = []
-    v8 = method86(v0, v1, v2, v3, v4, v5)
+    v8 = method87(v0, v1, v2, v3, v4, v5)
     del v0, v1, v2, v3, v4, v5
     v7.append(v8)
     del v8
-    v9 = method94(v6)
+    v9 = method95(v6)
     del v6
     v7.append(v9)
     del v9
     v10 = v7
     del v7
     return v10
-def method85(v0 : US4) -> object:
+def method86(v0 : US4) -> object:
     match v0:
         case US4_0(v1, v2, v3, v4, v5, v6): # ChanceCommunityCard
             del v0
-            v7 = method86(v1, v2, v3, v4, v5, v6)
+            v7 = method87(v1, v2, v3, v4, v5, v6)
             del v1, v2, v3, v4, v5, v6
             v8 = "ChanceCommunityCard"
             v9 = [v8,v7]
@@ -21443,14 +21452,14 @@ def method85(v0 : US4) -> object:
             return v9
         case US4_1(): # ChanceInit
             del v0
-            v10 = method84()
+            v10 = method85()
             v11 = "ChanceInit"
             v12 = [v11,v10]
             del v10, v11
             return v12
         case US4_2(v13, v14, v15, v16, v17, v18): # Round
             del v0
-            v19 = method86(v13, v14, v15, v16, v17, v18)
+            v19 = method87(v13, v14, v15, v16, v17, v18)
             del v13, v14, v15, v16, v17, v18
             v20 = "Round"
             v21 = [v20,v19]
@@ -21458,7 +21467,7 @@ def method85(v0 : US4) -> object:
             return v21
         case US4_3(v22, v23, v24, v25, v26, v27, v28): # RoundWithAction
             del v0
-            v29 = method93(v22, v23, v24, v25, v26, v27, v28)
+            v29 = method94(v22, v23, v24, v25, v26, v27, v28)
             del v22, v23, v24, v25, v26, v27, v28
             v30 = "RoundWithAction"
             v31 = [v30,v29]
@@ -21466,7 +21475,7 @@ def method85(v0 : US4) -> object:
             return v31
         case US4_4(v32, v33, v34, v35, v36, v37): # TerminalCall
             del v0
-            v38 = method86(v32, v33, v34, v35, v36, v37)
+            v38 = method87(v32, v33, v34, v35, v36, v37)
             del v32, v33, v34, v35, v36, v37
             v39 = "TerminalCall"
             v40 = [v39,v38]
@@ -21474,7 +21483,7 @@ def method85(v0 : US4) -> object:
             return v40
         case US4_5(v41, v42, v43, v44, v45, v46): # TerminalFold
             del v0
-            v47 = method86(v41, v42, v43, v44, v45, v46)
+            v47 = method87(v41, v42, v43, v44, v45, v46)
             del v41, v42, v43, v44, v45, v46
             v48 = "TerminalFold"
             v49 = [v48,v47]
@@ -21482,18 +21491,18 @@ def method85(v0 : US4) -> object:
             return v49
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method83(v0 : US3) -> object:
+def method84(v0 : US3) -> object:
     match v0:
         case US3_0(): # None
             del v0
-            v1 = method84()
+            v1 = method85()
             v2 = "None"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US3_1(v4): # Some
             del v0
-            v5 = method85(v4)
+            v5 = method86(v4)
             del v4
             v6 = "Some"
             v7 = [v6,v5]
@@ -21501,55 +21510,55 @@ def method83(v0 : US3) -> object:
             return v7
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method80(v0 : u32, v1 : US3) -> object:
-    v2 = method81(v0)
+def method81(v0 : u32, v1 : US3) -> object:
+    v2 = method82(v0)
     del v0
-    v3 = method83(v1)
+    v3 = method84(v1)
     del v1
     v4 = {'deck': v2, 'game': v3}
     del v2, v3
     return v4
-def method98(v0 : i32, v1 : US1) -> object:
+def method99(v0 : i32, v1 : US1) -> object:
     v2 = []
-    v3 = method91(v0)
+    v3 = method92(v0)
     del v0
     v2.append(v3)
     del v3
-    v4 = method94(v1)
+    v4 = method95(v1)
     del v1
     v2.append(v4)
     del v4
     v5 = v2
     del v2
     return v5
-def method99(v0 : i32, v1 : US6) -> object:
+def method100(v0 : i32, v1 : US6) -> object:
     v2 = []
-    v3 = method91(v0)
+    v3 = method92(v0)
     del v0
     v2.append(v3)
     del v3
-    v4 = method88(v1)
+    v4 = method89(v1)
     del v1
     v2.append(v4)
     del v4
     v5 = v2
     del v2
     return v5
-def method100(v0 : static_array, v1 : i32, v2 : i32) -> object:
-    v3 = method90(v0)
+def method101(v0 : static_array, v1 : i32, v2 : i32) -> object:
+    v3 = method91(v0)
     del v0
-    v4 = method91(v1)
+    v4 = method92(v1)
     del v1
-    v5 = method91(v2)
+    v5 = method92(v2)
     del v2
     v6 = {'cards_shown': v3, 'chips_won': v4, 'winner_id': v5}
     del v3, v4, v5
     return v6
-def method97(v0 : US8) -> object:
+def method98(v0 : US8) -> object:
     match v0:
         case US8_0(v1): # CommunityCardIs
             del v0
-            v2 = method88(v1)
+            v2 = method89(v1)
             del v1
             v3 = "CommunityCardIs"
             v4 = [v3,v2]
@@ -21557,7 +21566,7 @@ def method97(v0 : US8) -> object:
             return v4
         case US8_1(v5, v6): # PlayerAction
             del v0
-            v7 = method98(v5, v6)
+            v7 = method99(v5, v6)
             del v5, v6
             v8 = "PlayerAction"
             v9 = [v8,v7]
@@ -21565,7 +21574,7 @@ def method97(v0 : US8) -> object:
             return v9
         case US8_2(v10, v11): # PlayerGotCard
             del v0
-            v12 = method99(v10, v11)
+            v12 = method100(v10, v11)
             del v10, v11
             v13 = "PlayerGotCard"
             v14 = [v13,v12]
@@ -21573,7 +21582,7 @@ def method97(v0 : US8) -> object:
             return v14
         case US8_3(v15, v16, v17): # Showdown
             del v0
-            v18 = method100(v15, v16, v17)
+            v18 = method101(v15, v16, v17)
             del v15, v16, v17
             v19 = "Showdown"
             v20 = [v19,v18]
@@ -21581,45 +21590,45 @@ def method97(v0 : US8) -> object:
             return v20
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method96(v0 : static_array_list) -> object:
+def method97(v0 : static_array_list) -> object:
     v1 = []
     v2 = v0.length
     v3 = 0
     while method5(v2, v3):
         v6 = v0[v3]
-        v7 = method97(v6)
+        v7 = method98(v6)
         del v6
         v1.append(v7)
         del v7
         v3 += 1 
     del v0, v2, v3
     return v1
-def method102(v0 : US2) -> object:
+def method103(v0 : US2) -> object:
     match v0:
         case US2_0(): # Computer
             del v0
-            v1 = method84()
+            v1 = method85()
             v2 = "Computer"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US2_1(): # Human
             del v0
-            v4 = method84()
+            v4 = method85()
             v5 = "Human"
             v6 = [v5,v4]
             del v4, v5
             return v6
         case US2_2(): # Random
             del v0
-            v7 = method84()
+            v7 = method85()
             v8 = "Random"
             v9 = [v8,v7]
             del v7, v8
             return v9
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method101(v0 : static_array) -> object:
+def method102(v0 : static_array) -> object:
     v1 = []
     v2 = 0
     while method45(v2):
@@ -21639,25 +21648,25 @@ def method101(v0 : static_array) -> object:
             pass
         del v6, v7
         v10 = v0[v2]
-        v11 = method102(v10)
+        v11 = method103(v10)
         del v10
         v1.append(v11)
         del v11
         v2 += 1 
     del v0, v2
     return v1
-def method103(v0 : US7) -> object:
+def method104(v0 : US7) -> object:
     match v0:
         case US7_0(): # GameNotStarted
             del v0
-            v1 = method84()
+            v1 = method85()
             v2 = "GameNotStarted"
             v3 = [v2,v1]
             del v1, v2
             return v3
         case US7_1(v4, v5, v6, v7, v8, v9): # GameOver
             del v0
-            v10 = method86(v4, v5, v6, v7, v8, v9)
+            v10 = method87(v4, v5, v6, v7, v8, v9)
             del v4, v5, v6, v7, v8, v9
             v11 = "GameOver"
             v12 = [v11,v10]
@@ -21665,7 +21674,7 @@ def method103(v0 : US7) -> object:
             return v12
         case US7_2(v13, v14, v15, v16, v17, v18): # WaitingForActionFromPlayerId
             del v0
-            v19 = method86(v13, v14, v15, v16, v17, v18)
+            v19 = method87(v13, v14, v15, v16, v17, v18)
             del v13, v14, v15, v16, v17, v18
             v20 = "WaitingForActionFromPlayerId"
             v21 = [v20,v19]
@@ -21673,74 +21682,87 @@ def method103(v0 : US7) -> object:
             return v21
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method95(v0 : static_array_list, v1 : static_array, v2 : US7) -> object:
-    v3 = method96(v0)
+def method96(v0 : static_array_list, v1 : static_array, v2 : US7) -> object:
+    v3 = method97(v0)
     del v0
-    v4 = method101(v1)
+    v4 = method102(v1)
     del v1
-    v5 = method103(v2)
+    v5 = method104(v2)
     del v2
     v6 = {'messages': v3, 'pl_type': v4, 'ui_game_state': v5}
     del v3, v4, v5
     return v6
-def method79(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7) -> object:
-    v5 = method80(v0, v1)
+def method80(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7) -> object:
+    v5 = method81(v0, v1)
     del v0, v1
-    v6 = method95(v2, v3, v4)
+    v6 = method96(v2, v3, v4)
     del v2, v3, v4
     v7 = {'private': v5, 'public': v6}
     del v5, v6
     return v7
+def method110(v0 : cp.ndarray) -> object:
+    v1 = v0
+    del v0
+    return v1
 def method109(v0 : cp.ndarray) -> object:
+    return method110(v0)
+def method111(v0 : u64) -> object:
     v1 = v0
     del v0
     return v1
-def method108(v0 : cp.ndarray) -> object:
-    return method109(v0)
-def method110(v0 : u64) -> object:
-    v1 = v0
-    del v0
-    return v1
-def method107(v0 : cp.ndarray, v1 : u64) -> object:
+def method108(v0 : cp.ndarray, v1 : u64) -> object:
     v2 = []
-    v3 = method108(v0)
+    v3 = method109(v0)
     del v0
     v2.append(v3)
     del v3
-    v4 = method110(v1)
+    v4 = method111(v1)
     del v1
     v2.append(v4)
     del v4
     v5 = v2
     del v2
     return v5
-def method106(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method107(v0, v1)
+def method107(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    v4 = method108(v0, v1)
     del v0, v1
-    v5 = method107(v2, v3)
+    v5 = method108(v2, v3)
     del v2, v3
     v6 = {'output': v4, 'param': v5}
     del v4, v5
     return v6
+def method106(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
+    return method107(v0, v1, v2, v3)
 def method105(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    return method106(v0, v1, v2, v3)
-def method104(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
-    v4 = method105(v0, v1, v2, v3)
+    v4 = method106(v0, v1, v2, v3)
     del v0, v1, v2, v3
     v5 = {'model_data': v4}
     del v4
     return v5
-def method78(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
-    v9 = method79(v0, v1, v2, v3, v4)
+def method79(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
+    v9 = method80(v0, v1, v2, v3, v4)
     del v0, v1, v2, v3, v4
-    v10 = method104(v5, v6, v7, v8)
+    v10 = method105(v5, v6, v7, v8)
     del v5, v6, v7, v8
     v11 = {'game': v9, 'neural': v10}
     del v9, v10
     return v11
-def method115(v0 : f32) -> object:
+def method116(v0 : f32) -> object:
     v1 = v0
     del v0
+    return v1
+def method115(v0 : list) -> object:
+    v1 = []
+    v2 = len(v0)
+    v3 = 0
+    while method5(v2, v3):
+        v5 = v0[v3]
+        v6 = method116(v5)
+        del v5
+        v1.append(v6)
+        del v6
+        v3 += 1 
+    del v0, v2, v3
     return v1
 def method114(v0 : list) -> object:
     v1 = []
@@ -21755,24 +21777,11 @@ def method114(v0 : list) -> object:
         v3 += 1 
     del v0, v2, v3
     return v1
-def method113(v0 : list) -> object:
-    v1 = []
-    v2 = len(v0)
-    v3 = 0
-    while method5(v2, v3):
-        v5 = v0[v3]
-        v6 = method114(v5)
-        del v5
-        v1.append(v6)
-        del v6
-        v3 += 1 
-    del v0, v2, v3
-    return v1
-def method112(v0 : US9) -> object:
+def method113(v0 : US9) -> object:
     match v0:
         case US9_0(v1): # AddRewardsRando
             del v0
-            v2 = method113(v1)
+            v2 = method114(v1)
             del v1
             v3 = "AddRewardsRando"
             v4 = [v3,v2]
@@ -21780,7 +21789,7 @@ def method112(v0 : US9) -> object:
             return v4
         case US9_1(v5): # AddRewardsSelf
             del v0
-            v6 = method113(v5)
+            v6 = method114(v5)
             del v5
             v7 = "AddRewardsSelf"
             v8 = [v7,v6]
@@ -21788,38 +21797,38 @@ def method112(v0 : US9) -> object:
             return v8
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
-def method111(v0 : list) -> object:
+def method112(v0 : list) -> object:
     v1 = []
     v2 = len(v0)
     v3 = 0
     while method5(v2, v3):
         v5 = v0[v3]
-        v6 = method112(v5)
+        v6 = method113(v5)
         del v5
         v1.append(v6)
         del v6
         v3 += 1 
     del v0, v2, v3
     return v1
-def method77(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
+def method78(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
     v10 = []
-    v11 = method78(v0, v1, v2, v3, v4, v5, v6, v7, v8)
+    v11 = method79(v0, v1, v2, v3, v4, v5, v6, v7, v8)
     del v0, v1, v2, v3, v4, v5, v6, v7, v8
     v10.append(v11)
     del v11
-    v12 = method111(v9)
+    v12 = method112(v9)
     del v9
     v10.append(v12)
     del v12
     v13 = v10
     del v10
     return v13
-def method76(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
-    v10 = method77(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)
+def method77(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64, v9 : list) -> object:
+    v10 = method78(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)
     del v0, v1, v2, v3, v4, v5, v6, v7, v8, v9
     return v10
-def method116(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
-    v9 = method78(v0, v1, v2, v3, v4, v5, v6, v7, v8)
+def method117(v0 : u32, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US7, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
+    v9 = method79(v0, v1, v2, v3, v4, v5, v6, v7, v8)
     del v0, v1, v2, v3, v4, v5, v6, v7, v8
     return v9
 def main_body():
