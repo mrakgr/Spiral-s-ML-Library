@@ -43,25 +43,16 @@ inl transpose_snd_ forall a b c el. loop' (from : tensor (a * b * c) el) (to : t
         inl from, to = x |> apply i |> unzip
 
         inl () = // Copies the data into shared memory from global.
-            inl io = 
-                zip shared from
-                |> split_into_swapped (loop.rigid_split threads_per_block())
-                |> threads_in_block
-                |> apply_proj
+            inl io = zip shared from
 
-            loop.linear io.dim fun i =>
+            loop.projective threads_in_block(io.dim) fun i =>
                 inl to, from = io |> unzip
                 tensor_set i (tensor_index i from) to
 
         inl () = // Copies the data into global from shared memory.
-            inl io = 
-                zip to shared
-                |> reorder (fun b,c => c,b)
-                |> split_into_swapped (loop.rigid_split threads_per_block())
-                |> threads_in_block
-                |> apply_proj
+            inl io = zip to shared |> reorder (fun b,c => c,b)
 
-            loop.linear io.dim fun i =>
+            loop.projective threads_in_block(io.dim) fun i =>
                 inl to, from = io |> unzip
                 tensor_set i (tensor_index i from) to
 
