@@ -213,11 +213,6 @@ __device__ inline bool while_method_1(int v0){
     v1 = v0 < 8;
     return v1;
 }
-__device__ inline bool while_method_2(int v0){
-    bool v1;
-    v1 = v0 < 4;
-    return v1;
-}
 extern "C" __global__ void entry0(int * v0, int * v1) {
     auto v2 = cooperative_groups::this_grid();
     extern __shared__ unsigned char v3[];
@@ -303,69 +298,9 @@ extern "C" __global__ void entry0(int * v0, int * v1) {
             v39 = reinterpret_cast<int4*>(v0 + v38);
             int4* v40;
             v40 = reinterpret_cast<int4*>(v4 + v35);
-            assert("Pointer alignment check" && (unsigned long long)(v39) % 4 == 0 && (unsigned long long)(v40) % 4 == 0);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v39) % 16 == 0 && reinterpret_cast<unsigned long long>(v40) % 16 == 0);
             *v40 = *v39;
             v23 += 256 ;
-        }
-        int v41;
-        v41 = threadIdx.x;
-        int v42;
-        v42 = v41;
-        while (while_method_1(v42)){
-            bool v44;
-            v44 = 0 <= v42;
-            bool v45;
-            v45 = v44 == false;
-            if (v45){
-                assert("The index needs to be zero or positive." && v44);
-            } else {
-            }
-            int v47;
-            v47 = v42 % 1;
-            bool v48;
-            v48 = v42 < 8;
-            bool v49;
-            v49 = v48 == false;
-            if (v49){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v48);
-            } else {
-            }
-            assert("Tensor range check" && 0 <= v42 && v42 < 8);
-            assert("Tensor range check" && 0 <= v47 && v47 < 1);
-            int v51;
-            v51 = 4 * v47;
-            int v52;
-            v52 = v51 + v21;
-            int v53;
-            v53 = 4 * v42;
-            int v54;
-            v54 = v53 + v52;
-            int v55;
-            v55 = 516 * v47;
-            int v56;
-            v56 = v42 + v55;
-            int v57[4];
-            int v58;
-            v58 = 0;
-            while (while_method_2(v58)){
-                assert("Tensor range check" && 0 <= v58 && v58 < 4);
-                int v60;
-                v60 = 129 * v58;
-                int v61;
-                v61 = v60 + v56;
-                int v62;
-                v62 = v4[v61];
-                assert("Tensor range check" && 0 <= v58 && v58 < 4);
-                v57[v58] = v62;
-                v58 += 1 ;
-            }
-            int4* v63;
-            v63 = reinterpret_cast<int4*>(v57 + 0);
-            int4* v64;
-            v64 = reinterpret_cast<int4*>(v1 + v54);
-            assert("Pointer alignment check" && (unsigned long long)(v63) % 4 == 0 && (unsigned long long)(v64) % 4 == 0);
-            *v64 = *v63;
-            v42 += 256 ;
         }
         __syncthreads();
         v7 += 24 ;

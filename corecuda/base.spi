@@ -117,12 +117,13 @@ inl memcpy_sync forall float. (to, from : tensor int float * tensor int float) =
         iter2 (fun (tensor_body {array=from offset=from_offset stride=from_stride}) (tensor_body {array=to offset=to_offset stride=to_stride}) =>
             assert (to_stride = 1 && from_stride = 1) "The innermost dimension of every tensor body needs to have a contiguous stride."
             typecase `from with _ ~el =>
+            inl dim_sizeof16 = dim * (sizeof `el).value
             inl load_single forall el. =
                 inl from = $"reinterpret_cast<`el*>(!from + !from_offset)" : $'`el*'
                 inl to = $"reinterpret_cast<`el*>(!to + !to_offset)" : $'`el*'
-                $'assert("Pointer alignment check" && (unsigned long long)(!from) % !dim == 0 && (unsigned long long)(!to) % !dim == 0)' : ()
+                $'assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(!from) % !dim_sizeof16 == 0 && reinterpret_cast<unsigned long long>(!to) % !dim_sizeof16 == 0)' : ()
                 $"*!to = *!from" : ()
-            match dim * (sizeof `el).value with
+            match dim_sizeof16 with
             | 16 => load_single `($"int4")
             | 8 => load_single `($"int2")
             | 4 => load_single `($"int")
