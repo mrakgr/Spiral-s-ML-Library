@@ -382,27 +382,20 @@ inl fold forall dim s a. (s : s) (f : s -> a -> s) (t : tensor dim a) : s =
         loop._set s (f s (tensor_index i t))
     s
 
-// Note: `replicate_fst` doesn't play well with the rest of the library. `factorize` and `memcpy_sync` in particular.
-// // Replicates the first tensor dimension for an arbitrary amount of times with a stride of 0.
-// inl replicate_fst forall a b c el. (dim : b) (t : tensor (a * c) el) : tensor ((a * b) * c) el =
-//     assert_long_length (loop.prod dim) dim
-//     tensor {
-//         dim = (fst t.dim, dim), snd t.dim
-//         bodies = real
-//             open real_core
-//             map (fun (tensor_body r as x) =>
-//                 typecase `x with
-//                 | tensor_body (a * b) ~el => tensor_body `((a * b) * c) `el {r with stride #= fun a,b => 
-//                     (a, map (const 0) dim), b
-//                     }
-//                 ) t.bodies
-//     }
+// Iterates over all the types in the tensor.
+inl iter_type forall dim t'. (f : forall t. tensor dim t -> ()) (x : tensor dim t') : () = real
+    struct.iter (fun (tensor_body _ as b) =>
+        typecase `b with tensor_body dim ~t' => 
+        f `t' (tensor `dim `t' {dim=x.dim; bodies=b})
+        ) x.bodies
 
-// // Replicates the second tensor dimension for an arbitrary amount of times with a stride of 0.
-// inl replicate_snd forall a b c el. (dim : b) : tensor (a * c) el -> tensor (a * c * b) el = swap >> replicate_fst dim >> swap
-
-// // Replicates the tensor dimension for an arbitrary amount of times with a stride of 0.
-// inl replicate forall a b el. (dim : b) : tensor a el -> tensor (a * b) el = reorder (fun x => x, ()) >> replicate_fst dim >> reorder fst
+// Iterates over all the types in the tensor. Useful for doing a transpose.
+inl iter2_type forall dim t'. (f : forall t. tensor dim (t * t) -> ()) (x : tensor dim (t' * t')) : () = real
+    open real_core
+    struct.iter2 (fun (tensor_body _ as b1) (tensor_body _ as b2) =>
+        typecase `b1 * `b2 with tensor_body dim ~t' * tensor dim ~t' => 
+        f `t' (tensor `dim `t' {dim=x.dim; bodies=b1, b2})
+        ) (fst x.bodies) (snd x.bodies)
 
 // Tests
 // 

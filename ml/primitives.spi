@@ -10,7 +10,7 @@ open tensorm
 // They're all block level primitives (unless otherwise noted.)
 
 // Transposes the two inner dimensions of a tensor.
-inl transpose_snd_ forall a b c el. loop' (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
+inl transpose_snd_ forall a b c el'. loop' (from : tensor (a * b * c) el') (to : tensor (a * c * b) el') : () =
     inl x = 
         inl a,b,c = from.dim
         inl a',c',b' = to.dim
@@ -25,44 +25,52 @@ inl transpose_snd_ forall a b c el. loop' (from : tensor (a * b * c) el) (to : t
         |> flatten_fst
         |> reorder (fun c,b,a => a,{b},{c})
     
-    open tensor_cuda
-    inl shared : tensor _ el = 
-        inl padding = 1
-        inl shared_dim = 128, 128
-        inl a,{b},{c} = x.dim
-        tensor_create_extern_shared 0 ({b=fst shared_dim}, {c=snd shared_dim + padding})
-        |> fst
-        |> view (fun _ => {from=loop.zeroes; nearTo={b=min (fst shared_dim) b}, {c=min (snd shared_dim) c}})
+    inl body forall el. (x : tensor (a * {b : i32} * {c : i32}) (el * el)) : () =
+        open tensor_cuda
+        inl shared : tensor _ el =
+            inl padding, shared_dim =
+                match (sizeof : _ el).value with
+                | 8 => 1, 128, 64
+                | 4 => 1, 128, 128
+                | 2 => 2, 256, 128
+                | 1 => 4, 256, 256
+                | _ => failwith "Only 8,16,32 and 64 bit datatypes (or compounds containing them) are supported in transpose."
+            inl a,{b},{c} = x.dim
+            tensor_create_extern_shared 0 ({b=fst shared_dim}, {c=snd shared_dim + padding})
+            |> fst
+            |> view (fun _ => {from=loop.zeroes; nearTo={b=min (fst shared_dim) b}, {c=min (snd shared_dim) c}})
 
-    inl x = 
-        x 
-        |> split_into_snd (loop.div_fst_by shared.dim)
-        |> reorder (fun a,b,c => (a,b),c)
+        inl x = 
+            x
+            |> split_into_snd (loop.div_fst_by shared.dim)
+            |> reorder (fun a,b,c => (a,b),c)
 
-    loop' (fst x.dim) fun i =>
-        inl from, to = x |> apply i |> unzip
+        loop' (fst x.dim) fun i =>
+            inl from, to = x |> apply i |> unzip
 
-        inl () = // Copies the data into shared memory from global.
-            inl io = 
-                zip shared from
-                |> factorize_sizeof_16
+            inl () = // Copies the data into shared memory from global.
+                inl io =
+                    zip shared from
+                    |> factorize_sizeof_16
 
-            loop.projective threads_in_block(fst io.dim) fun i =>
-                io |> apply i |> unzip |> memcpy_sync
+                loop.projective threads_in_block(fst io.dim) fun i =>
+                    io |> apply i |> unzip |> memcpy_sync
 
-        inl () = // Copies the data into global from shared memory.
-            inl io = 
-                zip to shared 
-                |> reorder (fun b,c => c,b)
-                |> factorize_sizeof_16
+            inl () = // Copies the data into global from shared memory.
+                inl io =
+                    zip to shared
+                    |> reorder (fun b,c => c,b)
+                    |> factorize_sizeof_16
 
-            loop.projective threads_in_block(fst io.dim) fun i =>
-                inl to, from = io |> apply i |> unzip
-                inl l = tensor_create from.dim // The shared tensor isn't contiguous here so we first load the data into registers.
-                loop.linear l.dim fun i => tensor_set i (tensor_index i from) l
-                memcpy_sync (to,l)
+                loop.projective threads_in_block(fst io.dim) fun i =>
+                    inl to, from = io |> apply i |> unzip
+                    inl l = tensor_create from.dim // The shared tensor isn't contiguous here so we first load the data into registers.
+                    loop.linear l.dim fun i => tensor_set i (tensor_index i from) l
+                    memcpy_sync (to,l)
 
-        __syncthreads()
+            __syncthreads()
+
+    iter2_type `$body x
 
 // Transposes the two inner dimensions of a tensor using the entire grid.
 inl grid_transpose_snd forall a b c el. grid (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
