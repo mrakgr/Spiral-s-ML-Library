@@ -205,7 +205,7 @@ struct dynamic_array_list
 
 __device__ inline bool while_method_0(int v0){
     bool v1;
-    v1 = v0 < 1;
+    v1 = v0 < 2;
     return v1;
 }
 __device__ inline bool while_method_1(int v0){
@@ -244,130 +244,135 @@ extern "C" __global__ void entry0(int * v0, int * v1) {
         int v12;
         v12 = v7 % 1;
         bool v13;
-        v13 = v7 < 1;
+        v13 = v7 < 2;
         bool v14;
         v14 = v13 == false;
         if (v14){
             assert("The last element of the projection dimensions needs to be greater than the index remainder." && v13);
         } else {
         }
-        assert("Tensor range check" && 0 <= v7 && v7 < 1);
+        assert("Tensor range check" && 0 <= v7 && v7 < 2);
+        assert("Tensor range check" && 0 <= v12 && v12 < 1);
         assert("Tensor range check" && 0 <= v12 && v12 < 1);
         int v16;
         v16 = 8 * v12;
         int v17;
-        v17 = 32 * v7;
+        v17 = 32 * v12;
         int v18;
         v18 = v17 + v16;
         int v19;
-        v19 = 32 * v12;
+        v19 = 32 * v7;
         int v20;
-        v20 = 4 * v7;
+        v20 = v19 + v18;
         int v21;
-        v21 = v20 + v19;
+        v21 = 4 * v12;
         int v22;
-        v22 = threadIdx.x;
+        v22 = v21 + v17;
         int v23;
-        v23 = v22;
-        while (while_method_1(v23)){
-            bool v25;
-            v25 = 0 <= v23;
-            bool v26;
-            v26 = v25 == false;
-            if (v26){
-                assert("The index needs to be zero or positive." && v25);
+        v23 = v19 + v22;
+        int v24;
+        v24 = threadIdx.x;
+        int v25;
+        v25 = v24;
+        while (while_method_1(v25)){
+            bool v27;
+            v27 = 0 <= v25;
+            bool v28;
+            v28 = v27 == false;
+            if (v28){
+                assert("The index needs to be zero or positive." && v27);
             } else {
             }
-            int v28;
-            v28 = v23 % 8;
-            int v29;
-            v29 = v23 / 8;
-            bool v30;
-            v30 = v29 < 4;
-            bool v31;
-            v31 = v30 == false;
-            if (v31){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v30);
+            int v30;
+            v30 = v25 % 8;
+            int v31;
+            v31 = v25 / 8;
+            bool v32;
+            v32 = v31 < 4;
+            bool v33;
+            v33 = v32 == false;
+            if (v33){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v32);
             } else {
             }
-            assert("Tensor range check" && 0 <= v29 && v29 < 4);
-            assert("Tensor range check" && 0 <= v28 && v28 < 8);
-            int v33;
-            v33 = v28 + v18;
-            int v34;
-            v34 = 8 * v29;
+            assert("Tensor range check" && 0 <= v31 && v31 < 4);
+            assert("Tensor range check" && 0 <= v30 && v30 < 8);
             int v35;
-            v35 = v34 + v33;
+            v35 = v30 + v20;
             int v36;
-            v36 = v0[v35];
-            assert("Tensor range check" && 0 <= v29 && v29 < 4);
-            assert("Tensor range check" && 0 <= v28 && v28 < 8);
+            v36 = 8 * v31;
             int v37;
-            v37 = 129 * v29;
+            v37 = v36 + v35;
             int v38;
-            v38 = v37 + v28;
-            v4[v38] = v36;
-            v23 += 256 ;
+            v38 = v0[v37];
+            assert("Tensor range check" && 0 <= v31 && v31 < 4);
+            assert("Tensor range check" && 0 <= v30 && v30 < 8);
+            int v39;
+            v39 = 129 * v31;
+            int v40;
+            v40 = v39 + v30;
+            v4[v40] = v38;
+            v25 += 256 ;
         }
-        int v39;
-        v39 = threadIdx.x;
-        int v40;
-        v40 = v39;
-        while (while_method_2(v40)){
-            bool v42;
-            v42 = 0 <= v40;
-            bool v43;
-            v43 = v42 == false;
-            if (v43){
-                assert("The index needs to be zero or positive." && v42);
+        int v41;
+        v41 = threadIdx.x;
+        int v42;
+        v42 = v41;
+        while (while_method_2(v42)){
+            bool v44;
+            v44 = 0 <= v42;
+            bool v45;
+            v45 = v44 == false;
+            if (v45){
+                assert("The index needs to be zero or positive." && v44);
             } else {
             }
-            int v45;
-            v45 = v40 % 1;
-            bool v46;
-            v46 = v40 < 8;
-            bool v47;
-            v47 = v46 == false;
-            if (v47){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v46);
+            int v47;
+            v47 = v42 % 1;
+            bool v48;
+            v48 = v42 < 8;
+            bool v49;
+            v49 = v48 == false;
+            if (v49){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v48);
             } else {
             }
-            assert("Tensor range check" && 0 <= v40 && v40 < 8);
-            assert("Tensor range check" && 0 <= v45 && v45 < 1);
-            int v49;
-            v49 = 4 * v45;
-            int v50;
-            v50 = v49 + v21;
+            assert("Tensor range check" && 0 <= v42 && v42 < 8);
+            assert("Tensor range check" && 0 <= v47 && v47 < 1);
             int v51;
-            v51 = 4 * v40;
+            v51 = 4 * v47;
             int v52;
-            v52 = v51 + v50;
+            v52 = v51 + v23;
             int v53;
-            v53 = 516 * v45;
+            v53 = 4 * v42;
             int v54;
-            v54 = v40 + v53;
-            int v55[4];
+            v54 = v53 + v52;
+            int v55;
+            v55 = 516 * v47;
             int v56;
-            v56 = 0;
-            while (while_method_3(v56)){
-                assert("Tensor range check" && 0 <= v56 && v56 < 4);
-                int v58;
-                v58 = 129 * v56;
-                int v59;
-                v59 = v58 + v54;
+            v56 = v42 + v55;
+            int v57[4];
+            int v58;
+            v58 = 0;
+            while (while_method_3(v58)){
+                assert("Tensor range check" && 0 <= v58 && v58 < 4);
                 int v60;
-                v60 = v4[v59];
-                assert("Tensor range check" && 0 <= v56 && v56 < 4);
-                v55[v56] = v60;
-                v56 += 1 ;
+                v60 = 129 * v58;
+                int v61;
+                v61 = v60 + v56;
+                int v62;
+                v62 = v4[v61];
+                assert("Tensor range check" && 0 <= v58 && v58 < 4);
+                v57[v58] = v62;
+                v58 += 1 ;
             }
-            int4* v61;
-            v61 = reinterpret_cast<int4*>(v55 + 0);
-            int4* v62;
-            v62 = reinterpret_cast<int4*>(v1 + v52);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v61) % 16 == 0 && reinterpret_cast<unsigned long long>(v62) % 16 == 0);
-            *v62 = *v61;
-            v40 += 256 ;
+            int4* v63;
+            v63 = reinterpret_cast<int4*>(v57 + 0);
+            int4* v64;
+            v64 = reinterpret_cast<int4*>(v1 + v54);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v63) % 16 == 0 && reinterpret_cast<unsigned long long>(v64) % 16 == 0);
+            *v64 = *v63;
+            v42 += 256 ;
         }
         __syncthreads();
         v7 += 24 ;
@@ -437,17 +442,21 @@ options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
 def method0(v0 : i32) -> bool:
-    v1 = v0 < 4
+    v1 = v0 < 2
     del v0
     return v1
 def method1(v0 : i32) -> bool:
+    v1 = v0 < 4
+    del v0
+    return v1
+def method2(v0 : i32) -> bool:
     v1 = v0 < 8
     del v0
     return v1
 def main_body():
-    v0 = cp.arange(0,32,1,dtype=cp.int32) # type: ignore
+    v0 = cp.arange(0,64,1,dtype=cp.int32) # type: ignore
     v1 = v0.size
-    v2 = 32 == v1
+    v2 = 64 == v1
     del v1
     v3 = v2 == False
     if v3:
@@ -457,161 +466,221 @@ def main_body():
     else:
         pass
     del v2, v3
-    v5 = cp.empty(32,dtype=cp.int32)
-    v25 = 0
-    v26 = "{}"
-    print(v26.format('['),end="")
-    v27 = 0
-    while method0(v27):
-        v29 = v25
-        v30 = v29 >= 100
-        del v29
-        if v30:
-            v31 = " ..."
-            print(v26.format(v31),end="")
-            del v31
+    v5 = cp.empty(64,dtype=cp.int32)
+    v33 = 0
+    v34 = "{}"
+    print(v34.format('['),end="")
+    v35 = 0
+    while method0(v35):
+        v37 = v33
+        v38 = v37 >= 100
+        del v37
+        if v38:
+            v39 = " ..."
+            print(v34.format(v39),end="")
+            del v39
             break
         else:
             pass
-        del v30
-        v32 = v27 == 0
-        v33 = v32 != True
-        del v32
-        if v33:
-            v34 = "; "
-            print(v26.format(v34),end="")
-            del v34
+        del v38
+        v40 = v35 == 0
+        v41 = v40 != True
+        del v40
+        if v41:
+            v42 = "; "
+            print(v34.format(v42),end="")
+            del v42
         else:
             pass
-        del v33
-        print(v26.format('['),end="")
-        v35 = 0
-        while method1(v35):
-            v37 = v25
-            v38 = v37 >= 100
-            del v37
-            if v38:
-                v39 = " ..."
-                print(v26.format(v39),end="")
-                del v39
+        del v41
+        print(v34.format('['),end="")
+        v43 = 0
+        while method1(v43):
+            v45 = v33
+            v46 = v45 >= 100
+            del v45
+            if v46:
+                v47 = " ..."
+                print(v34.format(v47),end="")
+                del v47
                 break
             else:
                 pass
-            del v38
-            v40 = v35 == 0
-            v41 = v40 != True
-            del v40
-            if v41:
-                v42 = "; "
-                print(v26.format(v42),end="")
-                del v42
+            del v46
+            v48 = v43 == 0
+            v49 = v48 != True
+            del v48
+            if v49:
+                v50 = "; "
+                print(v34.format(v50),end="")
+                del v50
             else:
                 pass
-            del v41
-            v43 = v25 + 1
-            v25 = v43
-            del v43
-            v44 = v27 * 8
-            v45 = v44 + v35
-            del v44
-            v46 = v0[v45].item()
-            del v45
-            print(v26.format(v46),end="")
-            del v46
-            v35 += 1 
-        del v35
-        print(v26.format(']'),end="")
-        v27 += 1 
-    del v25, v27
-    print(v26.format(']'),end="")
-    v47 = "\n"
-    print(v47.format(),end="")
-    v48 = cp.cuda.Device().attributes['MultiProcessorCount']
-    v49 = v48 == 24
-    del v48
-    v50 = v49 == False
-    if v50:
-        v51 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-        assert v49, v51
-        del v51
+            del v49
+            print(v34.format('['),end="")
+            v51 = 0
+            while method2(v51):
+                v53 = v33
+                v54 = v53 >= 100
+                del v53
+                if v54:
+                    v55 = " ..."
+                    print(v34.format(v55),end="")
+                    del v55
+                    break
+                else:
+                    pass
+                del v54
+                v56 = v51 == 0
+                v57 = v56 != True
+                del v56
+                if v57:
+                    v58 = "; "
+                    print(v34.format(v58),end="")
+                    del v58
+                else:
+                    pass
+                del v57
+                v59 = v33 + 1
+                v33 = v59
+                del v59
+                v60 = v35 * 32
+                v61 = v43 * 8
+                v62 = v60 + v61
+                del v60, v61
+                v63 = v62 + v51
+                del v62
+                v64 = v0[v63].item()
+                del v63
+                print(v34.format(v64),end="")
+                del v64
+                v51 += 1 
+            del v51
+            print(v34.format(']'),end="")
+            v43 += 1 
+        del v43
+        print(v34.format(']'),end="")
+        v35 += 1 
+    del v33, v35
+    print(v34.format(']'),end="")
+    v65 = "\n"
+    print(v65.format(),end="")
+    v66 = cp.cuda.Device().attributes['MultiProcessorCount']
+    v67 = v66 == 24
+    del v66
+    v68 = v67 == False
+    if v68:
+        v69 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+        assert v67, v69
+        del v69
     else:
         pass
-    del v49, v50
-    v52 = 0
-    v53 = raw_module.get_function(f"entry{v52}")
-    del v52
-    v53.max_dynamic_shared_size_bytes = 98304 
+    del v67, v68
+    v70 = 0
+    v71 = raw_module.get_function(f"entry{v70}")
+    del v70
+    v71.max_dynamic_shared_size_bytes = 98304 
     print(f'DEBUG MODE. Threads per block, blocks per grid: {256}, {24}')
-    v53((24,),(256,),(v0, v5),shared_mem=98304)
-    del v0, v53
-    v73 = 0
-    print(v26.format('['),end="")
-    v74 = 0
-    while method1(v74):
-        v76 = v73
-        v77 = v76 >= 100
-        del v76
-        if v77:
-            v78 = " ..."
-            print(v26.format(v78),end="")
-            del v78
+    v71((24,),(256,),(v0, v5),shared_mem=98304)
+    del v0, v71
+    v99 = 0
+    print(v34.format('['),end="")
+    v100 = 0
+    while method0(v100):
+        v102 = v99
+        v103 = v102 >= 100
+        del v102
+        if v103:
+            v104 = " ..."
+            print(v34.format(v104),end="")
+            del v104
             break
         else:
             pass
-        del v77
-        v79 = v74 == 0
-        v80 = v79 != True
-        del v79
-        if v80:
-            v81 = "; "
-            print(v26.format(v81),end="")
-            del v81
+        del v103
+        v105 = v100 == 0
+        v106 = v105 != True
+        del v105
+        if v106:
+            v107 = "; "
+            print(v34.format(v107),end="")
+            del v107
         else:
             pass
-        del v80
-        print(v26.format('['),end="")
-        v82 = 0
-        while method0(v82):
-            v84 = v73
-            v85 = v84 >= 100
-            del v84
-            if v85:
-                v86 = " ..."
-                print(v26.format(v86),end="")
-                del v86
+        del v106
+        print(v34.format('['),end="")
+        v108 = 0
+        while method2(v108):
+            v110 = v99
+            v111 = v110 >= 100
+            del v110
+            if v111:
+                v112 = " ..."
+                print(v34.format(v112),end="")
+                del v112
                 break
             else:
                 pass
-            del v85
-            v87 = v82 == 0
-            v88 = v87 != True
-            del v87
-            if v88:
-                v89 = "; "
-                print(v26.format(v89),end="")
-                del v89
+            del v111
+            v113 = v108 == 0
+            v114 = v113 != True
+            del v113
+            if v114:
+                v115 = "; "
+                print(v34.format(v115),end="")
+                del v115
             else:
                 pass
-            del v88
-            v90 = v73 + 1
-            v73 = v90
-            del v90
-            v91 = v74 * 4
-            v92 = v91 + v82
-            del v91
-            v93 = v5[v92].item()
-            del v92
-            print(v26.format(v93),end="")
-            del v93
-            v82 += 1 
-        del v82
-        print(v26.format(']'),end="")
-        v74 += 1 
-    del v5, v73, v74
-    print(v26.format(']'),end="")
-    del v26
-    print(v47.format(),end="")
-    del v47
+            del v114
+            print(v34.format('['),end="")
+            v116 = 0
+            while method1(v116):
+                v118 = v99
+                v119 = v118 >= 100
+                del v118
+                if v119:
+                    v120 = " ..."
+                    print(v34.format(v120),end="")
+                    del v120
+                    break
+                else:
+                    pass
+                del v119
+                v121 = v116 == 0
+                v122 = v121 != True
+                del v121
+                if v122:
+                    v123 = "; "
+                    print(v34.format(v123),end="")
+                    del v123
+                else:
+                    pass
+                del v122
+                v124 = v99 + 1
+                v99 = v124
+                del v124
+                v125 = v100 * 32
+                v126 = v108 * 4
+                v127 = v125 + v126
+                del v125, v126
+                v128 = v127 + v116
+                del v127
+                v129 = v5[v128].item()
+                del v128
+                print(v34.format(v129),end="")
+                del v129
+                v116 += 1 
+            del v116
+            print(v34.format(']'),end="")
+            v108 += 1 
+        del v108
+        print(v34.format(']'),end="")
+        v100 += 1 
+    del v5, v99, v100
+    print(v34.format(']'),end="")
+    del v34
+    print(v65.format(),end="")
+    del v65
     return 
 
 def main():

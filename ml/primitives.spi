@@ -49,7 +49,7 @@ inl transpose_snd_ forall a b c el'. loop' (from : tensor (a * b * c) el') (to :
             inl from, to = x |> apply i |> unzip
 
             inl () = // Copies the data into shared memory from global.
-                inl io = zip shared from
+                inl io = zip shared from // Becuase the shared tensor isn't 16 byte aligned, we opt not to factorize it.
 
                 loop.projective threads_in_block(io.dim) fun i =>
                     inl to, from = io |> unzip
@@ -939,13 +939,13 @@ inl test4 (m,n : int * int) head_dir =
 
 
 inl test5 () =
-    inl m,n : int * int = 4,8
-    inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
-    inl output : _ _ int = tensor_create (n,m)
+    inl l,m,n : int * int * int = 2,4,8
+    inl input_identity : _ _ int = cupy.arange{from=0; nearTo=l,m,n; by=1}
+    inl output : _ _ int = tensor_create (l,n,m)
     console.write_ln input_identity
     run fun _ =>
         inl grid = cooperative_groups.create_grid()
-        grid_transpose grid input_identity output
+        grid_transpose_snd grid input_identity output
     console.write_ln output
 
 
