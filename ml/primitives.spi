@@ -729,32 +729,33 @@ inl test3 (n : int) head_dir =
     inl output_sample_reduce = tensor_create m
     inl output_identity_map = tensor_create (m,n)
     inl output_op_map : _ _ float = tensor_create (m,n)
-
-    run fun _ =>
-        open random
-        inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-        inl input = apply (thread_index()) input
-        inl input_identity = apply (thread_index()) input_identity
-        inl output_op_map = apply (thread_index()) output_op_map
-        inl output_indices_map = apply (thread_index()) output_indices_map
-        inl output_identity_map = apply (thread_index()) output_identity_map
-        row_gather_map () (fun () config x i j_tns => 
-            local_map (fun j => i, j) j_tns
-            ) input output_indices_map
-        row_gather_reduce () (fun () config x i j_tns =>
-            i
-            ) input |> fun v => tensor_set thread_index() v output_indices_reduce
-        row_gather_map () (fun () config x i j_tns => 
-            x
-            ) input output_identity_map
-        row_gather_map () (fun () config x i j_tns => 
-            local_masked_regret_matching (fun config x i j => j < 3) config x i j_tns
-            ) input output_op_map
-        row_gather_reduce rng() (fun rng config x i j_tns =>
-            local_masked_softmax_and_discrete_sampling (fun config x i j => j < 3) rng config x i j_tns |> snd
-            ) input |> fun v => tensor_set thread_index() v output_sample_reduce
-
+    
     open testing
+    redirect_io_into "test_text_outputs/primitives/" head_dir "kernel_params.txt" fun () =>
+        run fun _ =>
+            open random
+            inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            inl input = apply (thread_index()) input
+            inl input_identity = apply (thread_index()) input_identity
+            inl output_op_map = apply (thread_index()) output_op_map
+            inl output_indices_map = apply (thread_index()) output_indices_map
+            inl output_identity_map = apply (thread_index()) output_identity_map
+            row_gather_map () (fun () config x i j_tns => 
+                local_map (fun j => i, j) j_tns
+                ) input output_indices_map
+            row_gather_reduce () (fun () config x i j_tns =>
+                i
+                ) input |> fun v => tensor_set thread_index() v output_indices_reduce
+            row_gather_map () (fun () config x i j_tns => 
+                x
+                ) input output_identity_map
+            row_gather_map () (fun () config x i j_tns => 
+                local_masked_regret_matching (fun config x i j => j < 3) config x i j_tns
+                ) input output_op_map
+            row_gather_reduce rng() (fun rng config x i j_tns =>
+                local_masked_softmax_and_discrete_sampling (fun config x i j => j < 3) rng config x i j_tns |> snd
+                ) input |> fun v => tensor_set thread_index() v output_sample_reduce
+
     redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
         console.tensor.write_ln limit.max input_identity
     redirect_io_into "test_text_outputs/primitives/" head_dir "output_sample_reduce.txt" fun () =>
@@ -787,39 +788,41 @@ inl test2 (m,n : int * int) head_dir =
     inl output_sampling = tensor_create m
     inl output_softmax'' = tensor_create (m,n)
     inl output_sampling' = tensor_create m
-    run fun _ =>
-        open random
-        inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-        reduce 0 0 (+) input output_reduce
-        // indices (identity)
-        row_map (fun config x i j_tns => x) input_identity output_identity
-        // indices (map)
-        row_map (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
-        // indices (reduction)
-        row_reduce (fun config x i j_tns => i) input output_indices_reduction
-        // numerically stable softmax
-        row_map (fun config x _ _ => local_softmax config x) input output_softmax
-        // layer normalization L2
-        row_map (fun config x _ _ => local_ln_l2 config x) input output_ln
-        // argument maximum
-        row_reduce (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
-        // numerically stable softmax (scan)
-        row_map (fun config x _ _ =>
-            inl x' = local_softmax config x
-            inl x = local_inclusive_scan_sum config x'
-            zip x' x
-            ) input output_softmax_scan
-        // sum (exclusive scan)
-        row_map (fun config x _ _ =>
-            local_exclusive_scan config 0 (+) x
-            ) input_identity output_sum_exclusive
-        row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
-        // discrete sampling
-        row_map_reduce (local_softmax_and_discrete_sampling rng()) input output_softmax' output_sampling
-        // masked discrete sampling
-        row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng()) input output_softmax'' output_sampling'
 
     open testing
+    redirect_io_into "test_text_outputs/primitives/" head_dir "kernel_params.txt" fun () =>
+        run fun _ =>
+            open random
+            inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            reduce 0 0 (+) input output_reduce
+            // indices (identity)
+            row_map (fun config x i j_tns => x) input_identity output_identity
+            // indices (map)
+            row_map (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
+            // indices (reduction)
+            row_reduce (fun config x i j_tns => i) input output_indices_reduction
+            // numerically stable softmax
+            row_map (fun config x _ _ => local_softmax config x) input output_softmax
+            // layer normalization L2
+            row_map (fun config x _ _ => local_ln_l2 config x) input output_ln
+            // argument maximum
+            row_reduce (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
+            // numerically stable softmax (scan)
+            row_map (fun config x _ _ =>
+                inl x' = local_softmax config x
+                inl x = local_inclusive_scan_sum config x'
+                zip x' x
+                ) input output_softmax_scan
+            // sum (exclusive scan)
+            row_map (fun config x _ _ =>
+                local_exclusive_scan config 0 (+) x
+                ) input_identity output_sum_exclusive
+            row_map (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
+            // discrete sampling
+            row_map_reduce (local_softmax_and_discrete_sampling rng()) input output_softmax' output_sampling
+            // masked discrete sampling
+            row_map_reduce (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng()) input output_softmax'' output_sampling'
+
     redirect_io_into "test_text_outputs/primitives/" head_dir "input.txt" fun () =>
         console.tensor.write_ln 1024 input
     redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
@@ -872,39 +875,40 @@ inl test4 (m,n : int * int) head_dir =
     inl output_sampling = tensor_create m
     inl output_softmax'' = tensor_create (m,n)
     inl output_sampling' = tensor_create m
-    run fun _ =>
-        inl grid = cooperative_groups.create_grid()
-        open random
-        inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-        // indices (identity)
-        grid_row_map grid (fun config x i j_tns => x) input_identity output_identity
-        // indices (map)
-        grid_row_map grid (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
-        // indices (reduction)
-        grid_row_reduce grid (fun config x i j_tns => i) input output_indices_reduction
-        // numerically stable softmax
-        grid_row_map grid (fun config x _ _ => local_softmax config x) input output_softmax
-        // layer normalization L2
-        grid_row_map grid (fun config x _ _ => local_ln_l2 config x) input output_ln
-        // argument maximum
-        grid_row_reduce grid (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
-        // numerically stable softmax (scan)
-        grid_row_map grid (fun config x _ _ =>
-            inl x' = local_softmax config x
-            inl x = local_inclusive_scan_sum config x'
-            zip x' x
-            ) input output_softmax_scan
-        // sum (exclusive scan)
-        grid_row_map grid (fun config x _ _ =>
-            local_exclusive_scan config 0 (+) x
-            ) input_identity output_sum_exclusive
-        grid_row_map grid (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
-        // discrete sampling
-        grid_row_map_reduce grid (local_softmax_and_discrete_sampling rng()) input output_softmax' output_sampling
-        // masked discrete sampling
-        grid_row_map_reduce grid (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng()) input output_softmax'' output_sampling'
-
     open testing
+    redirect_io_into "test_text_outputs/primitives/" head_dir "kernel_params.txt" fun () =>
+        run fun _ =>
+            inl grid = cooperative_groups.create_grid()
+            open random
+            inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            // indices (identity)
+            grid_row_map grid (fun config x i j_tns => x) input_identity output_identity
+            // indices (map)
+            grid_row_map grid (fun config x i j_tns => local_map (fun j => i,j) j_tns) input output_indices_map
+            // indices (reduction)
+            grid_row_reduce grid (fun config x i j_tns => i) input output_indices_reduction
+            // numerically stable softmax
+            grid_row_map grid (fun config x _ _ => local_softmax config x) input output_softmax
+            // layer normalization L2
+            grid_row_map grid (fun config x _ _ => local_ln_l2 config x) input output_ln
+            // argument maximum
+            grid_row_reduce grid (fun config x _ j_tns => local_argmax config x j_tns) input output_argmax
+            // numerically stable softmax (scan)
+            grid_row_map grid (fun config x _ _ =>
+                inl x' = local_softmax config x
+                inl x = local_inclusive_scan_sum config x'
+                zip x' x
+                ) input output_softmax_scan
+            // sum (exclusive scan)
+            grid_row_map grid (fun config x _ _ =>
+                local_exclusive_scan config 0 (+) x
+                ) input_identity output_sum_exclusive
+            grid_row_map grid (local_masked_softmax (fun config x i j => j < 4)) input output_masked_softmax
+            // discrete sampling
+            grid_row_map_reduce grid (local_softmax_and_discrete_sampling rng()) input output_softmax' output_sampling
+            // masked discrete sampling
+            grid_row_map_reduce grid (local_masked_softmax_and_discrete_sampling (fun config x i j => j < 11) rng()) input output_softmax'' output_sampling'
+
     redirect_io_into "test_text_outputs/primitives/" head_dir "input.txt" fun () =>
         console.tensor.write_ln 1024 input
     redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
@@ -938,8 +942,9 @@ inl test4 (m,n : int * int) head_dir =
     ()
 
 
-inl test5 () =
-    inl l,m,n : int * int * int = 2,4,8
+inl test5 (l,m,n : int * int * int) head_dir =
+    open testing
+    redirect_io_into "test_text_outputs/primitives/" head_dir "transpose.txt" fun () =>
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=l,m,n; by=1}
     inl output : _ _ int = tensor_create (l,n,m)
     console.write_ln input_identity
@@ -950,14 +955,13 @@ inl test5 () =
 
 
 inl main() = 
-    // Ran with blocks_per_grid 1 and threads_per_block 32 
-    // test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
-    // test3((1 <<< 4)) "test3/a"
-    // test3((1 <<< 8)) "test3/b"
-    // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
-    // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
-    test5()
+    test2((1 <<< 6), (1 <<< 7)) "test2/a/"
+    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    test3((1 <<< 4)) "test3/a"
+    test3((1 <<< 8)) "test3/b"
+    test4((1 <<< 7), (1 <<< 6)) "test4/b/"
+    test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    test5 (2,4,8) "test5"
 
 
     

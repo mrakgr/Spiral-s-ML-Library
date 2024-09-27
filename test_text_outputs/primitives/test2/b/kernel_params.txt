@@ -1,0 +1,1 @@
+DEBUG MODE. Threads per block, blocks per grid: 256, 24
