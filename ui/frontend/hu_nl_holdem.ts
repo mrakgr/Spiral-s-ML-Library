@@ -57,8 +57,8 @@ type Action =
     | ["A_Raise",number] 
     | ["A_Call",[]] 
     | ["A_Fold",[]]
-type Players = ["Computer",[]] | ["Human",[]] | ["Random",[]]
-const players : Players[] = [["Computer",[]], ["Human",[]], ["Random",[]]]
+type Players = ["Computer",[]] | ["Human",[]] | ["Random",[]] | ["CallingMachine",[]]
+const players : Players[] = [["Computer",[]], ["Human",[]], ["Random",[]], ["CallingMachine",[]]]
 
 type Street =
     | ["Preflop", []]
@@ -291,6 +291,7 @@ class Menu extends GameElement {
             <div>
                 <sl-select name="pl1" id="pl1" .value=${this.pl_type[0][0]} @sl-change=${this.on_change(0)}>
                     <div slot="label">Player 0:</div>
+                    <sl-option value="CallingMachine">Calling Machine</sl-option>
                     <sl-option value="Random">Random</sl-option>
                     <sl-option value="Computer">Computer</sl-option>
                     <sl-option value="Human">Human</sl-option>
@@ -300,6 +301,7 @@ class Menu extends GameElement {
             <div>
                 <sl-select name="pl2" id="pl2" .value=${this.pl_type[1][0]} @sl-change=${this.on_change(1)}>
                     <div slot="label">Player 1:</div>
+                    <sl-option value="CallingMachine">Calling Machine</sl-option>
                     <sl-option value="Random">Random</sl-option>
                     <sl-option value="Computer">Computer</sl-option>
                     <sl-option value="Human">Human</sl-option>

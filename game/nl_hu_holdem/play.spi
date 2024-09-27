@@ -43,7 +43,7 @@ inl internal_play_to_state (state : state_internal) : state_game =
 inl internal_set (state_internal : state_internal) (state : state_game) =
     open refm
     state_internal.ui_game_state <- state.public.ui_game_state
-    state_internal.pl_type <- state.public.pl_type
+    // state_internal.pl_type <- state.public.pl_type
     state_internal.game <- state.private.game
     state_internal.deck <- state.private.deck
     state_internal.messages <- state.public.messages
@@ -141,6 +141,11 @@ let play_loop (neural : state_neural) (state : state_internal) node =
                 inl action = 
                     random_action (from_local state.rng) table
                     |> transposing_loop.shuffle 0
+                inl msg = PlayerAction(player_turn, action)
+                push_message msg
+                Some (round table action)
+            | CallingMachine =>
+                inl action = A_Call
                 inl msg = PlayerAction(player_turn, action)
                 push_message msg
                 Some (round table action)

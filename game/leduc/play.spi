@@ -43,7 +43,7 @@ inl internal_play_to_state (state : state_internal_play) : state_game =
 inl internal_set_play (state_internal : state_internal_play) (state : state_game) =
     open refm
     state_internal.ui_game_state <- state.public.ui_game_state
-    state_internal.pl_type <- state.public.pl_type
+    // state_internal.pl_type <- state.public.pl_type
     state_internal.game <- state.private.game
     state_internal.deck <- state.private.deck
     state_internal.messages <- state.public.messages

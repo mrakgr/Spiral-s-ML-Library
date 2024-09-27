@@ -421,43 +421,50 @@ struct Union1 {
         this->tag = 255;
     }
 };
-struct Union2_0 { // Computer
+struct Union2_0 { // CallingMachine
 };
-struct Union2_1 { // Human
+struct Union2_1 { // Computer
 };
-struct Union2_2 { // Random
+struct Union2_2 { // Human
+};
+struct Union2_3 { // Random
 };
 struct Union2 {
     union {
-        Union2_0 case0; // Computer
-        Union2_1 case1; // Human
-        Union2_2 case2; // Random
+        Union2_0 case0; // CallingMachine
+        Union2_1 case1; // Computer
+        Union2_2 case2; // Human
+        Union2_3 case3; // Random
     };
     unsigned char tag{255};
     __device__ Union2() {}
-    __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // Computer
-    __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Human
-    __device__ Union2(Union2_2 t) : tag(2), case2(t) {} // Random
+    __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // CallingMachine
+    __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Computer
+    __device__ Union2(Union2_2 t) : tag(2), case2(t) {} // Human
+    __device__ Union2(Union2_3 t) : tag(3), case3(t) {} // Random
     __device__ Union2(Union2 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union2_0(x.case0); break; // Computer
-            case 1: new (&this->case1) Union2_1(x.case1); break; // Human
-            case 2: new (&this->case2) Union2_2(x.case2); break; // Random
+            case 0: new (&this->case0) Union2_0(x.case0); break; // CallingMachine
+            case 1: new (&this->case1) Union2_1(x.case1); break; // Computer
+            case 2: new (&this->case2) Union2_2(x.case2); break; // Human
+            case 3: new (&this->case3) Union2_3(x.case3); break; // Random
         }
     }
     __device__ Union2(Union2 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union2_0(std::move(x.case0)); break; // Computer
-            case 1: new (&this->case1) Union2_1(std::move(x.case1)); break; // Human
-            case 2: new (&this->case2) Union2_2(std::move(x.case2)); break; // Random
+            case 0: new (&this->case0) Union2_0(std::move(x.case0)); break; // CallingMachine
+            case 1: new (&this->case1) Union2_1(std::move(x.case1)); break; // Computer
+            case 2: new (&this->case2) Union2_2(std::move(x.case2)); break; // Human
+            case 3: new (&this->case3) Union2_3(std::move(x.case3)); break; // Random
         }
     }
     __device__ Union2 & operator=(Union2 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = x.case0; break; // Computer
-                case 1: this->case1 = x.case1; break; // Human
-                case 2: this->case2 = x.case2; break; // Random
+                case 0: this->case0 = x.case0; break; // CallingMachine
+                case 1: this->case1 = x.case1; break; // Computer
+                case 2: this->case2 = x.case2; break; // Human
+                case 3: this->case3 = x.case3; break; // Random
             }
         } else {
             this->~Union2();
@@ -468,9 +475,10 @@ struct Union2 {
     __device__ Union2 & operator=(Union2 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Computer
-                case 1: this->case1 = std::move(x.case1); break; // Human
-                case 2: this->case2 = std::move(x.case2); break; // Random
+                case 0: this->case0 = std::move(x.case0); break; // CallingMachine
+                case 1: this->case1 = std::move(x.case1); break; // Computer
+                case 2: this->case2 = std::move(x.case2); break; // Human
+                case 3: this->case3 = std::move(x.case3); break; // Random
             }
         } else {
             this->~Union2();
@@ -480,9 +488,10 @@ struct Union2 {
     }
     __device__ ~Union2() {
         switch(this->tag){
-            case 0: this->case0.~Union2_0(); break; // Computer
-            case 1: this->case1.~Union2_1(); break; // Human
-            case 2: this->case2.~Union2_2(); break; // Random
+            case 0: this->case0.~Union2_0(); break; // CallingMachine
+            case 1: this->case1.~Union2_1(); break; // Computer
+            case 2: this->case2.~Union2_2(); break; // Human
+            case 3: this->case3.~Union2_3(); break; // Random
         }
         this->tag = 255;
     }
@@ -2155,6 +2164,11 @@ __device__ Union2 f_5(unsigned char * v0){
             return Union2{Union2_2{}};
             break;
         }
+        case 3: {
+            f_3(v2);
+            return Union2{Union2_3{}};
+            break;
+        }
         default: {
             printf("%s\n", "Invalid tag.");
             __trap();
@@ -3526,8 +3540,8 @@ __device__ void method_42(unsigned int v0, float * v1, int v2){
     } else {
     }
     int v8; unsigned int v9;
-    Tuple13 tmp28 = Tuple13{0, v3};
-    v8 = tmp28.v0; v9 = tmp28.v1;
+    Tuple13 tmp29 = Tuple13{0, v3};
+    v8 = tmp29.v0; v9 = tmp29.v1;
     while (while_method_8(v8)){
         unsigned int v11;
         v11 = v9 & 1u;
@@ -3571,8 +3585,8 @@ __device__ void method_43(unsigned int v0, float * v1, int v2){
     } else {
     }
     int v8; unsigned int v9;
-    Tuple13 tmp29 = Tuple13{0, v3};
-    v8 = tmp29.v0; v9 = tmp29.v1;
+    Tuple13 tmp30 = Tuple13{0, v3};
+    v8 = tmp30.v0; v9 = tmp30.v1;
     while (while_method_9(v8)){
         unsigned int v11;
         v11 = v9 & 1u;
@@ -4355,8 +4369,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
             v200 = 4 * v198;
             assert("Tensor range check" && 0 <= v198 && v198 < 1);
             int v201; float v202;
-            Tuple15 tmp30 = Tuple15{0, 0.0f};
-            v201 = tmp30.v0; v202 = tmp30.v1;
+            Tuple15 tmp31 = Tuple15{0, 0.0f};
+            v201 = tmp31.v0; v202 = tmp31.v1;
             while (while_method_3(v201)){
                 assert("Tensor range check" && 0 <= v201 && v201 < 4);
                 int v204;
@@ -4392,8 +4406,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
             float v217;
             v217 = v197 + v215;
             int v218; float v219;
-            Tuple15 tmp31 = Tuple15{0, v217};
-            v218 = tmp31.v0; v219 = tmp31.v1;
+            Tuple15 tmp32 = Tuple15{0, v217};
+            v218 = tmp32.v0; v219 = tmp32.v1;
             while (while_method_3(v218)){
                 assert("Tensor range check" && 0 <= v218 && v218 < 4);
                 int v221;
@@ -4441,8 +4455,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
             v227 += 1 ;
         }
         float v236; bool v237;
-        Tuple16 tmp32 = Tuple16{-1.0f / 0.0f, false};
-        v236 = tmp32.v0; v237 = tmp32.v1;
+        Tuple16 tmp33 = Tuple16{-1.0f / 0.0f, false};
+        v236 = tmp33.v0; v237 = tmp33.v1;
         int v238;
         v238 = 0;
         while (while_method_6(v238)){
@@ -4495,8 +4509,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
         auto v257 = cooperative_groups::labeled_partition(v254,v256);
         Closure4 v258{};
         float v259; bool v260;
-        Tuple16 tmp33 = cooperative_groups::reduce(v257, Tuple16{v236, v237}, v258);
-        v259 = tmp33.v0; v260 = tmp33.v1;
+        Tuple16 tmp34 = cooperative_groups::reduce(v257, Tuple16{v236, v237}, v258);
+        v259 = tmp34.v0; v260 = tmp34.v1;
         bool v261;
         v261 = v260 == false;
         if (v261){
@@ -4530,8 +4544,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
             v265 += 1 ;
         }
         float v273; int v274;
-        Tuple14 tmp34 = Tuple14{0.0f, 2147483647};
-        v273 = tmp34.v0; v274 = tmp34.v1;
+        Tuple14 tmp35 = Tuple14{0.0f, 2147483647};
+        v273 = tmp35.v0; v274 = tmp35.v1;
         int v275;
         v275 = 0;
         while (while_method_6(v275)){
@@ -4570,8 +4584,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
         auto v289 = cooperative_groups::labeled_partition(v286,v288);
         Closure5 v290{};
         float v291; int v292;
-        Tuple14 tmp35 = cooperative_groups::reduce(v289, Tuple14{v273, v274}, v290);
-        v291 = tmp35.v0; v292 = tmp35.v1;
+        Tuple14 tmp36 = cooperative_groups::reduce(v289, Tuple14{v273, v274}, v290);
+        v291 = tmp36.v0; v292 = tmp36.v1;
         float v293;
         v293 = v259 * v291;
         int v294[4];
@@ -4613,8 +4627,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
             v296 += 1 ;
         }
         int v309; bool v310;
-        Tuple17 tmp36 = Tuple17{2147483647, false};
-        v309 = tmp36.v0; v310 = tmp36.v1;
+        Tuple17 tmp37 = Tuple17{2147483647, false};
+        v309 = tmp37.v0; v310 = tmp37.v1;
         int v311;
         v311 = 0;
         while (while_method_6(v311)){
@@ -4667,8 +4681,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
         auto v330 = cooperative_groups::labeled_partition(v327,v329);
         Closure6 v331{};
         int v332; bool v333;
-        Tuple17 tmp37 = cooperative_groups::reduce(v330, Tuple17{v309, v310}, v331);
-        v332 = tmp37.v0; v333 = tmp37.v1;
+        Tuple17 tmp38 = cooperative_groups::reduce(v330, Tuple17{v309, v310}, v331);
+        v332 = tmp38.v0; v333 = tmp38.v1;
         bool v334;
         v334 = v333 == false;
         if (v334){
@@ -4874,8 +4888,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
             v398 += 1 ;
         }
         float v412; int v413;
-        Tuple14 tmp38 = Tuple14{0.0f, 2147483647};
-        v412 = tmp38.v0; v413 = tmp38.v1;
+        Tuple14 tmp39 = Tuple14{0.0f, 2147483647};
+        v412 = tmp39.v0; v413 = tmp39.v1;
         int v414;
         v414 = 0;
         while (while_method_6(v414)){
@@ -4920,8 +4934,8 @@ __device__ Tuple14 method_46(curandStatePhilox4_32_10_t & v0, int * v1, float * 
         auto v431 = cooperative_groups::labeled_partition(v428,v430);
         Closure7 v432{v332};
         float v433; int v434;
-        Tuple14 tmp39 = cooperative_groups::reduce(v431, Tuple14{v412, v413}, v432);
-        v433 = tmp39.v0; v434 = tmp39.v1;
+        Tuple14 tmp40 = cooperative_groups::reduce(v431, Tuple14{v412, v413}, v432);
+        v433 = tmp40.v0; v434 = tmp40.v1;
         bool v435;
         v435 = v434 == 2147483647;
         bool v436;
@@ -5111,8 +5125,8 @@ __device__ Union1 sample_discrete_47(static_array<Tuple18,6> v0, curandStatePhil
         } else {
         }
         Union1 v11; float v12;
-        Tuple18 tmp49 = v0[v4];
-        v11 = tmp49.v0; v12 = tmp49.v1;
+        Tuple18 tmp50 = v0[v4];
+        v11 = tmp50.v0; v12 = tmp50.v1;
         v2[v4] = v12;
         v4 += 1 ;
     }
@@ -5135,8 +5149,8 @@ __device__ Union1 sample_discrete_47(static_array<Tuple18,6> v0, curandStatePhil
     } else {
     }
     Union1 v21; float v22;
-    Tuple18 tmp50 = v0[v15];
-    v21 = tmp50.v0; v22 = tmp50.v1;
+    Tuple18 tmp51 = v0[v15];
+    v21 = tmp51.v0; v22 = tmp51.v1;
     return v21;
 }
 __device__ inline bool while_method_17(int v0){
@@ -5187,8 +5201,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,7> v12;
     bool v14; int v15;
-    Tuple19 tmp57 = Tuple19{true, 1};
-    v14 = tmp57.v0; v15 = tmp57.v1;
+    Tuple19 tmp58 = Tuple19{true, 1};
+    v14 = tmp58.v0; v15 = tmp58.v1;
     while (while_method_18(v1, v14, v15)){
         int v17;
         v17 = 0;
@@ -5216,8 +5230,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                 v25 = 7;
             }
             int v26; int v27; int v28;
-            Tuple20 tmp58 = Tuple20{v17, v21, v17};
-            v26 = tmp58.v0; v27 = tmp58.v1; v28 = tmp58.v2;
+            Tuple20 tmp59 = Tuple20{v17, v21, v17};
+            v26 = tmp59.v0; v27 = tmp59.v1; v28 = tmp59.v2;
             while (while_method_20(v25, v26, v27, v28)){
                 bool v30;
                 v30 = v26 < v21;
@@ -5497,8 +5511,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v130;
     int v132; int v133; unsigned char v134;
-    Tuple21 tmp59 = Tuple21{0, 0, 12u};
-    v132 = tmp59.v0; v133 = tmp59.v1; v134 = tmp59.v2;
+    Tuple21 tmp60 = Tuple21{0, 0, 12u};
+    v132 = tmp60.v0; v133 = tmp60.v1; v134 = tmp60.v2;
     while (while_method_17(v132)){
         bool v136;
         v136 = 0 <= v132;
@@ -5677,8 +5691,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v203;
     int v205; int v206; unsigned char v207;
-    Tuple21 tmp60 = Tuple21{0, 0, 12u};
-    v205 = tmp60.v0; v206 = tmp60.v1; v207 = tmp60.v2;
+    Tuple21 tmp61 = Tuple21{0, 0, 12u};
+    v205 = tmp61.v0; v206 = tmp61.v1; v207 = tmp61.v2;
     while (while_method_17(v205)){
         bool v209;
         v209 = 0 <= v205;
@@ -5873,8 +5887,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     Union11 v278;
                     v278 = Union11{Union11_0{}};
                     int v279; Union11 v280;
-                    Tuple22 tmp61 = Tuple22{0, v278};
-                    v279 = tmp61.v0; v280 = tmp61.v1;
+                    Tuple22 tmp62 = Tuple22{0, v278};
+                    v279 = tmp62.v0; v280 = tmp62.v1;
                     while (while_method_2(v279)){
                         bool v282;
                         v282 = 0 <= v279;
@@ -5970,8 +5984,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v313;
     int v315; int v316; unsigned char v317;
-    Tuple21 tmp62 = Tuple21{0, 0, 12u};
-    v315 = tmp62.v0; v316 = tmp62.v1; v317 = tmp62.v2;
+    Tuple21 tmp63 = Tuple21{0, 0, 12u};
+    v315 = tmp63.v0; v316 = tmp63.v1; v317 = tmp63.v2;
     while (while_method_17(v315)){
         bool v319;
         v319 = 0 <= v315;
@@ -6166,8 +6180,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     Union11 v388;
                     v388 = Union11{Union11_0{}};
                     int v389; Union11 v390;
-                    Tuple22 tmp63 = Tuple22{0, v388};
-                    v389 = tmp63.v0; v390 = tmp63.v1;
+                    Tuple22 tmp64 = Tuple22{0, v388};
+                    v389 = tmp64.v0; v390 = tmp64.v1;
                     while (while_method_2(v389)){
                         bool v392;
                         v392 = 0 <= v389;
@@ -6263,8 +6277,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v423;
     int v425; int v426; unsigned char v427;
-    Tuple21 tmp64 = Tuple21{0, 0, 12u};
-    v425 = tmp64.v0; v426 = tmp64.v1; v427 = tmp64.v2;
+    Tuple21 tmp65 = Tuple21{0, 0, 12u};
+    v425 = tmp65.v0; v426 = tmp65.v1; v427 = tmp65.v2;
     while (while_method_17(v425)){
         bool v429;
         v429 = 0 <= v425;
@@ -6459,8 +6473,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     Union11 v498;
                     v498 = Union11{Union11_0{}};
                     int v499; Union11 v500;
-                    Tuple22 tmp65 = Tuple22{0, v498};
-                    v499 = tmp65.v0; v500 = tmp65.v1;
+                    Tuple22 tmp66 = Tuple22{0, v498};
+                    v499 = tmp66.v0; v500 = tmp66.v1;
                     while (while_method_2(v499)){
                         bool v502;
                         v502 = 0 <= v499;
@@ -6560,8 +6574,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
             static_array<unsigned char,4> v534;
             static_array<unsigned char,3> v536;
             int v538; int v539; int v540; unsigned char v541;
-            Tuple23 tmp66 = Tuple23{0, 0, 0, 12u};
-            v538 = tmp66.v0; v539 = tmp66.v1; v540 = tmp66.v2; v541 = tmp66.v3;
+            Tuple23 tmp67 = Tuple23{0, 0, 0, 12u};
+            v538 = tmp67.v0; v539 = tmp67.v1; v540 = tmp67.v2; v541 = tmp67.v3;
             while (while_method_17(v538)){
                 bool v543;
                 v543 = 0 <= v538;
@@ -6747,8 +6761,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     static_array<unsigned char,3> v617;
                     static_array<unsigned char,4> v619;
                     int v621; int v622; int v623; unsigned char v624;
-                    Tuple23 tmp67 = Tuple23{0, 0, 0, 12u};
-                    v621 = tmp67.v0; v622 = tmp67.v1; v623 = tmp67.v2; v624 = tmp67.v3;
+                    Tuple23 tmp68 = Tuple23{0, 0, 0, 12u};
+                    v621 = tmp68.v0; v622 = tmp68.v1; v623 = tmp68.v2; v624 = tmp68.v3;
                     while (while_method_17(v621)){
                         bool v626;
                         v626 = 0 <= v621;
@@ -6849,8 +6863,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             static_array<unsigned char,2> v663;
                             static_array<unsigned char,2> v665;
                             int v667; int v668; int v669; unsigned char v670;
-                            Tuple23 tmp68 = Tuple23{0, 0, 0, 12u};
-                            v667 = tmp68.v0; v668 = tmp68.v1; v669 = tmp68.v2; v670 = tmp68.v3;
+                            Tuple23 tmp69 = Tuple23{0, 0, 0, 12u};
+                            v667 = tmp69.v0; v668 = tmp69.v1; v669 = tmp69.v2; v670 = tmp69.v3;
                             while (while_method_3(v667)){
                                 bool v672;
                                 v672 = 0 <= v667;
@@ -7015,8 +7029,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                         case 0: { // None
                             static_array<unsigned char,5> v738;
                             int v740; int v741;
-                            Tuple4 tmp69 = Tuple4{0, 0};
-                            v740 = tmp69.v0; v741 = tmp69.v1;
+                            Tuple4 tmp70 = Tuple4{0, 0};
+                            v740 = tmp70.v0; v741 = tmp70.v1;
                             while (while_method_17(v740)){
                                 bool v743;
                                 v743 = 0 <= v740;
@@ -7070,8 +7084,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             }
                             static_array<unsigned char,5> v760;
                             int v762; int v763;
-                            Tuple4 tmp70 = Tuple4{0, 0};
-                            v762 = tmp70.v0; v763 = tmp70.v1;
+                            Tuple4 tmp71 = Tuple4{0, 0};
+                            v762 = tmp71.v0; v763 = tmp71.v1;
                             while (while_method_17(v762)){
                                 bool v765;
                                 v765 = 0 <= v762;
@@ -7141,8 +7155,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             Union11 v784;
                                             v784 = Union11{Union11_0{}};
                                             int v785; Union11 v786;
-                                            Tuple22 tmp71 = Tuple22{0, v784};
-                                            v785 = tmp71.v0; v786 = tmp71.v1;
+                                            Tuple22 tmp72 = Tuple22{0, v784};
+                                            v785 = tmp72.v0; v786 = tmp72.v1;
                                             while (while_method_2(v785)){
                                                 bool v788;
                                                 v788 = 0 <= v785;
@@ -7238,8 +7252,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             }
                             static_array<unsigned char,5> v819;
                             int v821; int v822;
-                            Tuple4 tmp72 = Tuple4{0, 0};
-                            v821 = tmp72.v0; v822 = tmp72.v1;
+                            Tuple4 tmp73 = Tuple4{0, 0};
+                            v821 = tmp73.v0; v822 = tmp73.v1;
                             while (while_method_17(v821)){
                                 bool v824;
                                 v824 = 0 <= v821;
@@ -7309,8 +7323,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             Union11 v843;
                                             v843 = Union11{Union11_0{}};
                                             int v844; Union11 v845;
-                                            Tuple22 tmp73 = Tuple22{0, v843};
-                                            v844 = tmp73.v0; v845 = tmp73.v1;
+                                            Tuple22 tmp74 = Tuple22{0, v843};
+                                            v844 = tmp74.v0; v845 = tmp74.v1;
                                             while (while_method_2(v844)){
                                                 bool v847;
                                                 v847 = 0 <= v844;
@@ -7406,8 +7420,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             }
                             static_array<unsigned char,5> v878;
                             int v880; int v881;
-                            Tuple4 tmp74 = Tuple4{0, 0};
-                            v880 = tmp74.v0; v881 = tmp74.v1;
+                            Tuple4 tmp75 = Tuple4{0, 0};
+                            v880 = tmp75.v0; v881 = tmp75.v1;
                             while (while_method_17(v880)){
                                 bool v883;
                                 v883 = 0 <= v880;
@@ -7477,8 +7491,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             Union11 v902;
                                             v902 = Union11{Union11_0{}};
                                             int v903; Union11 v904;
-                                            Tuple22 tmp75 = Tuple22{0, v902};
-                                            v903 = tmp75.v0; v904 = tmp75.v1;
+                                            Tuple22 tmp76 = Tuple22{0, v902};
+                                            v903 = tmp76.v0; v904 = tmp76.v1;
                                             while (while_method_2(v903)){
                                                 bool v906;
                                                 v906 = 0 <= v903;
@@ -7576,8 +7590,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                 case 0: { // None
                                     static_array<unsigned char,5> v938;
                                     int v940; int v941; unsigned char v942;
-                                    Tuple21 tmp76 = Tuple21{0, 0, 12u};
-                                    v940 = tmp76.v0; v941 = tmp76.v1; v942 = tmp76.v2;
+                                    Tuple21 tmp77 = Tuple21{0, 0, 12u};
+                                    v940 = tmp77.v0; v941 = tmp77.v1; v942 = tmp77.v2;
                                     while (while_method_17(v940)){
                                         bool v944;
                                         v944 = 0 <= v940;
@@ -7676,8 +7690,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             static_array<unsigned char,3> v982;
                                             static_array<unsigned char,4> v984;
                                             int v986; int v987; int v988; unsigned char v989;
-                                            Tuple23 tmp77 = Tuple23{0, 0, 0, 12u};
-                                            v986 = tmp77.v0; v987 = tmp77.v1; v988 = tmp77.v2; v989 = tmp77.v3;
+                                            Tuple23 tmp78 = Tuple23{0, 0, 0, 12u};
+                                            v986 = tmp78.v0; v987 = tmp78.v1; v988 = tmp78.v2; v989 = tmp78.v3;
                                             while (while_method_17(v986)){
                                                 bool v991;
                                                 v991 = 0 <= v986;
@@ -7863,8 +7877,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                                     static_array<unsigned char,2> v1065;
                                                     static_array<unsigned char,5> v1067;
                                                     int v1069; int v1070; int v1071; unsigned char v1072;
-                                                    Tuple23 tmp78 = Tuple23{0, 0, 0, 12u};
-                                                    v1069 = tmp78.v0; v1070 = tmp78.v1; v1071 = tmp78.v2; v1072 = tmp78.v3;
+                                                    Tuple23 tmp79 = Tuple23{0, 0, 0, 12u};
+                                                    v1069 = tmp79.v0; v1070 = tmp79.v1; v1071 = tmp79.v2; v1072 = tmp79.v3;
                                                     while (while_method_17(v1069)){
                                                         bool v1074;
                                                         v1074 = 0 <= v1069;
@@ -7965,8 +7979,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                                             static_array<unsigned char,2> v1111;
                                                             static_array<unsigned char,3> v1113;
                                                             int v1115; int v1116; int v1117; unsigned char v1118;
-                                                            Tuple23 tmp79 = Tuple23{0, 0, 0, 12u};
-                                                            v1115 = tmp79.v0; v1116 = tmp79.v1; v1117 = tmp79.v2; v1118 = tmp79.v3;
+                                                            Tuple23 tmp80 = Tuple23{0, 0, 0, 12u};
+                                                            v1115 = tmp80.v0; v1116 = tmp80.v1; v1117 = tmp80.v2; v1118 = tmp80.v3;
                                                             while (while_method_2(v1115)){
                                                                 bool v1120;
                                                                 v1120 = 0 <= v1115;
@@ -8183,8 +8197,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                                             static_array<unsigned char,2> v1207;
                                                             static_array<unsigned char,5> v1209;
                                                             int v1211; int v1212; int v1213; unsigned char v1214;
-                                                            Tuple23 tmp80 = Tuple23{0, 0, 0, 12u};
-                                                            v1211 = tmp80.v0; v1212 = tmp80.v1; v1213 = tmp80.v2; v1214 = tmp80.v3;
+                                                            Tuple23 tmp81 = Tuple23{0, 0, 0, 12u};
+                                                            v1211 = tmp81.v0; v1212 = tmp81.v1; v1213 = tmp81.v2; v1214 = tmp81.v3;
                                                             while (while_method_17(v1211)){
                                                                 bool v1216;
                                                                 v1216 = 0 <= v1211;
@@ -8491,32 +8505,32 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
     Union3 v9;
     v9 = v8;
     while (while_method_5(v9)){
-        Union3 v2250;
+        Union3 v2330;
         switch (v9.tag) {
             case 0: { // None
-                v2250 = Union3{Union3_0{}};
+                v2330 = Union3{Union3_0{}};
                 break;
             }
             case 1: { // Some
                 Union4 v11 = v9.case1.v0;
                 switch (v11.tag) {
                     case 0: { // G_Flop
-                        int v2108 = v11.case0.v0; static_array<static_array<unsigned char,2>,2> v2109 = v11.case0.v1; static_array<int,2> v2110 = v11.case0.v2; int v2111 = v11.case0.v3; static_array<int,2> v2112 = v11.case0.v4; Union5 v2113 = v11.case0.v5;
-                        curandStatePhilox4_32_10_t & v2114 = v4.v4;
-                        curandStatePhilox4_32_10_t & v2115 = v2114;
-                        static_array<unsigned char,3> v2116; unsigned long long v2117;
-                        Tuple8 tmp18 = draw_cards_32(v2115, v7);
-                        v2116 = tmp18.v0; v2117 = tmp18.v1;
-                        v4.v0 = v2117;
-                        static_array_list<unsigned char,5> v2118;
-                        v2118 = get_community_cards_35(v2113, v2116);
-                        Union6 v2119;
-                        v2119 = Union6{Union6_0{v2118}};
-                        v6.push(v2119);
-                        Union5 v2122;
-                        switch (v2113.tag) {
+                        int v2188 = v11.case0.v0; static_array<static_array<unsigned char,2>,2> v2189 = v11.case0.v1; static_array<int,2> v2190 = v11.case0.v2; int v2191 = v11.case0.v3; static_array<int,2> v2192 = v11.case0.v4; Union5 v2193 = v11.case0.v5;
+                        curandStatePhilox4_32_10_t & v2194 = v4.v4;
+                        curandStatePhilox4_32_10_t & v2195 = v2194;
+                        static_array<unsigned char,3> v2196; unsigned long long v2197;
+                        Tuple8 tmp18 = draw_cards_32(v2195, v7);
+                        v2196 = tmp18.v0; v2197 = tmp18.v1;
+                        v4.v0 = v2197;
+                        static_array_list<unsigned char,5> v2198;
+                        v2198 = get_community_cards_35(v2193, v2196);
+                        Union6 v2199;
+                        v2199 = Union6{Union6_0{v2198}};
+                        v6.push(v2199);
+                        Union5 v2202;
+                        switch (v2193.tag) {
                             case 1: { // Preflop
-                                v2122 = Union5{Union5_0{v2116}};
+                                v2202 = Union5{Union5_0{v2196}};
                                 break;
                             }
                             default: {
@@ -8524,13 +8538,13 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                 __trap();
                             }
                         }
-                        int v2123;
-                        v2123 = 2;
-                        int v2124;
-                        v2124 = 0;
-                        Union4 v2125;
-                        v2125 = try_round_36(v2123, v2109, v2110, v2124, v2112, v2122);
-                        v2250 = Union3{Union3_1{v2125}};
+                        int v2203;
+                        v2203 = 2;
+                        int v2204;
+                        v2204 = 0;
+                        Union4 v2205;
+                        v2205 = try_round_36(v2203, v2189, v2190, v2204, v2192, v2202);
+                        v2330 = Union3{Union3_1{v2205}};
                         break;
                     }
                     case 1: { // G_Fold
@@ -8568,141 +8582,141 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                         Union3 v30;
                         v30 = Union3{Union3_0{}};
                         v4.v1 = v30;
-                        v2250 = Union3{Union3_0{}};
+                        v2330 = Union3{Union3_0{}};
                         break;
                     }
                     case 2: { // G_Preflop
-                        curandStatePhilox4_32_10_t & v2209 = v4.v4;
-                        curandStatePhilox4_32_10_t & v2210 = v2209;
-                        static_array<unsigned char,2> v2211; unsigned long long v2212;
-                        Tuple11 tmp23 = draw_cards_39(v2210, v7);
-                        v2211 = tmp23.v0; v2212 = tmp23.v1;
-                        v4.v0 = v2212;
-                        curandStatePhilox4_32_10_t & v2213 = v4.v4;
-                        curandStatePhilox4_32_10_t & v2214 = v2213;
-                        static_array<unsigned char,2> v2215; unsigned long long v2216;
-                        Tuple11 tmp24 = draw_cards_39(v2214, v7);
-                        v2215 = tmp24.v0; v2216 = tmp24.v1;
-                        v4.v0 = v2216;
-                        Union6 v2217;
-                        v2217 = Union6{Union6_3{0, v2211}};
-                        v6.push(v2217);
-                        Union6 v2218;
-                        v2218 = Union6{Union6_3{1, v2215}};
-                        v6.push(v2218);
-                        static_array<static_array<unsigned char,2>,2> v2219;
-                        v2219[0] = v2211;
-                        v2219[1] = v2215;
-                        static_array<int,2> v2221;
-                        v2221[0] = 2;
-                        v2221[1] = 1;
-                        static_array<int,2> v2223;
-                        int v2225;
-                        v2225 = 0;
-                        while (while_method_0(v2225)){
-                            bool v2227;
-                            v2227 = 0 <= v2225;
-                            bool v2229;
-                            if (v2227){
-                                bool v2228;
-                                v2228 = v2225 < 2;
-                                v2229 = v2228;
+                        curandStatePhilox4_32_10_t & v2289 = v4.v4;
+                        curandStatePhilox4_32_10_t & v2290 = v2289;
+                        static_array<unsigned char,2> v2291; unsigned long long v2292;
+                        Tuple11 tmp23 = draw_cards_39(v2290, v7);
+                        v2291 = tmp23.v0; v2292 = tmp23.v1;
+                        v4.v0 = v2292;
+                        curandStatePhilox4_32_10_t & v2293 = v4.v4;
+                        curandStatePhilox4_32_10_t & v2294 = v2293;
+                        static_array<unsigned char,2> v2295; unsigned long long v2296;
+                        Tuple11 tmp24 = draw_cards_39(v2294, v7);
+                        v2295 = tmp24.v0; v2296 = tmp24.v1;
+                        v4.v0 = v2296;
+                        Union6 v2297;
+                        v2297 = Union6{Union6_3{0, v2291}};
+                        v6.push(v2297);
+                        Union6 v2298;
+                        v2298 = Union6{Union6_3{1, v2295}};
+                        v6.push(v2298);
+                        static_array<static_array<unsigned char,2>,2> v2299;
+                        v2299[0] = v2291;
+                        v2299[1] = v2295;
+                        static_array<int,2> v2301;
+                        v2301[0] = 2;
+                        v2301[1] = 1;
+                        static_array<int,2> v2303;
+                        int v2305;
+                        v2305 = 0;
+                        while (while_method_0(v2305)){
+                            bool v2307;
+                            v2307 = 0 <= v2305;
+                            bool v2309;
+                            if (v2307){
+                                bool v2308;
+                                v2308 = v2305 < 2;
+                                v2309 = v2308;
                             } else {
-                                v2229 = false;
+                                v2309 = false;
                             }
-                            bool v2230;
-                            v2230 = v2229 == false;
-                            if (v2230){
-                                assert("Index must be in range." && v2229);
+                            bool v2310;
+                            v2310 = v2309 == false;
+                            if (v2310){
+                                assert("Index must be in range." && v2309);
                             } else {
                             }
-                            int v2232;
-                            v2232 = v2221[v2225];
-                            int v2234;
-                            v2234 = 100 - v2232;
-                            v2223[v2225] = v2234;
-                            v2225 += 1 ;
+                            int v2312;
+                            v2312 = v2301[v2305];
+                            int v2314;
+                            v2314 = 100 - v2312;
+                            v2303[v2305] = v2314;
+                            v2305 += 1 ;
                         }
-                        int v2235;
-                        v2235 = 2;
-                        int v2236;
-                        v2236 = 0;
-                        Union5 v2237;
-                        v2237 = Union5{Union5_1{}};
-                        Union4 v2238;
-                        v2238 = try_round_36(v2235, v2219, v2221, v2236, v2223, v2237);
-                        v2250 = Union3{Union3_1{v2238}};
+                        int v2315;
+                        v2315 = 2;
+                        int v2316;
+                        v2316 = 0;
+                        Union5 v2317;
+                        v2317 = Union5{Union5_1{}};
+                        Union4 v2318;
+                        v2318 = try_round_36(v2315, v2299, v2301, v2316, v2303, v2317);
+                        v2330 = Union3{Union3_1{v2318}};
                         break;
                     }
                     case 3: { // G_River
-                        int v2168 = v11.case3.v0; static_array<static_array<unsigned char,2>,2> v2169 = v11.case3.v1; static_array<int,2> v2170 = v11.case3.v2; int v2171 = v11.case3.v3; static_array<int,2> v2172 = v11.case3.v4; Union5 v2173 = v11.case3.v5;
-                        curandStatePhilox4_32_10_t & v2174 = v4.v4;
-                        curandStatePhilox4_32_10_t & v2175 = v2174;
-                        static_array<unsigned char,1> v2176; unsigned long long v2177;
-                        Tuple12 tmp27 = draw_cards_40(v2175, v7);
-                        v2176 = tmp27.v0; v2177 = tmp27.v1;
-                        v4.v0 = v2177;
-                        static_array_list<unsigned char,5> v2178;
-                        v2178 = get_community_cards_41(v2173, v2176);
-                        Union6 v2179;
-                        v2179 = Union6{Union6_0{v2178}};
-                        v6.push(v2179);
-                        Union5 v2204;
-                        switch (v2173.tag) {
+                        int v2248 = v11.case3.v0; static_array<static_array<unsigned char,2>,2> v2249 = v11.case3.v1; static_array<int,2> v2250 = v11.case3.v2; int v2251 = v11.case3.v3; static_array<int,2> v2252 = v11.case3.v4; Union5 v2253 = v11.case3.v5;
+                        curandStatePhilox4_32_10_t & v2254 = v4.v4;
+                        curandStatePhilox4_32_10_t & v2255 = v2254;
+                        static_array<unsigned char,1> v2256; unsigned long long v2257;
+                        Tuple12 tmp27 = draw_cards_40(v2255, v7);
+                        v2256 = tmp27.v0; v2257 = tmp27.v1;
+                        v4.v0 = v2257;
+                        static_array_list<unsigned char,5> v2258;
+                        v2258 = get_community_cards_41(v2253, v2256);
+                        Union6 v2259;
+                        v2259 = Union6{Union6_0{v2258}};
+                        v6.push(v2259);
+                        Union5 v2284;
+                        switch (v2253.tag) {
                             case 3: { // Turn
-                                static_array<unsigned char,4> v2180 = v2173.case3.v0;
-                                static_array<unsigned char,5> v2181;
-                                int v2183;
-                                v2183 = 0;
-                                while (while_method_3(v2183)){
-                                    bool v2185;
-                                    v2185 = 0 <= v2183;
-                                    bool v2187;
-                                    if (v2185){
-                                        bool v2186;
-                                        v2186 = v2183 < 4;
-                                        v2187 = v2186;
+                                static_array<unsigned char,4> v2260 = v2253.case3.v0;
+                                static_array<unsigned char,5> v2261;
+                                int v2263;
+                                v2263 = 0;
+                                while (while_method_3(v2263)){
+                                    bool v2265;
+                                    v2265 = 0 <= v2263;
+                                    bool v2267;
+                                    if (v2265){
+                                        bool v2266;
+                                        v2266 = v2263 < 4;
+                                        v2267 = v2266;
                                     } else {
-                                        v2187 = false;
+                                        v2267 = false;
                                     }
-                                    bool v2188;
-                                    v2188 = v2187 == false;
-                                    if (v2188){
-                                        assert("Index must be in range." && v2187);
+                                    bool v2268;
+                                    v2268 = v2267 == false;
+                                    if (v2268){
+                                        assert("Index must be in range." && v2267);
                                     } else {
                                     }
-                                    unsigned char v2190;
-                                    v2190 = v2180[v2183];
-                                    v2181[v2183] = v2190;
-                                    v2183 += 1 ;
+                                    unsigned char v2270;
+                                    v2270 = v2260[v2263];
+                                    v2261[v2263] = v2270;
+                                    v2263 += 1 ;
                                 }
-                                int v2192;
-                                v2192 = 0;
-                                while (while_method_6(v2192)){
-                                    bool v2194;
-                                    v2194 = 0 <= v2192;
-                                    bool v2196;
-                                    if (v2194){
-                                        bool v2195;
-                                        v2195 = v2192 < 1;
-                                        v2196 = v2195;
+                                int v2272;
+                                v2272 = 0;
+                                while (while_method_6(v2272)){
+                                    bool v2274;
+                                    v2274 = 0 <= v2272;
+                                    bool v2276;
+                                    if (v2274){
+                                        bool v2275;
+                                        v2275 = v2272 < 1;
+                                        v2276 = v2275;
                                     } else {
-                                        v2196 = false;
+                                        v2276 = false;
                                     }
-                                    bool v2197;
-                                    v2197 = v2196 == false;
-                                    if (v2197){
-                                        assert("Index must be in range." && v2196);
+                                    bool v2277;
+                                    v2277 = v2276 == false;
+                                    if (v2277){
+                                        assert("Index must be in range." && v2276);
                                     } else {
                                     }
-                                    unsigned char v2199;
-                                    v2199 = v2176[v2192];
-                                    int v2201;
-                                    v2201 = 4 + v2192;
-                                    v2181[v2201] = v2199;
-                                    v2192 += 1 ;
+                                    unsigned char v2279;
+                                    v2279 = v2256[v2272];
+                                    int v2281;
+                                    v2281 = 4 + v2272;
+                                    v2261[v2281] = v2279;
+                                    v2272 += 1 ;
                                 }
-                                v2204 = Union5{Union5_2{v2181}};
+                                v2284 = Union5{Union5_2{v2261}};
                                 break;
                             }
                             default: {
@@ -8710,13 +8724,13 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                 __trap();
                             }
                         }
-                        int v2205;
-                        v2205 = 2;
-                        int v2206;
-                        v2206 = 0;
-                        Union4 v2207;
-                        v2207 = try_round_36(v2205, v2169, v2170, v2206, v2172, v2204);
-                        v2250 = Union3{Union3_1{v2207}};
+                        int v2285;
+                        v2285 = 2;
+                        int v2286;
+                        v2286 = 0;
+                        Union4 v2287;
+                        v2287 = try_round_36(v2285, v2249, v2250, v2286, v2252, v2284);
+                        v2330 = Union3{Union3_1{v2287}};
                         break;
                     }
                     case 4: { // G_Round
@@ -8743,7 +8757,204 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                         Union2 v159;
                         v159 = v153[v152];
                         switch (v159.tag) {
-                            case 0: { // Computer
+                            case 0: { // CallingMachine
+                                Union1 v1764;
+                                v1764 = Union1{Union1_1{}};
+                                Union6 v1765;
+                                v1765 = Union6{Union6_2{v152, v1764}};
+                                v6.push(v1765);
+                                static_array<int,2> v1766;
+                                int v1768;
+                                v1768 = 0;
+                                while (while_method_0(v1768)){
+                                    bool v1770;
+                                    v1770 = 0 <= v1768;
+                                    bool v1772;
+                                    if (v1770){
+                                        bool v1771;
+                                        v1771 = v1768 < 2;
+                                        v1772 = v1771;
+                                    } else {
+                                        v1772 = false;
+                                    }
+                                    bool v1773;
+                                    v1773 = v1772 == false;
+                                    if (v1773){
+                                        assert("Index must be in range." && v1772);
+                                    } else {
+                                    }
+                                    int v1775;
+                                    v1775 = v150[v1768];
+                                    bool v1778;
+                                    if (v1770){
+                                        bool v1777;
+                                        v1777 = v1768 < 2;
+                                        v1778 = v1777;
+                                    } else {
+                                        v1778 = false;
+                                    }
+                                    bool v1779;
+                                    v1779 = v1778 == false;
+                                    if (v1779){
+                                        assert("Index must be in range." && v1778);
+                                    } else {
+                                    }
+                                    int v1781;
+                                    v1781 = v148[v1768];
+                                    int v1783;
+                                    v1783 = v1775 + v1781;
+                                    v1766[v1768] = v1783;
+                                    v1768 += 1 ;
+                                }
+                                int v1784;
+                                v1784 = v148[0];
+                                int v1786; int v1787;
+                                Tuple4 tmp28 = Tuple4{1, v1784};
+                                v1786 = tmp28.v0; v1787 = tmp28.v1;
+                                while (while_method_0(v1786)){
+                                    bool v1789;
+                                    v1789 = 0 <= v1786;
+                                    bool v1791;
+                                    if (v1789){
+                                        bool v1790;
+                                        v1790 = v1786 < 2;
+                                        v1791 = v1790;
+                                    } else {
+                                        v1791 = false;
+                                    }
+                                    bool v1792;
+                                    v1792 = v1791 == false;
+                                    if (v1792){
+                                        assert("Index must be in range." && v1791);
+                                    } else {
+                                    }
+                                    int v1794;
+                                    v1794 = v148[v1786];
+                                    bool v1796;
+                                    v1796 = v1787 >= v1794;
+                                    int v1797;
+                                    if (v1796){
+                                        v1797 = v1787;
+                                    } else {
+                                        v1797 = v1794;
+                                    }
+                                    v1787 = v1797;
+                                    v1786 += 1 ;
+                                }
+                                bool v1799;
+                                if (v154){
+                                    bool v1798;
+                                    v1798 = v152 < 2;
+                                    v1799 = v1798;
+                                } else {
+                                    v1799 = false;
+                                }
+                                bool v1800;
+                                v1800 = v1799 == false;
+                                if (v1800){
+                                    assert("Index must be in range." && v1799);
+                                } else {
+                                }
+                                int v1802;
+                                v1802 = v1766[v152];
+                                bool v1804;
+                                v1804 = v1787 < v1802;
+                                int v1805;
+                                if (v1804){
+                                    v1805 = v1787;
+                                } else {
+                                    v1805 = v1802;
+                                }
+                                static_array<int,2> v1806;
+                                int v1808;
+                                v1808 = 0;
+                                while (while_method_0(v1808)){
+                                    bool v1810;
+                                    v1810 = 0 <= v1808;
+                                    bool v1812;
+                                    if (v1810){
+                                        bool v1811;
+                                        v1811 = v1808 < 2;
+                                        v1812 = v1811;
+                                    } else {
+                                        v1812 = false;
+                                    }
+                                    bool v1813;
+                                    v1813 = v1812 == false;
+                                    if (v1813){
+                                        assert("Index must be in range." && v1812);
+                                    } else {
+                                    }
+                                    int v1815;
+                                    v1815 = v148[v1808];
+                                    bool v1817;
+                                    v1817 = v152 == v1808;
+                                    int v1818;
+                                    if (v1817){
+                                        v1818 = v1805;
+                                    } else {
+                                        v1818 = v1815;
+                                    }
+                                    v1806[v1808] = v1818;
+                                    v1808 += 1 ;
+                                }
+                                static_array<int,2> v1819;
+                                int v1821;
+                                v1821 = 0;
+                                while (while_method_0(v1821)){
+                                    bool v1823;
+                                    v1823 = 0 <= v1821;
+                                    bool v1825;
+                                    if (v1823){
+                                        bool v1824;
+                                        v1824 = v1821 < 2;
+                                        v1825 = v1824;
+                                    } else {
+                                        v1825 = false;
+                                    }
+                                    bool v1826;
+                                    v1826 = v1825 == false;
+                                    if (v1826){
+                                        assert("Index must be in range." && v1825);
+                                    } else {
+                                    }
+                                    int v1828;
+                                    v1828 = v1766[v1821];
+                                    bool v1831;
+                                    if (v1823){
+                                        bool v1830;
+                                        v1830 = v1821 < 2;
+                                        v1831 = v1830;
+                                    } else {
+                                        v1831 = false;
+                                    }
+                                    bool v1832;
+                                    v1832 = v1831 == false;
+                                    if (v1832){
+                                        assert("Index must be in range." && v1831);
+                                    } else {
+                                    }
+                                    int v1834;
+                                    v1834 = v1806[v1821];
+                                    int v1836;
+                                    v1836 = v1828 - v1834;
+                                    v1819[v1821] = v1836;
+                                    v1821 += 1 ;
+                                }
+                                bool v1837;
+                                v1837 = v152 < 2;
+                                Union4 v1841;
+                                if (v1837){
+                                    int v1838;
+                                    v1838 = v149 + 1;
+                                    v1841 = try_round_36(v146, v147, v1806, v1838, v1819, v151);
+                                } else {
+                                    v1841 = go_next_street_38(v146, v147, v1806, v149, v1819, v151);
+                                }
+                                v2330 = Union3{Union3_1{v1841}};
+                                break;
+                            }
+                            case 1: { // Computer
                                 bool v161;
                                 v161 = 12419088ull == v3;
                                 bool v162;
@@ -10201,8 +10412,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                 int v767;
                                 v767 = (int)v750;
                                 float v768; int v769;
-                                Tuple14 tmp40 = method_46(v169, v751, v753, v755, v757, v759, v761, v763, v765, v767, v394);
-                                v768 = tmp40.v0; v769 = tmp40.v1;
+                                Tuple14 tmp41 = method_46(v169, v751, v753, v755, v757, v759, v761, v763, v765, v767, v394);
+                                v768 = tmp41.v0; v769 = tmp41.v1;
                                 bool v770;
                                 v770 = 0 == v769;
                                 Union10 v803;
@@ -10282,8 +10493,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v804;
                                         v804 = v148[0];
                                         int v806; int v807;
-                                        Tuple4 tmp41 = Tuple4{1, v804};
-                                        v806 = tmp41.v0; v807 = tmp41.v1;
+                                        Tuple4 tmp42 = Tuple4{1, v804};
+                                        v806 = tmp42.v0; v807 = tmp42.v1;
                                         while (while_method_0(v806)){
                                             bool v809;
                                             v809 = 0 <= v806;
@@ -10387,8 +10598,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v849;
                                         v849 = v148[0];
                                         int v851; int v852;
-                                        Tuple4 tmp42 = Tuple4{1, v849};
-                                        v851 = tmp42.v0; v852 = tmp42.v1;
+                                        Tuple4 tmp43 = Tuple4{1, v849};
+                                        v851 = tmp43.v0; v852 = tmp43.v1;
                                         while (while_method_0(v851)){
                                             bool v854;
                                             v854 = 0 <= v851;
@@ -10479,8 +10690,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v884;
                                         v884 = v871[0];
                                         int v886; int v887;
-                                        Tuple4 tmp43 = Tuple4{1, v884};
-                                        v886 = tmp43.v0; v887 = tmp43.v1;
+                                        Tuple4 tmp44 = Tuple4{1, v884};
+                                        v886 = tmp44.v0; v887 = tmp44.v1;
                                         while (while_method_0(v886)){
                                             bool v889;
                                             v889 = 0 <= v886;
@@ -10676,8 +10887,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v1168;
                                         v1168 = v148[0];
                                         int v1170; int v1171;
-                                        Tuple4 tmp44 = Tuple4{1, v1168};
-                                        v1170 = tmp44.v0; v1171 = tmp44.v1;
+                                        Tuple4 tmp45 = Tuple4{1, v1168};
+                                        v1170 = tmp45.v0; v1171 = tmp45.v1;
                                         while (while_method_0(v1170)){
                                             bool v1173;
                                             v1173 = 0 <= v1170;
@@ -10986,8 +11197,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v966;
                                         v966 = v148[0];
                                         int v968; int v969;
-                                        Tuple4 tmp45 = Tuple4{1, v966};
-                                        v968 = tmp45.v0; v969 = tmp45.v1;
+                                        Tuple4 tmp46 = Tuple4{1, v966};
+                                        v968 = tmp46.v0; v969 = tmp46.v1;
                                         while (while_method_0(v968)){
                                             bool v971;
                                             v971 = 0 <= v968;
@@ -11189,8 +11400,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v1046;
                                         v1046 = v148[0];
                                         int v1048; int v1049;
-                                        Tuple4 tmp46 = Tuple4{1, v1046};
-                                        v1048 = tmp46.v0; v1049 = tmp46.v1;
+                                        Tuple4 tmp47 = Tuple4{1, v1046};
+                                        v1048 = tmp47.v0; v1049 = tmp47.v1;
                                         while (while_method_0(v1048)){
                                             bool v1051;
                                             v1051 = 0 <= v1048;
@@ -11456,20 +11667,20 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         assert("Invalid tag." && false); __trap();
                                     }
                                 }
-                                v2250 = Union3{Union3_1{v1274}};
+                                v2330 = Union3{Union3_1{v1274}};
                                 break;
                             }
-                            case 1: { // Human
+                            case 2: { // Human
                                 Union7 v1276;
                                 v1276 = Union7{Union7_2{v146, v147, v148, v149, v150, v151}};
                                 v4.v5 = v1276;
                                 Union3 v1277;
                                 v1277 = Union3{Union3_1{v11}};
                                 v4.v1 = v1277;
-                                v2250 = Union3{Union3_0{}};
+                                v2330 = Union3{Union3_0{}};
                                 break;
                             }
-                            case 2: { // Random
+                            case 3: { // Random
                                 curandStatePhilox4_32_10_t & v1279 = v4.v4;
                                 curandStatePhilox4_32_10_t & v1280 = v1279;
                                 static_array<int,2> v1281;
@@ -11518,8 +11729,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                 int v1299;
                                 v1299 = v148[0];
                                 int v1301; int v1302;
-                                Tuple4 tmp47 = Tuple4{1, v1299};
-                                v1301 = tmp47.v0; v1302 = tmp47.v1;
+                                Tuple4 tmp48 = Tuple4{1, v1299};
+                                v1301 = tmp48.v0; v1302 = tmp48.v1;
                                 while (while_method_0(v1301)){
                                     bool v1304;
                                     v1304 = 0 <= v1301;
@@ -11610,8 +11821,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                 int v1334;
                                 v1334 = v1321[0];
                                 int v1336; int v1337;
-                                Tuple4 tmp48 = Tuple4{1, v1334};
-                                v1336 = tmp48.v0; v1337 = tmp48.v1;
+                                Tuple4 tmp49 = Tuple4{1, v1334};
+                                v1336 = tmp49.v0; v1337 = tmp49.v1;
                                 while (while_method_0(v1336)){
                                     bool v1339;
                                     v1339 = 0 <= v1336;
@@ -11911,8 +12122,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v1656;
                                         v1656 = v148[0];
                                         int v1658; int v1659;
-                                        Tuple4 tmp51 = Tuple4{1, v1656};
-                                        v1658 = tmp51.v0; v1659 = tmp51.v1;
+                                        Tuple4 tmp52 = Tuple4{1, v1656};
+                                        v1658 = tmp52.v0; v1659 = tmp52.v1;
                                         while (while_method_0(v1658)){
                                             bool v1661;
                                             v1661 = 0 <= v1658;
@@ -12221,8 +12432,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v1454;
                                         v1454 = v148[0];
                                         int v1456; int v1457;
-                                        Tuple4 tmp52 = Tuple4{1, v1454};
-                                        v1456 = tmp52.v0; v1457 = tmp52.v1;
+                                        Tuple4 tmp53 = Tuple4{1, v1454};
+                                        v1456 = tmp53.v0; v1457 = tmp53.v1;
                                         while (while_method_0(v1456)){
                                             bool v1459;
                                             v1459 = 0 <= v1456;
@@ -12424,8 +12635,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         int v1534;
                                         v1534 = v148[0];
                                         int v1536; int v1537;
-                                        Tuple4 tmp53 = Tuple4{1, v1534};
-                                        v1536 = tmp53.v0; v1537 = tmp53.v1;
+                                        Tuple4 tmp54 = Tuple4{1, v1534};
+                                        v1536 = tmp54.v0; v1537 = tmp54.v1;
                                         while (while_method_0(v1536)){
                                             bool v1539;
                                             v1539 = 0 <= v1536;
@@ -12691,7 +12902,7 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                         assert("Invalid tag." && false); __trap();
                                     }
                                 }
-                                v2250 = Union3{Union3_1{v1762}};
+                                v2330 = Union3{Union3_1{v1762}};
                                 break;
                             }
                             default: {
@@ -12701,178 +12912,805 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                         break;
                     }
                     case 5: { // G_Round'
-                        int v1767 = v11.case5.v0; static_array<static_array<unsigned char,2>,2> v1768 = v11.case5.v1; static_array<int,2> v1769 = v11.case5.v2; int v1770 = v11.case5.v3; static_array<int,2> v1771 = v11.case5.v4; Union5 v1772 = v11.case5.v5; Union1 v1773 = v11.case5.v6;
-                        int v1774;
-                        v1774 = v1770 % 2;
-                        Union6 v1775;
-                        v1775 = Union6{Union6_2{v1774, v1773}};
-                        v6.push(v1775);
-                        Union4 v2106;
-                        switch (v1773.tag) {
+                        int v1847 = v11.case5.v0; static_array<static_array<unsigned char,2>,2> v1848 = v11.case5.v1; static_array<int,2> v1849 = v11.case5.v2; int v1850 = v11.case5.v3; static_array<int,2> v1851 = v11.case5.v4; Union5 v1852 = v11.case5.v5; Union1 v1853 = v11.case5.v6;
+                        int v1854;
+                        v1854 = v1850 % 2;
+                        Union6 v1855;
+                        v1855 = Union6{Union6_2{v1854, v1853}};
+                        v6.push(v1855);
+                        Union4 v2186;
+                        switch (v1853.tag) {
                             case 0: { // A_All_In
-                                static_array<int,2> v1981;
-                                int v1983;
-                                v1983 = 0;
-                                while (while_method_0(v1983)){
+                                static_array<int,2> v2061;
+                                int v2063;
+                                v2063 = 0;
+                                while (while_method_0(v2063)){
+                                    bool v2065;
+                                    v2065 = 0 <= v2063;
+                                    bool v2067;
+                                    if (v2065){
+                                        bool v2066;
+                                        v2066 = v2063 < 2;
+                                        v2067 = v2066;
+                                    } else {
+                                        v2067 = false;
+                                    }
+                                    bool v2068;
+                                    v2068 = v2067 == false;
+                                    if (v2068){
+                                        assert("Index must be in range." && v2067);
+                                    } else {
+                                    }
+                                    int v2070;
+                                    v2070 = v1851[v2063];
+                                    bool v2073;
+                                    if (v2065){
+                                        bool v2072;
+                                        v2072 = v2063 < 2;
+                                        v2073 = v2072;
+                                    } else {
+                                        v2073 = false;
+                                    }
+                                    bool v2074;
+                                    v2074 = v2073 == false;
+                                    if (v2074){
+                                        assert("Index must be in range." && v2073);
+                                    } else {
+                                    }
+                                    int v2076;
+                                    v2076 = v1849[v2063];
+                                    int v2078;
+                                    v2078 = v2070 + v2076;
+                                    v2061[v2063] = v2078;
+                                    v2063 += 1 ;
+                                }
+                                int v2079;
+                                v2079 = v1849[0];
+                                int v2081; int v2082;
+                                Tuple4 tmp55 = Tuple4{1, v2079};
+                                v2081 = tmp55.v0; v2082 = tmp55.v1;
+                                while (while_method_0(v2081)){
+                                    bool v2084;
+                                    v2084 = 0 <= v2081;
+                                    bool v2086;
+                                    if (v2084){
+                                        bool v2085;
+                                        v2085 = v2081 < 2;
+                                        v2086 = v2085;
+                                    } else {
+                                        v2086 = false;
+                                    }
+                                    bool v2087;
+                                    v2087 = v2086 == false;
+                                    if (v2087){
+                                        assert("Index must be in range." && v2086);
+                                    } else {
+                                    }
+                                    int v2089;
+                                    v2089 = v1849[v2081];
+                                    bool v2091;
+                                    v2091 = v2082 >= v2089;
+                                    int v2092;
+                                    if (v2091){
+                                        v2092 = v2082;
+                                    } else {
+                                        v2092 = v2089;
+                                    }
+                                    v2082 = v2092;
+                                    v2081 += 1 ;
+                                }
+                                bool v2093;
+                                v2093 = 0 <= v1854;
+                                bool v2095;
+                                if (v2093){
+                                    bool v2094;
+                                    v2094 = v1854 < 2;
+                                    v2095 = v2094;
+                                } else {
+                                    v2095 = false;
+                                }
+                                bool v2096;
+                                v2096 = v2095 == false;
+                                if (v2096){
+                                    assert("Index must be in range." && v2095);
+                                } else {
+                                }
+                                int v2098;
+                                v2098 = v2061[v1854];
+                                bool v2100;
+                                v2100 = v2082 < v2098;
+                                int v2101;
+                                if (v2100){
+                                    v2101 = v2082;
+                                } else {
+                                    v2101 = v2098;
+                                }
+                                static_array<int,2> v2102;
+                                int v2104;
+                                v2104 = 0;
+                                while (while_method_0(v2104)){
+                                    bool v2106;
+                                    v2106 = 0 <= v2104;
+                                    bool v2108;
+                                    if (v2106){
+                                        bool v2107;
+                                        v2107 = v2104 < 2;
+                                        v2108 = v2107;
+                                    } else {
+                                        v2108 = false;
+                                    }
+                                    bool v2109;
+                                    v2109 = v2108 == false;
+                                    if (v2109){
+                                        assert("Index must be in range." && v2108);
+                                    } else {
+                                    }
+                                    int v2111;
+                                    v2111 = v1849[v2104];
+                                    bool v2113;
+                                    v2113 = v1854 == v2104;
+                                    int v2114;
+                                    if (v2113){
+                                        v2114 = v2101;
+                                    } else {
+                                        v2114 = v2111;
+                                    }
+                                    v2102[v2104] = v2114;
+                                    v2104 += 1 ;
+                                }
+                                static_array<int,2> v2115;
+                                int v2117;
+                                v2117 = 0;
+                                while (while_method_0(v2117)){
+                                    bool v2119;
+                                    v2119 = 0 <= v2117;
+                                    bool v2121;
+                                    if (v2119){
+                                        bool v2120;
+                                        v2120 = v2117 < 2;
+                                        v2121 = v2120;
+                                    } else {
+                                        v2121 = false;
+                                    }
+                                    bool v2122;
+                                    v2122 = v2121 == false;
+                                    if (v2122){
+                                        assert("Index must be in range." && v2121);
+                                    } else {
+                                    }
+                                    int v2124;
+                                    v2124 = v2061[v2117];
+                                    bool v2127;
+                                    if (v2119){
+                                        bool v2126;
+                                        v2126 = v2117 < 2;
+                                        v2127 = v2126;
+                                    } else {
+                                        v2127 = false;
+                                    }
+                                    bool v2128;
+                                    v2128 = v2127 == false;
+                                    if (v2128){
+                                        assert("Index must be in range." && v2127);
+                                    } else {
+                                    }
+                                    int v2130;
+                                    v2130 = v2102[v2117];
+                                    int v2132;
+                                    v2132 = v2124 - v2130;
+                                    v2115[v2117] = v2132;
+                                    v2117 += 1 ;
+                                }
+                                bool v2134;
+                                if (v2093){
+                                    bool v2133;
+                                    v2133 = v1854 < 2;
+                                    v2134 = v2133;
+                                } else {
+                                    v2134 = false;
+                                }
+                                bool v2135;
+                                v2135 = v2134 == false;
+                                if (v2135){
+                                    assert("Index must be in range." && v2134);
+                                } else {
+                                }
+                                int v2137;
+                                v2137 = v2115[v1854];
+                                int v2139;
+                                v2139 = v2082 + v2137;
+                                bool v2141;
+                                if (v2093){
+                                    bool v2140;
+                                    v2140 = v1854 < 2;
+                                    v2141 = v2140;
+                                } else {
+                                    v2141 = false;
+                                }
+                                bool v2142;
+                                v2142 = v2141 == false;
+                                if (v2142){
+                                    assert("Index must be in range." && v2141);
+                                } else {
+                                }
+                                int v2144;
+                                v2144 = v2061[v1854];
+                                bool v2146;
+                                v2146 = v2139 < v2144;
+                                int v2147;
+                                if (v2146){
+                                    v2147 = v2139;
+                                } else {
+                                    v2147 = v2144;
+                                }
+                                static_array<int,2> v2148;
+                                int v2150;
+                                v2150 = 0;
+                                while (while_method_0(v2150)){
+                                    bool v2152;
+                                    v2152 = 0 <= v2150;
+                                    bool v2154;
+                                    if (v2152){
+                                        bool v2153;
+                                        v2153 = v2150 < 2;
+                                        v2154 = v2153;
+                                    } else {
+                                        v2154 = false;
+                                    }
+                                    bool v2155;
+                                    v2155 = v2154 == false;
+                                    if (v2155){
+                                        assert("Index must be in range." && v2154);
+                                    } else {
+                                    }
+                                    int v2157;
+                                    v2157 = v1849[v2150];
+                                    bool v2159;
+                                    v2159 = v1854 == v2150;
+                                    int v2160;
+                                    if (v2159){
+                                        v2160 = v2147;
+                                    } else {
+                                        v2160 = v2157;
+                                    }
+                                    v2148[v2150] = v2160;
+                                    v2150 += 1 ;
+                                }
+                                static_array<int,2> v2161;
+                                int v2163;
+                                v2163 = 0;
+                                while (while_method_0(v2163)){
+                                    bool v2165;
+                                    v2165 = 0 <= v2163;
+                                    bool v2167;
+                                    if (v2165){
+                                        bool v2166;
+                                        v2166 = v2163 < 2;
+                                        v2167 = v2166;
+                                    } else {
+                                        v2167 = false;
+                                    }
+                                    bool v2168;
+                                    v2168 = v2167 == false;
+                                    if (v2168){
+                                        assert("Index must be in range." && v2167);
+                                    } else {
+                                    }
+                                    int v2170;
+                                    v2170 = v2061[v2163];
+                                    bool v2173;
+                                    if (v2165){
+                                        bool v2172;
+                                        v2172 = v2163 < 2;
+                                        v2173 = v2172;
+                                    } else {
+                                        v2173 = false;
+                                    }
+                                    bool v2174;
+                                    v2174 = v2173 == false;
+                                    if (v2174){
+                                        assert("Index must be in range." && v2173);
+                                    } else {
+                                    }
+                                    int v2176;
+                                    v2176 = v2148[v2163];
+                                    int v2178;
+                                    v2178 = v2170 - v2176;
+                                    v2161[v2163] = v2178;
+                                    v2163 += 1 ;
+                                }
+                                bool v2179;
+                                v2179 = v2137 >= v1847;
+                                int v2180;
+                                if (v2179){
+                                    v2180 = v2137;
+                                } else {
+                                    v2180 = v1847;
+                                }
+                                int v2181;
+                                v2181 = v1850 + 1;
+                                v2186 = try_round_36(v2180, v1848, v2148, v2181, v2161, v1852);
+                                break;
+                            }
+                            case 1: { // A_Call
+                                static_array<int,2> v1857;
+                                int v1859;
+                                v1859 = 0;
+                                while (while_method_0(v1859)){
+                                    bool v1861;
+                                    v1861 = 0 <= v1859;
+                                    bool v1863;
+                                    if (v1861){
+                                        bool v1862;
+                                        v1862 = v1859 < 2;
+                                        v1863 = v1862;
+                                    } else {
+                                        v1863 = false;
+                                    }
+                                    bool v1864;
+                                    v1864 = v1863 == false;
+                                    if (v1864){
+                                        assert("Index must be in range." && v1863);
+                                    } else {
+                                    }
+                                    int v1866;
+                                    v1866 = v1851[v1859];
+                                    bool v1869;
+                                    if (v1861){
+                                        bool v1868;
+                                        v1868 = v1859 < 2;
+                                        v1869 = v1868;
+                                    } else {
+                                        v1869 = false;
+                                    }
+                                    bool v1870;
+                                    v1870 = v1869 == false;
+                                    if (v1870){
+                                        assert("Index must be in range." && v1869);
+                                    } else {
+                                    }
+                                    int v1872;
+                                    v1872 = v1849[v1859];
+                                    int v1874;
+                                    v1874 = v1866 + v1872;
+                                    v1857[v1859] = v1874;
+                                    v1859 += 1 ;
+                                }
+                                int v1875;
+                                v1875 = v1849[0];
+                                int v1877; int v1878;
+                                Tuple4 tmp56 = Tuple4{1, v1875};
+                                v1877 = tmp56.v0; v1878 = tmp56.v1;
+                                while (while_method_0(v1877)){
+                                    bool v1880;
+                                    v1880 = 0 <= v1877;
+                                    bool v1882;
+                                    if (v1880){
+                                        bool v1881;
+                                        v1881 = v1877 < 2;
+                                        v1882 = v1881;
+                                    } else {
+                                        v1882 = false;
+                                    }
+                                    bool v1883;
+                                    v1883 = v1882 == false;
+                                    if (v1883){
+                                        assert("Index must be in range." && v1882);
+                                    } else {
+                                    }
+                                    int v1885;
+                                    v1885 = v1849[v1877];
+                                    bool v1887;
+                                    v1887 = v1878 >= v1885;
+                                    int v1888;
+                                    if (v1887){
+                                        v1888 = v1878;
+                                    } else {
+                                        v1888 = v1885;
+                                    }
+                                    v1878 = v1888;
+                                    v1877 += 1 ;
+                                }
+                                bool v1889;
+                                v1889 = 0 <= v1854;
+                                bool v1891;
+                                if (v1889){
+                                    bool v1890;
+                                    v1890 = v1854 < 2;
+                                    v1891 = v1890;
+                                } else {
+                                    v1891 = false;
+                                }
+                                bool v1892;
+                                v1892 = v1891 == false;
+                                if (v1892){
+                                    assert("Index must be in range." && v1891);
+                                } else {
+                                }
+                                int v1894;
+                                v1894 = v1857[v1854];
+                                bool v1896;
+                                v1896 = v1878 < v1894;
+                                int v1897;
+                                if (v1896){
+                                    v1897 = v1878;
+                                } else {
+                                    v1897 = v1894;
+                                }
+                                static_array<int,2> v1898;
+                                int v1900;
+                                v1900 = 0;
+                                while (while_method_0(v1900)){
+                                    bool v1902;
+                                    v1902 = 0 <= v1900;
+                                    bool v1904;
+                                    if (v1902){
+                                        bool v1903;
+                                        v1903 = v1900 < 2;
+                                        v1904 = v1903;
+                                    } else {
+                                        v1904 = false;
+                                    }
+                                    bool v1905;
+                                    v1905 = v1904 == false;
+                                    if (v1905){
+                                        assert("Index must be in range." && v1904);
+                                    } else {
+                                    }
+                                    int v1907;
+                                    v1907 = v1849[v1900];
+                                    bool v1909;
+                                    v1909 = v1854 == v1900;
+                                    int v1910;
+                                    if (v1909){
+                                        v1910 = v1897;
+                                    } else {
+                                        v1910 = v1907;
+                                    }
+                                    v1898[v1900] = v1910;
+                                    v1900 += 1 ;
+                                }
+                                static_array<int,2> v1911;
+                                int v1913;
+                                v1913 = 0;
+                                while (while_method_0(v1913)){
+                                    bool v1915;
+                                    v1915 = 0 <= v1913;
+                                    bool v1917;
+                                    if (v1915){
+                                        bool v1916;
+                                        v1916 = v1913 < 2;
+                                        v1917 = v1916;
+                                    } else {
+                                        v1917 = false;
+                                    }
+                                    bool v1918;
+                                    v1918 = v1917 == false;
+                                    if (v1918){
+                                        assert("Index must be in range." && v1917);
+                                    } else {
+                                    }
+                                    int v1920;
+                                    v1920 = v1857[v1913];
+                                    bool v1923;
+                                    if (v1915){
+                                        bool v1922;
+                                        v1922 = v1913 < 2;
+                                        v1923 = v1922;
+                                    } else {
+                                        v1923 = false;
+                                    }
+                                    bool v1924;
+                                    v1924 = v1923 == false;
+                                    if (v1924){
+                                        assert("Index must be in range." && v1923);
+                                    } else {
+                                    }
+                                    int v1926;
+                                    v1926 = v1898[v1913];
+                                    int v1928;
+                                    v1928 = v1920 - v1926;
+                                    v1911[v1913] = v1928;
+                                    v1913 += 1 ;
+                                }
+                                bool v1929;
+                                v1929 = v1854 < 2;
+                                if (v1929){
+                                    int v1930;
+                                    v1930 = v1850 + 1;
+                                    v2186 = try_round_36(v1847, v1848, v1898, v1930, v1911, v1852);
+                                } else {
+                                    v2186 = go_next_street_38(v1847, v1848, v1898, v1850, v1911, v1852);
+                                }
+                                break;
+                            }
+                            case 2: { // A_Fold
+                                v2186 = Union4{Union4_1{v1847, v1848, v1849, v1850, v1851, v1852}};
+                                break;
+                            }
+                            case 3: { // A_Raise
+                                int v1934 = v1853.case3.v0;
+                                bool v1935;
+                                v1935 = v1847 <= v1934;
+                                bool v1936;
+                                v1936 = v1935 == false;
+                                if (v1936){
+                                    assert("The raise amount must match the minimum." && v1935);
+                                } else {
+                                }
+                                static_array<int,2> v1938;
+                                int v1940;
+                                v1940 = 0;
+                                while (while_method_0(v1940)){
+                                    bool v1942;
+                                    v1942 = 0 <= v1940;
+                                    bool v1944;
+                                    if (v1942){
+                                        bool v1943;
+                                        v1943 = v1940 < 2;
+                                        v1944 = v1943;
+                                    } else {
+                                        v1944 = false;
+                                    }
+                                    bool v1945;
+                                    v1945 = v1944 == false;
+                                    if (v1945){
+                                        assert("Index must be in range." && v1944);
+                                    } else {
+                                    }
+                                    int v1947;
+                                    v1947 = v1851[v1940];
+                                    bool v1950;
+                                    if (v1942){
+                                        bool v1949;
+                                        v1949 = v1940 < 2;
+                                        v1950 = v1949;
+                                    } else {
+                                        v1950 = false;
+                                    }
+                                    bool v1951;
+                                    v1951 = v1950 == false;
+                                    if (v1951){
+                                        assert("Index must be in range." && v1950);
+                                    } else {
+                                    }
+                                    int v1953;
+                                    v1953 = v1849[v1940];
+                                    int v1955;
+                                    v1955 = v1947 + v1953;
+                                    v1938[v1940] = v1955;
+                                    v1940 += 1 ;
+                                }
+                                int v1956;
+                                v1956 = v1849[0];
+                                int v1958; int v1959;
+                                Tuple4 tmp57 = Tuple4{1, v1956};
+                                v1958 = tmp57.v0; v1959 = tmp57.v1;
+                                while (while_method_0(v1958)){
+                                    bool v1961;
+                                    v1961 = 0 <= v1958;
+                                    bool v1963;
+                                    if (v1961){
+                                        bool v1962;
+                                        v1962 = v1958 < 2;
+                                        v1963 = v1962;
+                                    } else {
+                                        v1963 = false;
+                                    }
+                                    bool v1964;
+                                    v1964 = v1963 == false;
+                                    if (v1964){
+                                        assert("Index must be in range." && v1963);
+                                    } else {
+                                    }
+                                    int v1966;
+                                    v1966 = v1849[v1958];
+                                    bool v1968;
+                                    v1968 = v1959 >= v1966;
+                                    int v1969;
+                                    if (v1968){
+                                        v1969 = v1959;
+                                    } else {
+                                        v1969 = v1966;
+                                    }
+                                    v1959 = v1969;
+                                    v1958 += 1 ;
+                                }
+                                bool v1970;
+                                v1970 = 0 <= v1854;
+                                bool v1972;
+                                if (v1970){
+                                    bool v1971;
+                                    v1971 = v1854 < 2;
+                                    v1972 = v1971;
+                                } else {
+                                    v1972 = false;
+                                }
+                                bool v1973;
+                                v1973 = v1972 == false;
+                                if (v1973){
+                                    assert("Index must be in range." && v1972);
+                                } else {
+                                }
+                                int v1975;
+                                v1975 = v1938[v1854];
+                                bool v1977;
+                                v1977 = v1959 < v1975;
+                                int v1978;
+                                if (v1977){
+                                    v1978 = v1959;
+                                } else {
+                                    v1978 = v1975;
+                                }
+                                static_array<int,2> v1979;
+                                int v1981;
+                                v1981 = 0;
+                                while (while_method_0(v1981)){
+                                    bool v1983;
+                                    v1983 = 0 <= v1981;
                                     bool v1985;
-                                    v1985 = 0 <= v1983;
-                                    bool v1987;
-                                    if (v1985){
-                                        bool v1986;
-                                        v1986 = v1983 < 2;
-                                        v1987 = v1986;
+                                    if (v1983){
+                                        bool v1984;
+                                        v1984 = v1981 < 2;
+                                        v1985 = v1984;
                                     } else {
-                                        v1987 = false;
+                                        v1985 = false;
                                     }
-                                    bool v1988;
-                                    v1988 = v1987 == false;
-                                    if (v1988){
-                                        assert("Index must be in range." && v1987);
+                                    bool v1986;
+                                    v1986 = v1985 == false;
+                                    if (v1986){
+                                        assert("Index must be in range." && v1985);
                                     } else {
                                     }
-                                    int v1990;
-                                    v1990 = v1771[v1983];
-                                    bool v1993;
-                                    if (v1985){
-                                        bool v1992;
-                                        v1992 = v1983 < 2;
-                                        v1993 = v1992;
+                                    int v1988;
+                                    v1988 = v1849[v1981];
+                                    bool v1990;
+                                    v1990 = v1854 == v1981;
+                                    int v1991;
+                                    if (v1990){
+                                        v1991 = v1978;
                                     } else {
-                                        v1993 = false;
+                                        v1991 = v1988;
                                     }
-                                    bool v1994;
-                                    v1994 = v1993 == false;
-                                    if (v1994){
-                                        assert("Index must be in range." && v1993);
-                                    } else {
-                                    }
-                                    int v1996;
-                                    v1996 = v1769[v1983];
-                                    int v1998;
-                                    v1998 = v1990 + v1996;
-                                    v1981[v1983] = v1998;
-                                    v1983 += 1 ;
+                                    v1979[v1981] = v1991;
+                                    v1981 += 1 ;
                                 }
-                                int v1999;
-                                v1999 = v1769[0];
-                                int v2001; int v2002;
-                                Tuple4 tmp54 = Tuple4{1, v1999};
-                                v2001 = tmp54.v0; v2002 = tmp54.v1;
-                                while (while_method_0(v2001)){
+                                static_array<int,2> v1992;
+                                int v1994;
+                                v1994 = 0;
+                                while (while_method_0(v1994)){
+                                    bool v1996;
+                                    v1996 = 0 <= v1994;
+                                    bool v1998;
+                                    if (v1996){
+                                        bool v1997;
+                                        v1997 = v1994 < 2;
+                                        v1998 = v1997;
+                                    } else {
+                                        v1998 = false;
+                                    }
+                                    bool v1999;
+                                    v1999 = v1998 == false;
+                                    if (v1999){
+                                        assert("Index must be in range." && v1998);
+                                    } else {
+                                    }
+                                    int v2001;
+                                    v2001 = v1938[v1994];
                                     bool v2004;
-                                    v2004 = 0 <= v2001;
-                                    bool v2006;
-                                    if (v2004){
-                                        bool v2005;
-                                        v2005 = v2001 < 2;
-                                        v2006 = v2005;
+                                    if (v1996){
+                                        bool v2003;
+                                        v2003 = v1994 < 2;
+                                        v2004 = v2003;
                                     } else {
-                                        v2006 = false;
+                                        v2004 = false;
                                     }
-                                    bool v2007;
-                                    v2007 = v2006 == false;
-                                    if (v2007){
-                                        assert("Index must be in range." && v2006);
+                                    bool v2005;
+                                    v2005 = v2004 == false;
+                                    if (v2005){
+                                        assert("Index must be in range." && v2004);
                                     } else {
                                     }
+                                    int v2007;
+                                    v2007 = v1979[v1994];
                                     int v2009;
-                                    v2009 = v1769[v2001];
-                                    bool v2011;
-                                    v2011 = v2002 >= v2009;
-                                    int v2012;
-                                    if (v2011){
-                                        v2012 = v2002;
-                                    } else {
-                                        v2012 = v2009;
-                                    }
-                                    v2002 = v2012;
-                                    v2001 += 1 ;
+                                    v2009 = v2001 - v2007;
+                                    v1992[v1994] = v2009;
+                                    v1994 += 1 ;
                                 }
-                                bool v2013;
-                                v2013 = 0 <= v1774;
-                                bool v2015;
-                                if (v2013){
-                                    bool v2014;
-                                    v2014 = v1774 < 2;
-                                    v2015 = v2014;
+                                bool v2011;
+                                if (v1970){
+                                    bool v2010;
+                                    v2010 = v1854 < 2;
+                                    v2011 = v2010;
                                 } else {
-                                    v2015 = false;
+                                    v2011 = false;
                                 }
+                                bool v2012;
+                                v2012 = v2011 == false;
+                                if (v2012){
+                                    assert("Index must be in range." && v2011);
+                                } else {
+                                }
+                                int v2014;
+                                v2014 = v1992[v1854];
                                 bool v2016;
-                                v2016 = v2015 == false;
-                                if (v2016){
-                                    assert("Index must be in range." && v2015);
+                                v2016 = v1934 < v2014;
+                                bool v2017;
+                                v2017 = v2016 == false;
+                                if (v2017){
+                                    assert("The raise amount must be less than the stack size after calling." && v2016);
                                 } else {
                                 }
-                                int v2018;
-                                v2018 = v1981[v1774];
-                                bool v2020;
-                                v2020 = v2002 < v2018;
-                                int v2021;
-                                if (v2020){
-                                    v2021 = v2002;
+                                int v2019;
+                                v2019 = v1959 + v1934;
+                                bool v2021;
+                                if (v1970){
+                                    bool v2020;
+                                    v2020 = v1854 < 2;
+                                    v2021 = v2020;
                                 } else {
-                                    v2021 = v2018;
+                                    v2021 = false;
                                 }
-                                static_array<int,2> v2022;
+                                bool v2022;
+                                v2022 = v2021 == false;
+                                if (v2022){
+                                    assert("Index must be in range." && v2021);
+                                } else {
+                                }
                                 int v2024;
-                                v2024 = 0;
-                                while (while_method_0(v2024)){
-                                    bool v2026;
-                                    v2026 = 0 <= v2024;
-                                    bool v2028;
-                                    if (v2026){
-                                        bool v2027;
-                                        v2027 = v2024 < 2;
-                                        v2028 = v2027;
-                                    } else {
-                                        v2028 = false;
-                                    }
-                                    bool v2029;
-                                    v2029 = v2028 == false;
-                                    if (v2029){
-                                        assert("Index must be in range." && v2028);
-                                    } else {
-                                    }
-                                    int v2031;
-                                    v2031 = v1769[v2024];
-                                    bool v2033;
-                                    v2033 = v1774 == v2024;
-                                    int v2034;
-                                    if (v2033){
-                                        v2034 = v2021;
-                                    } else {
-                                        v2034 = v2031;
-                                    }
-                                    v2022[v2024] = v2034;
-                                    v2024 += 1 ;
+                                v2024 = v1938[v1854];
+                                bool v2026;
+                                v2026 = v2019 < v2024;
+                                int v2027;
+                                if (v2026){
+                                    v2027 = v2019;
+                                } else {
+                                    v2027 = v2024;
                                 }
-                                static_array<int,2> v2035;
-                                int v2037;
-                                v2037 = 0;
-                                while (while_method_0(v2037)){
+                                static_array<int,2> v2028;
+                                int v2030;
+                                v2030 = 0;
+                                while (while_method_0(v2030)){
+                                    bool v2032;
+                                    v2032 = 0 <= v2030;
+                                    bool v2034;
+                                    if (v2032){
+                                        bool v2033;
+                                        v2033 = v2030 < 2;
+                                        v2034 = v2033;
+                                    } else {
+                                        v2034 = false;
+                                    }
+                                    bool v2035;
+                                    v2035 = v2034 == false;
+                                    if (v2035){
+                                        assert("Index must be in range." && v2034);
+                                    } else {
+                                    }
+                                    int v2037;
+                                    v2037 = v1849[v2030];
                                     bool v2039;
-                                    v2039 = 0 <= v2037;
-                                    bool v2041;
+                                    v2039 = v1854 == v2030;
+                                    int v2040;
                                     if (v2039){
-                                        bool v2040;
-                                        v2040 = v2037 < 2;
-                                        v2041 = v2040;
+                                        v2040 = v2027;
                                     } else {
-                                        v2041 = false;
+                                        v2040 = v2037;
                                     }
-                                    bool v2042;
-                                    v2042 = v2041 == false;
-                                    if (v2042){
-                                        assert("Index must be in range." && v2041);
-                                    } else {
-                                    }
-                                    int v2044;
-                                    v2044 = v1981[v2037];
+                                    v2028[v2030] = v2040;
+                                    v2030 += 1 ;
+                                }
+                                static_array<int,2> v2041;
+                                int v2043;
+                                v2043 = 0;
+                                while (while_method_0(v2043)){
+                                    bool v2045;
+                                    v2045 = 0 <= v2043;
                                     bool v2047;
-                                    if (v2039){
+                                    if (v2045){
                                         bool v2046;
-                                        v2046 = v2037 < 2;
+                                        v2046 = v2043 < 2;
                                         v2047 = v2046;
                                     } else {
                                         v2047 = false;
@@ -12884,665 +13722,38 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                     } else {
                                     }
                                     int v2050;
-                                    v2050 = v2022[v2037];
-                                    int v2052;
-                                    v2052 = v2044 - v2050;
-                                    v2035[v2037] = v2052;
-                                    v2037 += 1 ;
-                                }
-                                bool v2054;
-                                if (v2013){
+                                    v2050 = v1938[v2043];
                                     bool v2053;
-                                    v2053 = v1774 < 2;
-                                    v2054 = v2053;
-                                } else {
-                                    v2054 = false;
+                                    if (v2045){
+                                        bool v2052;
+                                        v2052 = v2043 < 2;
+                                        v2053 = v2052;
+                                    } else {
+                                        v2053 = false;
+                                    }
+                                    bool v2054;
+                                    v2054 = v2053 == false;
+                                    if (v2054){
+                                        assert("Index must be in range." && v2053);
+                                    } else {
+                                    }
+                                    int v2056;
+                                    v2056 = v2028[v2043];
+                                    int v2058;
+                                    v2058 = v2050 - v2056;
+                                    v2041[v2043] = v2058;
+                                    v2043 += 1 ;
                                 }
-                                bool v2055;
-                                v2055 = v2054 == false;
-                                if (v2055){
-                                    assert("Index must be in range." && v2054);
-                                } else {
-                                }
-                                int v2057;
-                                v2057 = v2035[v1774];
                                 int v2059;
-                                v2059 = v2002 + v2057;
-                                bool v2061;
-                                if (v2013){
-                                    bool v2060;
-                                    v2060 = v1774 < 2;
-                                    v2061 = v2060;
-                                } else {
-                                    v2061 = false;
-                                }
-                                bool v2062;
-                                v2062 = v2061 == false;
-                                if (v2062){
-                                    assert("Index must be in range." && v2061);
-                                } else {
-                                }
-                                int v2064;
-                                v2064 = v1981[v1774];
-                                bool v2066;
-                                v2066 = v2059 < v2064;
-                                int v2067;
-                                if (v2066){
-                                    v2067 = v2059;
-                                } else {
-                                    v2067 = v2064;
-                                }
-                                static_array<int,2> v2068;
-                                int v2070;
-                                v2070 = 0;
-                                while (while_method_0(v2070)){
-                                    bool v2072;
-                                    v2072 = 0 <= v2070;
-                                    bool v2074;
-                                    if (v2072){
-                                        bool v2073;
-                                        v2073 = v2070 < 2;
-                                        v2074 = v2073;
-                                    } else {
-                                        v2074 = false;
-                                    }
-                                    bool v2075;
-                                    v2075 = v2074 == false;
-                                    if (v2075){
-                                        assert("Index must be in range." && v2074);
-                                    } else {
-                                    }
-                                    int v2077;
-                                    v2077 = v1769[v2070];
-                                    bool v2079;
-                                    v2079 = v1774 == v2070;
-                                    int v2080;
-                                    if (v2079){
-                                        v2080 = v2067;
-                                    } else {
-                                        v2080 = v2077;
-                                    }
-                                    v2068[v2070] = v2080;
-                                    v2070 += 1 ;
-                                }
-                                static_array<int,2> v2081;
-                                int v2083;
-                                v2083 = 0;
-                                while (while_method_0(v2083)){
-                                    bool v2085;
-                                    v2085 = 0 <= v2083;
-                                    bool v2087;
-                                    if (v2085){
-                                        bool v2086;
-                                        v2086 = v2083 < 2;
-                                        v2087 = v2086;
-                                    } else {
-                                        v2087 = false;
-                                    }
-                                    bool v2088;
-                                    v2088 = v2087 == false;
-                                    if (v2088){
-                                        assert("Index must be in range." && v2087);
-                                    } else {
-                                    }
-                                    int v2090;
-                                    v2090 = v1981[v2083];
-                                    bool v2093;
-                                    if (v2085){
-                                        bool v2092;
-                                        v2092 = v2083 < 2;
-                                        v2093 = v2092;
-                                    } else {
-                                        v2093 = false;
-                                    }
-                                    bool v2094;
-                                    v2094 = v2093 == false;
-                                    if (v2094){
-                                        assert("Index must be in range." && v2093);
-                                    } else {
-                                    }
-                                    int v2096;
-                                    v2096 = v2068[v2083];
-                                    int v2098;
-                                    v2098 = v2090 - v2096;
-                                    v2081[v2083] = v2098;
-                                    v2083 += 1 ;
-                                }
-                                bool v2099;
-                                v2099 = v2057 >= v1767;
-                                int v2100;
-                                if (v2099){
-                                    v2100 = v2057;
-                                } else {
-                                    v2100 = v1767;
-                                }
-                                int v2101;
-                                v2101 = v1770 + 1;
-                                v2106 = try_round_36(v2100, v1768, v2068, v2101, v2081, v1772);
-                                break;
-                            }
-                            case 1: { // A_Call
-                                static_array<int,2> v1777;
-                                int v1779;
-                                v1779 = 0;
-                                while (while_method_0(v1779)){
-                                    bool v1781;
-                                    v1781 = 0 <= v1779;
-                                    bool v1783;
-                                    if (v1781){
-                                        bool v1782;
-                                        v1782 = v1779 < 2;
-                                        v1783 = v1782;
-                                    } else {
-                                        v1783 = false;
-                                    }
-                                    bool v1784;
-                                    v1784 = v1783 == false;
-                                    if (v1784){
-                                        assert("Index must be in range." && v1783);
-                                    } else {
-                                    }
-                                    int v1786;
-                                    v1786 = v1771[v1779];
-                                    bool v1789;
-                                    if (v1781){
-                                        bool v1788;
-                                        v1788 = v1779 < 2;
-                                        v1789 = v1788;
-                                    } else {
-                                        v1789 = false;
-                                    }
-                                    bool v1790;
-                                    v1790 = v1789 == false;
-                                    if (v1790){
-                                        assert("Index must be in range." && v1789);
-                                    } else {
-                                    }
-                                    int v1792;
-                                    v1792 = v1769[v1779];
-                                    int v1794;
-                                    v1794 = v1786 + v1792;
-                                    v1777[v1779] = v1794;
-                                    v1779 += 1 ;
-                                }
-                                int v1795;
-                                v1795 = v1769[0];
-                                int v1797; int v1798;
-                                Tuple4 tmp55 = Tuple4{1, v1795};
-                                v1797 = tmp55.v0; v1798 = tmp55.v1;
-                                while (while_method_0(v1797)){
-                                    bool v1800;
-                                    v1800 = 0 <= v1797;
-                                    bool v1802;
-                                    if (v1800){
-                                        bool v1801;
-                                        v1801 = v1797 < 2;
-                                        v1802 = v1801;
-                                    } else {
-                                        v1802 = false;
-                                    }
-                                    bool v1803;
-                                    v1803 = v1802 == false;
-                                    if (v1803){
-                                        assert("Index must be in range." && v1802);
-                                    } else {
-                                    }
-                                    int v1805;
-                                    v1805 = v1769[v1797];
-                                    bool v1807;
-                                    v1807 = v1798 >= v1805;
-                                    int v1808;
-                                    if (v1807){
-                                        v1808 = v1798;
-                                    } else {
-                                        v1808 = v1805;
-                                    }
-                                    v1798 = v1808;
-                                    v1797 += 1 ;
-                                }
-                                bool v1809;
-                                v1809 = 0 <= v1774;
-                                bool v1811;
-                                if (v1809){
-                                    bool v1810;
-                                    v1810 = v1774 < 2;
-                                    v1811 = v1810;
-                                } else {
-                                    v1811 = false;
-                                }
-                                bool v1812;
-                                v1812 = v1811 == false;
-                                if (v1812){
-                                    assert("Index must be in range." && v1811);
-                                } else {
-                                }
-                                int v1814;
-                                v1814 = v1777[v1774];
-                                bool v1816;
-                                v1816 = v1798 < v1814;
-                                int v1817;
-                                if (v1816){
-                                    v1817 = v1798;
-                                } else {
-                                    v1817 = v1814;
-                                }
-                                static_array<int,2> v1818;
-                                int v1820;
-                                v1820 = 0;
-                                while (while_method_0(v1820)){
-                                    bool v1822;
-                                    v1822 = 0 <= v1820;
-                                    bool v1824;
-                                    if (v1822){
-                                        bool v1823;
-                                        v1823 = v1820 < 2;
-                                        v1824 = v1823;
-                                    } else {
-                                        v1824 = false;
-                                    }
-                                    bool v1825;
-                                    v1825 = v1824 == false;
-                                    if (v1825){
-                                        assert("Index must be in range." && v1824);
-                                    } else {
-                                    }
-                                    int v1827;
-                                    v1827 = v1769[v1820];
-                                    bool v1829;
-                                    v1829 = v1774 == v1820;
-                                    int v1830;
-                                    if (v1829){
-                                        v1830 = v1817;
-                                    } else {
-                                        v1830 = v1827;
-                                    }
-                                    v1818[v1820] = v1830;
-                                    v1820 += 1 ;
-                                }
-                                static_array<int,2> v1831;
-                                int v1833;
-                                v1833 = 0;
-                                while (while_method_0(v1833)){
-                                    bool v1835;
-                                    v1835 = 0 <= v1833;
-                                    bool v1837;
-                                    if (v1835){
-                                        bool v1836;
-                                        v1836 = v1833 < 2;
-                                        v1837 = v1836;
-                                    } else {
-                                        v1837 = false;
-                                    }
-                                    bool v1838;
-                                    v1838 = v1837 == false;
-                                    if (v1838){
-                                        assert("Index must be in range." && v1837);
-                                    } else {
-                                    }
-                                    int v1840;
-                                    v1840 = v1777[v1833];
-                                    bool v1843;
-                                    if (v1835){
-                                        bool v1842;
-                                        v1842 = v1833 < 2;
-                                        v1843 = v1842;
-                                    } else {
-                                        v1843 = false;
-                                    }
-                                    bool v1844;
-                                    v1844 = v1843 == false;
-                                    if (v1844){
-                                        assert("Index must be in range." && v1843);
-                                    } else {
-                                    }
-                                    int v1846;
-                                    v1846 = v1818[v1833];
-                                    int v1848;
-                                    v1848 = v1840 - v1846;
-                                    v1831[v1833] = v1848;
-                                    v1833 += 1 ;
-                                }
-                                bool v1849;
-                                v1849 = v1774 < 2;
-                                if (v1849){
-                                    int v1850;
-                                    v1850 = v1770 + 1;
-                                    v2106 = try_round_36(v1767, v1768, v1818, v1850, v1831, v1772);
-                                } else {
-                                    v2106 = go_next_street_38(v1767, v1768, v1818, v1770, v1831, v1772);
-                                }
-                                break;
-                            }
-                            case 2: { // A_Fold
-                                v2106 = Union4{Union4_1{v1767, v1768, v1769, v1770, v1771, v1772}};
-                                break;
-                            }
-                            case 3: { // A_Raise
-                                int v1854 = v1773.case3.v0;
-                                bool v1855;
-                                v1855 = v1767 <= v1854;
-                                bool v1856;
-                                v1856 = v1855 == false;
-                                if (v1856){
-                                    assert("The raise amount must match the minimum." && v1855);
-                                } else {
-                                }
-                                static_array<int,2> v1858;
-                                int v1860;
-                                v1860 = 0;
-                                while (while_method_0(v1860)){
-                                    bool v1862;
-                                    v1862 = 0 <= v1860;
-                                    bool v1864;
-                                    if (v1862){
-                                        bool v1863;
-                                        v1863 = v1860 < 2;
-                                        v1864 = v1863;
-                                    } else {
-                                        v1864 = false;
-                                    }
-                                    bool v1865;
-                                    v1865 = v1864 == false;
-                                    if (v1865){
-                                        assert("Index must be in range." && v1864);
-                                    } else {
-                                    }
-                                    int v1867;
-                                    v1867 = v1771[v1860];
-                                    bool v1870;
-                                    if (v1862){
-                                        bool v1869;
-                                        v1869 = v1860 < 2;
-                                        v1870 = v1869;
-                                    } else {
-                                        v1870 = false;
-                                    }
-                                    bool v1871;
-                                    v1871 = v1870 == false;
-                                    if (v1871){
-                                        assert("Index must be in range." && v1870);
-                                    } else {
-                                    }
-                                    int v1873;
-                                    v1873 = v1769[v1860];
-                                    int v1875;
-                                    v1875 = v1867 + v1873;
-                                    v1858[v1860] = v1875;
-                                    v1860 += 1 ;
-                                }
-                                int v1876;
-                                v1876 = v1769[0];
-                                int v1878; int v1879;
-                                Tuple4 tmp56 = Tuple4{1, v1876};
-                                v1878 = tmp56.v0; v1879 = tmp56.v1;
-                                while (while_method_0(v1878)){
-                                    bool v1881;
-                                    v1881 = 0 <= v1878;
-                                    bool v1883;
-                                    if (v1881){
-                                        bool v1882;
-                                        v1882 = v1878 < 2;
-                                        v1883 = v1882;
-                                    } else {
-                                        v1883 = false;
-                                    }
-                                    bool v1884;
-                                    v1884 = v1883 == false;
-                                    if (v1884){
-                                        assert("Index must be in range." && v1883);
-                                    } else {
-                                    }
-                                    int v1886;
-                                    v1886 = v1769[v1878];
-                                    bool v1888;
-                                    v1888 = v1879 >= v1886;
-                                    int v1889;
-                                    if (v1888){
-                                        v1889 = v1879;
-                                    } else {
-                                        v1889 = v1886;
-                                    }
-                                    v1879 = v1889;
-                                    v1878 += 1 ;
-                                }
-                                bool v1890;
-                                v1890 = 0 <= v1774;
-                                bool v1892;
-                                if (v1890){
-                                    bool v1891;
-                                    v1891 = v1774 < 2;
-                                    v1892 = v1891;
-                                } else {
-                                    v1892 = false;
-                                }
-                                bool v1893;
-                                v1893 = v1892 == false;
-                                if (v1893){
-                                    assert("Index must be in range." && v1892);
-                                } else {
-                                }
-                                int v1895;
-                                v1895 = v1858[v1774];
-                                bool v1897;
-                                v1897 = v1879 < v1895;
-                                int v1898;
-                                if (v1897){
-                                    v1898 = v1879;
-                                } else {
-                                    v1898 = v1895;
-                                }
-                                static_array<int,2> v1899;
-                                int v1901;
-                                v1901 = 0;
-                                while (while_method_0(v1901)){
-                                    bool v1903;
-                                    v1903 = 0 <= v1901;
-                                    bool v1905;
-                                    if (v1903){
-                                        bool v1904;
-                                        v1904 = v1901 < 2;
-                                        v1905 = v1904;
-                                    } else {
-                                        v1905 = false;
-                                    }
-                                    bool v1906;
-                                    v1906 = v1905 == false;
-                                    if (v1906){
-                                        assert("Index must be in range." && v1905);
-                                    } else {
-                                    }
-                                    int v1908;
-                                    v1908 = v1769[v1901];
-                                    bool v1910;
-                                    v1910 = v1774 == v1901;
-                                    int v1911;
-                                    if (v1910){
-                                        v1911 = v1898;
-                                    } else {
-                                        v1911 = v1908;
-                                    }
-                                    v1899[v1901] = v1911;
-                                    v1901 += 1 ;
-                                }
-                                static_array<int,2> v1912;
-                                int v1914;
-                                v1914 = 0;
-                                while (while_method_0(v1914)){
-                                    bool v1916;
-                                    v1916 = 0 <= v1914;
-                                    bool v1918;
-                                    if (v1916){
-                                        bool v1917;
-                                        v1917 = v1914 < 2;
-                                        v1918 = v1917;
-                                    } else {
-                                        v1918 = false;
-                                    }
-                                    bool v1919;
-                                    v1919 = v1918 == false;
-                                    if (v1919){
-                                        assert("Index must be in range." && v1918);
-                                    } else {
-                                    }
-                                    int v1921;
-                                    v1921 = v1858[v1914];
-                                    bool v1924;
-                                    if (v1916){
-                                        bool v1923;
-                                        v1923 = v1914 < 2;
-                                        v1924 = v1923;
-                                    } else {
-                                        v1924 = false;
-                                    }
-                                    bool v1925;
-                                    v1925 = v1924 == false;
-                                    if (v1925){
-                                        assert("Index must be in range." && v1924);
-                                    } else {
-                                    }
-                                    int v1927;
-                                    v1927 = v1899[v1914];
-                                    int v1929;
-                                    v1929 = v1921 - v1927;
-                                    v1912[v1914] = v1929;
-                                    v1914 += 1 ;
-                                }
-                                bool v1931;
-                                if (v1890){
-                                    bool v1930;
-                                    v1930 = v1774 < 2;
-                                    v1931 = v1930;
-                                } else {
-                                    v1931 = false;
-                                }
-                                bool v1932;
-                                v1932 = v1931 == false;
-                                if (v1932){
-                                    assert("Index must be in range." && v1931);
-                                } else {
-                                }
-                                int v1934;
-                                v1934 = v1912[v1774];
-                                bool v1936;
-                                v1936 = v1854 < v1934;
-                                bool v1937;
-                                v1937 = v1936 == false;
-                                if (v1937){
-                                    assert("The raise amount must be less than the stack size after calling." && v1936);
-                                } else {
-                                }
-                                int v1939;
-                                v1939 = v1879 + v1854;
-                                bool v1941;
-                                if (v1890){
-                                    bool v1940;
-                                    v1940 = v1774 < 2;
-                                    v1941 = v1940;
-                                } else {
-                                    v1941 = false;
-                                }
-                                bool v1942;
-                                v1942 = v1941 == false;
-                                if (v1942){
-                                    assert("Index must be in range." && v1941);
-                                } else {
-                                }
-                                int v1944;
-                                v1944 = v1858[v1774];
-                                bool v1946;
-                                v1946 = v1939 < v1944;
-                                int v1947;
-                                if (v1946){
-                                    v1947 = v1939;
-                                } else {
-                                    v1947 = v1944;
-                                }
-                                static_array<int,2> v1948;
-                                int v1950;
-                                v1950 = 0;
-                                while (while_method_0(v1950)){
-                                    bool v1952;
-                                    v1952 = 0 <= v1950;
-                                    bool v1954;
-                                    if (v1952){
-                                        bool v1953;
-                                        v1953 = v1950 < 2;
-                                        v1954 = v1953;
-                                    } else {
-                                        v1954 = false;
-                                    }
-                                    bool v1955;
-                                    v1955 = v1954 == false;
-                                    if (v1955){
-                                        assert("Index must be in range." && v1954);
-                                    } else {
-                                    }
-                                    int v1957;
-                                    v1957 = v1769[v1950];
-                                    bool v1959;
-                                    v1959 = v1774 == v1950;
-                                    int v1960;
-                                    if (v1959){
-                                        v1960 = v1947;
-                                    } else {
-                                        v1960 = v1957;
-                                    }
-                                    v1948[v1950] = v1960;
-                                    v1950 += 1 ;
-                                }
-                                static_array<int,2> v1961;
-                                int v1963;
-                                v1963 = 0;
-                                while (while_method_0(v1963)){
-                                    bool v1965;
-                                    v1965 = 0 <= v1963;
-                                    bool v1967;
-                                    if (v1965){
-                                        bool v1966;
-                                        v1966 = v1963 < 2;
-                                        v1967 = v1966;
-                                    } else {
-                                        v1967 = false;
-                                    }
-                                    bool v1968;
-                                    v1968 = v1967 == false;
-                                    if (v1968){
-                                        assert("Index must be in range." && v1967);
-                                    } else {
-                                    }
-                                    int v1970;
-                                    v1970 = v1858[v1963];
-                                    bool v1973;
-                                    if (v1965){
-                                        bool v1972;
-                                        v1972 = v1963 < 2;
-                                        v1973 = v1972;
-                                    } else {
-                                        v1973 = false;
-                                    }
-                                    bool v1974;
-                                    v1974 = v1973 == false;
-                                    if (v1974){
-                                        assert("Index must be in range." && v1973);
-                                    } else {
-                                    }
-                                    int v1976;
-                                    v1976 = v1948[v1963];
-                                    int v1978;
-                                    v1978 = v1970 - v1976;
-                                    v1961[v1963] = v1978;
-                                    v1963 += 1 ;
-                                }
-                                int v1979;
-                                v1979 = v1770 + 1;
-                                v2106 = try_round_36(v1854, v1768, v1948, v1979, v1961, v1772);
+                                v2059 = v1850 + 1;
+                                v2186 = try_round_36(v1934, v1848, v2028, v2059, v2041, v1852);
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        v2250 = Union3{Union3_1{v2106}};
+                        v2330 = Union3{Union3_1{v2186}};
                         break;
                     }
                     case 6: { // G_Showdown
@@ -13613,8 +13824,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                             v54 += 1 ;
                         }
                         static_array<unsigned char,5> v64; char v65;
-                        Tuple0 tmp81 = score_51(v43);
-                        v64 = tmp81.v0; v65 = tmp81.v1;
+                        Tuple0 tmp82 = score_51(v43);
+                        v64 = tmp82.v0; v65 = tmp82.v1;
                         static_array<unsigned char,2> v66;
                         v66 = v33[1];
                         static_array<unsigned char,7> v68;
@@ -13669,8 +13880,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                             v79 += 1 ;
                         }
                         static_array<unsigned char,5> v89; char v90;
-                        Tuple0 tmp82 = score_51(v68);
-                        v89 = tmp82.v0; v90 = tmp82.v1;
+                        Tuple0 tmp83 = score_51(v68);
+                        v89 = tmp83.v0; v90 = tmp83.v1;
                         int v91;
                         v91 = v35 % 2;
                         bool v92;
@@ -13821,78 +14032,78 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                         Union3 v144;
                         v144 = Union3{Union3_0{}};
                         v4.v1 = v144;
-                        v2250 = Union3{Union3_0{}};
+                        v2330 = Union3{Union3_0{}};
                         break;
                     }
                     case 7: { // G_Turn
-                        int v2127 = v11.case7.v0; static_array<static_array<unsigned char,2>,2> v2128 = v11.case7.v1; static_array<int,2> v2129 = v11.case7.v2; int v2130 = v11.case7.v3; static_array<int,2> v2131 = v11.case7.v4; Union5 v2132 = v11.case7.v5;
-                        curandStatePhilox4_32_10_t & v2133 = v4.v4;
-                        curandStatePhilox4_32_10_t & v2134 = v2133;
-                        static_array<unsigned char,1> v2135; unsigned long long v2136;
-                        Tuple12 tmp83 = draw_cards_40(v2134, v7);
-                        v2135 = tmp83.v0; v2136 = tmp83.v1;
-                        v4.v0 = v2136;
-                        static_array_list<unsigned char,5> v2137;
-                        v2137 = get_community_cards_41(v2132, v2135);
-                        Union6 v2138;
-                        v2138 = Union6{Union6_0{v2137}};
-                        v6.push(v2138);
-                        Union5 v2163;
-                        switch (v2132.tag) {
+                        int v2207 = v11.case7.v0; static_array<static_array<unsigned char,2>,2> v2208 = v11.case7.v1; static_array<int,2> v2209 = v11.case7.v2; int v2210 = v11.case7.v3; static_array<int,2> v2211 = v11.case7.v4; Union5 v2212 = v11.case7.v5;
+                        curandStatePhilox4_32_10_t & v2213 = v4.v4;
+                        curandStatePhilox4_32_10_t & v2214 = v2213;
+                        static_array<unsigned char,1> v2215; unsigned long long v2216;
+                        Tuple12 tmp84 = draw_cards_40(v2214, v7);
+                        v2215 = tmp84.v0; v2216 = tmp84.v1;
+                        v4.v0 = v2216;
+                        static_array_list<unsigned char,5> v2217;
+                        v2217 = get_community_cards_41(v2212, v2215);
+                        Union6 v2218;
+                        v2218 = Union6{Union6_0{v2217}};
+                        v6.push(v2218);
+                        Union5 v2243;
+                        switch (v2212.tag) {
                             case 0: { // Flop
-                                static_array<unsigned char,3> v2139 = v2132.case0.v0;
-                                static_array<unsigned char,4> v2140;
-                                int v2142;
-                                v2142 = 0;
-                                while (while_method_1(v2142)){
-                                    bool v2144;
-                                    v2144 = 0 <= v2142;
-                                    bool v2146;
-                                    if (v2144){
-                                        bool v2145;
-                                        v2145 = v2142 < 3;
-                                        v2146 = v2145;
+                                static_array<unsigned char,3> v2219 = v2212.case0.v0;
+                                static_array<unsigned char,4> v2220;
+                                int v2222;
+                                v2222 = 0;
+                                while (while_method_1(v2222)){
+                                    bool v2224;
+                                    v2224 = 0 <= v2222;
+                                    bool v2226;
+                                    if (v2224){
+                                        bool v2225;
+                                        v2225 = v2222 < 3;
+                                        v2226 = v2225;
                                     } else {
-                                        v2146 = false;
+                                        v2226 = false;
                                     }
-                                    bool v2147;
-                                    v2147 = v2146 == false;
-                                    if (v2147){
-                                        assert("Index must be in range." && v2146);
+                                    bool v2227;
+                                    v2227 = v2226 == false;
+                                    if (v2227){
+                                        assert("Index must be in range." && v2226);
                                     } else {
                                     }
-                                    unsigned char v2149;
-                                    v2149 = v2139[v2142];
-                                    v2140[v2142] = v2149;
-                                    v2142 += 1 ;
+                                    unsigned char v2229;
+                                    v2229 = v2219[v2222];
+                                    v2220[v2222] = v2229;
+                                    v2222 += 1 ;
                                 }
-                                int v2151;
-                                v2151 = 0;
-                                while (while_method_6(v2151)){
-                                    bool v2153;
-                                    v2153 = 0 <= v2151;
-                                    bool v2155;
-                                    if (v2153){
-                                        bool v2154;
-                                        v2154 = v2151 < 1;
-                                        v2155 = v2154;
+                                int v2231;
+                                v2231 = 0;
+                                while (while_method_6(v2231)){
+                                    bool v2233;
+                                    v2233 = 0 <= v2231;
+                                    bool v2235;
+                                    if (v2233){
+                                        bool v2234;
+                                        v2234 = v2231 < 1;
+                                        v2235 = v2234;
                                     } else {
-                                        v2155 = false;
+                                        v2235 = false;
                                     }
-                                    bool v2156;
-                                    v2156 = v2155 == false;
-                                    if (v2156){
-                                        assert("Index must be in range." && v2155);
+                                    bool v2236;
+                                    v2236 = v2235 == false;
+                                    if (v2236){
+                                        assert("Index must be in range." && v2235);
                                     } else {
                                     }
-                                    unsigned char v2158;
-                                    v2158 = v2135[v2151];
-                                    int v2160;
-                                    v2160 = 3 + v2151;
-                                    v2140[v2160] = v2158;
-                                    v2151 += 1 ;
+                                    unsigned char v2238;
+                                    v2238 = v2215[v2231];
+                                    int v2240;
+                                    v2240 = 3 + v2231;
+                                    v2220[v2240] = v2238;
+                                    v2231 += 1 ;
                                 }
-                                v2163 = Union5{Union5_3{v2140}};
+                                v2243 = Union5{Union5_3{v2220}};
                                 break;
                             }
                             default: {
@@ -13900,13 +14111,13 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                                 __trap();
                             }
                         }
-                        int v2164;
-                        v2164 = 2;
-                        int v2165;
-                        v2165 = 0;
-                        Union4 v2166;
-                        v2166 = try_round_36(v2164, v2128, v2129, v2165, v2131, v2163);
-                        v2250 = Union3{Union3_1{v2166}};
+                        int v2244;
+                        v2244 = 2;
+                        int v2245;
+                        v2245 = 0;
+                        Union4 v2246;
+                        v2246 = try_round_36(v2244, v2208, v2209, v2245, v2211, v2243);
+                        v2330 = Union3{Union3_1{v2246}};
                         break;
                     }
                     default: {
@@ -13919,7 +14130,7 @@ __device__ void play_loop_31(unsigned char * v0, unsigned long long v1, unsigned
                 assert("Invalid tag." && false); __trap();
             }
         }
-        v9 = v2250;
+        v9 = v2330;
     }
     return ;
 }
@@ -14613,8 +14824,8 @@ __device__ void f_75(unsigned char * v0, int v1, static_array<Tuple0,2> v2, int 
         } else {
         }
         static_array<unsigned char,5> v18; char v19;
-        Tuple0 tmp84 = v2[v6];
-        v18 = tmp84.v0; v19 = tmp84.v1;
+        Tuple0 tmp85 = v2[v6];
+        v18 = tmp85.v0; v19 = tmp85.v1;
         f_76(v11, v18, v19);
         v6 += 1 ;
     }
@@ -14667,15 +14878,19 @@ __device__ void f_78(unsigned char * v0, Union2 v1){
     unsigned char * v3;
     v3 = (unsigned char *)(v0+4ull);
     switch (v1.tag) {
-        case 0: { // Computer
+        case 0: { // CallingMachine
             return f_55(v3);
             break;
         }
-        case 1: { // Human
+        case 1: { // Computer
             return f_55(v3);
             break;
         }
-        case 2: { // Random
+        case 2: { // Human
+            return f_55(v3);
+            break;
+        }
+        case 3: { // Random
             return f_55(v3);
             break;
         }
@@ -15477,8 +15692,8 @@ __device__ float method_83(int * v0, float * v1, float * v2, float * v3, float *
             v166 += 1 ;
         }
         float v180; int v181;
-        Tuple14 tmp90 = Tuple14{0.0f, 2147483647};
-        v180 = tmp90.v0; v181 = tmp90.v1;
+        Tuple14 tmp91 = Tuple14{0.0f, 2147483647};
+        v180 = tmp91.v0; v181 = tmp91.v1;
         int v182;
         v182 = 0;
         while (while_method_6(v182)){
@@ -15523,8 +15738,8 @@ __device__ float method_83(int * v0, float * v1, float * v2, float * v3, float *
         auto v199 = cooperative_groups::labeled_partition(v196,v198);
         Closure7 v200{v62};
         float v201; int v202;
-        Tuple14 tmp91 = cooperative_groups::reduce(v199, Tuple14{v180, v181}, v200);
-        v201 = tmp91.v0; v202 = tmp91.v1;
+        Tuple14 tmp92 = cooperative_groups::reduce(v199, Tuple14{v180, v181}, v200);
+        v201 = tmp92.v0; v202 = tmp92.v1;
         bool v203;
         v203 = v202 == 2147483647;
         bool v204;
@@ -15563,15 +15778,15 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
     v7.unsafe_set_length(0);
     static_array<Union2,2> v8;
     Union2 v10;
-    v10 = Union2{Union2_0{}};
+    v10 = Union2{Union2_1{}};
     v8[0] = v10;
     Union2 v12;
-    v12 = Union2{Union2_0{}};
+    v12 = Union2{Union2_1{}};
     v8[1] = v12;
     int v14;
     v14 = v3 ^ 1;
     Union2 v15;
-    v15 = Union2{Union2_2{}};
+    v15 = Union2{Union2_3{}};
     v8[v14] = v15;
     v2.v3 = v8;
     static_array_list<Union6,128> & v17 = v2.v2;
@@ -15581,33 +15796,33 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
     Union3 v20;
     v20 = v19;
     while (while_method_22(v20)){
-        Union3 v1782;
+        Union3 v1784;
         switch (v20.tag) {
             case 0: { // None
-                v1782 = Union3{Union3_0{}};
+                v1784 = Union3{Union3_0{}};
                 break;
             }
             case 1: { // Some
                 Union4 v22 = v20.case1.v0;
-                Union18 v1433;
+                Union18 v1435;
                 switch (v22.tag) {
                     case 0: { // G_Flop
-                        int v1294 = v22.case0.v0; static_array<static_array<unsigned char,2>,2> v1295 = v22.case0.v1; static_array<int,2> v1296 = v22.case0.v2; int v1297 = v22.case0.v3; static_array<int,2> v1298 = v22.case0.v4; Union5 v1299 = v22.case0.v5;
-                        curandStatePhilox4_32_10_t & v1300 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1301 = v1300;
-                        static_array<unsigned char,3> v1302; unsigned long long v1303;
-                        Tuple8 tmp85 = draw_cards_32(v1301, v18);
-                        v1302 = tmp85.v0; v1303 = tmp85.v1;
-                        v2.v0 = v1303;
-                        static_array_list<unsigned char,5> v1304;
-                        v1304 = get_community_cards_81(v1299, v1302);
-                        Union6 v1305;
-                        v1305 = Union6{Union6_0{v1304}};
-                        v17.push(v1305);
-                        Union5 v1308;
-                        switch (v1299.tag) {
+                        int v1296 = v22.case0.v0; static_array<static_array<unsigned char,2>,2> v1297 = v22.case0.v1; static_array<int,2> v1298 = v22.case0.v2; int v1299 = v22.case0.v3; static_array<int,2> v1300 = v22.case0.v4; Union5 v1301 = v22.case0.v5;
+                        curandStatePhilox4_32_10_t & v1302 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1303 = v1302;
+                        static_array<unsigned char,3> v1304; unsigned long long v1305;
+                        Tuple8 tmp86 = draw_cards_32(v1303, v18);
+                        v1304 = tmp86.v0; v1305 = tmp86.v1;
+                        v2.v0 = v1305;
+                        static_array_list<unsigned char,5> v1306;
+                        v1306 = get_community_cards_81(v1301, v1304);
+                        Union6 v1307;
+                        v1307 = Union6{Union6_0{v1306}};
+                        v17.push(v1307);
+                        Union5 v1310;
+                        switch (v1301.tag) {
                             case 1: { // Preflop
-                                v1308 = Union5{Union5_0{v1302}};
+                                v1310 = Union5{Union5_0{v1304}};
                                 break;
                             }
                             default: {
@@ -15615,13 +15830,13 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1309;
-                        v1309 = 2;
-                        int v1310;
-                        v1310 = 0;
-                        Union4 v1311;
-                        v1311 = try_round_36(v1309, v1295, v1296, v1310, v1298, v1308);
-                        v1433 = Union18{Union18_2{v1311}};
+                        int v1311;
+                        v1311 = 2;
+                        int v1312;
+                        v1312 = 0;
+                        Union4 v1313;
+                        v1313 = try_round_36(v1311, v1297, v1298, v1312, v1300, v1310);
+                        v1435 = Union18{Union18_2{v1313}};
                         break;
                     }
                     case 1: { // G_Fold
@@ -15664,141 +15879,141 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         Union6 v44;
                         v44 = Union6{Union6_1{v35, v43}};
                         v17.push(v44);
-                        v1433 = Union18{Union18_0{}};
+                        v1435 = Union18{Union18_0{}};
                         break;
                     }
                     case 2: { // G_Preflop
-                        curandStatePhilox4_32_10_t & v1395 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1396 = v1395;
-                        static_array<unsigned char,2> v1397; unsigned long long v1398;
-                        Tuple11 tmp86 = draw_cards_39(v1396, v18);
-                        v1397 = tmp86.v0; v1398 = tmp86.v1;
-                        v2.v0 = v1398;
-                        curandStatePhilox4_32_10_t & v1399 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1400 = v1399;
-                        static_array<unsigned char,2> v1401; unsigned long long v1402;
-                        Tuple11 tmp87 = draw_cards_39(v1400, v18);
-                        v1401 = tmp87.v0; v1402 = tmp87.v1;
-                        v2.v0 = v1402;
-                        Union6 v1403;
-                        v1403 = Union6{Union6_3{0, v1397}};
-                        v17.push(v1403);
-                        Union6 v1404;
-                        v1404 = Union6{Union6_3{1, v1401}};
-                        v17.push(v1404);
-                        static_array<static_array<unsigned char,2>,2> v1405;
-                        v1405[0] = v1397;
-                        v1405[1] = v1401;
-                        static_array<int,2> v1407;
-                        v1407[0] = 2;
-                        v1407[1] = 1;
+                        curandStatePhilox4_32_10_t & v1397 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1398 = v1397;
+                        static_array<unsigned char,2> v1399; unsigned long long v1400;
+                        Tuple11 tmp87 = draw_cards_39(v1398, v18);
+                        v1399 = tmp87.v0; v1400 = tmp87.v1;
+                        v2.v0 = v1400;
+                        curandStatePhilox4_32_10_t & v1401 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1402 = v1401;
+                        static_array<unsigned char,2> v1403; unsigned long long v1404;
+                        Tuple11 tmp88 = draw_cards_39(v1402, v18);
+                        v1403 = tmp88.v0; v1404 = tmp88.v1;
+                        v2.v0 = v1404;
+                        Union6 v1405;
+                        v1405 = Union6{Union6_3{0, v1399}};
+                        v17.push(v1405);
+                        Union6 v1406;
+                        v1406 = Union6{Union6_3{1, v1403}};
+                        v17.push(v1406);
+                        static_array<static_array<unsigned char,2>,2> v1407;
+                        v1407[0] = v1399;
+                        v1407[1] = v1403;
                         static_array<int,2> v1409;
-                        int v1411;
-                        v1411 = 0;
-                        while (while_method_0(v1411)){
-                            bool v1413;
-                            v1413 = 0 <= v1411;
+                        v1409[0] = 2;
+                        v1409[1] = 1;
+                        static_array<int,2> v1411;
+                        int v1413;
+                        v1413 = 0;
+                        while (while_method_0(v1413)){
                             bool v1415;
-                            if (v1413){
-                                bool v1414;
-                                v1414 = v1411 < 2;
-                                v1415 = v1414;
+                            v1415 = 0 <= v1413;
+                            bool v1417;
+                            if (v1415){
+                                bool v1416;
+                                v1416 = v1413 < 2;
+                                v1417 = v1416;
                             } else {
-                                v1415 = false;
+                                v1417 = false;
                             }
-                            bool v1416;
-                            v1416 = v1415 == false;
-                            if (v1416){
-                                assert("Index must be in range." && v1415);
+                            bool v1418;
+                            v1418 = v1417 == false;
+                            if (v1418){
+                                assert("Index must be in range." && v1417);
                             } else {
                             }
-                            int v1418;
-                            v1418 = v1407[v1411];
                             int v1420;
-                            v1420 = 100 - v1418;
-                            v1409[v1411] = v1420;
-                            v1411 += 1 ;
+                            v1420 = v1409[v1413];
+                            int v1422;
+                            v1422 = 100 - v1420;
+                            v1411[v1413] = v1422;
+                            v1413 += 1 ;
                         }
-                        int v1421;
-                        v1421 = 2;
-                        int v1422;
-                        v1422 = 0;
-                        Union5 v1423;
-                        v1423 = Union5{Union5_1{}};
-                        Union4 v1424;
-                        v1424 = try_round_36(v1421, v1405, v1407, v1422, v1409, v1423);
-                        v1433 = Union18{Union18_2{v1424}};
+                        int v1423;
+                        v1423 = 2;
+                        int v1424;
+                        v1424 = 0;
+                        Union5 v1425;
+                        v1425 = Union5{Union5_1{}};
+                        Union4 v1426;
+                        v1426 = try_round_36(v1423, v1407, v1409, v1424, v1411, v1425);
+                        v1435 = Union18{Union18_2{v1426}};
                         break;
                     }
                     case 3: { // G_River
-                        int v1354 = v22.case3.v0; static_array<static_array<unsigned char,2>,2> v1355 = v22.case3.v1; static_array<int,2> v1356 = v22.case3.v2; int v1357 = v22.case3.v3; static_array<int,2> v1358 = v22.case3.v4; Union5 v1359 = v22.case3.v5;
-                        curandStatePhilox4_32_10_t & v1360 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1361 = v1360;
-                        static_array<unsigned char,1> v1362; unsigned long long v1363;
-                        Tuple12 tmp88 = draw_cards_40(v1361, v18);
-                        v1362 = tmp88.v0; v1363 = tmp88.v1;
-                        v2.v0 = v1363;
-                        static_array_list<unsigned char,5> v1364;
-                        v1364 = get_community_cards_82(v1359, v1362);
-                        Union6 v1365;
-                        v1365 = Union6{Union6_0{v1364}};
-                        v17.push(v1365);
-                        Union5 v1390;
-                        switch (v1359.tag) {
+                        int v1356 = v22.case3.v0; static_array<static_array<unsigned char,2>,2> v1357 = v22.case3.v1; static_array<int,2> v1358 = v22.case3.v2; int v1359 = v22.case3.v3; static_array<int,2> v1360 = v22.case3.v4; Union5 v1361 = v22.case3.v5;
+                        curandStatePhilox4_32_10_t & v1362 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1363 = v1362;
+                        static_array<unsigned char,1> v1364; unsigned long long v1365;
+                        Tuple12 tmp89 = draw_cards_40(v1363, v18);
+                        v1364 = tmp89.v0; v1365 = tmp89.v1;
+                        v2.v0 = v1365;
+                        static_array_list<unsigned char,5> v1366;
+                        v1366 = get_community_cards_82(v1361, v1364);
+                        Union6 v1367;
+                        v1367 = Union6{Union6_0{v1366}};
+                        v17.push(v1367);
+                        Union5 v1392;
+                        switch (v1361.tag) {
                             case 3: { // Turn
-                                static_array<unsigned char,4> v1366 = v1359.case3.v0;
-                                static_array<unsigned char,5> v1367;
-                                int v1369;
-                                v1369 = 0;
-                                while (while_method_3(v1369)){
-                                    bool v1371;
-                                    v1371 = 0 <= v1369;
+                                static_array<unsigned char,4> v1368 = v1361.case3.v0;
+                                static_array<unsigned char,5> v1369;
+                                int v1371;
+                                v1371 = 0;
+                                while (while_method_3(v1371)){
                                     bool v1373;
-                                    if (v1371){
-                                        bool v1372;
-                                        v1372 = v1369 < 4;
-                                        v1373 = v1372;
+                                    v1373 = 0 <= v1371;
+                                    bool v1375;
+                                    if (v1373){
+                                        bool v1374;
+                                        v1374 = v1371 < 4;
+                                        v1375 = v1374;
                                     } else {
-                                        v1373 = false;
+                                        v1375 = false;
                                     }
-                                    bool v1374;
-                                    v1374 = v1373 == false;
-                                    if (v1374){
-                                        assert("Index must be in range." && v1373);
+                                    bool v1376;
+                                    v1376 = v1375 == false;
+                                    if (v1376){
+                                        assert("Index must be in range." && v1375);
                                     } else {
                                     }
-                                    unsigned char v1376;
-                                    v1376 = v1366[v1369];
-                                    v1367[v1369] = v1376;
-                                    v1369 += 1 ;
+                                    unsigned char v1378;
+                                    v1378 = v1368[v1371];
+                                    v1369[v1371] = v1378;
+                                    v1371 += 1 ;
                                 }
-                                int v1378;
-                                v1378 = 0;
-                                while (while_method_6(v1378)){
-                                    bool v1380;
-                                    v1380 = 0 <= v1378;
+                                int v1380;
+                                v1380 = 0;
+                                while (while_method_6(v1380)){
                                     bool v1382;
-                                    if (v1380){
-                                        bool v1381;
-                                        v1381 = v1378 < 1;
-                                        v1382 = v1381;
+                                    v1382 = 0 <= v1380;
+                                    bool v1384;
+                                    if (v1382){
+                                        bool v1383;
+                                        v1383 = v1380 < 1;
+                                        v1384 = v1383;
                                     } else {
-                                        v1382 = false;
+                                        v1384 = false;
                                     }
-                                    bool v1383;
-                                    v1383 = v1382 == false;
-                                    if (v1383){
-                                        assert("Index must be in range." && v1382);
+                                    bool v1385;
+                                    v1385 = v1384 == false;
+                                    if (v1385){
+                                        assert("Index must be in range." && v1384);
                                     } else {
                                     }
-                                    unsigned char v1385;
-                                    v1385 = v1362[v1378];
-                                    int v1387;
-                                    v1387 = 4 + v1378;
-                                    v1367[v1387] = v1385;
-                                    v1378 += 1 ;
+                                    unsigned char v1387;
+                                    v1387 = v1364[v1380];
+                                    int v1389;
+                                    v1389 = 4 + v1380;
+                                    v1369[v1389] = v1387;
+                                    v1380 += 1 ;
                                 }
-                                v1390 = Union5{Union5_2{v1367}};
+                                v1392 = Union5{Union5_2{v1369}};
                                 break;
                             }
                             default: {
@@ -15806,13 +16021,13 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1391;
-                        v1391 = 2;
-                        int v1392;
-                        v1392 = 0;
-                        Union4 v1393;
-                        v1393 = try_round_36(v1391, v1355, v1356, v1392, v1358, v1390);
-                        v1433 = Union18{Union18_2{v1393}};
+                        int v1393;
+                        v1393 = 2;
+                        int v1394;
+                        v1394 = 0;
+                        Union4 v1395;
+                        v1395 = try_round_36(v1393, v1357, v1358, v1394, v1360, v1392);
+                        v1435 = Union18{Union18_2{v1395}};
                         break;
                     }
                     case 4: { // G_Round
@@ -15838,9 +16053,13 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         }
                         Union2 v178;
                         v178 = v172[v171];
-                        Union1 v1281;
+                        Union1 v1283;
                         switch (v178.tag) {
-                            case 0: { // Computer
+                            case 0: { // CallingMachine
+                                v1283 = Union1{Union1_1{}};
+                                break;
+                            }
+                            case 1: { // Computer
                                 static_array_list<Union6,128> & v181 = v2.v2;
                                 curandStatePhilox4_32_10_t & v182 = v2.v5;
                                 curandStatePhilox4_32_10_t & v183 = v182;
@@ -17270,8 +17489,8 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v776;
                                 v776 = (int)v775;
                                 float v777; int v778;
-                                Tuple14 tmp89 = method_46(v183, v750, v752, v754, v756, v758, v760, v762, v764, v776, v766);
-                                v777 = tmp89.v0; v778 = tmp89.v1;
+                                Tuple14 tmp90 = method_46(v183, v750, v752, v754, v756, v758, v760, v762, v764, v776, v766);
+                                v777 = tmp90.v0; v778 = tmp90.v1;
                                 extern __shared__ unsigned char v779[];
                                 float * v780;
                                 v780 = reinterpret_cast<float *>(&v779[0ull]);
@@ -17767,15 +17986,15 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 }
                                 switch (v995.tag) {
                                     case 0: { // AA_Call
-                                        v1281 = Union1{Union1_1{}};
+                                        v1283 = Union1{Union1_1{}};
                                         break;
                                     }
                                     case 1: { // AA_Fold
                                         int v996;
                                         v996 = v167[0];
                                         int v998; int v999;
-                                        Tuple4 tmp92 = Tuple4{1, v996};
-                                        v998 = tmp92.v0; v999 = tmp92.v1;
+                                        Tuple4 tmp93 = Tuple4{1, v996};
+                                        v998 = tmp93.v0; v999 = tmp93.v1;
                                         while (while_method_0(v998)){
                                             bool v1001;
                                             v1001 = 0 <= v998;
@@ -17825,9 +18044,9 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         bool v1016;
                                         v1016 = v1014 == v999;
                                         if (v1016){
-                                            v1281 = Union1{Union1_1{}};
+                                            v1283 = Union1{Union1_1{}};
                                         } else {
-                                            v1281 = Union1{Union1_2{}};
+                                            v1283 = Union1{Union1_2{}};
                                         }
                                         break;
                                     }
@@ -17879,8 +18098,8 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         int v1041;
                                         v1041 = v167[0];
                                         int v1043; int v1044;
-                                        Tuple4 tmp93 = Tuple4{1, v1041};
-                                        v1043 = tmp93.v0; v1044 = tmp93.v1;
+                                        Tuple4 tmp94 = Tuple4{1, v1041};
+                                        v1043 = tmp94.v0; v1044 = tmp94.v1;
                                         while (while_method_0(v1043)){
                                             bool v1046;
                                             v1046 = 0 <= v1043;
@@ -17971,8 +18190,8 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         int v1076;
                                         v1076 = v1063[0];
                                         int v1078; int v1079;
-                                        Tuple4 tmp94 = Tuple4{1, v1076};
-                                        v1078 = tmp94.v0; v1079 = tmp94.v1;
+                                        Tuple4 tmp95 = Tuple4{1, v1076};
+                                        v1078 = tmp95.v0; v1079 = tmp95.v1;
                                         while (while_method_0(v1078)){
                                             bool v1081;
                                             v1081 = 0 <= v1078;
@@ -18071,9 +18290,9 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         bool v1117;
                                         v1117 = v1110 >= v1115;
                                         if (v1117){
-                                            v1281 = Union1{Union1_0{}};
+                                            v1283 = Union1{Union1_0{}};
                                         } else {
-                                            v1281 = Union1{Union1_3{v1110}};
+                                            v1283 = Union1{Union1_3{v1110}};
                                         }
                                         break;
                                     }
@@ -18083,12 +18302,12 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 }
                                 break;
                             }
-                            case 1: { // Human
+                            case 2: { // Human
                                 printf("%s\n", "Humans aren't allowed during training.");
                                 __trap();
                                 break;
                             }
-                            case 2: { // Random
+                            case 3: { // Random
                                 curandStatePhilox4_32_10_t & v1124 = v2.v5;
                                 curandStatePhilox4_32_10_t & v1125 = v1124;
                                 static_array<int,2> v1126;
@@ -18137,8 +18356,8 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v1144;
                                 v1144 = v167[0];
                                 int v1146; int v1147;
-                                Tuple4 tmp95 = Tuple4{1, v1144};
-                                v1146 = tmp95.v0; v1147 = tmp95.v1;
+                                Tuple4 tmp96 = Tuple4{1, v1144};
+                                v1146 = tmp96.v0; v1147 = tmp96.v1;
                                 while (while_method_0(v1146)){
                                     bool v1149;
                                     v1149 = 0 <= v1146;
@@ -18229,8 +18448,8 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v1179;
                                 v1179 = v1166[0];
                                 int v1181; int v1182;
-                                Tuple4 tmp96 = Tuple4{1, v1179};
-                                v1181 = tmp96.v0; v1182 = tmp96.v1;
+                                Tuple4 tmp97 = Tuple4{1, v1179};
+                                v1181 = tmp97.v0; v1182 = tmp97.v1;
                                 while (while_method_0(v1181)){
                                     bool v1184;
                                     v1184 = 0 <= v1181;
@@ -18478,27 +18697,27 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 Union1 v1278;
                                 v1278 = v1274[0];
                                 __syncthreads();
-                                v1281 = v1278;
+                                v1283 = v1278;
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        Union6 v1282;
-                        v1282 = Union6{Union6_2{v171, v1281}};
-                        v17.push(v1282);
-                        v1433 = Union18{Union18_1{v165, v166, v167, v168, v169, v170, v1281}};
+                        Union6 v1284;
+                        v1284 = Union6{Union6_2{v171, v1283}};
+                        v17.push(v1284);
+                        v1435 = Union18{Union18_1{v165, v166, v167, v168, v169, v170, v1283}};
                         break;
                     }
                     case 5: { // G_Round'
-                        int v1284 = v22.case5.v0; static_array<static_array<unsigned char,2>,2> v1285 = v22.case5.v1; static_array<int,2> v1286 = v22.case5.v2; int v1287 = v22.case5.v3; static_array<int,2> v1288 = v22.case5.v4; Union5 v1289 = v22.case5.v5; Union1 v1290 = v22.case5.v6;
-                        int v1291;
-                        v1291 = v1287 % 2;
-                        Union6 v1292;
-                        v1292 = Union6{Union6_2{v1291, v1290}};
-                        v17.push(v1292);
-                        v1433 = Union18{Union18_1{v1284, v1285, v1286, v1287, v1288, v1289, v1290}};
+                        int v1286 = v22.case5.v0; static_array<static_array<unsigned char,2>,2> v1287 = v22.case5.v1; static_array<int,2> v1288 = v22.case5.v2; int v1289 = v22.case5.v3; static_array<int,2> v1290 = v22.case5.v4; Union5 v1291 = v22.case5.v5; Union1 v1292 = v22.case5.v6;
+                        int v1293;
+                        v1293 = v1289 % 2;
+                        Union6 v1294;
+                        v1294 = Union6{Union6_2{v1293, v1292}};
+                        v17.push(v1294);
+                        v1435 = Union18{Union18_1{v1286, v1287, v1288, v1289, v1290, v1291, v1292}};
                         break;
                     }
                     case 6: { // G_Showdown
@@ -18569,8 +18788,8 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                             v68 += 1 ;
                         }
                         static_array<unsigned char,5> v78; char v79;
-                        Tuple0 tmp97 = score_51(v57);
-                        v78 = tmp97.v0; v79 = tmp97.v1;
+                        Tuple0 tmp98 = score_51(v57);
+                        v78 = tmp98.v0; v79 = tmp98.v1;
                         static_array<unsigned char,2> v80;
                         v80 = v47[1];
                         static_array<unsigned char,7> v82;
@@ -18625,8 +18844,8 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                             v93 += 1 ;
                         }
                         static_array<unsigned char,5> v103; char v104;
-                        Tuple0 tmp98 = score_51(v82);
-                        v103 = tmp98.v0; v104 = tmp98.v1;
+                        Tuple0 tmp99 = score_51(v82);
+                        v103 = tmp99.v0; v104 = tmp99.v1;
                         int v105;
                         v105 = v49 % 2;
                         bool v106;
@@ -18790,78 +19009,78 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         Union6 v163;
                         v163 = Union6{Union6_4{v152, v161, v153}};
                         v17.push(v163);
-                        v1433 = Union18{Union18_0{}};
+                        v1435 = Union18{Union18_0{}};
                         break;
                     }
                     case 7: { // G_Turn
-                        int v1313 = v22.case7.v0; static_array<static_array<unsigned char,2>,2> v1314 = v22.case7.v1; static_array<int,2> v1315 = v22.case7.v2; int v1316 = v22.case7.v3; static_array<int,2> v1317 = v22.case7.v4; Union5 v1318 = v22.case7.v5;
-                        curandStatePhilox4_32_10_t & v1319 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1320 = v1319;
-                        static_array<unsigned char,1> v1321; unsigned long long v1322;
-                        Tuple12 tmp99 = draw_cards_40(v1320, v18);
-                        v1321 = tmp99.v0; v1322 = tmp99.v1;
-                        v2.v0 = v1322;
-                        static_array_list<unsigned char,5> v1323;
-                        v1323 = get_community_cards_82(v1318, v1321);
-                        Union6 v1324;
-                        v1324 = Union6{Union6_0{v1323}};
-                        v17.push(v1324);
-                        Union5 v1349;
-                        switch (v1318.tag) {
+                        int v1315 = v22.case7.v0; static_array<static_array<unsigned char,2>,2> v1316 = v22.case7.v1; static_array<int,2> v1317 = v22.case7.v2; int v1318 = v22.case7.v3; static_array<int,2> v1319 = v22.case7.v4; Union5 v1320 = v22.case7.v5;
+                        curandStatePhilox4_32_10_t & v1321 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1322 = v1321;
+                        static_array<unsigned char,1> v1323; unsigned long long v1324;
+                        Tuple12 tmp100 = draw_cards_40(v1322, v18);
+                        v1323 = tmp100.v0; v1324 = tmp100.v1;
+                        v2.v0 = v1324;
+                        static_array_list<unsigned char,5> v1325;
+                        v1325 = get_community_cards_82(v1320, v1323);
+                        Union6 v1326;
+                        v1326 = Union6{Union6_0{v1325}};
+                        v17.push(v1326);
+                        Union5 v1351;
+                        switch (v1320.tag) {
                             case 0: { // Flop
-                                static_array<unsigned char,3> v1325 = v1318.case0.v0;
-                                static_array<unsigned char,4> v1326;
-                                int v1328;
-                                v1328 = 0;
-                                while (while_method_1(v1328)){
-                                    bool v1330;
-                                    v1330 = 0 <= v1328;
+                                static_array<unsigned char,3> v1327 = v1320.case0.v0;
+                                static_array<unsigned char,4> v1328;
+                                int v1330;
+                                v1330 = 0;
+                                while (while_method_1(v1330)){
                                     bool v1332;
-                                    if (v1330){
-                                        bool v1331;
-                                        v1331 = v1328 < 3;
-                                        v1332 = v1331;
+                                    v1332 = 0 <= v1330;
+                                    bool v1334;
+                                    if (v1332){
+                                        bool v1333;
+                                        v1333 = v1330 < 3;
+                                        v1334 = v1333;
                                     } else {
-                                        v1332 = false;
+                                        v1334 = false;
                                     }
-                                    bool v1333;
-                                    v1333 = v1332 == false;
-                                    if (v1333){
-                                        assert("Index must be in range." && v1332);
+                                    bool v1335;
+                                    v1335 = v1334 == false;
+                                    if (v1335){
+                                        assert("Index must be in range." && v1334);
                                     } else {
                                     }
-                                    unsigned char v1335;
-                                    v1335 = v1325[v1328];
-                                    v1326[v1328] = v1335;
-                                    v1328 += 1 ;
+                                    unsigned char v1337;
+                                    v1337 = v1327[v1330];
+                                    v1328[v1330] = v1337;
+                                    v1330 += 1 ;
                                 }
-                                int v1337;
-                                v1337 = 0;
-                                while (while_method_6(v1337)){
-                                    bool v1339;
-                                    v1339 = 0 <= v1337;
+                                int v1339;
+                                v1339 = 0;
+                                while (while_method_6(v1339)){
                                     bool v1341;
-                                    if (v1339){
-                                        bool v1340;
-                                        v1340 = v1337 < 1;
-                                        v1341 = v1340;
+                                    v1341 = 0 <= v1339;
+                                    bool v1343;
+                                    if (v1341){
+                                        bool v1342;
+                                        v1342 = v1339 < 1;
+                                        v1343 = v1342;
                                     } else {
-                                        v1341 = false;
+                                        v1343 = false;
                                     }
-                                    bool v1342;
-                                    v1342 = v1341 == false;
-                                    if (v1342){
-                                        assert("Index must be in range." && v1341);
+                                    bool v1344;
+                                    v1344 = v1343 == false;
+                                    if (v1344){
+                                        assert("Index must be in range." && v1343);
                                     } else {
                                     }
-                                    unsigned char v1344;
-                                    v1344 = v1321[v1337];
-                                    int v1346;
-                                    v1346 = 3 + v1337;
-                                    v1326[v1346] = v1344;
-                                    v1337 += 1 ;
+                                    unsigned char v1346;
+                                    v1346 = v1323[v1339];
+                                    int v1348;
+                                    v1348 = 3 + v1339;
+                                    v1328[v1348] = v1346;
+                                    v1339 += 1 ;
                                 }
-                                v1349 = Union5{Union5_3{v1326}};
+                                v1351 = Union5{Union5_3{v1328}};
                                 break;
                             }
                             default: {
@@ -18869,869 +19088,869 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1350;
-                        v1350 = 2;
-                        int v1351;
-                        v1351 = 0;
-                        Union4 v1352;
-                        v1352 = try_round_36(v1350, v1314, v1315, v1351, v1317, v1349);
-                        v1433 = Union18{Union18_2{v1352}};
+                        int v1352;
+                        v1352 = 2;
+                        int v1353;
+                        v1353 = 0;
+                        Union4 v1354;
+                        v1354 = try_round_36(v1352, v1316, v1317, v1353, v1319, v1351);
+                        v1435 = Union18{Union18_2{v1354}};
                         break;
                     }
                     default: {
                         assert("Invalid tag." && false); __trap();
                     }
                 }
-                switch (v1433.tag) {
+                switch (v1435.tag) {
                     case 0: { // T_none
-                        v1782 = Union3{Union3_0{}};
+                        v1784 = Union3{Union3_0{}};
                         break;
                     }
                     case 1: { // T_round
-                        int v1437 = v1433.case1.v0; static_array<static_array<unsigned char,2>,2> v1438 = v1433.case1.v1; static_array<int,2> v1439 = v1433.case1.v2; int v1440 = v1433.case1.v3; static_array<int,2> v1441 = v1433.case1.v4; Union5 v1442 = v1433.case1.v5; Union1 v1443 = v1433.case1.v6;
-                        int v1444;
-                        v1444 = v1440 % 2;
-                        Union4 v1775;
-                        switch (v1443.tag) {
+                        int v1439 = v1435.case1.v0; static_array<static_array<unsigned char,2>,2> v1440 = v1435.case1.v1; static_array<int,2> v1441 = v1435.case1.v2; int v1442 = v1435.case1.v3; static_array<int,2> v1443 = v1435.case1.v4; Union5 v1444 = v1435.case1.v5; Union1 v1445 = v1435.case1.v6;
+                        int v1446;
+                        v1446 = v1442 % 2;
+                        Union4 v1777;
+                        switch (v1445.tag) {
                             case 0: { // A_All_In
-                                static_array<int,2> v1650;
-                                int v1652;
-                                v1652 = 0;
-                                while (while_method_0(v1652)){
-                                    bool v1654;
-                                    v1654 = 0 <= v1652;
+                                static_array<int,2> v1652;
+                                int v1654;
+                                v1654 = 0;
+                                while (while_method_0(v1654)){
                                     bool v1656;
-                                    if (v1654){
-                                        bool v1655;
-                                        v1655 = v1652 < 2;
-                                        v1656 = v1655;
+                                    v1656 = 0 <= v1654;
+                                    bool v1658;
+                                    if (v1656){
+                                        bool v1657;
+                                        v1657 = v1654 < 2;
+                                        v1658 = v1657;
                                     } else {
-                                        v1656 = false;
+                                        v1658 = false;
                                     }
-                                    bool v1657;
-                                    v1657 = v1656 == false;
-                                    if (v1657){
-                                        assert("Index must be in range." && v1656);
-                                    } else {
-                                    }
-                                    int v1659;
-                                    v1659 = v1441[v1652];
-                                    bool v1662;
-                                    if (v1654){
-                                        bool v1661;
-                                        v1661 = v1652 < 2;
-                                        v1662 = v1661;
-                                    } else {
-                                        v1662 = false;
-                                    }
-                                    bool v1663;
-                                    v1663 = v1662 == false;
-                                    if (v1663){
-                                        assert("Index must be in range." && v1662);
+                                    bool v1659;
+                                    v1659 = v1658 == false;
+                                    if (v1659){
+                                        assert("Index must be in range." && v1658);
                                     } else {
                                     }
-                                    int v1665;
-                                    v1665 = v1439[v1652];
+                                    int v1661;
+                                    v1661 = v1443[v1654];
+                                    bool v1664;
+                                    if (v1656){
+                                        bool v1663;
+                                        v1663 = v1654 < 2;
+                                        v1664 = v1663;
+                                    } else {
+                                        v1664 = false;
+                                    }
+                                    bool v1665;
+                                    v1665 = v1664 == false;
+                                    if (v1665){
+                                        assert("Index must be in range." && v1664);
+                                    } else {
+                                    }
                                     int v1667;
-                                    v1667 = v1659 + v1665;
-                                    v1650[v1652] = v1667;
-                                    v1652 += 1 ;
+                                    v1667 = v1441[v1654];
+                                    int v1669;
+                                    v1669 = v1661 + v1667;
+                                    v1652[v1654] = v1669;
+                                    v1654 += 1 ;
                                 }
-                                int v1668;
-                                v1668 = v1439[0];
-                                int v1670; int v1671;
-                                Tuple4 tmp100 = Tuple4{1, v1668};
-                                v1670 = tmp100.v0; v1671 = tmp100.v1;
-                                while (while_method_0(v1670)){
-                                    bool v1673;
-                                    v1673 = 0 <= v1670;
+                                int v1670;
+                                v1670 = v1441[0];
+                                int v1672; int v1673;
+                                Tuple4 tmp101 = Tuple4{1, v1670};
+                                v1672 = tmp101.v0; v1673 = tmp101.v1;
+                                while (while_method_0(v1672)){
                                     bool v1675;
-                                    if (v1673){
-                                        bool v1674;
-                                        v1674 = v1670 < 2;
-                                        v1675 = v1674;
+                                    v1675 = 0 <= v1672;
+                                    bool v1677;
+                                    if (v1675){
+                                        bool v1676;
+                                        v1676 = v1672 < 2;
+                                        v1677 = v1676;
                                     } else {
-                                        v1675 = false;
+                                        v1677 = false;
                                     }
-                                    bool v1676;
-                                    v1676 = v1675 == false;
-                                    if (v1676){
-                                        assert("Index must be in range." && v1675);
+                                    bool v1678;
+                                    v1678 = v1677 == false;
+                                    if (v1678){
+                                        assert("Index must be in range." && v1677);
                                     } else {
                                     }
-                                    int v1678;
-                                    v1678 = v1439[v1670];
-                                    bool v1680;
-                                    v1680 = v1671 >= v1678;
-                                    int v1681;
-                                    if (v1680){
-                                        v1681 = v1671;
+                                    int v1680;
+                                    v1680 = v1441[v1672];
+                                    bool v1682;
+                                    v1682 = v1673 >= v1680;
+                                    int v1683;
+                                    if (v1682){
+                                        v1683 = v1673;
                                     } else {
-                                        v1681 = v1678;
+                                        v1683 = v1680;
                                     }
-                                    v1671 = v1681;
-                                    v1670 += 1 ;
+                                    v1673 = v1683;
+                                    v1672 += 1 ;
                                 }
-                                bool v1682;
-                                v1682 = 0 <= v1444;
                                 bool v1684;
-                                if (v1682){
-                                    bool v1683;
-                                    v1683 = v1444 < 2;
-                                    v1684 = v1683;
+                                v1684 = 0 <= v1446;
+                                bool v1686;
+                                if (v1684){
+                                    bool v1685;
+                                    v1685 = v1446 < 2;
+                                    v1686 = v1685;
                                 } else {
-                                    v1684 = false;
+                                    v1686 = false;
                                 }
-                                bool v1685;
-                                v1685 = v1684 == false;
-                                if (v1685){
-                                    assert("Index must be in range." && v1684);
+                                bool v1687;
+                                v1687 = v1686 == false;
+                                if (v1687){
+                                    assert("Index must be in range." && v1686);
                                 } else {
                                 }
-                                int v1687;
-                                v1687 = v1650[v1444];
-                                bool v1689;
-                                v1689 = v1671 < v1687;
-                                int v1690;
-                                if (v1689){
-                                    v1690 = v1671;
+                                int v1689;
+                                v1689 = v1652[v1446];
+                                bool v1691;
+                                v1691 = v1673 < v1689;
+                                int v1692;
+                                if (v1691){
+                                    v1692 = v1673;
                                 } else {
-                                    v1690 = v1687;
+                                    v1692 = v1689;
                                 }
-                                static_array<int,2> v1691;
-                                int v1693;
-                                v1693 = 0;
-                                while (while_method_0(v1693)){
-                                    bool v1695;
-                                    v1695 = 0 <= v1693;
+                                static_array<int,2> v1693;
+                                int v1695;
+                                v1695 = 0;
+                                while (while_method_0(v1695)){
                                     bool v1697;
-                                    if (v1695){
-                                        bool v1696;
-                                        v1696 = v1693 < 2;
-                                        v1697 = v1696;
+                                    v1697 = 0 <= v1695;
+                                    bool v1699;
+                                    if (v1697){
+                                        bool v1698;
+                                        v1698 = v1695 < 2;
+                                        v1699 = v1698;
                                     } else {
-                                        v1697 = false;
+                                        v1699 = false;
                                     }
-                                    bool v1698;
-                                    v1698 = v1697 == false;
-                                    if (v1698){
-                                        assert("Index must be in range." && v1697);
+                                    bool v1700;
+                                    v1700 = v1699 == false;
+                                    if (v1700){
+                                        assert("Index must be in range." && v1699);
                                     } else {
                                     }
-                                    int v1700;
-                                    v1700 = v1439[v1693];
-                                    bool v1702;
-                                    v1702 = v1444 == v1693;
-                                    int v1703;
-                                    if (v1702){
-                                        v1703 = v1690;
+                                    int v1702;
+                                    v1702 = v1441[v1695];
+                                    bool v1704;
+                                    v1704 = v1446 == v1695;
+                                    int v1705;
+                                    if (v1704){
+                                        v1705 = v1692;
                                     } else {
-                                        v1703 = v1700;
+                                        v1705 = v1702;
                                     }
-                                    v1691[v1693] = v1703;
-                                    v1693 += 1 ;
+                                    v1693[v1695] = v1705;
+                                    v1695 += 1 ;
                                 }
-                                static_array<int,2> v1704;
-                                int v1706;
-                                v1706 = 0;
-                                while (while_method_0(v1706)){
-                                    bool v1708;
-                                    v1708 = 0 <= v1706;
+                                static_array<int,2> v1706;
+                                int v1708;
+                                v1708 = 0;
+                                while (while_method_0(v1708)){
                                     bool v1710;
-                                    if (v1708){
-                                        bool v1709;
-                                        v1709 = v1706 < 2;
-                                        v1710 = v1709;
+                                    v1710 = 0 <= v1708;
+                                    bool v1712;
+                                    if (v1710){
+                                        bool v1711;
+                                        v1711 = v1708 < 2;
+                                        v1712 = v1711;
                                     } else {
-                                        v1710 = false;
+                                        v1712 = false;
                                     }
-                                    bool v1711;
-                                    v1711 = v1710 == false;
-                                    if (v1711){
-                                        assert("Index must be in range." && v1710);
-                                    } else {
-                                    }
-                                    int v1713;
-                                    v1713 = v1650[v1706];
-                                    bool v1716;
-                                    if (v1708){
-                                        bool v1715;
-                                        v1715 = v1706 < 2;
-                                        v1716 = v1715;
-                                    } else {
-                                        v1716 = false;
-                                    }
-                                    bool v1717;
-                                    v1717 = v1716 == false;
-                                    if (v1717){
-                                        assert("Index must be in range." && v1716);
+                                    bool v1713;
+                                    v1713 = v1712 == false;
+                                    if (v1713){
+                                        assert("Index must be in range." && v1712);
                                     } else {
                                     }
-                                    int v1719;
-                                    v1719 = v1691[v1706];
+                                    int v1715;
+                                    v1715 = v1652[v1708];
+                                    bool v1718;
+                                    if (v1710){
+                                        bool v1717;
+                                        v1717 = v1708 < 2;
+                                        v1718 = v1717;
+                                    } else {
+                                        v1718 = false;
+                                    }
+                                    bool v1719;
+                                    v1719 = v1718 == false;
+                                    if (v1719){
+                                        assert("Index must be in range." && v1718);
+                                    } else {
+                                    }
                                     int v1721;
-                                    v1721 = v1713 - v1719;
-                                    v1704[v1706] = v1721;
-                                    v1706 += 1 ;
+                                    v1721 = v1693[v1708];
+                                    int v1723;
+                                    v1723 = v1715 - v1721;
+                                    v1706[v1708] = v1723;
+                                    v1708 += 1 ;
                                 }
-                                bool v1723;
-                                if (v1682){
-                                    bool v1722;
-                                    v1722 = v1444 < 2;
-                                    v1723 = v1722;
+                                bool v1725;
+                                if (v1684){
+                                    bool v1724;
+                                    v1724 = v1446 < 2;
+                                    v1725 = v1724;
                                 } else {
-                                    v1723 = false;
+                                    v1725 = false;
                                 }
-                                bool v1724;
-                                v1724 = v1723 == false;
-                                if (v1724){
-                                    assert("Index must be in range." && v1723);
+                                bool v1726;
+                                v1726 = v1725 == false;
+                                if (v1726){
+                                    assert("Index must be in range." && v1725);
                                 } else {
                                 }
-                                int v1726;
-                                v1726 = v1704[v1444];
                                 int v1728;
-                                v1728 = v1671 + v1726;
-                                bool v1730;
-                                if (v1682){
-                                    bool v1729;
-                                    v1729 = v1444 < 2;
-                                    v1730 = v1729;
+                                v1728 = v1706[v1446];
+                                int v1730;
+                                v1730 = v1673 + v1728;
+                                bool v1732;
+                                if (v1684){
+                                    bool v1731;
+                                    v1731 = v1446 < 2;
+                                    v1732 = v1731;
                                 } else {
-                                    v1730 = false;
+                                    v1732 = false;
                                 }
-                                bool v1731;
-                                v1731 = v1730 == false;
-                                if (v1731){
-                                    assert("Index must be in range." && v1730);
+                                bool v1733;
+                                v1733 = v1732 == false;
+                                if (v1733){
+                                    assert("Index must be in range." && v1732);
                                 } else {
                                 }
-                                int v1733;
-                                v1733 = v1650[v1444];
-                                bool v1735;
-                                v1735 = v1728 < v1733;
-                                int v1736;
-                                if (v1735){
-                                    v1736 = v1728;
+                                int v1735;
+                                v1735 = v1652[v1446];
+                                bool v1737;
+                                v1737 = v1730 < v1735;
+                                int v1738;
+                                if (v1737){
+                                    v1738 = v1730;
                                 } else {
-                                    v1736 = v1733;
+                                    v1738 = v1735;
                                 }
-                                static_array<int,2> v1737;
-                                int v1739;
-                                v1739 = 0;
-                                while (while_method_0(v1739)){
-                                    bool v1741;
-                                    v1741 = 0 <= v1739;
+                                static_array<int,2> v1739;
+                                int v1741;
+                                v1741 = 0;
+                                while (while_method_0(v1741)){
                                     bool v1743;
-                                    if (v1741){
-                                        bool v1742;
-                                        v1742 = v1739 < 2;
-                                        v1743 = v1742;
+                                    v1743 = 0 <= v1741;
+                                    bool v1745;
+                                    if (v1743){
+                                        bool v1744;
+                                        v1744 = v1741 < 2;
+                                        v1745 = v1744;
                                     } else {
-                                        v1743 = false;
+                                        v1745 = false;
                                     }
-                                    bool v1744;
-                                    v1744 = v1743 == false;
-                                    if (v1744){
-                                        assert("Index must be in range." && v1743);
+                                    bool v1746;
+                                    v1746 = v1745 == false;
+                                    if (v1746){
+                                        assert("Index must be in range." && v1745);
                                     } else {
                                     }
-                                    int v1746;
-                                    v1746 = v1439[v1739];
-                                    bool v1748;
-                                    v1748 = v1444 == v1739;
-                                    int v1749;
-                                    if (v1748){
-                                        v1749 = v1736;
+                                    int v1748;
+                                    v1748 = v1441[v1741];
+                                    bool v1750;
+                                    v1750 = v1446 == v1741;
+                                    int v1751;
+                                    if (v1750){
+                                        v1751 = v1738;
                                     } else {
-                                        v1749 = v1746;
+                                        v1751 = v1748;
                                     }
-                                    v1737[v1739] = v1749;
-                                    v1739 += 1 ;
+                                    v1739[v1741] = v1751;
+                                    v1741 += 1 ;
                                 }
-                                static_array<int,2> v1750;
-                                int v1752;
-                                v1752 = 0;
-                                while (while_method_0(v1752)){
-                                    bool v1754;
-                                    v1754 = 0 <= v1752;
+                                static_array<int,2> v1752;
+                                int v1754;
+                                v1754 = 0;
+                                while (while_method_0(v1754)){
                                     bool v1756;
-                                    if (v1754){
-                                        bool v1755;
-                                        v1755 = v1752 < 2;
-                                        v1756 = v1755;
+                                    v1756 = 0 <= v1754;
+                                    bool v1758;
+                                    if (v1756){
+                                        bool v1757;
+                                        v1757 = v1754 < 2;
+                                        v1758 = v1757;
                                     } else {
-                                        v1756 = false;
+                                        v1758 = false;
                                     }
-                                    bool v1757;
-                                    v1757 = v1756 == false;
-                                    if (v1757){
-                                        assert("Index must be in range." && v1756);
-                                    } else {
-                                    }
-                                    int v1759;
-                                    v1759 = v1650[v1752];
-                                    bool v1762;
-                                    if (v1754){
-                                        bool v1761;
-                                        v1761 = v1752 < 2;
-                                        v1762 = v1761;
-                                    } else {
-                                        v1762 = false;
-                                    }
-                                    bool v1763;
-                                    v1763 = v1762 == false;
-                                    if (v1763){
-                                        assert("Index must be in range." && v1762);
+                                    bool v1759;
+                                    v1759 = v1758 == false;
+                                    if (v1759){
+                                        assert("Index must be in range." && v1758);
                                     } else {
                                     }
-                                    int v1765;
-                                    v1765 = v1737[v1752];
+                                    int v1761;
+                                    v1761 = v1652[v1754];
+                                    bool v1764;
+                                    if (v1756){
+                                        bool v1763;
+                                        v1763 = v1754 < 2;
+                                        v1764 = v1763;
+                                    } else {
+                                        v1764 = false;
+                                    }
+                                    bool v1765;
+                                    v1765 = v1764 == false;
+                                    if (v1765){
+                                        assert("Index must be in range." && v1764);
+                                    } else {
+                                    }
                                     int v1767;
-                                    v1767 = v1759 - v1765;
-                                    v1750[v1752] = v1767;
-                                    v1752 += 1 ;
+                                    v1767 = v1739[v1754];
+                                    int v1769;
+                                    v1769 = v1761 - v1767;
+                                    v1752[v1754] = v1769;
+                                    v1754 += 1 ;
                                 }
-                                bool v1768;
-                                v1768 = v1726 >= v1437;
-                                int v1769;
-                                if (v1768){
-                                    v1769 = v1726;
+                                bool v1770;
+                                v1770 = v1728 >= v1439;
+                                int v1771;
+                                if (v1770){
+                                    v1771 = v1728;
                                 } else {
-                                    v1769 = v1437;
+                                    v1771 = v1439;
                                 }
-                                int v1770;
-                                v1770 = v1440 + 1;
-                                v1775 = try_round_36(v1769, v1438, v1737, v1770, v1750, v1442);
+                                int v1772;
+                                v1772 = v1442 + 1;
+                                v1777 = try_round_36(v1771, v1440, v1739, v1772, v1752, v1444);
                                 break;
                             }
                             case 1: { // A_Call
-                                static_array<int,2> v1446;
-                                int v1448;
-                                v1448 = 0;
-                                while (while_method_0(v1448)){
-                                    bool v1450;
-                                    v1450 = 0 <= v1448;
+                                static_array<int,2> v1448;
+                                int v1450;
+                                v1450 = 0;
+                                while (while_method_0(v1450)){
                                     bool v1452;
-                                    if (v1450){
-                                        bool v1451;
-                                        v1451 = v1448 < 2;
-                                        v1452 = v1451;
+                                    v1452 = 0 <= v1450;
+                                    bool v1454;
+                                    if (v1452){
+                                        bool v1453;
+                                        v1453 = v1450 < 2;
+                                        v1454 = v1453;
                                     } else {
-                                        v1452 = false;
+                                        v1454 = false;
                                     }
-                                    bool v1453;
-                                    v1453 = v1452 == false;
-                                    if (v1453){
-                                        assert("Index must be in range." && v1452);
-                                    } else {
-                                    }
-                                    int v1455;
-                                    v1455 = v1441[v1448];
-                                    bool v1458;
-                                    if (v1450){
-                                        bool v1457;
-                                        v1457 = v1448 < 2;
-                                        v1458 = v1457;
-                                    } else {
-                                        v1458 = false;
-                                    }
-                                    bool v1459;
-                                    v1459 = v1458 == false;
-                                    if (v1459){
-                                        assert("Index must be in range." && v1458);
+                                    bool v1455;
+                                    v1455 = v1454 == false;
+                                    if (v1455){
+                                        assert("Index must be in range." && v1454);
                                     } else {
                                     }
-                                    int v1461;
-                                    v1461 = v1439[v1448];
+                                    int v1457;
+                                    v1457 = v1443[v1450];
+                                    bool v1460;
+                                    if (v1452){
+                                        bool v1459;
+                                        v1459 = v1450 < 2;
+                                        v1460 = v1459;
+                                    } else {
+                                        v1460 = false;
+                                    }
+                                    bool v1461;
+                                    v1461 = v1460 == false;
+                                    if (v1461){
+                                        assert("Index must be in range." && v1460);
+                                    } else {
+                                    }
                                     int v1463;
-                                    v1463 = v1455 + v1461;
-                                    v1446[v1448] = v1463;
-                                    v1448 += 1 ;
+                                    v1463 = v1441[v1450];
+                                    int v1465;
+                                    v1465 = v1457 + v1463;
+                                    v1448[v1450] = v1465;
+                                    v1450 += 1 ;
                                 }
-                                int v1464;
-                                v1464 = v1439[0];
-                                int v1466; int v1467;
-                                Tuple4 tmp101 = Tuple4{1, v1464};
-                                v1466 = tmp101.v0; v1467 = tmp101.v1;
-                                while (while_method_0(v1466)){
-                                    bool v1469;
-                                    v1469 = 0 <= v1466;
+                                int v1466;
+                                v1466 = v1441[0];
+                                int v1468; int v1469;
+                                Tuple4 tmp102 = Tuple4{1, v1466};
+                                v1468 = tmp102.v0; v1469 = tmp102.v1;
+                                while (while_method_0(v1468)){
                                     bool v1471;
-                                    if (v1469){
-                                        bool v1470;
-                                        v1470 = v1466 < 2;
-                                        v1471 = v1470;
+                                    v1471 = 0 <= v1468;
+                                    bool v1473;
+                                    if (v1471){
+                                        bool v1472;
+                                        v1472 = v1468 < 2;
+                                        v1473 = v1472;
                                     } else {
-                                        v1471 = false;
+                                        v1473 = false;
                                     }
-                                    bool v1472;
-                                    v1472 = v1471 == false;
-                                    if (v1472){
-                                        assert("Index must be in range." && v1471);
+                                    bool v1474;
+                                    v1474 = v1473 == false;
+                                    if (v1474){
+                                        assert("Index must be in range." && v1473);
                                     } else {
                                     }
-                                    int v1474;
-                                    v1474 = v1439[v1466];
-                                    bool v1476;
-                                    v1476 = v1467 >= v1474;
-                                    int v1477;
-                                    if (v1476){
-                                        v1477 = v1467;
+                                    int v1476;
+                                    v1476 = v1441[v1468];
+                                    bool v1478;
+                                    v1478 = v1469 >= v1476;
+                                    int v1479;
+                                    if (v1478){
+                                        v1479 = v1469;
                                     } else {
-                                        v1477 = v1474;
+                                        v1479 = v1476;
                                     }
-                                    v1467 = v1477;
-                                    v1466 += 1 ;
+                                    v1469 = v1479;
+                                    v1468 += 1 ;
                                 }
-                                bool v1478;
-                                v1478 = 0 <= v1444;
                                 bool v1480;
-                                if (v1478){
-                                    bool v1479;
-                                    v1479 = v1444 < 2;
-                                    v1480 = v1479;
+                                v1480 = 0 <= v1446;
+                                bool v1482;
+                                if (v1480){
+                                    bool v1481;
+                                    v1481 = v1446 < 2;
+                                    v1482 = v1481;
                                 } else {
-                                    v1480 = false;
+                                    v1482 = false;
                                 }
-                                bool v1481;
-                                v1481 = v1480 == false;
-                                if (v1481){
-                                    assert("Index must be in range." && v1480);
+                                bool v1483;
+                                v1483 = v1482 == false;
+                                if (v1483){
+                                    assert("Index must be in range." && v1482);
                                 } else {
                                 }
-                                int v1483;
-                                v1483 = v1446[v1444];
-                                bool v1485;
-                                v1485 = v1467 < v1483;
-                                int v1486;
-                                if (v1485){
-                                    v1486 = v1467;
+                                int v1485;
+                                v1485 = v1448[v1446];
+                                bool v1487;
+                                v1487 = v1469 < v1485;
+                                int v1488;
+                                if (v1487){
+                                    v1488 = v1469;
                                 } else {
-                                    v1486 = v1483;
+                                    v1488 = v1485;
                                 }
-                                static_array<int,2> v1487;
-                                int v1489;
-                                v1489 = 0;
-                                while (while_method_0(v1489)){
-                                    bool v1491;
-                                    v1491 = 0 <= v1489;
+                                static_array<int,2> v1489;
+                                int v1491;
+                                v1491 = 0;
+                                while (while_method_0(v1491)){
                                     bool v1493;
-                                    if (v1491){
-                                        bool v1492;
-                                        v1492 = v1489 < 2;
-                                        v1493 = v1492;
+                                    v1493 = 0 <= v1491;
+                                    bool v1495;
+                                    if (v1493){
+                                        bool v1494;
+                                        v1494 = v1491 < 2;
+                                        v1495 = v1494;
                                     } else {
-                                        v1493 = false;
+                                        v1495 = false;
                                     }
-                                    bool v1494;
-                                    v1494 = v1493 == false;
-                                    if (v1494){
-                                        assert("Index must be in range." && v1493);
+                                    bool v1496;
+                                    v1496 = v1495 == false;
+                                    if (v1496){
+                                        assert("Index must be in range." && v1495);
                                     } else {
                                     }
-                                    int v1496;
-                                    v1496 = v1439[v1489];
-                                    bool v1498;
-                                    v1498 = v1444 == v1489;
-                                    int v1499;
-                                    if (v1498){
-                                        v1499 = v1486;
+                                    int v1498;
+                                    v1498 = v1441[v1491];
+                                    bool v1500;
+                                    v1500 = v1446 == v1491;
+                                    int v1501;
+                                    if (v1500){
+                                        v1501 = v1488;
                                     } else {
-                                        v1499 = v1496;
+                                        v1501 = v1498;
                                     }
-                                    v1487[v1489] = v1499;
-                                    v1489 += 1 ;
+                                    v1489[v1491] = v1501;
+                                    v1491 += 1 ;
                                 }
-                                static_array<int,2> v1500;
-                                int v1502;
-                                v1502 = 0;
-                                while (while_method_0(v1502)){
-                                    bool v1504;
-                                    v1504 = 0 <= v1502;
+                                static_array<int,2> v1502;
+                                int v1504;
+                                v1504 = 0;
+                                while (while_method_0(v1504)){
                                     bool v1506;
-                                    if (v1504){
-                                        bool v1505;
-                                        v1505 = v1502 < 2;
-                                        v1506 = v1505;
+                                    v1506 = 0 <= v1504;
+                                    bool v1508;
+                                    if (v1506){
+                                        bool v1507;
+                                        v1507 = v1504 < 2;
+                                        v1508 = v1507;
                                     } else {
-                                        v1506 = false;
+                                        v1508 = false;
                                     }
-                                    bool v1507;
-                                    v1507 = v1506 == false;
-                                    if (v1507){
-                                        assert("Index must be in range." && v1506);
-                                    } else {
-                                    }
-                                    int v1509;
-                                    v1509 = v1446[v1502];
-                                    bool v1512;
-                                    if (v1504){
-                                        bool v1511;
-                                        v1511 = v1502 < 2;
-                                        v1512 = v1511;
-                                    } else {
-                                        v1512 = false;
-                                    }
-                                    bool v1513;
-                                    v1513 = v1512 == false;
-                                    if (v1513){
-                                        assert("Index must be in range." && v1512);
+                                    bool v1509;
+                                    v1509 = v1508 == false;
+                                    if (v1509){
+                                        assert("Index must be in range." && v1508);
                                     } else {
                                     }
-                                    int v1515;
-                                    v1515 = v1487[v1502];
+                                    int v1511;
+                                    v1511 = v1448[v1504];
+                                    bool v1514;
+                                    if (v1506){
+                                        bool v1513;
+                                        v1513 = v1504 < 2;
+                                        v1514 = v1513;
+                                    } else {
+                                        v1514 = false;
+                                    }
+                                    bool v1515;
+                                    v1515 = v1514 == false;
+                                    if (v1515){
+                                        assert("Index must be in range." && v1514);
+                                    } else {
+                                    }
                                     int v1517;
-                                    v1517 = v1509 - v1515;
-                                    v1500[v1502] = v1517;
-                                    v1502 += 1 ;
-                                }
-                                bool v1518;
-                                v1518 = v1444 < 2;
-                                if (v1518){
+                                    v1517 = v1489[v1504];
                                     int v1519;
-                                    v1519 = v1440 + 1;
-                                    v1775 = try_round_36(v1437, v1438, v1487, v1519, v1500, v1442);
+                                    v1519 = v1511 - v1517;
+                                    v1502[v1504] = v1519;
+                                    v1504 += 1 ;
+                                }
+                                bool v1520;
+                                v1520 = v1446 < 2;
+                                if (v1520){
+                                    int v1521;
+                                    v1521 = v1442 + 1;
+                                    v1777 = try_round_36(v1439, v1440, v1489, v1521, v1502, v1444);
                                 } else {
-                                    v1775 = go_next_street_38(v1437, v1438, v1487, v1440, v1500, v1442);
+                                    v1777 = go_next_street_38(v1439, v1440, v1489, v1442, v1502, v1444);
                                 }
                                 break;
                             }
                             case 2: { // A_Fold
-                                v1775 = Union4{Union4_1{v1437, v1438, v1439, v1440, v1441, v1442}};
+                                v1777 = Union4{Union4_1{v1439, v1440, v1441, v1442, v1443, v1444}};
                                 break;
                             }
                             case 3: { // A_Raise
-                                int v1523 = v1443.case3.v0;
-                                bool v1524;
-                                v1524 = v1437 <= v1523;
-                                bool v1525;
-                                v1525 = v1524 == false;
-                                if (v1525){
-                                    assert("The raise amount must match the minimum." && v1524);
+                                int v1525 = v1445.case3.v0;
+                                bool v1526;
+                                v1526 = v1439 <= v1525;
+                                bool v1527;
+                                v1527 = v1526 == false;
+                                if (v1527){
+                                    assert("The raise amount must match the minimum." && v1526);
                                 } else {
                                 }
-                                static_array<int,2> v1527;
-                                int v1529;
-                                v1529 = 0;
-                                while (while_method_0(v1529)){
-                                    bool v1531;
-                                    v1531 = 0 <= v1529;
+                                static_array<int,2> v1529;
+                                int v1531;
+                                v1531 = 0;
+                                while (while_method_0(v1531)){
                                     bool v1533;
-                                    if (v1531){
-                                        bool v1532;
-                                        v1532 = v1529 < 2;
-                                        v1533 = v1532;
+                                    v1533 = 0 <= v1531;
+                                    bool v1535;
+                                    if (v1533){
+                                        bool v1534;
+                                        v1534 = v1531 < 2;
+                                        v1535 = v1534;
                                     } else {
-                                        v1533 = false;
+                                        v1535 = false;
                                     }
-                                    bool v1534;
-                                    v1534 = v1533 == false;
-                                    if (v1534){
-                                        assert("Index must be in range." && v1533);
-                                    } else {
-                                    }
-                                    int v1536;
-                                    v1536 = v1441[v1529];
-                                    bool v1539;
-                                    if (v1531){
-                                        bool v1538;
-                                        v1538 = v1529 < 2;
-                                        v1539 = v1538;
-                                    } else {
-                                        v1539 = false;
-                                    }
-                                    bool v1540;
-                                    v1540 = v1539 == false;
-                                    if (v1540){
-                                        assert("Index must be in range." && v1539);
+                                    bool v1536;
+                                    v1536 = v1535 == false;
+                                    if (v1536){
+                                        assert("Index must be in range." && v1535);
                                     } else {
                                     }
-                                    int v1542;
-                                    v1542 = v1439[v1529];
+                                    int v1538;
+                                    v1538 = v1443[v1531];
+                                    bool v1541;
+                                    if (v1533){
+                                        bool v1540;
+                                        v1540 = v1531 < 2;
+                                        v1541 = v1540;
+                                    } else {
+                                        v1541 = false;
+                                    }
+                                    bool v1542;
+                                    v1542 = v1541 == false;
+                                    if (v1542){
+                                        assert("Index must be in range." && v1541);
+                                    } else {
+                                    }
                                     int v1544;
-                                    v1544 = v1536 + v1542;
-                                    v1527[v1529] = v1544;
-                                    v1529 += 1 ;
+                                    v1544 = v1441[v1531];
+                                    int v1546;
+                                    v1546 = v1538 + v1544;
+                                    v1529[v1531] = v1546;
+                                    v1531 += 1 ;
                                 }
-                                int v1545;
-                                v1545 = v1439[0];
-                                int v1547; int v1548;
-                                Tuple4 tmp102 = Tuple4{1, v1545};
-                                v1547 = tmp102.v0; v1548 = tmp102.v1;
-                                while (while_method_0(v1547)){
-                                    bool v1550;
-                                    v1550 = 0 <= v1547;
+                                int v1547;
+                                v1547 = v1441[0];
+                                int v1549; int v1550;
+                                Tuple4 tmp103 = Tuple4{1, v1547};
+                                v1549 = tmp103.v0; v1550 = tmp103.v1;
+                                while (while_method_0(v1549)){
                                     bool v1552;
-                                    if (v1550){
-                                        bool v1551;
-                                        v1551 = v1547 < 2;
-                                        v1552 = v1551;
+                                    v1552 = 0 <= v1549;
+                                    bool v1554;
+                                    if (v1552){
+                                        bool v1553;
+                                        v1553 = v1549 < 2;
+                                        v1554 = v1553;
                                     } else {
-                                        v1552 = false;
+                                        v1554 = false;
                                     }
-                                    bool v1553;
-                                    v1553 = v1552 == false;
-                                    if (v1553){
-                                        assert("Index must be in range." && v1552);
+                                    bool v1555;
+                                    v1555 = v1554 == false;
+                                    if (v1555){
+                                        assert("Index must be in range." && v1554);
                                     } else {
                                     }
-                                    int v1555;
-                                    v1555 = v1439[v1547];
-                                    bool v1557;
-                                    v1557 = v1548 >= v1555;
-                                    int v1558;
-                                    if (v1557){
-                                        v1558 = v1548;
+                                    int v1557;
+                                    v1557 = v1441[v1549];
+                                    bool v1559;
+                                    v1559 = v1550 >= v1557;
+                                    int v1560;
+                                    if (v1559){
+                                        v1560 = v1550;
                                     } else {
-                                        v1558 = v1555;
+                                        v1560 = v1557;
                                     }
-                                    v1548 = v1558;
-                                    v1547 += 1 ;
+                                    v1550 = v1560;
+                                    v1549 += 1 ;
                                 }
-                                bool v1559;
-                                v1559 = 0 <= v1444;
                                 bool v1561;
-                                if (v1559){
-                                    bool v1560;
-                                    v1560 = v1444 < 2;
-                                    v1561 = v1560;
+                                v1561 = 0 <= v1446;
+                                bool v1563;
+                                if (v1561){
+                                    bool v1562;
+                                    v1562 = v1446 < 2;
+                                    v1563 = v1562;
                                 } else {
-                                    v1561 = false;
+                                    v1563 = false;
                                 }
-                                bool v1562;
-                                v1562 = v1561 == false;
-                                if (v1562){
-                                    assert("Index must be in range." && v1561);
+                                bool v1564;
+                                v1564 = v1563 == false;
+                                if (v1564){
+                                    assert("Index must be in range." && v1563);
                                 } else {
                                 }
-                                int v1564;
-                                v1564 = v1527[v1444];
-                                bool v1566;
-                                v1566 = v1548 < v1564;
-                                int v1567;
-                                if (v1566){
-                                    v1567 = v1548;
+                                int v1566;
+                                v1566 = v1529[v1446];
+                                bool v1568;
+                                v1568 = v1550 < v1566;
+                                int v1569;
+                                if (v1568){
+                                    v1569 = v1550;
                                 } else {
-                                    v1567 = v1564;
+                                    v1569 = v1566;
                                 }
-                                static_array<int,2> v1568;
-                                int v1570;
-                                v1570 = 0;
-                                while (while_method_0(v1570)){
-                                    bool v1572;
-                                    v1572 = 0 <= v1570;
+                                static_array<int,2> v1570;
+                                int v1572;
+                                v1572 = 0;
+                                while (while_method_0(v1572)){
                                     bool v1574;
-                                    if (v1572){
-                                        bool v1573;
-                                        v1573 = v1570 < 2;
-                                        v1574 = v1573;
+                                    v1574 = 0 <= v1572;
+                                    bool v1576;
+                                    if (v1574){
+                                        bool v1575;
+                                        v1575 = v1572 < 2;
+                                        v1576 = v1575;
                                     } else {
-                                        v1574 = false;
+                                        v1576 = false;
                                     }
-                                    bool v1575;
-                                    v1575 = v1574 == false;
-                                    if (v1575){
-                                        assert("Index must be in range." && v1574);
+                                    bool v1577;
+                                    v1577 = v1576 == false;
+                                    if (v1577){
+                                        assert("Index must be in range." && v1576);
                                     } else {
                                     }
-                                    int v1577;
-                                    v1577 = v1439[v1570];
-                                    bool v1579;
-                                    v1579 = v1444 == v1570;
-                                    int v1580;
-                                    if (v1579){
-                                        v1580 = v1567;
+                                    int v1579;
+                                    v1579 = v1441[v1572];
+                                    bool v1581;
+                                    v1581 = v1446 == v1572;
+                                    int v1582;
+                                    if (v1581){
+                                        v1582 = v1569;
                                     } else {
-                                        v1580 = v1577;
+                                        v1582 = v1579;
                                     }
-                                    v1568[v1570] = v1580;
-                                    v1570 += 1 ;
+                                    v1570[v1572] = v1582;
+                                    v1572 += 1 ;
                                 }
-                                static_array<int,2> v1581;
-                                int v1583;
-                                v1583 = 0;
-                                while (while_method_0(v1583)){
-                                    bool v1585;
-                                    v1585 = 0 <= v1583;
+                                static_array<int,2> v1583;
+                                int v1585;
+                                v1585 = 0;
+                                while (while_method_0(v1585)){
                                     bool v1587;
-                                    if (v1585){
-                                        bool v1586;
-                                        v1586 = v1583 < 2;
-                                        v1587 = v1586;
+                                    v1587 = 0 <= v1585;
+                                    bool v1589;
+                                    if (v1587){
+                                        bool v1588;
+                                        v1588 = v1585 < 2;
+                                        v1589 = v1588;
                                     } else {
-                                        v1587 = false;
+                                        v1589 = false;
                                     }
-                                    bool v1588;
-                                    v1588 = v1587 == false;
-                                    if (v1588){
-                                        assert("Index must be in range." && v1587);
-                                    } else {
-                                    }
-                                    int v1590;
-                                    v1590 = v1527[v1583];
-                                    bool v1593;
-                                    if (v1585){
-                                        bool v1592;
-                                        v1592 = v1583 < 2;
-                                        v1593 = v1592;
-                                    } else {
-                                        v1593 = false;
-                                    }
-                                    bool v1594;
-                                    v1594 = v1593 == false;
-                                    if (v1594){
-                                        assert("Index must be in range." && v1593);
+                                    bool v1590;
+                                    v1590 = v1589 == false;
+                                    if (v1590){
+                                        assert("Index must be in range." && v1589);
                                     } else {
                                     }
-                                    int v1596;
-                                    v1596 = v1568[v1583];
+                                    int v1592;
+                                    v1592 = v1529[v1585];
+                                    bool v1595;
+                                    if (v1587){
+                                        bool v1594;
+                                        v1594 = v1585 < 2;
+                                        v1595 = v1594;
+                                    } else {
+                                        v1595 = false;
+                                    }
+                                    bool v1596;
+                                    v1596 = v1595 == false;
+                                    if (v1596){
+                                        assert("Index must be in range." && v1595);
+                                    } else {
+                                    }
                                     int v1598;
-                                    v1598 = v1590 - v1596;
-                                    v1581[v1583] = v1598;
-                                    v1583 += 1 ;
+                                    v1598 = v1570[v1585];
+                                    int v1600;
+                                    v1600 = v1592 - v1598;
+                                    v1583[v1585] = v1600;
+                                    v1585 += 1 ;
                                 }
-                                bool v1600;
-                                if (v1559){
-                                    bool v1599;
-                                    v1599 = v1444 < 2;
-                                    v1600 = v1599;
+                                bool v1602;
+                                if (v1561){
+                                    bool v1601;
+                                    v1601 = v1446 < 2;
+                                    v1602 = v1601;
                                 } else {
-                                    v1600 = false;
+                                    v1602 = false;
                                 }
-                                bool v1601;
-                                v1601 = v1600 == false;
-                                if (v1601){
-                                    assert("Index must be in range." && v1600);
-                                } else {
-                                }
-                                int v1603;
-                                v1603 = v1581[v1444];
-                                bool v1605;
-                                v1605 = v1523 < v1603;
-                                bool v1606;
-                                v1606 = v1605 == false;
-                                if (v1606){
-                                    assert("The raise amount must be less than the stack size after calling." && v1605);
+                                bool v1603;
+                                v1603 = v1602 == false;
+                                if (v1603){
+                                    assert("Index must be in range." && v1602);
                                 } else {
                                 }
-                                int v1608;
-                                v1608 = v1548 + v1523;
-                                bool v1610;
-                                if (v1559){
-                                    bool v1609;
-                                    v1609 = v1444 < 2;
-                                    v1610 = v1609;
-                                } else {
-                                    v1610 = false;
-                                }
-                                bool v1611;
-                                v1611 = v1610 == false;
-                                if (v1611){
-                                    assert("Index must be in range." && v1610);
+                                int v1605;
+                                v1605 = v1583[v1446];
+                                bool v1607;
+                                v1607 = v1525 < v1605;
+                                bool v1608;
+                                v1608 = v1607 == false;
+                                if (v1608){
+                                    assert("The raise amount must be less than the stack size after calling." && v1607);
                                 } else {
                                 }
-                                int v1613;
-                                v1613 = v1527[v1444];
-                                bool v1615;
-                                v1615 = v1608 < v1613;
-                                int v1616;
-                                if (v1615){
-                                    v1616 = v1608;
+                                int v1610;
+                                v1610 = v1550 + v1525;
+                                bool v1612;
+                                if (v1561){
+                                    bool v1611;
+                                    v1611 = v1446 < 2;
+                                    v1612 = v1611;
                                 } else {
-                                    v1616 = v1613;
+                                    v1612 = false;
                                 }
-                                static_array<int,2> v1617;
-                                int v1619;
-                                v1619 = 0;
-                                while (while_method_0(v1619)){
-                                    bool v1621;
-                                    v1621 = 0 <= v1619;
+                                bool v1613;
+                                v1613 = v1612 == false;
+                                if (v1613){
+                                    assert("Index must be in range." && v1612);
+                                } else {
+                                }
+                                int v1615;
+                                v1615 = v1529[v1446];
+                                bool v1617;
+                                v1617 = v1610 < v1615;
+                                int v1618;
+                                if (v1617){
+                                    v1618 = v1610;
+                                } else {
+                                    v1618 = v1615;
+                                }
+                                static_array<int,2> v1619;
+                                int v1621;
+                                v1621 = 0;
+                                while (while_method_0(v1621)){
                                     bool v1623;
-                                    if (v1621){
-                                        bool v1622;
-                                        v1622 = v1619 < 2;
-                                        v1623 = v1622;
+                                    v1623 = 0 <= v1621;
+                                    bool v1625;
+                                    if (v1623){
+                                        bool v1624;
+                                        v1624 = v1621 < 2;
+                                        v1625 = v1624;
                                     } else {
-                                        v1623 = false;
+                                        v1625 = false;
                                     }
-                                    bool v1624;
-                                    v1624 = v1623 == false;
-                                    if (v1624){
-                                        assert("Index must be in range." && v1623);
+                                    bool v1626;
+                                    v1626 = v1625 == false;
+                                    if (v1626){
+                                        assert("Index must be in range." && v1625);
                                     } else {
                                     }
-                                    int v1626;
-                                    v1626 = v1439[v1619];
-                                    bool v1628;
-                                    v1628 = v1444 == v1619;
-                                    int v1629;
-                                    if (v1628){
-                                        v1629 = v1616;
+                                    int v1628;
+                                    v1628 = v1441[v1621];
+                                    bool v1630;
+                                    v1630 = v1446 == v1621;
+                                    int v1631;
+                                    if (v1630){
+                                        v1631 = v1618;
                                     } else {
-                                        v1629 = v1626;
+                                        v1631 = v1628;
                                     }
-                                    v1617[v1619] = v1629;
-                                    v1619 += 1 ;
+                                    v1619[v1621] = v1631;
+                                    v1621 += 1 ;
                                 }
-                                static_array<int,2> v1630;
-                                int v1632;
-                                v1632 = 0;
-                                while (while_method_0(v1632)){
-                                    bool v1634;
-                                    v1634 = 0 <= v1632;
+                                static_array<int,2> v1632;
+                                int v1634;
+                                v1634 = 0;
+                                while (while_method_0(v1634)){
                                     bool v1636;
-                                    if (v1634){
-                                        bool v1635;
-                                        v1635 = v1632 < 2;
-                                        v1636 = v1635;
+                                    v1636 = 0 <= v1634;
+                                    bool v1638;
+                                    if (v1636){
+                                        bool v1637;
+                                        v1637 = v1634 < 2;
+                                        v1638 = v1637;
                                     } else {
-                                        v1636 = false;
+                                        v1638 = false;
                                     }
-                                    bool v1637;
-                                    v1637 = v1636 == false;
-                                    if (v1637){
-                                        assert("Index must be in range." && v1636);
-                                    } else {
-                                    }
-                                    int v1639;
-                                    v1639 = v1527[v1632];
-                                    bool v1642;
-                                    if (v1634){
-                                        bool v1641;
-                                        v1641 = v1632 < 2;
-                                        v1642 = v1641;
-                                    } else {
-                                        v1642 = false;
-                                    }
-                                    bool v1643;
-                                    v1643 = v1642 == false;
-                                    if (v1643){
-                                        assert("Index must be in range." && v1642);
+                                    bool v1639;
+                                    v1639 = v1638 == false;
+                                    if (v1639){
+                                        assert("Index must be in range." && v1638);
                                     } else {
                                     }
-                                    int v1645;
-                                    v1645 = v1617[v1632];
+                                    int v1641;
+                                    v1641 = v1529[v1634];
+                                    bool v1644;
+                                    if (v1636){
+                                        bool v1643;
+                                        v1643 = v1634 < 2;
+                                        v1644 = v1643;
+                                    } else {
+                                        v1644 = false;
+                                    }
+                                    bool v1645;
+                                    v1645 = v1644 == false;
+                                    if (v1645){
+                                        assert("Index must be in range." && v1644);
+                                    } else {
+                                    }
                                     int v1647;
-                                    v1647 = v1639 - v1645;
-                                    v1630[v1632] = v1647;
-                                    v1632 += 1 ;
+                                    v1647 = v1619[v1634];
+                                    int v1649;
+                                    v1649 = v1641 - v1647;
+                                    v1632[v1634] = v1649;
+                                    v1634 += 1 ;
                                 }
-                                int v1648;
-                                v1648 = v1440 + 1;
-                                v1775 = try_round_36(v1523, v1438, v1617, v1648, v1630, v1442);
+                                int v1650;
+                                v1650 = v1442 + 1;
+                                v1777 = try_round_36(v1525, v1440, v1619, v1650, v1632, v1444);
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        v1782 = Union3{Union3_1{v1775}};
+                        v1784 = Union3{Union3_1{v1777}};
                         break;
                     }
                     case 2: { // T_some
-                        Union4 v1435 = v1433.case2.v0;
-                        v1782 = Union3{Union3_1{v1435}};
+                        Union4 v1437 = v1435.case2.v0;
+                        v1784 = Union3{Union3_1{v1437}};
                         break;
                     }
                     default: {
@@ -19744,7 +19963,7 @@ __device__ void method_80(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                 assert("Invalid tag." && false); __trap();
             }
         }
-        v20 = v1782;
+        v20 = v1784;
     }
     return ;
 }
@@ -19768,10 +19987,10 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
     v6.unsafe_set_length(0);
     static_array<Union2,2> v7;
     Union2 v9;
-    v9 = Union2{Union2_0{}};
+    v9 = Union2{Union2_1{}};
     v7[0] = v9;
     Union2 v11;
-    v11 = Union2{Union2_0{}};
+    v11 = Union2{Union2_1{}};
     v7[1] = v11;
     v2.v3 = v7;
     static_array_list<Union6,128> & v13 = v2.v2;
@@ -19781,33 +20000,33 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
     Union3 v16;
     v16 = v15;
     while (while_method_22(v16)){
-        Union3 v1778;
+        Union3 v1780;
         switch (v16.tag) {
             case 0: { // None
-                v1778 = Union3{Union3_0{}};
+                v1780 = Union3{Union3_0{}};
                 break;
             }
             case 1: { // Some
                 Union4 v18 = v16.case1.v0;
-                Union18 v1429;
+                Union18 v1431;
                 switch (v18.tag) {
                     case 0: { // G_Flop
-                        int v1290 = v18.case0.v0; static_array<static_array<unsigned char,2>,2> v1291 = v18.case0.v1; static_array<int,2> v1292 = v18.case0.v2; int v1293 = v18.case0.v3; static_array<int,2> v1294 = v18.case0.v4; Union5 v1295 = v18.case0.v5;
-                        curandStatePhilox4_32_10_t & v1296 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1297 = v1296;
-                        static_array<unsigned char,3> v1298; unsigned long long v1299;
-                        Tuple8 tmp107 = draw_cards_32(v1297, v14);
-                        v1298 = tmp107.v0; v1299 = tmp107.v1;
-                        v2.v0 = v1299;
-                        static_array_list<unsigned char,5> v1300;
-                        v1300 = get_community_cards_81(v1295, v1298);
-                        Union6 v1301;
-                        v1301 = Union6{Union6_0{v1300}};
-                        v13.push(v1301);
-                        Union5 v1304;
-                        switch (v1295.tag) {
+                        int v1292 = v18.case0.v0; static_array<static_array<unsigned char,2>,2> v1293 = v18.case0.v1; static_array<int,2> v1294 = v18.case0.v2; int v1295 = v18.case0.v3; static_array<int,2> v1296 = v18.case0.v4; Union5 v1297 = v18.case0.v5;
+                        curandStatePhilox4_32_10_t & v1298 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1299 = v1298;
+                        static_array<unsigned char,3> v1300; unsigned long long v1301;
+                        Tuple8 tmp108 = draw_cards_32(v1299, v14);
+                        v1300 = tmp108.v0; v1301 = tmp108.v1;
+                        v2.v0 = v1301;
+                        static_array_list<unsigned char,5> v1302;
+                        v1302 = get_community_cards_81(v1297, v1300);
+                        Union6 v1303;
+                        v1303 = Union6{Union6_0{v1302}};
+                        v13.push(v1303);
+                        Union5 v1306;
+                        switch (v1297.tag) {
                             case 1: { // Preflop
-                                v1304 = Union5{Union5_0{v1298}};
+                                v1306 = Union5{Union5_0{v1300}};
                                 break;
                             }
                             default: {
@@ -19815,13 +20034,13 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1305;
-                        v1305 = 2;
-                        int v1306;
-                        v1306 = 0;
-                        Union4 v1307;
-                        v1307 = try_round_36(v1305, v1291, v1292, v1306, v1294, v1304);
-                        v1429 = Union18{Union18_2{v1307}};
+                        int v1307;
+                        v1307 = 2;
+                        int v1308;
+                        v1308 = 0;
+                        Union4 v1309;
+                        v1309 = try_round_36(v1307, v1293, v1294, v1308, v1296, v1306);
+                        v1431 = Union18{Union18_2{v1309}};
                         break;
                     }
                     case 1: { // G_Fold
@@ -19864,141 +20083,141 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         Union6 v40;
                         v40 = Union6{Union6_1{v31, v39}};
                         v13.push(v40);
-                        v1429 = Union18{Union18_0{}};
+                        v1431 = Union18{Union18_0{}};
                         break;
                     }
                     case 2: { // G_Preflop
-                        curandStatePhilox4_32_10_t & v1391 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1392 = v1391;
-                        static_array<unsigned char,2> v1393; unsigned long long v1394;
-                        Tuple11 tmp108 = draw_cards_39(v1392, v14);
-                        v1393 = tmp108.v0; v1394 = tmp108.v1;
-                        v2.v0 = v1394;
-                        curandStatePhilox4_32_10_t & v1395 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1396 = v1395;
-                        static_array<unsigned char,2> v1397; unsigned long long v1398;
-                        Tuple11 tmp109 = draw_cards_39(v1396, v14);
-                        v1397 = tmp109.v0; v1398 = tmp109.v1;
-                        v2.v0 = v1398;
-                        Union6 v1399;
-                        v1399 = Union6{Union6_3{0, v1393}};
-                        v13.push(v1399);
-                        Union6 v1400;
-                        v1400 = Union6{Union6_3{1, v1397}};
-                        v13.push(v1400);
-                        static_array<static_array<unsigned char,2>,2> v1401;
-                        v1401[0] = v1393;
-                        v1401[1] = v1397;
-                        static_array<int,2> v1403;
-                        v1403[0] = 2;
-                        v1403[1] = 1;
+                        curandStatePhilox4_32_10_t & v1393 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1394 = v1393;
+                        static_array<unsigned char,2> v1395; unsigned long long v1396;
+                        Tuple11 tmp109 = draw_cards_39(v1394, v14);
+                        v1395 = tmp109.v0; v1396 = tmp109.v1;
+                        v2.v0 = v1396;
+                        curandStatePhilox4_32_10_t & v1397 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1398 = v1397;
+                        static_array<unsigned char,2> v1399; unsigned long long v1400;
+                        Tuple11 tmp110 = draw_cards_39(v1398, v14);
+                        v1399 = tmp110.v0; v1400 = tmp110.v1;
+                        v2.v0 = v1400;
+                        Union6 v1401;
+                        v1401 = Union6{Union6_3{0, v1395}};
+                        v13.push(v1401);
+                        Union6 v1402;
+                        v1402 = Union6{Union6_3{1, v1399}};
+                        v13.push(v1402);
+                        static_array<static_array<unsigned char,2>,2> v1403;
+                        v1403[0] = v1395;
+                        v1403[1] = v1399;
                         static_array<int,2> v1405;
-                        int v1407;
-                        v1407 = 0;
-                        while (while_method_0(v1407)){
-                            bool v1409;
-                            v1409 = 0 <= v1407;
+                        v1405[0] = 2;
+                        v1405[1] = 1;
+                        static_array<int,2> v1407;
+                        int v1409;
+                        v1409 = 0;
+                        while (while_method_0(v1409)){
                             bool v1411;
-                            if (v1409){
-                                bool v1410;
-                                v1410 = v1407 < 2;
-                                v1411 = v1410;
+                            v1411 = 0 <= v1409;
+                            bool v1413;
+                            if (v1411){
+                                bool v1412;
+                                v1412 = v1409 < 2;
+                                v1413 = v1412;
                             } else {
-                                v1411 = false;
+                                v1413 = false;
                             }
-                            bool v1412;
-                            v1412 = v1411 == false;
-                            if (v1412){
-                                assert("Index must be in range." && v1411);
+                            bool v1414;
+                            v1414 = v1413 == false;
+                            if (v1414){
+                                assert("Index must be in range." && v1413);
                             } else {
                             }
-                            int v1414;
-                            v1414 = v1403[v1407];
                             int v1416;
-                            v1416 = 100 - v1414;
-                            v1405[v1407] = v1416;
-                            v1407 += 1 ;
+                            v1416 = v1405[v1409];
+                            int v1418;
+                            v1418 = 100 - v1416;
+                            v1407[v1409] = v1418;
+                            v1409 += 1 ;
                         }
-                        int v1417;
-                        v1417 = 2;
-                        int v1418;
-                        v1418 = 0;
-                        Union5 v1419;
-                        v1419 = Union5{Union5_1{}};
-                        Union4 v1420;
-                        v1420 = try_round_36(v1417, v1401, v1403, v1418, v1405, v1419);
-                        v1429 = Union18{Union18_2{v1420}};
+                        int v1419;
+                        v1419 = 2;
+                        int v1420;
+                        v1420 = 0;
+                        Union5 v1421;
+                        v1421 = Union5{Union5_1{}};
+                        Union4 v1422;
+                        v1422 = try_round_36(v1419, v1403, v1405, v1420, v1407, v1421);
+                        v1431 = Union18{Union18_2{v1422}};
                         break;
                     }
                     case 3: { // G_River
-                        int v1350 = v18.case3.v0; static_array<static_array<unsigned char,2>,2> v1351 = v18.case3.v1; static_array<int,2> v1352 = v18.case3.v2; int v1353 = v18.case3.v3; static_array<int,2> v1354 = v18.case3.v4; Union5 v1355 = v18.case3.v5;
-                        curandStatePhilox4_32_10_t & v1356 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1357 = v1356;
-                        static_array<unsigned char,1> v1358; unsigned long long v1359;
-                        Tuple12 tmp110 = draw_cards_40(v1357, v14);
-                        v1358 = tmp110.v0; v1359 = tmp110.v1;
-                        v2.v0 = v1359;
-                        static_array_list<unsigned char,5> v1360;
-                        v1360 = get_community_cards_82(v1355, v1358);
-                        Union6 v1361;
-                        v1361 = Union6{Union6_0{v1360}};
-                        v13.push(v1361);
-                        Union5 v1386;
-                        switch (v1355.tag) {
+                        int v1352 = v18.case3.v0; static_array<static_array<unsigned char,2>,2> v1353 = v18.case3.v1; static_array<int,2> v1354 = v18.case3.v2; int v1355 = v18.case3.v3; static_array<int,2> v1356 = v18.case3.v4; Union5 v1357 = v18.case3.v5;
+                        curandStatePhilox4_32_10_t & v1358 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1359 = v1358;
+                        static_array<unsigned char,1> v1360; unsigned long long v1361;
+                        Tuple12 tmp111 = draw_cards_40(v1359, v14);
+                        v1360 = tmp111.v0; v1361 = tmp111.v1;
+                        v2.v0 = v1361;
+                        static_array_list<unsigned char,5> v1362;
+                        v1362 = get_community_cards_82(v1357, v1360);
+                        Union6 v1363;
+                        v1363 = Union6{Union6_0{v1362}};
+                        v13.push(v1363);
+                        Union5 v1388;
+                        switch (v1357.tag) {
                             case 3: { // Turn
-                                static_array<unsigned char,4> v1362 = v1355.case3.v0;
-                                static_array<unsigned char,5> v1363;
-                                int v1365;
-                                v1365 = 0;
-                                while (while_method_3(v1365)){
-                                    bool v1367;
-                                    v1367 = 0 <= v1365;
+                                static_array<unsigned char,4> v1364 = v1357.case3.v0;
+                                static_array<unsigned char,5> v1365;
+                                int v1367;
+                                v1367 = 0;
+                                while (while_method_3(v1367)){
                                     bool v1369;
-                                    if (v1367){
-                                        bool v1368;
-                                        v1368 = v1365 < 4;
-                                        v1369 = v1368;
+                                    v1369 = 0 <= v1367;
+                                    bool v1371;
+                                    if (v1369){
+                                        bool v1370;
+                                        v1370 = v1367 < 4;
+                                        v1371 = v1370;
                                     } else {
-                                        v1369 = false;
+                                        v1371 = false;
                                     }
-                                    bool v1370;
-                                    v1370 = v1369 == false;
-                                    if (v1370){
-                                        assert("Index must be in range." && v1369);
+                                    bool v1372;
+                                    v1372 = v1371 == false;
+                                    if (v1372){
+                                        assert("Index must be in range." && v1371);
                                     } else {
                                     }
-                                    unsigned char v1372;
-                                    v1372 = v1362[v1365];
-                                    v1363[v1365] = v1372;
-                                    v1365 += 1 ;
+                                    unsigned char v1374;
+                                    v1374 = v1364[v1367];
+                                    v1365[v1367] = v1374;
+                                    v1367 += 1 ;
                                 }
-                                int v1374;
-                                v1374 = 0;
-                                while (while_method_6(v1374)){
-                                    bool v1376;
-                                    v1376 = 0 <= v1374;
+                                int v1376;
+                                v1376 = 0;
+                                while (while_method_6(v1376)){
                                     bool v1378;
-                                    if (v1376){
-                                        bool v1377;
-                                        v1377 = v1374 < 1;
-                                        v1378 = v1377;
+                                    v1378 = 0 <= v1376;
+                                    bool v1380;
+                                    if (v1378){
+                                        bool v1379;
+                                        v1379 = v1376 < 1;
+                                        v1380 = v1379;
                                     } else {
-                                        v1378 = false;
+                                        v1380 = false;
                                     }
-                                    bool v1379;
-                                    v1379 = v1378 == false;
-                                    if (v1379){
-                                        assert("Index must be in range." && v1378);
+                                    bool v1381;
+                                    v1381 = v1380 == false;
+                                    if (v1381){
+                                        assert("Index must be in range." && v1380);
                                     } else {
                                     }
-                                    unsigned char v1381;
-                                    v1381 = v1358[v1374];
-                                    int v1383;
-                                    v1383 = 4 + v1374;
-                                    v1363[v1383] = v1381;
-                                    v1374 += 1 ;
+                                    unsigned char v1383;
+                                    v1383 = v1360[v1376];
+                                    int v1385;
+                                    v1385 = 4 + v1376;
+                                    v1365[v1385] = v1383;
+                                    v1376 += 1 ;
                                 }
-                                v1386 = Union5{Union5_2{v1363}};
+                                v1388 = Union5{Union5_2{v1365}};
                                 break;
                             }
                             default: {
@@ -20006,13 +20225,13 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1387;
-                        v1387 = 2;
-                        int v1388;
-                        v1388 = 0;
-                        Union4 v1389;
-                        v1389 = try_round_36(v1387, v1351, v1352, v1388, v1354, v1386);
-                        v1429 = Union18{Union18_2{v1389}};
+                        int v1389;
+                        v1389 = 2;
+                        int v1390;
+                        v1390 = 0;
+                        Union4 v1391;
+                        v1391 = try_round_36(v1389, v1353, v1354, v1390, v1356, v1388);
+                        v1431 = Union18{Union18_2{v1391}};
                         break;
                     }
                     case 4: { // G_Round
@@ -20038,9 +20257,13 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         }
                         Union2 v174;
                         v174 = v168[v167];
-                        Union1 v1277;
+                        Union1 v1279;
                         switch (v174.tag) {
-                            case 0: { // Computer
+                            case 0: { // CallingMachine
+                                v1279 = Union1{Union1_1{}};
+                                break;
+                            }
+                            case 1: { // Computer
                                 static_array_list<Union6,128> & v177 = v2.v2;
                                 curandStatePhilox4_32_10_t & v178 = v2.v5;
                                 curandStatePhilox4_32_10_t & v179 = v178;
@@ -21470,8 +21693,8 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v772;
                                 v772 = (int)v771;
                                 float v773; int v774;
-                                Tuple14 tmp111 = method_46(v179, v746, v748, v750, v752, v754, v756, v758, v760, v772, v762);
-                                v773 = tmp111.v0; v774 = tmp111.v1;
+                                Tuple14 tmp112 = method_46(v179, v746, v748, v750, v752, v754, v756, v758, v760, v772, v762);
+                                v773 = tmp112.v0; v774 = tmp112.v1;
                                 extern __shared__ unsigned char v775[];
                                 float * v776;
                                 v776 = reinterpret_cast<float *>(&v775[0ull]);
@@ -21967,15 +22190,15 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 }
                                 switch (v991.tag) {
                                     case 0: { // AA_Call
-                                        v1277 = Union1{Union1_1{}};
+                                        v1279 = Union1{Union1_1{}};
                                         break;
                                     }
                                     case 1: { // AA_Fold
                                         int v992;
                                         v992 = v163[0];
                                         int v994; int v995;
-                                        Tuple4 tmp112 = Tuple4{1, v992};
-                                        v994 = tmp112.v0; v995 = tmp112.v1;
+                                        Tuple4 tmp113 = Tuple4{1, v992};
+                                        v994 = tmp113.v0; v995 = tmp113.v1;
                                         while (while_method_0(v994)){
                                             bool v997;
                                             v997 = 0 <= v994;
@@ -22025,9 +22248,9 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         bool v1012;
                                         v1012 = v1010 == v995;
                                         if (v1012){
-                                            v1277 = Union1{Union1_1{}};
+                                            v1279 = Union1{Union1_1{}};
                                         } else {
-                                            v1277 = Union1{Union1_2{}};
+                                            v1279 = Union1{Union1_2{}};
                                         }
                                         break;
                                     }
@@ -22079,8 +22302,8 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         int v1037;
                                         v1037 = v163[0];
                                         int v1039; int v1040;
-                                        Tuple4 tmp113 = Tuple4{1, v1037};
-                                        v1039 = tmp113.v0; v1040 = tmp113.v1;
+                                        Tuple4 tmp114 = Tuple4{1, v1037};
+                                        v1039 = tmp114.v0; v1040 = tmp114.v1;
                                         while (while_method_0(v1039)){
                                             bool v1042;
                                             v1042 = 0 <= v1039;
@@ -22171,8 +22394,8 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         int v1072;
                                         v1072 = v1059[0];
                                         int v1074; int v1075;
-                                        Tuple4 tmp114 = Tuple4{1, v1072};
-                                        v1074 = tmp114.v0; v1075 = tmp114.v1;
+                                        Tuple4 tmp115 = Tuple4{1, v1072};
+                                        v1074 = tmp115.v0; v1075 = tmp115.v1;
                                         while (while_method_0(v1074)){
                                             bool v1077;
                                             v1077 = 0 <= v1074;
@@ -22271,9 +22494,9 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         bool v1113;
                                         v1113 = v1106 >= v1111;
                                         if (v1113){
-                                            v1277 = Union1{Union1_0{}};
+                                            v1279 = Union1{Union1_0{}};
                                         } else {
-                                            v1277 = Union1{Union1_3{v1106}};
+                                            v1279 = Union1{Union1_3{v1106}};
                                         }
                                         break;
                                     }
@@ -22283,12 +22506,12 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 }
                                 break;
                             }
-                            case 1: { // Human
+                            case 2: { // Human
                                 printf("%s\n", "Humans aren't allowed during training.");
                                 __trap();
                                 break;
                             }
-                            case 2: { // Random
+                            case 3: { // Random
                                 curandStatePhilox4_32_10_t & v1120 = v2.v5;
                                 curandStatePhilox4_32_10_t & v1121 = v1120;
                                 static_array<int,2> v1122;
@@ -22337,8 +22560,8 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v1140;
                                 v1140 = v163[0];
                                 int v1142; int v1143;
-                                Tuple4 tmp115 = Tuple4{1, v1140};
-                                v1142 = tmp115.v0; v1143 = tmp115.v1;
+                                Tuple4 tmp116 = Tuple4{1, v1140};
+                                v1142 = tmp116.v0; v1143 = tmp116.v1;
                                 while (while_method_0(v1142)){
                                     bool v1145;
                                     v1145 = 0 <= v1142;
@@ -22429,8 +22652,8 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v1175;
                                 v1175 = v1162[0];
                                 int v1177; int v1178;
-                                Tuple4 tmp116 = Tuple4{1, v1175};
-                                v1177 = tmp116.v0; v1178 = tmp116.v1;
+                                Tuple4 tmp117 = Tuple4{1, v1175};
+                                v1177 = tmp117.v0; v1178 = tmp117.v1;
                                 while (while_method_0(v1177)){
                                     bool v1180;
                                     v1180 = 0 <= v1177;
@@ -22678,27 +22901,27 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 Union1 v1274;
                                 v1274 = v1270[0];
                                 __syncthreads();
-                                v1277 = v1274;
+                                v1279 = v1274;
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        Union6 v1278;
-                        v1278 = Union6{Union6_2{v167, v1277}};
-                        v13.push(v1278);
-                        v1429 = Union18{Union18_1{v161, v162, v163, v164, v165, v166, v1277}};
+                        Union6 v1280;
+                        v1280 = Union6{Union6_2{v167, v1279}};
+                        v13.push(v1280);
+                        v1431 = Union18{Union18_1{v161, v162, v163, v164, v165, v166, v1279}};
                         break;
                     }
                     case 5: { // G_Round'
-                        int v1280 = v18.case5.v0; static_array<static_array<unsigned char,2>,2> v1281 = v18.case5.v1; static_array<int,2> v1282 = v18.case5.v2; int v1283 = v18.case5.v3; static_array<int,2> v1284 = v18.case5.v4; Union5 v1285 = v18.case5.v5; Union1 v1286 = v18.case5.v6;
-                        int v1287;
-                        v1287 = v1283 % 2;
-                        Union6 v1288;
-                        v1288 = Union6{Union6_2{v1287, v1286}};
-                        v13.push(v1288);
-                        v1429 = Union18{Union18_1{v1280, v1281, v1282, v1283, v1284, v1285, v1286}};
+                        int v1282 = v18.case5.v0; static_array<static_array<unsigned char,2>,2> v1283 = v18.case5.v1; static_array<int,2> v1284 = v18.case5.v2; int v1285 = v18.case5.v3; static_array<int,2> v1286 = v18.case5.v4; Union5 v1287 = v18.case5.v5; Union1 v1288 = v18.case5.v6;
+                        int v1289;
+                        v1289 = v1285 % 2;
+                        Union6 v1290;
+                        v1290 = Union6{Union6_2{v1289, v1288}};
+                        v13.push(v1290);
+                        v1431 = Union18{Union18_1{v1282, v1283, v1284, v1285, v1286, v1287, v1288}};
                         break;
                     }
                     case 6: { // G_Showdown
@@ -22769,8 +22992,8 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                             v64 += 1 ;
                         }
                         static_array<unsigned char,5> v74; char v75;
-                        Tuple0 tmp117 = score_51(v53);
-                        v74 = tmp117.v0; v75 = tmp117.v1;
+                        Tuple0 tmp118 = score_51(v53);
+                        v74 = tmp118.v0; v75 = tmp118.v1;
                         static_array<unsigned char,2> v76;
                         v76 = v43[1];
                         static_array<unsigned char,7> v78;
@@ -22825,8 +23048,8 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                             v89 += 1 ;
                         }
                         static_array<unsigned char,5> v99; char v100;
-                        Tuple0 tmp118 = score_51(v78);
-                        v99 = tmp118.v0; v100 = tmp118.v1;
+                        Tuple0 tmp119 = score_51(v78);
+                        v99 = tmp119.v0; v100 = tmp119.v1;
                         int v101;
                         v101 = v45 % 2;
                         bool v102;
@@ -22990,78 +23213,78 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         Union6 v159;
                         v159 = Union6{Union6_4{v148, v157, v149}};
                         v13.push(v159);
-                        v1429 = Union18{Union18_0{}};
+                        v1431 = Union18{Union18_0{}};
                         break;
                     }
                     case 7: { // G_Turn
-                        int v1309 = v18.case7.v0; static_array<static_array<unsigned char,2>,2> v1310 = v18.case7.v1; static_array<int,2> v1311 = v18.case7.v2; int v1312 = v18.case7.v3; static_array<int,2> v1313 = v18.case7.v4; Union5 v1314 = v18.case7.v5;
-                        curandStatePhilox4_32_10_t & v1315 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1316 = v1315;
-                        static_array<unsigned char,1> v1317; unsigned long long v1318;
-                        Tuple12 tmp119 = draw_cards_40(v1316, v14);
-                        v1317 = tmp119.v0; v1318 = tmp119.v1;
-                        v2.v0 = v1318;
-                        static_array_list<unsigned char,5> v1319;
-                        v1319 = get_community_cards_82(v1314, v1317);
-                        Union6 v1320;
-                        v1320 = Union6{Union6_0{v1319}};
-                        v13.push(v1320);
-                        Union5 v1345;
-                        switch (v1314.tag) {
+                        int v1311 = v18.case7.v0; static_array<static_array<unsigned char,2>,2> v1312 = v18.case7.v1; static_array<int,2> v1313 = v18.case7.v2; int v1314 = v18.case7.v3; static_array<int,2> v1315 = v18.case7.v4; Union5 v1316 = v18.case7.v5;
+                        curandStatePhilox4_32_10_t & v1317 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1318 = v1317;
+                        static_array<unsigned char,1> v1319; unsigned long long v1320;
+                        Tuple12 tmp120 = draw_cards_40(v1318, v14);
+                        v1319 = tmp120.v0; v1320 = tmp120.v1;
+                        v2.v0 = v1320;
+                        static_array_list<unsigned char,5> v1321;
+                        v1321 = get_community_cards_82(v1316, v1319);
+                        Union6 v1322;
+                        v1322 = Union6{Union6_0{v1321}};
+                        v13.push(v1322);
+                        Union5 v1347;
+                        switch (v1316.tag) {
                             case 0: { // Flop
-                                static_array<unsigned char,3> v1321 = v1314.case0.v0;
-                                static_array<unsigned char,4> v1322;
-                                int v1324;
-                                v1324 = 0;
-                                while (while_method_1(v1324)){
-                                    bool v1326;
-                                    v1326 = 0 <= v1324;
+                                static_array<unsigned char,3> v1323 = v1316.case0.v0;
+                                static_array<unsigned char,4> v1324;
+                                int v1326;
+                                v1326 = 0;
+                                while (while_method_1(v1326)){
                                     bool v1328;
-                                    if (v1326){
-                                        bool v1327;
-                                        v1327 = v1324 < 3;
-                                        v1328 = v1327;
+                                    v1328 = 0 <= v1326;
+                                    bool v1330;
+                                    if (v1328){
+                                        bool v1329;
+                                        v1329 = v1326 < 3;
+                                        v1330 = v1329;
                                     } else {
-                                        v1328 = false;
+                                        v1330 = false;
                                     }
-                                    bool v1329;
-                                    v1329 = v1328 == false;
-                                    if (v1329){
-                                        assert("Index must be in range." && v1328);
+                                    bool v1331;
+                                    v1331 = v1330 == false;
+                                    if (v1331){
+                                        assert("Index must be in range." && v1330);
                                     } else {
                                     }
-                                    unsigned char v1331;
-                                    v1331 = v1321[v1324];
-                                    v1322[v1324] = v1331;
-                                    v1324 += 1 ;
+                                    unsigned char v1333;
+                                    v1333 = v1323[v1326];
+                                    v1324[v1326] = v1333;
+                                    v1326 += 1 ;
                                 }
-                                int v1333;
-                                v1333 = 0;
-                                while (while_method_6(v1333)){
-                                    bool v1335;
-                                    v1335 = 0 <= v1333;
+                                int v1335;
+                                v1335 = 0;
+                                while (while_method_6(v1335)){
                                     bool v1337;
-                                    if (v1335){
-                                        bool v1336;
-                                        v1336 = v1333 < 1;
-                                        v1337 = v1336;
+                                    v1337 = 0 <= v1335;
+                                    bool v1339;
+                                    if (v1337){
+                                        bool v1338;
+                                        v1338 = v1335 < 1;
+                                        v1339 = v1338;
                                     } else {
-                                        v1337 = false;
+                                        v1339 = false;
                                     }
-                                    bool v1338;
-                                    v1338 = v1337 == false;
-                                    if (v1338){
-                                        assert("Index must be in range." && v1337);
+                                    bool v1340;
+                                    v1340 = v1339 == false;
+                                    if (v1340){
+                                        assert("Index must be in range." && v1339);
                                     } else {
                                     }
-                                    unsigned char v1340;
-                                    v1340 = v1317[v1333];
-                                    int v1342;
-                                    v1342 = 3 + v1333;
-                                    v1322[v1342] = v1340;
-                                    v1333 += 1 ;
+                                    unsigned char v1342;
+                                    v1342 = v1319[v1335];
+                                    int v1344;
+                                    v1344 = 3 + v1335;
+                                    v1324[v1344] = v1342;
+                                    v1335 += 1 ;
                                 }
-                                v1345 = Union5{Union5_3{v1322}};
+                                v1347 = Union5{Union5_3{v1324}};
                                 break;
                             }
                             default: {
@@ -23069,869 +23292,869 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1346;
-                        v1346 = 2;
-                        int v1347;
-                        v1347 = 0;
-                        Union4 v1348;
-                        v1348 = try_round_36(v1346, v1310, v1311, v1347, v1313, v1345);
-                        v1429 = Union18{Union18_2{v1348}};
+                        int v1348;
+                        v1348 = 2;
+                        int v1349;
+                        v1349 = 0;
+                        Union4 v1350;
+                        v1350 = try_round_36(v1348, v1312, v1313, v1349, v1315, v1347);
+                        v1431 = Union18{Union18_2{v1350}};
                         break;
                     }
                     default: {
                         assert("Invalid tag." && false); __trap();
                     }
                 }
-                switch (v1429.tag) {
+                switch (v1431.tag) {
                     case 0: { // T_none
-                        v1778 = Union3{Union3_0{}};
+                        v1780 = Union3{Union3_0{}};
                         break;
                     }
                     case 1: { // T_round
-                        int v1433 = v1429.case1.v0; static_array<static_array<unsigned char,2>,2> v1434 = v1429.case1.v1; static_array<int,2> v1435 = v1429.case1.v2; int v1436 = v1429.case1.v3; static_array<int,2> v1437 = v1429.case1.v4; Union5 v1438 = v1429.case1.v5; Union1 v1439 = v1429.case1.v6;
-                        int v1440;
-                        v1440 = v1436 % 2;
-                        Union4 v1771;
-                        switch (v1439.tag) {
+                        int v1435 = v1431.case1.v0; static_array<static_array<unsigned char,2>,2> v1436 = v1431.case1.v1; static_array<int,2> v1437 = v1431.case1.v2; int v1438 = v1431.case1.v3; static_array<int,2> v1439 = v1431.case1.v4; Union5 v1440 = v1431.case1.v5; Union1 v1441 = v1431.case1.v6;
+                        int v1442;
+                        v1442 = v1438 % 2;
+                        Union4 v1773;
+                        switch (v1441.tag) {
                             case 0: { // A_All_In
-                                static_array<int,2> v1646;
-                                int v1648;
-                                v1648 = 0;
-                                while (while_method_0(v1648)){
-                                    bool v1650;
-                                    v1650 = 0 <= v1648;
+                                static_array<int,2> v1648;
+                                int v1650;
+                                v1650 = 0;
+                                while (while_method_0(v1650)){
                                     bool v1652;
-                                    if (v1650){
-                                        bool v1651;
-                                        v1651 = v1648 < 2;
-                                        v1652 = v1651;
+                                    v1652 = 0 <= v1650;
+                                    bool v1654;
+                                    if (v1652){
+                                        bool v1653;
+                                        v1653 = v1650 < 2;
+                                        v1654 = v1653;
                                     } else {
-                                        v1652 = false;
+                                        v1654 = false;
                                     }
-                                    bool v1653;
-                                    v1653 = v1652 == false;
-                                    if (v1653){
-                                        assert("Index must be in range." && v1652);
-                                    } else {
-                                    }
-                                    int v1655;
-                                    v1655 = v1437[v1648];
-                                    bool v1658;
-                                    if (v1650){
-                                        bool v1657;
-                                        v1657 = v1648 < 2;
-                                        v1658 = v1657;
-                                    } else {
-                                        v1658 = false;
-                                    }
-                                    bool v1659;
-                                    v1659 = v1658 == false;
-                                    if (v1659){
-                                        assert("Index must be in range." && v1658);
+                                    bool v1655;
+                                    v1655 = v1654 == false;
+                                    if (v1655){
+                                        assert("Index must be in range." && v1654);
                                     } else {
                                     }
-                                    int v1661;
-                                    v1661 = v1435[v1648];
+                                    int v1657;
+                                    v1657 = v1439[v1650];
+                                    bool v1660;
+                                    if (v1652){
+                                        bool v1659;
+                                        v1659 = v1650 < 2;
+                                        v1660 = v1659;
+                                    } else {
+                                        v1660 = false;
+                                    }
+                                    bool v1661;
+                                    v1661 = v1660 == false;
+                                    if (v1661){
+                                        assert("Index must be in range." && v1660);
+                                    } else {
+                                    }
                                     int v1663;
-                                    v1663 = v1655 + v1661;
-                                    v1646[v1648] = v1663;
-                                    v1648 += 1 ;
+                                    v1663 = v1437[v1650];
+                                    int v1665;
+                                    v1665 = v1657 + v1663;
+                                    v1648[v1650] = v1665;
+                                    v1650 += 1 ;
                                 }
-                                int v1664;
-                                v1664 = v1435[0];
-                                int v1666; int v1667;
-                                Tuple4 tmp120 = Tuple4{1, v1664};
-                                v1666 = tmp120.v0; v1667 = tmp120.v1;
-                                while (while_method_0(v1666)){
-                                    bool v1669;
-                                    v1669 = 0 <= v1666;
+                                int v1666;
+                                v1666 = v1437[0];
+                                int v1668; int v1669;
+                                Tuple4 tmp121 = Tuple4{1, v1666};
+                                v1668 = tmp121.v0; v1669 = tmp121.v1;
+                                while (while_method_0(v1668)){
                                     bool v1671;
-                                    if (v1669){
-                                        bool v1670;
-                                        v1670 = v1666 < 2;
-                                        v1671 = v1670;
+                                    v1671 = 0 <= v1668;
+                                    bool v1673;
+                                    if (v1671){
+                                        bool v1672;
+                                        v1672 = v1668 < 2;
+                                        v1673 = v1672;
                                     } else {
-                                        v1671 = false;
+                                        v1673 = false;
                                     }
-                                    bool v1672;
-                                    v1672 = v1671 == false;
-                                    if (v1672){
-                                        assert("Index must be in range." && v1671);
+                                    bool v1674;
+                                    v1674 = v1673 == false;
+                                    if (v1674){
+                                        assert("Index must be in range." && v1673);
                                     } else {
                                     }
-                                    int v1674;
-                                    v1674 = v1435[v1666];
-                                    bool v1676;
-                                    v1676 = v1667 >= v1674;
-                                    int v1677;
-                                    if (v1676){
-                                        v1677 = v1667;
+                                    int v1676;
+                                    v1676 = v1437[v1668];
+                                    bool v1678;
+                                    v1678 = v1669 >= v1676;
+                                    int v1679;
+                                    if (v1678){
+                                        v1679 = v1669;
                                     } else {
-                                        v1677 = v1674;
+                                        v1679 = v1676;
                                     }
-                                    v1667 = v1677;
-                                    v1666 += 1 ;
+                                    v1669 = v1679;
+                                    v1668 += 1 ;
                                 }
-                                bool v1678;
-                                v1678 = 0 <= v1440;
                                 bool v1680;
-                                if (v1678){
-                                    bool v1679;
-                                    v1679 = v1440 < 2;
-                                    v1680 = v1679;
+                                v1680 = 0 <= v1442;
+                                bool v1682;
+                                if (v1680){
+                                    bool v1681;
+                                    v1681 = v1442 < 2;
+                                    v1682 = v1681;
                                 } else {
-                                    v1680 = false;
+                                    v1682 = false;
                                 }
-                                bool v1681;
-                                v1681 = v1680 == false;
-                                if (v1681){
-                                    assert("Index must be in range." && v1680);
+                                bool v1683;
+                                v1683 = v1682 == false;
+                                if (v1683){
+                                    assert("Index must be in range." && v1682);
                                 } else {
                                 }
-                                int v1683;
-                                v1683 = v1646[v1440];
-                                bool v1685;
-                                v1685 = v1667 < v1683;
-                                int v1686;
-                                if (v1685){
-                                    v1686 = v1667;
+                                int v1685;
+                                v1685 = v1648[v1442];
+                                bool v1687;
+                                v1687 = v1669 < v1685;
+                                int v1688;
+                                if (v1687){
+                                    v1688 = v1669;
                                 } else {
-                                    v1686 = v1683;
+                                    v1688 = v1685;
                                 }
-                                static_array<int,2> v1687;
-                                int v1689;
-                                v1689 = 0;
-                                while (while_method_0(v1689)){
-                                    bool v1691;
-                                    v1691 = 0 <= v1689;
+                                static_array<int,2> v1689;
+                                int v1691;
+                                v1691 = 0;
+                                while (while_method_0(v1691)){
                                     bool v1693;
-                                    if (v1691){
-                                        bool v1692;
-                                        v1692 = v1689 < 2;
-                                        v1693 = v1692;
+                                    v1693 = 0 <= v1691;
+                                    bool v1695;
+                                    if (v1693){
+                                        bool v1694;
+                                        v1694 = v1691 < 2;
+                                        v1695 = v1694;
                                     } else {
-                                        v1693 = false;
+                                        v1695 = false;
                                     }
-                                    bool v1694;
-                                    v1694 = v1693 == false;
-                                    if (v1694){
-                                        assert("Index must be in range." && v1693);
+                                    bool v1696;
+                                    v1696 = v1695 == false;
+                                    if (v1696){
+                                        assert("Index must be in range." && v1695);
                                     } else {
                                     }
-                                    int v1696;
-                                    v1696 = v1435[v1689];
-                                    bool v1698;
-                                    v1698 = v1440 == v1689;
-                                    int v1699;
-                                    if (v1698){
-                                        v1699 = v1686;
+                                    int v1698;
+                                    v1698 = v1437[v1691];
+                                    bool v1700;
+                                    v1700 = v1442 == v1691;
+                                    int v1701;
+                                    if (v1700){
+                                        v1701 = v1688;
                                     } else {
-                                        v1699 = v1696;
+                                        v1701 = v1698;
                                     }
-                                    v1687[v1689] = v1699;
-                                    v1689 += 1 ;
+                                    v1689[v1691] = v1701;
+                                    v1691 += 1 ;
                                 }
-                                static_array<int,2> v1700;
-                                int v1702;
-                                v1702 = 0;
-                                while (while_method_0(v1702)){
-                                    bool v1704;
-                                    v1704 = 0 <= v1702;
+                                static_array<int,2> v1702;
+                                int v1704;
+                                v1704 = 0;
+                                while (while_method_0(v1704)){
                                     bool v1706;
-                                    if (v1704){
-                                        bool v1705;
-                                        v1705 = v1702 < 2;
-                                        v1706 = v1705;
+                                    v1706 = 0 <= v1704;
+                                    bool v1708;
+                                    if (v1706){
+                                        bool v1707;
+                                        v1707 = v1704 < 2;
+                                        v1708 = v1707;
                                     } else {
-                                        v1706 = false;
+                                        v1708 = false;
                                     }
-                                    bool v1707;
-                                    v1707 = v1706 == false;
-                                    if (v1707){
-                                        assert("Index must be in range." && v1706);
-                                    } else {
-                                    }
-                                    int v1709;
-                                    v1709 = v1646[v1702];
-                                    bool v1712;
-                                    if (v1704){
-                                        bool v1711;
-                                        v1711 = v1702 < 2;
-                                        v1712 = v1711;
-                                    } else {
-                                        v1712 = false;
-                                    }
-                                    bool v1713;
-                                    v1713 = v1712 == false;
-                                    if (v1713){
-                                        assert("Index must be in range." && v1712);
+                                    bool v1709;
+                                    v1709 = v1708 == false;
+                                    if (v1709){
+                                        assert("Index must be in range." && v1708);
                                     } else {
                                     }
-                                    int v1715;
-                                    v1715 = v1687[v1702];
+                                    int v1711;
+                                    v1711 = v1648[v1704];
+                                    bool v1714;
+                                    if (v1706){
+                                        bool v1713;
+                                        v1713 = v1704 < 2;
+                                        v1714 = v1713;
+                                    } else {
+                                        v1714 = false;
+                                    }
+                                    bool v1715;
+                                    v1715 = v1714 == false;
+                                    if (v1715){
+                                        assert("Index must be in range." && v1714);
+                                    } else {
+                                    }
                                     int v1717;
-                                    v1717 = v1709 - v1715;
-                                    v1700[v1702] = v1717;
-                                    v1702 += 1 ;
+                                    v1717 = v1689[v1704];
+                                    int v1719;
+                                    v1719 = v1711 - v1717;
+                                    v1702[v1704] = v1719;
+                                    v1704 += 1 ;
                                 }
-                                bool v1719;
-                                if (v1678){
-                                    bool v1718;
-                                    v1718 = v1440 < 2;
-                                    v1719 = v1718;
+                                bool v1721;
+                                if (v1680){
+                                    bool v1720;
+                                    v1720 = v1442 < 2;
+                                    v1721 = v1720;
                                 } else {
-                                    v1719 = false;
+                                    v1721 = false;
                                 }
-                                bool v1720;
-                                v1720 = v1719 == false;
-                                if (v1720){
-                                    assert("Index must be in range." && v1719);
+                                bool v1722;
+                                v1722 = v1721 == false;
+                                if (v1722){
+                                    assert("Index must be in range." && v1721);
                                 } else {
                                 }
-                                int v1722;
-                                v1722 = v1700[v1440];
                                 int v1724;
-                                v1724 = v1667 + v1722;
-                                bool v1726;
-                                if (v1678){
-                                    bool v1725;
-                                    v1725 = v1440 < 2;
-                                    v1726 = v1725;
+                                v1724 = v1702[v1442];
+                                int v1726;
+                                v1726 = v1669 + v1724;
+                                bool v1728;
+                                if (v1680){
+                                    bool v1727;
+                                    v1727 = v1442 < 2;
+                                    v1728 = v1727;
                                 } else {
-                                    v1726 = false;
+                                    v1728 = false;
                                 }
-                                bool v1727;
-                                v1727 = v1726 == false;
-                                if (v1727){
-                                    assert("Index must be in range." && v1726);
+                                bool v1729;
+                                v1729 = v1728 == false;
+                                if (v1729){
+                                    assert("Index must be in range." && v1728);
                                 } else {
                                 }
-                                int v1729;
-                                v1729 = v1646[v1440];
-                                bool v1731;
-                                v1731 = v1724 < v1729;
-                                int v1732;
-                                if (v1731){
-                                    v1732 = v1724;
+                                int v1731;
+                                v1731 = v1648[v1442];
+                                bool v1733;
+                                v1733 = v1726 < v1731;
+                                int v1734;
+                                if (v1733){
+                                    v1734 = v1726;
                                 } else {
-                                    v1732 = v1729;
+                                    v1734 = v1731;
                                 }
-                                static_array<int,2> v1733;
-                                int v1735;
-                                v1735 = 0;
-                                while (while_method_0(v1735)){
-                                    bool v1737;
-                                    v1737 = 0 <= v1735;
+                                static_array<int,2> v1735;
+                                int v1737;
+                                v1737 = 0;
+                                while (while_method_0(v1737)){
                                     bool v1739;
-                                    if (v1737){
-                                        bool v1738;
-                                        v1738 = v1735 < 2;
-                                        v1739 = v1738;
+                                    v1739 = 0 <= v1737;
+                                    bool v1741;
+                                    if (v1739){
+                                        bool v1740;
+                                        v1740 = v1737 < 2;
+                                        v1741 = v1740;
                                     } else {
-                                        v1739 = false;
+                                        v1741 = false;
                                     }
-                                    bool v1740;
-                                    v1740 = v1739 == false;
-                                    if (v1740){
-                                        assert("Index must be in range." && v1739);
+                                    bool v1742;
+                                    v1742 = v1741 == false;
+                                    if (v1742){
+                                        assert("Index must be in range." && v1741);
                                     } else {
                                     }
-                                    int v1742;
-                                    v1742 = v1435[v1735];
-                                    bool v1744;
-                                    v1744 = v1440 == v1735;
-                                    int v1745;
-                                    if (v1744){
-                                        v1745 = v1732;
+                                    int v1744;
+                                    v1744 = v1437[v1737];
+                                    bool v1746;
+                                    v1746 = v1442 == v1737;
+                                    int v1747;
+                                    if (v1746){
+                                        v1747 = v1734;
                                     } else {
-                                        v1745 = v1742;
+                                        v1747 = v1744;
                                     }
-                                    v1733[v1735] = v1745;
-                                    v1735 += 1 ;
+                                    v1735[v1737] = v1747;
+                                    v1737 += 1 ;
                                 }
-                                static_array<int,2> v1746;
-                                int v1748;
-                                v1748 = 0;
-                                while (while_method_0(v1748)){
-                                    bool v1750;
-                                    v1750 = 0 <= v1748;
+                                static_array<int,2> v1748;
+                                int v1750;
+                                v1750 = 0;
+                                while (while_method_0(v1750)){
                                     bool v1752;
-                                    if (v1750){
-                                        bool v1751;
-                                        v1751 = v1748 < 2;
-                                        v1752 = v1751;
+                                    v1752 = 0 <= v1750;
+                                    bool v1754;
+                                    if (v1752){
+                                        bool v1753;
+                                        v1753 = v1750 < 2;
+                                        v1754 = v1753;
                                     } else {
-                                        v1752 = false;
+                                        v1754 = false;
                                     }
-                                    bool v1753;
-                                    v1753 = v1752 == false;
-                                    if (v1753){
-                                        assert("Index must be in range." && v1752);
-                                    } else {
-                                    }
-                                    int v1755;
-                                    v1755 = v1646[v1748];
-                                    bool v1758;
-                                    if (v1750){
-                                        bool v1757;
-                                        v1757 = v1748 < 2;
-                                        v1758 = v1757;
-                                    } else {
-                                        v1758 = false;
-                                    }
-                                    bool v1759;
-                                    v1759 = v1758 == false;
-                                    if (v1759){
-                                        assert("Index must be in range." && v1758);
+                                    bool v1755;
+                                    v1755 = v1754 == false;
+                                    if (v1755){
+                                        assert("Index must be in range." && v1754);
                                     } else {
                                     }
-                                    int v1761;
-                                    v1761 = v1733[v1748];
+                                    int v1757;
+                                    v1757 = v1648[v1750];
+                                    bool v1760;
+                                    if (v1752){
+                                        bool v1759;
+                                        v1759 = v1750 < 2;
+                                        v1760 = v1759;
+                                    } else {
+                                        v1760 = false;
+                                    }
+                                    bool v1761;
+                                    v1761 = v1760 == false;
+                                    if (v1761){
+                                        assert("Index must be in range." && v1760);
+                                    } else {
+                                    }
                                     int v1763;
-                                    v1763 = v1755 - v1761;
-                                    v1746[v1748] = v1763;
-                                    v1748 += 1 ;
+                                    v1763 = v1735[v1750];
+                                    int v1765;
+                                    v1765 = v1757 - v1763;
+                                    v1748[v1750] = v1765;
+                                    v1750 += 1 ;
                                 }
-                                bool v1764;
-                                v1764 = v1722 >= v1433;
-                                int v1765;
-                                if (v1764){
-                                    v1765 = v1722;
+                                bool v1766;
+                                v1766 = v1724 >= v1435;
+                                int v1767;
+                                if (v1766){
+                                    v1767 = v1724;
                                 } else {
-                                    v1765 = v1433;
+                                    v1767 = v1435;
                                 }
-                                int v1766;
-                                v1766 = v1436 + 1;
-                                v1771 = try_round_36(v1765, v1434, v1733, v1766, v1746, v1438);
+                                int v1768;
+                                v1768 = v1438 + 1;
+                                v1773 = try_round_36(v1767, v1436, v1735, v1768, v1748, v1440);
                                 break;
                             }
                             case 1: { // A_Call
-                                static_array<int,2> v1442;
-                                int v1444;
-                                v1444 = 0;
-                                while (while_method_0(v1444)){
-                                    bool v1446;
-                                    v1446 = 0 <= v1444;
+                                static_array<int,2> v1444;
+                                int v1446;
+                                v1446 = 0;
+                                while (while_method_0(v1446)){
                                     bool v1448;
-                                    if (v1446){
-                                        bool v1447;
-                                        v1447 = v1444 < 2;
-                                        v1448 = v1447;
+                                    v1448 = 0 <= v1446;
+                                    bool v1450;
+                                    if (v1448){
+                                        bool v1449;
+                                        v1449 = v1446 < 2;
+                                        v1450 = v1449;
                                     } else {
-                                        v1448 = false;
+                                        v1450 = false;
                                     }
-                                    bool v1449;
-                                    v1449 = v1448 == false;
-                                    if (v1449){
-                                        assert("Index must be in range." && v1448);
-                                    } else {
-                                    }
-                                    int v1451;
-                                    v1451 = v1437[v1444];
-                                    bool v1454;
-                                    if (v1446){
-                                        bool v1453;
-                                        v1453 = v1444 < 2;
-                                        v1454 = v1453;
-                                    } else {
-                                        v1454 = false;
-                                    }
-                                    bool v1455;
-                                    v1455 = v1454 == false;
-                                    if (v1455){
-                                        assert("Index must be in range." && v1454);
+                                    bool v1451;
+                                    v1451 = v1450 == false;
+                                    if (v1451){
+                                        assert("Index must be in range." && v1450);
                                     } else {
                                     }
-                                    int v1457;
-                                    v1457 = v1435[v1444];
+                                    int v1453;
+                                    v1453 = v1439[v1446];
+                                    bool v1456;
+                                    if (v1448){
+                                        bool v1455;
+                                        v1455 = v1446 < 2;
+                                        v1456 = v1455;
+                                    } else {
+                                        v1456 = false;
+                                    }
+                                    bool v1457;
+                                    v1457 = v1456 == false;
+                                    if (v1457){
+                                        assert("Index must be in range." && v1456);
+                                    } else {
+                                    }
                                     int v1459;
-                                    v1459 = v1451 + v1457;
-                                    v1442[v1444] = v1459;
-                                    v1444 += 1 ;
+                                    v1459 = v1437[v1446];
+                                    int v1461;
+                                    v1461 = v1453 + v1459;
+                                    v1444[v1446] = v1461;
+                                    v1446 += 1 ;
                                 }
-                                int v1460;
-                                v1460 = v1435[0];
-                                int v1462; int v1463;
-                                Tuple4 tmp121 = Tuple4{1, v1460};
-                                v1462 = tmp121.v0; v1463 = tmp121.v1;
-                                while (while_method_0(v1462)){
-                                    bool v1465;
-                                    v1465 = 0 <= v1462;
+                                int v1462;
+                                v1462 = v1437[0];
+                                int v1464; int v1465;
+                                Tuple4 tmp122 = Tuple4{1, v1462};
+                                v1464 = tmp122.v0; v1465 = tmp122.v1;
+                                while (while_method_0(v1464)){
                                     bool v1467;
-                                    if (v1465){
-                                        bool v1466;
-                                        v1466 = v1462 < 2;
-                                        v1467 = v1466;
+                                    v1467 = 0 <= v1464;
+                                    bool v1469;
+                                    if (v1467){
+                                        bool v1468;
+                                        v1468 = v1464 < 2;
+                                        v1469 = v1468;
                                     } else {
-                                        v1467 = false;
+                                        v1469 = false;
                                     }
-                                    bool v1468;
-                                    v1468 = v1467 == false;
-                                    if (v1468){
-                                        assert("Index must be in range." && v1467);
+                                    bool v1470;
+                                    v1470 = v1469 == false;
+                                    if (v1470){
+                                        assert("Index must be in range." && v1469);
                                     } else {
                                     }
-                                    int v1470;
-                                    v1470 = v1435[v1462];
-                                    bool v1472;
-                                    v1472 = v1463 >= v1470;
-                                    int v1473;
-                                    if (v1472){
-                                        v1473 = v1463;
+                                    int v1472;
+                                    v1472 = v1437[v1464];
+                                    bool v1474;
+                                    v1474 = v1465 >= v1472;
+                                    int v1475;
+                                    if (v1474){
+                                        v1475 = v1465;
                                     } else {
-                                        v1473 = v1470;
+                                        v1475 = v1472;
                                     }
-                                    v1463 = v1473;
-                                    v1462 += 1 ;
+                                    v1465 = v1475;
+                                    v1464 += 1 ;
                                 }
-                                bool v1474;
-                                v1474 = 0 <= v1440;
                                 bool v1476;
-                                if (v1474){
-                                    bool v1475;
-                                    v1475 = v1440 < 2;
-                                    v1476 = v1475;
+                                v1476 = 0 <= v1442;
+                                bool v1478;
+                                if (v1476){
+                                    bool v1477;
+                                    v1477 = v1442 < 2;
+                                    v1478 = v1477;
                                 } else {
-                                    v1476 = false;
+                                    v1478 = false;
                                 }
-                                bool v1477;
-                                v1477 = v1476 == false;
-                                if (v1477){
-                                    assert("Index must be in range." && v1476);
+                                bool v1479;
+                                v1479 = v1478 == false;
+                                if (v1479){
+                                    assert("Index must be in range." && v1478);
                                 } else {
                                 }
-                                int v1479;
-                                v1479 = v1442[v1440];
-                                bool v1481;
-                                v1481 = v1463 < v1479;
-                                int v1482;
-                                if (v1481){
-                                    v1482 = v1463;
+                                int v1481;
+                                v1481 = v1444[v1442];
+                                bool v1483;
+                                v1483 = v1465 < v1481;
+                                int v1484;
+                                if (v1483){
+                                    v1484 = v1465;
                                 } else {
-                                    v1482 = v1479;
+                                    v1484 = v1481;
                                 }
-                                static_array<int,2> v1483;
-                                int v1485;
-                                v1485 = 0;
-                                while (while_method_0(v1485)){
-                                    bool v1487;
-                                    v1487 = 0 <= v1485;
+                                static_array<int,2> v1485;
+                                int v1487;
+                                v1487 = 0;
+                                while (while_method_0(v1487)){
                                     bool v1489;
-                                    if (v1487){
-                                        bool v1488;
-                                        v1488 = v1485 < 2;
-                                        v1489 = v1488;
+                                    v1489 = 0 <= v1487;
+                                    bool v1491;
+                                    if (v1489){
+                                        bool v1490;
+                                        v1490 = v1487 < 2;
+                                        v1491 = v1490;
                                     } else {
-                                        v1489 = false;
+                                        v1491 = false;
                                     }
-                                    bool v1490;
-                                    v1490 = v1489 == false;
-                                    if (v1490){
-                                        assert("Index must be in range." && v1489);
+                                    bool v1492;
+                                    v1492 = v1491 == false;
+                                    if (v1492){
+                                        assert("Index must be in range." && v1491);
                                     } else {
                                     }
-                                    int v1492;
-                                    v1492 = v1435[v1485];
-                                    bool v1494;
-                                    v1494 = v1440 == v1485;
-                                    int v1495;
-                                    if (v1494){
-                                        v1495 = v1482;
+                                    int v1494;
+                                    v1494 = v1437[v1487];
+                                    bool v1496;
+                                    v1496 = v1442 == v1487;
+                                    int v1497;
+                                    if (v1496){
+                                        v1497 = v1484;
                                     } else {
-                                        v1495 = v1492;
+                                        v1497 = v1494;
                                     }
-                                    v1483[v1485] = v1495;
-                                    v1485 += 1 ;
+                                    v1485[v1487] = v1497;
+                                    v1487 += 1 ;
                                 }
-                                static_array<int,2> v1496;
-                                int v1498;
-                                v1498 = 0;
-                                while (while_method_0(v1498)){
-                                    bool v1500;
-                                    v1500 = 0 <= v1498;
+                                static_array<int,2> v1498;
+                                int v1500;
+                                v1500 = 0;
+                                while (while_method_0(v1500)){
                                     bool v1502;
-                                    if (v1500){
-                                        bool v1501;
-                                        v1501 = v1498 < 2;
-                                        v1502 = v1501;
+                                    v1502 = 0 <= v1500;
+                                    bool v1504;
+                                    if (v1502){
+                                        bool v1503;
+                                        v1503 = v1500 < 2;
+                                        v1504 = v1503;
                                     } else {
-                                        v1502 = false;
+                                        v1504 = false;
                                     }
-                                    bool v1503;
-                                    v1503 = v1502 == false;
-                                    if (v1503){
-                                        assert("Index must be in range." && v1502);
-                                    } else {
-                                    }
-                                    int v1505;
-                                    v1505 = v1442[v1498];
-                                    bool v1508;
-                                    if (v1500){
-                                        bool v1507;
-                                        v1507 = v1498 < 2;
-                                        v1508 = v1507;
-                                    } else {
-                                        v1508 = false;
-                                    }
-                                    bool v1509;
-                                    v1509 = v1508 == false;
-                                    if (v1509){
-                                        assert("Index must be in range." && v1508);
+                                    bool v1505;
+                                    v1505 = v1504 == false;
+                                    if (v1505){
+                                        assert("Index must be in range." && v1504);
                                     } else {
                                     }
-                                    int v1511;
-                                    v1511 = v1483[v1498];
+                                    int v1507;
+                                    v1507 = v1444[v1500];
+                                    bool v1510;
+                                    if (v1502){
+                                        bool v1509;
+                                        v1509 = v1500 < 2;
+                                        v1510 = v1509;
+                                    } else {
+                                        v1510 = false;
+                                    }
+                                    bool v1511;
+                                    v1511 = v1510 == false;
+                                    if (v1511){
+                                        assert("Index must be in range." && v1510);
+                                    } else {
+                                    }
                                     int v1513;
-                                    v1513 = v1505 - v1511;
-                                    v1496[v1498] = v1513;
-                                    v1498 += 1 ;
-                                }
-                                bool v1514;
-                                v1514 = v1440 < 2;
-                                if (v1514){
+                                    v1513 = v1485[v1500];
                                     int v1515;
-                                    v1515 = v1436 + 1;
-                                    v1771 = try_round_36(v1433, v1434, v1483, v1515, v1496, v1438);
+                                    v1515 = v1507 - v1513;
+                                    v1498[v1500] = v1515;
+                                    v1500 += 1 ;
+                                }
+                                bool v1516;
+                                v1516 = v1442 < 2;
+                                if (v1516){
+                                    int v1517;
+                                    v1517 = v1438 + 1;
+                                    v1773 = try_round_36(v1435, v1436, v1485, v1517, v1498, v1440);
                                 } else {
-                                    v1771 = go_next_street_38(v1433, v1434, v1483, v1436, v1496, v1438);
+                                    v1773 = go_next_street_38(v1435, v1436, v1485, v1438, v1498, v1440);
                                 }
                                 break;
                             }
                             case 2: { // A_Fold
-                                v1771 = Union4{Union4_1{v1433, v1434, v1435, v1436, v1437, v1438}};
+                                v1773 = Union4{Union4_1{v1435, v1436, v1437, v1438, v1439, v1440}};
                                 break;
                             }
                             case 3: { // A_Raise
-                                int v1519 = v1439.case3.v0;
-                                bool v1520;
-                                v1520 = v1433 <= v1519;
-                                bool v1521;
-                                v1521 = v1520 == false;
-                                if (v1521){
-                                    assert("The raise amount must match the minimum." && v1520);
+                                int v1521 = v1441.case3.v0;
+                                bool v1522;
+                                v1522 = v1435 <= v1521;
+                                bool v1523;
+                                v1523 = v1522 == false;
+                                if (v1523){
+                                    assert("The raise amount must match the minimum." && v1522);
                                 } else {
                                 }
-                                static_array<int,2> v1523;
-                                int v1525;
-                                v1525 = 0;
-                                while (while_method_0(v1525)){
-                                    bool v1527;
-                                    v1527 = 0 <= v1525;
+                                static_array<int,2> v1525;
+                                int v1527;
+                                v1527 = 0;
+                                while (while_method_0(v1527)){
                                     bool v1529;
-                                    if (v1527){
-                                        bool v1528;
-                                        v1528 = v1525 < 2;
-                                        v1529 = v1528;
+                                    v1529 = 0 <= v1527;
+                                    bool v1531;
+                                    if (v1529){
+                                        bool v1530;
+                                        v1530 = v1527 < 2;
+                                        v1531 = v1530;
                                     } else {
-                                        v1529 = false;
+                                        v1531 = false;
                                     }
-                                    bool v1530;
-                                    v1530 = v1529 == false;
-                                    if (v1530){
-                                        assert("Index must be in range." && v1529);
-                                    } else {
-                                    }
-                                    int v1532;
-                                    v1532 = v1437[v1525];
-                                    bool v1535;
-                                    if (v1527){
-                                        bool v1534;
-                                        v1534 = v1525 < 2;
-                                        v1535 = v1534;
-                                    } else {
-                                        v1535 = false;
-                                    }
-                                    bool v1536;
-                                    v1536 = v1535 == false;
-                                    if (v1536){
-                                        assert("Index must be in range." && v1535);
+                                    bool v1532;
+                                    v1532 = v1531 == false;
+                                    if (v1532){
+                                        assert("Index must be in range." && v1531);
                                     } else {
                                     }
-                                    int v1538;
-                                    v1538 = v1435[v1525];
+                                    int v1534;
+                                    v1534 = v1439[v1527];
+                                    bool v1537;
+                                    if (v1529){
+                                        bool v1536;
+                                        v1536 = v1527 < 2;
+                                        v1537 = v1536;
+                                    } else {
+                                        v1537 = false;
+                                    }
+                                    bool v1538;
+                                    v1538 = v1537 == false;
+                                    if (v1538){
+                                        assert("Index must be in range." && v1537);
+                                    } else {
+                                    }
                                     int v1540;
-                                    v1540 = v1532 + v1538;
-                                    v1523[v1525] = v1540;
-                                    v1525 += 1 ;
+                                    v1540 = v1437[v1527];
+                                    int v1542;
+                                    v1542 = v1534 + v1540;
+                                    v1525[v1527] = v1542;
+                                    v1527 += 1 ;
                                 }
-                                int v1541;
-                                v1541 = v1435[0];
-                                int v1543; int v1544;
-                                Tuple4 tmp122 = Tuple4{1, v1541};
-                                v1543 = tmp122.v0; v1544 = tmp122.v1;
-                                while (while_method_0(v1543)){
-                                    bool v1546;
-                                    v1546 = 0 <= v1543;
+                                int v1543;
+                                v1543 = v1437[0];
+                                int v1545; int v1546;
+                                Tuple4 tmp123 = Tuple4{1, v1543};
+                                v1545 = tmp123.v0; v1546 = tmp123.v1;
+                                while (while_method_0(v1545)){
                                     bool v1548;
-                                    if (v1546){
-                                        bool v1547;
-                                        v1547 = v1543 < 2;
-                                        v1548 = v1547;
+                                    v1548 = 0 <= v1545;
+                                    bool v1550;
+                                    if (v1548){
+                                        bool v1549;
+                                        v1549 = v1545 < 2;
+                                        v1550 = v1549;
                                     } else {
-                                        v1548 = false;
+                                        v1550 = false;
                                     }
-                                    bool v1549;
-                                    v1549 = v1548 == false;
-                                    if (v1549){
-                                        assert("Index must be in range." && v1548);
+                                    bool v1551;
+                                    v1551 = v1550 == false;
+                                    if (v1551){
+                                        assert("Index must be in range." && v1550);
                                     } else {
                                     }
-                                    int v1551;
-                                    v1551 = v1435[v1543];
-                                    bool v1553;
-                                    v1553 = v1544 >= v1551;
-                                    int v1554;
-                                    if (v1553){
-                                        v1554 = v1544;
+                                    int v1553;
+                                    v1553 = v1437[v1545];
+                                    bool v1555;
+                                    v1555 = v1546 >= v1553;
+                                    int v1556;
+                                    if (v1555){
+                                        v1556 = v1546;
                                     } else {
-                                        v1554 = v1551;
+                                        v1556 = v1553;
                                     }
-                                    v1544 = v1554;
-                                    v1543 += 1 ;
+                                    v1546 = v1556;
+                                    v1545 += 1 ;
                                 }
-                                bool v1555;
-                                v1555 = 0 <= v1440;
                                 bool v1557;
-                                if (v1555){
-                                    bool v1556;
-                                    v1556 = v1440 < 2;
-                                    v1557 = v1556;
+                                v1557 = 0 <= v1442;
+                                bool v1559;
+                                if (v1557){
+                                    bool v1558;
+                                    v1558 = v1442 < 2;
+                                    v1559 = v1558;
                                 } else {
-                                    v1557 = false;
+                                    v1559 = false;
                                 }
-                                bool v1558;
-                                v1558 = v1557 == false;
-                                if (v1558){
-                                    assert("Index must be in range." && v1557);
+                                bool v1560;
+                                v1560 = v1559 == false;
+                                if (v1560){
+                                    assert("Index must be in range." && v1559);
                                 } else {
                                 }
-                                int v1560;
-                                v1560 = v1523[v1440];
-                                bool v1562;
-                                v1562 = v1544 < v1560;
-                                int v1563;
-                                if (v1562){
-                                    v1563 = v1544;
+                                int v1562;
+                                v1562 = v1525[v1442];
+                                bool v1564;
+                                v1564 = v1546 < v1562;
+                                int v1565;
+                                if (v1564){
+                                    v1565 = v1546;
                                 } else {
-                                    v1563 = v1560;
+                                    v1565 = v1562;
                                 }
-                                static_array<int,2> v1564;
-                                int v1566;
-                                v1566 = 0;
-                                while (while_method_0(v1566)){
-                                    bool v1568;
-                                    v1568 = 0 <= v1566;
+                                static_array<int,2> v1566;
+                                int v1568;
+                                v1568 = 0;
+                                while (while_method_0(v1568)){
                                     bool v1570;
-                                    if (v1568){
-                                        bool v1569;
-                                        v1569 = v1566 < 2;
-                                        v1570 = v1569;
+                                    v1570 = 0 <= v1568;
+                                    bool v1572;
+                                    if (v1570){
+                                        bool v1571;
+                                        v1571 = v1568 < 2;
+                                        v1572 = v1571;
                                     } else {
-                                        v1570 = false;
+                                        v1572 = false;
                                     }
-                                    bool v1571;
-                                    v1571 = v1570 == false;
-                                    if (v1571){
-                                        assert("Index must be in range." && v1570);
+                                    bool v1573;
+                                    v1573 = v1572 == false;
+                                    if (v1573){
+                                        assert("Index must be in range." && v1572);
                                     } else {
                                     }
-                                    int v1573;
-                                    v1573 = v1435[v1566];
-                                    bool v1575;
-                                    v1575 = v1440 == v1566;
-                                    int v1576;
-                                    if (v1575){
-                                        v1576 = v1563;
+                                    int v1575;
+                                    v1575 = v1437[v1568];
+                                    bool v1577;
+                                    v1577 = v1442 == v1568;
+                                    int v1578;
+                                    if (v1577){
+                                        v1578 = v1565;
                                     } else {
-                                        v1576 = v1573;
+                                        v1578 = v1575;
                                     }
-                                    v1564[v1566] = v1576;
-                                    v1566 += 1 ;
+                                    v1566[v1568] = v1578;
+                                    v1568 += 1 ;
                                 }
-                                static_array<int,2> v1577;
-                                int v1579;
-                                v1579 = 0;
-                                while (while_method_0(v1579)){
-                                    bool v1581;
-                                    v1581 = 0 <= v1579;
+                                static_array<int,2> v1579;
+                                int v1581;
+                                v1581 = 0;
+                                while (while_method_0(v1581)){
                                     bool v1583;
-                                    if (v1581){
-                                        bool v1582;
-                                        v1582 = v1579 < 2;
-                                        v1583 = v1582;
+                                    v1583 = 0 <= v1581;
+                                    bool v1585;
+                                    if (v1583){
+                                        bool v1584;
+                                        v1584 = v1581 < 2;
+                                        v1585 = v1584;
                                     } else {
-                                        v1583 = false;
+                                        v1585 = false;
                                     }
-                                    bool v1584;
-                                    v1584 = v1583 == false;
-                                    if (v1584){
-                                        assert("Index must be in range." && v1583);
-                                    } else {
-                                    }
-                                    int v1586;
-                                    v1586 = v1523[v1579];
-                                    bool v1589;
-                                    if (v1581){
-                                        bool v1588;
-                                        v1588 = v1579 < 2;
-                                        v1589 = v1588;
-                                    } else {
-                                        v1589 = false;
-                                    }
-                                    bool v1590;
-                                    v1590 = v1589 == false;
-                                    if (v1590){
-                                        assert("Index must be in range." && v1589);
+                                    bool v1586;
+                                    v1586 = v1585 == false;
+                                    if (v1586){
+                                        assert("Index must be in range." && v1585);
                                     } else {
                                     }
-                                    int v1592;
-                                    v1592 = v1564[v1579];
+                                    int v1588;
+                                    v1588 = v1525[v1581];
+                                    bool v1591;
+                                    if (v1583){
+                                        bool v1590;
+                                        v1590 = v1581 < 2;
+                                        v1591 = v1590;
+                                    } else {
+                                        v1591 = false;
+                                    }
+                                    bool v1592;
+                                    v1592 = v1591 == false;
+                                    if (v1592){
+                                        assert("Index must be in range." && v1591);
+                                    } else {
+                                    }
                                     int v1594;
-                                    v1594 = v1586 - v1592;
-                                    v1577[v1579] = v1594;
-                                    v1579 += 1 ;
+                                    v1594 = v1566[v1581];
+                                    int v1596;
+                                    v1596 = v1588 - v1594;
+                                    v1579[v1581] = v1596;
+                                    v1581 += 1 ;
                                 }
-                                bool v1596;
-                                if (v1555){
-                                    bool v1595;
-                                    v1595 = v1440 < 2;
-                                    v1596 = v1595;
+                                bool v1598;
+                                if (v1557){
+                                    bool v1597;
+                                    v1597 = v1442 < 2;
+                                    v1598 = v1597;
                                 } else {
-                                    v1596 = false;
+                                    v1598 = false;
                                 }
-                                bool v1597;
-                                v1597 = v1596 == false;
-                                if (v1597){
-                                    assert("Index must be in range." && v1596);
-                                } else {
-                                }
-                                int v1599;
-                                v1599 = v1577[v1440];
-                                bool v1601;
-                                v1601 = v1519 < v1599;
-                                bool v1602;
-                                v1602 = v1601 == false;
-                                if (v1602){
-                                    assert("The raise amount must be less than the stack size after calling." && v1601);
+                                bool v1599;
+                                v1599 = v1598 == false;
+                                if (v1599){
+                                    assert("Index must be in range." && v1598);
                                 } else {
                                 }
-                                int v1604;
-                                v1604 = v1544 + v1519;
-                                bool v1606;
-                                if (v1555){
-                                    bool v1605;
-                                    v1605 = v1440 < 2;
-                                    v1606 = v1605;
-                                } else {
-                                    v1606 = false;
-                                }
-                                bool v1607;
-                                v1607 = v1606 == false;
-                                if (v1607){
-                                    assert("Index must be in range." && v1606);
+                                int v1601;
+                                v1601 = v1579[v1442];
+                                bool v1603;
+                                v1603 = v1521 < v1601;
+                                bool v1604;
+                                v1604 = v1603 == false;
+                                if (v1604){
+                                    assert("The raise amount must be less than the stack size after calling." && v1603);
                                 } else {
                                 }
-                                int v1609;
-                                v1609 = v1523[v1440];
-                                bool v1611;
-                                v1611 = v1604 < v1609;
-                                int v1612;
-                                if (v1611){
-                                    v1612 = v1604;
+                                int v1606;
+                                v1606 = v1546 + v1521;
+                                bool v1608;
+                                if (v1557){
+                                    bool v1607;
+                                    v1607 = v1442 < 2;
+                                    v1608 = v1607;
                                 } else {
-                                    v1612 = v1609;
+                                    v1608 = false;
                                 }
-                                static_array<int,2> v1613;
-                                int v1615;
-                                v1615 = 0;
-                                while (while_method_0(v1615)){
-                                    bool v1617;
-                                    v1617 = 0 <= v1615;
+                                bool v1609;
+                                v1609 = v1608 == false;
+                                if (v1609){
+                                    assert("Index must be in range." && v1608);
+                                } else {
+                                }
+                                int v1611;
+                                v1611 = v1525[v1442];
+                                bool v1613;
+                                v1613 = v1606 < v1611;
+                                int v1614;
+                                if (v1613){
+                                    v1614 = v1606;
+                                } else {
+                                    v1614 = v1611;
+                                }
+                                static_array<int,2> v1615;
+                                int v1617;
+                                v1617 = 0;
+                                while (while_method_0(v1617)){
                                     bool v1619;
-                                    if (v1617){
-                                        bool v1618;
-                                        v1618 = v1615 < 2;
-                                        v1619 = v1618;
+                                    v1619 = 0 <= v1617;
+                                    bool v1621;
+                                    if (v1619){
+                                        bool v1620;
+                                        v1620 = v1617 < 2;
+                                        v1621 = v1620;
                                     } else {
-                                        v1619 = false;
+                                        v1621 = false;
                                     }
-                                    bool v1620;
-                                    v1620 = v1619 == false;
-                                    if (v1620){
-                                        assert("Index must be in range." && v1619);
+                                    bool v1622;
+                                    v1622 = v1621 == false;
+                                    if (v1622){
+                                        assert("Index must be in range." && v1621);
                                     } else {
                                     }
-                                    int v1622;
-                                    v1622 = v1435[v1615];
-                                    bool v1624;
-                                    v1624 = v1440 == v1615;
-                                    int v1625;
-                                    if (v1624){
-                                        v1625 = v1612;
+                                    int v1624;
+                                    v1624 = v1437[v1617];
+                                    bool v1626;
+                                    v1626 = v1442 == v1617;
+                                    int v1627;
+                                    if (v1626){
+                                        v1627 = v1614;
                                     } else {
-                                        v1625 = v1622;
+                                        v1627 = v1624;
                                     }
-                                    v1613[v1615] = v1625;
-                                    v1615 += 1 ;
+                                    v1615[v1617] = v1627;
+                                    v1617 += 1 ;
                                 }
-                                static_array<int,2> v1626;
-                                int v1628;
-                                v1628 = 0;
-                                while (while_method_0(v1628)){
-                                    bool v1630;
-                                    v1630 = 0 <= v1628;
+                                static_array<int,2> v1628;
+                                int v1630;
+                                v1630 = 0;
+                                while (while_method_0(v1630)){
                                     bool v1632;
-                                    if (v1630){
-                                        bool v1631;
-                                        v1631 = v1628 < 2;
-                                        v1632 = v1631;
+                                    v1632 = 0 <= v1630;
+                                    bool v1634;
+                                    if (v1632){
+                                        bool v1633;
+                                        v1633 = v1630 < 2;
+                                        v1634 = v1633;
                                     } else {
-                                        v1632 = false;
+                                        v1634 = false;
                                     }
-                                    bool v1633;
-                                    v1633 = v1632 == false;
-                                    if (v1633){
-                                        assert("Index must be in range." && v1632);
-                                    } else {
-                                    }
-                                    int v1635;
-                                    v1635 = v1523[v1628];
-                                    bool v1638;
-                                    if (v1630){
-                                        bool v1637;
-                                        v1637 = v1628 < 2;
-                                        v1638 = v1637;
-                                    } else {
-                                        v1638 = false;
-                                    }
-                                    bool v1639;
-                                    v1639 = v1638 == false;
-                                    if (v1639){
-                                        assert("Index must be in range." && v1638);
+                                    bool v1635;
+                                    v1635 = v1634 == false;
+                                    if (v1635){
+                                        assert("Index must be in range." && v1634);
                                     } else {
                                     }
-                                    int v1641;
-                                    v1641 = v1613[v1628];
+                                    int v1637;
+                                    v1637 = v1525[v1630];
+                                    bool v1640;
+                                    if (v1632){
+                                        bool v1639;
+                                        v1639 = v1630 < 2;
+                                        v1640 = v1639;
+                                    } else {
+                                        v1640 = false;
+                                    }
+                                    bool v1641;
+                                    v1641 = v1640 == false;
+                                    if (v1641){
+                                        assert("Index must be in range." && v1640);
+                                    } else {
+                                    }
                                     int v1643;
-                                    v1643 = v1635 - v1641;
-                                    v1626[v1628] = v1643;
-                                    v1628 += 1 ;
+                                    v1643 = v1615[v1630];
+                                    int v1645;
+                                    v1645 = v1637 - v1643;
+                                    v1628[v1630] = v1645;
+                                    v1630 += 1 ;
                                 }
-                                int v1644;
-                                v1644 = v1436 + 1;
-                                v1771 = try_round_36(v1519, v1434, v1613, v1644, v1626, v1438);
+                                int v1646;
+                                v1646 = v1438 + 1;
+                                v1773 = try_round_36(v1521, v1436, v1615, v1646, v1628, v1440);
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        v1778 = Union3{Union3_1{v1771}};
+                        v1780 = Union3{Union3_1{v1773}};
                         break;
                     }
                     case 2: { // T_some
-                        Union4 v1431 = v1429.case2.v0;
-                        v1778 = Union3{Union3_1{v1431}};
+                        Union4 v1433 = v1431.case2.v0;
+                        v1780 = Union3{Union3_1{v1433}};
                         break;
                     }
                     default: {
@@ -23944,7 +24167,7 @@ __device__ void method_84(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                 assert("Invalid tag." && false); __trap();
             }
         }
-        v16 = v1778;
+        v16 = v1780;
     }
     return ;
 }
@@ -24373,8 +24596,8 @@ __device__ float method_86(int * v0, float * v1, float * v2, float * v3, float *
             v166 += 1 ;
         }
         float v180; int v181;
-        Tuple14 tmp128 = Tuple14{0.0f, 2147483647};
-        v180 = tmp128.v0; v181 = tmp128.v1;
+        Tuple14 tmp129 = Tuple14{0.0f, 2147483647};
+        v180 = tmp129.v0; v181 = tmp129.v1;
         int v182;
         v182 = 0;
         while (while_method_6(v182)){
@@ -24419,8 +24642,8 @@ __device__ float method_86(int * v0, float * v1, float * v2, float * v3, float *
         auto v199 = cooperative_groups::labeled_partition(v196,v198);
         Closure7 v200{v62};
         float v201; int v202;
-        Tuple14 tmp129 = cooperative_groups::reduce(v199, Tuple14{v180, v181}, v200);
-        v201 = tmp129.v0; v202 = tmp129.v1;
+        Tuple14 tmp130 = cooperative_groups::reduce(v199, Tuple14{v180, v181}, v200);
+        v201 = tmp130.v0; v202 = tmp130.v1;
         bool v203;
         v203 = v202 == 2147483647;
         bool v204;
@@ -24459,10 +24682,10 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
     v6.unsafe_set_length(0);
     static_array<Union2,2> v7;
     Union2 v9;
-    v9 = Union2{Union2_0{}};
+    v9 = Union2{Union2_1{}};
     v7[0] = v9;
     Union2 v11;
-    v11 = Union2{Union2_0{}};
+    v11 = Union2{Union2_1{}};
     v7[1] = v11;
     v2.v3 = v7;
     static_array_list<Union6,128> & v13 = v2.v2;
@@ -24472,33 +24695,33 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
     Union3 v16;
     v16 = v15;
     while (while_method_22(v16)){
-        Union3 v1659;
+        Union3 v1661;
         switch (v16.tag) {
             case 0: { // None
-                v1659 = Union3{Union3_0{}};
+                v1661 = Union3{Union3_0{}};
                 break;
             }
             case 1: { // Some
                 Union4 v18 = v16.case1.v0;
-                Union18 v1310;
+                Union18 v1312;
                 switch (v18.tag) {
                     case 0: { // G_Flop
-                        int v1171 = v18.case0.v0; static_array<static_array<unsigned char,2>,2> v1172 = v18.case0.v1; static_array<int,2> v1173 = v18.case0.v2; int v1174 = v18.case0.v3; static_array<int,2> v1175 = v18.case0.v4; Union5 v1176 = v18.case0.v5;
-                        curandStatePhilox4_32_10_t & v1177 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1178 = v1177;
-                        static_array<unsigned char,3> v1179; unsigned long long v1180;
-                        Tuple8 tmp123 = draw_cards_32(v1178, v14);
-                        v1179 = tmp123.v0; v1180 = tmp123.v1;
-                        v2.v0 = v1180;
-                        static_array_list<unsigned char,5> v1181;
-                        v1181 = get_community_cards_81(v1176, v1179);
-                        Union6 v1182;
-                        v1182 = Union6{Union6_0{v1181}};
-                        v13.push(v1182);
-                        Union5 v1185;
-                        switch (v1176.tag) {
+                        int v1173 = v18.case0.v0; static_array<static_array<unsigned char,2>,2> v1174 = v18.case0.v1; static_array<int,2> v1175 = v18.case0.v2; int v1176 = v18.case0.v3; static_array<int,2> v1177 = v18.case0.v4; Union5 v1178 = v18.case0.v5;
+                        curandStatePhilox4_32_10_t & v1179 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1180 = v1179;
+                        static_array<unsigned char,3> v1181; unsigned long long v1182;
+                        Tuple8 tmp124 = draw_cards_32(v1180, v14);
+                        v1181 = tmp124.v0; v1182 = tmp124.v1;
+                        v2.v0 = v1182;
+                        static_array_list<unsigned char,5> v1183;
+                        v1183 = get_community_cards_81(v1178, v1181);
+                        Union6 v1184;
+                        v1184 = Union6{Union6_0{v1183}};
+                        v13.push(v1184);
+                        Union5 v1187;
+                        switch (v1178.tag) {
                             case 1: { // Preflop
-                                v1185 = Union5{Union5_0{v1179}};
+                                v1187 = Union5{Union5_0{v1181}};
                                 break;
                             }
                             default: {
@@ -24506,13 +24729,13 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1186;
-                        v1186 = 2;
-                        int v1187;
-                        v1187 = 0;
-                        Union4 v1188;
-                        v1188 = try_round_36(v1186, v1172, v1173, v1187, v1175, v1185);
-                        v1310 = Union18{Union18_2{v1188}};
+                        int v1188;
+                        v1188 = 2;
+                        int v1189;
+                        v1189 = 0;
+                        Union4 v1190;
+                        v1190 = try_round_36(v1188, v1174, v1175, v1189, v1177, v1187);
+                        v1312 = Union18{Union18_2{v1190}};
                         break;
                     }
                     case 1: { // G_Fold
@@ -24555,141 +24778,141 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         Union6 v40;
                         v40 = Union6{Union6_1{v31, v39}};
                         v13.push(v40);
-                        v1310 = Union18{Union18_0{}};
+                        v1312 = Union18{Union18_0{}};
                         break;
                     }
                     case 2: { // G_Preflop
-                        curandStatePhilox4_32_10_t & v1272 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1273 = v1272;
-                        static_array<unsigned char,2> v1274; unsigned long long v1275;
-                        Tuple11 tmp124 = draw_cards_39(v1273, v14);
-                        v1274 = tmp124.v0; v1275 = tmp124.v1;
-                        v2.v0 = v1275;
-                        curandStatePhilox4_32_10_t & v1276 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1277 = v1276;
-                        static_array<unsigned char,2> v1278; unsigned long long v1279;
-                        Tuple11 tmp125 = draw_cards_39(v1277, v14);
-                        v1278 = tmp125.v0; v1279 = tmp125.v1;
-                        v2.v0 = v1279;
-                        Union6 v1280;
-                        v1280 = Union6{Union6_3{0, v1274}};
-                        v13.push(v1280);
-                        Union6 v1281;
-                        v1281 = Union6{Union6_3{1, v1278}};
-                        v13.push(v1281);
-                        static_array<static_array<unsigned char,2>,2> v1282;
-                        v1282[0] = v1274;
-                        v1282[1] = v1278;
-                        static_array<int,2> v1284;
-                        v1284[0] = 2;
-                        v1284[1] = 1;
+                        curandStatePhilox4_32_10_t & v1274 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1275 = v1274;
+                        static_array<unsigned char,2> v1276; unsigned long long v1277;
+                        Tuple11 tmp125 = draw_cards_39(v1275, v14);
+                        v1276 = tmp125.v0; v1277 = tmp125.v1;
+                        v2.v0 = v1277;
+                        curandStatePhilox4_32_10_t & v1278 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1279 = v1278;
+                        static_array<unsigned char,2> v1280; unsigned long long v1281;
+                        Tuple11 tmp126 = draw_cards_39(v1279, v14);
+                        v1280 = tmp126.v0; v1281 = tmp126.v1;
+                        v2.v0 = v1281;
+                        Union6 v1282;
+                        v1282 = Union6{Union6_3{0, v1276}};
+                        v13.push(v1282);
+                        Union6 v1283;
+                        v1283 = Union6{Union6_3{1, v1280}};
+                        v13.push(v1283);
+                        static_array<static_array<unsigned char,2>,2> v1284;
+                        v1284[0] = v1276;
+                        v1284[1] = v1280;
                         static_array<int,2> v1286;
-                        int v1288;
-                        v1288 = 0;
-                        while (while_method_0(v1288)){
-                            bool v1290;
-                            v1290 = 0 <= v1288;
+                        v1286[0] = 2;
+                        v1286[1] = 1;
+                        static_array<int,2> v1288;
+                        int v1290;
+                        v1290 = 0;
+                        while (while_method_0(v1290)){
                             bool v1292;
-                            if (v1290){
-                                bool v1291;
-                                v1291 = v1288 < 2;
-                                v1292 = v1291;
+                            v1292 = 0 <= v1290;
+                            bool v1294;
+                            if (v1292){
+                                bool v1293;
+                                v1293 = v1290 < 2;
+                                v1294 = v1293;
                             } else {
-                                v1292 = false;
+                                v1294 = false;
                             }
-                            bool v1293;
-                            v1293 = v1292 == false;
-                            if (v1293){
-                                assert("Index must be in range." && v1292);
+                            bool v1295;
+                            v1295 = v1294 == false;
+                            if (v1295){
+                                assert("Index must be in range." && v1294);
                             } else {
                             }
-                            int v1295;
-                            v1295 = v1284[v1288];
                             int v1297;
-                            v1297 = 100 - v1295;
-                            v1286[v1288] = v1297;
-                            v1288 += 1 ;
+                            v1297 = v1286[v1290];
+                            int v1299;
+                            v1299 = 100 - v1297;
+                            v1288[v1290] = v1299;
+                            v1290 += 1 ;
                         }
-                        int v1298;
-                        v1298 = 2;
-                        int v1299;
-                        v1299 = 0;
-                        Union5 v1300;
-                        v1300 = Union5{Union5_1{}};
-                        Union4 v1301;
-                        v1301 = try_round_36(v1298, v1282, v1284, v1299, v1286, v1300);
-                        v1310 = Union18{Union18_2{v1301}};
+                        int v1300;
+                        v1300 = 2;
+                        int v1301;
+                        v1301 = 0;
+                        Union5 v1302;
+                        v1302 = Union5{Union5_1{}};
+                        Union4 v1303;
+                        v1303 = try_round_36(v1300, v1284, v1286, v1301, v1288, v1302);
+                        v1312 = Union18{Union18_2{v1303}};
                         break;
                     }
                     case 3: { // G_River
-                        int v1231 = v18.case3.v0; static_array<static_array<unsigned char,2>,2> v1232 = v18.case3.v1; static_array<int,2> v1233 = v18.case3.v2; int v1234 = v18.case3.v3; static_array<int,2> v1235 = v18.case3.v4; Union5 v1236 = v18.case3.v5;
-                        curandStatePhilox4_32_10_t & v1237 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1238 = v1237;
-                        static_array<unsigned char,1> v1239; unsigned long long v1240;
-                        Tuple12 tmp126 = draw_cards_40(v1238, v14);
-                        v1239 = tmp126.v0; v1240 = tmp126.v1;
-                        v2.v0 = v1240;
-                        static_array_list<unsigned char,5> v1241;
-                        v1241 = get_community_cards_82(v1236, v1239);
-                        Union6 v1242;
-                        v1242 = Union6{Union6_0{v1241}};
-                        v13.push(v1242);
-                        Union5 v1267;
-                        switch (v1236.tag) {
+                        int v1233 = v18.case3.v0; static_array<static_array<unsigned char,2>,2> v1234 = v18.case3.v1; static_array<int,2> v1235 = v18.case3.v2; int v1236 = v18.case3.v3; static_array<int,2> v1237 = v18.case3.v4; Union5 v1238 = v18.case3.v5;
+                        curandStatePhilox4_32_10_t & v1239 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1240 = v1239;
+                        static_array<unsigned char,1> v1241; unsigned long long v1242;
+                        Tuple12 tmp127 = draw_cards_40(v1240, v14);
+                        v1241 = tmp127.v0; v1242 = tmp127.v1;
+                        v2.v0 = v1242;
+                        static_array_list<unsigned char,5> v1243;
+                        v1243 = get_community_cards_82(v1238, v1241);
+                        Union6 v1244;
+                        v1244 = Union6{Union6_0{v1243}};
+                        v13.push(v1244);
+                        Union5 v1269;
+                        switch (v1238.tag) {
                             case 3: { // Turn
-                                static_array<unsigned char,4> v1243 = v1236.case3.v0;
-                                static_array<unsigned char,5> v1244;
-                                int v1246;
-                                v1246 = 0;
-                                while (while_method_3(v1246)){
-                                    bool v1248;
-                                    v1248 = 0 <= v1246;
+                                static_array<unsigned char,4> v1245 = v1238.case3.v0;
+                                static_array<unsigned char,5> v1246;
+                                int v1248;
+                                v1248 = 0;
+                                while (while_method_3(v1248)){
                                     bool v1250;
-                                    if (v1248){
-                                        bool v1249;
-                                        v1249 = v1246 < 4;
-                                        v1250 = v1249;
+                                    v1250 = 0 <= v1248;
+                                    bool v1252;
+                                    if (v1250){
+                                        bool v1251;
+                                        v1251 = v1248 < 4;
+                                        v1252 = v1251;
                                     } else {
-                                        v1250 = false;
+                                        v1252 = false;
                                     }
-                                    bool v1251;
-                                    v1251 = v1250 == false;
-                                    if (v1251){
-                                        assert("Index must be in range." && v1250);
+                                    bool v1253;
+                                    v1253 = v1252 == false;
+                                    if (v1253){
+                                        assert("Index must be in range." && v1252);
                                     } else {
                                     }
-                                    unsigned char v1253;
-                                    v1253 = v1243[v1246];
-                                    v1244[v1246] = v1253;
-                                    v1246 += 1 ;
+                                    unsigned char v1255;
+                                    v1255 = v1245[v1248];
+                                    v1246[v1248] = v1255;
+                                    v1248 += 1 ;
                                 }
-                                int v1255;
-                                v1255 = 0;
-                                while (while_method_6(v1255)){
-                                    bool v1257;
-                                    v1257 = 0 <= v1255;
+                                int v1257;
+                                v1257 = 0;
+                                while (while_method_6(v1257)){
                                     bool v1259;
-                                    if (v1257){
-                                        bool v1258;
-                                        v1258 = v1255 < 1;
-                                        v1259 = v1258;
+                                    v1259 = 0 <= v1257;
+                                    bool v1261;
+                                    if (v1259){
+                                        bool v1260;
+                                        v1260 = v1257 < 1;
+                                        v1261 = v1260;
                                     } else {
-                                        v1259 = false;
+                                        v1261 = false;
                                     }
-                                    bool v1260;
-                                    v1260 = v1259 == false;
-                                    if (v1260){
-                                        assert("Index must be in range." && v1259);
+                                    bool v1262;
+                                    v1262 = v1261 == false;
+                                    if (v1262){
+                                        assert("Index must be in range." && v1261);
                                     } else {
                                     }
-                                    unsigned char v1262;
-                                    v1262 = v1239[v1255];
-                                    int v1264;
-                                    v1264 = 4 + v1255;
-                                    v1244[v1264] = v1262;
-                                    v1255 += 1 ;
+                                    unsigned char v1264;
+                                    v1264 = v1241[v1257];
+                                    int v1266;
+                                    v1266 = 4 + v1257;
+                                    v1246[v1266] = v1264;
+                                    v1257 += 1 ;
                                 }
-                                v1267 = Union5{Union5_2{v1244}};
+                                v1269 = Union5{Union5_2{v1246}};
                                 break;
                             }
                             default: {
@@ -24697,13 +24920,13 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1268;
-                        v1268 = 2;
-                        int v1269;
-                        v1269 = 0;
-                        Union4 v1270;
-                        v1270 = try_round_36(v1268, v1232, v1233, v1269, v1235, v1267);
-                        v1310 = Union18{Union18_2{v1270}};
+                        int v1270;
+                        v1270 = 2;
+                        int v1271;
+                        v1271 = 0;
+                        Union4 v1272;
+                        v1272 = try_round_36(v1270, v1234, v1235, v1271, v1237, v1269);
+                        v1312 = Union18{Union18_2{v1272}};
                         break;
                     }
                     case 4: { // G_Round
@@ -24729,9 +24952,13 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         }
                         Union2 v174;
                         v174 = v168[v167];
-                        Union1 v1158;
+                        Union1 v1160;
                         switch (v174.tag) {
-                            case 0: { // Computer
+                            case 0: { // CallingMachine
+                                v1160 = Union1{Union1_1{}};
+                                break;
+                            }
+                            case 1: { // Computer
                                 static_array_list<Union6,128> & v177 = v2.v2;
                                 curandStatePhilox4_32_10_t & v178 = v2.v5;
                                 curandStatePhilox4_32_10_t & v179 = v178;
@@ -26180,8 +26407,8 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v780;
                                 v780 = (int)v779;
                                 float v781; int v782;
-                                Tuple14 tmp127 = method_46(v179, v746, v748, v750, v752, v754, v756, v758, v760, v780, v770);
-                                v781 = tmp127.v0; v782 = tmp127.v1;
+                                Tuple14 tmp128 = method_46(v179, v746, v748, v750, v752, v754, v756, v758, v760, v780, v770);
+                                v781 = tmp128.v0; v782 = tmp128.v1;
                                 extern __shared__ unsigned char v783[];
                                 float * v784;
                                 v784 = reinterpret_cast<float *>(&v783[0ull]);
@@ -26359,15 +26586,15 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 }
                                 switch (v872.tag) {
                                     case 0: { // AA_Call
-                                        v1158 = Union1{Union1_1{}};
+                                        v1160 = Union1{Union1_1{}};
                                         break;
                                     }
                                     case 1: { // AA_Fold
                                         int v873;
                                         v873 = v163[0];
                                         int v875; int v876;
-                                        Tuple4 tmp130 = Tuple4{1, v873};
-                                        v875 = tmp130.v0; v876 = tmp130.v1;
+                                        Tuple4 tmp131 = Tuple4{1, v873};
+                                        v875 = tmp131.v0; v876 = tmp131.v1;
                                         while (while_method_0(v875)){
                                             bool v878;
                                             v878 = 0 <= v875;
@@ -26417,9 +26644,9 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         bool v893;
                                         v893 = v891 == v876;
                                         if (v893){
-                                            v1158 = Union1{Union1_1{}};
+                                            v1160 = Union1{Union1_1{}};
                                         } else {
-                                            v1158 = Union1{Union1_2{}};
+                                            v1160 = Union1{Union1_2{}};
                                         }
                                         break;
                                     }
@@ -26471,8 +26698,8 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         int v918;
                                         v918 = v163[0];
                                         int v920; int v921;
-                                        Tuple4 tmp131 = Tuple4{1, v918};
-                                        v920 = tmp131.v0; v921 = tmp131.v1;
+                                        Tuple4 tmp132 = Tuple4{1, v918};
+                                        v920 = tmp132.v0; v921 = tmp132.v1;
                                         while (while_method_0(v920)){
                                             bool v923;
                                             v923 = 0 <= v920;
@@ -26563,8 +26790,8 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         int v953;
                                         v953 = v940[0];
                                         int v955; int v956;
-                                        Tuple4 tmp132 = Tuple4{1, v953};
-                                        v955 = tmp132.v0; v956 = tmp132.v1;
+                                        Tuple4 tmp133 = Tuple4{1, v953};
+                                        v955 = tmp133.v0; v956 = tmp133.v1;
                                         while (while_method_0(v955)){
                                             bool v958;
                                             v958 = 0 <= v955;
@@ -26663,9 +26890,9 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                         bool v994;
                                         v994 = v987 >= v992;
                                         if (v994){
-                                            v1158 = Union1{Union1_0{}};
+                                            v1160 = Union1{Union1_0{}};
                                         } else {
-                                            v1158 = Union1{Union1_3{v987}};
+                                            v1160 = Union1{Union1_3{v987}};
                                         }
                                         break;
                                     }
@@ -26675,12 +26902,12 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 }
                                 break;
                             }
-                            case 1: { // Human
+                            case 2: { // Human
                                 printf("%s\n", "Humans aren't allowed during training.");
                                 __trap();
                                 break;
                             }
-                            case 2: { // Random
+                            case 3: { // Random
                                 curandStatePhilox4_32_10_t & v1001 = v2.v5;
                                 curandStatePhilox4_32_10_t & v1002 = v1001;
                                 static_array<int,2> v1003;
@@ -26729,8 +26956,8 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v1021;
                                 v1021 = v163[0];
                                 int v1023; int v1024;
-                                Tuple4 tmp133 = Tuple4{1, v1021};
-                                v1023 = tmp133.v0; v1024 = tmp133.v1;
+                                Tuple4 tmp134 = Tuple4{1, v1021};
+                                v1023 = tmp134.v0; v1024 = tmp134.v1;
                                 while (while_method_0(v1023)){
                                     bool v1026;
                                     v1026 = 0 <= v1023;
@@ -26821,8 +27048,8 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 int v1056;
                                 v1056 = v1043[0];
                                 int v1058; int v1059;
-                                Tuple4 tmp134 = Tuple4{1, v1056};
-                                v1058 = tmp134.v0; v1059 = tmp134.v1;
+                                Tuple4 tmp135 = Tuple4{1, v1056};
+                                v1058 = tmp135.v0; v1059 = tmp135.v1;
                                 while (while_method_0(v1058)){
                                     bool v1061;
                                     v1061 = 0 <= v1058;
@@ -27070,27 +27297,27 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 Union1 v1155;
                                 v1155 = v1151[0];
                                 __syncthreads();
-                                v1158 = v1155;
+                                v1160 = v1155;
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        Union6 v1159;
-                        v1159 = Union6{Union6_2{v167, v1158}};
-                        v13.push(v1159);
-                        v1310 = Union18{Union18_1{v161, v162, v163, v164, v165, v166, v1158}};
+                        Union6 v1161;
+                        v1161 = Union6{Union6_2{v167, v1160}};
+                        v13.push(v1161);
+                        v1312 = Union18{Union18_1{v161, v162, v163, v164, v165, v166, v1160}};
                         break;
                     }
                     case 5: { // G_Round'
-                        int v1161 = v18.case5.v0; static_array<static_array<unsigned char,2>,2> v1162 = v18.case5.v1; static_array<int,2> v1163 = v18.case5.v2; int v1164 = v18.case5.v3; static_array<int,2> v1165 = v18.case5.v4; Union5 v1166 = v18.case5.v5; Union1 v1167 = v18.case5.v6;
-                        int v1168;
-                        v1168 = v1164 % 2;
-                        Union6 v1169;
-                        v1169 = Union6{Union6_2{v1168, v1167}};
-                        v13.push(v1169);
-                        v1310 = Union18{Union18_1{v1161, v1162, v1163, v1164, v1165, v1166, v1167}};
+                        int v1163 = v18.case5.v0; static_array<static_array<unsigned char,2>,2> v1164 = v18.case5.v1; static_array<int,2> v1165 = v18.case5.v2; int v1166 = v18.case5.v3; static_array<int,2> v1167 = v18.case5.v4; Union5 v1168 = v18.case5.v5; Union1 v1169 = v18.case5.v6;
+                        int v1170;
+                        v1170 = v1166 % 2;
+                        Union6 v1171;
+                        v1171 = Union6{Union6_2{v1170, v1169}};
+                        v13.push(v1171);
+                        v1312 = Union18{Union18_1{v1163, v1164, v1165, v1166, v1167, v1168, v1169}};
                         break;
                     }
                     case 6: { // G_Showdown
@@ -27161,8 +27388,8 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                             v64 += 1 ;
                         }
                         static_array<unsigned char,5> v74; char v75;
-                        Tuple0 tmp135 = score_51(v53);
-                        v74 = tmp135.v0; v75 = tmp135.v1;
+                        Tuple0 tmp136 = score_51(v53);
+                        v74 = tmp136.v0; v75 = tmp136.v1;
                         static_array<unsigned char,2> v76;
                         v76 = v43[1];
                         static_array<unsigned char,7> v78;
@@ -27217,8 +27444,8 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                             v89 += 1 ;
                         }
                         static_array<unsigned char,5> v99; char v100;
-                        Tuple0 tmp136 = score_51(v78);
-                        v99 = tmp136.v0; v100 = tmp136.v1;
+                        Tuple0 tmp137 = score_51(v78);
+                        v99 = tmp137.v0; v100 = tmp137.v1;
                         int v101;
                         v101 = v45 % 2;
                         bool v102;
@@ -27382,78 +27609,78 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                         Union6 v159;
                         v159 = Union6{Union6_4{v148, v157, v149}};
                         v13.push(v159);
-                        v1310 = Union18{Union18_0{}};
+                        v1312 = Union18{Union18_0{}};
                         break;
                     }
                     case 7: { // G_Turn
-                        int v1190 = v18.case7.v0; static_array<static_array<unsigned char,2>,2> v1191 = v18.case7.v1; static_array<int,2> v1192 = v18.case7.v2; int v1193 = v18.case7.v3; static_array<int,2> v1194 = v18.case7.v4; Union5 v1195 = v18.case7.v5;
-                        curandStatePhilox4_32_10_t & v1196 = v2.v5;
-                        curandStatePhilox4_32_10_t & v1197 = v1196;
-                        static_array<unsigned char,1> v1198; unsigned long long v1199;
-                        Tuple12 tmp137 = draw_cards_40(v1197, v14);
-                        v1198 = tmp137.v0; v1199 = tmp137.v1;
-                        v2.v0 = v1199;
-                        static_array_list<unsigned char,5> v1200;
-                        v1200 = get_community_cards_82(v1195, v1198);
-                        Union6 v1201;
-                        v1201 = Union6{Union6_0{v1200}};
-                        v13.push(v1201);
-                        Union5 v1226;
-                        switch (v1195.tag) {
+                        int v1192 = v18.case7.v0; static_array<static_array<unsigned char,2>,2> v1193 = v18.case7.v1; static_array<int,2> v1194 = v18.case7.v2; int v1195 = v18.case7.v3; static_array<int,2> v1196 = v18.case7.v4; Union5 v1197 = v18.case7.v5;
+                        curandStatePhilox4_32_10_t & v1198 = v2.v5;
+                        curandStatePhilox4_32_10_t & v1199 = v1198;
+                        static_array<unsigned char,1> v1200; unsigned long long v1201;
+                        Tuple12 tmp138 = draw_cards_40(v1199, v14);
+                        v1200 = tmp138.v0; v1201 = tmp138.v1;
+                        v2.v0 = v1201;
+                        static_array_list<unsigned char,5> v1202;
+                        v1202 = get_community_cards_82(v1197, v1200);
+                        Union6 v1203;
+                        v1203 = Union6{Union6_0{v1202}};
+                        v13.push(v1203);
+                        Union5 v1228;
+                        switch (v1197.tag) {
                             case 0: { // Flop
-                                static_array<unsigned char,3> v1202 = v1195.case0.v0;
-                                static_array<unsigned char,4> v1203;
-                                int v1205;
-                                v1205 = 0;
-                                while (while_method_1(v1205)){
-                                    bool v1207;
-                                    v1207 = 0 <= v1205;
+                                static_array<unsigned char,3> v1204 = v1197.case0.v0;
+                                static_array<unsigned char,4> v1205;
+                                int v1207;
+                                v1207 = 0;
+                                while (while_method_1(v1207)){
                                     bool v1209;
-                                    if (v1207){
-                                        bool v1208;
-                                        v1208 = v1205 < 3;
-                                        v1209 = v1208;
+                                    v1209 = 0 <= v1207;
+                                    bool v1211;
+                                    if (v1209){
+                                        bool v1210;
+                                        v1210 = v1207 < 3;
+                                        v1211 = v1210;
                                     } else {
-                                        v1209 = false;
+                                        v1211 = false;
                                     }
-                                    bool v1210;
-                                    v1210 = v1209 == false;
-                                    if (v1210){
-                                        assert("Index must be in range." && v1209);
+                                    bool v1212;
+                                    v1212 = v1211 == false;
+                                    if (v1212){
+                                        assert("Index must be in range." && v1211);
                                     } else {
                                     }
-                                    unsigned char v1212;
-                                    v1212 = v1202[v1205];
-                                    v1203[v1205] = v1212;
-                                    v1205 += 1 ;
+                                    unsigned char v1214;
+                                    v1214 = v1204[v1207];
+                                    v1205[v1207] = v1214;
+                                    v1207 += 1 ;
                                 }
-                                int v1214;
-                                v1214 = 0;
-                                while (while_method_6(v1214)){
-                                    bool v1216;
-                                    v1216 = 0 <= v1214;
+                                int v1216;
+                                v1216 = 0;
+                                while (while_method_6(v1216)){
                                     bool v1218;
-                                    if (v1216){
-                                        bool v1217;
-                                        v1217 = v1214 < 1;
-                                        v1218 = v1217;
+                                    v1218 = 0 <= v1216;
+                                    bool v1220;
+                                    if (v1218){
+                                        bool v1219;
+                                        v1219 = v1216 < 1;
+                                        v1220 = v1219;
                                     } else {
-                                        v1218 = false;
+                                        v1220 = false;
                                     }
-                                    bool v1219;
-                                    v1219 = v1218 == false;
-                                    if (v1219){
-                                        assert("Index must be in range." && v1218);
+                                    bool v1221;
+                                    v1221 = v1220 == false;
+                                    if (v1221){
+                                        assert("Index must be in range." && v1220);
                                     } else {
                                     }
-                                    unsigned char v1221;
-                                    v1221 = v1198[v1214];
-                                    int v1223;
-                                    v1223 = 3 + v1214;
-                                    v1203[v1223] = v1221;
-                                    v1214 += 1 ;
+                                    unsigned char v1223;
+                                    v1223 = v1200[v1216];
+                                    int v1225;
+                                    v1225 = 3 + v1216;
+                                    v1205[v1225] = v1223;
+                                    v1216 += 1 ;
                                 }
-                                v1226 = Union5{Union5_3{v1203}};
+                                v1228 = Union5{Union5_3{v1205}};
                                 break;
                             }
                             default: {
@@ -27461,869 +27688,869 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                                 __trap();
                             }
                         }
-                        int v1227;
-                        v1227 = 2;
-                        int v1228;
-                        v1228 = 0;
-                        Union4 v1229;
-                        v1229 = try_round_36(v1227, v1191, v1192, v1228, v1194, v1226);
-                        v1310 = Union18{Union18_2{v1229}};
+                        int v1229;
+                        v1229 = 2;
+                        int v1230;
+                        v1230 = 0;
+                        Union4 v1231;
+                        v1231 = try_round_36(v1229, v1193, v1194, v1230, v1196, v1228);
+                        v1312 = Union18{Union18_2{v1231}};
                         break;
                     }
                     default: {
                         assert("Invalid tag." && false); __trap();
                     }
                 }
-                switch (v1310.tag) {
+                switch (v1312.tag) {
                     case 0: { // T_none
-                        v1659 = Union3{Union3_0{}};
+                        v1661 = Union3{Union3_0{}};
                         break;
                     }
                     case 1: { // T_round
-                        int v1314 = v1310.case1.v0; static_array<static_array<unsigned char,2>,2> v1315 = v1310.case1.v1; static_array<int,2> v1316 = v1310.case1.v2; int v1317 = v1310.case1.v3; static_array<int,2> v1318 = v1310.case1.v4; Union5 v1319 = v1310.case1.v5; Union1 v1320 = v1310.case1.v6;
-                        int v1321;
-                        v1321 = v1317 % 2;
-                        Union4 v1652;
-                        switch (v1320.tag) {
+                        int v1316 = v1312.case1.v0; static_array<static_array<unsigned char,2>,2> v1317 = v1312.case1.v1; static_array<int,2> v1318 = v1312.case1.v2; int v1319 = v1312.case1.v3; static_array<int,2> v1320 = v1312.case1.v4; Union5 v1321 = v1312.case1.v5; Union1 v1322 = v1312.case1.v6;
+                        int v1323;
+                        v1323 = v1319 % 2;
+                        Union4 v1654;
+                        switch (v1322.tag) {
                             case 0: { // A_All_In
-                                static_array<int,2> v1527;
-                                int v1529;
-                                v1529 = 0;
-                                while (while_method_0(v1529)){
-                                    bool v1531;
-                                    v1531 = 0 <= v1529;
+                                static_array<int,2> v1529;
+                                int v1531;
+                                v1531 = 0;
+                                while (while_method_0(v1531)){
                                     bool v1533;
-                                    if (v1531){
-                                        bool v1532;
-                                        v1532 = v1529 < 2;
-                                        v1533 = v1532;
+                                    v1533 = 0 <= v1531;
+                                    bool v1535;
+                                    if (v1533){
+                                        bool v1534;
+                                        v1534 = v1531 < 2;
+                                        v1535 = v1534;
                                     } else {
-                                        v1533 = false;
+                                        v1535 = false;
                                     }
-                                    bool v1534;
-                                    v1534 = v1533 == false;
-                                    if (v1534){
-                                        assert("Index must be in range." && v1533);
-                                    } else {
-                                    }
-                                    int v1536;
-                                    v1536 = v1318[v1529];
-                                    bool v1539;
-                                    if (v1531){
-                                        bool v1538;
-                                        v1538 = v1529 < 2;
-                                        v1539 = v1538;
-                                    } else {
-                                        v1539 = false;
-                                    }
-                                    bool v1540;
-                                    v1540 = v1539 == false;
-                                    if (v1540){
-                                        assert("Index must be in range." && v1539);
+                                    bool v1536;
+                                    v1536 = v1535 == false;
+                                    if (v1536){
+                                        assert("Index must be in range." && v1535);
                                     } else {
                                     }
-                                    int v1542;
-                                    v1542 = v1316[v1529];
+                                    int v1538;
+                                    v1538 = v1320[v1531];
+                                    bool v1541;
+                                    if (v1533){
+                                        bool v1540;
+                                        v1540 = v1531 < 2;
+                                        v1541 = v1540;
+                                    } else {
+                                        v1541 = false;
+                                    }
+                                    bool v1542;
+                                    v1542 = v1541 == false;
+                                    if (v1542){
+                                        assert("Index must be in range." && v1541);
+                                    } else {
+                                    }
                                     int v1544;
-                                    v1544 = v1536 + v1542;
-                                    v1527[v1529] = v1544;
-                                    v1529 += 1 ;
+                                    v1544 = v1318[v1531];
+                                    int v1546;
+                                    v1546 = v1538 + v1544;
+                                    v1529[v1531] = v1546;
+                                    v1531 += 1 ;
                                 }
-                                int v1545;
-                                v1545 = v1316[0];
-                                int v1547; int v1548;
-                                Tuple4 tmp138 = Tuple4{1, v1545};
-                                v1547 = tmp138.v0; v1548 = tmp138.v1;
-                                while (while_method_0(v1547)){
-                                    bool v1550;
-                                    v1550 = 0 <= v1547;
+                                int v1547;
+                                v1547 = v1318[0];
+                                int v1549; int v1550;
+                                Tuple4 tmp139 = Tuple4{1, v1547};
+                                v1549 = tmp139.v0; v1550 = tmp139.v1;
+                                while (while_method_0(v1549)){
                                     bool v1552;
-                                    if (v1550){
-                                        bool v1551;
-                                        v1551 = v1547 < 2;
-                                        v1552 = v1551;
+                                    v1552 = 0 <= v1549;
+                                    bool v1554;
+                                    if (v1552){
+                                        bool v1553;
+                                        v1553 = v1549 < 2;
+                                        v1554 = v1553;
                                     } else {
-                                        v1552 = false;
+                                        v1554 = false;
                                     }
-                                    bool v1553;
-                                    v1553 = v1552 == false;
-                                    if (v1553){
-                                        assert("Index must be in range." && v1552);
+                                    bool v1555;
+                                    v1555 = v1554 == false;
+                                    if (v1555){
+                                        assert("Index must be in range." && v1554);
                                     } else {
                                     }
-                                    int v1555;
-                                    v1555 = v1316[v1547];
-                                    bool v1557;
-                                    v1557 = v1548 >= v1555;
-                                    int v1558;
-                                    if (v1557){
-                                        v1558 = v1548;
+                                    int v1557;
+                                    v1557 = v1318[v1549];
+                                    bool v1559;
+                                    v1559 = v1550 >= v1557;
+                                    int v1560;
+                                    if (v1559){
+                                        v1560 = v1550;
                                     } else {
-                                        v1558 = v1555;
+                                        v1560 = v1557;
                                     }
-                                    v1548 = v1558;
-                                    v1547 += 1 ;
+                                    v1550 = v1560;
+                                    v1549 += 1 ;
                                 }
-                                bool v1559;
-                                v1559 = 0 <= v1321;
                                 bool v1561;
-                                if (v1559){
-                                    bool v1560;
-                                    v1560 = v1321 < 2;
-                                    v1561 = v1560;
+                                v1561 = 0 <= v1323;
+                                bool v1563;
+                                if (v1561){
+                                    bool v1562;
+                                    v1562 = v1323 < 2;
+                                    v1563 = v1562;
                                 } else {
-                                    v1561 = false;
+                                    v1563 = false;
                                 }
-                                bool v1562;
-                                v1562 = v1561 == false;
-                                if (v1562){
-                                    assert("Index must be in range." && v1561);
+                                bool v1564;
+                                v1564 = v1563 == false;
+                                if (v1564){
+                                    assert("Index must be in range." && v1563);
                                 } else {
                                 }
-                                int v1564;
-                                v1564 = v1527[v1321];
-                                bool v1566;
-                                v1566 = v1548 < v1564;
-                                int v1567;
-                                if (v1566){
-                                    v1567 = v1548;
+                                int v1566;
+                                v1566 = v1529[v1323];
+                                bool v1568;
+                                v1568 = v1550 < v1566;
+                                int v1569;
+                                if (v1568){
+                                    v1569 = v1550;
                                 } else {
-                                    v1567 = v1564;
+                                    v1569 = v1566;
                                 }
-                                static_array<int,2> v1568;
-                                int v1570;
-                                v1570 = 0;
-                                while (while_method_0(v1570)){
-                                    bool v1572;
-                                    v1572 = 0 <= v1570;
+                                static_array<int,2> v1570;
+                                int v1572;
+                                v1572 = 0;
+                                while (while_method_0(v1572)){
                                     bool v1574;
-                                    if (v1572){
-                                        bool v1573;
-                                        v1573 = v1570 < 2;
-                                        v1574 = v1573;
+                                    v1574 = 0 <= v1572;
+                                    bool v1576;
+                                    if (v1574){
+                                        bool v1575;
+                                        v1575 = v1572 < 2;
+                                        v1576 = v1575;
                                     } else {
-                                        v1574 = false;
+                                        v1576 = false;
                                     }
-                                    bool v1575;
-                                    v1575 = v1574 == false;
-                                    if (v1575){
-                                        assert("Index must be in range." && v1574);
+                                    bool v1577;
+                                    v1577 = v1576 == false;
+                                    if (v1577){
+                                        assert("Index must be in range." && v1576);
                                     } else {
                                     }
-                                    int v1577;
-                                    v1577 = v1316[v1570];
-                                    bool v1579;
-                                    v1579 = v1321 == v1570;
-                                    int v1580;
-                                    if (v1579){
-                                        v1580 = v1567;
+                                    int v1579;
+                                    v1579 = v1318[v1572];
+                                    bool v1581;
+                                    v1581 = v1323 == v1572;
+                                    int v1582;
+                                    if (v1581){
+                                        v1582 = v1569;
                                     } else {
-                                        v1580 = v1577;
+                                        v1582 = v1579;
                                     }
-                                    v1568[v1570] = v1580;
-                                    v1570 += 1 ;
+                                    v1570[v1572] = v1582;
+                                    v1572 += 1 ;
                                 }
-                                static_array<int,2> v1581;
-                                int v1583;
-                                v1583 = 0;
-                                while (while_method_0(v1583)){
-                                    bool v1585;
-                                    v1585 = 0 <= v1583;
+                                static_array<int,2> v1583;
+                                int v1585;
+                                v1585 = 0;
+                                while (while_method_0(v1585)){
                                     bool v1587;
-                                    if (v1585){
-                                        bool v1586;
-                                        v1586 = v1583 < 2;
-                                        v1587 = v1586;
+                                    v1587 = 0 <= v1585;
+                                    bool v1589;
+                                    if (v1587){
+                                        bool v1588;
+                                        v1588 = v1585 < 2;
+                                        v1589 = v1588;
                                     } else {
-                                        v1587 = false;
+                                        v1589 = false;
                                     }
-                                    bool v1588;
-                                    v1588 = v1587 == false;
-                                    if (v1588){
-                                        assert("Index must be in range." && v1587);
-                                    } else {
-                                    }
-                                    int v1590;
-                                    v1590 = v1527[v1583];
-                                    bool v1593;
-                                    if (v1585){
-                                        bool v1592;
-                                        v1592 = v1583 < 2;
-                                        v1593 = v1592;
-                                    } else {
-                                        v1593 = false;
-                                    }
-                                    bool v1594;
-                                    v1594 = v1593 == false;
-                                    if (v1594){
-                                        assert("Index must be in range." && v1593);
+                                    bool v1590;
+                                    v1590 = v1589 == false;
+                                    if (v1590){
+                                        assert("Index must be in range." && v1589);
                                     } else {
                                     }
-                                    int v1596;
-                                    v1596 = v1568[v1583];
+                                    int v1592;
+                                    v1592 = v1529[v1585];
+                                    bool v1595;
+                                    if (v1587){
+                                        bool v1594;
+                                        v1594 = v1585 < 2;
+                                        v1595 = v1594;
+                                    } else {
+                                        v1595 = false;
+                                    }
+                                    bool v1596;
+                                    v1596 = v1595 == false;
+                                    if (v1596){
+                                        assert("Index must be in range." && v1595);
+                                    } else {
+                                    }
                                     int v1598;
-                                    v1598 = v1590 - v1596;
-                                    v1581[v1583] = v1598;
-                                    v1583 += 1 ;
+                                    v1598 = v1570[v1585];
+                                    int v1600;
+                                    v1600 = v1592 - v1598;
+                                    v1583[v1585] = v1600;
+                                    v1585 += 1 ;
                                 }
-                                bool v1600;
-                                if (v1559){
-                                    bool v1599;
-                                    v1599 = v1321 < 2;
-                                    v1600 = v1599;
+                                bool v1602;
+                                if (v1561){
+                                    bool v1601;
+                                    v1601 = v1323 < 2;
+                                    v1602 = v1601;
                                 } else {
-                                    v1600 = false;
+                                    v1602 = false;
                                 }
-                                bool v1601;
-                                v1601 = v1600 == false;
-                                if (v1601){
-                                    assert("Index must be in range." && v1600);
+                                bool v1603;
+                                v1603 = v1602 == false;
+                                if (v1603){
+                                    assert("Index must be in range." && v1602);
                                 } else {
                                 }
-                                int v1603;
-                                v1603 = v1581[v1321];
                                 int v1605;
-                                v1605 = v1548 + v1603;
-                                bool v1607;
-                                if (v1559){
-                                    bool v1606;
-                                    v1606 = v1321 < 2;
-                                    v1607 = v1606;
+                                v1605 = v1583[v1323];
+                                int v1607;
+                                v1607 = v1550 + v1605;
+                                bool v1609;
+                                if (v1561){
+                                    bool v1608;
+                                    v1608 = v1323 < 2;
+                                    v1609 = v1608;
                                 } else {
-                                    v1607 = false;
+                                    v1609 = false;
                                 }
-                                bool v1608;
-                                v1608 = v1607 == false;
-                                if (v1608){
-                                    assert("Index must be in range." && v1607);
+                                bool v1610;
+                                v1610 = v1609 == false;
+                                if (v1610){
+                                    assert("Index must be in range." && v1609);
                                 } else {
                                 }
-                                int v1610;
-                                v1610 = v1527[v1321];
-                                bool v1612;
-                                v1612 = v1605 < v1610;
-                                int v1613;
-                                if (v1612){
-                                    v1613 = v1605;
+                                int v1612;
+                                v1612 = v1529[v1323];
+                                bool v1614;
+                                v1614 = v1607 < v1612;
+                                int v1615;
+                                if (v1614){
+                                    v1615 = v1607;
                                 } else {
-                                    v1613 = v1610;
+                                    v1615 = v1612;
                                 }
-                                static_array<int,2> v1614;
-                                int v1616;
-                                v1616 = 0;
-                                while (while_method_0(v1616)){
-                                    bool v1618;
-                                    v1618 = 0 <= v1616;
+                                static_array<int,2> v1616;
+                                int v1618;
+                                v1618 = 0;
+                                while (while_method_0(v1618)){
                                     bool v1620;
-                                    if (v1618){
-                                        bool v1619;
-                                        v1619 = v1616 < 2;
-                                        v1620 = v1619;
+                                    v1620 = 0 <= v1618;
+                                    bool v1622;
+                                    if (v1620){
+                                        bool v1621;
+                                        v1621 = v1618 < 2;
+                                        v1622 = v1621;
                                     } else {
-                                        v1620 = false;
+                                        v1622 = false;
                                     }
-                                    bool v1621;
-                                    v1621 = v1620 == false;
-                                    if (v1621){
-                                        assert("Index must be in range." && v1620);
+                                    bool v1623;
+                                    v1623 = v1622 == false;
+                                    if (v1623){
+                                        assert("Index must be in range." && v1622);
                                     } else {
                                     }
-                                    int v1623;
-                                    v1623 = v1316[v1616];
-                                    bool v1625;
-                                    v1625 = v1321 == v1616;
-                                    int v1626;
-                                    if (v1625){
-                                        v1626 = v1613;
+                                    int v1625;
+                                    v1625 = v1318[v1618];
+                                    bool v1627;
+                                    v1627 = v1323 == v1618;
+                                    int v1628;
+                                    if (v1627){
+                                        v1628 = v1615;
                                     } else {
-                                        v1626 = v1623;
+                                        v1628 = v1625;
                                     }
-                                    v1614[v1616] = v1626;
-                                    v1616 += 1 ;
+                                    v1616[v1618] = v1628;
+                                    v1618 += 1 ;
                                 }
-                                static_array<int,2> v1627;
-                                int v1629;
-                                v1629 = 0;
-                                while (while_method_0(v1629)){
-                                    bool v1631;
-                                    v1631 = 0 <= v1629;
+                                static_array<int,2> v1629;
+                                int v1631;
+                                v1631 = 0;
+                                while (while_method_0(v1631)){
                                     bool v1633;
-                                    if (v1631){
-                                        bool v1632;
-                                        v1632 = v1629 < 2;
-                                        v1633 = v1632;
+                                    v1633 = 0 <= v1631;
+                                    bool v1635;
+                                    if (v1633){
+                                        bool v1634;
+                                        v1634 = v1631 < 2;
+                                        v1635 = v1634;
                                     } else {
-                                        v1633 = false;
+                                        v1635 = false;
                                     }
-                                    bool v1634;
-                                    v1634 = v1633 == false;
-                                    if (v1634){
-                                        assert("Index must be in range." && v1633);
-                                    } else {
-                                    }
-                                    int v1636;
-                                    v1636 = v1527[v1629];
-                                    bool v1639;
-                                    if (v1631){
-                                        bool v1638;
-                                        v1638 = v1629 < 2;
-                                        v1639 = v1638;
-                                    } else {
-                                        v1639 = false;
-                                    }
-                                    bool v1640;
-                                    v1640 = v1639 == false;
-                                    if (v1640){
-                                        assert("Index must be in range." && v1639);
+                                    bool v1636;
+                                    v1636 = v1635 == false;
+                                    if (v1636){
+                                        assert("Index must be in range." && v1635);
                                     } else {
                                     }
-                                    int v1642;
-                                    v1642 = v1614[v1629];
+                                    int v1638;
+                                    v1638 = v1529[v1631];
+                                    bool v1641;
+                                    if (v1633){
+                                        bool v1640;
+                                        v1640 = v1631 < 2;
+                                        v1641 = v1640;
+                                    } else {
+                                        v1641 = false;
+                                    }
+                                    bool v1642;
+                                    v1642 = v1641 == false;
+                                    if (v1642){
+                                        assert("Index must be in range." && v1641);
+                                    } else {
+                                    }
                                     int v1644;
-                                    v1644 = v1636 - v1642;
-                                    v1627[v1629] = v1644;
-                                    v1629 += 1 ;
+                                    v1644 = v1616[v1631];
+                                    int v1646;
+                                    v1646 = v1638 - v1644;
+                                    v1629[v1631] = v1646;
+                                    v1631 += 1 ;
                                 }
-                                bool v1645;
-                                v1645 = v1603 >= v1314;
-                                int v1646;
-                                if (v1645){
-                                    v1646 = v1603;
+                                bool v1647;
+                                v1647 = v1605 >= v1316;
+                                int v1648;
+                                if (v1647){
+                                    v1648 = v1605;
                                 } else {
-                                    v1646 = v1314;
+                                    v1648 = v1316;
                                 }
-                                int v1647;
-                                v1647 = v1317 + 1;
-                                v1652 = try_round_36(v1646, v1315, v1614, v1647, v1627, v1319);
+                                int v1649;
+                                v1649 = v1319 + 1;
+                                v1654 = try_round_36(v1648, v1317, v1616, v1649, v1629, v1321);
                                 break;
                             }
                             case 1: { // A_Call
-                                static_array<int,2> v1323;
-                                int v1325;
-                                v1325 = 0;
-                                while (while_method_0(v1325)){
-                                    bool v1327;
-                                    v1327 = 0 <= v1325;
+                                static_array<int,2> v1325;
+                                int v1327;
+                                v1327 = 0;
+                                while (while_method_0(v1327)){
                                     bool v1329;
-                                    if (v1327){
-                                        bool v1328;
-                                        v1328 = v1325 < 2;
-                                        v1329 = v1328;
+                                    v1329 = 0 <= v1327;
+                                    bool v1331;
+                                    if (v1329){
+                                        bool v1330;
+                                        v1330 = v1327 < 2;
+                                        v1331 = v1330;
                                     } else {
-                                        v1329 = false;
+                                        v1331 = false;
                                     }
-                                    bool v1330;
-                                    v1330 = v1329 == false;
-                                    if (v1330){
-                                        assert("Index must be in range." && v1329);
-                                    } else {
-                                    }
-                                    int v1332;
-                                    v1332 = v1318[v1325];
-                                    bool v1335;
-                                    if (v1327){
-                                        bool v1334;
-                                        v1334 = v1325 < 2;
-                                        v1335 = v1334;
-                                    } else {
-                                        v1335 = false;
-                                    }
-                                    bool v1336;
-                                    v1336 = v1335 == false;
-                                    if (v1336){
-                                        assert("Index must be in range." && v1335);
+                                    bool v1332;
+                                    v1332 = v1331 == false;
+                                    if (v1332){
+                                        assert("Index must be in range." && v1331);
                                     } else {
                                     }
-                                    int v1338;
-                                    v1338 = v1316[v1325];
+                                    int v1334;
+                                    v1334 = v1320[v1327];
+                                    bool v1337;
+                                    if (v1329){
+                                        bool v1336;
+                                        v1336 = v1327 < 2;
+                                        v1337 = v1336;
+                                    } else {
+                                        v1337 = false;
+                                    }
+                                    bool v1338;
+                                    v1338 = v1337 == false;
+                                    if (v1338){
+                                        assert("Index must be in range." && v1337);
+                                    } else {
+                                    }
                                     int v1340;
-                                    v1340 = v1332 + v1338;
-                                    v1323[v1325] = v1340;
-                                    v1325 += 1 ;
+                                    v1340 = v1318[v1327];
+                                    int v1342;
+                                    v1342 = v1334 + v1340;
+                                    v1325[v1327] = v1342;
+                                    v1327 += 1 ;
                                 }
-                                int v1341;
-                                v1341 = v1316[0];
-                                int v1343; int v1344;
-                                Tuple4 tmp139 = Tuple4{1, v1341};
-                                v1343 = tmp139.v0; v1344 = tmp139.v1;
-                                while (while_method_0(v1343)){
-                                    bool v1346;
-                                    v1346 = 0 <= v1343;
+                                int v1343;
+                                v1343 = v1318[0];
+                                int v1345; int v1346;
+                                Tuple4 tmp140 = Tuple4{1, v1343};
+                                v1345 = tmp140.v0; v1346 = tmp140.v1;
+                                while (while_method_0(v1345)){
                                     bool v1348;
-                                    if (v1346){
-                                        bool v1347;
-                                        v1347 = v1343 < 2;
-                                        v1348 = v1347;
+                                    v1348 = 0 <= v1345;
+                                    bool v1350;
+                                    if (v1348){
+                                        bool v1349;
+                                        v1349 = v1345 < 2;
+                                        v1350 = v1349;
                                     } else {
-                                        v1348 = false;
+                                        v1350 = false;
                                     }
-                                    bool v1349;
-                                    v1349 = v1348 == false;
-                                    if (v1349){
-                                        assert("Index must be in range." && v1348);
+                                    bool v1351;
+                                    v1351 = v1350 == false;
+                                    if (v1351){
+                                        assert("Index must be in range." && v1350);
                                     } else {
                                     }
-                                    int v1351;
-                                    v1351 = v1316[v1343];
-                                    bool v1353;
-                                    v1353 = v1344 >= v1351;
-                                    int v1354;
-                                    if (v1353){
-                                        v1354 = v1344;
+                                    int v1353;
+                                    v1353 = v1318[v1345];
+                                    bool v1355;
+                                    v1355 = v1346 >= v1353;
+                                    int v1356;
+                                    if (v1355){
+                                        v1356 = v1346;
                                     } else {
-                                        v1354 = v1351;
+                                        v1356 = v1353;
                                     }
-                                    v1344 = v1354;
-                                    v1343 += 1 ;
+                                    v1346 = v1356;
+                                    v1345 += 1 ;
                                 }
-                                bool v1355;
-                                v1355 = 0 <= v1321;
                                 bool v1357;
-                                if (v1355){
-                                    bool v1356;
-                                    v1356 = v1321 < 2;
-                                    v1357 = v1356;
+                                v1357 = 0 <= v1323;
+                                bool v1359;
+                                if (v1357){
+                                    bool v1358;
+                                    v1358 = v1323 < 2;
+                                    v1359 = v1358;
                                 } else {
-                                    v1357 = false;
+                                    v1359 = false;
                                 }
-                                bool v1358;
-                                v1358 = v1357 == false;
-                                if (v1358){
-                                    assert("Index must be in range." && v1357);
+                                bool v1360;
+                                v1360 = v1359 == false;
+                                if (v1360){
+                                    assert("Index must be in range." && v1359);
                                 } else {
                                 }
-                                int v1360;
-                                v1360 = v1323[v1321];
-                                bool v1362;
-                                v1362 = v1344 < v1360;
-                                int v1363;
-                                if (v1362){
-                                    v1363 = v1344;
+                                int v1362;
+                                v1362 = v1325[v1323];
+                                bool v1364;
+                                v1364 = v1346 < v1362;
+                                int v1365;
+                                if (v1364){
+                                    v1365 = v1346;
                                 } else {
-                                    v1363 = v1360;
+                                    v1365 = v1362;
                                 }
-                                static_array<int,2> v1364;
-                                int v1366;
-                                v1366 = 0;
-                                while (while_method_0(v1366)){
-                                    bool v1368;
-                                    v1368 = 0 <= v1366;
+                                static_array<int,2> v1366;
+                                int v1368;
+                                v1368 = 0;
+                                while (while_method_0(v1368)){
                                     bool v1370;
-                                    if (v1368){
-                                        bool v1369;
-                                        v1369 = v1366 < 2;
-                                        v1370 = v1369;
+                                    v1370 = 0 <= v1368;
+                                    bool v1372;
+                                    if (v1370){
+                                        bool v1371;
+                                        v1371 = v1368 < 2;
+                                        v1372 = v1371;
                                     } else {
-                                        v1370 = false;
+                                        v1372 = false;
                                     }
-                                    bool v1371;
-                                    v1371 = v1370 == false;
-                                    if (v1371){
-                                        assert("Index must be in range." && v1370);
+                                    bool v1373;
+                                    v1373 = v1372 == false;
+                                    if (v1373){
+                                        assert("Index must be in range." && v1372);
                                     } else {
                                     }
-                                    int v1373;
-                                    v1373 = v1316[v1366];
-                                    bool v1375;
-                                    v1375 = v1321 == v1366;
-                                    int v1376;
-                                    if (v1375){
-                                        v1376 = v1363;
+                                    int v1375;
+                                    v1375 = v1318[v1368];
+                                    bool v1377;
+                                    v1377 = v1323 == v1368;
+                                    int v1378;
+                                    if (v1377){
+                                        v1378 = v1365;
                                     } else {
-                                        v1376 = v1373;
+                                        v1378 = v1375;
                                     }
-                                    v1364[v1366] = v1376;
-                                    v1366 += 1 ;
+                                    v1366[v1368] = v1378;
+                                    v1368 += 1 ;
                                 }
-                                static_array<int,2> v1377;
-                                int v1379;
-                                v1379 = 0;
-                                while (while_method_0(v1379)){
-                                    bool v1381;
-                                    v1381 = 0 <= v1379;
+                                static_array<int,2> v1379;
+                                int v1381;
+                                v1381 = 0;
+                                while (while_method_0(v1381)){
                                     bool v1383;
-                                    if (v1381){
-                                        bool v1382;
-                                        v1382 = v1379 < 2;
-                                        v1383 = v1382;
+                                    v1383 = 0 <= v1381;
+                                    bool v1385;
+                                    if (v1383){
+                                        bool v1384;
+                                        v1384 = v1381 < 2;
+                                        v1385 = v1384;
                                     } else {
-                                        v1383 = false;
+                                        v1385 = false;
                                     }
-                                    bool v1384;
-                                    v1384 = v1383 == false;
-                                    if (v1384){
-                                        assert("Index must be in range." && v1383);
-                                    } else {
-                                    }
-                                    int v1386;
-                                    v1386 = v1323[v1379];
-                                    bool v1389;
-                                    if (v1381){
-                                        bool v1388;
-                                        v1388 = v1379 < 2;
-                                        v1389 = v1388;
-                                    } else {
-                                        v1389 = false;
-                                    }
-                                    bool v1390;
-                                    v1390 = v1389 == false;
-                                    if (v1390){
-                                        assert("Index must be in range." && v1389);
+                                    bool v1386;
+                                    v1386 = v1385 == false;
+                                    if (v1386){
+                                        assert("Index must be in range." && v1385);
                                     } else {
                                     }
-                                    int v1392;
-                                    v1392 = v1364[v1379];
+                                    int v1388;
+                                    v1388 = v1325[v1381];
+                                    bool v1391;
+                                    if (v1383){
+                                        bool v1390;
+                                        v1390 = v1381 < 2;
+                                        v1391 = v1390;
+                                    } else {
+                                        v1391 = false;
+                                    }
+                                    bool v1392;
+                                    v1392 = v1391 == false;
+                                    if (v1392){
+                                        assert("Index must be in range." && v1391);
+                                    } else {
+                                    }
                                     int v1394;
-                                    v1394 = v1386 - v1392;
-                                    v1377[v1379] = v1394;
-                                    v1379 += 1 ;
-                                }
-                                bool v1395;
-                                v1395 = v1321 < 2;
-                                if (v1395){
+                                    v1394 = v1366[v1381];
                                     int v1396;
-                                    v1396 = v1317 + 1;
-                                    v1652 = try_round_36(v1314, v1315, v1364, v1396, v1377, v1319);
+                                    v1396 = v1388 - v1394;
+                                    v1379[v1381] = v1396;
+                                    v1381 += 1 ;
+                                }
+                                bool v1397;
+                                v1397 = v1323 < 2;
+                                if (v1397){
+                                    int v1398;
+                                    v1398 = v1319 + 1;
+                                    v1654 = try_round_36(v1316, v1317, v1366, v1398, v1379, v1321);
                                 } else {
-                                    v1652 = go_next_street_38(v1314, v1315, v1364, v1317, v1377, v1319);
+                                    v1654 = go_next_street_38(v1316, v1317, v1366, v1319, v1379, v1321);
                                 }
                                 break;
                             }
                             case 2: { // A_Fold
-                                v1652 = Union4{Union4_1{v1314, v1315, v1316, v1317, v1318, v1319}};
+                                v1654 = Union4{Union4_1{v1316, v1317, v1318, v1319, v1320, v1321}};
                                 break;
                             }
                             case 3: { // A_Raise
-                                int v1400 = v1320.case3.v0;
-                                bool v1401;
-                                v1401 = v1314 <= v1400;
-                                bool v1402;
-                                v1402 = v1401 == false;
-                                if (v1402){
-                                    assert("The raise amount must match the minimum." && v1401);
+                                int v1402 = v1322.case3.v0;
+                                bool v1403;
+                                v1403 = v1316 <= v1402;
+                                bool v1404;
+                                v1404 = v1403 == false;
+                                if (v1404){
+                                    assert("The raise amount must match the minimum." && v1403);
                                 } else {
                                 }
-                                static_array<int,2> v1404;
-                                int v1406;
-                                v1406 = 0;
-                                while (while_method_0(v1406)){
-                                    bool v1408;
-                                    v1408 = 0 <= v1406;
+                                static_array<int,2> v1406;
+                                int v1408;
+                                v1408 = 0;
+                                while (while_method_0(v1408)){
                                     bool v1410;
-                                    if (v1408){
-                                        bool v1409;
-                                        v1409 = v1406 < 2;
-                                        v1410 = v1409;
+                                    v1410 = 0 <= v1408;
+                                    bool v1412;
+                                    if (v1410){
+                                        bool v1411;
+                                        v1411 = v1408 < 2;
+                                        v1412 = v1411;
                                     } else {
-                                        v1410 = false;
+                                        v1412 = false;
                                     }
-                                    bool v1411;
-                                    v1411 = v1410 == false;
-                                    if (v1411){
-                                        assert("Index must be in range." && v1410);
-                                    } else {
-                                    }
-                                    int v1413;
-                                    v1413 = v1318[v1406];
-                                    bool v1416;
-                                    if (v1408){
-                                        bool v1415;
-                                        v1415 = v1406 < 2;
-                                        v1416 = v1415;
-                                    } else {
-                                        v1416 = false;
-                                    }
-                                    bool v1417;
-                                    v1417 = v1416 == false;
-                                    if (v1417){
-                                        assert("Index must be in range." && v1416);
+                                    bool v1413;
+                                    v1413 = v1412 == false;
+                                    if (v1413){
+                                        assert("Index must be in range." && v1412);
                                     } else {
                                     }
-                                    int v1419;
-                                    v1419 = v1316[v1406];
+                                    int v1415;
+                                    v1415 = v1320[v1408];
+                                    bool v1418;
+                                    if (v1410){
+                                        bool v1417;
+                                        v1417 = v1408 < 2;
+                                        v1418 = v1417;
+                                    } else {
+                                        v1418 = false;
+                                    }
+                                    bool v1419;
+                                    v1419 = v1418 == false;
+                                    if (v1419){
+                                        assert("Index must be in range." && v1418);
+                                    } else {
+                                    }
                                     int v1421;
-                                    v1421 = v1413 + v1419;
-                                    v1404[v1406] = v1421;
-                                    v1406 += 1 ;
+                                    v1421 = v1318[v1408];
+                                    int v1423;
+                                    v1423 = v1415 + v1421;
+                                    v1406[v1408] = v1423;
+                                    v1408 += 1 ;
                                 }
-                                int v1422;
-                                v1422 = v1316[0];
-                                int v1424; int v1425;
-                                Tuple4 tmp140 = Tuple4{1, v1422};
-                                v1424 = tmp140.v0; v1425 = tmp140.v1;
-                                while (while_method_0(v1424)){
-                                    bool v1427;
-                                    v1427 = 0 <= v1424;
+                                int v1424;
+                                v1424 = v1318[0];
+                                int v1426; int v1427;
+                                Tuple4 tmp141 = Tuple4{1, v1424};
+                                v1426 = tmp141.v0; v1427 = tmp141.v1;
+                                while (while_method_0(v1426)){
                                     bool v1429;
-                                    if (v1427){
-                                        bool v1428;
-                                        v1428 = v1424 < 2;
-                                        v1429 = v1428;
+                                    v1429 = 0 <= v1426;
+                                    bool v1431;
+                                    if (v1429){
+                                        bool v1430;
+                                        v1430 = v1426 < 2;
+                                        v1431 = v1430;
                                     } else {
-                                        v1429 = false;
+                                        v1431 = false;
                                     }
-                                    bool v1430;
-                                    v1430 = v1429 == false;
-                                    if (v1430){
-                                        assert("Index must be in range." && v1429);
+                                    bool v1432;
+                                    v1432 = v1431 == false;
+                                    if (v1432){
+                                        assert("Index must be in range." && v1431);
                                     } else {
                                     }
-                                    int v1432;
-                                    v1432 = v1316[v1424];
-                                    bool v1434;
-                                    v1434 = v1425 >= v1432;
-                                    int v1435;
-                                    if (v1434){
-                                        v1435 = v1425;
+                                    int v1434;
+                                    v1434 = v1318[v1426];
+                                    bool v1436;
+                                    v1436 = v1427 >= v1434;
+                                    int v1437;
+                                    if (v1436){
+                                        v1437 = v1427;
                                     } else {
-                                        v1435 = v1432;
+                                        v1437 = v1434;
                                     }
-                                    v1425 = v1435;
-                                    v1424 += 1 ;
+                                    v1427 = v1437;
+                                    v1426 += 1 ;
                                 }
-                                bool v1436;
-                                v1436 = 0 <= v1321;
                                 bool v1438;
-                                if (v1436){
-                                    bool v1437;
-                                    v1437 = v1321 < 2;
-                                    v1438 = v1437;
+                                v1438 = 0 <= v1323;
+                                bool v1440;
+                                if (v1438){
+                                    bool v1439;
+                                    v1439 = v1323 < 2;
+                                    v1440 = v1439;
                                 } else {
-                                    v1438 = false;
+                                    v1440 = false;
                                 }
-                                bool v1439;
-                                v1439 = v1438 == false;
-                                if (v1439){
-                                    assert("Index must be in range." && v1438);
+                                bool v1441;
+                                v1441 = v1440 == false;
+                                if (v1441){
+                                    assert("Index must be in range." && v1440);
                                 } else {
                                 }
-                                int v1441;
-                                v1441 = v1404[v1321];
-                                bool v1443;
-                                v1443 = v1425 < v1441;
-                                int v1444;
-                                if (v1443){
-                                    v1444 = v1425;
+                                int v1443;
+                                v1443 = v1406[v1323];
+                                bool v1445;
+                                v1445 = v1427 < v1443;
+                                int v1446;
+                                if (v1445){
+                                    v1446 = v1427;
                                 } else {
-                                    v1444 = v1441;
+                                    v1446 = v1443;
                                 }
-                                static_array<int,2> v1445;
-                                int v1447;
-                                v1447 = 0;
-                                while (while_method_0(v1447)){
-                                    bool v1449;
-                                    v1449 = 0 <= v1447;
+                                static_array<int,2> v1447;
+                                int v1449;
+                                v1449 = 0;
+                                while (while_method_0(v1449)){
                                     bool v1451;
-                                    if (v1449){
-                                        bool v1450;
-                                        v1450 = v1447 < 2;
-                                        v1451 = v1450;
+                                    v1451 = 0 <= v1449;
+                                    bool v1453;
+                                    if (v1451){
+                                        bool v1452;
+                                        v1452 = v1449 < 2;
+                                        v1453 = v1452;
                                     } else {
-                                        v1451 = false;
+                                        v1453 = false;
                                     }
-                                    bool v1452;
-                                    v1452 = v1451 == false;
-                                    if (v1452){
-                                        assert("Index must be in range." && v1451);
+                                    bool v1454;
+                                    v1454 = v1453 == false;
+                                    if (v1454){
+                                        assert("Index must be in range." && v1453);
                                     } else {
                                     }
-                                    int v1454;
-                                    v1454 = v1316[v1447];
-                                    bool v1456;
-                                    v1456 = v1321 == v1447;
-                                    int v1457;
-                                    if (v1456){
-                                        v1457 = v1444;
+                                    int v1456;
+                                    v1456 = v1318[v1449];
+                                    bool v1458;
+                                    v1458 = v1323 == v1449;
+                                    int v1459;
+                                    if (v1458){
+                                        v1459 = v1446;
                                     } else {
-                                        v1457 = v1454;
+                                        v1459 = v1456;
                                     }
-                                    v1445[v1447] = v1457;
-                                    v1447 += 1 ;
+                                    v1447[v1449] = v1459;
+                                    v1449 += 1 ;
                                 }
-                                static_array<int,2> v1458;
-                                int v1460;
-                                v1460 = 0;
-                                while (while_method_0(v1460)){
-                                    bool v1462;
-                                    v1462 = 0 <= v1460;
+                                static_array<int,2> v1460;
+                                int v1462;
+                                v1462 = 0;
+                                while (while_method_0(v1462)){
                                     bool v1464;
-                                    if (v1462){
-                                        bool v1463;
-                                        v1463 = v1460 < 2;
-                                        v1464 = v1463;
+                                    v1464 = 0 <= v1462;
+                                    bool v1466;
+                                    if (v1464){
+                                        bool v1465;
+                                        v1465 = v1462 < 2;
+                                        v1466 = v1465;
                                     } else {
-                                        v1464 = false;
+                                        v1466 = false;
                                     }
-                                    bool v1465;
-                                    v1465 = v1464 == false;
-                                    if (v1465){
-                                        assert("Index must be in range." && v1464);
-                                    } else {
-                                    }
-                                    int v1467;
-                                    v1467 = v1404[v1460];
-                                    bool v1470;
-                                    if (v1462){
-                                        bool v1469;
-                                        v1469 = v1460 < 2;
-                                        v1470 = v1469;
-                                    } else {
-                                        v1470 = false;
-                                    }
-                                    bool v1471;
-                                    v1471 = v1470 == false;
-                                    if (v1471){
-                                        assert("Index must be in range." && v1470);
+                                    bool v1467;
+                                    v1467 = v1466 == false;
+                                    if (v1467){
+                                        assert("Index must be in range." && v1466);
                                     } else {
                                     }
-                                    int v1473;
-                                    v1473 = v1445[v1460];
+                                    int v1469;
+                                    v1469 = v1406[v1462];
+                                    bool v1472;
+                                    if (v1464){
+                                        bool v1471;
+                                        v1471 = v1462 < 2;
+                                        v1472 = v1471;
+                                    } else {
+                                        v1472 = false;
+                                    }
+                                    bool v1473;
+                                    v1473 = v1472 == false;
+                                    if (v1473){
+                                        assert("Index must be in range." && v1472);
+                                    } else {
+                                    }
                                     int v1475;
-                                    v1475 = v1467 - v1473;
-                                    v1458[v1460] = v1475;
-                                    v1460 += 1 ;
+                                    v1475 = v1447[v1462];
+                                    int v1477;
+                                    v1477 = v1469 - v1475;
+                                    v1460[v1462] = v1477;
+                                    v1462 += 1 ;
                                 }
-                                bool v1477;
-                                if (v1436){
-                                    bool v1476;
-                                    v1476 = v1321 < 2;
-                                    v1477 = v1476;
+                                bool v1479;
+                                if (v1438){
+                                    bool v1478;
+                                    v1478 = v1323 < 2;
+                                    v1479 = v1478;
                                 } else {
-                                    v1477 = false;
+                                    v1479 = false;
                                 }
-                                bool v1478;
-                                v1478 = v1477 == false;
-                                if (v1478){
-                                    assert("Index must be in range." && v1477);
-                                } else {
-                                }
-                                int v1480;
-                                v1480 = v1458[v1321];
-                                bool v1482;
-                                v1482 = v1400 < v1480;
-                                bool v1483;
-                                v1483 = v1482 == false;
-                                if (v1483){
-                                    assert("The raise amount must be less than the stack size after calling." && v1482);
+                                bool v1480;
+                                v1480 = v1479 == false;
+                                if (v1480){
+                                    assert("Index must be in range." && v1479);
                                 } else {
                                 }
-                                int v1485;
-                                v1485 = v1425 + v1400;
-                                bool v1487;
-                                if (v1436){
-                                    bool v1486;
-                                    v1486 = v1321 < 2;
-                                    v1487 = v1486;
-                                } else {
-                                    v1487 = false;
-                                }
-                                bool v1488;
-                                v1488 = v1487 == false;
-                                if (v1488){
-                                    assert("Index must be in range." && v1487);
+                                int v1482;
+                                v1482 = v1460[v1323];
+                                bool v1484;
+                                v1484 = v1402 < v1482;
+                                bool v1485;
+                                v1485 = v1484 == false;
+                                if (v1485){
+                                    assert("The raise amount must be less than the stack size after calling." && v1484);
                                 } else {
                                 }
-                                int v1490;
-                                v1490 = v1404[v1321];
-                                bool v1492;
-                                v1492 = v1485 < v1490;
-                                int v1493;
-                                if (v1492){
-                                    v1493 = v1485;
+                                int v1487;
+                                v1487 = v1427 + v1402;
+                                bool v1489;
+                                if (v1438){
+                                    bool v1488;
+                                    v1488 = v1323 < 2;
+                                    v1489 = v1488;
                                 } else {
-                                    v1493 = v1490;
+                                    v1489 = false;
                                 }
-                                static_array<int,2> v1494;
-                                int v1496;
-                                v1496 = 0;
-                                while (while_method_0(v1496)){
-                                    bool v1498;
-                                    v1498 = 0 <= v1496;
+                                bool v1490;
+                                v1490 = v1489 == false;
+                                if (v1490){
+                                    assert("Index must be in range." && v1489);
+                                } else {
+                                }
+                                int v1492;
+                                v1492 = v1406[v1323];
+                                bool v1494;
+                                v1494 = v1487 < v1492;
+                                int v1495;
+                                if (v1494){
+                                    v1495 = v1487;
+                                } else {
+                                    v1495 = v1492;
+                                }
+                                static_array<int,2> v1496;
+                                int v1498;
+                                v1498 = 0;
+                                while (while_method_0(v1498)){
                                     bool v1500;
-                                    if (v1498){
-                                        bool v1499;
-                                        v1499 = v1496 < 2;
-                                        v1500 = v1499;
+                                    v1500 = 0 <= v1498;
+                                    bool v1502;
+                                    if (v1500){
+                                        bool v1501;
+                                        v1501 = v1498 < 2;
+                                        v1502 = v1501;
                                     } else {
-                                        v1500 = false;
+                                        v1502 = false;
                                     }
-                                    bool v1501;
-                                    v1501 = v1500 == false;
-                                    if (v1501){
-                                        assert("Index must be in range." && v1500);
+                                    bool v1503;
+                                    v1503 = v1502 == false;
+                                    if (v1503){
+                                        assert("Index must be in range." && v1502);
                                     } else {
                                     }
-                                    int v1503;
-                                    v1503 = v1316[v1496];
-                                    bool v1505;
-                                    v1505 = v1321 == v1496;
-                                    int v1506;
-                                    if (v1505){
-                                        v1506 = v1493;
+                                    int v1505;
+                                    v1505 = v1318[v1498];
+                                    bool v1507;
+                                    v1507 = v1323 == v1498;
+                                    int v1508;
+                                    if (v1507){
+                                        v1508 = v1495;
                                     } else {
-                                        v1506 = v1503;
+                                        v1508 = v1505;
                                     }
-                                    v1494[v1496] = v1506;
-                                    v1496 += 1 ;
+                                    v1496[v1498] = v1508;
+                                    v1498 += 1 ;
                                 }
-                                static_array<int,2> v1507;
-                                int v1509;
-                                v1509 = 0;
-                                while (while_method_0(v1509)){
-                                    bool v1511;
-                                    v1511 = 0 <= v1509;
+                                static_array<int,2> v1509;
+                                int v1511;
+                                v1511 = 0;
+                                while (while_method_0(v1511)){
                                     bool v1513;
-                                    if (v1511){
-                                        bool v1512;
-                                        v1512 = v1509 < 2;
-                                        v1513 = v1512;
+                                    v1513 = 0 <= v1511;
+                                    bool v1515;
+                                    if (v1513){
+                                        bool v1514;
+                                        v1514 = v1511 < 2;
+                                        v1515 = v1514;
                                     } else {
-                                        v1513 = false;
+                                        v1515 = false;
                                     }
-                                    bool v1514;
-                                    v1514 = v1513 == false;
-                                    if (v1514){
-                                        assert("Index must be in range." && v1513);
-                                    } else {
-                                    }
-                                    int v1516;
-                                    v1516 = v1404[v1509];
-                                    bool v1519;
-                                    if (v1511){
-                                        bool v1518;
-                                        v1518 = v1509 < 2;
-                                        v1519 = v1518;
-                                    } else {
-                                        v1519 = false;
-                                    }
-                                    bool v1520;
-                                    v1520 = v1519 == false;
-                                    if (v1520){
-                                        assert("Index must be in range." && v1519);
+                                    bool v1516;
+                                    v1516 = v1515 == false;
+                                    if (v1516){
+                                        assert("Index must be in range." && v1515);
                                     } else {
                                     }
-                                    int v1522;
-                                    v1522 = v1494[v1509];
+                                    int v1518;
+                                    v1518 = v1406[v1511];
+                                    bool v1521;
+                                    if (v1513){
+                                        bool v1520;
+                                        v1520 = v1511 < 2;
+                                        v1521 = v1520;
+                                    } else {
+                                        v1521 = false;
+                                    }
+                                    bool v1522;
+                                    v1522 = v1521 == false;
+                                    if (v1522){
+                                        assert("Index must be in range." && v1521);
+                                    } else {
+                                    }
                                     int v1524;
-                                    v1524 = v1516 - v1522;
-                                    v1507[v1509] = v1524;
-                                    v1509 += 1 ;
+                                    v1524 = v1496[v1511];
+                                    int v1526;
+                                    v1526 = v1518 - v1524;
+                                    v1509[v1511] = v1526;
+                                    v1511 += 1 ;
                                 }
-                                int v1525;
-                                v1525 = v1317 + 1;
-                                v1652 = try_round_36(v1400, v1315, v1494, v1525, v1507, v1319);
+                                int v1527;
+                                v1527 = v1319 + 1;
+                                v1654 = try_round_36(v1402, v1317, v1496, v1527, v1509, v1321);
                                 break;
                             }
                             default: {
                                 assert("Invalid tag." && false); __trap();
                             }
                         }
-                        v1659 = Union3{Union3_1{v1652}};
+                        v1661 = Union3{Union3_1{v1654}};
                         break;
                     }
                     case 2: { // T_some
-                        Union4 v1312 = v1310.case2.v0;
-                        v1659 = Union3{Union3_1{v1312}};
+                        Union4 v1314 = v1312.case2.v0;
+                        v1661 = Union3{Union3_1{v1314}};
                         break;
                     }
                     default: {
@@ -28336,7 +28563,7 @@ __device__ void method_85(unsigned char * v0, unsigned char * v1, StackMut1 & v2
                 assert("Invalid tag." && false); __trap();
             }
         }
-        v16 = v1659;
+        v16 = v1661;
     }
     return ;
 }
@@ -28410,17 +28637,16 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
         case 2: { // StartGame
             static_array<Union2,2> v21;
             Union2 v23;
-            v23 = Union2{Union2_0{}};
+            v23 = Union2{Union2_1{}};
             v21[0] = v23;
             Union2 v25;
-            v25 = Union2{Union2_1{}};
+            v25 = Union2{Union2_2{}};
             v21[1] = v25;
             static_array_list<Union6,128> v27;
             v27 = static_array_list<Union6,128>{};
             Union7 v29;
             v29 = Union7{Union7_0{}};
             v20.v5 = v29;
-            v20.v3 = v21;
             Union3 v30;
             v30 = Union3{Union3_0{}};
             v20.v1 = v30;
@@ -28497,10 +28723,10 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
     curand_init(v8,v13,0ull,&v14);
     static_array<Union2,2> v15;
     Union2 v17;
-    v17 = Union2{Union2_2{}};
+    v17 = Union2{Union2_3{}};
     v15[0] = v17;
     Union2 v19;
-    v19 = Union2{Union2_2{}};
+    v19 = Union2{Union2_3{}};
     v15[1] = v19;
     static_array_list<Union6,128> v21;
     v21 = static_array_list<Union6,128>{};
@@ -28575,15 +28801,15 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                 int v59;
                 v59 = 2 * v58;
                 int v60; double v61;
-                Tuple24 tmp103 = Tuple24{0, 1.0};
-                v60 = tmp103.v0; v61 = tmp103.v1;
+                Tuple24 tmp104 = Tuple24{0, 1.0};
+                v60 = tmp104.v0; v61 = tmp104.v1;
                 while (while_method_0(v60)){
                     assert("Tensor range check" && 0 <= v60 && v60 < 2);
                     int v63;
                     v63 = v60 + v59;
                     int v64; double v65;
-                    Tuple24 tmp104 = Tuple24{0, 0.0};
-                    v64 = tmp104.v0; v65 = tmp104.v1;
+                    Tuple24 tmp105 = Tuple24{0, 0.0};
+                    v64 = tmp105.v0; v65 = tmp105.v1;
                     while (while_method_3(v64)){
                         assert("Tensor range check" && 0 <= v64 && v64 < 4);
                         int v67;
@@ -28631,15 +28857,15 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned long long v1, uns
                     int v88;
                     v88 = 2 * v87;
                     int v89; double v90;
-                    Tuple24 tmp105 = Tuple24{0, 1.0};
-                    v89 = tmp105.v0; v90 = tmp105.v1;
+                    Tuple24 tmp106 = Tuple24{0, 1.0};
+                    v89 = tmp106.v0; v90 = tmp106.v1;
                     while (while_method_0(v89)){
                         assert("Tensor range check" && 0 <= v89 && v89 < 2);
                         int v92;
                         v92 = v89 + v88;
                         int v93; double v94;
-                        Tuple24 tmp106 = Tuple24{0, 0.0};
-                        v93 = tmp106.v0; v94 = tmp106.v1;
+                        Tuple24 tmp107 = Tuple24{0, 0.0};
+                        v93 = tmp107.v0; v94 = tmp107.v1;
                         while (while_method_3(v93)){
                             assert("Tensor range check" && 0 <= v93 && v93 < 4);
                             int v96;
@@ -30806,10 +31032,10 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
     curand_init(v8,v13,0ull,&v14);
     static_array<Union2,2> v15;
     Union2 v17;
-    v17 = Union2{Union2_2{}};
+    v17 = Union2{Union2_3{}};
     v15[0] = v17;
     Union2 v19;
-    v19 = Union2{Union2_2{}};
+    v19 = Union2{Union2_3{}};
     v15[1] = v19;
     static_array_list<Union6,128> v21;
     v21 = static_array_list<Union6,128>{};
@@ -32075,15 +32301,15 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned long long v1, uns
             int v580;
             v580 = 2 * v579;
             int v581; double v582;
-            Tuple24 tmp141 = Tuple24{0, 1.0};
-            v581 = tmp141.v0; v582 = tmp141.v1;
+            Tuple24 tmp142 = Tuple24{0, 1.0};
+            v581 = tmp142.v0; v582 = tmp142.v1;
             while (while_method_0(v581)){
                 assert("Tensor range check" && 0 <= v581 && v581 < 2);
                 int v584;
                 v584 = v581 + v580;
                 int v585; double v586;
-                Tuple24 tmp142 = Tuple24{0, 0.0};
-                v585 = tmp142.v0; v586 = tmp142.v1;
+                Tuple24 tmp143 = Tuple24{0, 0.0};
+                v585 = tmp143.v0; v586 = tmp143.v1;
                 while (while_method_3(v585)){
                     assert("Tensor range check" && 0 <= v585 && v585 < 4);
                     int v588;
@@ -33458,13 +33684,15 @@ class US0_3(NamedTuple): # StartTrainingVsRando
 class US0_4(NamedTuple): # StartTrainingVsSelf
     tag = 4
 US0 = Union[US0_0, US0_1, US0_2, US0_3, US0_4]
-class US2_0(NamedTuple): # Computer
+class US2_0(NamedTuple): # CallingMachine
     tag = 0
-class US2_1(NamedTuple): # Human
+class US2_1(NamedTuple): # Computer
     tag = 1
-class US2_2(NamedTuple): # Random
+class US2_2(NamedTuple): # Human
     tag = 2
-US2 = Union[US2_0, US2_1, US2_2]
+class US2_3(NamedTuple): # Random
+    tag = 3
+US2 = Union[US2_0, US2_1, US2_2, US2_3]
 class US5_0(NamedTuple): # Flop
     v0 : static_array
     tag = 0
@@ -33788,10 +34016,10 @@ def Closure0():
 def Closure1():
     def inner() -> object:
         v1 = static_array(2)
-        v3 = US2_0()
+        v3 = US2_1()
         v1[0] = v3
         del v3
-        v5 = US2_1()
+        v5 = US2_2()
         v1[1] = v5
         del v5
         v7 = static_array_list(128)
@@ -33898,7 +34126,7 @@ def method7(v0 : object) -> US2:
     v1 = v0[0] # type: ignore
     v2 = v0[1] # type: ignore
     del v0
-    v3 = "Computer" == v1
+    v3 = "CallingMachine" == v1
     if v3:
         del v1, v3
         method3(v2)
@@ -33906,7 +34134,7 @@ def method7(v0 : object) -> US2:
         return US2_0()
     else:
         del v3
-        v5 = "Human" == v1
+        v5 = "Computer" == v1
         if v5:
             del v1, v5
             method3(v2)
@@ -33914,17 +34142,25 @@ def method7(v0 : object) -> US2:
             return US2_1()
         else:
             del v5
-            v7 = "Random" == v1
+            v7 = "Human" == v1
             if v7:
                 del v1, v7
                 method3(v2)
                 del v2
                 return US2_2()
             else:
-                del v2, v7
-                raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
-                del v1
-                raise Exception("Error")
+                del v7
+                v9 = "Random" == v1
+                if v9:
+                    del v1, v9
+                    method3(v2)
+                    del v2
+                    return US2_3()
+                else:
+                    del v2, v9
+                    raise TypeError(f"Cannot convert the Python object into a Spiral union type. Invalid string tag. Got: {v1}")
+                    del v1
+                    raise Exception("Error")
 def method5(v0 : object) -> static_array:
     assert isinstance(v0,list), f'The object needs to be a Python list. Got: {v0}'
     v1 = len(v0) # type: ignore
@@ -35245,13 +35481,16 @@ def method76(v0 : cp.ndarray, v1 : US2) -> None:
     v4 = v0[4:].view(cp.uint8)
     del v0
     match v1:
-        case US2_0(): # Computer
+        case US2_0(): # CallingMachine
             del v1
             return method49(v4)
-        case US2_1(): # Human
+        case US2_1(): # Computer
             del v1
             return method49(v4)
-        case US2_2(): # Random
+        case US2_2(): # Human
+            del v1
+            return method49(v4)
+        case US2_3(): # Random
             del v1
             return method49(v4)
         case t:
@@ -35911,6 +36150,11 @@ def method108(v0 : cp.ndarray) -> US2:
         method85(v3)
         del v3
         return US2_2()
+    elif v1 == 3:
+        del v1
+        method85(v3)
+        del v3
+        return US2_3()
     else:
         del v1, v3
         raise Exception("Invalid tag.")
@@ -36514,27 +36758,34 @@ def method134(v0 : static_array_list) -> object:
     return v1
 def method146(v0 : US2) -> object:
     match v0:
-        case US2_0(): # Computer
+        case US2_0(): # CallingMachine
             del v0
             v1 = method118()
-            v2 = "Computer"
+            v2 = "CallingMachine"
             v3 = [v2,v1]
             del v1, v2
             return v3
-        case US2_1(): # Human
+        case US2_1(): # Computer
             del v0
             v4 = method118()
-            v5 = "Human"
+            v5 = "Computer"
             v6 = [v5,v4]
             del v4, v5
             return v6
-        case US2_2(): # Random
+        case US2_2(): # Human
             del v0
             v7 = method118()
-            v8 = "Random"
+            v8 = "Human"
             v9 = [v8,v7]
             del v7, v8
             return v9
+        case US2_3(): # Random
+            del v0
+            v10 = method118()
+            v11 = "Random"
+            v12 = [v11,v10]
+            del v10, v11
+            return v12
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
 def method145(v0 : static_array) -> object:

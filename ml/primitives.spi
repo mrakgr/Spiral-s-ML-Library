@@ -9,6 +9,80 @@ open tensorm
 // The primitives here are only attended for execution on the GPU.
 // They're all block level primitives (unless otherwise noted.)
 
+// Transposes the two inner dimensions of a tensor.
+inl transpose_snd_ forall a b c el. loop' (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
+    inl x = 
+        inl a,b,c = from.dim
+        inl a',c',b' = to.dim
+        assert (a = a') "The outer dimensions must be equal in transpose."
+        assert (b = b') "The middle dimensions must be equal in transpose."
+        assert (c = c') "The inner dimensions must be equal in transpose."
+
+        zip from (reorder (fun a,c,b => a,b,c) to)
+        |> reorder (fun a,b,c => b,a,c)
+        |> flatten_fst
+        |> reorder (fun b,a,c => c,b,a)
+        |> flatten_fst
+        |> reorder (fun c,b,a => a,{b},{c})
+    
+    open tensor_cuda
+    inl shared : tensor _ el = 
+        inl padding = 1
+        inl shared_dim = 128, 128
+        inl a,{b},{c} = x.dim
+        tensor_create_extern_shared 0 ({b=fst shared_dim}, {c=snd shared_dim + padding})
+        |> fst
+        |> view (fun _ => {from=loop.zeroes; nearTo={b=min (fst shared_dim) b}, {c=min (snd shared_dim) c}})
+
+    inl x = 
+        x 
+        |> split_into_snd (loop.div_fst_by shared.dim)
+        |> reorder (fun a,b,c => (a,b),c)
+
+    loop' (fst x.dim) fun i =>
+        inl from, to = x |> apply i |> unzip
+
+        inl () = // Copies the data into shared memory from global.
+            inl io = 
+                zip shared from
+                |> split_into_swapped (loop.rigid_split threads_per_block())
+                |> threads_in_block
+                |> apply_proj
+
+            loop.linear io.dim fun i =>
+                inl to, from = io |> unzip
+                tensor_set i (tensor_index i from) to
+
+        inl () = // Copies the data into global from shared memory.
+            inl io = 
+                zip to shared
+                |> reorder (fun b,c => c,b)
+                |> split_into_swapped (loop.rigid_split threads_per_block())
+                |> threads_in_block
+                |> apply_proj
+
+            loop.linear io.dim fun i =>
+                inl to, from = io |> unzip
+                tensor_set i (tensor_index i from) to
+
+        __syncthreads()
+
+// Transposes the two inner dimensions of a tensor using the entire grid.
+inl grid_transpose_snd forall a b c el. grid (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
+    transpose_snd_ (loop.projective << blocks_in_grid) from to . cooperative_groups.sync grid
+
+// Transposes the two inner dimensions of a tensor using a single block.
+inl transpose_snd forall a b c el. (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
+    transpose_snd_ loop.linear from to
+
+// Transposes the two dimensions of a tensor using the entire grid.
+inl grid_transpose forall a b el. grid (from : tensor (a * b) el) (to : tensor (b * a) el) : () =
+    grid_transpose_snd grid (from |> reorder (fun a,b => {},a,b)) (to |> reorder (fun b,a => {},b,a))
+
+// Transposes the two dimensions of a tensor using a single block.
+inl transpose forall a b el. grid (from : tensor (a * b) el) (to : tensor (b * a) el) : () =
+    transpose_snd (from |> reorder (fun a,b => {},a,b)) (to |> reorder (fun b,a => {},b,a))
+
 // Maps all the elements of a tensor given the mapping function.
 inl map_ forall dim a b. loop' (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
     assert (from.dim = to.dim) "The dimensions of the two inputs to the map kernel need to be the same."

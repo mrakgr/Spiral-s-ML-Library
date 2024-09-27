@@ -129,6 +129,8 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
                     play.random_action (refm.from_local state.rng) table 
                     |> transposing_loop.shuffle 0
+                | CallingMachine =>
+                    A_Call
             inl msg = PlayerAction(player_turn, action)
             push_message msg
             T_round (table, action)

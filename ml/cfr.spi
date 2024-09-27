@@ -228,8 +228,10 @@ inl apply_updates grid rng (model : model) =
     open tensor_cuda
     open primitives
 
+    cooperative_groups.sync grid // TODO: This shouldn't be done here.
+
     inl table = model.table |> reorder (fun a,b,c => (a,b),c)
-    cooperative_groups.sync grid
+
     if rangem.threads_in_grid().from = 0 then // We want to only change the id after all the threads have finished running the game.
         tensor_set {} (random.int_range {from=0; nearTo=fst model.table.dim} rng) model.exploratory_ensemble_id // Pick a random ensemble id
     __syncwarp() // Converge the first warp.

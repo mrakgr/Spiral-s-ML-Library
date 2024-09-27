@@ -12013,7 +12013,6 @@ extern "C" __global__ void entry0(unsigned char * v0, unsigned char * v1, unsign
             Union8 v29;
             v29 = Union8{Union8_0{}};
             v20.v5 = v29;
-            v20.v3 = v21;
             Union3 v30;
             v30 = Union3{Union3_0{}};
             v20.v1 = v30;
