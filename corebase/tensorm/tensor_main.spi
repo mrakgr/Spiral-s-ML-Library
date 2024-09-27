@@ -385,16 +385,17 @@ inl fold forall dim s a. (s : s) (f : s -> a -> s) (t : tensor dim a) : s =
 // Iterates over all the types in the tensor.
 inl iter_type forall dim t'. (f : forall t. tensor dim t -> ()) (x : tensor dim t') : () = real
     struct.iter (fun (tensor_body _ as b) =>
-        typecase `b with tensor_body dim ~t' => 
-        f `t' (tensor `dim `t' {dim=x.dim; bodies=b})
+        typecase `b with tensor_body dim ~t => 
+        f `t (tensor `dim `t {dim=x.dim; bodies=b})
         ) x.bodies
 
 // Iterates over all the types in the tensor. Useful for doing a transpose.
 inl iter2_type forall dim t'. (f : forall t. tensor dim (t * t) -> ()) (x : tensor dim (t' * t')) : () = real
     open real_core
     struct.iter2 (fun (tensor_body _ as b1) (tensor_body _ as b2) =>
-        typecase `b1 * `b2 with tensor_body dim ~t' * tensor dim ~t' => 
-        f `t' (tensor `dim `t' {dim=x.dim; bodies=b1, b2})
+        typecase `b1 * `b2 with 
+        | tensor_body dim ~t * tensor_body dim ~t => 
+            f `t (tensor `dim `(t * t) {dim=x.dim; bodies=b1, b2})
         ) (fst x.bodies) (snd x.bodies)
 
 // Tests

@@ -937,12 +937,28 @@ inl test4 (m,n : int * int) head_dir =
     redirect_io_into "test_text_outputs/primitives/" head_dir "output_sampling'.txt" fun () =>
         console.tensor.write_ln 1024 output_sampling'
     ()
+
+
+inl test5 () =
+    inl m,n : int * int = 4,8
+    inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
+    inl output : _ _ int = tensor_create (n,m)
+    console.write_ln input_identity
+    run fun _ =>
+        inl grid = cooperative_groups.create_grid()
+        grid_transpose grid input_identity output
+    console.write_ln output
+
+
 inl main() = 
     // Ran with blocks_per_grid 1 and threads_per_block 32 
-    test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
-    test3((1 <<< 4)) "test3/a"
-    test3((1 <<< 8)) "test3/b"
-    test4((1 <<< 7), (1 <<< 6)) "test4/b/"
-    test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    // test2((1 <<< 6), (1 <<< 7)) "test2/a/"
+    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    // test3((1 <<< 4)) "test3/a"
+    // test3((1 <<< 8)) "test3/b"
+    // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
+    // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    test5()
+
+
     
