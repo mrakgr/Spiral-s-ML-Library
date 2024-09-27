@@ -210,7 +210,17 @@ __device__ inline bool while_method_0(int v0){
 }
 __device__ inline bool while_method_1(int v0){
     bool v1;
+    v1 = v0 < 32;
+    return v1;
+}
+__device__ inline bool while_method_2(int v0){
+    bool v1;
     v1 = v0 < 8;
+    return v1;
+}
+__device__ inline bool while_method_3(int v0){
+    bool v1;
+    v1 = v0 < 4;
     return v1;
 }
 extern "C" __global__ void entry0(int * v0, int * v1) {
@@ -269,9 +279,9 @@ extern "C" __global__ void entry0(int * v0, int * v1) {
             } else {
             }
             int v28;
-            v28 = v23 % 2;
+            v28 = v23 % 8;
             int v29;
-            v29 = v23 / 2;
+            v29 = v23 / 8;
             bool v30;
             v30 = v29 < 4;
             bool v31;
@@ -281,26 +291,83 @@ extern "C" __global__ void entry0(int * v0, int * v1) {
             } else {
             }
             assert("Tensor range check" && 0 <= v29 && v29 < 4);
-            assert("Tensor range check" && 0 <= v28 && v28 < 2);
+            assert("Tensor range check" && 0 <= v28 && v28 < 8);
             int v33;
-            v33 = 4 * v28;
+            v33 = v28 + v18;
             int v34;
-            v34 = 129 * v29;
+            v34 = 8 * v29;
             int v35;
             v35 = v34 + v33;
             int v36;
-            v36 = v33 + v18;
+            v36 = v0[v35];
+            assert("Tensor range check" && 0 <= v29 && v29 < 4);
+            assert("Tensor range check" && 0 <= v28 && v28 < 8);
             int v37;
-            v37 = 8 * v29;
+            v37 = 129 * v29;
             int v38;
-            v38 = v37 + v36;
-            int4* v39;
-            v39 = reinterpret_cast<int4*>(v0 + v38);
-            int4* v40;
-            v40 = reinterpret_cast<int4*>(v4 + v35);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v39) % 16 == 0 && reinterpret_cast<unsigned long long>(v40) % 16 == 0);
-            *v40 = *v39;
+            v38 = v37 + v28;
+            v4[v38] = v36;
             v23 += 256 ;
+        }
+        int v39;
+        v39 = threadIdx.x;
+        int v40;
+        v40 = v39;
+        while (while_method_2(v40)){
+            bool v42;
+            v42 = 0 <= v40;
+            bool v43;
+            v43 = v42 == false;
+            if (v43){
+                assert("The index needs to be zero or positive." && v42);
+            } else {
+            }
+            int v45;
+            v45 = v40 % 1;
+            bool v46;
+            v46 = v40 < 8;
+            bool v47;
+            v47 = v46 == false;
+            if (v47){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v46);
+            } else {
+            }
+            assert("Tensor range check" && 0 <= v40 && v40 < 8);
+            assert("Tensor range check" && 0 <= v45 && v45 < 1);
+            int v49;
+            v49 = 4 * v45;
+            int v50;
+            v50 = v49 + v21;
+            int v51;
+            v51 = 4 * v40;
+            int v52;
+            v52 = v51 + v50;
+            int v53;
+            v53 = 516 * v45;
+            int v54;
+            v54 = v40 + v53;
+            int v55[4];
+            int v56;
+            v56 = 0;
+            while (while_method_3(v56)){
+                assert("Tensor range check" && 0 <= v56 && v56 < 4);
+                int v58;
+                v58 = 129 * v56;
+                int v59;
+                v59 = v58 + v54;
+                int v60;
+                v60 = v4[v59];
+                assert("Tensor range check" && 0 <= v56 && v56 < 4);
+                v55[v56] = v60;
+                v56 += 1 ;
+            }
+            int4* v61;
+            v61 = reinterpret_cast<int4*>(v55 + 0);
+            int4* v62;
+            v62 = reinterpret_cast<int4*>(v1 + v52);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v61) % 16 == 0 && reinterpret_cast<unsigned long long>(v62) % 16 == 0);
+            *v62 = *v61;
+            v40 += 256 ;
         }
         __syncthreads();
         v7 += 24 ;
