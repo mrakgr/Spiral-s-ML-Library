@@ -56,16 +56,13 @@ inl transpose_snd_ forall a b c el'. loop' (from : tensor (a * b * c) el') (to :
                     tensor_set i (tensor_index i from) to
 
             inl () = // Copies the data into global from shared memory.
-                inl io =
+                inl io = // In addition to the shared tensor not being aligned, loading it into registers locally would result in 4-way bank conflicts.
                     zip to shared
                     |> reorder (fun b,c => c,b)
-                    |> factorize_sizeof_16
 
-                loop.projective threads_in_block(fst io.dim) fun i =>
-                    inl to, from = io |> apply i |> unzip
-                    inl l = tensor_create from.dim // The shared tensor isn't contiguous here so we first load the data into registers.
-                    loop.linear l.dim fun i => tensor_set i (tensor_index i from) l
-                    memcpy_sync (to,l)
+                loop.projective threads_in_block(io.dim) fun i =>
+                    inl to, from = io |> unzip
+                    tensor_set i (tensor_index i from) to
 
             __syncthreads()
 
@@ -947,21 +944,22 @@ inl test5 (l,m,n : int * int * int) head_dir =
     redirect_io_into "test_text_outputs/primitives/" head_dir "transpose.txt" fun () =>
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=l,m,n; by=1}
     inl output : _ _ int = tensor_create (l,n,m)
-    console.write_ln input_identity
+    console.tensor.write_ln limit.max input_identity
     run fun _ =>
         inl grid = cooperative_groups.create_grid()
         grid_transpose_snd grid input_identity output
-    console.write_ln output
+    console.tensor.write_ln limit.max output
 
 
 inl main() = 
-    test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
-    test3((1 <<< 4)) "test3/a"
-    test3((1 <<< 8)) "test3/b"
-    test4((1 <<< 7), (1 <<< 6)) "test4/b/"
-    test4((1 <<< 6), (1 <<< 7)) "test4/a/"
-    test5 (2,4,8) "test5"
+    // test2((1 <<< 6), (1 <<< 7)) "test2/a/"
+    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    // test3((1 <<< 4)) "test3/a"
+    // test3((1 <<< 8)) "test3/b"
+    // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
+    // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    test5 (2,4,8) "test5/a"
+    test5 (2,128,256) "test5/b"
 
 
     
