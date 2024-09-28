@@ -27,8 +27,9 @@ inl transpose_snd_ forall a b c el'. loop' (from : tensor (a * b * c) el') (to :
     
     inl body forall el. (x : tensor (a * {b : i32} * {c : i32}) (el * el)) : () =
         open tensor_cuda
+        
         inl shared : tensor _ el =
-            inl padding, shared_dim =
+            inl padding, shared_dim = // TODO: Better shared dims for small sizes.
                 match (sizeof : _ el).value with
                 | 8 => 1, 128, 64
                 | 4 => 1, 128, 128
@@ -55,6 +56,8 @@ inl transpose_snd_ forall a b c el'. loop' (from : tensor (a * b * c) el') (to :
                     inl to, from = io |> unzip
                     tensor_set i (tensor_index i from) to
 
+            __syncthreads()
+            
             inl () = // Copies the data into global from shared memory.
                 inl io = // In addition to the shared tensor not being aligned, loading it into registers locally would result in 4-way bank conflicts.
                     zip to shared
@@ -68,21 +71,22 @@ inl transpose_snd_ forall a b c el'. loop' (from : tensor (a * b * c) el') (to :
 
     iter2_type `$body x
 
-// Transposes the two inner dimensions of a tensor using the entire grid.
-inl grid_transpose_snd forall a b c el. grid (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
-    transpose_snd_ (loop.projective << blocks_in_grid) from to . cooperative_groups.sync grid
 
 // Transposes the two inner dimensions of a tensor using a single block.
 inl transpose_snd forall a b c el. (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
     transpose_snd_ loop.linear from to
 
-// Transposes the two dimensions of a tensor using the entire grid.
-inl grid_transpose forall a b el. grid (from : tensor (a * b) el) (to : tensor (b * a) el) : () =
-    grid_transpose_snd grid (from |> reorder (fun a,b => {},a,b)) (to |> reorder (fun b,a => {},b,a))
-
 // Transposes the two dimensions of a tensor using a single block.
 inl transpose forall a b el. grid (from : tensor (a * b) el) (to : tensor (b * a) el) : () =
     transpose_snd (from |> reorder (fun a,b => {},a,b)) (to |> reorder (fun b,a => {},b,a))
+
+// Transposes the two inner dimensions of a tensor using the entire grid.
+inl grid_transpose_snd forall a b c el. (from : tensor (a * b * c) el) (to : tensor (a * c * b) el) : () =
+    transpose_snd_ (loop.projective << blocks_in_grid) from to
+
+// Transposes the two dimensions of a tensor using the entire grid.
+inl grid_transpose forall a b el. (from : tensor (a * b) el) (to : tensor (b * a) el) : () =
+    grid_transpose_snd (from |> reorder (fun a,b => {},a,b)) (to |> reorder (fun b,a => {},b,a))
 
 // Maps all the elements of a tensor given the mapping function.
 inl map_ forall dim a b. loop' (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
@@ -443,7 +447,7 @@ inl row_ forall dim a kb b kc c.
             tensor_set i result to
                 
 inl loop_block dim f = loop.linear dim f . __syncthreads()
-inl loop_grid (grid : _ cooperative_groups.grid_group) dim f = loop.projective rangem.blocks_in_grid(dim) f . cooperative_groups.sync grid
+inl loop_grid dim f = loop.projective rangem.blocks_in_grid(dim) f
 
 // A very flexible version of the `map_2d` kernel that allows the user to chain arbitrary local operations inside the mapping function.
 // Using `local_map`, `local_reduce` and `local_scan` it's possible to implement most kinds of activation functions,
@@ -493,32 +497,54 @@ inl row_void forall dim a b.
         (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
     row_ loop_block (fun config x i j_tns => f config x i j_tns . None',None') from (None' : _ _ (_ _ ())) (None' : _ _ (_ _ ()))
 
+// Gridwise version of row_map. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_map' forall dim a b.
+        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b)
+        (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
+    row_ loop_grid (fun config x i j_tns => Some'(f config x i j_tns),None') from (Some' to) (None' : _ _ (_ _ ()))
+
 // Gridwise version of row_map. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
 inl grid_row_map forall dim a b.
         grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b)
         (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
-    row_ (loop_grid grid) (fun config x i j_tns => Some'(f config x i j_tns),None') from (Some' to) (None' : _ _ (_ _ ()))
+    grid_row_map' f from to . cooperative_groups.sync grid
+
+// Gridwise version of row_reduce. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_reduce' forall dim a b.
+        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> b)
+        (from : tensor (dim * int) a) (to : tensor dim b) : () =
+    row_ loop_grid (fun config x i j_tns => None',Some'(f config x i j_tns)) from (None' : _ _ (_ _ ())) (Some' to) 
 
 // Gridwise version of row_reduce. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
 inl grid_row_reduce forall dim a b.
         grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> b)
         (from : tensor (dim * int) a) (to : tensor dim b) : () =
-    row_ (loop_grid grid) (fun config x i j_tns => None',Some'(f config x i j_tns)) from (None' : _ _ (_ _ ())) (Some' to) 
+    grid_row_reduce' f from to . cooperative_groups.sync grid
 
+// Gridwise version of row_map_reduce. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_map_reduce' forall dim a b c.
+        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b * c)
+        (from : tensor (dim * int) a) (to_map : tensor (dim * int) b) (to_reduce : tensor dim c) : () =
+    row_ loop_grid (fun config x i j_tns => 
+        inl a,b = f config x i j_tns
+        Some' a, Some' b
+        ) from (Some' to_map) (Some' to_reduce)
 // Gridwise version of row_map_reduce. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
 inl grid_row_map_reduce forall dim a b c.
         grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> tensor (int * int) b * c)
         (from : tensor (dim * int) a) (to_map : tensor (dim * int) b) (to_reduce : tensor dim c) : () =
-    row_ (loop_grid grid) (fun config x i j_tns => 
-        inl a,b = f config x i j_tns
-        Some' a, Some' b
-        ) from (Some' to_map) (Some' to_reduce)
+    grid_row_map_reduce' f from to_map to_reduce . cooperative_groups.sync grid
 
+// Gridwise version of row_void. Uses the entire grid to iterate over a tensor instead of just a single block.
+inl grid_row_void' forall dim a b.
+        (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> ())
+        (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
+    row_ loop_grid (fun config x i j_tns => f config x i j_tns . None',None') from (None' : _ _ (_ _ ())) (None' : _ _ (_ _ ()))
 // Gridwise version of row_void. Does grid synchronization at the end. Uses the entire grid to iterate over a tensor instead of just a single block.
 inl grid_row_void forall dim a b.
         grid (f : row_config -> tensor (int * int) a -> dim -> tensor (int * int) int -> ())
         (from : tensor (dim * int) a) (to : tensor (dim * int) b) : () =
-    row_ (loop_grid grid) (fun config x i j_tns => f config x i j_tns . None',None') from (None' : _ _ (_ _ ())) (None' : _ _ (_ _ ()))
+    grid_row_void' f from to . cooperative_groups.sync grid
 
 // Reduces the innermost dimension of a given tensor. Less flexible than `row_reduce` since it can only be used to do a single reduction, 
 // but can be used on smaller tensors than `row_reduce` allows.
@@ -946,8 +972,8 @@ inl test5 (l,m,n : int * int * int) head_dir =
     inl output : _ _ int = tensor_create (l,n,m)
     console.tensor.write_ln limit.max input_identity
     run fun _ =>
-        inl grid = cooperative_groups.create_grid()
-        grid_transpose_snd grid input_identity output
+        // inl grid = cooperative_groups.create_grid()
+        grid_transpose_snd input_identity output
     console.tensor.write_ln limit.max output
 
 

@@ -98,6 +98,7 @@ modules:
         cfr
         models
         cfr_models
+        cem
 
     game/
         utils
