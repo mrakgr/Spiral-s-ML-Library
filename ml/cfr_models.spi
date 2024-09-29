@@ -62,7 +62,7 @@ inl trace_and_play_ forall inp out.
     inl cfr_model = (key_extract model .cfr_model : cfr.model)
 
     // Extract the output index and the sampling probability for it.
-    inl sampling,action_id = 
+    inl sampling,action_id =
         inl ensemble_id : int = 
             if is_train then
                 // The ensemble id is held steady between the `apply_updates` calls.

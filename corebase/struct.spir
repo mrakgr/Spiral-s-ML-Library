@@ -99,7 +99,7 @@ inl foldBack2 g =
     inl rec f ar v s =
         match ar, v with
         | (a, b), (va, vb) => f a va (f b vb s)
-        | {} & ar, {} & v => record_fold_back (fun x => f x.value (v x.key) x.state) ar s
+        | {} & ar, {} & v => record_fold_back (fun x => f (ar x.key) x.value x.state) v s
         | ar, v => g ar v s
     f
 
@@ -116,6 +116,21 @@ inl mapFoldBack g =
                 {m with $key=value}, state
                 ) ar ({}, s)
         | ar => g ar s
+    f
+
+inl mapFoldBack2 g =
+    inl rec f ar v s =
+        match ar, v with
+        | (a, b), (va, vb) => 
+            inl b,s = f b vb s
+            inl a,s = f a va s
+            (a, b), s
+        | {} & ar, {} & v => 
+            record_fold_back (fun {value key state=m,state} => 
+                inl value, state = f (ar key) value state
+                {m with $key=value}, state
+                ) v ({}, s)
+        | ar, v => g ar v s
     f
 
 inl iter2 set ar v =

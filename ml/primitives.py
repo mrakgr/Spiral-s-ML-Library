@@ -2,7 +2,6 @@ kernel = r"""
 #include <new>
 #include <assert.h>
 #include <stdio.h>
-#include <cooperative_groups.h>
 using default_int = int;
 using default_uint = unsigned int;
 template <typename el>
@@ -224,291 +223,289 @@ __device__ inline bool while_method_3(int v0){
     return v1;
 }
 extern "C" __global__ void entry0(int * v0, int * v1) {
-    auto v2 = cooperative_groups::this_grid();
-    extern __shared__ unsigned char v3[];
-    int * v4;
-    v4 = reinterpret_cast<int *>(&v3[0ull]);
+    extern __shared__ unsigned char v2[];
+    int * v3;
+    v3 = reinterpret_cast<int *>(&v2[0ull]);
+    int v5;
+    v5 = blockIdx.x;
     int v6;
-    v6 = blockIdx.x;
-    int v7;
-    v7 = v6;
-    while (while_method_0(v7)){
+    v6 = v5;
+    while (while_method_0(v6)){
+        bool v8;
+        v8 = 0 <= v6;
         bool v9;
-        v9 = 0 <= v7;
-        bool v10;
-        v10 = v9 == false;
-        if (v10){
-            assert("The index needs to be zero or positive." && v9);
+        v9 = v8 == false;
+        if (v9){
+            assert("The index needs to be zero or positive." && v8);
         } else {
         }
-        int v12;
-        v12 = v7 % 1;
+        int v11;
+        v11 = v6 % 1;
+        bool v12;
+        v12 = v6 < 2;
         bool v13;
-        v13 = v7 < 2;
-        bool v14;
-        v14 = v13 == false;
-        if (v14){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v13);
+        v13 = v12 == false;
+        if (v13){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v12);
         } else {
         }
-        assert("Tensor range check" && 0 <= v7 && v7 < 2);
-        assert("Tensor range check" && 0 <= v12 && v12 < 1);
-        assert("Tensor range check" && 0 <= v12 && v12 < 1);
+        assert("Tensor range check" && 0 <= v6 && v6 < 2);
+        assert("Tensor range check" && 0 <= v11 && v11 < 1);
+        assert("Tensor range check" && 0 <= v11 && v11 < 1);
+        int v15;
+        v15 = 8 * v11;
         int v16;
-        v16 = 8 * v12;
+        v16 = 32 * v11;
         int v17;
-        v17 = 32 * v12;
+        v17 = v16 + v15;
         int v18;
-        v18 = v17 + v16;
+        v18 = 32 * v6;
         int v19;
-        v19 = 32 * v7;
+        v19 = v18 + v17;
         int v20;
-        v20 = v19 + v18;
+        v20 = 4 * v11;
         int v21;
-        v21 = 4 * v12;
+        v21 = v20 + v16;
         int v22;
-        v22 = v21 + v17;
+        v22 = v18 + v21;
         int v23;
-        v23 = v19 + v22;
+        v23 = threadIdx.x;
         int v24;
-        v24 = threadIdx.x;
-        int v25;
-        v25 = v24;
-        while (while_method_1(v25)){
+        v24 = v23;
+        while (while_method_1(v24)){
+            bool v26;
+            v26 = 0 <= v24;
             bool v27;
-            v27 = 0 <= v25;
-            bool v28;
-            v28 = v27 == false;
-            if (v28){
-                assert("The index needs to be zero or positive." && v27);
+            v27 = v26 == false;
+            if (v27){
+                assert("The index needs to be zero or positive." && v26);
             } else {
             }
+            int v29;
+            v29 = v24 % 8;
             int v30;
-            v30 = v25 % 8;
-            int v31;
-            v31 = v25 / 8;
+            v30 = v24 / 8;
+            bool v31;
+            v31 = v30 < 4;
             bool v32;
-            v32 = v31 < 4;
-            bool v33;
-            v33 = v32 == false;
-            if (v33){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v32);
+            v32 = v31 == false;
+            if (v32){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v31);
             } else {
             }
-            assert("Tensor range check" && 0 <= v31 && v31 < 4);
-            assert("Tensor range check" && 0 <= v30 && v30 < 8);
+            assert("Tensor range check" && 0 <= v30 && v30 < 4);
+            assert("Tensor range check" && 0 <= v29 && v29 < 8);
+            int v34;
+            v34 = v29 + v19;
             int v35;
-            v35 = v30 + v20;
+            v35 = 8 * v30;
             int v36;
-            v36 = 8 * v31;
+            v36 = v35 + v34;
             int v37;
-            v37 = v36 + v35;
+            v37 = v0[v36];
+            assert("Tensor range check" && 0 <= v30 && v30 < 4);
+            assert("Tensor range check" && 0 <= v29 && v29 < 8);
             int v38;
-            v38 = v0[v37];
-            assert("Tensor range check" && 0 <= v31 && v31 < 4);
-            assert("Tensor range check" && 0 <= v30 && v30 < 8);
+            v38 = 33 * v30;
             int v39;
-            v39 = 129 * v31;
-            int v40;
-            v40 = v39 + v30;
-            v4[v40] = v38;
-            v25 += 256 ;
-        }
-        int v41;
-        v41 = threadIdx.x;
-        int v42;
-        v42 = v41;
-        while (while_method_1(v42)){
-            bool v44;
-            v44 = 0 <= v42;
-            bool v45;
-            v45 = v44 == false;
-            if (v45){
-                assert("The index needs to be zero or positive." && v44);
-            } else {
-            }
-            int v47;
-            v47 = v42 % 4;
-            int v48;
-            v48 = v42 / 4;
-            bool v49;
-            v49 = v48 < 8;
-            bool v50;
-            v50 = v49 == false;
-            if (v50){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v49);
-            } else {
-            }
-            assert("Tensor range check" && 0 <= v48 && v48 < 8);
-            assert("Tensor range check" && 0 <= v47 && v47 < 4);
-            int v52;
-            v52 = 129 * v47;
-            int v53;
-            v53 = v48 + v52;
-            int v54;
-            v54 = v4[v53];
-            assert("Tensor range check" && 0 <= v48 && v48 < 8);
-            assert("Tensor range check" && 0 <= v47 && v47 < 4);
-            int v55;
-            v55 = v47 + v23;
-            int v56;
-            v56 = 4 * v48;
-            int v57;
-            v57 = v56 + v55;
-            v1[v57] = v54;
-            v42 += 256 ;
+            v39 = v38 + v29;
+            v3[v39] = v37;
+            v24 += 256 ;
         }
         __syncthreads();
-        v7 += 24 ;
+        int v40;
+        v40 = threadIdx.x;
+        int v41;
+        v41 = v40;
+        while (while_method_1(v41)){
+            bool v43;
+            v43 = 0 <= v41;
+            bool v44;
+            v44 = v43 == false;
+            if (v44){
+                assert("The index needs to be zero or positive." && v43);
+            } else {
+            }
+            int v46;
+            v46 = v41 % 4;
+            int v47;
+            v47 = v41 / 4;
+            bool v48;
+            v48 = v47 < 8;
+            bool v49;
+            v49 = v48 == false;
+            if (v49){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v48);
+            } else {
+            }
+            assert("Tensor range check" && 0 <= v47 && v47 < 8);
+            assert("Tensor range check" && 0 <= v46 && v46 < 4);
+            int v51;
+            v51 = 33 * v46;
+            int v52;
+            v52 = v47 + v51;
+            int v53;
+            v53 = v3[v52];
+            assert("Tensor range check" && 0 <= v47 && v47 < 8);
+            assert("Tensor range check" && 0 <= v46 && v46 < 4);
+            int v54;
+            v54 = v46 + v22;
+            int v55;
+            v55 = 4 * v47;
+            int v56;
+            v56 = v55 + v54;
+            v1[v56] = v53;
+            v41 += 256 ;
+        }
+        __syncthreads();
+        v6 += 24 ;
     }
-    v2.sync() ;
     return ;
 }
 extern "C" __global__ void entry1(int * v0, int * v1) {
-    auto v2 = cooperative_groups::this_grid();
-    extern __shared__ unsigned char v3[];
-    int * v4;
-    v4 = reinterpret_cast<int *>(&v3[0ull]);
+    extern __shared__ unsigned char v2[];
+    int * v3;
+    v3 = reinterpret_cast<int *>(&v2[0ull]);
+    int v5;
+    v5 = blockIdx.x;
     int v6;
-    v6 = blockIdx.x;
-    int v7;
-    v7 = v6;
-    while (while_method_2(v7)){
+    v6 = v5;
+    while (while_method_2(v6)){
+        bool v8;
+        v8 = 0 <= v6;
         bool v9;
-        v9 = 0 <= v7;
-        bool v10;
-        v10 = v9 == false;
-        if (v10){
-            assert("The index needs to be zero or positive." && v9);
+        v9 = v8 == false;
+        if (v9){
+            assert("The index needs to be zero or positive." && v8);
         } else {
         }
+        int v11;
+        v11 = v6 % 2;
         int v12;
-        v12 = v7 % 2;
+        v12 = v6 / 2;
         int v13;
-        v13 = v7 / 2;
-        int v14;
-        v14 = v13 % 1;
+        v13 = v12 % 1;
+        bool v14;
+        v14 = v12 < 2;
         bool v15;
-        v15 = v13 < 2;
-        bool v16;
-        v16 = v15 == false;
-        if (v16){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v15);
+        v15 = v14 == false;
+        if (v15){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v14);
         } else {
         }
-        assert("Tensor range check" && 0 <= v13 && v13 < 2);
-        assert("Tensor range check" && 0 <= v14 && v14 < 1);
         assert("Tensor range check" && 0 <= v12 && v12 < 2);
+        assert("Tensor range check" && 0 <= v13 && v13 < 1);
+        assert("Tensor range check" && 0 <= v11 && v11 < 2);
+        int v17;
+        v17 = 128 * v11;
         int v18;
-        v18 = 128 * v12;
+        v18 = 32768 * v13;
         int v19;
-        v19 = 32768 * v14;
+        v19 = v18 + v17;
         int v20;
-        v20 = v19 + v18;
+        v20 = 32768 * v12;
         int v21;
-        v21 = 32768 * v13;
+        v21 = v20 + v19;
         int v22;
-        v22 = v21 + v20;
+        v22 = 16384 * v11;
         int v23;
-        v23 = 16384 * v12;
+        v23 = 128 * v13;
         int v24;
-        v24 = 128 * v14;
+        v24 = v23 + v22;
         int v25;
-        v25 = v24 + v23;
+        v25 = v20 + v24;
         int v26;
-        v26 = v21 + v25;
+        v26 = threadIdx.x;
         int v27;
-        v27 = threadIdx.x;
-        int v28;
-        v28 = v27;
-        while (while_method_3(v28)){
+        v27 = v26;
+        while (while_method_3(v27)){
+            bool v29;
+            v29 = 0 <= v27;
             bool v30;
-            v30 = 0 <= v28;
-            bool v31;
-            v31 = v30 == false;
-            if (v31){
-                assert("The index needs to be zero or positive." && v30);
+            v30 = v29 == false;
+            if (v30){
+                assert("The index needs to be zero or positive." && v29);
             } else {
             }
+            int v32;
+            v32 = v27 % 128;
             int v33;
-            v33 = v28 % 128;
-            int v34;
-            v34 = v28 / 128;
+            v33 = v27 / 128;
+            bool v34;
+            v34 = v33 < 128;
             bool v35;
-            v35 = v34 < 128;
-            bool v36;
-            v36 = v35 == false;
-            if (v36){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v35);
+            v35 = v34 == false;
+            if (v35){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v34);
             } else {
             }
-            assert("Tensor range check" && 0 <= v34 && v34 < 128);
             assert("Tensor range check" && 0 <= v33 && v33 < 128);
+            assert("Tensor range check" && 0 <= v32 && v32 < 128);
+            int v37;
+            v37 = v32 + v21;
             int v38;
-            v38 = v33 + v22;
+            v38 = 256 * v33;
             int v39;
-            v39 = 256 * v34;
+            v39 = v38 + v37;
             int v40;
-            v40 = v39 + v38;
-            int v41;
-            v41 = v0[v40];
-            assert("Tensor range check" && 0 <= v34 && v34 < 128);
+            v40 = v0[v39];
             assert("Tensor range check" && 0 <= v33 && v33 < 128);
+            assert("Tensor range check" && 0 <= v32 && v32 < 128);
+            int v41;
+            v41 = 129 * v33;
             int v42;
-            v42 = 129 * v34;
-            int v43;
-            v43 = v42 + v33;
-            v4[v43] = v41;
-            v28 += 256 ;
-        }
-        int v44;
-        v44 = threadIdx.x;
-        int v45;
-        v45 = v44;
-        while (while_method_3(v45)){
-            bool v47;
-            v47 = 0 <= v45;
-            bool v48;
-            v48 = v47 == false;
-            if (v48){
-                assert("The index needs to be zero or positive." && v47);
-            } else {
-            }
-            int v50;
-            v50 = v45 % 128;
-            int v51;
-            v51 = v45 / 128;
-            bool v52;
-            v52 = v51 < 128;
-            bool v53;
-            v53 = v52 == false;
-            if (v53){
-                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v52);
-            } else {
-            }
-            assert("Tensor range check" && 0 <= v51 && v51 < 128);
-            assert("Tensor range check" && 0 <= v50 && v50 < 128);
-            int v55;
-            v55 = 129 * v50;
-            int v56;
-            v56 = v51 + v55;
-            int v57;
-            v57 = v4[v56];
-            assert("Tensor range check" && 0 <= v51 && v51 < 128);
-            assert("Tensor range check" && 0 <= v50 && v50 < 128);
-            int v58;
-            v58 = v50 + v26;
-            int v59;
-            v59 = 128 * v51;
-            int v60;
-            v60 = v59 + v58;
-            v1[v60] = v57;
-            v45 += 256 ;
+            v42 = v41 + v32;
+            v3[v42] = v40;
+            v27 += 256 ;
         }
         __syncthreads();
-        v7 += 24 ;
+        int v43;
+        v43 = threadIdx.x;
+        int v44;
+        v44 = v43;
+        while (while_method_3(v44)){
+            bool v46;
+            v46 = 0 <= v44;
+            bool v47;
+            v47 = v46 == false;
+            if (v47){
+                assert("The index needs to be zero or positive." && v46);
+            } else {
+            }
+            int v49;
+            v49 = v44 % 128;
+            int v50;
+            v50 = v44 / 128;
+            bool v51;
+            v51 = v50 < 128;
+            bool v52;
+            v52 = v51 == false;
+            if (v52){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v51);
+            } else {
+            }
+            assert("Tensor range check" && 0 <= v50 && v50 < 128);
+            assert("Tensor range check" && 0 <= v49 && v49 < 128);
+            int v54;
+            v54 = 129 * v49;
+            int v55;
+            v55 = v50 + v54;
+            int v56;
+            v56 = v3[v55];
+            assert("Tensor range check" && 0 <= v50 && v50 < 128);
+            assert("Tensor range check" && 0 <= v49 && v49 < 128);
+            int v57;
+            v57 = v49 + v25;
+            int v58;
+            v58 = 128 * v50;
+            int v59;
+            v59 = v58 + v57;
+            v1[v59] = v56;
+            v44 += 256 ;
+        }
+        __syncthreads();
+        v6 += 24 ;
     }
-    v2.sync() ;
     return ;
 }
 """

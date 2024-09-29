@@ -2,7 +2,15 @@ open corebase
 open corecuda
 open primitives
 
+// According to CEM papers, adding noise helps performance significantly in games like tetris.
 inl cross_entropy_noise() = 0.1
+
+// This is the trick that we talked about in the Ghostlike's Cross Entropy Method video.
+// It's supposed to encourage the cross entropy method to gradually reduce the weights towards 0.
+// But I changed my mind on having it.
+// 
+// We're going to be using a curriculum training, so I don't want the weights being pruned prematurely.
+inl mean_decay() = 1
 
 type ensemble_id = int
 type ratio = float * float
@@ -17,11 +25,11 @@ inl cem forall dim float{number; float}. rng (transposed_weights : tensor (dim *
             inl mask = 
                 inl average = local_average config x
                 local_map (fun x => x >= average) x
-            inl winner_mean = local_masked_reduce config 0 (+) (tensorm.zip x mask)
+            inl winner_count = conv (local_masked_count config mask)
+            inl winner_mean = local_masked_sum config x mask / winner_count * mean_decay()
             inl winner_std = 
                 inl x = local_map (fun x => inl r = x - winner_mean in r * r) x
-                local_masked_reduce config 0 (+) (tensorm.zip x mask)
-                |> sqrt
+                sqrt (local_masked_sum config x mask / winner_count)
             local_map (fun x,b => 
                 inl r = conv (random.normal rng) * (winner_std + cross_entropy_noise()) + winner_mean
                 if b then x else r
@@ -43,7 +51,7 @@ inl apply_updates rng grid (weights : weights) (trace_rewards : trace_rewards) :
         )
     cooperative_groups.sync grid
 
-inl test1 weights transposed_weights trace_rewards =
+inl test1 weights trace_rewards =
     run fun () =>
         inl grid = cooperative_groups.create_grid()
         inl rng : ref random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
@@ -60,4 +68,4 @@ inl test1 weights transposed_weights trace_rewards =
         calculate_updates trace_rewards 0 (-4 * 0.5, 0.5)
         calculate_updates trace_rewards 1 (-4 * 0.3, 0.3)
 
-        apply_updates rng weights transposed_weights trace_rewards
+        apply_updates rng grid weights trace_rewards

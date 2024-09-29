@@ -1,0 +1,22 @@
+open corebase
+open corecuda
+
+// Multiplies the elements of min by 2 until either their individual maximumv or the overall limit has been reached.
+inl frame forall t. (max' : t) (min', limit : t * int) : t * int = real
+    open real_core
+    struct.mapFoldBack2 (fun min' max' limit =>
+        if limit > 1 && min' < max' then min' * 2, limit / 2
+        else min', limit
+        ) min' max' limit
+
+// Calls frame iteratively 4 times in the tranpose primitive, which should be enough for it to converge. 
+// For internal use.
+inl transpose_frame min (max : int * int) =
+    inl f = frame max
+    inl s = dynamic_shared_memory_used() / (sizeof : _ float).value / loop.prod min
+    f (min,s) |> f |> f |> f
+
+inl main() =
+    inl x,s = transpose_frame (32, 32) (1024, 64)
+    print_static {x s}
+    ()

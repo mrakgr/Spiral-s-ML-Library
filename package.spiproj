@@ -152,6 +152,7 @@ modules:
         test15
         test16
         test17
+        test18 
 
         async_loads/
             config-
