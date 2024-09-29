@@ -3,11 +3,14 @@ open corecuda
 open coreext
 open tensorm
 
-type size = size
-type graph_array = ptr * size
+type space_id = int
+inl weight_id() : space_id = 0
+inl output_id() : space_id = 1
+inl weight_adjoint_id() : space_id = 2
+
 type graph_dims = compile_time.hashmap
-type graph_offset = compile_time.hashmap * size
-type graph_data = {array : graph_array; offset : graph_offset}
+type graph_partitions = list {partition : compile_time.hashmap; size : size}
+type graph_data = list {array : ptr; partition : compile_time.hashmap; size : size}
 
 nominal layer_state = 
     {
@@ -40,8 +43,7 @@ union rec graph t =
         -> graph (tensor (int * int * int) t)
     | Zip :: forall dim a b. graph (tensor dim a) * graph (tensor dim b) -> graph (tensor dim (a * b))
     | Pair :: forall a b. graph a * graph b -> graph (a * b)
-    | Weight :: forall t. partitionm.partition t * (t -> ()) -> graph t
-    | Input :: forall t. partitionm.partition t -> graph t
+    | Layer :: forall t. space_id * partitionm.partition t * (t -> ()) -> graph t
     | Apply :: forall b el. (exists a. graph (tensor (a * b) el) * graph a) -> graph (tensor b el)
     | KeyGraph :: forall t. (exists key{symbol}. key) * graph t -> graph t
     | KeyScalar :: forall t. (exists key{symbol}. key) -> graph t
@@ -56,8 +58,7 @@ nominal model t =
     {
         graph : graph t
         dims : graph_dims
-        output : graph_data
-        param : graph_data
+        data : graph_data
     }
 
 inl memoize (h : compile_time.hashmap) f k =
@@ -107,77 +108,40 @@ inl rec get_dim_pair forall t_top. (h : graph_dims) : graph t_top -> dim_of t_to
             inl a,b = f a,f b
             assert (a = b) "The dimensions of the two inputs to the Zip node have to be equal."
             D_D a
-        | Weight(dim, init) => real
+        | Layer(sid, dim, init) => real
             typecase `dim with
             | _ (tensor ~dim ~t) => D_D `dim `t (partitionm.dim_of `dim `t dim)
             | _ ~p => 
                 !!!!PrintStatic(`p)
-                error_type "Can only get the dimension of a singleton weight layer. Check the terminal to see the type of the Weight node."
-        | Input dim => real
-            typecase `dim with
-            | _ (tensor ~dim ~t) => D_D `dim `t (partitionm.dim_of `dim `t dim)
-            | _ ~p =>
-                !!!!PrintStatic(`p)
-                error_type "Can only get the dimension of a singleton input layer. Check the terminal to see the type of the Input node."
+                error_type "Can only get the dimension of a singleton layer. Check the terminal to see the type of the Layer node."
         | KeyGraph(_,x) => f' x
         | Apply(exists a. a,b) => D_D(snd (f a))
         )
 and inl get_dim forall dim t. (h : graph_dims) (x : graph (tensor dim t)) : dim = match get_dim_pair h x with D_D x => x
 
-// Calculates the parameter offsets.
-inl pass_offset_param forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
-    inl h_offset_param = compile_time.hashmapm.create() // stores the offsets pointing to the start of the weight parameter array for each node
-    inl h = compile_time.hashmapm.create()
-    inl offset_key = ()
-    inl get_offset () : size = match compile_time.hashmapm.try_get h offset_key with Some x => x | None => 0
-    inl set_offset (offset : size) : () = compile_time.hashmapm.set h offset_key offset
-    inl get_dim x = get_dim dims x
-    inl rec g forall t. (out : option (graph t)) : () =
-        match out with
-        | Some x' => f x'
-        | None => ()
-    and inl f forall t. : graph t -> () =
-        memoize h function
-            | BlockMap(exists a. _,a,out) => f a . g out
-            | BlockRowMap(exists a. _,a,out) => f a . g out
-            | BlockRowReduce(exists a. _,a,out) => f a . g out
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
-            | BlockMatmul(a,b) => f a . f b
-            | Zip(a,b) => f a . f b
-            | Pair(a,b) => f a . f b
-            | Weight(p,init) as k =>
-                inl partition_offsets : _ t = p |> partitionm.calculate_offsets get_offset()
-                compile_time.hashmapm.add h_offset_param k partition_offsets
-                set_offset partition_offsets.offset_end
-            | Apply(exists a. a,b) => f a . f b
-            | KeyGraph(_,x) => f x
-            | KeyScalar => ()
-            | Input => ()
-    f x
-    compile_time.hashmapm.set_immutable(h_offset_param)
-    h_offset_param, get_offset()
+inl pass_calculate_partitions forall t_top. (space_id : space_id) (x : graph t_top) (dims : graph_dims) : graph_partitions =
+    inl h_data = listm.init space_id <| fun _ => compile_time.hashmapm.create()
+    inl offset_key = .offset
 
-// Calculates the output node offsets.
-inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : graph_offset =
-    inl h_offset_output = compile_time.hashmapm.create() // stores the offsets pointing to the start of the output array for each node
     inl h = compile_time.hashmapm.create()
-    inl offset_key = ()
-    inl get_offset () : size = match compile_time.hashmapm.try_get h offset_key with Some x => x | None => 0
-    inl set_offset (offset : size) : () = compile_time.hashmapm.set h offset_key offset
+    inl get_offset' h_data : size = match compile_time.hashmapm.try_get h_data offset_key with Some x => x | None => 0
+    inl get_offset (sid : space_id) : size = get_offset' (index h_data sid)
+    inl set_offset (sid : space_id) (offset : size) : () = compile_time.hashmapm.set (index h_data sid) offset_key offset
     inl get_dim x = get_dim dims x
     inl get_dim_pair x = get_dim_pair dims x
     inl rec g forall t. (k : graph t) (out : option (graph t)) : () =
         match out with
         | Some x => f x
         | None =>
+            inl sid = output_id()
             inl rec loop forall t'. (x : dim_of t') : partition_of t' =
                 match x with
                 | D_P(a,b) => P_P(loop a, loop b)
                 | D_D dim =>
-                    inl partition_offsets = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset()
-                    set_offset partition_offsets.offset_end
+                    inl partition_offsets = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset(sid)
+                    set_offset sid partition_offsets.offset_end
                     P_D partition_offsets
-            compile_time.hashmapm.add h_offset_output k (loop (get_dim_pair k))
+            compile_time.hashmapm.add (index h_data sid) k (loop (get_dim_pair k))
     and inl f forall t. : graph t -> () =
         memoize h fun k =>
             match k with
@@ -188,22 +152,20 @@ inl pass_offset_output forall t_top. (x : graph t_top) (dims : graph_dims) : gra
             | BlockMatmul(a,b) => f a . f b . g k None
             | Zip(a,b) => f a . f b // passthrough
             | Pair(a,b) => f a . f b // passthrough
-            | Weight => ()
             | Apply(exists a. a,b) => f a . f b // passthrough
-            | Input(p) =>
-                inl partition_offsets : _ t = partitionm.calculate_offsets get_offset() p
-                compile_time.hashmapm.add h_offset_output k (P_D partition_offsets)
-                set_offset partition_offsets.offset_end
-            | KeyGraph(_,x) => f x // passthrough
-            | KeyScalar(_) => ()
-        
+            | Layer(sid,p,_) as k =>
+                inl partition_offsets : _ t = p |> partitionm.calculate_offsets get_offset(sid)
+                compile_time.hashmapm.add (index h_data sid) k partition_offsets
+                set_offset sid partition_offsets.offset_end
+            | Apply(exists a. a,b) => f a . f b
+            | KeyGraph(_,x) => f x
+            | KeyScalar => ()
     f x
-    compile_time.hashmapm.set_immutable(h_offset_output)
-    h_offset_output, get_offset()
+    listm.iter compile_time.hashmapm.set_immutable h_data
+    listm.map (fun h => {partition=h; size=get_offset' h}) h_data
 
 // Initializes the parameters of a NN on the host.
-inl param_init forall t_top. (model {graph param} : model t_top) =
-    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+inl pass_init forall t_top. (model {graph data} : model t_top) =
     inl h = compile_time.hashmapm.create()
     inl rec g forall t. : option (graph t) -> () = function
         | None => ()
@@ -217,16 +179,16 @@ inl param_init forall t_top. (model {graph param} : model t_top) =
             | BlockMatmul(a,b) => f a . f b
             | Zip(a,b) => f a . f b
             | Pair(a,b) => f a . f b
-            | Weight(_, init) as k => partitionm.from_partition_offsets param.array (compile_time.hashmapm.get (fst param.offset) k) |> init . ()
+            | Layer(sid, _, init) as k => 
+                inl x = index data sid
+                partitionm.from_partition_offsets (x.array, x.size) (compile_time.hashmapm.get x.partition k) |> init . ()
             | Apply(exists a. a,b) => f a . f b
             | KeyGraph(_,x) => f x
             | KeyScalar => ()
-            | Input => ()
     f graph
 
 // Prints all the weight layers.
-inl param_print forall t_top. (model {graph param} : model t_top) =
-    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+inl param_print forall t_top. (model {graph data} : model t_top) =
     inl h = compile_time.hashmapm.create()
     inl get_partition forall t. (k : graph t) : t = partitionm.from_partition_offsets param.array (compile_time.hashmapm.get (fst param.offset) k)
     inl rec g forall t. : option (graph t) -> () = function
@@ -241,17 +203,18 @@ inl param_print forall t_top. (model {graph param} : model t_top) =
             | BlockMatmul(a,b) => f a . f b
             | Zip(a,b) => f a . f b
             | Pair(a,b) => f a . f b
-            | Weight as x => get_partition x |> console.write_ln
+            | Layer(sid,_,_) as x => if sid = weight_id() then get_partition x |> console.write_ln
             | Apply(exists a. a,b) => f a . f b
             | KeyGraph(_,x) => f x
             | KeyScalar => ()
-            | Input => ()
     f graph
 
 // Allocates an array given the graph offset.
-inl create_graph_data (offset : graph_offset) : graph_data =
-    inl array = partitionm.create_array (snd offset)
-    {array offset}
+inl create_graph_data (offset : graph_partitions) : graph_data =
+    offset |> listm.map fun x =>
+        inl array,size = partitionm.create_array x.size
+        assert (size >= x.size) "The created array has to be equal or greater to the given size."
+        {x with array}
 
 // Extracts the tensor at the top level node.
 inl graph_extract forall t_top indices. (model {graph param output} : model t_top) (indices : indices) : t_top =

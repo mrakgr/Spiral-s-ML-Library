@@ -112,3 +112,12 @@ inl pick_discrete forall t. (r : float) (l : list (t * float)) =
         if var_is l then join body l
         else body l
     loop l
+
+instance index list = fun l i =>
+    inl rec body s = function 
+        | Cons(x,x') => if i = 0 then x else loop (i-1) x'
+        | Nil => failwith "Index not found in list."
+    and inl loop s l =
+        if var_is l then inl ~s = s in join body s l
+        else body s l 
+    loop i l

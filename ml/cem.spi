@@ -15,6 +15,7 @@ inl mean_decay() = 1
 type ensemble_id = int
 type ratio = float * float
 type trace_rewards = tensor ensemble_id ratio // actual reward is fst ratio / snd ratio
+
 type weights = list (exists dim float{number; float}. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float)
 
 inl calculate_updates (trace_rewards : trace_rewards) (ensemble_id : ensemble_id) (ratio : ratio) =
