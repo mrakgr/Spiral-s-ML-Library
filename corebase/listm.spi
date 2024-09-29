@@ -121,3 +121,16 @@ instance index list = fun l i =>
         if var_is l then inl ~s = s in join body s l
         else body s l 
     loop i l
+
+// Returns the first element that maps to Some in the list.
+inl chooseFirst forall el el'. (f : el -> option el') l : option el' =
+    inl rec body = function 
+        | Cons(x,x') => 
+            match f x with
+            | Some as x => x
+            | None => loop x'
+        | Nil => None
+    and inl loop l =
+        if var_is l then join body l
+        else body l
+    loop l

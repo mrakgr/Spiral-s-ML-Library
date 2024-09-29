@@ -7,6 +7,7 @@ type space_id = int
 inl weight_id() : space_id = 0
 inl output_id() : space_id = 1
 inl weight_adjoint_id() : space_id = 2
+inl num_spaces() : space_id = 3
 
 type graph_dims = compile_time.hashmap
 type graph_partitions = list {partition : compile_time.hashmap; size : size}
@@ -50,9 +51,6 @@ union rec graph t =
 union rec dim_of t =
     | D_D :: forall dim t. dim -> dim_of (tensor dim t)
     | D_P :: forall a b. dim_of a * dim_of b -> dim_of (a * b)
-union rec partition_of t =
-    | P_D :: forall t. partitionm.partition_offsets t -> partition_of t
-    | P_P :: forall a b. partition_of a * partition_of b -> partition_of (a * b)
 
 nominal model t =
     {
@@ -134,13 +132,13 @@ inl pass_calculate_partitions forall t_top. (space_id : space_id) (x : graph t_t
         | Some x => f x
         | None =>
             inl sid = output_id()
-            inl rec loop forall t'. (x : dim_of t') : partition_of t' =
+            inl rec loop forall t'. (x : dim_of t') : partition_offsets t' =
                 match x with
-                | D_P(a,b) => P_P(loop a, loop b)
+                | D_P(a,b) => open partitionm in loop a +. loop b
                 | D_D dim =>
                     inl partition_offsets = partitionm.to_partition dim |> partitionm.calculate_offsets get_offset(sid)
                     set_offset sid partition_offsets.offset_end
-                    P_D partition_offsets
+                    partition_offsets
             compile_time.hashmapm.add (index h_data sid) k (loop (get_dim_pair k))
     and inl f forall t. : graph t -> () =
         memoize h fun k =>
@@ -190,7 +188,8 @@ inl pass_init forall t_top. (model {graph data} : model t_top) =
 // Prints all the weight layers.
 inl param_print forall t_top. (model {graph data} : model t_top) =
     inl h = compile_time.hashmapm.create()
-    inl get_partition forall t. (k : graph t) : t = partitionm.from_partition_offsets param.array (compile_time.hashmapm.get (fst param.offset) k)
+    inl h_data = index data weight_id()
+    inl get_partition forall t. (k : graph t) : t = partitionm.from_partition_offsets (h_data.array, h_data.size) (compile_time.hashmapm.get h_data.partition k)
     inl rec g forall t. : option (graph t) -> () = function
         | None => ()
         | Some x => f x
@@ -217,7 +216,7 @@ inl create_graph_data (offset : graph_partitions) : graph_data =
         {x with array}
 
 // Extracts the tensor at the top level node.
-inl graph_extract forall t_top indices. (model {graph param output} : model t_top) (indices : indices) : t_top =
+inl graph_extract forall t_top indices. (model {graph data} : model t_top) (indices : indices) : t_top =
     inl rec loop forall t. (graph : graph t) : t =
         match graph with
         | BlockMap(exists a. _,_,Some out) => loop out
@@ -233,23 +232,19 @@ inl graph_extract forall t_top indices. (model {graph param output} : model t_to
             | _ => real_core.error_type "Cannot extract the node for the graph due to the missing key."
         | KeyGraph(_,x) => loop x
         | _ =>
-            match compile_time.hashmapm.try_get (fst param.offset) graph with
-            | Some x => partitionm.from_partition_offsets param.array x
-            | None =>
-                match compile_time.hashmapm.try_get (fst output.offset) graph with
-                | Some (x : partition_of t) => 
-                    inl rec f forall t'. : partition_of t' -> t' = function
-                        | P_D x => partitionm.from_partition_offsets output.array x
-                        | P_P(a,b) => f a, f b
-                    f x
-                | None =>
-                    print_static graph
-                    error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
+            data |> listm.chooseFirst (fun x => 
+                compile_time.hashmapm.try_get x.partition graph 
+                |> optionm.map (partitionm.from_partition_offsets (x.array, x.size))
+                )
+            |> function
+            | Some x => x
+            | None => 
+                print_static graph
+                error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
     loop graph
 
 // Extracts the input tensor from the Key node given the key.
-inl key_extract forall t_top key{symbol} input. (model ({graph param output} & m) : model t_top) (_ : key) : input =
-    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+inl key_extract forall t_top key{symbol} input. (model ({graph data} & m) : model t_top) (_ : key) : input =
     inl h = compile_time.hashmapm.create()
     inl rec g forall t. (x : option input) (out : option (graph t)) : option input =
         match x with
@@ -272,8 +267,7 @@ inl key_extract forall t_top key{symbol} input. (model ({graph param output} & m
             | Apply(exists a. a,b) => pair a b
             | Zip(a,b) => pair a b
             | Pair(a,b) => pair a b
-            | Weight => None
-            | Input => None
+            | Layer => None
             | KeyScalar => None
             | KeyGraph((exists key'. _),graph) =>
                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
@@ -287,20 +281,13 @@ inl key_extract forall t_top key{symbol} input. (model ({graph param output} & m
 // Runs the graph and returns the result in the top level node. Is intended to be used in device code.
 // Does not do any safety checking and is intended for internal use in other graph_run functions.
 // Inserts the block index into the indices variable automatically.
-inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
+inl graph_run forall t_top indices. (model ({graph data} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
     inl h = compile_time.hashmapm.create()
     inl abi t = apply block_index() t
     inl tensor_extract forall t. (graph : graph t) : t = graph_extract (model {m with graph}) indices
     inl rec f forall t. : graph t -> t =
         open primitives
         memoize h fun x =>
-            // inl debug str f =
-            //     if thread_index() = 0 then console.write_ln str
-            //     __syncthreads()
-            //     inl x = f()
-            //     if thread_index() = 0 then console.write_ln "done"
-            //     __syncthreads()
-            //     x
             match x with
             | BlockMap(exists a. g,a,_) =>
                 inl a, out = f a, tensor_extract x
@@ -342,16 +329,13 @@ inl graph_run forall t_top indices. (model ({graph param output} & m) : model t_
             | Zip(a,b) => zip (f a) (f b)
             | Pair(a,b) => f a, f b
             | Apply(exists a. a,b) => apply (f b) (f a)
-            | Weight => tensor_extract x
-            | Input => tensor_extract x
+            | Layer => tensor_extract x
             | KeyGraph => tensor_extract x
             | KeyScalar => tensor_extract x
     f graph
 
 // Runs the kernel on the device.
-inl graph_run_device forall t_top indices. (model {graph param output} & m : model t_top) (ls : layer_state) (indices : indices) =
-    assert (snd param.array = snd param.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
-    assert (snd output.array = snd output.offset) "The sizes of both the pointer storing the data for the graph, and the graph size must be the same."
+inl graph_run_device forall t_top indices. (model {graph data} & m : model t_top) (ls : layer_state) (indices : indices) =
     inl _ = graph_run m ls indices
     ()
 
@@ -447,24 +431,23 @@ inl weight_init forall dim t. (x : tensor dim t) : () =
     cupy.copy_to {from=cupy.random_normal{mean=0; std=loop.prod x.dim |> conv |> (/) 1 |> sqrt} x.dim; to=x}
 inl matmul (b,a) x =
     open partitionm
-    BlockMatmul(x, Weight(!(a,b), weight_init))
+    BlockMatmul(x, Layer(weight_id(), !(a,b), weight_init))
 inl key_scalar forall t key{symbol}. (key : key) : graph t = KeyScalar(exists key)
 inl matmul_ensemble (c,b,a : int * int * int) x =
     open partitionm
-    BlockMatmul(x, Apply(exists Weight(!(c,a,b), weight_init), key_scalar .ensemble))
+    BlockMatmul(x, Apply(exists Layer(weight_id(), !(c,a,b), weight_init), key_scalar .ensemble))
 inl key_graph forall key{symbol}. (key : key) x = KeyGraph((exists key), x)
 inl input forall dim' t key{symbol}. (key : key) (dim' : dim') : graph (tensor dim' t) = 
     open partitionm
-    KeyGraph((exists key), Input !dim')
+    KeyGraph((exists key), Layer(output_id(), !dim', const ()))
 inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : graph (tensor b t) = Apply(exists a, key_scalar b)
 inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)
 
 inl create_model forall t. (graph : graph t) =
     inl dims = compile_time.hashmapm.create()
-    inl param = create_graph_data (pass_offset_param graph dims)
-    inl output = create_graph_data (pass_offset_output graph dims)
+    inl data = create_graph_data (pass_calculate_partitions num_spaces() graph dims)
     compile_time.hashmapm.set_immutable(dims)
-    model {graph param output dims}
+    model {graph data dims}
 
 nominal model_data = {param : ptr * size; output : ptr * size}
 
