@@ -244,6 +244,33 @@ inl graph_extract forall t_top indices. (model {graph data} : model t_top) (indi
     loop graph
 
 // Extracts the input tensor from the Key node given the key.
+inl keys_extract forall t_top key{symbol}. (model ({graph data} & m) : model t_top) (_ : key) : list (exists t. t) =
+    inl h = compile_time.hashmapm.create()
+    inl rec g forall t. (out : option (graph t)) : list (exists t. t) =
+        match out with
+        | Some x => f x
+        | None => []
+    and inl pair forall a b. (a : graph a) (b : graph b) : list (exists t. t) = listm.append (f a) (f b)
+    and inl f forall t. : graph t -> list (exists t. t)=
+        memoize h function
+            | BlockMap(exists a. _,a,out) => listm.append (f a) (g out)
+            | BlockRowMap(exists a. _,a,out) => listm.append (f a) (g out)
+            | BlockRowReduce(exists a. _,a,out) => listm.append (f a) (g out)
+            | BlockRowMapReduce(exists a. _,a,out) => listm.append (f a) (g out)
+            | BlockMatmul(a,b) => listm.append (f a) (f b)
+            | Apply(exists a. a,b) => listm.append (f a) (f b)
+            | Zip(a,b) => listm.append (f a) (f b)
+            | Pair(a,b) => listm.append (f a) (f b)
+            | Layer => []
+            | KeyScalar => []
+            | KeyGraph((exists key'. _),graph) =>
+                if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
+                    inl g = graph_extract (model {m with graph}) {}
+                    [exists g]
+                else f graph
+    f graph
+
+// Extracts the input tensor from the Key node given the key.
 inl key_extract forall t_top key{symbol} input. (model ({graph data} & m) : model t_top) (_ : key) : input =
     inl h = compile_time.hashmapm.create()
     inl rec g forall t. (x : option input) (out : option (graph t)) : option input =
