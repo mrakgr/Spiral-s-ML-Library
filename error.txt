@@ -1,0 +1,151 @@
+Error trace on line: 297, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. g,a,_) =>
+              ^
+Error trace on line: 302, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. g,a,_) =>
+              ^
+Error trace on line: 307, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. g,a,_) =>
+              ^
+Error trace on line: 312, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) =>
+              ^
+Error trace on line: 312, column: 27 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) =>
+                          ^
+Error trace on line: 313, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a,b,out = f a, f b, tensor_extract x
+                ^
+Error trace on line: 313, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a,b,out = f a, f b, tensor_extract x
+                    ^
+Error trace on line: 313, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl a,b,out = f a, f b, tensor_extract x
+                      ^
+Error trace on line: 314, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl alpha, beta : float * float = 1, 0
+                ^
+Error trace on line: 314, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl alpha, beta : float * float = 1, 0
+                    ^
+Error trace on line: 315, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                inl () =
+                ^
+Error trace on line: 316, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    inl a, out = abi a, abi out
+                    ^
+Error trace on line: 316, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    inl a, out = abi a, abi out
+                        ^
+Error trace on line: 319, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                        typecase t with
+                        ^
+Error trace on line: 321, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl noinline_graph_run_matmul () = matmul.matmul_tf32' false true alpha a b beta out
+                            ^
+Error trace on line: 322, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            noinline_graph_run_matmul()
+                            ^
+Error trace on line: 321, column: 59 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl noinline_graph_run_matmul () = matmul.matmul_tf32' false true alpha a b beta out
+                                                          ^
+Error trace on line: 321, column: 64 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                            inl noinline_graph_run_matmul () = matmul.matmul_tf32' false true alpha a b beta out
+                                                               ^
+Error trace on line: 22, column: 5 in module: c:\Spiral_s_ML_Library\ml\matmul\run.spi.
+    inl m,n = c.dim
+    ^
+Error trace on line: 22, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\run.spi.
+    inl m,n = c.dim
+        ^
+Error trace on line: 23, column: 5 in module: c:\Spiral_s_ML_Library\ml\matmul\run.spi.
+    inl _,k = swap a_transpose a.dim
+    ^
+Error trace on line: 23, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\run.spi.
+    inl _,k = swap a_transpose a.dim
+        ^
+Error trace on line: 24, column: 5 in module: c:\Spiral_s_ML_Library\ml\matmul\run.spi.
+    matmul_tf32_template (matmul_config_tf32 a_transpose b_transpose m n k) alpha a b beta c
+    ^
+Error trace on line: 41, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl div x = loop.div x
+        ^
+Error trace on line: 42, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl _ =
+        ^
+Error trace on line: 51, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl split_a {m k} (a : tensor (int * int) float) =
+        ^
+Error trace on line: 64, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl split_b {n k} (b : tensor (int * int) float) =
+        ^
+Error trace on line: 77, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl split_c {m n} (c : tensor (int * int) float) =
+        ^
+Error trace on line: 82, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl a = split_a {m=m_tile; k=k_tile} a    
+        ^
+Error trace on line: 83, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl b = split_b {n=n_tile; k=k_tile} b
+        ^
+Error trace on line: 84, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl c = split_c {m=m_tile; n=n_tile} c
+        ^
+Error trace on line: 86, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        global "#include <mma.h>"
+        ^
+Error trace on line: 87, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        global "using namespace nvcuda;"
+        ^
+Error trace on line: 93, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl pipe = make_pipeline_thread()
+        ^
+Error trace on line: 95, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+        ^
+Error trace on line: 95, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+            ^
+Error trace on line: 95, column: 28 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl a_shared_tile, b_shared_tile, c_shared_tile = 
+                           ^
+Error trace on line: 102, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl c_shared_frag = split_c {m=m_frag; n=n_frag} c_shared_tile
+        ^
+Error trace on line: 103, column: 9 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+        inl {proj_small=(m_proj_warp, n_proj_warp) dim_small=(m_warp, n_warp) dim_linear=(m_local, n_local)} =
+        ^
+Error trace on line: 104, column: 13 in module: c:\Spiral_s_ML_Library\ml\matmul\kernel.spi.
+            loop.rigid_split' (warps_in_block (fst c_shared_frag.dim))
+            ^
+Error trace on line: 115, column: 31 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+inl rigid_split' forall dim. ({from nearTo by} : range dim) : {proj_small : dim; dim_small : dim; dim_linear : dim} =
+                              ^
+Error trace on line: 116, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_small, dim_linear = rigid_split by nearTo
+    ^
+Error trace on line: 116, column: 33 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl dim_small, dim_linear = rigid_split by nearTo
+                                ^
+Error trace on line: 96, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl a, (i : int) = real
+    ^
+Error trace on line: 96, column: 9 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    inl a, (i : int) = real
+        ^
+Error trace on line: 102, column: 5 in module: c:\Spiral_s_ML_Library\corebase\loop.spi.
+    assert (i = 1) "The integer length must be distributed in its entirety."
+    ^
+Error trace on line: 145, column: 50 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 267, column: 5 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 268, column: 9 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 268, column: 40 in module: c:\Spiral_s_ML_Library\corebase\real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+The integer length must be distributed in its entirety.

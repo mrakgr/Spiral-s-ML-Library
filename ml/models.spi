@@ -110,5 +110,5 @@ inl from_model_data forall inp out.
 
 inl init forall a b. (game_graph {graph=(exists t. graph) input output} : game_graph a b) : game_model a b = 
     inl model = create_model graph
-    param_init model
+    pass_init model
     game_model { input output model = exists model }

@@ -249,7 +249,7 @@ inl from_model_data forall inp out.
 
 inl init forall a b. (cfr_game_graph {graph sizes input output} : cfr_game_graph a b) : cfr_game_model a b = 
     inl model = create_model graph
-    param_init model
+    pass_init model
     cfr_game_model { sizes input output model }
 
 // Calculates the policy and the value array updates.

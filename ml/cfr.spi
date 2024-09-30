@@ -305,7 +305,7 @@ inl test1() =
 
     inl graph = graph(sizes)
     inl model = layers.create_model graph
-    layers.param_init model
+    layers.pass_init model
 
     run fun () =>
         inl grid = cooperative_groups.create_grid()

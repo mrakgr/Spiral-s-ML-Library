@@ -102,7 +102,7 @@ inl test3() =
             )
 
     inl model = create_model graph
-    param_init model
+    pass_init model
     
     inl game_model =
         ml.models.game_model {

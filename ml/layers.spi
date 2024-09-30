@@ -117,8 +117,8 @@ inl rec get_dim_pair forall t_top. (h : graph_dims) : graph t_top -> dim_of t_to
         )
 and inl get_dim forall dim t. (h : graph_dims) (x : graph (tensor dim t)) : dim = match get_dim_pair h x with D_D x => x
 
-inl pass_calculate_partitions forall t_top. (space_id : space_id) (x : graph t_top) (dims : graph_dims) : graph_partitions =
-    inl h_data = listm.init space_id <| fun _ => compile_time.hashmapm.create()
+inl pass_calculate_partitions forall t_top. (x : graph t_top) (dims : graph_dims) : graph_partitions =
+    inl h_data = listm.init num_spaces() fun _ => compile_time.hashmapm.create()
     inl offset_key = .offset
 
     inl h = compile_time.hashmapm.create()
@@ -445,24 +445,21 @@ inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)
 
 inl create_model forall t. (graph : graph t) =
     inl dims = compile_time.hashmapm.create()
-    inl data = create_graph_data (pass_calculate_partitions num_spaces() graph dims)
+    inl data = create_graph_data (pass_calculate_partitions graph dims)
     compile_time.hashmapm.set_immutable(dims)
     model {graph data dims}
 
-nominal model_data = {param : ptr * size; output : ptr * size}
+// The size of the array is bound to num_spaces.
+nominal model_ptrs = array ptr
 
-inl model_to_model_data (x : model _) = model_data {param=x.param.array; output=x.output.array}
-inl model_data_to_model (graph : graph _) (d : model_data) =
+inl model_to_model_data (x : model _) = model_ptrs (arraym.init num_spaces() (index x.data >> fun x => x.array))
+inl model_data_to_model (graph : graph _) (model_ptrs d) =
     inl dims = compile_time.hashmapm.create()
-    inl param = pass_offset_param graph dims
-    assert (snd param = snd d.param) "The params needs to have matching offsets."
-    inl output = pass_offset_output graph dims
-    assert (snd output = snd d.output) "The outputs needs to have matching offsets."
+    inl data = 
+        pass_calculate_partitions graph dims
+        |> listm.mapi (fun i x => {x with array = index d i})
     compile_time.hashmapm.set_immutable(dims)
-    model { graph dims
-        param = { array = fst d.param, snd param; offset = param }
-        output = { array = fst d.output, snd output; offset = output }
-        }
+    model { graph dims data }
 
 type d2 = int * int
 type d3 = int * int * int
@@ -485,7 +482,7 @@ inl test1() =
     
     console.write_ln "---"
     param_print model
-    param_init model
+    pass_init model
     console.write_ln "Done initing."
     param_print model
     ()
@@ -505,7 +502,7 @@ inl test2() =
 
     inl model = create_model graph
     console.write_ln "---"
-    param_init model
+    pass_init model
     console.write_ln "Here are the weight matrices."
     param_print model
     console.write_ln "Here is the input tensor."
@@ -522,18 +519,18 @@ inl test3() =
     cupy.set_random_seed(cupy.constant_seed())
     testing.redirect_io_into "test_text_outputs/layers/" "test3" "layers.txt" fun () =>
     inl graph : graph (tensor d3 float * tensor d2 int) =
-        (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
-        |> matmul (8,16)
+        (input .input (blocks_per_grid(),64,64) : graph (tensor _ float))
+        |> matmul (64,64)
         |> ln_l2
         |> relu
-        |> matmul (16,16)
+        |> matmul (64,64)
         |> ln_l2
         |> relu
-        |> matmul (16,16)
+        |> matmul (64,64)
         |> softmax_and_discrete_sample
 
     inl model = create_model graph
-    param_init model
+    pass_init model
     console.write_ln "Here are the weight matrices."
     param_print model
     inl input : tensor d3 float = key_extract model .input
@@ -557,21 +554,21 @@ inl test4() =
     testing.redirect_io_into "test_text_outputs/layers/" "test4" "layers.txt" fun () =>
     inl ensemble = 16
     inl graph : graph (tensor d3 float * tensor d2 int) =
-        (input .input (blocks_per_grid(),16,8) : graph (tensor _ float))
-        |> matmul_ensemble (ensemble,8,16)
+        (input .input (blocks_per_grid(),64,64) : graph (tensor _ float))
+        |> matmul_ensemble (ensemble,64,64)
         |> ln_l2
         |> relu
-        |> matmul_ensemble (ensemble,16,16)
+        |> matmul_ensemble (ensemble,64,64)
         |> ln_l2
         |> relu
-        |> matmul_ensemble (ensemble,16,16)
+        |> matmul_ensemble (ensemble,64,64)
         |> softmax_and_discrete_sample' (
-            pair (input .output_probs   (ensemble,blocks_per_grid(),16,16) |> apply .ensemble) 
-                 (input .output_indices (ensemble,blocks_per_grid(),16) |> apply .ensemble)
+            pair (input .output_probs   (ensemble,blocks_per_grid(),64,64) |> apply .ensemble) 
+                 (input .output_indices (ensemble,blocks_per_grid(),64) |> apply .ensemble)
             )
 
     inl model = create_model graph
-    param_init model
+    pass_init model
     console.write_ln "Here are the weight matrices."
     param_print model
     inl input : tensor d3 float = key_extract model .input
@@ -592,24 +589,23 @@ inl test4() =
 inl test5() =
     cupy.set_random_seed(cupy.constant_seed())
     testing.redirect_io_into "test_text_outputs/layers/" "test5" "layers.txt" fun () =>
-    inl inner : int = 32 * 4 * 64
     inl ensemble : int = 4
     inl graph =
-        (input .input (blocks_per_grid(),threads_per_block(),inner) : graph (tensor _ float))
-        |> matmul_ensemble (ensemble,inner,inner)
+        (input .input (blocks_per_grid(),64,64) : graph (tensor _ float))
+        |> matmul_ensemble (ensemble,64,64)
         // |> ln_l2
         // |> relu
-        // |> matmul_ensemble (ensemble,inner,inner)
+        // |> matmul_ensemble (ensemble,64,64)
         // |> ln_l2
         // |> relu
-        // |> matmul_ensemble (ensemble,inner,inner)
+        // |> matmul_ensemble (ensemble,64,64)
         |> masked_softmax_and_discrete_sample' 11 (
-            pair (input .output_probs   (ensemble,blocks_per_grid(),threads_per_block(),inner) |> apply .ensemble) 
-                 (input .output_indices (ensemble,blocks_per_grid(),threads_per_block()) |> apply .ensemble)
+            pair (input .output_probs   (ensemble,blocks_per_grid(),64,64) |> apply .ensemble) 
+                 (input .output_indices (ensemble,blocks_per_grid(),64) |> apply .ensemble)
             )
 
     inl model = create_model graph
-    param_init model
+    pass_init model
     // console.write_ln "Here are the weight matrices."
     // param_print model
     inl input : tensor d3 float = key_extract model .input

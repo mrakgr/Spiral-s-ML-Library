@@ -90,10 +90,10 @@ modules:
         pickler
 
     ml/
+        primitives
         matmul/
             kernel
             run-
-        primitives
         layers
         cfr
         models
