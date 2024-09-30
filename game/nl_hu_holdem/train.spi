@@ -169,7 +169,7 @@ inl vs_self (neural : state_neural) =
             inl grid = cooperative_groups.create_grid()
             random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
             |> state_to_internal_train grid
-        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+        inl model = ml.cfr_models.from_model_ptrs model.game_graph() neural.model_ptrs
         loop.linear config.outer fun (outer : int) =>
             loop.linear config.inner fun (inner : int) =>
                 // Does a training run, modifying the trace state.
@@ -202,7 +202,7 @@ inl vs_rando (neural : state_neural) =
             inl grid = cooperative_groups.create_grid()
             random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
             |> state_to_internal_train grid
-        inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+        inl model = ml.cfr_models.from_model_ptrs model.game_graph() neural.model_ptrs
         loop.linear config.outer fun (outer : int) =>
             loop.linear config.inner fun (inner : int) =>
                 // The loop uses less registers than a noinline function.

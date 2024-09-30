@@ -91,9 +91,9 @@ inl graph (size : sizes) : _ (model * trace * trace_state) =
         $"!(real average.bodies.array)[:] = !init_value"
 
     inl (<|) a b = layers.pair a b
-    (layers.key_graph .cfr_model layers.Weight(model, fun x => init_zero x . init_average x))
-    <| (layers.key_graph .cfr_trace layers.Input(trace))
-    <| (layers.key_graph .cfr_trace_state layers.Weight(trace_state, init_zero))
+    (layers.key_graph .cfr_model (layers.weight' model (fun x => init_zero x . init_average x)))
+    <| (layers.key_graph .cfr_trace (layers.input' trace))
+    <| (layers.key_graph .cfr_trace_state (layers.weight' trace_state init_zero))
 
 inl get_prob config (action_id : action_id) (probs : tensor _ (prob * action_id)) =
     open primitives

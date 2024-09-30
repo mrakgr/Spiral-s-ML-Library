@@ -34826,7 +34826,7 @@ def method41(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
     del v0
     return v1, v2, v3, v4
 def method40(v0 : object) -> Tuple[cp.ndarray, u64, cp.ndarray, u64]:
-    v1 = v0["model_data"] # type: ignore
+    v1 = v0["model_ptrs"] # type: ignore
     del v0
     v2, v3, v4, v5 = method41(v1)
     del v1
@@ -36892,7 +36892,7 @@ def method149(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
 def method148(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
     v4 = method149(v0, v1, v2, v3)
     del v0, v1, v2, v3
-    v5 = {'model_data': v4}
+    v5 = {'model_ptrs': v4}
     del v4
     return v5
 def method112(v0 : u64, v1 : US3, v2 : static_array_list, v3 : static_array, v4 : US6, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:

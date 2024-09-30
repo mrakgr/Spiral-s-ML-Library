@@ -84,7 +84,7 @@ inl play_loop (neural : state_neural) (state : state_internal_play) node =
             match index state.pl_type table.player_turn with
             | Computer =>
                 open model
-                inl model = ml.cfr_models.from_model_data model.game_graph() neural.model_data
+                inl model = ml.cfr_models.from_model_ptrs model.game_graph() neural.model_ptrs
                 inl data = table, state.messages
                 inl action = 
                     ml.cfr_models.run (refm.from_local state.rng) model data |> action_conv table

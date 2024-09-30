@@ -429,9 +429,10 @@ inl binarize' forall dim t{float;number}. modulo out (x : graph (tensor (int * d
 // Takes the sqrt of the product of the tensor dimensions.
 inl weight_init forall dim t. (x : tensor dim t) : () =
     cupy.copy_to {from=cupy.random_normal{mean=0; std=loop.prod x.dim |> conv |> (/) 1 |> sqrt} x.dim; to=x}
-inl matmul (b,a) x =
-    open partitionm
-    BlockMatmul(x, Layer(weight_id(), !(a,b), weight_init))
+inl weight' x init = Layer(weight_id(), x, init)
+inl weight x = open partitionm in weight' !x weight_init
+inl input' x = Layer(output_id(), x, const ())
+inl matmul (b,a) x = BlockMatmul(x, weight (a,b))
 inl key_scalar forall t key{symbol}. (key : key) : graph t = KeyScalar(exists key)
 inl matmul_ensemble (c,b,a : int * int * int) x =
     open partitionm
@@ -452,8 +453,8 @@ inl create_model forall t. (graph : graph t) =
 // The size of the array is bound to num_spaces.
 nominal model_ptrs = array ptr
 
-inl model_to_model_data (x : model _) = model_ptrs (arraym.init num_spaces() (index x.data >> fun x => x.array))
-inl model_data_to_model (graph : graph _) (model_ptrs d) =
+inl model_to_model_ptrs (x : model _) = model_ptrs (arraym.init num_spaces() (index x.data >> fun x => x.array))
+inl model_ptrs_to_model (graph : graph _) (model_ptrs d) =
     inl dims = compile_time.hashmapm.create()
     inl data = 
         pass_calculate_partitions graph dims

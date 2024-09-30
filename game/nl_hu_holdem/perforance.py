@@ -12141,7 +12141,7 @@ def method100(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
 def method99(v0 : cp.ndarray, v1 : u64, v2 : cp.ndarray, v3 : u64) -> object:
     v4 = method100(v0, v1, v2, v3)
     del v0, v1, v2, v3
-    v5 = {'model_data': v4}
+    v5 = {'model_ptrs': v4}
     del v4
     return v5
 def method63(v0 : u64, v1 : US1, v2 : static_array_list, v3 : static_array, v4 : US5, v5 : cp.ndarray, v6 : u64, v7 : cp.ndarray, v8 : u64) -> object:
