@@ -49,6 +49,8 @@ union rec graph t =
     | Apply :: forall b el. (exists a. graph (tensor (a * b) el) * graph a) -> graph (tensor b el)
     | KeyGraph :: forall t. (exists key{symbol}. key) * graph t -> graph t
     | KeyScalar :: forall t. (exists key{symbol}. key) -> graph t
+    | Fst :: forall a. (exists b. graph (a * b)) -> graph a
+    | Snd :: forall b. (exists a. graph (a * b)) -> graph b
 union rec dim_of t =
     | D_D :: forall dim t. dim -> dim_of (tensor dim t)
     | D_P :: forall a b. dim_of a * dim_of b -> dim_of (a * b)
@@ -115,6 +117,8 @@ inl rec get_dim_pair forall t_top. (h : graph_dims) : graph t_top -> dim_of t_to
                 error_type "Can only get the dimension of a singleton layer. Check the terminal to see the type of the Layer node."
         | KeyGraph(_,x) => f' x
         | Apply(exists a. a,b) => D_D(snd (f a))
+        | Fst(exists b. x) => inl (D_P(a,b)) = f' x in a
+        | Snd(exists a. x) => inl (D_P(a,b)) = f' x in b
         )
 and inl get_dim forall dim t. (h : graph_dims) (x : graph (tensor dim t)) : dim = match get_dim_pair h x with D_D x => x
 
@@ -149,9 +153,11 @@ inl pass_calculate_partitions forall t_top. (x : graph t_top) (dims : graph_dims
             | BlockRowReduce(exists a. _,a,out) => f a . g k out
             | BlockRowMapReduce(exists a. _,a,out) => f a . g k out
             | BlockMatmul(a,b) => f a . f b . g k None
-            | Zip(a,b) => f a . f b // passthrough
-            | Pair(a,b) => f a . f b // passthrough
-            | Apply(exists a. a,b) => f a . f b // passthrough
+            | Zip(a,b) => f a . f b
+            | Pair(a,b) => f a . f b
+            | Apply(exists a. a,b) => f a . f b
+            | Fst(exists a. x) => f x
+            | Snd(exists b. x) => f x
             | Layer(sid,p,_) as k =>
                 inl partition_offsets : _ t = p |> partitionm.calculate_offsets get_offset(sid)
                 compile_time.hashmapm.add (index h_data sid) k partition_offsets
@@ -162,52 +168,6 @@ inl pass_calculate_partitions forall t_top. (x : graph t_top) (dims : graph_dims
     f x
     listm.iter compile_time.hashmapm.set_immutable h_data
     listm.map (fun h => {partition=h; size=get_offset' h}) h_data
-
-// Initializes the parameters of a NN on the host.
-inl pass_init forall t_top. (model {graph data} : model t_top) =
-    inl h = compile_time.hashmapm.create()
-    inl rec g forall t. : option (graph t) -> () = function
-        | None => ()
-        | Some x => f x
-    and inl f forall t. : graph t -> () =
-        memoize h function
-            | BlockMap(exists a. _,a,out)  => f a . g out
-            | BlockRowMap(exists a. _,a,out) => f a . g out
-            | BlockRowReduce(exists a. _,a,out) => f a . g out
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
-            | BlockMatmul(a,b) => f a . f b
-            | Zip(a,b) => f a . f b
-            | Pair(a,b) => f a . f b
-            | Layer(sid, _, init) as k => 
-                inl x = index data sid
-                partitionm.from_partition_offsets (x.array, x.size) (compile_time.hashmapm.get x.partition k) |> init . ()
-            | Apply(exists a. a,b) => f a . f b
-            | KeyGraph(_,x) => f x
-            | KeyScalar => ()
-    f graph
-
-// Prints all the weight layers.
-inl param_print forall t_top. (model {graph data} : model t_top) =
-    inl h = compile_time.hashmapm.create()
-    inl h_data = index data weight_id()
-    inl get_partition forall t. (k : graph t) : t = partitionm.from_partition_offsets (h_data.array, h_data.size) (compile_time.hashmapm.get h_data.partition k)
-    inl rec g forall t. : option (graph t) -> () = function
-        | None => ()
-        | Some x => f x
-    and inl f forall t. : graph t -> () =
-        memoize h function
-            | BlockMap(exists a. _,a,out)  => f a . g out
-            | BlockRowMap(exists a. _,a,out) => f a . g out
-            | BlockRowReduce(exists a. _,a,out) => f a . g out
-            | BlockRowMapReduce(exists a. _,a,out) => f a . g out
-            | BlockMatmul(a,b) => f a . f b
-            | Zip(a,b) => f a . f b
-            | Pair(a,b) => f a . f b
-            | Layer(sid,_,_) as x => if sid = weight_id() then get_partition x |> console.write_ln
-            | Apply(exists a. a,b) => f a . f b
-            | KeyGraph(_,x) => f x
-            | KeyScalar => ()
-    f graph
 
 // Allocates an array given the graph offset.
 inl create_graph_data (offset : graph_partitions) : graph_data =
@@ -223,7 +183,7 @@ inl graph_extract_ forall t_top indices. layer_state (model {graph data} : model
             | None => print_static graph . error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
             | Some x => x
         inl handle_data_elem (x : graph_data_elem) =
-            compile_time.hashmapm.try_get x.partition graph 
+            compile_time.hashmapm.try_get x.partition graph
             |> optionm.map (partitionm.from_partition_offsets (x.array, x.size))
         inl extract_current () : t = data |> listm.chooseFirst handle_data_elem |> handle_body
         inl try_out = function
@@ -296,68 +256,72 @@ inl graph_extract model indices = graph_extract_ None model indices
 // Inserts the block index into the indices variable automatically.
 inl graph_run forall t_top indices. (model : model t_top) (ls : layer_state) (indices : indices) : t_top = graph_extract_ (Some ls) model indices
 
+type layer = exists t. space_id * t * (t -> ())
 
-// // Extracts the input tensor from the Key node given the key.
-// inl keys_extract forall t_top key{symbol}. (model ({graph data} & m) : model t_top) (_ : key) : list (exists t. t) =
-//     inl h = compile_time.hashmapm.create()
-//     inl rec g forall t. (out : option (graph t)) : list (exists t. t) =
-//         match out with
-//         | Some x => f x
-//         | None => []
-//     and inl pair forall a b. (a : graph a) (b : graph b) : list (exists t. t) = listm.append (f a) (f b)
-//     and inl f forall t. : graph t -> list (exists t. t)=
-//         memoize h function
-//             | BlockMap(exists a. _,a,out) => listm.append (f a) (g out)
-//             | BlockRowMap(exists a. _,a,out) => listm.append (f a) (g out)
-//             | BlockRowReduce(exists a. _,a,out) => listm.append (f a) (g out)
-//             | BlockRowMapReduce(exists a. _,a,out) => listm.append (f a) (g out)
-//             | BlockMatmul(a,b) => listm.append (f a) (f b)
-//             | Apply(exists a. a,b) => listm.append (f a) (f b)
-//             | Zip(a,b) => listm.append (f a) (f b)
-//             | Pair(a,b) => listm.append (f a) (f b)
-//             | Layer => []
-//             | KeyScalar => []
-//             | KeyGraph((exists key'. _),graph) =>
-//                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-//                     inl g = graph_extract (model {m with graph}) {}
-//                     [exists g]
-//                 else f graph
-//     f graph
-
-// Extracts the input tensor from the Key node given the key.
-inl key_extract forall t_top key{symbol} input. (model ({graph data} & m) : model t_top) (_ : key) : input =
+// Extracts all the layers into a list.
+inl extract_layers forall t_top. (model ({graph data} & m) : model t_top) : list layer =
     inl h = compile_time.hashmapm.create()
-    inl rec g forall t. (x : option input) (out : option (graph t)) : option input =
-        match x with
-        | Some => x
-        | None =>
-            match out with
-            | Some x => f x
-            | None => None
-    and inl pair forall a b. (a : graph a) (b : graph b) : option input =
-        match f a with
-        | None => f b
-        | a => a
-    and inl f forall t. : graph t -> option input =
+    inl list_key = .list_key
+    inl get_current() : list layer = compile_time.hashmapm.try_get h list_key |> optionm.defaultWith []
+    inl add_item (x : layer) = compile_time.hashmapm.set h list_key (x :: get_current())
+    inl rec f forall t. : graph t -> () =
         memoize h function
-            | BlockMap(exists a. _,a,out) => g (f a) out
-            | BlockRowMap(exists a. _,a,out) => g (f a) out
-            | BlockRowReduce(exists a. _,a,out) => g (f a) out
-            | BlockRowMapReduce(exists a. _,a,out) => g (f a) out
-            | BlockMatmul(a,b) => pair a b
-            | Apply(exists a. a,b) => pair a b
-            | Zip(a,b) => pair a b
-            | Pair(a,b) => pair a b
-            | Layer => None
-            | KeyScalar => None
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockRowMap(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockRowReduce(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockRowMapReduce(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockMatmul(a,b) => f a . f b
+            | Apply(exists a. a,b) => f a . f b
+            | Zip(a,b) => f a . f b
+            | Pair(a,b) => f a . f b
+            | Fst(exists a. x) => f x
+            | Snd(exists b. x) => f x
+            | Layer(sid,_,init) as graph =>
+                inl g = graph_extract (model {m with graph}) {}
+                add_item (exists sid, g, init)
+            | KeyScalar => ()
+            | KeyGraph(_,graph) => f graph
+    f graph
+    get_current() |> listm.rev
+
+// Initializes the layers on the host.
+inl pass_init forall t_top. (m : model t_top) = extract_layers m |> listm.iter fun (exists t. sid, g, init) => init g
+
+// Prints all the layer parameters.
+inl param_print forall t_top. (m : model t_top) = extract_layers m |> listm.iter fun (exists t. sid, g, init) => console.write_ln g
+
+// Extracts the input tensors from the Key nodes given the key.
+inl key_extract_list forall t_top key{symbol} input. (model ({graph data} & m) : model t_top) (_ : key) : list input =
+    inl h = compile_time.hashmapm.create()
+    inl list_key = .list_key
+    inl get_current() : list input = compile_time.hashmapm.try_get h list_key |> optionm.defaultWith []
+    inl add_item (x : input) = compile_time.hashmapm.set h list_key (x :: get_current())
+    inl rec f forall t. : graph t -> () =
+        memoize h function
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockRowMap(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockRowReduce(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockRowMapReduce(exists a. _,a,out) => f a . optionm.iter f out
+            | BlockMatmul(a,b) => f a . f b
+            | Apply(exists a. a,b) => f a . f b
+            | Zip(a,b) => f a . f b
+            | Pair(a,b) => f a . f b
+            | Layer => ()
+            | KeyScalar => ()
             | KeyGraph((exists key'. _),graph) =>
                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
                     inl g = graph_extract (model {m with graph}) {}
-                    Some (real g : input)
+                    add_item (real g : input) // If you get a type error here, then the input type doesn't match graph type.
                 else f graph
-    match f graph with
-    | Some x => x
-    | None => error_type "Cannot find the input tensor with the given key."
+    f graph
+    get_current() |> listm.rev
+
+// Extracts the input tensor from the Key nodes given the key. Gives a type error if there is more than one input tensor with the key, or if there isn't one.
+inl key_extract forall t_top key{symbol} input. (m : model t_top) (key : key) : input =
+    match key_extract_list m key with
+    | [] => error_type "Cannot find the input tensor with the given key."
+    | [x] => x
+    | _ => error_type "More than one tensor with the given key found."
 
 // Runs the kernel on the device.
 inl graph_run_device forall t_top indices. (model {graph data} & m : model t_top) (ls : layer_state) (indices : indices) =
