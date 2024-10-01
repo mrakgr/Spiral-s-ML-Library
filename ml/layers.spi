@@ -11,7 +11,8 @@ inl num_spaces() : space_id = 3
 
 type graph_dims = compile_time.hashmap
 type graph_partitions = list {partition : compile_time.hashmap; size : size}
-type graph_data = list {array : ptr; partition : compile_time.hashmap; size : size}
+type graph_data_elem = {array : ptr; partition : compile_time.hashmap; size : size}
+type graph_data = list graph_data_elem
 
 nominal layer_state = 
     {
@@ -215,60 +216,113 @@ inl create_graph_data (offset : graph_partitions) : graph_data =
         assert (size >= x.size) "The created array has to be equal or greater to the given size."
         {x with array}
 
-// Extracts the tensor at the top level node.
-inl graph_extract forall t_top indices. (model {graph data} : model t_top) (indices : indices) : t_top =
+inl graph_extract_ forall t_top indices. layer_state (model {graph data} : model t_top) (indices : indices) : t_top =
+    inl abi t = apply block_index() t
     inl rec loop forall t. (graph : graph t) : t =
+        inl handle_body = function
+            | None => print_static graph . error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
+            | Some x => x
+        inl handle_data_elem (x : graph_data_elem) =
+            compile_time.hashmapm.try_get x.partition graph 
+            |> optionm.map (partitionm.from_partition_offsets (x.array, x.size))
+        inl extract_current () : t = data |> listm.chooseFirst handle_data_elem |> handle_body
+        inl try_out = function
+            | Some out => loop out
+            | None => extract_current()
         match graph with
-        | BlockMap(exists a. _,_,Some out) => loop out
-        | BlockRowMap(exists a. _,_,Some out) => loop out
-        | BlockRowReduce(exists a. _,_,Some out) => loop out
-        | BlockRowMapReduce(exists a. _,_,Some out) => loop out
+        | BlockMap(exists a. g,a,out) => 
+            inl out = try_out out
+            layer_state |> optionm.iter fun ls =>
+                inl a = loop a
+                inl g = g ls
+                let block_map() = primitives.map g (abi a) (abi out)
+                block_map()
+            out
+        | BlockRowMap(exists a. g,a,out) => 
+            inl out = try_out out
+            layer_state |> optionm.iter fun ls =>
+                inl a = loop a
+                inl g = g ls
+                let block_row_map() = primitives.row_map g (abi a) (abi out)
+                block_row_map()
+            out
+        | BlockRowReduce(exists a. g,a,out) =>
+            inl out = try_out out
+            layer_state |> optionm.iter fun ls =>
+                inl a = loop a
+                inl g = g ls
+                let block_row_reduce() = primitives.row_reduce g (abi a) (abi out)
+                block_row_reduce()
+            out
+        | BlockRowMapReduce(exists a. g,a,out) =>
+            inl (out_map, out_reduce as out) = try_out out
+            layer_state |> optionm.iter fun ls =>
+                inl a = loop a
+                inl g = g ls
+                let block_row_map_reduce () = primitives.row_map_reduce g (abi a) (abi out_map) (abi out_reduce)
+                block_row_map_reduce()
+            out
+        | BlockMatmul(a,b) =>
+            inl a,b,out = loop a, loop b, extract_current()
+            inl alpha, beta : float * float = 1, 0
+            let block_matmul() =
+                inl a, out = abi a, abi out
+                real
+                    open real_core
+                    typecase t with
+                    | tensor _ f32 => matmul.matmul_tf32' false true alpha (abi a) b beta (abi out)
+                    | _ => 
+                        !!!!PrintStatic(`t)
+                        error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
+            block_matmul()
+            out
         | Zip(a,b) => zip (loop a) (loop b)
         | Pair(a,b) => loop a, loop b
+        | Layer(sid,_,_) => index data sid |> handle_data_elem |> handle_body
         | Apply(exists a. a,b) => apply (loop b) (loop a)
+        | KeyGraph(_,x) => loop x
         | KeyScalar(exists k. k) => real 
             match indices with
             | {$k=x} => x : t
             | _ => real_core.error_type "Cannot extract the node for the graph due to the missing key."
-        | KeyGraph(_,x) => loop x
-        | _ =>
-            data |> listm.chooseFirst (fun x => 
-                compile_time.hashmapm.try_get x.partition graph 
-                |> optionm.map (partitionm.from_partition_offsets (x.array, x.size))
-                )
-            |> function
-            | Some x => x
-            | None => 
-                print_static graph
-                error_type "Cannot find the offset in the dictionaries. Check the output in the terminal to see which node it is."
+
     loop graph
 
-// Extracts the input tensor from the Key node given the key.
-inl keys_extract forall t_top key{symbol}. (model ({graph data} & m) : model t_top) (_ : key) : list (exists t. t) =
-    inl h = compile_time.hashmapm.create()
-    inl rec g forall t. (out : option (graph t)) : list (exists t. t) =
-        match out with
-        | Some x => f x
-        | None => []
-    and inl pair forall a b. (a : graph a) (b : graph b) : list (exists t. t) = listm.append (f a) (f b)
-    and inl f forall t. : graph t -> list (exists t. t)=
-        memoize h function
-            | BlockMap(exists a. _,a,out) => listm.append (f a) (g out)
-            | BlockRowMap(exists a. _,a,out) => listm.append (f a) (g out)
-            | BlockRowReduce(exists a. _,a,out) => listm.append (f a) (g out)
-            | BlockRowMapReduce(exists a. _,a,out) => listm.append (f a) (g out)
-            | BlockMatmul(a,b) => listm.append (f a) (f b)
-            | Apply(exists a. a,b) => listm.append (f a) (f b)
-            | Zip(a,b) => listm.append (f a) (f b)
-            | Pair(a,b) => listm.append (f a) (f b)
-            | Layer => []
-            | KeyScalar => []
-            | KeyGraph((exists key'. _),graph) =>
-                if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                    inl g = graph_extract (model {m with graph}) {}
-                    [exists g]
-                else f graph
-    f graph
+// Extracts the tensor at the top level node.
+inl graph_extract model indices = graph_extract_ None model indices
+
+// Runs the graph and returns the result in the top level node. Is intended to be used in device code.
+// Does not do any safety checking and is intended for internal use in other graph_run functions.
+// Inserts the block index into the indices variable automatically.
+inl graph_run forall t_top indices. (model : model t_top) (ls : layer_state) (indices : indices) : t_top = graph_extract_ (Some ls) model indices
+
+
+// // Extracts the input tensor from the Key node given the key.
+// inl keys_extract forall t_top key{symbol}. (model ({graph data} & m) : model t_top) (_ : key) : list (exists t. t) =
+//     inl h = compile_time.hashmapm.create()
+//     inl rec g forall t. (out : option (graph t)) : list (exists t. t) =
+//         match out with
+//         | Some x => f x
+//         | None => []
+//     and inl pair forall a b. (a : graph a) (b : graph b) : list (exists t. t) = listm.append (f a) (f b)
+//     and inl f forall t. : graph t -> list (exists t. t)=
+//         memoize h function
+//             | BlockMap(exists a. _,a,out) => listm.append (f a) (g out)
+//             | BlockRowMap(exists a. _,a,out) => listm.append (f a) (g out)
+//             | BlockRowReduce(exists a. _,a,out) => listm.append (f a) (g out)
+//             | BlockRowMapReduce(exists a. _,a,out) => listm.append (f a) (g out)
+//             | BlockMatmul(a,b) => listm.append (f a) (f b)
+//             | Apply(exists a. a,b) => listm.append (f a) (f b)
+//             | Zip(a,b) => listm.append (f a) (f b)
+//             | Pair(a,b) => listm.append (f a) (f b)
+//             | Layer => []
+//             | KeyScalar => []
+//             | KeyGraph((exists key'. _),graph) =>
+//                 if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
+//                     inl g = graph_extract (model {m with graph}) {}
+//                     [exists g]
+//                 else f graph
+//     f graph
 
 // Extracts the input tensor from the Key node given the key.
 inl key_extract forall t_top key{symbol} input. (model ({graph data} & m) : model t_top) (_ : key) : input =
@@ -304,62 +358,6 @@ inl key_extract forall t_top key{symbol} input. (model ({graph data} & m) : mode
     match f graph with
     | Some x => x
     | None => error_type "Cannot find the input tensor with the given key."
-
-// Runs the graph and returns the result in the top level node. Is intended to be used in device code.
-// Does not do any safety checking and is intended for internal use in other graph_run functions.
-// Inserts the block index into the indices variable automatically.
-inl graph_run forall t_top indices. (model ({graph data} & m) : model t_top) (ls : layer_state) (indices : indices) : t_top =
-    inl h = compile_time.hashmapm.create()
-    inl abi t = apply block_index() t
-    inl tensor_extract forall t. (graph : graph t) : t = graph_extract (model {m with graph}) indices
-    inl rec f forall t. : graph t -> t =
-        open primitives
-        memoize h fun x =>
-            match x with
-            | BlockMap(exists a. g,a,_) =>
-                inl a, out = f a, tensor_extract x
-                inl g = g ls
-                join map g (abi a) (abi out)
-                out
-            | BlockRowMap(exists a. g,a,_) =>
-                inl a, out = f a, tensor_extract x
-                inl g = g ls
-                join row_map g (abi a) (abi out)
-                out
-            | BlockRowReduce(exists a. g,a,_) =>
-                inl a, out = f a, tensor_extract x
-                inl g = g ls
-                join row_reduce g (abi a) (abi out)
-                out
-            | BlockRowMapReduce(exists a. g,a,_) =>
-                inl a, (out_map, out_reduce as out) = f a, tensor_extract x
-                inl g = g ls
-                join row_map_reduce g (abi a) (abi out_map) (abi out_reduce)
-                out
-            | BlockMatmul(a,b) =>
-                inl a,b,out = f a, f b, tensor_extract x
-                inl alpha, beta : float * float = 1, 0
-                inl () =
-                    inl a, out = abi a, abi out
-                    real
-                        open real_core
-                        typecase t with
-                        | tensor _ f32 =>
-                            inl noinline_graph_run_matmul () = matmul.matmul_tf32' false true alpha a b beta out
-                            noinline_graph_run_matmul()
-                        | _ => 
-                            !!!!PrintStatic(`t)
-                            error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
-                out
-            // These need to be separate otherwise the typecase inserted by the inference will be overly specific 
-            // and we'll get a typecase miss during partial evaluation.
-            | Zip(a,b) => zip (f a) (f b)
-            | Pair(a,b) => f a, f b
-            | Apply(exists a. a,b) => apply (f b) (f a)
-            | Layer => tensor_extract x
-            | KeyGraph => tensor_extract x
-            | KeyScalar => tensor_extract x
-    f graph
 
 // Runs the kernel on the device.
 inl graph_run_device forall t_top indices. (model {graph data} & m : model t_top) (ls : layer_state) (indices : indices) =
