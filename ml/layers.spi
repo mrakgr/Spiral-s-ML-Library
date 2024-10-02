@@ -230,7 +230,7 @@ inl graph_extract_ forall t_top indices. layer_state (model {graph data} : model
                 real
                     open real_core
                     typecase t with
-                    | tensor _ f32 => matmul.matmul_tf32' false true alpha (abi a) b beta (abi out)
+                    | tensor _ f32 => matmul.matmul_tf32' false true alpha a b beta out
                     | _ => 
                         !!!!PrintStatic(`t)
                         error_type "The type is not supported in the matrix multiply node. Only f32 is supported at the moment. Check the terminal to see which type was being passed in."
@@ -257,13 +257,16 @@ inl graph_extract model indices = graph_extract_ None model indices
 inl graph_run forall t_top indices. (model : model t_top) (ls : layer_state) (indices : indices) : t_top = graph_extract_ (Some ls) model indices
 
 type layer = exists t. space_id * t * (t -> ())
+union extractor t =
+    | Ex_Layer :: space_id -> extractor layer // passing -1 as the space_id selects all the layer spaces.
+    | Ex_KeyGraph : (exists key. key)
 
 // Extracts all the layers into a list.
-inl extract_layers forall t_top. (model ({graph data} & m) : model t_top) : list layer =
+inl extract_layers_ forall t_top ex_t. (ex : extractor ex_t) (model ({graph data} & m) : model t_top) : list ex_t =
     inl h = compile_time.hashmapm.create()
     inl list_key = .list_key
-    inl get_current() : list layer = compile_time.hashmapm.try_get h list_key |> optionm.defaultWith []
-    inl add_item (x : layer) = compile_time.hashmapm.set h list_key (x :: get_current())
+    inl get_current() : list ex_t = compile_time.hashmapm.try_get h list_key |> optionm.defaultWith []
+    inl add_item (x : ex_t) = compile_time.hashmapm.set h list_key (x :: get_current())
     inl rec f forall t. : graph t -> () =
         memoize h function
             | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
@@ -276,45 +279,37 @@ inl extract_layers forall t_top. (model ({graph data} & m) : model t_top) : list
             | Pair(a,b) => f a . f b
             | Fst(exists a. x) => f x
             | Snd(exists b. x) => f x
-            | Layer(sid,_,init) as graph =>
-                inl g = graph_extract (model {m with graph}) {}
-                add_item (exists sid, g, init)
             | KeyScalar => ()
-            | KeyGraph(_,graph) => f graph
+            | Layer(sid,_,init) as graph =>
+                match ex with
+                | Ex_Layer sid' when sid' = -1 || sid = sid' =>
+                    inl g = graph_extract (model {m with graph}) {}
+                    add_item (exists sid, g, init)
+                | _ => ()
+            | KeyGraph((exists key'. _),graph) =>
+                match ex with
+                // `= operator compares the two types for equality.
+                | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
+                    inl g = graph_extract (model {m with graph}) {}
+                    add_item (real g : ex_t) // If you get a type error here, then the input type doesn't match graph type.
+                | _ => f graph
     f graph
     get_current() |> listm.rev
+
+// Extracts all the layers into a list.
+inl extract_layers forall t_top. (m : model t_top) : list layer = extract_layers_ (Ex_Layer -1) m
 
 // Initializes the layers on the host.
 inl pass_init forall t_top. (m : model t_top) = extract_layers m |> listm.iter fun (exists t. sid, g, init) => init g
 
 // Prints all the layer parameters.
-inl param_print forall t_top. (m : model t_top) = extract_layers m |> listm.iter fun (exists t. sid, g, init) => console.write_ln g
+inl print_layers forall t_top. (m : model t_top) = extract_layers m |> listm.iter fun (exists t. sid, g, init) => console.write_ln g
+
+// Prints the weight space layer parameters.
+inl print_weights forall t_top. (m : model t_top) = extract_layers_ (Ex_Layer weight_id()) m |> listm.iter fun (exists t. sid, g, init) => console.write_ln g
 
 // Extracts the input tensors from the Key nodes given the key.
-inl key_extract_list forall t_top key{symbol} input. (model ({graph data} & m) : model t_top) (_ : key) : list input =
-    inl h = compile_time.hashmapm.create()
-    inl list_key = .list_key
-    inl get_current() : list input = compile_time.hashmapm.try_get h list_key |> optionm.defaultWith []
-    inl add_item (x : input) = compile_time.hashmapm.set h list_key (x :: get_current())
-    inl rec f forall t. : graph t -> () =
-        memoize h function
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-            | BlockRowMap(exists a. _,a,out) => f a . optionm.iter f out
-            | BlockRowReduce(exists a. _,a,out) => f a . optionm.iter f out
-            | BlockRowMapReduce(exists a. _,a,out) => f a . optionm.iter f out
-            | BlockMatmul(a,b) => f a . f b
-            | Apply(exists a. a,b) => f a . f b
-            | Zip(a,b) => f a . f b
-            | Pair(a,b) => f a . f b
-            | Layer => ()
-            | KeyScalar => ()
-            | KeyGraph((exists key'. _),graph) =>
-                if (real open real_core in `key `= `key') then // `= operator compares the two types for equality.
-                    inl g = graph_extract (model {m with graph}) {}
-                    add_item (real g : input) // If you get a type error here, then the input type doesn't match graph type.
-                else f graph
-    f graph
-    get_current() |> listm.rev
+inl key_extract_list forall t_top key{symbol} input. (m : model t_top) (key : key) : list input = extract_layers_ (Ex_KeyGraph exists key) m
 
 // Extracts the input tensor from the Key nodes given the key. Gives a type error if there is more than one input tensor with the key, or if there isn't one.
 inl key_extract forall t_top key{symbol} input. (m : model t_top) (key : key) : input =
@@ -471,10 +466,10 @@ inl test1() =
     inl model = create_model graph
     
     console.write_ln "---"
-    param_print model
+    print_weights model
     pass_init model
     console.write_ln "Done initing."
-    param_print model
+    print_weights model
     ()
 
 // Tests whether extracting the inputs of the graph works. Also randomly inits them.
@@ -494,7 +489,7 @@ inl test2() =
     console.write_ln "---"
     pass_init model
     console.write_ln "Here are the weight matrices."
-    param_print model
+    print_weights model
     console.write_ln "Here is the input tensor."
     inl input : tensor d3 float = key_extract model .input
     cupy.copy_to {
@@ -522,7 +517,7 @@ inl test3() =
     inl model = create_model graph
     pass_init model
     console.write_ln "Here are the weight matrices."
-    param_print model
+    print_weights model
     inl input : tensor d3 float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
@@ -560,7 +555,7 @@ inl test4() =
     inl model = create_model graph
     pass_init model
     console.write_ln "Here are the weight matrices."
-    param_print model
+    print_weights model
     inl input : tensor d3 float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.
@@ -597,7 +592,7 @@ inl test5() =
     inl model = create_model graph
     pass_init model
     // console.write_ln "Here are the weight matrices."
-    // param_print model
+    // print_weights model
     inl input : tensor d3 float = key_extract model .input
     // Immitates the passing of data into the output vector.
     // In the poker game the serialization function will be responsible for this.

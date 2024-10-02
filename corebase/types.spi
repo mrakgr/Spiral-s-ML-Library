@@ -1,8 +1,8 @@
-// For the types I couldn't put into base.
+// For the types that can't be put into base.
 
 type tensor dim el = tensorm.tensor dim el
 type partition el = partitionm.partition el
 type partition_offsets el = partitionm.partition_offsets el
 type serializer el = serializerm.serializer el
 type pu a = pickler.pu a
-
+type tuple_list num_spaces el = tuple_listm.tuple_list num_spaces el

@@ -1,0 +1,38 @@
+// A list built out of tuples.
+// Exists for interop purposes.
+nominal tuple_list num_spaces el =
+    `(
+        open real_core
+        inl rec loop i =
+            if i > 0 then ``el, loop (i - 1)
+            else ``(())
+        loop (type_lit_to_lit `num_spaces)
+    )
+
+instance length tuple_list num_spaces = const real real_core.type_lit_to_lit `num_spaces
+instance index tuple_list num_spaces = fun ar i =>
+    assert (lit_is i) "The index must be known at compile time."
+    assert (i <= 0 && i < length ar) "The index must be in bounds."
+    real
+        open real_core
+        inl rec loop i x = if i > 0 then loop (i - 1) (snd x) else fst x
+        loop i (nominal_strip ar)
+
+inl fromList forall num_spaces el. (l : list el) : tuple_list num_spaces el = 
+    inl len = length l
+    assert (lit_is len) "The length of the list must be known at compile time."
+    assert (len = real real_core.type_lit_to_lit `num_spaces) "The length of the list must be equal to the tuple list."
+    real 
+        inl rec loop l = 
+            match l with
+            | a :: b => a, loop b
+            | [] => ()
+        tuple_list `num_spaces `el (loop l)
+
+inl toList forall num_spaces el. (tuple_list l : _ num_spaces el) : list el = 
+    real 
+        inl rec loop l = 
+            match l with
+            | a, b => Cons `el (a, loop b)
+            | () => Nil `el
+        loop l
