@@ -736,7 +736,7 @@ inl local_masked_regret_matching_and_discrete_sampling mask rng config x i (j_tn
 
 // Turns the vector into a hash.
 inl local_binarize (modulo : uint) config x i (j_tns : tensor (int * int) int) : uint =
-    inl x = local_map (fun x,j => if x <= 0 then 0 else 1 <<< j) (zip x j_tns)
+    inl x = local_map (fun x,j => if x <= 0 then 0 else 1 <<< j) (zip x j_tns) // TODO: This is wrong. The binarize will rotate the values when j > 31.
     local_reduce config 0 (|||) x % modulo
 
 inl test1() =

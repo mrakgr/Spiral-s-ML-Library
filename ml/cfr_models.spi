@@ -5,11 +5,6 @@ open tensorm
 open corecuda
 open rangem
 
-inl print0 msg =
-    if rangem.threads_in_grid().from = 0 then
-        console.write_ln msg
-    __syncwarp()
-
 type graph_body = tensor d2 uint * cfr.model * cfr.trace * cfr.trace_state
 
 inl trace_and_play_ forall inp out.
@@ -20,9 +15,9 @@ inl trace_and_play_ forall inp out.
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
         ~({player_id}, data : {player_id : cfr.player_id} * inp) =
-
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread = (key_extract model .output_world_id : tensor d3 uint).dim
+    
     inl () = // Assert that all the dimensions are right.
         assert (block = blocks_per_grid()) "The second dimension of the output tensor has to equal the number of blocks per grid."
         assert (thread = threads_per_block()) "The third dimension of the output tensor has to equal number threads per block."

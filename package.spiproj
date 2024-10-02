@@ -74,7 +74,7 @@ modules:
         semaphore
         latchm
         transposing_loop
-
+        
     coreext/
         console/
             types-
@@ -91,15 +91,17 @@ modules:
         pickler
 
     ml/
+        helpers-
         primitives
         matmul/
             kernel
             run-
         layers
-        cfr
         models
+        cfr
         cfr_models
         cem
+        cem_models
 
     game/
         utils

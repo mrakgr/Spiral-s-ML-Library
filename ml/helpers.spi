@@ -1,0 +1,9 @@
+open corebase
+open corecuda
+open coreext
+
+// Prints the element using the first thread of the grid.
+inl print0 msg =
+    if rangem.threads_in_grid().from = 0 then
+        console.write_ln msg
+    __syncwarp()

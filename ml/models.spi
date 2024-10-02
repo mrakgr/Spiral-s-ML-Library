@@ -1,14 +1,8 @@
 open corebase
+open corecuda
 open coreext
 open layers
 open tensorm
-
-type size = // The block and thread dimensions should match blocks_per_grid and threads_per_block
-    {
-        ensemble : int
-    }
-
-open corecuda
 open rangem
 
 // The noinline prefix will force the __noinline__ annotation in the generated code.
@@ -17,10 +11,7 @@ inl noinline_run forall inp out.
         (exists t. model : exists t. model t) 
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
         (output : int -> out) 
-        ~(data : option inp) = join
-    // All the threads will be waiting on this barrier until the game threads call on it with the inputs.
-    __syncthreads()
-
+        (data : option inp) =
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
     inl () = // Assert that all the dimensions are right.
