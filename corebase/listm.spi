@@ -24,11 +24,27 @@ inl fold2 f =
     loop
 // Folds the list from the end to the beginning.
 inl foldBack f l s =
-    inl rec body s = function Cons(x,x') => f x (loop s x') | Nil => s
+    inl rec body s = function 
+        | x :: x' => f x (loop s x') 
+        | [] => s
     and inl loop s l =
         if var_is l then inl ~s = s in join body s l
         else body s l 
     loop s l
+
+// Folds the two lists from the end to the beginning.
+inl foldBack2 f a b s =
+    inl rec body s = function 
+        | (a :: a'), (b :: b') => f a b (loop s a' b' )
+        | [],[] => s
+        | _ => failwith "The two lists need to be the same length."
+    and inl loop s a b =
+        if var_is a && var_is b then inl ~(s, a, b) = s, a, b in join body s (a, b)
+        else body s (a, b)
+    loop s a b
+
+// Zips the two lists together.
+inl zip a b = foldBack2 (fun a b l => (a,b) :: l) a b []
 // Reverses a list.
 inl rev l = fold (fun s x => Cons(x,s)) Nil l
 // Appends two lists.
@@ -37,6 +53,8 @@ inl append a b = foldBack (::) a b
 inl concat l = foldBack append l Nil
 // Maps a list.
 inl map f l = foldBack (fun x s => f x :: s) l Nil
+// Maps two lists.
+inl map2 f a b = foldBack2 (fun a b s => f a b :: s) a b Nil
 // Maps a list.
 inl mapi f l = foldBack (fun x (i,s) => inl i = i-1 in i, f i x :: s) l (length l, Nil) |> snd
 // Maps a list in reverse while passing the index into the mapping function.

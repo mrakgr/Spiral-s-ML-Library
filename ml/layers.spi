@@ -7,7 +7,8 @@ type space_id = int
 inl weight_id() : space_id = 0
 inl output_id() : space_id = 1
 inl weight_adjoint_id() : space_id = 2
-inl num_spaces() : space_id = 3
+type num_spaces = 3
+inl num_spaces() : space_id = real real_core.type_lit_to_lit `num_spaces
 
 type graph_dims = compile_time.hashmap
 type graph_partitions = list {partition : compile_time.hashmap; size : size}
@@ -435,14 +436,14 @@ inl create_model forall t. (graph : graph t) =
     model {graph data dims}
 
 // The size of the array is bound to num_spaces.
-nominal model_ptrs = array ptr
+nominal model_ptrs = tuple_list num_spaces ptr
 
-inl model_to_model_ptrs (x : model _) = model_ptrs (arraym.init num_spaces() (index x.data >> fun x => x.array))
+inl model_to_model_ptrs (x : model _) = x.data |> listm.map (fun x => x.array) |> tuple_listm.fromList |> model_ptrs
 inl model_ptrs_to_model (graph : graph _) (model_ptrs d) =
     inl dims = compile_time.hashmapm.create()
     inl data = 
-        pass_calculate_partitions graph dims
-        |> listm.mapi (fun i x => {x with array = index d i})
+        (pass_calculate_partitions graph dims, tuple_listm.toList d)
+        ||> listm.map2 (fun x array => {x with array})
     compile_time.hashmapm.set_immutable(dims)
     model { graph dims data }
 
