@@ -23,12 +23,12 @@ inl calculate_updates (trace_rewards : trace_rewards) (ensemble_id : ensemble_id
 
 inl cem forall dim float{number; float}. rng (transposed_weights : tensor (dim * ensemble_id) float) (trace_rewards : trace_rewards) =
     grid_row_map' (fun config x i j_tns =>
-            inl mask = 
+            inl mask =
                 inl average = local_average config x
                 local_map (fun x => x >= average) x
             inl winner_count = conv (local_masked_count config mask)
             inl winner_mean = local_masked_sum config x mask / winner_count * mean_decay()
-            inl winner_std = 
+            inl winner_std =
                 inl x = local_map (fun x => inl r = x - winner_mean in r * r) x
                 sqrt (local_masked_sum config x mask / winner_count)
             local_map (fun x,b => 

@@ -4,3 +4,82 @@ open layers
 open tensorm
 open corecuda
 open rangem
+
+// The noinline prefix will force the __noinline__ annotation in the generated code when placed on a join point.
+inl noinline_run forall inp out.
+        rng
+        (exists t. model : exists t. model t)
+        (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid)
+        (output : int -> out)
+        ~(data : inp) =
+    // Get the ensemble,block and thread dimensions based on the output tensor.
+    inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
+    inl () = // Assert that all the dimensions are right.
+        assert (block = blocks_per_grid()) "The second dimension of the output tensor has to equal the number of blocks per grid."
+        assert (thread = threads_per_block()) "The third dimension of the output tensor has to equal number threads per block."
+        inl block',thread',_ = (key_extract model .input : tensor d3 float).dim
+        assert ((block,thread) = (block',thread')) "The first two dimensions of the input tensor have to match number of blocks per grid and number of threads per block respectively."
+
+    // Extract the input tensor.
+    inl x = (key_extract model .input : tensor d3 float)
+    assert (block = fst x.dim) "The first dimension of the input tensor has to equal the number of blocks per grid."
+    inl x = x |> apply block_index()
+    assert (thread = fst x.dim) "The second dimension of the input tensor has to equal number threads per block."
+
+    // Sets the input tensor to 0.
+    loop.projective threads_in_block(x.dim) fun i =>
+        tensor_set i 0 x
+
+    __syncthreads()
+
+    // Serializes the data into the input tensor.
+    inl () =
+        open pickler
+        inl tns_input = apply thread_index() x
+        snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
+
+    __syncthreads()
+
+    // Creates the layer state.
+    inl ls = create_layer_state rng
+
+    // Runs the model on the inputs.
+    loop.linear ensemble fun ensemble =>
+        graph_run_device model ls {ensemble}
+
+    __syncthreads()
+
+    // Randomly pick an ensemble id for each thread.
+    inl ensemble_id : int = 
+        random.int_range {from=0; nearTo=ensemble} ls.rng
+        |> transposing_loop.shuffle 0
+
+    // Extract the output probabilities (already calculated).
+    inl output_probs = (key_extract model .output_probs : tensor d4 float)
+
+    inl output_id =
+        output_probs
+        |> apply ensemble_id
+        |> apply block_index()
+        |> apply thread_index()
+        |> primitives.row_gather_reduce rng (fun rng config policy i j_tns =>
+            open random
+            ()
+            )
+    ()
+
+    // // Extract the output index.
+    // inl output_id =
+    //     (key_extract model .output_indices : tensor d3 int) 
+    //     |> apply ensemble_id
+    //     |> apply block_index()
+    //     |> tensor_index thread_index()
+
+    // {
+    //     action = output output_id
+    //     sampling_prob_selected = output_probs |> tensor_index (ensemble_id,block_index(),thread_index(),output_id)
+    //     sampling_prob_ensemble =
+    //         output_probs
+    //         |> reorder (fun ensemble,block,thread,inner => block,thread,inner,ensemble)
+    //         |> apply block_index() |> apply thread_index() |> apply output_id
+    // }
