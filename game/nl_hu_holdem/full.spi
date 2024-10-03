@@ -19,9 +19,11 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
 
     inl effects : plist ui_effects = plistm.create'
     match msg with
-    | StartTrainingVsRando => train.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
-    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
+    // | StartTrainingVsRando => train.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
+    // | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    | StartTrainingVsRando 
+    | StartTrainingVsSelf => failwith "TOTO"
+    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play_cem.vs_human seri neural
 
     device_sync()
 
@@ -38,6 +40,6 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
 
 inl main() =
     named_tuple "Holdem_Full" {
-        init = fun () => jsonm.serialize init()
+        init = fun () => jsonm.serialize init(model_cem.game_graph() |> ml.cem_models.init |> ml.cem_models.to_model_ptrs)
         event_loop_gpu
     }

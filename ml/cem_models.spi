@@ -8,7 +8,7 @@ open rangem
 // The noinline prefix will force the __noinline__ annotation in the generated code when placed on a join point.
 inl noinline_run forall inp out.
         rng
-        (exists t. model : exists t. model t)
+        (model : model (tensor d3 float))
         (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid)
         (output : int -> out)
         ~(data : inp) =
@@ -50,36 +50,46 @@ inl noinline_run forall inp out.
     __syncthreads()
 
     // Randomly pick an ensemble id for each thread.
-    inl ensemble_id : int = 
-        random.int_range {from=0; nearTo=ensemble} ls.rng
-        |> transposing_loop.shuffle 0
+    inl ensemble_id : int = random.int_range {from=0; nearTo=ensemble} ls.rng
 
     // Extract the output probabilities (already calculated).
     inl output_probs = (key_extract model .output_probs : tensor d4 float)
 
     inl output_id =
+        open primitives
         output_probs
         |> apply ensemble_id
         |> apply block_index()
         |> apply thread_index()
-        |> primitives.row_gather_reduce rng (fun rng config policy i j_tns =>
-            open random
-            ()
-            )
-    ()
+        |> row_gather_reduce rng local_discrete_sampling
+    
+    output output_id
 
-    // // Extract the output index.
-    // inl output_id =
-    //     (key_extract model .output_indices : tensor d3 int) 
-    //     |> apply ensemble_id
-    //     |> apply block_index()
-    //     |> tensor_index thread_index()
+nominal cem_game_graph inp out =
+    {
+        graph : graph (tensor d3 float)
+        input : exists t. (inp -> t) * pickler.pu t
+        output : int -> out
+    }
 
-    // {
-    //     action = output output_id
-    //     sampling_prob_selected = output_probs |> tensor_index (ensemble_id,block_index(),thread_index(),output_id)
-    //     sampling_prob_ensemble =
-    //         output_probs
-    //         |> reorder (fun ensemble,block,thread,inner => block,thread,inner,ensemble)
-    //         |> apply block_index() |> apply thread_index() |> apply output_id
-    // }
+nominal cem_game_model inp out = 
+    {
+        model : model (tensor d3 float)
+        input : exists t. (inp -> t) * pickler.pu t
+        output : int -> out
+    }
+
+inl run forall inp out. rng (cem_game_model {model input output} : cem_game_model inp out) = noinline_run rng model input output
+
+inl to_model_ptrs forall a b. (cem_game_model {model} : cem_game_model a b) : layers.model_ptrs = model_to_model_ptrs model
+inl from_model_ptrs forall inp out. 
+        (cem_game_graph {graph input output} : cem_game_graph inp out) 
+        (x : layers.model_ptrs) 
+        : cem_game_model inp out = 
+    inl model = model_ptrs_to_model graph x
+    cem_game_model { model input output }
+
+inl init forall a b. (cem_game_graph {graph input output} : cem_game_graph a b) : cem_game_model a b = 
+    inl model = create_model graph
+    pass_init model
+    cem_game_model { input output model }

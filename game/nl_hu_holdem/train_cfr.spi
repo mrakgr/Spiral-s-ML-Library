@@ -124,10 +124,10 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                         ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=player_turn}, data) 
                     else
                         ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=player_turn}, data) 
-                    |> model.action_conv table
+                    |> model_cfr.action_conv table
                 | Random =>
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
-                    play.random_action (refm.from_local state.rng) table 
+                    play_cfr.random_action (refm.from_local state.rng) table 
                     |> transposing_loop.shuffle 0
                 | CallingMachine =>
                     A_Call
@@ -160,7 +160,7 @@ open serializerm
 
 // Does a training run against the self.
 inl vs_self (neural : state_neural) =
-    inl sizes = model.nlholdem_sizes()
+    inl sizes = model_cfr.nlholdem_sizes()
     inl config = event_config()
     inl trace_rewards = cupy.zeros (sizes.player_id, config.outer / config.frontend_divider)
     inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
@@ -169,7 +169,7 @@ inl vs_self (neural : state_neural) =
             inl grid = cooperative_groups.create_grid()
             random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
             |> state_to_internal_train grid
-        inl model = ml.cfr_models.from_model_ptrs model.game_graph() neural.model_ptrs
+        inl model = ml.cfr_models.from_model_ptrs model_cfr.game_graph() neural.model_ptrs
         loop.linear config.outer fun (outer : int) =>
             loop.linear config.inner fun (inner : int) =>
                 // Does a training run, modifying the trace state.
@@ -193,7 +193,7 @@ inl vs_self (neural : state_neural) =
 
 // Does a training run against the random player.
 inl vs_rando (neural : state_neural) =
-    inl sizes = model.nlholdem_sizes()
+    inl sizes = model_cfr.nlholdem_sizes()
     inl config = event_config()
     inl trace_rewards : _ _ (float * float) = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
     inl frontend_rewards : _ _ float = tensorm.tensor_create trace_rewards.dim
@@ -202,7 +202,7 @@ inl vs_rando (neural : state_neural) =
             inl grid = cooperative_groups.create_grid()
             random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
             |> state_to_internal_train grid
-        inl model = ml.cfr_models.from_model_ptrs model.game_graph() neural.model_ptrs
+        inl model = ml.cfr_models.from_model_ptrs model_cfr.game_graph() neural.model_ptrs
         loop.linear config.outer fun (outer : int) =>
             loop.linear config.inner fun (inner : int) =>
                 // The loop uses less registers than a noinline function.

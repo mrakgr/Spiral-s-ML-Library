@@ -1,0 +1,193 @@
+open corebase
+open coreext
+open lib
+open game
+open corecuda
+
+type state_internal =
+    stack_mut {
+        ui_game_state : ui_game_state
+        pl_type : player_types
+        game : option game_node
+        deck : deck
+        messages : messages
+        rng : random.philox_state
+    }
+
+// Converts the given state to internal one.
+inl state_to_internal_play (state : state_game) : state_internal =
+    stack_mut {
+        ui_game_state = state.public.ui_game_state
+        pl_type = state.public.pl_type
+        game = state.private.game
+        deck = state.private.deck
+        messages = state.public.messages
+        rng = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0} |> refm.to_local
+    }
+
+// Converts the given internal into the serializable state.
+inl internal_play_to_state (state : state_internal) : state_game =
+    {
+        public = {
+            ui_game_state = state.ui_game_state
+            pl_type = state.pl_type
+            messages = state.messages
+        }
+        private = {
+            game = state.game
+            deck = state.deck
+        }
+    }
+
+// Sets the internal state to the values held by the regular one.
+inl internal_set (state_internal : state_internal) (state : state_game) =
+    open refm
+    state_internal.ui_game_state <- state.public.ui_game_state
+    // state_internal.pl_type <- state.public.pl_type
+    state_internal.game <- state.private.game
+    state_internal.deck <- state.private.deck
+    state_internal.messages <- state.public.messages
+
+inl random_action = fun rng (table : table) =>
+    inl player_turn = player_turn table
+    inl full_stack = arraym.map2 (+) table.stack table.pot
+    inl pot_size_needed_to_call = arraym.reduce max table.pot
+    inl pot_after_calling = arraym.update' player_turn (min (pot_size_needed_to_call) (index full_stack player_turn)) table.pot
+    inl pot_bet_size = arraym.reduce (+) pot_after_calling
+    inl stack_after_calling = arraym.map2 (-) full_stack pot_after_calling
+    inl raise x = // Only do the raise if there are enough chips in the stack after calling.
+        inl prob = if table.min_raise <= x && x < index stack_after_calling player_turn then 1 else 0
+        A_Raise x, prob
+    inl actions : sa 6 (action * f32) = arraym.fromList [
+        A_Fold, if index table.pot player_turn < pot_size_needed_to_call then 1 else 0
+        A_Call, 4
+        raise (pot_bet_size / 3)
+        raise (pot_bet_size / 2)
+        raise pot_bet_size
+        A_All_In, 1
+        ]
+    random.sample_discrete actions rng
+
+let play_loop (neural : state_neural) (state : state_internal) node =
+    open refm
+    inl push_message = sa_listm.push state.messages
+    inl deck = state.deck
+    inl pop_deck () = 
+        open random
+        inl cards, deck = lib.deckm.draw_cards (from_local state.rng) deck
+        state.deck <- deck
+        cards
+    let get_community_cards street new_cards = 
+        inl ar = sa_create
+        inl push cards = arraym.iter (sa_listm.push ar) cards 
+        match street with
+        | Preflop => ()
+        | Flop cards => push cards
+        | Turn cards => push cards
+        | River cards => push cards
+        push new_cards
+        ar : sa_list 5 _
+    inl go_street (table : table) flop =
+        inl new_cards = pop_deck()
+        inl msg = CommunityCardsAre (get_community_cards table.street new_cards)
+        push_message msg
+        Some (flop table new_cards)
+
+    inl body node =
+        match node with
+        | G_Fold table =>
+            inl msg =
+                inl chips_won = index table.pot (player_turn table)
+                Fold {chips_won winner_id=next_turn table.round_turn % num_players()}
+            push_message msg
+            state.ui_game_state <- GameOver(table)
+            state.game <- None
+            None
+        | G_Showdown table => 
+            inl msg =
+                inl community_cards = match table.street with River cards => cards | _ => failwith "Invalid street in showdown."
+                inl h i : sa 7 card = sam.merge (index table.pl_card i) community_cards |> nominal_recreate
+                inl s0, s1 = lib.hand_rankerm.score (h 0), lib.hand_rankerm.score (h 1)
+                inl chips_won, winner_id =
+                    inl chips_won = index table.pot (player_turn table)
+                    match comp s0 s1 with
+                    | Gt => chips_won, 0
+                    | Eq => 0, -1
+                    | Lt => chips_won, 1
+                inl hands_shown = arraym.fromList [s0; s1]
+                Showdown {hands_shown chips_won winner_id}
+            push_message msg
+            state.ui_game_state <- GameOver(table)
+            state.game <- None
+            None
+        | G_Round table =>
+            inl player_turn = player_turn table
+            match index state.pl_type player_turn with
+            | Computer =>
+                open model_cem
+                inl model = ml.cem_models.from_model_ptrs game_graph() neural.model_ptrs
+                inl data = table, state.messages
+                inl action = 
+                    ml.cem_models.run (from_local state.rng) model data |> action_conv table
+                    |> transposing_loop.shuffle 0
+                inl msg = PlayerAction(player_turn, action)
+                push_message msg
+                Some (round table action)
+            | Human =>
+                state.ui_game_state <- WaitingForActionFromPlayerId(table)
+                state.game <- Some node
+                None
+            | Random =>
+                inl action = 
+                    random_action (from_local state.rng) table
+                    |> transposing_loop.shuffle 0
+                inl msg = PlayerAction(player_turn, action)
+                push_message msg
+                Some (round table action)
+            | CallingMachine =>
+                inl action = A_Call
+                inl msg = PlayerAction(player_turn, action)
+                push_message msg
+                Some (round table action)
+        | G_Round'(table,action) =>
+            inl msg = PlayerAction(player_turn table, action)
+            push_message msg
+            Some (round table action)
+        | G_Flop table => go_street table flop
+        | G_Turn table => go_street table turn
+        | G_River table => go_street table river
+        | G_Preflop => 
+            inl c0,c1 = pop_deck(), pop_deck()
+            push_message PlayerGotCards(0, c0)
+            push_message PlayerGotCards(1, c1)
+            Some (preflop (arraym.fromList [c0; c1]))
+    
+    loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
+
+inl event_loop_play state_neural (msg, state_internal : event * state_internal) : () =
+    open refm
+    match msg with
+    | StartGame =>
+        internal_set state_internal init_game()
+        game_start() |> Some
+    | PlayerChanged pl_type =>
+        state_internal.pl_type <- pl_type
+        None
+    | ActionSelected action =>
+        match state_internal.game with
+        | Some game =>
+            match game with
+            | G_Round table => G_Round'(table, action) |> Some
+            | _ => failwith "Unexpected game node in ActionSelected."
+        | None => failwith "The game hasn't been started in ActionSelected."
+    | StartTrainingVsRando | StartTrainingVsSelf => failwith "Training is not supported in the `event_loop_play` function."
+    |> optionm.iter (play_loop state_neural state_internal)
+
+open serializerm
+inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural) =
+    run' fun () =>
+        inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
+        inl state = state_to_internal_play game_state
+        event_loop_play neural (msg, state)
+        if rangem.threads_in_grid().from = 0 then
+            serialize seri.game_state (internal_play_to_state state)

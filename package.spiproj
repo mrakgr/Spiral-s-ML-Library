@@ -130,13 +130,15 @@ modules:
                 deckm
                 hand_rankerm
             game
-            model
             types-
-            play
-            train
+            model_cfr
+            play_cfr
+            train_cfr
+            model_cem
+            play_cem
+            train_cem
             full
-            performance
-
+            
     tests/
         test1
         test2

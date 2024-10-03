@@ -1,0 +1,137 @@
+open corebase
+open corecuda
+open tensorm
+open lib
+open game
+
+type history = sa_list 128 (option action) // The game history. RL agents need this one.
+
+inl nlholdem_pickler() : pickler.pu {history : history; pot : sa 2 int; stack : sa 2 int; player_cards : sa 2 card; community_cards : sa_list 5 card} =
+    open pickler
+
+    inl card =
+        open lib.cardm
+        wrap {inp=fun (x : card) => conv (suit x), conv (rank x); out=fun suit,rank => from_suit_rank (conv suit, conv rank)} (int 4 ** int 13)
+
+    inl action : pu action = alt {
+        A_Fold = unit()
+        A_Call = unit()
+        A_All_In = unit()
+        A_Raise = bin_int {from=1; nearTo=(1 <<< 10) - 1}
+    }
+    inl history : pu history = sa_list (option action)
+    inl pot : pu (sa 2 int) = sa (bin_int {from=0; nearTo=(1 <<< 10) - 1})
+    inl stack : pu (sa 2 int) = pot
+    inl player_cards : pu (sa 2 card) = sa card
+    inl community_cards : pu (sa_list 5 card) = sa_list card
+    wrap {
+        out = fun history,pot,stack,player_cards,community_cards => {history pot stack player_cards community_cards}
+        inp = fun {history pot stack player_cards community_cards} => history,pot,stack,player_cards,community_cards
+    } (history ** pot ** stack ** player_cards ** community_cards)
+
+inl extract_community_cards (table : table) =
+    inl community_cards = sa_create : sa_list 5 card
+    inl f cards = arraym.iter (sa_listm.push community_cards) cards
+    match table.street with Preflop => () | Flop cards => f cards | Turn cards => f cards | River cards => f cards
+    community_cards
+
+inl nlholdem_conv (table, messages : table * messages) =
+    inl rotate_left forall dim t. (i' : int) (x : sa dim t) : sa dim t = sam.init (fun i => index x ((i + i') % length x))
+    {
+        history = messages |> arraym.map function
+            | PlayerAction(id,action) => Some(action)
+            | _ => None
+        pot = rotate_left table.round_turn table.pot
+        stack = rotate_left table.round_turn table.stack
+        player_cards = index table.pl_card (table.round_turn % length table.pl_card)
+        community_cards = extract_community_cards table
+    }
+
+union alt_action = // Instead of having direct raises these use a ratio of the pot bet size.
+    | AA_Fold
+    | AA_Call
+    | AA_Raise : int * int // numerator * denominator
+
+inl possible_actions () =
+    [
+        AA_Fold
+        AA_Call
+        // AA_Raise(1, 3)
+        // AA_Raise(1, 2)
+        // AA_Raise(2, 3)
+        // AA_Raise(3, 4)
+        AA_Raise(1, 1)
+        // AA_Raise(3, 2)
+        // AA_Raise(2, 1)
+        // AA_Raise(3, 1)
+        // AA_Raise(limit.max, 1)
+    ]
+
+// inl nlholdem_sizes() : ml.cfr.sizes =
+//     {
+//         ensemble_id = 4
+//         world_id = 1 <<< 12
+//         player_id = 2
+//         action_id = 1 <<< 4
+//         action_mask = length possible_actions()
+//         seq_id = 1 <<< 7
+//         thread_id = threads_per_block() * blocks_per_grid()
+//     }
+
+inl nlholdem_graph() =
+    open ml.layers
+    inl pu_history = nlholdem_pickler()
+    inl sizes = {
+        ensemble = 32 // The third dimension of each weight layer.
+        block = blocks_per_grid()
+        thread = threads_per_block()
+        input = modup pu_history.size 128
+        final = 64
+    }
+
+    inl neural =
+        (input .input (sizes.block,sizes.thread,sizes.input) : graph (tensor (int * int * int) float))
+        |> matmul_ensemble (sizes.ensemble,sizes.input,sizes.final)
+        |> masked_softmax' (length possible_actions()) (
+            input .output_probs (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble
+        )
+
+    neural
+
+inl nlholdem_output (i' : int) : alt_action =
+    listm.foldBack 
+        (fun (x : alt_action) (next : int -> alt_action) (i : int) =>
+            if i = i' then x else next (i + 1)
+            )
+        possible_actions()
+        (fun i => failwith "Invalid output id in the NL Holdem model.")
+        0
+
+// Converts the alternative actions to the regular ones.
+inl action_conv (table : table) (x : alt_action) : action = // TODO: Need to return bool instead of converting to a different action.
+    match x with
+    | AA_Fold => 
+        inl player_turn = player_turn table
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        if index table.pot player_turn = pot_size_needed_to_call then A_Call else A_Fold
+    | AA_Call => A_Call
+    | AA_Raise ratio =>
+        inl player_turn = player_turn table
+        inl full_stack = arraym.map2 (+) table.stack table.pot
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        inl pot_after_calling = arraym.update' player_turn (min pot_size_needed_to_call (index full_stack player_turn)) table.pot
+        inl pot_bet_size = arraym.reduce (+) pot_after_calling
+        inl stack_after_calling = arraym.map2 (-) full_stack pot_after_calling
+        inl bet_size = max table.min_raise (fst ratio * pot_bet_size / snd ratio)
+        if bet_size >= index stack_after_calling player_turn then A_All_In
+        // elif bet_size < table.min_raise then A_Call
+        else A_Raise bet_size
+
+open ml.cem_models
+inl game_graph() =
+    cem_game_graph {
+        graph = nlholdem_graph()
+        input = exists nlholdem_conv, nlholdem_pickler()
+        output = nlholdem_output
+    }
+
