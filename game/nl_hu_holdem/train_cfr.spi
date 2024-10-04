@@ -124,7 +124,7 @@ inl train_loop is_train (cfr_model : ml.cfr_models.cfr_game_model _ _) (state : 
                         ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=player_turn}, data) 
                     else
                         ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=player_turn}, data) 
-                    |> model_cfr.action_conv table
+                    |> action_conv table
                 | Random =>
                     // Important: If the action is shared across the block in Computer it should also be done for the Random player.
                     play_cfr.random_action (refm.from_local state.rng) table 

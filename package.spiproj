@@ -131,6 +131,7 @@ modules:
                 hand_rankerm
             game
             types-
+            utils-
             model_cfr
             play_cfr
             train_cfr

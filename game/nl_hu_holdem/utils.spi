@@ -1,0 +1,34 @@
+open corebase
+open lib
+open game
+
+union alt_action = // Instead of having direct raises these use a ratio of the pot bet size.
+    | AA_Fold
+    | AA_Call
+    | AA_Raise : int * int // numerator * denominator
+
+// Converts the alternative actions to the regular ones.
+inl action_conv (table : table) (x : alt_action) : action =
+    match x with
+    | AA_Fold => 
+        inl player_turn = player_turn table
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        if index table.pot player_turn = pot_size_needed_to_call then A_Call else A_Fold
+    | AA_Call => A_Call
+    | AA_Raise ratio =>
+        inl player_turn = player_turn table
+        inl full_stack = arraym.map2 (+) table.stack table.pot
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        inl pot_after_calling = arraym.update' player_turn (min pot_size_needed_to_call (index full_stack player_turn)) table.pot
+        inl pot_bet_size = arraym.reduce (+) pot_after_calling
+        inl stack_after_calling = arraym.map2 (-) full_stack pot_after_calling
+        inl bet_size = max table.min_raise (fst ratio * pot_bet_size / snd ratio)
+        if bet_size >= index stack_after_calling player_turn then A_All_In
+        // elif bet_size < table.min_raise then A_Call
+        else A_Raise bet_size
+
+inl extract_community_cards (table : table) =
+    inl community_cards = sa_create : sa_list 5 card
+    inl f cards = arraym.iter (sa_listm.push community_cards) cards
+    match table.street with Preflop => () | Flop cards => f cards | Turn cards => f cards | River cards => f cards
+    community_cards

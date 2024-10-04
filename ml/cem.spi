@@ -2,6 +2,43 @@ open corebase
 open corecuda
 open primitives
 
+type prob = float
+type log_prob = f64
+type ensemble_id = int
+type player_id = int
+type thread_id = int
+type seq_id = int
+type log_path_prob = {sampling : log_prob; policy : log_prob}
+type reward = float
+
+type sizes =
+    {
+        ensemble_id : ensemble_id
+        player_id : player_id
+        thread_id : thread_id
+    }
+type trace_state =
+    {
+        log_path_probs : tensor (ensemble_id * thread_id * player_id) log_path_prob
+    }
+
+inl graph (size : sizes) : _ (trace_state) =
+    open partitionm
+
+    inl trace_state : partition trace_state = 
+        !(size.ensemble_id, size.thread_id, size.player_id)
+        |> reorder (fun log_path_probs => {log_path_probs})
+    // Initializes all the elements of the arrays to zero.
+    inl init_zero forall t. (x : t) : () = real
+        struct.iter (fun x =>
+            struct.iter (fun x =>
+                $"!(x.array)[:] = 0" : ()
+                ) x.bodies
+        ) x
+
+    inl (<|) a b = layers.pair a b
+    (layers.key_graph .cem_trace_state (layers.weight' trace_state init_zero))
+
 // According to CEM papers, adding noise helps performance significantly in games like tetris.
 inl cross_entropy_noise() = 0.1
 

@@ -4,7 +4,8 @@ open tensorm
 open lib
 open game
 
-type history = sa_list 128 (option action) // The game history. RL agents need this one.
+// TODO: Don't forget to increase this later.
+type history = sa_list 20 (option action) // The game history. RL agents need this one.
 
 inl nlholdem_pickler() : pickler.pu {history : history; pot : sa 2 int; stack : sa 2 int; player_cards : sa 2 card; community_cards : sa_list 5 card} =
     open pickler
@@ -28,12 +29,6 @@ inl nlholdem_pickler() : pickler.pu {history : history; pot : sa 2 int; stack : 
         out = fun history,pot,stack,player_cards,community_cards => {history pot stack player_cards community_cards}
         inp = fun {history pot stack player_cards community_cards} => history,pot,stack,player_cards,community_cards
     } (history ** pot ** stack ** player_cards ** community_cards)
-
-inl extract_community_cards (table : table) =
-    inl community_cards = sa_create : sa_list 5 card
-    inl f cards = arraym.iter (sa_listm.push community_cards) cards
-    match table.street with Preflop => () | Flop cards => f cards | Turn cards => f cards | River cards => f cards
-    community_cards
 
 inl nlholdem_conv (table, messages : table * messages) =
     inl rotate_left forall dim t. (i' : int) (x : sa dim t) : sa dim t = sam.init (fun i => index x ((i + i') % length x))
@@ -64,17 +59,6 @@ inl possible_actions () =
         // AA_Raise(limit.max, 1)
     ]
 
-// inl nlholdem_sizes() : ml.cfr.sizes =
-//     {
-//         ensemble_id = 4
-//         world_id = 1 <<< 12
-//         player_id = 2
-//         action_id = 1 <<< 4
-//         action_mask = length possible_actions()
-//         seq_id = 1 <<< 7
-//         thread_id = threads_per_block() * blocks_per_grid()
-//     }
-
 inl nlholdem_graph() =
     open ml.layers
     inl pu_history = nlholdem_pickler()
@@ -104,8 +88,6 @@ inl nlholdem_output (i' : int) : alt_action =
         (fun i => failwith "Invalid output id in the NL Holdem model.")
         0
 
-// Converts the alternative actions to the regular ones.
-inl action_conv (table : table) (x : alt_action) : action = model_cfr.action_conv table x
 open ml.cem_models
 inl game_graph() =
     cem_game_graph {

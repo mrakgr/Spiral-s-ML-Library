@@ -54,13 +54,13 @@ type model =
     }
 type sizes =
     {
-        ensemble_id : int
-        world_id : int
-        player_id : int
-        action_id : int
+        ensemble_id : ensemble_id
+        world_id : world_id
+        player_id : player_id
+        action_id : action_id
         action_mask : int
-        seq_id : int
-        thread_id : int
+        seq_id : seq_id
+        thread_id : thread_id
     }
 
 inl graph (size : sizes) : _ (model * trace * trace_state) =

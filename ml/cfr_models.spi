@@ -267,5 +267,5 @@ inl reset_trace_state forall a b. (cfr_game_model {model sizes} : _ a b) =
 // Clamps the average policy vector if applicable.
 // Also randomizes the `exploratory_ensemble_id`.
 inl apply_updates forall a b. grid rng (cfr_game_model {model} : _ a b) =
-    inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
+    inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {}
     cfr.apply_updates grid rng cfr_model
