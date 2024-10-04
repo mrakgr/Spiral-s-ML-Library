@@ -6,10 +6,14 @@ type prob = float
 type log_prob = f64
 type ensemble_id = int
 type player_id = int
+type action_id = int
 type thread_id = int
 type seq_id = int
+type action_prob = {sampling : prob; policy : prob}
 type log_path_prob = {sampling : log_prob; policy : log_prob}
 type reward = float
+type count = float
+type ratio = reward * count
 
 type sizes =
     {
@@ -20,6 +24,11 @@ type sizes =
 type trace_state =
     {
         log_path_probs : tensor (ensemble_id * thread_id * player_id) log_path_prob
+    }
+type model =
+    {
+        exploratory_ensemble_id : tensor {} ensemble_id
+        rewards : tensor ensemble_id ratio // actual reward is reward / count
     }
 
 inl graph (size : sizes) : _ (trace_state) =
@@ -49,61 +58,102 @@ inl cross_entropy_noise() = 0.1
 // We're going to be using a curriculum training, so I don't want the weights being pruned prematurely.
 inl mean_decay() = 1
 
-type ensemble_id = int
-type ratio = float * float
-type trace_rewards = tensor ensemble_id ratio // actual reward is fst ratio / snd ratio
+type weights = list (exists dim. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float)
 
-type weights = list (exists dim float{number; float}. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float)
+inl calculate_updates forall dim. ({rewards} : model) ({log_path_probs} : trace_state) (ensemble_id : ensemble_id) (reward : sa dim reward) =
+    open tensorm
+    inl log_path_probs =
+        log_path_probs
+        |> apply ensemble_id
+        |> apply thread_index()
+        |> apply_ptr
+    inl path_prob player_id =
+        inl {policy sampling} = tensor_index player_id log_path_probs
+        conv (exp (policy - sampling))
+    arraym.iteri (fun player_id reward =>
+        inl path_prob = path_prob player_id
+        tensor_cuda.tensor_atomic_add ensemble_id (reward * path_prob, path_prob) rewards
+        ) reward
 
-inl calculate_updates (trace_rewards : trace_rewards) (ensemble_id : ensemble_id) (ratio : ratio) =
-    tensor_cuda.tensor_atomic_add ensemble_id ratio trace_rewards
-
-inl cem forall dim float{number; float}. rng (transposed_weights : tensor (dim * ensemble_id) float) (trace_rewards : trace_rewards) =
+inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) ({rewards} : model) =
     grid_row_map' (fun config x i j_tns =>
-            inl mask =
-                inl average = local_average config x
-                local_map (fun x => x >= average) x
-            inl winner_count = conv (local_masked_count config mask)
-            inl winner_mean = local_masked_sum config x mask / winner_count * mean_decay()
-            inl winner_std =
-                inl x = local_map (fun x => inl r = x - winner_mean in r * r) x
-                sqrt (local_masked_sum config x mask / winner_count)
-            local_map (fun x,b => 
-                inl r = conv (random.normal rng) * (winner_std + cross_entropy_noise()) + winner_mean
-                if b then x else r
-                ) (tensorm.zip x mask)
-            )
+        open tensorm
+        inl rewards = local_map (fun ensemble_id => inl reward,count = tensor_index ensemble_id rewards in reward / count) j_tns
+        inl mask =
+            inl average = local_average config rewards
+            local_map (fun x => x >= average) rewards
+        inl winner_count = conv (local_masked_count config mask)
+        // TODO: Instead of getting the average, it might be better to take the argmax of the rewards.
+        inl winner_mean = local_masked_sum config mask x / winner_count * mean_decay()
+        inl winner_std = // TODO: The filtering will cause the variance to collapse, so research should be done on alternatives to adding noise.
+            inl variance = 
+                local_map (fun x => inl r = x - winner_mean in r * r) x
+                |> local_masked_sum config mask
+                |> fun x => x / winner_count
+            inl biased_std = sqrt variance
+            if winner_count > 1 then biased_std * winner_count / (winner_count - 1) else 0
+        local_map (fun x,b => 
+            inl r = conv (random.normal rng) * (winner_std + cross_entropy_noise()) + winner_mean
+            if b then x else r
+            ) (tensorm.zip x mask)
+        ) 
         transposed_weights transposed_weights
 
-inl apply_updates rng grid (weights : weights) (trace_rewards : trace_rewards) : () =
-    weights |> listm.iter (fun (exists dim float. weights, transposed_weights) =>
+inl apply_updates rng grid (weights : weights) model : () =
+    weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
         grid_transpose weights transposed_weights
         )
     cooperative_groups.sync grid
-    weights |> listm.iter (fun (exists dim float. _, transposed_weights) =>
-        cem rng transposed_weights trace_rewards
+    weights |> listm.iter (fun (exists dim. _, transposed_weights) =>
+        cem rng transposed_weights model
         )
     cooperative_groups.sync grid
-    weights |> listm.iter (fun (exists dim float. weights, transposed_weights) =>
+    weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
         grid_transpose transposed_weights weights
         )
     cooperative_groups.sync grid
 
-inl test1 weights trace_rewards =
-    run fun () =>
-        inl grid = cooperative_groups.create_grid()
-        inl rng : ref random.philox_state = random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+open layers
+open tensorm
 
-        // step 1
-        calculate_updates trace_rewards 0 (13 * 0.5, 0.5)
-        calculate_updates trace_rewards 1 (13 * 0.3, 0.3)
+// Sets the log_path_probs to 0.
+inl reset_trace_state (trace_state : trace_state) (ensemble_id : ensemble_id) =
+    open primitives
+    inl thread_id = rangem.threads_in_grid().from
+    inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id |> apply_ptr
+    // Sets the log_path_probs to 0.
+    (log_path_probs,log_path_probs) ||> row_gather_map () (fun () config x i j_tns => local_map (const loop.zeroes) x)
 
-        // step 2
-        calculate_updates trace_rewards 0 (5 * 0.58, 0.58)
-        calculate_updates trace_rewards 1 (5 * 0.342, 0.342)
+inl get_action rng model ensemble_id =
+    // Extract the output probabilities (already calculated.)
+    inl output_probs = (key_extract model .output_probs : tensor d4 float)
 
-        // step 3
-        calculate_updates trace_rewards 0 (-4 * 0.5, 0.5)
-        calculate_updates trace_rewards 1 (-4 * 0.3, 0.3)
+    open primitives
+    output_probs
+    |> apply ensemble_id
+    |> apply block_index()
+    |> apply thread_index()
+    |> row_gather_reduce rng (fun rng config policy_probs i j_tns =>
+        inl action_id = local_discrete_sampling rng config policy_probs i j_tns
+        local_get_prob config action_id (zip policy_probs j_tns), action_id
+        )
 
-        apply_updates rng grid weights trace_rewards
+// Returns policy probability of an action given the ensemble_id and the action_id.
+// If the first argument is true, it does that using the `policy.current` else it uses `policy.average`.
+inl get_policy_probs model ensemble_id action_id =
+    // Extract the output probabilities (already calculated.)
+    inl output_probs = (key_extract model .output_probs : tensor d4 float)
+    tensor_index (ensemble_id, block_index(), thread_index(), action_id) output_probs
+
+// Updates the trace state log path probabilities.
+inl push_trace (trace_state : trace_state) {thread_id ensemble_id player_id} (action_prob, action_id : action_prob * action_id) : () =
+    // Updates the log path probs in the trace_state.
+    inl v = {
+        sampling = log (conv action_prob.sampling)
+        policy = log (conv action_prob.policy)
+    }
+    // Updates the log path probs in the trace_state.
+    tensor_update (ensemble_id, thread_id, player_id) (loop.add v) trace_state.log_path_probs
+
+// Updates the trace state log path probabilities.
+inl update_trace_state_path_probs x = push_trace x

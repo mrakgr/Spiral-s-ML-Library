@@ -5,15 +5,16 @@ open tensorm
 open corecuda
 open rangem
 
-type graph_body = tensor d3 cem.prob * cem.trace_state
+type graph_body = tensor d3 cem.prob * cem.model * cem.trace_state
 
-// The noinline prefix will force the __noinline__ annotation in the generated code when placed on a join point.
-inl noinline_run forall inp out.
+inl trace_and_play_ forall inp out.
+        (is_train : bool) // The sampling behavior differs depending on whether the training is being done.
         rng
         (model : model graph_body)
-        (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid)
-        (output : int -> out)
-        ~(data : inp) =
+        (sizes : cem.sizes)
+        (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid) 
+        (output : int -> out) 
+        ~({player_id}, data : {player_id : cem.player_id} * inp) =
     // Get the ensemble,block and thread dimensions based on the output tensor.
     inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
     inl () = // Assert that all the dimensions are right.
@@ -51,21 +52,87 @@ inl noinline_run forall inp out.
 
     __syncthreads()
 
-    // Randomly pick an ensemble id for each thread.
-    inl ensemble_id : int = random.int_range {from=0; nearTo=ensemble} ls.rng
+    // Extract the cem model.
+    inl cem_model = (key_extract model .cem_model : cem.model)
 
-    // Extract the output probabilities (already calculated).
-    inl output_probs = (key_extract model .output_probs : tensor d4 float)
+    // Extract the output index and the sampling probability for it.
+    inl sampling,action_id =
+        inl ensemble_id : int = 
+            if is_train then
+                // The ensemble id is held steady between the `apply_updates` calls.
+                tensor_index {} cem_model.exploratory_ensemble_id
+            else
+                // Generates a random ensemble_id and shares it across all the threads in the block.
+                random.int_range {from=0; nearTo=sizes.ensemble_id} rng
+                |> transposing_loop.shuffle 0
 
-    inl output_id =
-        open primitives
-        output_probs
-        |> apply ensemble_id
-        |> apply block_index()
-        |> apply thread_index()
-        |> row_gather_reduce rng local_discrete_sampling
+        cem.get_action rng model ensemble_id
+        // Shares the action_id across all the threads in the block.
+        |> transposing_loop.shuffle 0
+
+    // Extract the cem trace state model.
+    inl cem_trace_state = (key_extract model .cem_trace_state : cem.trace_state)
     
-    output output_id
+    // Index of the thread in the grid.
+    inl thread_id = rangem.threads_in_grid().from
+
+    loop.linear ensemble fun ensemble_id =>
+        // Calculate the policy probability for the given action.
+        inl policy = cem.get_policy_probs model ensemble_id action_id
+        cem.update_trace_state_path_probs cem_trace_state {thread_id ensemble_id player_id} ({policy sampling}, action_id)
+
+    output action_id
+
+inl run_ forall inp out.
+        rng
+        (model : model graph_body)
+        (exists mid. input : exists mid. (inp -> mid) * pickler.pu mid)
+        (output : int -> out)
+        ~(data : inp) =
+    // Get the ensemble,block and thread dimensions based on the output tensor.
+    inl ensemble,block,thread,inner = (key_extract model .output_probs : tensor d4 float).dim
+    inl () = // Assert that all the dimensions are right.
+        assert (block = blocks_per_grid()) "The second dimension of the output tensor has to equal the number of blocks per grid."
+        assert (thread = threads_per_block()) "The third dimension of the output tensor has to equal number threads per block."
+        inl block',thread',_ = (key_extract model .input : tensor d3 float).dim
+        assert ((block,thread) = (block',thread')) "The first two dimensions of the input tensor have to match number of blocks per grid and number of threads per block respectively."
+
+    // Extract the input tensor.
+    inl x = (key_extract model .input : tensor d3 float)
+    assert (block = fst x.dim) "The first dimension of the input tensor has to equal the number of blocks per grid."
+    inl x = x |> apply block_index()
+    assert (thread = fst x.dim) "The second dimension of the input tensor has to equal number threads per block."
+
+    // Sets the input tensor to 0.
+    loop.projective threads_in_block(x.dim) fun i =>
+        tensor_set i 0 x
+
+    __syncthreads()
+
+    // Serializes the data into the input tensor.
+    inl () =
+        open pickler
+        inl tns_input = apply thread_index() x
+        snd input .pickle (fst input data) (0,tns_input |> ptr_at_current_offset)
+
+    __syncthreads()
+
+    // TODO: Might have to change this to a loop once we do RNNs.
+
+    // Randomly pick an ensemble id for each thread.
+    inl ensemble_id : int = 
+        random.int_range {from=0; nearTo=ensemble} rng
+        |> transposing_loop.shuffle 0
+
+    // Creates the layer state.
+    inl ls = create_layer_state rng
+
+    // Runs the model on the inputs.
+    graph_run_device model ls {ensemble=ensemble_id}
+
+    __syncthreads()
+    
+    output (cem.get_action rng model ensemble_id |> snd)
 
 nominal cem_game_graph inp out =
     {
@@ -83,7 +150,7 @@ nominal cem_game_model inp out =
         output : int -> out
     }
 
-inl run forall inp out. rng (cem_game_model {model input output} : cem_game_model inp out) = noinline_run rng model input output
+inl run forall inp out. rng (cem_game_model {model input output} : cem_game_model inp out) = run_ rng model input output
 
 inl to_model_ptrs forall a b. (cem_game_model {model} : cem_game_model a b) : layers.model_ptrs = model_to_model_ptrs model
 inl from_model_ptrs forall inp out. 
@@ -148,9 +215,9 @@ inl calculate_updates forall dim a b.
         (cem_game_model {model sizes} : _ a b)
         (reward : sa dim cem.reward) =
     // Since we aren't using the output_world_id we'll pass `ensemble=0` instead of extracting the other nodes one by one.
-    inl _, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
+    inl _, cem_model, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
     loop.linear sizes.ensemble_id fun ensemble_id =>
-        cem.calculate_updates sizes trace_state ensemble_id reward
+        cem.calculate_updates cem_model trace_state ensemble_id reward
 
 // Resets the trace state.
 inl reset_trace_state forall a b. (cem_game_model {model sizes} : _ a b) =
@@ -162,5 +229,5 @@ inl reset_trace_state forall a b. (cem_game_model {model sizes} : _ a b) =
 // Clamps the average policy vector if applicable.
 // Also randomizes the `exploratory_ensemble_id`.
 inl apply_updates forall a b. grid rng (cem_game_model {model} : _ a b) =
-    inl _, cem_model, trace, trace_state : graph_body = layers.graph_extract model {}
+    inl _, cem_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
     cem.apply_updates grid rng cem_model

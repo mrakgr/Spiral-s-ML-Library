@@ -92,7 +92,6 @@ inl trace_and_play_ forall inp out.
             |> tensor_index (ensemble_id, block_index(), thread_index())
             |> conv
 
-
         // Calculate the policy probability for the given action.
         inl policy = 
             if is_train then
@@ -267,5 +266,5 @@ inl reset_trace_state forall a b. (cfr_game_model {model sizes} : _ a b) =
 // Clamps the average policy vector if applicable.
 // Also randomizes the `exploratory_ensemble_id`.
 inl apply_updates forall a b. grid rng (cfr_game_model {model} : _ a b) =
-    inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {}
+    inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
     cfr.apply_updates grid rng cfr_model

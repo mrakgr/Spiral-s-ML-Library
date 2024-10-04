@@ -678,13 +678,13 @@ inl local_masked_reduce forall t. config neutral_element (f : t -> t -> t) (x' :
     |> fun (x,cond) => assert cond "The local reduce must be true." . x
 
 inl local_masked_count config = local_map (fun mask => if mask then 1 else 0 : int) >> local_sum config
-inl local_masked_sum config x mask = zip x mask |> local_map (fun x,mask => if mask then x else 0) |> local_sum config
-inl local_masked_average config x mask = local_masked_sum config x mask / conv (local_masked_count config mask)
+inl local_masked_sum config mask x = zip x mask |> local_map (fun x,mask => if mask then x else 0) |> local_sum config
+inl local_masked_average config mask x = local_masked_sum config mask x / conv (local_masked_count config mask)
 
 // Numerically stable softmax.
 inl local_masked_softmax forall dim t{number;float}. (mask : row_config -> t -> dim -> int -> bool) config x i j_tns =
     inl mask = local_map (fun x,j => mask config x i j : bool) (zip x j_tns)
-    inl average = local_masked_average config x mask
+    inl average = local_masked_average config mask x
     inl x = local_map (fun x,mask => exp ((if mask then x else limit.min) - average)) (zip x mask)
     inl sum = local_sum config x
     local_map (fun x => x / sum) x
@@ -740,6 +740,15 @@ inl local_binarize (modulo : uint) config x i (j_tns : tensor (int * int) int) :
     // https://forums.developer.nvidia.com/t/32bit-shift-on-32bit-integer/188953
     inl x = local_map (fun x,j => (if x <= 0 then 0 else 1) <<< j) (zip x j_tns)
     local_reduce config 0 (|||) x % modulo
+
+// Gets the probability for the selected action.
+inl local_get_prob config (action_id : int) (probs : tensor _ (float * int)) =
+    local_reduce config (0,limit.max) (fun a b =>
+        if snd a = action_id then a
+        elif snd b = action_id then b
+        else a
+        ) probs
+    |> fun prob,i => assert (i <> limit.max) "Expected a valid action id in get_prob." . prob
 
 inl test1() =
     inl m,n : int * int = 3, 36*4
