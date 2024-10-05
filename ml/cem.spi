@@ -31,22 +31,21 @@ type model =
         rewards : tensor ensemble_id ratio // actual reward is reward / count
     }
 
-inl graph (size : sizes) : _ (trace_state) =
+inl graph (size : sizes) : _ (model * trace_state) =
     open partitionm
 
-    inl trace_state : partition trace_state = 
+    inl model' : partition model =
+        !{} *. !size.ensemble_id
+        |> reorder (fun exploratory_ensemble_id,rewards => {exploratory_ensemble_id rewards})
+
+    inl trace_state : partition trace_state =
         !(size.ensemble_id, size.thread_id, size.player_id)
         |> reorder (fun log_path_probs => {log_path_probs})
-    // Initializes all the elements of the arrays to zero.
-    inl init_zero forall t. (x : t) : () = real
-        struct.iter (fun x =>
-            struct.iter (fun x =>
-                $"!(x.array)[:] = 0" : ()
-                ) x.bodies
-        ) x
 
     inl (<|) a b = layers.pair a b
-    (layers.key_graph .cem_trace_state (layers.weight' trace_state init_zero))
+    open layers
+    (key_graph .cem_model (layer weight_id() model' init_zero))
+    <| (key_graph .cem_trace_state (layer workspace_id() trace_state init_zero))
 
 // According to CEM papers, adding noise helps performance significantly in games like tetris.
 inl cross_entropy_noise() = 0.1
@@ -58,7 +57,7 @@ inl cross_entropy_noise() = 0.1
 // We're going to be using a curriculum training, so I don't want the weights being pruned prematurely.
 inl mean_decay() = 1
 
-type weights = list (exists dim. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float)
+type weights = exists dim. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float
 
 inl calculate_updates forall dim. ({rewards} : model) ({log_path_probs} : trace_state) (ensemble_id : ensemble_id) (reward : sa dim reward) =
     open tensorm
@@ -99,7 +98,7 @@ inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) 
         ) 
         transposed_weights transposed_weights
 
-inl apply_updates rng grid (weights : weights) model : () =
+inl apply_updates rng grid (weights : list weights) model : () =
     weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
         grid_transpose weights transposed_weights
         )

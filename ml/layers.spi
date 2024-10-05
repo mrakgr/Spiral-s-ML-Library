@@ -5,7 +5,8 @@ open tensorm
 
 type space_id = int
 inl weight_id() : space_id = 0
-inl output_id() : space_id = 1
+// For input layers and intermediates.
+inl workspace_id() : space_id = 1
 inl weight_adjoint_id() : space_id = 2
 type num_spaces = 3
 inl num_spaces() : space_id = real real_core.type_lit_to_lit `num_spaces
@@ -137,7 +138,7 @@ inl pass_calculate_partitions forall t_top. (x : graph t_top) (dims : graph_dims
         match out with
         | Some x => f x
         | None =>
-            inl sid = output_id()
+            inl sid = workspace_id()
             inl rec loop forall t'. (x : dim_of t') : partition_offsets t' =
                 match x with
                 | D_P(a,b) => open partitionm in loop a +. loop b
@@ -411,23 +412,46 @@ inl binarize forall dim t{float;number}. modulo (x : graph (tensor (int * dim * 
 inl binarize' forall dim t{float;number}. modulo out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) uint) =
     binarize_ modulo (Some out) x
 
-// Takes the sqrt of the product of the tensor dimensions.
-inl weight_init forall dim t. (x : tensor dim t) : () =
-    cupy.copy_to {from=cupy.random_normal{mean=0; std=loop.prod x.dim |> conv |> (/) 1 |> sqrt} x.dim; to=x}
-inl weight' x init = Layer(weight_id(), x, init)
-inl weight x = open partitionm in weight' !x weight_init
-inl input' x = Layer(output_id(), x, const ())
-inl matmul (b,a) x = BlockMatmul(x, weight (a,b))
 inl key_scalar forall t key{symbol}. (key : key) : graph t = KeyScalar(exists key)
-inl matmul_ensemble (c,b,a : int * int * int) x =
-    open partitionm
-    BlockMatmul(x, Apply(exists Layer(weight_id(), !(c,a,b), weight_init), key_scalar .ensemble))
-inl key_graph forall key{symbol}. (key : key) x = KeyGraph((exists key), x)
-inl input forall dim' t key{symbol}. (key : key) (dim' : dim') : graph (tensor dim' t) = 
-    open partitionm
-    KeyGraph((exists key), Layer(output_id(), !dim', const ()))
+inl key_graph forall t key{symbol}. (key : key) (x : graph t) : graph t = KeyGraph((exists key), x)
 inl apply forall key{symbol} a b t. (b : key) (a : graph (tensor (a * b) t)) : graph (tensor b t) = Apply(exists a, key_scalar b)
 inl pair forall a b. (a : graph a) (b : graph b) : graph (a * b) = Pair(a,b)
+inl fst' forall a b. (x : graph (a * b)) : graph a = Fst(exists x)
+inl layer id p init = Layer(id, p, init)
+inl tensor id dim' init = open partitionm in Layer(id, !dim', init)
+
+// Initializes all the elements of the tensors to zero.
+inl init_zero forall t. (x : t) : () = real
+    struct.iter (fun x =>
+        struct.iter (fun x =>
+            $"!(x.array)[:] = 0" : ()
+            ) x.bodies
+    ) x
+
+// Takes the inverse of the sqrt of the product of the tensor dimensions. Similar to Xavier initialization.
+inl weight_init forall dim t. (to : tensor dim t) : () = // TODO: This would be xavier init if we were using 2d matrices. We're also missing a mult by a constant.
+    cupy.copy_to { to from=cupy.random_normal{mean=0; std=loop.prod to.dim |> conv |> (/) 1 |> sqrt} to.dim }
+    
+inl weight' x init =  tensor weight_id() x init
+inl weight x = weight' x weight_init
+inl matmul (b,a) x = BlockMatmul(x, weight (a,b))
+inl matmul_ensemble (c,b,a : int * int * int) x =
+    open partitionm
+    inl weights = tensor weight_id() (c,a,b) weight_init
+    BlockMatmul(x, apply .ensemble weights)
+type ensemble_id = int
+type cem_weight_layer_dual float = tensor (ensemble_id * (int * int)) float * tensor ((int * int) * ensemble_id) float
+inl matmul_ensemble_with_adjoint forall el. (c,b,a : int * int * int) x : graph (tensor (int * int * int) el) =
+    inl weights : graph (cem_weight_layer_dual el) = 
+        pair (tensor weight_id() (c,(a,b)) weight_init)
+             (tensor weight_adjoint_id() ((a,b),c) const() : graph (tensor _ el))
+        |> key_graph .cem_weight_layer_dual
+    BlockMatmul(x, apply .ensemble (fst' weights))
+// Creates a layer in the workspace. Doesn't initialize it.
+inl input' x = Layer(workspace_id(), x, const ())
+inl input forall dim' t key{symbol}. (key : key) (dim' : dim') : graph (tensor dim' t) = 
+    open partitionm
+    key_graph key (tensor workspace_id() dim' const())
 
 inl create_model forall t. (graph : graph t) =
     inl dims = compile_time.hashmapm.create()
@@ -441,7 +465,7 @@ nominal model_ptrs = tuple_list num_spaces ptr
 inl model_to_model_ptrs (x : model _) = x.data |> listm.map (fun x => x.array) |> tuple_listm.fromList |> model_ptrs
 inl model_ptrs_to_model (graph : graph _) (model_ptrs d) =
     inl dims = compile_time.hashmapm.create()
-    inl data = 
+    inl data =
         (pass_calculate_partitions graph dims, tuple_listm.toList d)
         ||> listm.map2 (fun x array => {x with array})
     compile_time.hashmapm.set_immutable(dims)

@@ -194,7 +194,7 @@ inl vs_self (neural : state_neural) =
 
 // Does a training run against the random player.
 inl vs_rando (neural : state_neural) =
-    inl sizes = model_cfr.nlholdem_sizes()
+    inl sizes = model_cem.nlholdem_sizes()
     inl config = event_config()
     inl trace_rewards : _ _ (float * float) = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
     inl frontend_rewards : _ _ float = tensorm.tensor_create trace_rewards.dim
@@ -203,7 +203,7 @@ inl vs_rando (neural : state_neural) =
             inl grid = cooperative_groups.create_grid()
             random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
             |> state_to_internal_train grid
-        inl model = ml.cfr_models.from_model_ptrs model_cfr.game_graph() neural.model_ptrs
+        inl model = ml.cem_models.from_model_ptrs model_cem.game_graph() neural.model_ptrs
         loop.linear config.outer fun (outer : int) =>
             loop.linear config.inner fun (inner : int) =>
                 // The loop uses less registers than a noinline function.
@@ -213,13 +213,13 @@ inl vs_rando (neural : state_neural) =
                     train_loop true model state (Some player_id) game_start()
                     // Adds the rewards to the trace.
                     inl reward = index state.rewards player_id
-                    inl total_path_prob = ml.cfr_models.extract_integrated_path_prob model
+                    inl total_path_prob = ml.cem_models.extract_integrated_path_prob model
                     loop.linear sizes.ensemble_id fun ensemble_id =>
-                        inl ensemble_path_prob = total_path_prob - ml.cfr_models.extract_integrated_path_prob_excluding model {ensemble_id}
+                        inl ensemble_path_prob = total_path_prob - ml.cem_models.extract_integrated_path_prob_excluding model {ensemble_id}
                         tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)
                             (reward * ensemble_path_prob, ensemble_path_prob)
                             trace_rewards
-                    ml.cfr_models.calculate_updates model state.rewards
-            ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
+                    ml.cem_models.calculate_updates model state.rewards
+            ml.cem_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
         ml.primitives.grid_map (refm.from_local state.grid) (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
     frontend_rewards

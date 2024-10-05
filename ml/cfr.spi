@@ -58,15 +58,15 @@ type sizes =
         world_id : world_id
         player_id : player_id
         action_id : action_id
-        action_mask : int
+        number_of_valid_actions : action_id
         seq_id : seq_id
         thread_id : thread_id
     }
 
 inl graph (size : sizes) : _ (model * trace * trace_state) =
     open partitionm
-    assert (size.action_mask <= size.action_id) "The number of masked in actions (action_mask) must be less than or equal the size of the action_id tensor dimension."
-    inl model : partition model = 
+    assert (size.number_of_valid_actions <= size.action_id) "The number of valid actions must be less than or equal the size of the action_id tensor dimension."
+    inl model' : partition model = 
         inl table = !(size.ensemble_id, size.world_id, size.action_id)
         inl exploratory_ensemble_id = !{}
         exploratory_ensemble_id *. table 
@@ -77,29 +77,24 @@ inl graph (size : sizes) : _ (model * trace * trace_state) =
     inl trace_state : partition trace_state =
         !(size.ensemble_id, size.thread_id, size.player_id) *. !(size.ensemble_id, size.thread_id)
         |> reorder (fun (log_path_probs, seq_id) => {log_path_probs seq_id})
-    // Initializes all the elements of the arrays to zero.
-    inl init_zero forall t. (x : t) : () = real
-        struct.iter (fun x =>
-            struct.iter (fun x =>
-                $"!(x.array)[:] = 0" : ()
-                ) x.bodies
-        ) x
+
     // Initializes all the model average to the average_threeshold divided by the size of the innermost dimension.
     inl init_average ({table} : model) : () =
         inl average = table |> rezip (fun x => x.policy.average)
-        inl init_value = average_threeshold() / conv size.action_mask
+        inl init_value = average_threeshold() / conv size.number_of_valid_actions
         $"!(real average.bodies.array)[:] = !init_value"
 
-    inl (<|) a b = layers.pair a b
-    (layers.key_graph .cfr_model (layers.weight' model (fun x => init_zero x . init_average x)))
-    <| (layers.key_graph .cfr_trace (layers.input' trace))
-    <| (layers.key_graph .cfr_trace_state (layers.weight' trace_state init_zero))
+    open layers
+    inl (<|) a b = pair a b
+    (key_graph .cfr_model (layer weight_id() model' (fun x => init_zero x . init_average x)))
+    <| (key_graph .cfr_trace (input' trace))
+    <| (key_graph .cfr_trace_state (layer workspace_id() trace_state init_zero))
 
-inl mask_of action_mask (_ : primitives.row_config) _ (_ : int) (i : int) = i < action_mask
+inl mask_of number_of_valid_actions (_ : primitives.row_config) _ (_ : int) (i : int) = i < number_of_valid_actions
 
 // Returns policy probability of an action given the ensemble_id, world_id and the action_id.
 // If the first argument is true, it does that using the `policy.current` else it uses `policy.average`.
-inl get_policy_probs_ is_current action_mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) (action_id : action_id) : prob = join
+inl get_policy_probs_ is_current number_of_valid_actions (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) (action_id : action_id) : prob = join
     open primitives
     model.table
     |> apply ensemble_id
@@ -107,7 +102,7 @@ inl get_policy_probs_ is_current action_mask (model : model) ~(ensemble_id, worl
     |> rezip (fun {policy} => if is_current then policy.current else policy.average)
     |> row_gather_reduce () (fun () config policy i j_tns =>
         open random
-        inl policy_probs = local_masked_regret_matching (mask_of action_mask) config policy i j_tns
+        inl policy_probs = local_masked_regret_matching (mask_of number_of_valid_actions) config policy i j_tns
         local_get_prob config action_id (zip policy_probs j_tns)
         )
 
@@ -118,7 +113,7 @@ inl get_policy_probs x = get_policy_probs_ true x
 inl get_average_probs x = get_policy_probs_ false x
 
 // Samples an action from the model using the average policy and returns both the action and the probabilities of it being selected.
-inl get_action rng action_mask (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) : prob * action_id = join
+inl get_action rng number_of_valid_actions (model : model) ~(ensemble_id, world_id : ensemble_id * world_id) : prob * action_id = join
     open primitives
     model.table
     |> apply ensemble_id
@@ -127,8 +122,8 @@ inl get_action rng action_mask (model : model) ~(ensemble_id, world_id : ensembl
     |> row_gather_reduce rng (fun rng config x i j_tns =>
         open random
         inl sampling, policy = unzip x
-        inl sampling_probs, action_id = local_masked_regret_matching_and_discrete_sampling (mask_of action_mask) rng config sampling i j_tns
-        inl policy_probs = local_masked_regret_matching (mask_of action_mask) config policy i j_tns
+        inl sampling_probs, action_id = local_masked_regret_matching_and_discrete_sampling (mask_of number_of_valid_actions) rng config sampling i j_tns
+        inl policy_probs = local_masked_regret_matching (mask_of number_of_valid_actions) config policy i j_tns
         inl get_prob probs = local_get_prob config action_id (zip probs j_tns)
         get_prob sampling_probs, action_id
         )
@@ -192,7 +187,7 @@ inl calculate_updates forall dim.
         |> row_gather_reduce () (fun () config x thread_id j_tns => // row_gather shares the vars in lexical scope via shared memory
             inl policy_current, value_current = unzip x
             inl values = local_map (fun reward, count => if count <> 0 then reward / count else 0) value_current
-            inl action_probs = local_masked_regret_matching (mask_of size.action_mask) config policy_current thread_id j_tns
+            inl action_probs = local_masked_regret_matching (mask_of size.number_of_valid_actions) config policy_current thread_id j_tns
             inl weighted_values =
                 local_map (fun value, j => 
                     (if action_id = j then (reward - value) / action_sampling_prob else 0) + value
@@ -289,7 +284,7 @@ inl test1() =
             world_id = 1 <<< 12
             player_id = 2
             action_id = 1 <<< 2
-            action_mask = 3
+            number_of_valid_actions = 3
             seq_id = 1 <<< 4
             thread_id = rangem.threads_in_grid().by // number of threads in grid
         }
@@ -306,8 +301,8 @@ inl test1() =
         inl thread_id = rangem.threads_in_grid().from
 
         let push (ensemble_id, world_id, player_id : ensemble_id * world_id * player_id) = 
-            inl sampling, action_id = get_action rng sizes.action_mask model (ensemble_id, world_id)
-            inl policy = get_policy_probs sizes.action_mask model (ensemble_id, world_id) action_id
+            inl sampling, action_id = get_action rng sizes.number_of_valid_actions model (ensemble_id, world_id)
+            inl policy = get_policy_probs sizes.number_of_valid_actions model (ensemble_id, world_id) action_id
             push_trace trace trace_state {thread_id ensemble_id world_id player_id} ({policy sampling}, action_id)
 
         push (0, 235, 0)

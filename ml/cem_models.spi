@@ -229,5 +229,7 @@ inl reset_trace_state forall a b. (cem_game_model {model sizes} : _ a b) =
 // Clamps the average policy vector if applicable.
 // Also randomizes the `exploratory_ensemble_id`.
 inl apply_updates forall a b. grid rng (cem_game_model {model} : _ a b) =
-    inl _, cem_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
-    cem.apply_updates grid rng cem_model
+    inl x : list (cem_weight_layer_dual float) = key_extract_list model .cem_weight_layer_dual
+    inl l : list cem.weights = x |> listm.map (fun a,b => exists a,b)
+    inl _, cem_model, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
+    cem.apply_updates rng grid l cem_model

@@ -72,7 +72,7 @@ inl trace_and_play_ forall inp out.
             (key_extract model .output_world_id : tensor d3 uint)
             |> tensor_index (ensemble_id, block_index(), thread_index())
 
-        cfr.get_action rng sizes.action_mask cfr_model (ensemble_id, conv world_id)
+        cfr.get_action rng sizes.number_of_valid_actions cfr_model (ensemble_id, conv world_id)
         // Shares the action_id across all the threads in the block.
         |> transposing_loop.shuffle 0
 
@@ -96,10 +96,10 @@ inl trace_and_play_ forall inp out.
         inl policy = 
             if is_train then
                 // During training the policy is the current policy.
-                cfr.get_policy_probs sizes.action_mask cfr_model (ensemble_id, world_id) action_id
+                cfr.get_policy_probs sizes.number_of_valid_actions cfr_model (ensemble_id, world_id) action_id
             else
                 // During evaluation the policy is the average policy.
-                cfr.get_average_probs sizes.action_mask cfr_model (ensemble_id, world_id) action_id
+                cfr.get_average_probs sizes.number_of_valid_actions cfr_model (ensemble_id, world_id) action_id
 
         if is_train then
             // Pushes the data into the trace.
@@ -168,7 +168,7 @@ inl run_ forall inp out.
     inl cfr_model = (key_extract model .cfr_model : cfr.model)
 
     // Extract the output index.
-    inl _,output_id = cfr.get_action rng sizes.action_mask cfr_model (ensemble_id, conv world_id)
+    inl _,output_id = cfr.get_action rng sizes.number_of_valid_actions cfr_model (ensemble_id, conv world_id)
 
     output output_id
 

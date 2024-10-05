@@ -62,7 +62,7 @@ inl nlholdem_sizes() : ml.cfr.sizes =
         world_id = 1 <<< 12
         player_id = 2
         action_id = 1 <<< 4
-        action_mask = length possible_actions()
+        number_of_valid_actions = length possible_actions()
         seq_id = 1 <<< 7
         thread_id = threads_per_block() * blocks_per_grid()
     }
