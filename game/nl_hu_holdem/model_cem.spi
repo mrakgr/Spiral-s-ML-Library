@@ -5,7 +5,7 @@ open lib
 open game
 
 // TODO: Don't forget to increase this later.
-type history = sa_list 20 (option action) // The game history. RL agents need this one.
+type history = sa_list 20 (option action) // The game history. Specific to the RL agents rather than the game.
 
 inl nlholdem_pickler() : pickler.pu {history : history; pot : sa 2 int; stack : sa 2 int; player_cards : sa 2 card; community_cards : sa_list 5 card} =
     open pickler
@@ -63,6 +63,8 @@ inl nlholdem_sizes() : ml.cem.sizes =
     {
         ensemble_id = 4
         player_id = 2
+        action_id = 1 <<< 6
+        number_of_valid_actions = length possible_actions()
         thread_id = threads_per_block() * blocks_per_grid()
     }
 
@@ -71,17 +73,17 @@ inl nlholdem_graph() : ml.layers.graph ml.cem_models.graph_body =
     inl pu_history = nlholdem_pickler()
     inl cem_sizes = nlholdem_sizes()
     inl sizes = {
-        ensemble = 32 // The third dimension of each weight layer.
+        ensemble = cem_sizes.ensemble_id // The third dimension of each weight layer.
         block = blocks_per_grid()
         thread = threads_per_block()
         input = modup pu_history.size 128
-        final = 64
+        final = cem_sizes.action_id
     }
 
     inl neural =
         (input .input (sizes.block,sizes.thread,sizes.input) : graph (tensor (int * int * int) float))
         |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.input,sizes.final)
-        |> masked_softmax' (length possible_actions()) (
+        |> masked_softmax' cem_sizes.number_of_valid_actions (
             input .output_probs (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble
         )
 

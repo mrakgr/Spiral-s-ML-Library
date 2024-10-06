@@ -1,0 +1,90 @@
+open corebase
+open corecuda
+open tensorm
+open cardm
+open game
+
+type history = sa_list 10 (choice2 action card) // The game history. Specific to the RL agents rather than the game.
+
+inl leduc_pickler() : pickler.pu history =
+    open pickler
+    inl card : pu card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl action : pu action = alt {
+        Fold = unit()
+        Call = unit()
+        Raise = unit()
+    }
+    inl action_or_card : pu (choice2 action card) = action ++ card
+    inl history : pu history = sa_list action_or_card
+    history
+
+inl leduc_conv (table, messages : table * messages) : history = 
+    messages |> sa_listm.choose function
+        | PlayerGotCard(id,card) when id = table.player_turn => Some(C2of2 card)
+        | CommunityCardIs card => Some(C2of2 card)
+        | PlayerAction(id,action) => Some(C1of2 action)
+        | _ => None
+
+inl leduc_sizes() : ml.cem.sizes =
+    {
+        ensemble_id = 4
+        player_id = 2
+        number_of_valid_actions = 3
+        action_id = 1 <<< 6
+        thread_id = threads_per_block() * blocks_per_grid()
+    }
+
+inl leduc_graph() : ml.layers.graph ml.cem_models.graph_body =
+    open ml.layers
+    inl pu_history = leduc_pickler()
+
+    inl cem_sizes = leduc_sizes()
+    assert (cem_sizes.number_of_valid_actions <= cem_sizes.action_id) "The sizes of action in the table must be >= the length of possible actions."
+    inl sizes = {
+        ensemble = cem_sizes.ensemble_id // The third dimension of each weight layer.
+        block = blocks_per_grid()
+        thread = threads_per_block()
+        inner = modup pu_history.size 128
+        final = cem_sizes.action_id
+    }
+
+    inl neural =
+        (input .input (sizes.block,sizes.thread,sizes.inner) : graph (tensor (int * int * int) float))
+        |> matmul_ensemble (sizes.ensemble,sizes.inner,sizes.final)
+        |> masked_softmax' cem_sizes.number_of_valid_actions (
+            input .output_probs (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble
+        )
+
+    inl cem_table = ml.cem.graph(cem_sizes) |> key_graph .cem_table
+    pair neural cem_table
+
+union alt_action = AA_Raise | AA_Call | AA_Fold
+
+// Converts the alternative actions to the regular ones.
+inl action_conv (table : table) (x : alt_action) : action = 
+    match x with
+    | AA_Fold =>
+        inl pot_size_needed_to_call = arraym.reduce max table.pot
+        if index table.pot table.player_turn = pot_size_needed_to_call then Call else Fold
+    | AA_Call => Call
+    | AA_Raise => if table.raises_left > 0 then Raise else Call
+
+inl leduc_output : int -> _ = function
+    | 0 => AA_Fold
+    | 1 => AA_Call
+    | 2 => AA_Raise
+    | _ => failwith "Invalid output id in the Leduc model."
+
+open ml.cem_models
+inl game_graph() =
+    cem_game_graph {
+        graph = leduc_graph()
+        sizes = leduc_sizes()
+        input = exists leduc_conv, leduc_pickler()
+        output = leduc_output
+    }
+

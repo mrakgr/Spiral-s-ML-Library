@@ -19,6 +19,8 @@ type sizes =
     {
         ensemble_id : ensemble_id
         player_id : player_id
+        action_id : action_id
+        number_of_valid_actions : action_id
         thread_id : thread_id
     }
 type trace_state =

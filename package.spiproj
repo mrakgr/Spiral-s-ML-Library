@@ -114,11 +114,13 @@ modules:
             cardm
             deckm
             game
-            model
-            performance
+            model_cfr
+            model_cem
             types-
-            play
-            train
+            play_cfr
+            train_cfr
+            play_cem
+            train_cem
             full
             tests/
                 train
