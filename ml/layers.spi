@@ -240,6 +240,7 @@ inl graph_extract_ forall t_top indices. layer_state (model {graph data} : model
             out
         | Zip(a,b) => zip (loop a) (loop b)
         | Pair(a,b) => loop a, loop b
+        | Fst(exists ab. x) => loop x |> fst
         | Layer(sid,_,_) => index data sid |> handle_data_elem |> handle_body
         | Apply(exists a. a,b) => apply (loop b) (loop a)
         | KeyGraph(_,x) => loop x
