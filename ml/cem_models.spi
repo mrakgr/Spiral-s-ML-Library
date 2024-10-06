@@ -152,10 +152,10 @@ nominal cem_game_model inp out =
 
 inl run forall inp out. rng (cem_game_model {model input output} : cem_game_model inp out) = run_ rng model input output
 
-inl to_model_ptrs forall a b. (cem_game_model {model} : cem_game_model a b) : layers.model_ptrs = model_to_model_ptrs model
+inl to_model_ptrs forall a b. (cem_game_model {model} : cem_game_model a b) : layers.model_ptrs .cem = model_to_model_ptrs model
 inl from_model_ptrs forall inp out. 
         (cem_game_graph {graph sizes input output} : cem_game_graph inp out) 
-        (x : layers.model_ptrs) 
+        (x : layers.model_ptrs .cem)
         : cem_game_model inp out = 
     inl model = model_ptrs_to_model graph x
     cem_game_model { model sizes input output }

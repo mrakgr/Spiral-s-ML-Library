@@ -4,7 +4,10 @@ open corepython
 open coreext
 open serializerm
 
-inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
+// This is so we don't accidentally run the wrong model in the future.
+type neural_ptr_type = .cem
+
+inl event_loop_gpu = fun (msg, state : _ event * _ (state neural_ptr_type)) =>
     inl msg, {game neural} = jsonm.deserialize msg, jsonm.deserialize state
     inl seri = {
         msg = create_serializer : serializer event
@@ -19,9 +22,9 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
 
     inl effects : plist ui_effects = plistm.create'
     match msg with
-    | StartTrainingVsRando => train.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    | StartTrainingVsSelf => train.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
-    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play.vs_human seri neural
+    | StartTrainingVsRando => train_cem.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
+    | StartTrainingVsSelf => train_cem.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play_cem.vs_human seri neural
 
     device_sync()
 
@@ -38,6 +41,6 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
 
 inl main() =
     named_tuple "Leduc_Full" {
-        init = fun () => jsonm.serialize init()
+        init = fun () => jsonm.serialize init(model_cem.game_graph() |> ml.cem_models.init |> ml.cem_models.to_model_ptrs : _ neural_ptr_type)
         event_loop_gpu
     }

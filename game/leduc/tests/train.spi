@@ -3,7 +3,7 @@ open corecuda
 open coreext
 open cardm
 open game
-open model
+open model_cfr
 
 inl pu_table() : pickler.pu table =
     open pickler

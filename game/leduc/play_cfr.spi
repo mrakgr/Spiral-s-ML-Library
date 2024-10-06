@@ -48,7 +48,7 @@ inl internal_set_play (state_internal : state_internal_play) (state : state_game
     state_internal.deck <- state.private.deck
     state_internal.messages <- state.public.messages
 
-inl play_loop (neural : state_neural) (state : state_internal_play) node =
+inl play_loop (neural : state_neural .cfr) (state : state_internal_play) node =
     inl push_message = sa_listm.push state.messages
     inl pop_deck () =
         open refm
@@ -83,8 +83,8 @@ inl play_loop (neural : state_neural) (state : state_internal_play) node =
         | Round table => 
             match index state.pl_type table.player_turn with
             | Computer =>
-                open model
-                inl model = ml.cfr_models.from_model_ptrs model.game_graph() neural.model_ptrs
+                open model_cfr
+                inl model = ml.cfr_models.from_model_ptrs game_graph() neural.model_ptrs
                 inl data = table, state.messages
                 inl action = 
                     ml.cfr_models.run (refm.from_local state.rng) model data |> action_conv table
@@ -144,7 +144,7 @@ open corepython
 open coreext
 open serializerm
 
-inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural) =
+inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural .cfr) =
     run' fun () =>
         inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
         inl state = state_to_internal_play game_state

@@ -68,7 +68,7 @@ inl random_action = fun rng (table : table) =>
         ]
     random.sample_discrete actions rng
 
-let play_loop (neural : state_neural) (state : state_internal) node =
+let play_loop (neural : state_neural .cem) (state : state_internal) node =
     open refm
     inl push_message = sa_listm.push state.messages
     inl deck = state.deck
@@ -184,7 +184,7 @@ inl event_loop_play state_neural (msg, state_internal : event * state_internal) 
     |> optionm.iter (play_loop state_neural state_internal)
 
 open serializerm
-inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural) =
+inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural .cem) =
     run' fun () =>
         inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
         inl state = state_to_internal_play game_state

@@ -460,7 +460,7 @@ inl create_model forall t. (graph : graph t) =
     model {graph data dims}
 
 // The size of the array is bound to num_spaces.
-nominal model_ptrs = tuple_list num_spaces ptr
+nominal model_ptrs sig = tuple_list num_spaces ptr
 
 inl model_to_model_ptrs (x : model _) = x.data |> listm.map (fun x => x.array) |> tuple_listm.fromList |> model_ptrs
 inl model_ptrs_to_model (graph : graph _) (model_ptrs d) =

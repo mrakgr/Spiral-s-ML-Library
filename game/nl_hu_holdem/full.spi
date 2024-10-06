@@ -4,7 +4,10 @@ open corepython
 open coreext
 open serializerm
 
-inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
+// This is so we don't accidentally run the wrong model in the future.
+type neural_ptr_type = .cem
+
+inl event_loop_gpu = fun (msg, state : _ event * _ (state neural_ptr_type)) =>
     inl msg, {game neural} = jsonm.deserialize msg, jsonm.deserialize state
     inl seri = {
         msg = create_serializer : serializer event
@@ -40,6 +43,6 @@ inl event_loop_gpu = fun (msg, state : _ event * _ state) =>
 
 inl main() =
     named_tuple "Holdem_Full" {
-        init = fun () => jsonm.serialize init(model_cem.game_graph() |> ml.cem_models.init |> ml.cem_models.to_model_ptrs)
+        init = fun () => jsonm.serialize init(model_cem.game_graph() |> ml.cem_models.init |> ml.cem_models.to_model_ptrs : _ neural_ptr_type)
         event_loop_gpu
     }

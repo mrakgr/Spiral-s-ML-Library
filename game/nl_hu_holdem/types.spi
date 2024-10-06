@@ -38,9 +38,9 @@ type state_private =
         deck : deck
     }
 
-type state_neural =
+type state_neural sig =
     {
-        model_ptrs : ml.layers.model_ptrs
+        model_ptrs : ml.layers.model_ptrs sig
     }
 
 type state_game = 
@@ -49,10 +49,10 @@ type state_game =
         public : state_public
     }
 
-type state =
+type state sig =
     {
         game : state_game
-        neural : state_neural
+        neural : state_neural sig
     }
 
 inl init_game() =
@@ -68,10 +68,8 @@ inl init_game() =
         }
     }
 
-inl init model_ptrs : state = 
+inl init model_ptrs : state _ = 
     {
         game = init_game()
-        neural = {
-            model_ptrs
-        }
+        neural = { model_ptrs }
     }

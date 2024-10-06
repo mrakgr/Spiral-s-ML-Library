@@ -233,10 +233,10 @@ inl trace_and_train forall inp out. rng (cfr_game_model {model sizes input outpu
 inl trace_and_play forall inp out. rng (cfr_game_model {model sizes input output} : cfr_game_model inp out) = 
     trace_and_play_ false rng model sizes input output
 
-inl to_model_ptrs forall a b. (cfr_game_model {model} : cfr_game_model a b) : layers.model_ptrs = model_to_model_ptrs model
+inl to_model_ptrs forall a b. (cfr_game_model {model} : cfr_game_model a b) : layers.model_ptrs .cfr = model_to_model_ptrs model
 inl from_model_ptrs forall inp out.
         (cfr_game_graph {graph sizes input output} : cfr_game_graph inp out) 
-        (x : layers.model_ptrs) 
+        (x : layers.model_ptrs .cfr) 
         : cfr_game_model inp out = 
     inl model = model_ptrs_to_model graph x
     cfr_game_model {model sizes input output}

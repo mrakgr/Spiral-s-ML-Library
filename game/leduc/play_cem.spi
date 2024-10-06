@@ -48,7 +48,7 @@ inl internal_set_play (state_internal : state_internal_play) (state : state_game
     state_internal.deck <- state.private.deck
     state_internal.messages <- state.public.messages
 
-inl play_loop (neural : state_neural) (state : state_internal_play) node =
+inl play_loop (neural : state_neural .cem) (state : state_internal_play) node =
     inl push_message = sa_listm.push state.messages
     inl pop_deck () =
         open refm
@@ -144,7 +144,7 @@ open corepython
 open coreext
 open serializerm
 
-inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural) =
+inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural .cem) =
     run' fun () =>
         inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
         inl state = state_to_internal_play game_state
