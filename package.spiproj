@@ -98,6 +98,7 @@ modules:
             run-
         layers
         models
+        path_probs
         cfr
         cfr_models
         cem

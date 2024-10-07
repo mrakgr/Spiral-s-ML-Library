@@ -184,7 +184,7 @@ inl extract_integrated_path_prob forall inp out. (cem_game_model {model sizes} :
     |> conv
 
 // Excludes the ensemble from the path probability calculations.
-inl extract_integrated_path_prob_excluding forall inp out. (cem_game_model {model sizes} : cem_game_model inp out) {ensemble_id} : cem.prob =
+inl extract_integrated_path_prob_excluding_ensemble forall inp out. (cem_game_model {model sizes} : cem_game_model inp out) {ensemble_id} : cem.prob =
     inl log_path_probs = 
         (key_extract model .cem_trace_state : cem.trace_state).log_path_probs
         |> reorder (fun ensemble_id,thread_id,player_id => thread_id,player_id,ensemble_id)

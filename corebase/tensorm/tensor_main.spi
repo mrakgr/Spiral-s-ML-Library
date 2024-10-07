@@ -311,7 +311,6 @@ inl split_into_fst forall a b el. (f : a -> a * a) (t : tensor (a * b) el) : ten
 inl split_into_swapped_fst forall a b el. (f : a -> a * a) : tensor (a * b) el -> tensor ((a * a) * b) el = 
     split_into_fst (f >> loop.swap) >> reorder_fst loop.swap
     
-    
 // Splits the second tensor dimension into two pieces, the elementwise product of which has to equal the original.
 // Unlike reshape, the tensor dimensions do not have to be contiguous for this to work.
 // The strides of the second part being acted upon will remain as in the original, while the first part will have them adjusted.
@@ -365,6 +364,13 @@ inl mapi forall dim a b. (f : dim -> a -> b) (t : tensor dim a) : tensor dim b =
         tensor_set i (f i (tensor_index i t)) out
     out
     
+// Initializes the tensor with the given function.
+inl init forall dim a. (dim : dim) (f : dim -> a) : tensor dim a = 
+    inl out = tensor_create dim
+    loop.linear dim fun i =>
+        tensor_set i (f i) out
+    out
+
 // Inplace init. Provides the index as the first argument.
 inl reinit forall dim a. (f : dim -> a) (t : tensor dim a) : () = 
     loop.linear t.dim fun i =>

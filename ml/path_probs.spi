@@ -1,0 +1,39 @@
+open corebase
+open tensorm
+
+type ensemble_id = int
+type player_id = int
+type reward = float
+type prob = float
+type log_prob = f64
+type log_path_prob = {sampling : log_prob; policy : log_prob}
+
+// // Loops over the outermost dimension of a tensor.
+// inl loop_tensor forall b el. (t : tensor (int * b) el) f =
+//     loop.for {from=0; nearTo=fst t.dim} (fun i s => f i (tensor_apply i t) s)
+
+// TODO: Maybe return a f64?
+inl from_log_path_prob ({policy sampling} : log_path_prob) : prob = conv (exp (policy - sampling))
+
+inl integrate_rewards_for_ensemble
+    (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) 
+    (rewards : tensor player_id reward) =
+    inl ensemble, player = log_path_probs.dim
+    inl player_probs =
+        init ensemble (fun ensemble_id' =>
+            loop.for {from = 0; nearTo=player} (fun player_id' s =>
+                s + (tensor_index (ensemble_id', player_id') log_path_probs |> from_log_path_prob)
+                ) 0
+            )
+    init ensemble fun ensemble_id =>
+        loop.for {from = 0; nearTo=player} (fun player_id s =>
+            inl path_prob =
+                loop.for {from = 0; nearTo=ensemble} (fun ensemble_id' s =>
+                    inl path_prob =
+                        if ensemble_id = ensemble_id' then tensor_index (ensemble_id', player_id) log_path_probs |> from_log_path_prob
+                        else tensor_index ensemble_id' player_probs
+                    s * path_prob
+                    ) 1
+            inl reward = tensor_index player_id rewards
+            s + path_prob * reward
+            ) 0
