@@ -364,6 +364,11 @@ inl mapi forall dim a b. (f : dim -> a -> b) (t : tensor dim a) : tensor dim b =
         tensor_set i (f i (tensor_index i t)) out
     out
     
+// Iterates over a tensor using a single thread. Provides the index as the first argument.
+inl iteri forall dim a. (f : dim -> a -> ()) (t : tensor dim a) : () = 
+    loop.linear t.dim fun i =>
+        f i (tensor_index i t)
+
 // Initializes the tensor with the given function.
 inl init forall dim a. (dim : dim) (f : dim -> a) : tensor dim a = 
     inl out = tensor_create dim

@@ -61,20 +61,34 @@ inl mean_decay() = 1
 
 type weights = exists dim. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float
 
-inl calculate_updates forall dim. ({rewards} : model) ({log_path_probs} : trace_state) (ensemble_id : ensemble_id) (reward : sa dim reward) =
+// Sets the log_path_probs to 0.
+inl reset_trace_state (trace_state : trace_state) =
+    open tensorm
+    open primitives
+    inl thread_id = rangem.threads_in_grid().from
+    inl log_path_probs = trace_state.log_path_probs |> reorder (fun a,b,c => (a,b),c)
+    // Sets the log_path_probs to 0.
+    // TODO: Need to make this a gridwise operation.
+    (log_path_probs,log_path_probs) ||> grid_map (fun config x i j_tns => local_map (const loop.zeroes) x)
+
+inl calculate_updates forall dim. 
+        ({rewards} : model) 
+        (trace_state : trace_state) 
+        (reward : sa dim reward) =
     open tensorm
     inl log_path_probs =
-        log_path_probs
-        |> apply ensemble_id
-        |> apply thread_index()
+        trace_state.log_path_probs
+        |> reorder (fun ensemble_id,thread_id,player_id => thread_id,ensemble_id,player_id)
+        |> apply rangem.threads_in_grid().from
         |> apply_ptr
-    inl path_prob player_id =
-        inl {policy sampling} = tensor_index player_id log_path_probs
-        conv (exp (policy - sampling))
-    arraym.iteri (fun player_id reward =>
-        inl path_prob = path_prob player_id
+    path_probs.integrate_rewards_over_players log_path_probs (init (length reward) (index reward))
+    |> iteri (fun ensemble_id (reward, path_prob) =>
+        inl path_prob = conv path_prob
         tensor_cuda.tensor_atomic_add ensemble_id (reward * path_prob, path_prob) rewards
-        ) reward
+        )
+
+    reset_trace_state trace_state
+
 
 inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) ({rewards} : model) =
     grid_row_map' (fun config x i j_tns =>
@@ -100,8 +114,13 @@ inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) 
         ) 
         transposed_weights transposed_weights
 
-inl apply_updates rng grid (weights : list weights) model : () =
+inl apply_updates rng grid (weights : list weights) (model : model) : () =
     cooperative_groups.sync grid // TODO: Get rid of the grid sync on this line here.
+
+    if rangem.threads_in_grid().from = 0 then // We want to only change the id after all the threads have finished running the game.
+        tensorm.tensor_set {} (random.int_range {from=0; nearTo=model.rewards.dim} rng) model.exploratory_ensemble_id // Pick a random ensemble id
+    __syncwarp() // Converge the first warp.
+
     weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
         grid_transpose weights transposed_weights
         )
@@ -117,14 +136,6 @@ inl apply_updates rng grid (weights : list weights) model : () =
 
 open layers
 open tensorm
-
-// Sets the log_path_probs to 0.
-inl reset_trace_state (trace_state : trace_state) (ensemble_id : ensemble_id) =
-    open primitives
-    inl thread_id = rangem.threads_in_grid().from
-    inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id |> apply_ptr
-    // Sets the log_path_probs to 0.
-    (log_path_probs,log_path_probs) ||> row_gather_map () (fun () config x i j_tns => local_map (const loop.zeroes) x)
 
 inl get_action rng model ensemble_id =
     // Extract the output probabilities (already calculated.)

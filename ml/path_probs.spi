@@ -31,37 +31,57 @@ inl integrate_path_probs_for_player (log_path_probs : tensor (ensemble_id * play
 inl integrate_path_probs (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) = 
     fold (*) 1 (integrate_path_probs_for_player log_path_probs)
 
-// Integrates the rewards given the path probabilities.
-inl integrate_rewards
+// Creates an integration structure such that the following holds:
+// 
+// inl path_prob(ensemble_id, player_id) = total_prob / player_prob player_id * individual_prob (ensemble_id, player_id)
+// 
+// By integrating over the dimensions of this structure, and multiplying by the reward it's possible to the actual reward given the path probabilities.
+// In other words the following equals the true (unnormalized) reward for a game:
+// 
+// sum (fun (ensemble_id,player_id) => reward(player_id) * path_prob(ensemble_id, player_id))
+inl integrate_rewards_
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) 
-        (rewards : tensor player_id reward)
-        : tensor ensemble_id reward =
+        : tensor (ensemble_id * player_id) prob =
     inl ensemble, player = log_path_probs.dim
-    assert (player = rewards.dim) "The player_id dimensions must match for both tensors."
     inl individual_prob (ensemble_id, player_id) = from_log_path_prob(tensor_index (ensemble_id, player_id) log_path_probs)
     inl player_probs = integrate_path_probs_for_player log_path_probs
     inl player_prob ensemble_id = tensor_index ensemble_id player_probs
     inl total_prob = fold (*) 1 player_probs
-    inl reward player_id = tensor_index player_id rewards
-    init ensemble fun ensemble_id =>
-        loop.for {from = 0; nearTo=player} (fun player_id s =>
-            inl path_prob = total_prob / player_prob player_id * individual_prob (ensemble_id, player_id)
-            s + conv path_prob * reward player_id
-            ) 0
+    init (ensemble,player) fun ensemble_id,player_id =>
+        total_prob / player_prob player_id * individual_prob (ensemble_id, player_id)
 
-// Integrates the rewards given the path probabilities and a player id.
-inl integrate_rewards_for_player
-        (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) 
+// Returns the unnormalized true reward given the path probabilities and the path probability given the rewards tensor integrated
+// over the player_id dimension.
+inl integrate_rewards_over_players
+        (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
         (rewards : tensor player_id reward)
-        (player_id : player_id)
-        : tensor ensemble_id reward =
+        : tensor ensemble_id (reward * prob) =
     inl ensemble, player = log_path_probs.dim
     assert (player = rewards.dim) "The player_id dimensions must match for both tensors."
-    inl individual_prob (ensemble_id, player_id) = from_log_path_prob(tensor_index (ensemble_id, player_id) log_path_probs)
-    inl player_probs = integrate_path_probs_for_player log_path_probs
-    inl player_prob ensemble_id = tensor_index ensemble_id player_probs
-    inl total_prob = fold (*) 1 player_probs
+    inl path_probs = integrate_rewards_ log_path_probs
+    inl path_prob (ensemble_id,player_id) = tensor_index (ensemble_id,player_id) path_probs
     inl reward player_id = tensor_index player_id rewards
-    init ensemble fun ensemble_id =>
-        inl path_prob = total_prob / player_prob player_id * individual_prob (ensemble_id, player_id)
-        conv path_prob * reward player_id
+    init ensemble (fun ensemble_id =>
+        loop.for {from=0; nearTo=player} (fun player_id (r,p) =>
+            inl p',r' = path_prob (ensemble_id, player_id), reward player_id
+            r + conv p' * r', p + p'
+            ) (0, 0)
+        )
+
+// Returns the unnormalized true reward and the sum of path probabilities given the path probabilities and the rewards tensor integrated
+// over all the dimensions.
+inl integrate_rewards
+        (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
+        (rewards : tensor player_id reward)
+        : reward * prob =
+    inl ensemble, player = log_path_probs.dim
+    assert (player = rewards.dim) "The player_id dimensions must match for both tensors."
+    inl path_probs = integrate_rewards_ log_path_probs
+    inl path_prob (ensemble_id,player_id) = tensor_index (ensemble_id,player_id) path_probs
+    inl reward player_id = tensor_index player_id rewards
+    loop.for {from=0; nearTo=ensemble} (fun ensemble_id =>
+        loop.for {from=0; nearTo=player} (fun player_id (r,p) =>
+            inl p',r' = path_prob (ensemble_id, player_id), reward player_id
+            r + conv p' * r', p + p'
+            )
+        ) (0, 0)
