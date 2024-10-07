@@ -382,7 +382,7 @@ inl copy forall dim t. {from = (src : tensor dim t)} (a : tensor dim t) : () =
     reinit (fun i => tensor_index i src) a
 
 // Folds over a tensor using a single thread.
-inl fold forall dim s a. (s : s) (f : s -> a -> s) (t : tensor dim a) : s = 
+inl fold forall dim s a. (f : s -> a -> s) (s : s) (t : tensor dim a) : s = 
     inl s = loop._dup s
     loop.linear t.dim fun i =>
         loop._set s (f s (tensor_index i t))
