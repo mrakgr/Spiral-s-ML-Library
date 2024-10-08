@@ -81,7 +81,7 @@ inl calculate_updates forall dim.
         |> reorder (fun ensemble_id,thread_id,player_id => thread_id,ensemble_id,player_id)
         |> apply rangem.threads_in_grid().from
         |> apply_ptr
-    path_probs.integrate_rewards_over_players log_path_probs (init (length reward) (index reward))
+    path_probs.integrate_rewards_over_players log_path_probs (path_probs.sa_to_tensor reward)
     |> iteri (fun ensemble_id (reward, path_prob) =>
         inl path_prob = conv path_prob
         tensor_cuda.tensor_atomic_add ensemble_id (reward * path_prob, path_prob) rewards

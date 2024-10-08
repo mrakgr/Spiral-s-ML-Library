@@ -176,15 +176,12 @@ inl vs_self (neural : state_neural .cfr) =
                 train_loop true model state None game_start() 
                 ml.cfr_models.calculate_updates model state.rewards
                 // Does a purely evalutation run, not modifying the trace state.
-                inl rewards = train_loop false model state None game_start()
-                // Returns the integrate path probability.
-                inl path_prob = ml.cfr_models.extract_integrated_path_prob model
-                // Adds the rewards to the trace.
-                loop.linear sizes.player_id fun player_id =>
-                    inl reward = index state.rewards player_id
-                    tensor_cuda.tensor_atomic_add (player_id,outer / config.frontend_divider)
-                        (reward * path_prob, path_prob)
-                        trace_rewards
+                train_loop false model state None game_start()
+                // Returns the integrate rewards and path probabilities.
+                ml.path_probs.integrate_rewards_over_players (ml.cfr_models.extract_log_path_probs model) (ml.path_probs.sa_to_tensor state.rewards)
+                |> tensorm.iteri fun ensemble_id unnormaized_reward_and_prob =>
+                    // Adds the rewards to the trace.
+                    tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider) unnormaized_reward_and_prob trace_rewards
                 ml.cfr_models.reset_trace_state model
             ml.cfr_models.apply_updates (refm.from_local state.grid) (refm.from_local state.rng) model
         ml.primitives.grid_map (refm.from_local state.grid) (fun a,b => if b <> 0 then a / b else 0) trace_rewards frontend_rewards
