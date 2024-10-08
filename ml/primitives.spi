@@ -675,7 +675,10 @@ inl local_masked_reduce forall t. config neutral_element (f : t -> t -> t) (x' :
         | (_,true as x), _ | _, (_,true as x) => x
         | _ => a
         ) x'
-    |> fun (x,cond) => assert cond "The local reduce must be true." . x
+    |> fun (x,cond) => 
+        // if not cond then
+        //     console.write_ln {x' tid=threads_in_grid().from}
+        assert cond "The local reduce must be true." . x
 
 inl local_masked_count config = local_map (fun mask => if mask then 1 else 0 : int) >> local_sum config
 inl local_masked_sum config mask x = zip x mask |> local_map (fun x,mask => if mask then x else 0) |> local_sum config
@@ -685,7 +688,12 @@ inl local_masked_average config mask x = local_masked_sum config mask x / conv (
 inl local_masked_softmax forall dim t{number;float}. (mask : row_config -> t -> dim -> int -> bool) config x i j_tns =
     inl mask = local_map (fun x,j => mask config x i j : bool) (zip x j_tns)
     inl average = local_masked_average config mask x
-    inl x = local_map (fun x,mask => exp ((if mask then x else limit.min) - average)) (zip x mask)
+    inl x = 
+        local_map (fun x,mask => 
+            inl q = exp ((if mask then x else limit.min) - average)
+            assert (q < inf) "The softmax values must not grow too large."
+            q
+            ) (zip x mask)
     inl sum = local_sum config x
     local_map (fun x => x / sum) x
 
