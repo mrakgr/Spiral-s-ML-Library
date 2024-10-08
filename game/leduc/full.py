@@ -13768,103 +13768,180 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             __syncthreads();
             v653 += 24 ;
         }
+        int v702;
+        v702 = threadIdx.x;
+        int v703;
+        v703 = blockIdx.x;
+        int v704;
+        v704 = v703 * 256;
+        int v705;
+        v705 = v702 + v704;
+        int v706;
+        v706 = v705;
+        while (while_method_5(v706)){
+            bool v708;
+            v708 = 0 <= v706;
+            bool v709;
+            v709 = v708 == false;
+            if (v709){
+                assert("The index needs to be zero or positive." && v708);
+            } else {
+            }
+            bool v711;
+            v711 = v706 < 8;
+            bool v712;
+            v712 = v711 == false;
+            if (v712){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v711);
+            } else {
+            }
+            assert("Tensor range check" && 0 <= v706 && v706 < 8);
+            int v714;
+            v714 = 4 * v706;
+            assert("Tensor range check" && 0 <= v706 && v706 < 8);
+            float v715[4];
+            float v716[4];
+            float v717[4];
+            float v718[4];
+            int4* v719;
+            v719 = reinterpret_cast<int4*>(v342 + v714);
+            int4* v720;
+            v720 = reinterpret_cast<int4*>(v715 + 0);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v719) % 16 == 0 && reinterpret_cast<unsigned long long>(v720) % 16 == 0);
+            *v720 = *v719;
+            int4* v721;
+            v721 = reinterpret_cast<int4*>(v344 + v714);
+            int4* v722;
+            v722 = reinterpret_cast<int4*>(v716 + 0);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v721) % 16 == 0 && reinterpret_cast<unsigned long long>(v722) % 16 == 0);
+            *v722 = *v721;
+            // Pushing the loop unrolling to: 0
+            int v723;
+            v723 = 0;
+            #pragma unroll
+            while (while_method_7(v723)){
+                assert("Tensor range check" && 0 <= v723 && v723 < 4);
+                float v725;
+                v725 = v715[v723];
+                float v726;
+                v726 = v716[v723];
+                assert("Tensor range check" && 0 <= v723 && v723 < 4);
+                v717[v723] = 0.0f;
+                v718[v723] = 0.0f;
+                v723 += 1 ;
+            }
+            // Poping the loop unrolling to: 0
+            int4* v727;
+            v727 = reinterpret_cast<int4*>(v717 + 0);
+            int4* v728;
+            v728 = reinterpret_cast<int4*>(v342 + v714);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v727) % 16 == 0 && reinterpret_cast<unsigned long long>(v728) % 16 == 0);
+            *v728 = *v727;
+            int4* v729;
+            v729 = reinterpret_cast<int4*>(v718 + 0);
+            int4* v730;
+            v730 = reinterpret_cast<int4*>(v344 + v714);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v729) % 16 == 0 && reinterpret_cast<unsigned long long>(v730) % 16 == 0);
+            *v730 = *v729;
+            v706 += 6144 ;
+        }
         v331.sync() ;
         v27 += 1 ;
     }
-    cooperative_groups::grid_group & v702 = v26.v1;
-    cooperative_groups::grid_group & v703 = v702;
-    int v704;
-    v704 = threadIdx.x;
-    int v705;
-    v705 = blockIdx.x;
-    int v706;
-    v706 = v705 * 256;
-    int v707;
-    v707 = v704 + v706;
-    int v708;
-    v708 = v707;
-    while (while_method_13(v708)){
-        bool v710;
-        v710 = 0 <= v708;
-        bool v711;
-        v711 = v710 == false;
-        if (v711){
-            assert("The index needs to be zero or positive." && v710);
+    cooperative_groups::grid_group & v731 = v26.v1;
+    cooperative_groups::grid_group & v732 = v731;
+    int v733;
+    v733 = threadIdx.x;
+    int v734;
+    v734 = blockIdx.x;
+    int v735;
+    v735 = v734 * 256;
+    int v736;
+    v736 = v733 + v735;
+    int v737;
+    v737 = v736;
+    while (while_method_13(v737)){
+        bool v739;
+        v739 = 0 <= v737;
+        bool v740;
+        v740 = v739 == false;
+        if (v740){
+            assert("The index needs to be zero or positive." && v739);
         } else {
         }
-        int v713;
-        v713 = v708 % 8;
-        int v714;
-        v714 = v708 / 8;
-        bool v715;
-        v715 = v714 < 32;
-        bool v716;
-        v716 = v715 == false;
-        if (v716){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v715);
+        int v742;
+        v742 = v737 % 8;
+        int v743;
+        v743 = v737 / 8;
+        bool v744;
+        v744 = v743 < 32;
+        bool v745;
+        v745 = v744 == false;
+        if (v745){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v744);
         } else {
         }
-        assert("Tensor range check" && 0 <= v714 && v714 < 32);
-        assert("Tensor range check" && 0 <= v713 && v713 < 8);
-        int v718;
-        v718 = 4 * v713;
-        int v719;
-        v719 = 32 * v714;
-        int v720;
-        v720 = v719 + v718;
-        assert("Tensor range check" && 0 <= v714 && v714 < 32);
-        assert("Tensor range check" && 0 <= v713 && v713 < 8);
-        float v721[4];
-        float v722[4];
-        float v723[4];
-        int4* v724;
-        v724 = reinterpret_cast<int4*>(v3 + v720);
-        int4* v725;
-        v725 = reinterpret_cast<int4*>(v721 + 0);
-        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v724) % 16 == 0 && reinterpret_cast<unsigned long long>(v725) % 16 == 0);
-        *v725 = *v724;
-        int4* v726;
-        v726 = reinterpret_cast<int4*>(v4 + v720);
-        int4* v727;
-        v727 = reinterpret_cast<int4*>(v722 + 0);
-        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v726) % 16 == 0 && reinterpret_cast<unsigned long long>(v727) % 16 == 0);
-        *v727 = *v726;
+        assert("Tensor range check" && 0 <= v743 && v743 < 32);
+        assert("Tensor range check" && 0 <= v742 && v742 < 8);
+        int v747;
+        v747 = 4 * v742;
+        int v748;
+        v748 = 32 * v743;
+        int v749;
+        v749 = v748 + v747;
+        assert("Tensor range check" && 0 <= v743 && v743 < 32);
+        assert("Tensor range check" && 0 <= v742 && v742 < 8);
+        float v750[4];
+        float v751[4];
+        float v752[4];
+        int4* v753;
+        v753 = reinterpret_cast<int4*>(v3 + v749);
+        int4* v754;
+        v754 = reinterpret_cast<int4*>(v750 + 0);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v753) % 16 == 0 && reinterpret_cast<unsigned long long>(v754) % 16 == 0);
+        *v754 = *v753;
+        int4* v755;
+        v755 = reinterpret_cast<int4*>(v4 + v749);
+        int4* v756;
+        v756 = reinterpret_cast<int4*>(v751 + 0);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v755) % 16 == 0 && reinterpret_cast<unsigned long long>(v756) % 16 == 0);
+        *v756 = *v755;
         // Pushing the loop unrolling to: 0
-        int v728;
-        v728 = 0;
+        int v757;
+        v757 = 0;
         #pragma unroll
-        while (while_method_7(v728)){
-            assert("Tensor range check" && 0 <= v728 && v728 < 4);
-            float v730;
-            v730 = v721[v728];
-            float v731;
-            v731 = v722[v728];
-            bool v732;
-            v732 = v731 == 0.0f;
-            bool v733;
-            v733 = v732 != true;
-            float v735;
-            if (v733){
-                float v734;
-                v734 = v730 / v731;
-                v735 = v734;
+        while (while_method_7(v757)){
+            assert("Tensor range check" && 0 <= v757 && v757 < 4);
+            float v759;
+            v759 = v750[v757];
+            float v760;
+            v760 = v751[v757];
+            bool v761;
+            v761 = v760 == 0.0f;
+            bool v762;
+            v762 = v761 != true;
+            float v764;
+            if (v762){
+                float v763;
+                v763 = v759 / v760;
+                v764 = v763;
             } else {
-                v735 = 0.0f;
+                v764 = 0.0f;
             }
-            assert("Tensor range check" && 0 <= v728 && v728 < 4);
-            v723[v728] = v735;
-            v728 += 1 ;
+            assert("Tensor range check" && 0 <= v757 && v757 < 4);
+            v752[v757] = v764;
+            v757 += 1 ;
         }
         // Poping the loop unrolling to: 0
-        int4* v736;
-        v736 = reinterpret_cast<int4*>(v723 + 0);
-        int4* v737;
-        v737 = reinterpret_cast<int4*>(v5 + v720);
-        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v736) % 16 == 0 && reinterpret_cast<unsigned long long>(v737) % 16 == 0);
-        *v737 = *v736;
-        v708 += 6144 ;
+        int4* v765;
+        v765 = reinterpret_cast<int4*>(v752 + 0);
+        int4* v766;
+        v766 = reinterpret_cast<int4*>(v5 + v749);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v765) % 16 == 0 && reinterpret_cast<unsigned long long>(v766) % 16 == 0);
+        *v766 = *v765;
+        v737 += 6144 ;
     }
-    v703.sync() ;
+    v732.sync() ;
     return ;
 }
 extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsigned char * v2, float * v3, float * v4, float * v5) {
@@ -15880,103 +15957,180 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             __syncthreads();
             v807 += 24 ;
         }
+        int v856;
+        v856 = threadIdx.x;
+        int v857;
+        v857 = blockIdx.x;
+        int v858;
+        v858 = v857 * 256;
+        int v859;
+        v859 = v856 + v858;
+        int v860;
+        v860 = v859;
+        while (while_method_5(v860)){
+            bool v862;
+            v862 = 0 <= v860;
+            bool v863;
+            v863 = v862 == false;
+            if (v863){
+                assert("The index needs to be zero or positive." && v862);
+            } else {
+            }
+            bool v865;
+            v865 = v860 < 8;
+            bool v866;
+            v866 = v865 == false;
+            if (v866){
+                assert("The last element of the projection dimensions needs to be greater than the index remainder." && v865);
+            } else {
+            }
+            assert("Tensor range check" && 0 <= v860 && v860 < 8);
+            int v868;
+            v868 = 4 * v860;
+            assert("Tensor range check" && 0 <= v860 && v860 < 8);
+            float v869[4];
+            float v870[4];
+            float v871[4];
+            float v872[4];
+            int4* v873;
+            v873 = reinterpret_cast<int4*>(v496 + v868);
+            int4* v874;
+            v874 = reinterpret_cast<int4*>(v869 + 0);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v873) % 16 == 0 && reinterpret_cast<unsigned long long>(v874) % 16 == 0);
+            *v874 = *v873;
+            int4* v875;
+            v875 = reinterpret_cast<int4*>(v498 + v868);
+            int4* v876;
+            v876 = reinterpret_cast<int4*>(v870 + 0);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v875) % 16 == 0 && reinterpret_cast<unsigned long long>(v876) % 16 == 0);
+            *v876 = *v875;
+            // Pushing the loop unrolling to: 0
+            int v877;
+            v877 = 0;
+            #pragma unroll
+            while (while_method_7(v877)){
+                assert("Tensor range check" && 0 <= v877 && v877 < 4);
+                float v879;
+                v879 = v869[v877];
+                float v880;
+                v880 = v870[v877];
+                assert("Tensor range check" && 0 <= v877 && v877 < 4);
+                v871[v877] = 0.0f;
+                v872[v877] = 0.0f;
+                v877 += 1 ;
+            }
+            // Poping the loop unrolling to: 0
+            int4* v881;
+            v881 = reinterpret_cast<int4*>(v871 + 0);
+            int4* v882;
+            v882 = reinterpret_cast<int4*>(v496 + v868);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v881) % 16 == 0 && reinterpret_cast<unsigned long long>(v882) % 16 == 0);
+            *v882 = *v881;
+            int4* v883;
+            v883 = reinterpret_cast<int4*>(v872 + 0);
+            int4* v884;
+            v884 = reinterpret_cast<int4*>(v498 + v868);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v883) % 16 == 0 && reinterpret_cast<unsigned long long>(v884) % 16 == 0);
+            *v884 = *v883;
+            v860 += 6144 ;
+        }
         v485.sync() ;
         v27 += 1 ;
     }
-    cooperative_groups::grid_group & v856 = v26.v1;
-    cooperative_groups::grid_group & v857 = v856;
-    int v858;
-    v858 = threadIdx.x;
-    int v859;
-    v859 = blockIdx.x;
-    int v860;
-    v860 = v859 * 256;
-    int v861;
-    v861 = v858 + v860;
-    int v862;
-    v862 = v861;
-    while (while_method_8(v862)){
-        bool v864;
-        v864 = 0 <= v862;
-        bool v865;
-        v865 = v864 == false;
-        if (v865){
-            assert("The index needs to be zero or positive." && v864);
+    cooperative_groups::grid_group & v885 = v26.v1;
+    cooperative_groups::grid_group & v886 = v885;
+    int v887;
+    v887 = threadIdx.x;
+    int v888;
+    v888 = blockIdx.x;
+    int v889;
+    v889 = v888 * 256;
+    int v890;
+    v890 = v887 + v889;
+    int v891;
+    v891 = v890;
+    while (while_method_8(v891)){
+        bool v893;
+        v893 = 0 <= v891;
+        bool v894;
+        v894 = v893 == false;
+        if (v894){
+            assert("The index needs to be zero or positive." && v893);
         } else {
         }
-        int v867;
-        v867 = v862 % 8;
-        int v868;
-        v868 = v862 / 8;
-        bool v869;
-        v869 = v868 < 2;
-        bool v870;
-        v870 = v869 == false;
-        if (v870){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v869);
+        int v896;
+        v896 = v891 % 8;
+        int v897;
+        v897 = v891 / 8;
+        bool v898;
+        v898 = v897 < 2;
+        bool v899;
+        v899 = v898 == false;
+        if (v899){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v898);
         } else {
         }
-        assert("Tensor range check" && 0 <= v868 && v868 < 2);
-        assert("Tensor range check" && 0 <= v867 && v867 < 8);
-        int v872;
-        v872 = 4 * v867;
-        int v873;
-        v873 = 32 * v868;
-        int v874;
-        v874 = v873 + v872;
-        assert("Tensor range check" && 0 <= v868 && v868 < 2);
-        assert("Tensor range check" && 0 <= v867 && v867 < 8);
-        float v875[4];
-        float v876[4];
-        float v877[4];
-        int4* v878;
-        v878 = reinterpret_cast<int4*>(v3 + v874);
-        int4* v879;
-        v879 = reinterpret_cast<int4*>(v875 + 0);
-        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v878) % 16 == 0 && reinterpret_cast<unsigned long long>(v879) % 16 == 0);
-        *v879 = *v878;
-        int4* v880;
-        v880 = reinterpret_cast<int4*>(v4 + v874);
-        int4* v881;
-        v881 = reinterpret_cast<int4*>(v876 + 0);
-        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v880) % 16 == 0 && reinterpret_cast<unsigned long long>(v881) % 16 == 0);
-        *v881 = *v880;
+        assert("Tensor range check" && 0 <= v897 && v897 < 2);
+        assert("Tensor range check" && 0 <= v896 && v896 < 8);
+        int v901;
+        v901 = 4 * v896;
+        int v902;
+        v902 = 32 * v897;
+        int v903;
+        v903 = v902 + v901;
+        assert("Tensor range check" && 0 <= v897 && v897 < 2);
+        assert("Tensor range check" && 0 <= v896 && v896 < 8);
+        float v904[4];
+        float v905[4];
+        float v906[4];
+        int4* v907;
+        v907 = reinterpret_cast<int4*>(v3 + v903);
+        int4* v908;
+        v908 = reinterpret_cast<int4*>(v904 + 0);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v907) % 16 == 0 && reinterpret_cast<unsigned long long>(v908) % 16 == 0);
+        *v908 = *v907;
+        int4* v909;
+        v909 = reinterpret_cast<int4*>(v4 + v903);
+        int4* v910;
+        v910 = reinterpret_cast<int4*>(v905 + 0);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v909) % 16 == 0 && reinterpret_cast<unsigned long long>(v910) % 16 == 0);
+        *v910 = *v909;
         // Pushing the loop unrolling to: 0
-        int v882;
-        v882 = 0;
+        int v911;
+        v911 = 0;
         #pragma unroll
-        while (while_method_7(v882)){
-            assert("Tensor range check" && 0 <= v882 && v882 < 4);
-            float v884;
-            v884 = v875[v882];
-            float v885;
-            v885 = v876[v882];
-            bool v886;
-            v886 = v885 == 0.0f;
-            bool v887;
-            v887 = v886 != true;
-            float v889;
-            if (v887){
-                float v888;
-                v888 = v884 / v885;
-                v889 = v888;
+        while (while_method_7(v911)){
+            assert("Tensor range check" && 0 <= v911 && v911 < 4);
+            float v913;
+            v913 = v904[v911];
+            float v914;
+            v914 = v905[v911];
+            bool v915;
+            v915 = v914 == 0.0f;
+            bool v916;
+            v916 = v915 != true;
+            float v918;
+            if (v916){
+                float v917;
+                v917 = v913 / v914;
+                v918 = v917;
             } else {
-                v889 = 0.0f;
+                v918 = 0.0f;
             }
-            assert("Tensor range check" && 0 <= v882 && v882 < 4);
-            v877[v882] = v889;
-            v882 += 1 ;
+            assert("Tensor range check" && 0 <= v911 && v911 < 4);
+            v906[v911] = v918;
+            v911 += 1 ;
         }
         // Poping the loop unrolling to: 0
-        int4* v890;
-        v890 = reinterpret_cast<int4*>(v877 + 0);
-        int4* v891;
-        v891 = reinterpret_cast<int4*>(v5 + v874);
-        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v890) % 16 == 0 && reinterpret_cast<unsigned long long>(v891) % 16 == 0);
-        *v891 = *v890;
-        v862 += 6144 ;
+        int4* v919;
+        v919 = reinterpret_cast<int4*>(v906 + 0);
+        int4* v920;
+        v920 = reinterpret_cast<int4*>(v5 + v903);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v919) % 16 == 0 && reinterpret_cast<unsigned long long>(v920) % 16 == 0);
+        *v920 = *v919;
+        v891 += 6144 ;
     }
-    v857.sync() ;
+    v886.sync() ;
     return ;
 }
 """

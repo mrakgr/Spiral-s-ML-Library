@@ -118,7 +118,7 @@ inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) 
         transposed_weights transposed_weights
 
 inl apply_updates rng grid (weights : list weights) (model : model) : () =
-    cooperative_groups.sync grid // TODO: Get rid of the grid sync on this line here.
+    cooperative_groups.sync grid // TODO: Get rid of the grid sync on this line here. It needs to be moved to a better location.
 
     if rangem.threads_in_grid().from = 0 then // We want to only change the id after all the threads have finished running the game.
         tensorm.tensor_set {} (random.int_range {from=0; nearTo=model.rewards.dim} rng) model.exploratory_ensemble_id // Pick a random ensemble id
@@ -135,7 +135,7 @@ inl apply_updates rng grid (weights : list weights) (model : model) : () =
     weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
         grid_transpose transposed_weights weights
         )
-    cooperative_groups.sync grid
+    grid_map grid (const loop.zeroes) model.rewards model.rewards // grid map will do a sync
 
 open layers
 open tensorm
