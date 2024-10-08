@@ -186,14 +186,12 @@ inl calculate_updates forall dim a b.
         (reward : sa dim cem.reward) =
     // Since we aren't using the output_world_id we'll pass `ensemble=0` instead of extracting the other nodes one by one.
     inl _, cem_model, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
-    loop.linear sizes.ensemble_id fun ensemble_id =>
-        cem.calculate_updates cem_model trace_state ensemble_id reward
+    cem.calculate_updates cem_model trace_state reward
 
 // Resets the trace state.
 inl reset_trace_state forall a b. (cem_game_model {model sizes} : _ a b) =
     inl trace_state = (key_extract model .cem_trace_state : cem.trace_state)
-    loop.linear sizes.ensemble_id fun ensemble_id =>
-        cem.reset_trace_state trace_state ensemble_id
+    cem.reset_trace_state trace_state
 
 // Applies the policy and the value array updates.
 // Clamps the average policy vector if applicable.

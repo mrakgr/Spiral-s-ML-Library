@@ -223,14 +223,12 @@ inl calculate_updates forall dim a b.
         (reward : sa dim cfr.reward) =
     // Since we aren't using the output_world_id we'll pass `ensemble=0` instead of extracting the other nodes one by one.
     inl _, cfr_model, trace, trace_state : graph_body = layers.graph_extract model {ensemble=0 : int}
-    loop.linear sizes.ensemble_id fun ensemble_id =>
-        cfr.calculate_updates sizes cfr_model trace trace_state ensemble_id reward
+    cfr.calculate_updates sizes cfr_model trace trace_state reward
 
 // Resets the trace state.
 inl reset_trace_state forall a b. (cfr_game_model {model sizes} : _ a b) =
     inl trace_state = (key_extract model .cfr_trace_state : cfr.trace_state)
-    loop.linear sizes.ensemble_id fun ensemble_id =>
-        cfr.reset_trace_state trace_state ensemble_id
+    cfr.reset_trace_state trace_state
 
 // Applies the policy and the value array updates.
 // Clamps the average policy vector if applicable.

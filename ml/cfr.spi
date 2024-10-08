@@ -129,83 +129,84 @@ inl get_action rng number_of_valid_actions (model : model) ~(ensemble_id, world_
         )
 
 // Sets the log_path_probs and seq_id to 0.
-inl reset_trace_state (trace_state : trace_state) (ensemble_id : ensemble_id) =
+inl reset_trace_state (trace_state : trace_state) =
     open primitives
     inl thread_id = rangem.threads_in_grid().from
-    inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id |> apply_ptr
-    // Sets the log_path_probs to 0.
-    (log_path_probs,log_path_probs) ||> row_gather_map () (fun () config x i j_tns => local_map (const loop.zeroes) x)
-    // Sets the seq_id to 0.
-    tensor_set (ensemble_id, thread_id) 0 trace_state.seq_id
+    loop.linear (fst trace_state.log_path_probs.dim) fun ensemble_id =>
+        inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id
+        // Sets the log_path_probs to 0.
+        (log_path_probs,log_path_probs) ||> row_gather_map () (fun () config x i j_tns => local_map (const loop.zeroes) x)
+        // Sets the seq_id to 0.
+        tensor_set (ensemble_id, thread_id) 0 trace_state.seq_id
 
 // Calculates the policy and the value array updates.
 // Resets the trace state afterwards.
 inl calculate_updates forall dim. 
         (size : sizes) 
         (model : model) (trace : trace) (trace_state : trace_state) 
-        (ensemble_id : ensemble_id) 
         (reward : sa dim reward) =
     open primitives
     inl thread_id = rangem.threads_in_grid().from
     inl rewards : _ _ reward = tensorm.from reward
     assert (rewards.dim = size.player_id) "The rewards have to equal the number of players."
 
-    // Calculates the updates.
-    loop.forDown' {nearFrom=tensor_index (ensemble_id, thread_id) trace_state.seq_id; to=0} (fun seq_id =>
-        inl {action_id player_id action_sampling_prob world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
-        inl reward = tensor_index player_id rewards
-        inl table =
-            model.table
-            |> apply ensemble_id
-            |> apply world_id
-            |> apply_ptr
-        inl path_prob =
-            inl log_path_probs = 
-                trace.log_path_probs
+    loop.linear (fst model.table.dim) fun ensemble_id =>
+        // Calculates the updates.
+        loop.forDown' {nearFrom=tensor_index (ensemble_id, thread_id) trace_state.seq_id; to=0} (fun seq_id =>
+            inl {action_id player_id action_sampling_prob world_id} = tensor_index (ensemble_id, seq_id, thread_id) trace.actions
+            inl reward = tensor_index player_id rewards
+            inl table =
+                model.table
                 |> apply ensemble_id
-                |> apply seq_id
-                |> apply thread_id
-            inl log_path_policy_prob =
-                log_path_probs
-                |> rezip (fun x => x.policy)
-                |> tensorm.mapi (fun i x => if player_id = i then 0 else x)
-                |> tensorm.fold (+) 0
-            inl log_path_sampling_prob =
-                log_path_probs
-                |> rezip (fun x => x.sampling)
-                |> tensorm.fold (+) 0
-            conv (exp (log_path_policy_prob - log_path_sampling_prob))
+                |> apply world_id
+                |> apply_ptr
+            inl path_prob =
+                inl log_path_probs = 
+                    trace.log_path_probs
+                    |> apply ensemble_id
+                    |> apply seq_id
+                    |> apply thread_id
+                inl log_path_policy_prob =
+                    log_path_probs
+                    |> rezip (fun x => x.policy)
+                    |> tensorm.mapi (fun i x => if player_id = i then 0 else x)
+                    |> tensorm.fold (+) 0
+                inl log_path_sampling_prob =
+                    log_path_probs
+                    |> rezip (fun x => x.sampling)
+                    |> tensorm.fold (+) 0
+                conv (exp (log_path_policy_prob - log_path_sampling_prob))
 
-        inl () = // Calculates the value update
-            inl value_update = table |> rezip (fun x => x.value.update)
-            tensor_cuda.tensor_atomic_add action_id (reward * path_prob, path_prob) value_update
-        
-        inl policy_update = table |> rezip (fun x => x.policy.update)
+            inl () = // Calculates the value update
+                inl value_update = table |> rezip (fun x => x.value.update)
+                tensor_cuda.tensor_atomic_add action_id (reward * path_prob, path_prob) value_update
+            
+            inl policy_update = table |> rezip (fun x => x.policy.update)
 
-        table
-        |> rezip (fun x => x.policy.current, x.value.current)
-        |> row_gather_reduce () (fun () config x thread_id j_tns => // row_gather shares the vars in lexical scope via shared memory
-            inl policy_current, value_current = unzip x
-            inl values = local_map (fun reward, count => if count <> 0 then reward / count else 0) value_current
-            inl action_probs = local_masked_regret_matching (mask_of size.number_of_valid_actions) config policy_current thread_id j_tns
-            inl weighted_values =
-                local_map (fun value, j => 
-                    (if action_id = j then (reward - value) / action_sampling_prob else 0) + value
-                    ) (zip values j_tns)
-            inl expected_value =
-                local_map (fun action_prob, value => action_prob * value) (zip action_probs weighted_values)
-                |> local_sum config
-            inl () = // Calculates the policy updates
-                local_iter (fun value, action_id =>
-                    tensor_cuda.tensor_atomic_add action_id (path_prob * (value - expected_value)) policy_update
-                    ) (zip weighted_values j_tns)
-            expected_value
+            table
+            |> rezip (fun x => x.policy.current, x.value.current)
+            |> row_gather_reduce () (fun () config x thread_id j_tns => // row_gather shares the vars in lexical scope via shared memory
+                inl policy_current, value_current = unzip x
+                inl values = local_map (fun reward, count => if count <> 0 then reward / count else 0) value_current
+                inl action_probs = local_masked_regret_matching (mask_of size.number_of_valid_actions) config policy_current thread_id j_tns
+                inl weighted_values =
+                    local_map (fun value, j => 
+                        (if action_id = j then (reward - value) / action_sampling_prob else 0) + value
+                        ) (zip values j_tns)
+                inl expected_value =
+                    local_map (fun action_prob, value => action_prob * value) (zip action_probs weighted_values)
+                    |> local_sum config
+                inl () = // Calculates the policy updates
+                    local_iter (fun value, action_id =>
+                        tensor_cuda.tensor_atomic_add action_id (path_prob * (value - expected_value)) policy_update
+                        ) (zip weighted_values j_tns)
+                expected_value
+                )
+            |> fun (reward : reward) => 
+                tensor_set player_id reward rewards
             )
-        |> fun (reward : reward) => 
-            tensor_set player_id reward rewards
-        )
 
-    reset_trace_state trace_state ensemble_id
+    reset_trace_state trace_state
 
 // Applies the policy and the value array updates.
 // Clamps the average policy vector if applicable.
@@ -313,7 +314,7 @@ inl test1() =
         push (0, 3447, 1)
 
         inl rewards : sa 2 reward = arraym.fromList [13; -13]
-        calculate_updates sizes model trace trace_state 0 rewards
+        calculate_updates sizes model trace trace_state rewards
         apply_updates grid rng model
 
 inl main() = test1()
