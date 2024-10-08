@@ -31,7 +31,7 @@ inl leduc_conv (table, messages : table * messages) : history =
 
 inl leduc_sizes() : ml.cem.sizes =
     {
-        ensemble_id = 4
+        ensemble_id = 32
         player_id = 2
         number_of_valid_actions = 3
         action_id = 1 <<< 6
@@ -54,7 +54,8 @@ inl leduc_graph() : ml.layers.graph ml.cem_models.graph_body =
 
     inl neural =
         (input .input (sizes.block,sizes.thread,sizes.inner) : graph (tensor (int * int * int) float))
-        |> matmul_ensemble (sizes.ensemble,sizes.inner,sizes.final)
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.inner,sizes.final)
+        |> copy' (input .output_values (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble)
         |> masked_softmax' cem_sizes.number_of_valid_actions (
             input .output_probs (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble
         )

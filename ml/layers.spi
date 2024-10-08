@@ -247,7 +247,7 @@ inl graph_extract_ forall t_top indices. layer_state (model {graph data} : model
         | KeyScalar(exists k. k) => real 
             match indices with
             | {$k=x} => x : t
-            | _ => real_core.error_type "Cannot extract the node for the graph due to the missing key."
+            | _ => real_core.error_type "Cannot extract the node for the graph due to the missing (scalar) key in the environment."
 
     loop graph
 
@@ -290,10 +290,11 @@ inl extract_layers_ forall t_top ex_t. (ex : extractor ex_t) (model ({graph data
                     add_item (exists sid, g, init)
                 | _ => ()
             | KeyGraph((exists key'. _),graph) =>
+                // !!!!PrintStatic(`key')
                 match ex with
                 // `= operator compares the two types for equality.
                 | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
-                    inl g = graph_extract (model {m with graph}) {}
+                    inl g = graph_extract (model {m with graph}) {} // TODO: Add the env as an argument.
                     add_item (real g : ex_t) // If you get a type error here, then the input type doesn't match graph type.
                 | _ => f graph
     f graph
@@ -309,7 +310,9 @@ inl pass_init forall t_top. (m : model t_top) = extract_layers m |> listm.iter f
 inl print_layers forall t_top. (m : model t_top) = extract_layers m |> listm.iter fun (exists t. sid, g, init) => console.write_ln g
 
 // Prints the weight space layer parameters.
-inl print_weights forall t_top. (m : model t_top) = extract_layers_ (Ex_Layer weight_id()) m |> listm.iter fun (exists t. sid, g, init) => console.write_ln g
+inl print_weights forall t_top. (m : model t_top) = 
+    extract_layers_ (Ex_Layer weight_id()) m 
+    |> listm.iter fun (exists t. sid, g, init) => console.write_ln g
 
 // Extracts the input tensors from the Key nodes given the key.
 inl key_extract_list forall t_top key{symbol} input. (m : model t_top) (key : key) : list input = extract_layers_ (Ex_KeyGraph exists key) m
@@ -388,6 +391,13 @@ inl softmax_and_discrete_sample' forall dim t{float;number}. out (x : graph (ten
 inl softmax_and_discrete_sample forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) =
     softmax_and_discrete_sample_ None x
 
+inl copy_ forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    BlockMap (exists (fun config x => x), x, out)
+inl copy' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    copy_ (Some out) x
+inl copy forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    copy_ None x
+
 inl masked_softmax_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     BlockRowMap (exists (fun _ config x => primitives.local_masked_softmax (fun config x i j => j < size) config x), x, out)
 inl masked_softmax' forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
@@ -438,13 +448,13 @@ inl weight x = weight' x weight_init
 inl matmul (b,a) x = BlockMatmul(x, weight (a,b))
 inl matmul_ensemble (c,b,a : int * int * int) x =
     open partitionm
-    inl weights = tensor weight_id() (c,a,b) weight_init
+    inl weights = tensor weight_id() (c,a,b) weight_init |> key_graph .weights
     BlockMatmul(x, apply .ensemble weights)
 type ensemble_id = int
 type cem_weight_layer_dual float = tensor (ensemble_id * (int * int)) float * tensor ((int * int) * ensemble_id) float
 inl matmul_ensemble_with_adjoint forall el. (c,b,a : int * int * int) x : graph (tensor (int * int * int) el) =
     inl weights : graph (cem_weight_layer_dual el) = 
-        pair (tensor weight_id() (c,(a,b)) weight_init)
+        pair (tensor weight_id() (c,(a,b)) weight_init |> key_graph .weights)
              (tensor weight_adjoint_id() ((a,b),c) const() : graph (tensor _ el))
         |> key_graph .cem_weight_layer_dual
     BlockMatmul(x, apply .ensemble (fst' weights))

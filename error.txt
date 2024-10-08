@@ -1,6 +1,21 @@
-Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl (|>) a b = b a
-               ^
+Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 275, column: 24 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+                       ^
+Error trace on line: 275, column: 34 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+                                 ^
+Error trace on line: 275, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+                                   ^
+Error trace on line: 275, column: 46 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+                                             ^
+Error trace on line: 275, column: 52 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+                                                   ^
 Error trace on line: 6, column: 16 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
 inl iter f x = match x with Some a => f a | None => ()
                ^
@@ -13,139 +28,126 @@ inl iter f x = match x with Some a => f a | None => ()
 Error trace on line: 6, column: 39 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
 inl iter f x = match x with Some a => f a | None => ()
                                       ^
-Error trace on line: 196, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a = loop a
-                ^
-Error trace on line: 196, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a = loop a
-                        ^
-Error trace on line: 182, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl handle_body = function
-        ^
-Error trace on line: 185, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl handle_data_elem (x : graph_data_elem) =
-        ^
-Error trace on line: 188, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl extract_current () : t = data |> listm.chooseFirst handle_data_elem |> handle_body
-        ^
-Error trace on line: 189, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl try_out = function
-        ^
-Error trace on line: 192, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match graph with
-        ^
-Error trace on line: 193, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockMap(exists a. g,a,out) => 
-          ^
-Error trace on line: 201, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMap(exists a. g,a,out) => 
-          ^
-Error trace on line: 201, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMap(exists a. g,a,out) => 
+Error trace on line: 68, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match compile_time.hashmapm.try_get h k with
+    ^
+Error trace on line: 69, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 70, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in compile_time.hashmapm.add h k v . v
+      ^
+Error trace on line: 70, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in compile_time.hashmapm.add h k v . v
+              ^
+Error trace on line: 70, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in compile_time.hashmapm.add h k v . v
                       ^
-Error trace on line: 201, column: 33 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMap(exists a. g,a,out) => 
-                                ^
-Error trace on line: 201, column: 35 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMap(exists a. g,a,out) => 
-                                  ^
-Error trace on line: 202, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl out = try_out out
-            ^
-Error trace on line: 203, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            layer_state |> optionm.iter fun ls =>
-            ^
-Error trace on line: 57, column: 16 in module: c:\Spiral_s_ML_Library\corebase\core.spi.
-inl (|>) a b = b a
-               ^
-Error trace on line: 6, column: 16 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
-               ^
-Error trace on line: 6, column: 29 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
-                            ^
-Error trace on line: 6, column: 34 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
-                                 ^
-Error trace on line: 6, column: 39 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
+Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 276, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 277, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 278, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 279, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => f a . f b
+              ^
+Error trace on line: 280, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Apply(exists a. a,b) => f a . f b
+              ^
+Error trace on line: 280, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Apply(exists a. a,b) => f a . f b
+                    ^
+Error trace on line: 280, column: 31 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Apply(exists a. a,b) => f a . f b
+                              ^
+Error trace on line: 280, column: 39 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Apply(exists a. a,b) => f a . f b
                                       ^
-Error trace on line: 204, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a = loop a
-                ^
-Error trace on line: 204, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a = loop a
-                        ^
-Error trace on line: 182, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl handle_body = function
-        ^
-Error trace on line: 185, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl handle_data_elem (x : graph_data_elem) =
-        ^
-Error trace on line: 188, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl extract_current () : t = data |> listm.chooseFirst handle_data_elem |> handle_body
-        ^
-Error trace on line: 189, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        inl try_out = function
-        ^
-Error trace on line: 192, column: 9 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        match graph with
-        ^
-Error trace on line: 193, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockMap(exists a. g,a,out) => 
-          ^
-Error trace on line: 201, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMap(exists a. g,a,out) => 
-          ^
-Error trace on line: 209, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowReduce(exists a. g,a,out) =>
-          ^
-Error trace on line: 217, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockRowMapReduce(exists a. g,a,out) =>
-          ^
-Error trace on line: 225, column: 11 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockMatmul(a,b) =>
-          ^
-Error trace on line: 225, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-        | BlockMatmul(a,b) =>
+Error trace on line: 68, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    match compile_time.hashmapm.try_get h k with
+    ^
+Error trace on line: 69, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | Some v => v
+      ^
+Error trace on line: 70, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in compile_time.hashmapm.add h k v . v
+      ^
+Error trace on line: 70, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in compile_time.hashmapm.add h k v . v
+              ^
+Error trace on line: 70, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+    | None => inl v = f k in compile_time.hashmapm.add h k v . v
                       ^
-Error trace on line: 226, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl a,b,out = loop a, loop b, extract_current()
-            ^
-Error trace on line: 226, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl a,b,out = loop a, loop b, extract_current()
+Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 276, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMap(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 277, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowReduce(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 278, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockRowMapReduce(exists a. _,a,out) => f a . optionm.iter f out
+              ^
+Error trace on line: 279, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | BlockMatmul(a,b) => f a . f b
+              ^
+Error trace on line: 280, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Apply(exists a. a,b) => f a . f b
+              ^
+Error trace on line: 281, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Zip(a,b) => f a . f b
+              ^
+Error trace on line: 282, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Pair(a,b) => f a . f b
+              ^
+Error trace on line: 283, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Fst(exists a. x) => f x
+              ^
+Error trace on line: 284, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Snd(exists b. x) => f x
+              ^
+Error trace on line: 285, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | KeyScalar => ()
+              ^
+Error trace on line: 286, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | Layer(sid,_,init) as graph =>
+              ^
+Error trace on line: 292, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | KeyGraph((exists key'. _),graph) =>
+              ^
+Error trace on line: 292, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+            | KeyGraph((exists key'. _),graph) =>
+                        ^
+Error trace on line: 294, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                match ex with
                 ^
-Error trace on line: 226, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl a,b,out = loop a, loop b, extract_current()
+Error trace on line: 296, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
                   ^
-Error trace on line: 227, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl alpha, beta : float * float = 1, 0
-            ^
-Error trace on line: 227, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            inl alpha, beta : float * float = 1, 0
-                ^
-Error trace on line: 228, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            let block_matmul() =
-            ^
-Error trace on line: 237, column: 13 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            block_matmul()
-            ^
-Error trace on line: 228, column: 29 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            let block_matmul() =
-                            ^
-Error trace on line: 229, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a, out = abi a, abi out
-                ^
-Error trace on line: 229, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                inl a, out = abi a, abi out
+Error trace on line: 296, column: 31 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
+                              ^
+Error trace on line: 296, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
+                  ^
+Error trace on line: 297, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    inl g = graph_extract (model {m with graph}) {} // TODO: Add the env as an argument.
                     ^
-Error trace on line: 232, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    typecase t with
+Error trace on line: 298, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    add_item (real g : ex_t) // If you get a type error here, then the input type doesn't match graph type.
                     ^
-Error trace on line: 233, column: 39 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | tensor _ f32 => matmul.matmul_tf32' false true alpha (abi a) b beta (abi out)
-                                      ^
-Error trace on line: 233, column: 77 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    | tensor _ f32 => matmul.matmul_tf32' false true alpha (abi a) b beta (abi out)
-                                                                            ^
-Cannot apply a forall with a term.
+Error trace on line: 298, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
+                    add_item (real g : ex_t) // If you get a type error here, then the input type doesn't match graph type.
+                                   ^
+The body does not match the annotation.
+Got: tensor (i32 * i32 * i32 * i32) f32
+Expected: tensor (i32 * i32 * i32) f32
