@@ -692,6 +692,7 @@ inl local_masked_softmax forall dim t{number;float}. (mask : row_config -> t -> 
         local_map (fun x,mask => 
             inl q = exp ((if mask then x else limit.min) - average)
             assert (q < inf) "The softmax values must not grow too large."
+            assert (not (nan_is q)) "The softmax values must not be nans."
             q
             ) (zip x mask)
     inl sum = local_sum config x
