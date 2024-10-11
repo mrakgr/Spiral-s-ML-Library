@@ -1062,7 +1062,7 @@ inl test6 (m,n : int * int) head_dir =
 
 inl main() : () = 
     test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
     // test3((1 <<< 4)) "test3/a"
     // test3((1 <<< 8)) "test3/b"
     // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
