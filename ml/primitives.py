@@ -883,1454 +883,1466 @@ extern "C" __global__ void entry0(float * v0, float * v1, int * v2, int * v3, in
     __syncthreads();
     int v231;
     v231 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v231 && v231 < 6144);
-    v4[v231] = v230;
-    float * v232;
-    v232 = v1+v12;
-    float * v234;
-    v234 = v6+v32;
-    unsigned long long v236;
-    v236 = v45 + v41;
-    bool v237;
-    v237 = v236 <= 98304ull;
-    bool v238;
-    v238 = v237 == false;
-    if (v238){
-        assert("The dynamic shared memory is insufficient to allocate the tensor." && v237);
-    } else {
-    }
-    extern __shared__ unsigned char v240[];
+    int v232;
+    v232 = blockIdx.x;
+    int v233;
+    v233 = v232 * 256;
+    int v234;
+    v234 = v231 + v233;
+    assert("Tensor range check" && 0 <= v234 && v234 < 6144);
+    v4[v234] = v230;
+    float * v235;
+    v235 = v1+v12;
+    float * v237;
+    v237 = v6+v32;
+    unsigned long long v239;
+    v239 = v45 + v41;
+    bool v240;
+    v240 = v239 <= 98304ull;
     bool v241;
-    v241 = v236 <= v236;
-    bool v242;
-    v242 = v241 == false;
-    if (v242){
-        assert("The length of the partition has to be less than or equal to the length of the base array." && v241);
+    v241 = v240 == false;
+    if (v241){
+        assert("The dynamic shared memory is insufficient to allocate the tensor." && v240);
     } else {
     }
-    float * * v244;
-    v244 = reinterpret_cast<float * *>(&v240[0ull]);
-    float * * v246;
-    v246 = reinterpret_cast<float * *>(&v240[v45]);
-    int v248;
-    v248 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v248 && v248 < 256);
-    v244[v248] = v232;
-    v246[v248] = v234;
+    extern __shared__ unsigned char v243[];
+    bool v244;
+    v244 = v239 <= v239;
+    bool v245;
+    v245 = v244 == false;
+    if (v245){
+        assert("The length of the partition has to be less than or equal to the length of the base array." && v244);
+    } else {
+    }
+    float * * v247;
+    v247 = reinterpret_cast<float * *>(&v243[0ull]);
+    float * * v249;
+    v249 = reinterpret_cast<float * *>(&v243[v45]);
+    int v251;
+    v251 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v251 && v251 < 256);
+    v247[v251] = v235;
+    v249[v251] = v237;
     __syncthreads();
-    bool v249;
-    v249 = 0 <= v248;
-    bool v250;
-    v250 = v249 == false;
-    if (v250){
-        assert("The index needs to be zero or positive." && v249);
+    bool v252;
+    v252 = 0 <= v251;
+    bool v253;
+    v253 = v252 == false;
+    if (v253){
+        assert("The index needs to be zero or positive." && v252);
     } else {
     }
-    int v252;
-    v252 = v248 % 4;
-    int v253;
-    v253 = v248 / 4;
-    bool v254;
-    v254 = v253 < 64;
-    bool v255;
-    v255 = v254 == false;
-    if (v255){
-        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v254);
+    int v255;
+    v255 = v251 % 4;
+    int v256;
+    v256 = v251 / 4;
+    bool v257;
+    v257 = v256 < 64;
+    bool v258;
+    v258 = v257 == false;
+    if (v258){
+        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v257);
     } else {
     }
-    assert("Tensor range check" && 0 <= v253 && v253 < 64);
-    int v257;
-    v257 = 0;
-    while (while_method_0(v257)){
-        bool v259;
-        v259 = 0 <= v253;
-        bool v260;
-        v260 = v259 && v254;
-        bool v261;
-        v261 = v260 == false;
-        if (v261){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v260);
-        } else {
-        }
+    assert("Tensor range check" && 0 <= v256 && v256 < 64);
+    int v260;
+    v260 = 0;
+    while (while_method_0(v260)){
+        bool v262;
+        v262 = 0 <= v256;
         bool v263;
-        v263 = 0 <= v257;
-        bool v265;
-        if (v263){
-            bool v264;
-            v264 = v257 < 4;
-            v265 = v264;
+        v263 = v262 && v257;
+        bool v264;
+        v264 = v263 == false;
+        if (v264){
+            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v263);
         } else {
-            v265 = false;
         }
         bool v266;
-        v266 = v265 == false;
+        v266 = 0 <= v260;
+        bool v268;
         if (v266){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v265);
+            bool v267;
+            v267 = v260 < 4;
+            v268 = v267;
+        } else {
+            v268 = false;
+        }
+        bool v269;
+        v269 = v268 == false;
+        if (v269){
+            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v268);
         } else {
         }
-        int v268;
-        v268 = v257 * 64;
-        int v269;
-        v269 = v268 + v253;
-        assert("Tensor range check" && 0 <= v257 && v257 < 4);
-        int v270;
-        v270 = 64 * v257;
         int v271;
-        v271 = v270 + v253;
-        float * v272;
-        v272 = v244[v271];
-        float * v273;
-        v273 = v246[v271];
+        v271 = v260 * 64;
+        int v272;
+        v272 = v271 + v256;
+        assert("Tensor range check" && 0 <= v260 && v260 < 4);
+        int v273;
+        v273 = 64 * v260;
         int v274;
-        v274 = blockIdx.x;
-        int v275;
-        v275 = v274 * 256;
-        int v276;
-        v276 = v275 + v269;
-        assert("Tensor range check" && 0 <= v252 && v252 < 4);
+        v274 = v273 + v256;
+        float * v275;
+        v275 = v247[v274];
+        float * v276;
+        v276 = v249[v274];
         int v277;
-        v277 = 4 * v252;
-        float v278[4];
-        int v279[4];
+        v277 = blockIdx.x;
+        int v278;
+        v278 = v277 * 256;
+        int v279;
+        v279 = v278 + v272;
+        assert("Tensor range check" && 0 <= v255 && v255 < 4);
         int v280;
-        v280 = 0;
-        while (while_method_1(v280)){
-            assert("Tensor range check" && 0 <= v280 && v280 < 1);
-            int v282;
-            v282 = 4 * v280;
-            assert("Tensor range check" && 0 <= v280 && v280 < 1);
-            int v283;
-            v283 = 16 * v280;
-            int v284;
-            v284 = v283 + v277;
-            int4* v285;
-            v285 = reinterpret_cast<int4*>(v272 + v284);
-            int4* v286;
-            v286 = reinterpret_cast<int4*>(v278 + v282);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v285) % 16 == 0 && reinterpret_cast<unsigned long long>(v286) % 16 == 0);
-            *v286 = *v285;
-            v280 += 1 ;
+        v280 = 4 * v255;
+        float v281[4];
+        int v282[4];
+        int v283;
+        v283 = 0;
+        while (while_method_1(v283)){
+            assert("Tensor range check" && 0 <= v283 && v283 < 1);
+            int v285;
+            v285 = 4 * v283;
+            assert("Tensor range check" && 0 <= v283 && v283 < 1);
+            int v286;
+            v286 = 16 * v283;
+            int v287;
+            v287 = v286 + v280;
+            int4* v288;
+            v288 = reinterpret_cast<int4*>(v275 + v287);
+            int4* v289;
+            v289 = reinterpret_cast<int4*>(v281 + v285);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v288) % 16 == 0 && reinterpret_cast<unsigned long long>(v289) % 16 == 0);
+            *v289 = *v288;
+            v283 += 1 ;
         }
-        int v287;
-        v287 = 0;
-        while (while_method_1(v287)){
-            int v289;
-            v289 = 0;
-            while (while_method_0(v289)){
-                bool v291;
-                v291 = 0 <= v289;
-                bool v293;
-                if (v291){
-                    bool v292;
-                    v292 = v289 < 4;
-                    v293 = v292;
-                } else {
-                    v293 = false;
-                }
+        int v290;
+        v290 = 0;
+        while (while_method_1(v290)){
+            int v292;
+            v292 = 0;
+            while (while_method_0(v292)){
                 bool v294;
-                v294 = v293 == false;
-                if (v294){
-                    assert("The indices should be inside the range of the dimension." && v293);
-                } else {
-                }
+                v294 = 0 <= v292;
                 bool v296;
-                v296 = 0 <= v252;
-                bool v298;
-                if (v296){
-                    bool v297;
-                    v297 = v252 < 4;
-                    v298 = v297;
+                if (v294){
+                    bool v295;
+                    v295 = v292 < 4;
+                    v296 = v295;
                 } else {
-                    v298 = false;
+                    v296 = false;
+                }
+                bool v297;
+                v297 = v296 == false;
+                if (v297){
+                    assert("The indices should be inside the range of the dimension." && v296);
+                } else {
                 }
                 bool v299;
-                v299 = v298 == false;
+                v299 = 0 <= v255;
+                bool v301;
                 if (v299){
-                    assert("The indices should be inside the range of the dimension." && v298);
+                    bool v300;
+                    v300 = v255 < 4;
+                    v301 = v300;
+                } else {
+                    v301 = false;
+                }
+                bool v302;
+                v302 = v301 == false;
+                if (v302){
+                    assert("The indices should be inside the range of the dimension." && v301);
                 } else {
                 }
-                int v301;
-                v301 = v252 * 4;
-                int v302;
-                v302 = v289 + v301;
-                bool v303;
-                v303 = 0 <= v287;
-                bool v305;
-                if (v303){
-                    bool v304;
-                    v304 = v287 < 1;
-                    v305 = v304;
-                } else {
-                    v305 = false;
-                }
+                int v304;
+                v304 = v255 * 4;
+                int v305;
+                v305 = v292 + v304;
                 bool v306;
-                v306 = v305 == false;
+                v306 = 0 <= v290;
+                bool v308;
                 if (v306){
-                    assert("The indices should be inside the range of the dimension." && v305);
+                    bool v307;
+                    v307 = v290 < 1;
+                    v308 = v307;
+                } else {
+                    v308 = false;
+                }
+                bool v309;
+                v309 = v308 == false;
+                if (v309){
+                    assert("The indices should be inside the range of the dimension." && v308);
                 } else {
                 }
-                int v308;
-                v308 = v287 * 16;
-                int v309;
-                v309 = v302 + v308;
-                assert("Tensor range check" && 0 <= v287 && v287 < 1);
-                assert("Tensor range check" && 0 <= v289 && v289 < 4);
-                int v310;
-                v310 = 4 * v287;
                 int v311;
-                v311 = v310 + v289;
-                v279[v311] = v309;
-                v289 += 1 ;
+                v311 = v290 * 16;
+                int v312;
+                v312 = v305 + v311;
+                assert("Tensor range check" && 0 <= v290 && v290 < 1);
+                assert("Tensor range check" && 0 <= v292 && v292 < 4);
+                int v313;
+                v313 = 4 * v290;
+                int v314;
+                v314 = v313 + v292;
+                v282[v314] = v312;
+                v292 += 1 ;
             }
-            v287 += 1 ;
+            v290 += 1 ;
         }
-        int v312;
-        v312 = 0;
-        while (while_method_1(v312)){
-            assert("Tensor range check" && 0 <= v312 && v312 < 1);
-            int v314;
-            v314 = 16 * v312;
-            int v315;
-            v315 = v314 + v277;
-            assert("Tensor range check" && 0 <= v312 && v312 < 1);
-            int v316;
-            v316 = 4 * v312;
-            int4* v317;
-            v317 = reinterpret_cast<int4*>(v278 + v316);
-            int4* v318;
-            v318 = reinterpret_cast<int4*>(v273 + v315);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v317) % 16 == 0 && reinterpret_cast<unsigned long long>(v318) % 16 == 0);
-            *v318 = *v317;
-            v312 += 1 ;
+        int v315;
+        v315 = 0;
+        while (while_method_1(v315)){
+            assert("Tensor range check" && 0 <= v315 && v315 < 1);
+            int v317;
+            v317 = 16 * v315;
+            int v318;
+            v318 = v317 + v280;
+            assert("Tensor range check" && 0 <= v315 && v315 < 1);
+            int v319;
+            v319 = 4 * v315;
+            int4* v320;
+            v320 = reinterpret_cast<int4*>(v281 + v319);
+            int4* v321;
+            v321 = reinterpret_cast<int4*>(v276 + v318);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v320) % 16 == 0 && reinterpret_cast<unsigned long long>(v321) % 16 == 0);
+            *v321 = *v320;
+            v315 += 1 ;
         }
-        assert("Tensor range check" && 0 <= v269 && v269 < 256);
-        v257 += 1 ;
+        assert("Tensor range check" && 0 <= v272 && v272 < 256);
+        v260 += 1 ;
     }
     __syncthreads();
-    assert("Tensor range check" && 0 <= v248 && v248 < 256);
+    assert("Tensor range check" && 0 <= v251 && v251 < 256);
     __syncthreads();
-    float * v319;
-    v319 = v1+v12;
-    float * v321;
-    v321 = v7+v22;
-    if (v238){
-        assert("The dynamic shared memory is insufficient to allocate the tensor." && v237);
+    float * v322;
+    v322 = v1+v12;
+    float * v324;
+    v324 = v7+v22;
+    if (v241){
+        assert("The dynamic shared memory is insufficient to allocate the tensor." && v240);
     } else {
     }
-    extern __shared__ unsigned char v324[];
-    if (v242){
-        assert("The length of the partition has to be less than or equal to the length of the base array." && v241);
+    extern __shared__ unsigned char v327[];
+    if (v245){
+        assert("The length of the partition has to be less than or equal to the length of the base array." && v244);
     } else {
     }
-    float * * v326;
-    v326 = reinterpret_cast<float * *>(&v324[0ull]);
-    float * * v328;
-    v328 = reinterpret_cast<float * *>(&v324[v45]);
-    int v330;
-    v330 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v330 && v330 < 256);
-    v326[v330] = v319;
-    v328[v330] = v321;
+    float * * v329;
+    v329 = reinterpret_cast<float * *>(&v327[0ull]);
+    float * * v331;
+    v331 = reinterpret_cast<float * *>(&v327[v45]);
+    int v333;
+    v333 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v333 && v333 < 256);
+    v329[v333] = v322;
+    v331[v333] = v324;
     __syncthreads();
-    bool v331;
-    v331 = 0 <= v330;
-    bool v332;
-    v332 = v331 == false;
-    if (v332){
-        assert("The index needs to be zero or positive." && v331);
+    bool v334;
+    v334 = 0 <= v333;
+    bool v335;
+    v335 = v334 == false;
+    if (v335){
+        assert("The index needs to be zero or positive." && v334);
     } else {
     }
-    int v334;
-    v334 = v330 % 4;
-    int v335;
-    v335 = v330 / 4;
-    bool v336;
-    v336 = v335 < 64;
-    bool v337;
-    v337 = v336 == false;
-    if (v337){
-        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v336);
+    int v337;
+    v337 = v333 % 4;
+    int v338;
+    v338 = v333 / 4;
+    bool v339;
+    v339 = v338 < 64;
+    bool v340;
+    v340 = v339 == false;
+    if (v340){
+        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v339);
     } else {
     }
-    assert("Tensor range check" && 0 <= v335 && v335 < 64);
-    int v339;
-    v339 = 0;
-    while (while_method_0(v339)){
-        bool v341;
-        v341 = 0 <= v335;
-        bool v342;
-        v342 = v341 && v336;
-        bool v343;
-        v343 = v342 == false;
-        if (v343){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v342);
-        } else {
-        }
+    assert("Tensor range check" && 0 <= v338 && v338 < 64);
+    int v342;
+    v342 = 0;
+    while (while_method_0(v342)){
+        bool v344;
+        v344 = 0 <= v338;
         bool v345;
-        v345 = 0 <= v339;
-        bool v347;
-        if (v345){
-            bool v346;
-            v346 = v339 < 4;
-            v347 = v346;
+        v345 = v344 && v339;
+        bool v346;
+        v346 = v345 == false;
+        if (v346){
+            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v345);
         } else {
-            v347 = false;
         }
         bool v348;
-        v348 = v347 == false;
+        v348 = 0 <= v342;
+        bool v350;
         if (v348){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v347);
+            bool v349;
+            v349 = v342 < 4;
+            v350 = v349;
+        } else {
+            v350 = false;
+        }
+        bool v351;
+        v351 = v350 == false;
+        if (v351){
+            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v350);
         } else {
         }
-        int v350;
-        v350 = v339 * 64;
-        int v351;
-        v351 = v350 + v335;
-        assert("Tensor range check" && 0 <= v339 && v339 < 4);
-        int v352;
-        v352 = 64 * v339;
         int v353;
-        v353 = v352 + v335;
-        float * v354;
-        v354 = v326[v353];
-        float * v355;
-        v355 = v328[v353];
+        v353 = v342 * 64;
+        int v354;
+        v354 = v353 + v338;
+        assert("Tensor range check" && 0 <= v342 && v342 < 4);
+        int v355;
+        v355 = 64 * v342;
         int v356;
-        v356 = blockIdx.x;
-        int v357;
-        v357 = v356 * 256;
-        int v358;
-        v358 = v357 + v351;
-        assert("Tensor range check" && 0 <= v334 && v334 < 4);
+        v356 = v355 + v338;
+        float * v357;
+        v357 = v329[v356];
+        float * v358;
+        v358 = v331[v356];
         int v359;
-        v359 = 4 * v334;
-        float v360[4];
-        int v361[4];
+        v359 = blockIdx.x;
+        int v360;
+        v360 = v359 * 256;
+        int v361;
+        v361 = v360 + v354;
+        assert("Tensor range check" && 0 <= v337 && v337 < 4);
         int v362;
-        v362 = 0;
-        while (while_method_1(v362)){
-            assert("Tensor range check" && 0 <= v362 && v362 < 1);
-            int v364;
-            v364 = 4 * v362;
-            assert("Tensor range check" && 0 <= v362 && v362 < 1);
-            int v365;
-            v365 = 16 * v362;
-            int v366;
-            v366 = v365 + v359;
-            int4* v367;
-            v367 = reinterpret_cast<int4*>(v354 + v366);
-            int4* v368;
-            v368 = reinterpret_cast<int4*>(v360 + v364);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v367) % 16 == 0 && reinterpret_cast<unsigned long long>(v368) % 16 == 0);
-            *v368 = *v367;
-            v362 += 1 ;
+        v362 = 4 * v337;
+        float v363[4];
+        int v364[4];
+        int v365;
+        v365 = 0;
+        while (while_method_1(v365)){
+            assert("Tensor range check" && 0 <= v365 && v365 < 1);
+            int v367;
+            v367 = 4 * v365;
+            assert("Tensor range check" && 0 <= v365 && v365 < 1);
+            int v368;
+            v368 = 16 * v365;
+            int v369;
+            v369 = v368 + v362;
+            int4* v370;
+            v370 = reinterpret_cast<int4*>(v357 + v369);
+            int4* v371;
+            v371 = reinterpret_cast<int4*>(v363 + v367);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v370) % 16 == 0 && reinterpret_cast<unsigned long long>(v371) % 16 == 0);
+            *v371 = *v370;
+            v365 += 1 ;
         }
-        int v369;
-        v369 = 0;
-        while (while_method_1(v369)){
-            int v371;
-            v371 = 0;
-            while (while_method_0(v371)){
-                bool v373;
-                v373 = 0 <= v371;
-                bool v375;
-                if (v373){
-                    bool v374;
-                    v374 = v371 < 4;
-                    v375 = v374;
-                } else {
-                    v375 = false;
-                }
+        int v372;
+        v372 = 0;
+        while (while_method_1(v372)){
+            int v374;
+            v374 = 0;
+            while (while_method_0(v374)){
                 bool v376;
-                v376 = v375 == false;
-                if (v376){
-                    assert("The indices should be inside the range of the dimension." && v375);
-                } else {
-                }
+                v376 = 0 <= v374;
                 bool v378;
-                v378 = 0 <= v334;
-                bool v380;
-                if (v378){
-                    bool v379;
-                    v379 = v334 < 4;
-                    v380 = v379;
+                if (v376){
+                    bool v377;
+                    v377 = v374 < 4;
+                    v378 = v377;
                 } else {
-                    v380 = false;
+                    v378 = false;
+                }
+                bool v379;
+                v379 = v378 == false;
+                if (v379){
+                    assert("The indices should be inside the range of the dimension." && v378);
+                } else {
                 }
                 bool v381;
-                v381 = v380 == false;
+                v381 = 0 <= v337;
+                bool v383;
                 if (v381){
-                    assert("The indices should be inside the range of the dimension." && v380);
+                    bool v382;
+                    v382 = v337 < 4;
+                    v383 = v382;
+                } else {
+                    v383 = false;
+                }
+                bool v384;
+                v384 = v383 == false;
+                if (v384){
+                    assert("The indices should be inside the range of the dimension." && v383);
                 } else {
                 }
-                int v383;
-                v383 = v334 * 4;
-                int v384;
-                v384 = v371 + v383;
-                bool v385;
-                v385 = 0 <= v369;
-                bool v387;
-                if (v385){
-                    bool v386;
-                    v386 = v369 < 1;
-                    v387 = v386;
-                } else {
-                    v387 = false;
-                }
+                int v386;
+                v386 = v337 * 4;
+                int v387;
+                v387 = v374 + v386;
                 bool v388;
-                v388 = v387 == false;
+                v388 = 0 <= v372;
+                bool v390;
                 if (v388){
-                    assert("The indices should be inside the range of the dimension." && v387);
+                    bool v389;
+                    v389 = v372 < 1;
+                    v390 = v389;
+                } else {
+                    v390 = false;
+                }
+                bool v391;
+                v391 = v390 == false;
+                if (v391){
+                    assert("The indices should be inside the range of the dimension." && v390);
                 } else {
                 }
-                int v390;
-                v390 = v369 * 16;
-                int v391;
-                v391 = v384 + v390;
-                assert("Tensor range check" && 0 <= v369 && v369 < 1);
-                assert("Tensor range check" && 0 <= v371 && v371 < 4);
-                int v392;
-                v392 = 4 * v369;
                 int v393;
-                v393 = v392 + v371;
-                v361[v393] = v391;
-                v371 += 1 ;
+                v393 = v372 * 16;
+                int v394;
+                v394 = v387 + v393;
+                assert("Tensor range check" && 0 <= v372 && v372 < 1);
+                assert("Tensor range check" && 0 <= v374 && v374 < 4);
+                int v395;
+                v395 = 4 * v372;
+                int v396;
+                v396 = v395 + v374;
+                v364[v396] = v394;
+                v374 += 1 ;
             }
-            v369 += 1 ;
+            v372 += 1 ;
         }
-        bool v394[4];
-        int v395;
-        v395 = 0;
-        while (while_method_1(v395)){
-            int v397;
-            v397 = 0;
-            while (while_method_0(v397)){
-                assert("Tensor range check" && 0 <= v395 && v395 < 1);
-                assert("Tensor range check" && 0 <= v397 && v397 < 4);
-                int v399;
-                v399 = 4 * v395;
-                int v400;
-                v400 = v399 + v397;
-                float v401;
-                v401 = v360[v400];
+        bool v397[4];
+        int v398;
+        v398 = 0;
+        while (while_method_1(v398)){
+            int v400;
+            v400 = 0;
+            while (while_method_0(v400)){
+                assert("Tensor range check" && 0 <= v398 && v398 < 1);
+                assert("Tensor range check" && 0 <= v400 && v400 < 4);
                 int v402;
-                v402 = v361[v400];
-                bool v403;
-                v403 = v402 < 3;
-                assert("Tensor range check" && 0 <= v395 && v395 < 1);
-                assert("Tensor range check" && 0 <= v397 && v397 < 4);
-                v394[v400] = v403;
-                v397 += 1 ;
+                v402 = 4 * v398;
+                int v403;
+                v403 = v402 + v400;
+                float v404;
+                v404 = v363[v403];
+                int v405;
+                v405 = v364[v403];
+                bool v406;
+                v406 = v405 < 3;
+                assert("Tensor range check" && 0 <= v398 && v398 < 1);
+                assert("Tensor range check" && 0 <= v400 && v400 < 4);
+                v397[v403] = v406;
+                v400 += 1 ;
             }
-            v395 += 1 ;
+            v398 += 1 ;
         }
-        float v404[4];
-        int v405;
-        v405 = 0;
-        while (while_method_1(v405)){
-            int v407;
-            v407 = 0;
-            while (while_method_0(v407)){
-                assert("Tensor range check" && 0 <= v405 && v405 < 1);
-                assert("Tensor range check" && 0 <= v407 && v407 < 4);
-                int v409;
-                v409 = 4 * v405;
-                int v410;
-                v410 = v409 + v407;
-                float v411;
-                v411 = v360[v410];
-                bool v412;
-                v412 = v394[v410];
-                float v415;
-                if (v412){
-                    bool v413;
-                    v413 = 0.0f >= v411;
-                    if (v413){
-                        v415 = 0.0f;
+        float v407[4];
+        int v408;
+        v408 = 0;
+        while (while_method_1(v408)){
+            int v410;
+            v410 = 0;
+            while (while_method_0(v410)){
+                assert("Tensor range check" && 0 <= v408 && v408 < 1);
+                assert("Tensor range check" && 0 <= v410 && v410 < 4);
+                int v412;
+                v412 = 4 * v408;
+                int v413;
+                v413 = v412 + v410;
+                float v414;
+                v414 = v363[v413];
+                bool v415;
+                v415 = v397[v413];
+                float v418;
+                if (v415){
+                    bool v416;
+                    v416 = 0.0f >= v414;
+                    if (v416){
+                        v418 = 0.0f;
                     } else {
-                        v415 = v411;
+                        v418 = v414;
                     }
                 } else {
-                    v415 = 0.0f;
+                    v418 = 0.0f;
                 }
-                assert("Tensor range check" && 0 <= v405 && v405 < 1);
-                assert("Tensor range check" && 0 <= v407 && v407 < 4);
-                v404[v410] = v415;
-                v407 += 1 ;
+                assert("Tensor range check" && 0 <= v408 && v408 < 1);
+                assert("Tensor range check" && 0 <= v410 && v410 < 4);
+                v407[v413] = v418;
+                v410 += 1 ;
             }
-            v405 += 1 ;
+            v408 += 1 ;
         }
-        float v416;
-        v416 = 0.0f;
-        int v417;
-        v417 = 0;
-        while (while_method_1(v417)){
-            int v419;
-            v419 = 0;
-            while (while_method_0(v419)){
-                assert("Tensor range check" && 0 <= v417 && v417 < 1);
-                assert("Tensor range check" && 0 <= v419 && v419 < 4);
-                int v421;
-                v421 = 4 * v417;
-                int v422;
-                v422 = v421 + v419;
-                float v423;
-                v423 = v404[v422];
-                float v424;
-                v424 = v416 + v423;
-                v416 = v424;
-                v419 += 1 ;
+        float v419;
+        v419 = 0.0f;
+        int v420;
+        v420 = 0;
+        while (while_method_1(v420)){
+            int v422;
+            v422 = 0;
+            while (while_method_0(v422)){
+                assert("Tensor range check" && 0 <= v420 && v420 < 1);
+                assert("Tensor range check" && 0 <= v422 && v422 < 4);
+                int v424;
+                v424 = 4 * v420;
+                int v425;
+                v425 = v424 + v422;
+                float v426;
+                v426 = v407[v425];
+                float v427;
+                v427 = v419 + v426;
+                v419 = v427;
+                v422 += 1 ;
             }
-            v417 += 1 ;
+            v420 += 1 ;
         }
-        auto v425 = cooperative_groups::coalesced_threads();
-        int v426;
-        v426 = threadIdx.x;
-        int v427;
-        v427 = v426 / 4;
-        auto v428 = cooperative_groups::labeled_partition(v425,v427);
-        Closure0 v429{};
-        float v430;
-        v430 = cooperative_groups::reduce(v428, v416, v429);
-        int v431[4];
-        int v432;
-        v432 = 0;
-        while (while_method_1(v432)){
-            int v434;
-            v434 = 0;
-            while (while_method_0(v434)){
-                assert("Tensor range check" && 0 <= v432 && v432 < 1);
-                assert("Tensor range check" && 0 <= v434 && v434 < 4);
-                int v436;
-                v436 = 4 * v432;
-                int v437;
-                v437 = v436 + v434;
-                bool v438;
-                v438 = v394[v437];
+        auto v428 = cooperative_groups::coalesced_threads();
+        int v429;
+        v429 = threadIdx.x;
+        int v430;
+        v430 = v429 / 4;
+        auto v431 = cooperative_groups::labeled_partition(v428,v430);
+        Closure0 v432{};
+        float v433;
+        v433 = cooperative_groups::reduce(v431, v419, v432);
+        int v434[4];
+        int v435;
+        v435 = 0;
+        while (while_method_1(v435)){
+            int v437;
+            v437 = 0;
+            while (while_method_0(v437)){
+                assert("Tensor range check" && 0 <= v435 && v435 < 1);
+                assert("Tensor range check" && 0 <= v437 && v437 < 4);
                 int v439;
-                if (v438){
-                    v439 = 1;
+                v439 = 4 * v435;
+                int v440;
+                v440 = v439 + v437;
+                bool v441;
+                v441 = v397[v440];
+                int v442;
+                if (v441){
+                    v442 = 1;
                 } else {
-                    v439 = 0;
+                    v442 = 0;
                 }
-                assert("Tensor range check" && 0 <= v432 && v432 < 1);
-                assert("Tensor range check" && 0 <= v434 && v434 < 4);
-                v431[v437] = v439;
-                v434 += 1 ;
+                assert("Tensor range check" && 0 <= v435 && v435 < 1);
+                assert("Tensor range check" && 0 <= v437 && v437 < 4);
+                v434[v440] = v442;
+                v437 += 1 ;
             }
-            v432 += 1 ;
+            v435 += 1 ;
         }
-        int v440;
-        v440 = 0;
-        int v441;
-        v441 = 0;
-        while (while_method_1(v441)){
-            int v443;
-            v443 = 0;
-            while (while_method_0(v443)){
-                assert("Tensor range check" && 0 <= v441 && v441 < 1);
-                assert("Tensor range check" && 0 <= v443 && v443 < 4);
-                int v445;
-                v445 = 4 * v441;
-                int v446;
-                v446 = v445 + v443;
-                int v447;
-                v447 = v431[v446];
+        int v443;
+        v443 = 0;
+        int v444;
+        v444 = 0;
+        while (while_method_1(v444)){
+            int v446;
+            v446 = 0;
+            while (while_method_0(v446)){
+                assert("Tensor range check" && 0 <= v444 && v444 < 1);
+                assert("Tensor range check" && 0 <= v446 && v446 < 4);
                 int v448;
-                v448 = v440 + v447;
-                v440 = v448;
-                v443 += 1 ;
+                v448 = 4 * v444;
+                int v449;
+                v449 = v448 + v446;
+                int v450;
+                v450 = v434[v449];
+                int v451;
+                v451 = v443 + v450;
+                v443 = v451;
+                v446 += 1 ;
             }
-            v441 += 1 ;
+            v444 += 1 ;
         }
-        auto v449 = cooperative_groups::coalesced_threads();
-        int v450;
-        v450 = threadIdx.x;
-        int v451;
-        v451 = v450 / 4;
-        auto v452 = cooperative_groups::labeled_partition(v449,v451);
-        Closure1 v453{};
+        auto v452 = cooperative_groups::coalesced_threads();
+        int v453;
+        v453 = threadIdx.x;
         int v454;
-        v454 = cooperative_groups::reduce(v452, v440, v453);
-        float v455;
-        v455 = (float)v454;
-        float v456;
-        v456 = 1.0f / v455;
-        float v457[4];
-        int v458;
-        v458 = 0;
-        while (while_method_1(v458)){
-            int v460;
-            v460 = 0;
-            while (while_method_0(v460)){
-                assert("Tensor range check" && 0 <= v458 && v458 < 1);
-                assert("Tensor range check" && 0 <= v460 && v460 < 4);
-                int v462;
-                v462 = 4 * v458;
-                int v463;
-                v463 = v462 + v460;
-                float v464;
-                v464 = v404[v463];
-                bool v465;
-                v465 = v394[v463];
-                bool v466;
-                v466 = v465 == false;
-                float v471;
-                if (v466){
-                    v471 = 0.0f;
+        v454 = v453 / 4;
+        auto v455 = cooperative_groups::labeled_partition(v452,v454);
+        Closure1 v456{};
+        int v457;
+        v457 = cooperative_groups::reduce(v455, v443, v456);
+        float v458;
+        v458 = (float)v457;
+        float v459;
+        v459 = 1.0f / v458;
+        float v460[4];
+        int v461;
+        v461 = 0;
+        while (while_method_1(v461)){
+            int v463;
+            v463 = 0;
+            while (while_method_0(v463)){
+                assert("Tensor range check" && 0 <= v461 && v461 < 1);
+                assert("Tensor range check" && 0 <= v463 && v463 < 4);
+                int v465;
+                v465 = 4 * v461;
+                int v466;
+                v466 = v465 + v463;
+                float v467;
+                v467 = v407[v466];
+                bool v468;
+                v468 = v397[v466];
+                bool v469;
+                v469 = v468 == false;
+                float v474;
+                if (v469){
+                    v474 = 0.0f;
                 } else {
-                    bool v467;
-                    v467 = v430 == 0.0f;
-                    bool v468;
-                    v468 = v467 != true;
-                    if (v468){
-                        float v469;
-                        v469 = v464 / v430;
-                        v471 = v469;
+                    bool v470;
+                    v470 = v433 == 0.0f;
+                    bool v471;
+                    v471 = v470 != true;
+                    if (v471){
+                        float v472;
+                        v472 = v467 / v433;
+                        v474 = v472;
                     } else {
-                        v471 = v456;
+                        v474 = v459;
                     }
                 }
-                assert("Tensor range check" && 0 <= v458 && v458 < 1);
-                assert("Tensor range check" && 0 <= v460 && v460 < 4);
-                v457[v463] = v471;
-                v460 += 1 ;
+                assert("Tensor range check" && 0 <= v461 && v461 < 1);
+                assert("Tensor range check" && 0 <= v463 && v463 < 4);
+                v460[v466] = v474;
+                v463 += 1 ;
             }
-            v458 += 1 ;
+            v461 += 1 ;
         }
-        int v472;
-        v472 = 0;
-        while (while_method_1(v472)){
-            assert("Tensor range check" && 0 <= v472 && v472 < 1);
-            int v474;
-            v474 = 16 * v472;
-            int v475;
-            v475 = v474 + v359;
-            assert("Tensor range check" && 0 <= v472 && v472 < 1);
-            int v476;
-            v476 = 4 * v472;
-            int4* v477;
-            v477 = reinterpret_cast<int4*>(v457 + v476);
-            int4* v478;
-            v478 = reinterpret_cast<int4*>(v355 + v475);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v477) % 16 == 0 && reinterpret_cast<unsigned long long>(v478) % 16 == 0);
-            *v478 = *v477;
-            v472 += 1 ;
+        int v475;
+        v475 = 0;
+        while (while_method_1(v475)){
+            assert("Tensor range check" && 0 <= v475 && v475 < 1);
+            int v477;
+            v477 = 16 * v475;
+            int v478;
+            v478 = v477 + v362;
+            assert("Tensor range check" && 0 <= v475 && v475 < 1);
+            int v479;
+            v479 = 4 * v475;
+            int4* v480;
+            v480 = reinterpret_cast<int4*>(v460 + v479);
+            int4* v481;
+            v481 = reinterpret_cast<int4*>(v358 + v478);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v480) % 16 == 0 && reinterpret_cast<unsigned long long>(v481) % 16 == 0);
+            *v481 = *v480;
+            v475 += 1 ;
         }
-        assert("Tensor range check" && 0 <= v351 && v351 < 256);
-        v339 += 1 ;
+        assert("Tensor range check" && 0 <= v354 && v354 < 256);
+        v342 += 1 ;
     }
     __syncthreads();
-    assert("Tensor range check" && 0 <= v330 && v330 < 256);
+    assert("Tensor range check" && 0 <= v333 && v333 < 256);
     __syncthreads();
-    int v479;
-    v479 = threadIdx.x;
-    int v480;
-    v480 = blockIdx.x;
-    int v481;
-    v481 = v480 * 256;
     int v482;
-    v482 = v479 + v481;
-    unsigned long long v483;
-    v483 = (unsigned long long)v482;
-    curandStatePhilox4_32_10_t v484;
-    curand_init(12344321ull,v483,0ull,&v484);
-    float * v485;
-    v485 = v1+v12;
+    v482 = threadIdx.x;
+    int v483;
+    v483 = blockIdx.x;
+    int v484;
+    v484 = v483 * 256;
+    int v485;
+    v485 = v482 + v484;
+    unsigned long long v486;
+    v486 = (unsigned long long)v485;
+    curandStatePhilox4_32_10_t v487;
+    curand_init(12344321ull,v486,0ull,&v487);
+    float * v488;
+    v488 = v1+v12;
     if (v155){
         assert("The dynamic shared memory is insufficient to allocate the tensor." && v154);
     } else {
     }
-    extern __shared__ unsigned char v488[];
+    extern __shared__ unsigned char v491[];
     if (v159){
         assert("The length of the partition has to be less than or equal to the length of the base array." && v158);
     } else {
     }
-    float * * v490;
-    v490 = reinterpret_cast<float * *>(&v488[0ull]);
-    int * v492;
-    v492 = reinterpret_cast<int *>(&v488[v45]);
-    int v494;
-    v494 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v494 && v494 < 256);
-    v490[v494] = v485;
+    float * * v493;
+    v493 = reinterpret_cast<float * *>(&v491[0ull]);
+    int * v495;
+    v495 = reinterpret_cast<int *>(&v491[v45]);
+    int v497;
+    v497 = threadIdx.x;
+    assert("Tensor range check" && 0 <= v497 && v497 < 256);
+    v493[v497] = v488;
     __syncthreads();
-    bool v495;
-    v495 = 0 <= v494;
-    bool v496;
-    v496 = v495 == false;
-    if (v496){
-        assert("The index needs to be zero or positive." && v495);
+    bool v498;
+    v498 = 0 <= v497;
+    bool v499;
+    v499 = v498 == false;
+    if (v499){
+        assert("The index needs to be zero or positive." && v498);
     } else {
     }
-    int v498;
-    v498 = v494 % 4;
-    int v499;
-    v499 = v494 / 4;
-    bool v500;
-    v500 = v499 < 64;
-    bool v501;
-    v501 = v500 == false;
-    if (v501){
-        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v500);
+    int v501;
+    v501 = v497 % 4;
+    int v502;
+    v502 = v497 / 4;
+    bool v503;
+    v503 = v502 < 64;
+    bool v504;
+    v504 = v503 == false;
+    if (v504){
+        assert("The last element of the projection dimensions needs to be greater than the index remainder." && v503);
     } else {
     }
-    assert("Tensor range check" && 0 <= v499 && v499 < 64);
-    int v503;
-    v503 = 0;
-    while (while_method_0(v503)){
-        bool v505;
-        v505 = 0 <= v499;
-        bool v506;
-        v506 = v505 && v500;
-        bool v507;
-        v507 = v506 == false;
-        if (v507){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v506);
-        } else {
-        }
+    assert("Tensor range check" && 0 <= v502 && v502 < 64);
+    int v506;
+    v506 = 0;
+    while (while_method_0(v506)){
+        bool v508;
+        v508 = 0 <= v502;
         bool v509;
-        v509 = 0 <= v503;
-        bool v511;
-        if (v509){
-            bool v510;
-            v510 = v503 < 4;
-            v511 = v510;
+        v509 = v508 && v503;
+        bool v510;
+        v510 = v509 == false;
+        if (v510){
+            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v509);
         } else {
-            v511 = false;
         }
         bool v512;
-        v512 = v511 == false;
+        v512 = 0 <= v506;
+        bool v514;
         if (v512){
-            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v511);
+            bool v513;
+            v513 = v506 < 4;
+            v514 = v513;
+        } else {
+            v514 = false;
+        }
+        bool v515;
+        v515 = v514 == false;
+        if (v515){
+            assert("The rigid merge indices have to be greater than or equal to 0 and less than the dimensions." && v514);
         } else {
         }
-        int v514;
-        v514 = v503 * 64;
-        int v515;
-        v515 = v514 + v499;
-        assert("Tensor range check" && 0 <= v503 && v503 < 4);
-        int v516;
-        v516 = 64 * v503;
         int v517;
-        v517 = v516 + v499;
-        float * v518;
-        v518 = v490[v517];
+        v517 = v506 * 64;
+        int v518;
+        v518 = v517 + v502;
+        assert("Tensor range check" && 0 <= v506 && v506 < 4);
         int v519;
-        v519 = blockIdx.x;
+        v519 = 64 * v506;
         int v520;
-        v520 = v519 * 256;
-        int v521;
-        v521 = v520 + v515;
-        assert("Tensor range check" && 0 <= v498 && v498 < 4);
+        v520 = v519 + v502;
+        float * v521;
+        v521 = v493[v520];
         int v522;
-        v522 = 4 * v498;
-        float v523[4];
-        int v524[4];
+        v522 = blockIdx.x;
+        int v523;
+        v523 = v522 * 256;
+        int v524;
+        v524 = v523 + v518;
+        assert("Tensor range check" && 0 <= v501 && v501 < 4);
         int v525;
-        v525 = 0;
-        while (while_method_1(v525)){
-            assert("Tensor range check" && 0 <= v525 && v525 < 1);
-            int v527;
-            v527 = 4 * v525;
-            assert("Tensor range check" && 0 <= v525 && v525 < 1);
-            int v528;
-            v528 = 16 * v525;
-            int v529;
-            v529 = v528 + v522;
-            int4* v530;
-            v530 = reinterpret_cast<int4*>(v518 + v529);
-            int4* v531;
-            v531 = reinterpret_cast<int4*>(v523 + v527);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v530) % 16 == 0 && reinterpret_cast<unsigned long long>(v531) % 16 == 0);
-            *v531 = *v530;
-            v525 += 1 ;
+        v525 = 4 * v501;
+        float v526[4];
+        int v527[4];
+        int v528;
+        v528 = 0;
+        while (while_method_1(v528)){
+            assert("Tensor range check" && 0 <= v528 && v528 < 1);
+            int v530;
+            v530 = 4 * v528;
+            assert("Tensor range check" && 0 <= v528 && v528 < 1);
+            int v531;
+            v531 = 16 * v528;
+            int v532;
+            v532 = v531 + v525;
+            int4* v533;
+            v533 = reinterpret_cast<int4*>(v521 + v532);
+            int4* v534;
+            v534 = reinterpret_cast<int4*>(v526 + v530);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v533) % 16 == 0 && reinterpret_cast<unsigned long long>(v534) % 16 == 0);
+            *v534 = *v533;
+            v528 += 1 ;
         }
-        int v532;
-        v532 = 0;
-        while (while_method_1(v532)){
-            int v534;
-            v534 = 0;
-            while (while_method_0(v534)){
-                bool v536;
-                v536 = 0 <= v534;
-                bool v538;
-                if (v536){
-                    bool v537;
-                    v537 = v534 < 4;
-                    v538 = v537;
-                } else {
-                    v538 = false;
-                }
+        int v535;
+        v535 = 0;
+        while (while_method_1(v535)){
+            int v537;
+            v537 = 0;
+            while (while_method_0(v537)){
                 bool v539;
-                v539 = v538 == false;
-                if (v539){
-                    assert("The indices should be inside the range of the dimension." && v538);
-                } else {
-                }
+                v539 = 0 <= v537;
                 bool v541;
-                v541 = 0 <= v498;
-                bool v543;
-                if (v541){
-                    bool v542;
-                    v542 = v498 < 4;
-                    v543 = v542;
+                if (v539){
+                    bool v540;
+                    v540 = v537 < 4;
+                    v541 = v540;
                 } else {
-                    v543 = false;
+                    v541 = false;
+                }
+                bool v542;
+                v542 = v541 == false;
+                if (v542){
+                    assert("The indices should be inside the range of the dimension." && v541);
+                } else {
                 }
                 bool v544;
-                v544 = v543 == false;
+                v544 = 0 <= v501;
+                bool v546;
                 if (v544){
-                    assert("The indices should be inside the range of the dimension." && v543);
+                    bool v545;
+                    v545 = v501 < 4;
+                    v546 = v545;
+                } else {
+                    v546 = false;
+                }
+                bool v547;
+                v547 = v546 == false;
+                if (v547){
+                    assert("The indices should be inside the range of the dimension." && v546);
                 } else {
                 }
-                int v546;
-                v546 = v498 * 4;
-                int v547;
-                v547 = v534 + v546;
-                bool v548;
-                v548 = 0 <= v532;
-                bool v550;
-                if (v548){
-                    bool v549;
-                    v549 = v532 < 1;
-                    v550 = v549;
-                } else {
-                    v550 = false;
-                }
+                int v549;
+                v549 = v501 * 4;
+                int v550;
+                v550 = v537 + v549;
                 bool v551;
-                v551 = v550 == false;
+                v551 = 0 <= v535;
+                bool v553;
                 if (v551){
-                    assert("The indices should be inside the range of the dimension." && v550);
+                    bool v552;
+                    v552 = v535 < 1;
+                    v553 = v552;
+                } else {
+                    v553 = false;
+                }
+                bool v554;
+                v554 = v553 == false;
+                if (v554){
+                    assert("The indices should be inside the range of the dimension." && v553);
                 } else {
                 }
-                int v553;
-                v553 = v532 * 16;
-                int v554;
-                v554 = v547 + v553;
-                assert("Tensor range check" && 0 <= v532 && v532 < 1);
-                assert("Tensor range check" && 0 <= v534 && v534 < 4);
-                int v555;
-                v555 = 4 * v532;
                 int v556;
-                v556 = v555 + v534;
-                v524[v556] = v554;
-                v534 += 1 ;
+                v556 = v535 * 16;
+                int v557;
+                v557 = v550 + v556;
+                assert("Tensor range check" && 0 <= v535 && v535 < 1);
+                assert("Tensor range check" && 0 <= v537 && v537 < 4);
+                int v558;
+                v558 = 4 * v535;
+                int v559;
+                v559 = v558 + v537;
+                v527[v559] = v557;
+                v537 += 1 ;
             }
-            v532 += 1 ;
+            v535 += 1 ;
         }
-        bool v557[4];
-        int v558;
-        v558 = 0;
-        while (while_method_1(v558)){
-            int v560;
-            v560 = 0;
-            while (while_method_0(v560)){
-                assert("Tensor range check" && 0 <= v558 && v558 < 1);
-                assert("Tensor range check" && 0 <= v560 && v560 < 4);
-                int v562;
-                v562 = 4 * v558;
-                int v563;
-                v563 = v562 + v560;
-                float v564;
-                v564 = v523[v563];
+        bool v560[4];
+        int v561;
+        v561 = 0;
+        while (while_method_1(v561)){
+            int v563;
+            v563 = 0;
+            while (while_method_0(v563)){
+                assert("Tensor range check" && 0 <= v561 && v561 < 1);
+                assert("Tensor range check" && 0 <= v563 && v563 < 4);
                 int v565;
-                v565 = v524[v563];
-                bool v566;
-                v566 = v565 < 3;
-                assert("Tensor range check" && 0 <= v558 && v558 < 1);
-                assert("Tensor range check" && 0 <= v560 && v560 < 4);
-                v557[v563] = v566;
-                v560 += 1 ;
+                v565 = 4 * v561;
+                int v566;
+                v566 = v565 + v563;
+                float v567;
+                v567 = v526[v566];
+                int v568;
+                v568 = v527[v566];
+                bool v569;
+                v569 = v568 < 3;
+                assert("Tensor range check" && 0 <= v561 && v561 < 1);
+                assert("Tensor range check" && 0 <= v563 && v563 < 4);
+                v560[v566] = v569;
+                v563 += 1 ;
             }
-            v558 += 1 ;
+            v561 += 1 ;
         }
-        float v567[4];
-        int v568;
-        v568 = 0;
-        while (while_method_1(v568)){
-            int v570;
-            v570 = 0;
-            while (while_method_0(v570)){
-                assert("Tensor range check" && 0 <= v568 && v568 < 1);
-                assert("Tensor range check" && 0 <= v570 && v570 < 4);
-                int v572;
-                v572 = 4 * v568;
-                int v573;
-                v573 = v572 + v570;
-                float v574;
-                v574 = v523[v573];
-                bool v575;
-                v575 = v557[v573];
-                float v576;
-                if (v575){
-                    v576 = v574;
+        float v570[4];
+        int v571;
+        v571 = 0;
+        while (while_method_1(v571)){
+            int v573;
+            v573 = 0;
+            while (while_method_0(v573)){
+                assert("Tensor range check" && 0 <= v571 && v571 < 1);
+                assert("Tensor range check" && 0 <= v573 && v573 < 4);
+                int v575;
+                v575 = 4 * v571;
+                int v576;
+                v576 = v575 + v573;
+                float v577;
+                v577 = v526[v576];
+                bool v578;
+                v578 = v560[v576];
+                float v579;
+                if (v578){
+                    v579 = v577;
                 } else {
-                    v576 = 0.0f;
+                    v579 = 0.0f;
                 }
-                assert("Tensor range check" && 0 <= v568 && v568 < 1);
-                assert("Tensor range check" && 0 <= v570 && v570 < 4);
-                v567[v573] = v576;
-                v570 += 1 ;
+                assert("Tensor range check" && 0 <= v571 && v571 < 1);
+                assert("Tensor range check" && 0 <= v573 && v573 < 4);
+                v570[v576] = v579;
+                v573 += 1 ;
             }
-            v568 += 1 ;
+            v571 += 1 ;
         }
-        float v577;
-        v577 = 0.0f;
-        int v578;
-        v578 = 0;
-        while (while_method_1(v578)){
-            int v580;
-            v580 = 0;
-            while (while_method_0(v580)){
-                assert("Tensor range check" && 0 <= v578 && v578 < 1);
-                assert("Tensor range check" && 0 <= v580 && v580 < 4);
-                int v582;
-                v582 = 4 * v578;
-                int v583;
-                v583 = v582 + v580;
-                float v584;
-                v584 = v567[v583];
-                float v585;
-                v585 = v577 + v584;
-                v577 = v585;
-                v580 += 1 ;
+        float v580;
+        v580 = 0.0f;
+        int v581;
+        v581 = 0;
+        while (while_method_1(v581)){
+            int v583;
+            v583 = 0;
+            while (while_method_0(v583)){
+                assert("Tensor range check" && 0 <= v581 && v581 < 1);
+                assert("Tensor range check" && 0 <= v583 && v583 < 4);
+                int v585;
+                v585 = 4 * v581;
+                int v586;
+                v586 = v585 + v583;
+                float v587;
+                v587 = v570[v586];
+                float v588;
+                v588 = v580 + v587;
+                v580 = v588;
+                v583 += 1 ;
             }
-            v578 += 1 ;
+            v581 += 1 ;
         }
-        auto v586 = cooperative_groups::coalesced_threads();
-        int v587;
-        v587 = threadIdx.x;
-        int v588;
-        v588 = v587 / 4;
-        auto v589 = cooperative_groups::labeled_partition(v586,v588);
-        Closure0 v590{};
-        float v591;
-        v591 = cooperative_groups::reduce(v589, v577, v590);
-        int v592[4];
-        int v593;
-        v593 = 0;
-        while (while_method_1(v593)){
-            int v595;
-            v595 = 0;
-            while (while_method_0(v595)){
-                assert("Tensor range check" && 0 <= v593 && v593 < 1);
-                assert("Tensor range check" && 0 <= v595 && v595 < 4);
-                int v597;
-                v597 = 4 * v593;
-                int v598;
-                v598 = v597 + v595;
-                bool v599;
-                v599 = v557[v598];
+        auto v589 = cooperative_groups::coalesced_threads();
+        int v590;
+        v590 = threadIdx.x;
+        int v591;
+        v591 = v590 / 4;
+        auto v592 = cooperative_groups::labeled_partition(v589,v591);
+        Closure0 v593{};
+        float v594;
+        v594 = cooperative_groups::reduce(v592, v580, v593);
+        int v595[4];
+        int v596;
+        v596 = 0;
+        while (while_method_1(v596)){
+            int v598;
+            v598 = 0;
+            while (while_method_0(v598)){
+                assert("Tensor range check" && 0 <= v596 && v596 < 1);
+                assert("Tensor range check" && 0 <= v598 && v598 < 4);
                 int v600;
-                if (v599){
-                    v600 = 1;
+                v600 = 4 * v596;
+                int v601;
+                v601 = v600 + v598;
+                bool v602;
+                v602 = v560[v601];
+                int v603;
+                if (v602){
+                    v603 = 1;
                 } else {
-                    v600 = 0;
+                    v603 = 0;
                 }
-                assert("Tensor range check" && 0 <= v593 && v593 < 1);
-                assert("Tensor range check" && 0 <= v595 && v595 < 4);
-                v592[v598] = v600;
-                v595 += 1 ;
+                assert("Tensor range check" && 0 <= v596 && v596 < 1);
+                assert("Tensor range check" && 0 <= v598 && v598 < 4);
+                v595[v601] = v603;
+                v598 += 1 ;
             }
-            v593 += 1 ;
+            v596 += 1 ;
         }
-        int v601;
-        v601 = 0;
-        int v602;
-        v602 = 0;
-        while (while_method_1(v602)){
-            int v604;
-            v604 = 0;
-            while (while_method_0(v604)){
-                assert("Tensor range check" && 0 <= v602 && v602 < 1);
-                assert("Tensor range check" && 0 <= v604 && v604 < 4);
-                int v606;
-                v606 = 4 * v602;
-                int v607;
-                v607 = v606 + v604;
-                int v608;
-                v608 = v592[v607];
+        int v604;
+        v604 = 0;
+        int v605;
+        v605 = 0;
+        while (while_method_1(v605)){
+            int v607;
+            v607 = 0;
+            while (while_method_0(v607)){
+                assert("Tensor range check" && 0 <= v605 && v605 < 1);
+                assert("Tensor range check" && 0 <= v607 && v607 < 4);
                 int v609;
-                v609 = v601 + v608;
-                v601 = v609;
-                v604 += 1 ;
+                v609 = 4 * v605;
+                int v610;
+                v610 = v609 + v607;
+                int v611;
+                v611 = v595[v610];
+                int v612;
+                v612 = v604 + v611;
+                v604 = v612;
+                v607 += 1 ;
             }
-            v602 += 1 ;
+            v605 += 1 ;
         }
-        auto v610 = cooperative_groups::coalesced_threads();
-        int v611;
-        v611 = threadIdx.x;
-        int v612;
-        v612 = v611 / 4;
-        auto v613 = cooperative_groups::labeled_partition(v610,v612);
-        Closure1 v614{};
+        auto v613 = cooperative_groups::coalesced_threads();
+        int v614;
+        v614 = threadIdx.x;
         int v615;
-        v615 = cooperative_groups::reduce(v613, v601, v614);
-        float v616;
-        v616 = (float)v615;
-        float v617;
-        v617 = v591 / v616;
-        float v618[4];
-        int v619;
-        v619 = 0;
-        while (while_method_1(v619)){
-            int v621;
-            v621 = 0;
-            while (while_method_0(v621)){
-                assert("Tensor range check" && 0 <= v619 && v619 < 1);
-                assert("Tensor range check" && 0 <= v621 && v621 < 4);
-                int v623;
-                v623 = 4 * v619;
-                int v624;
-                v624 = v623 + v621;
-                float v625;
-                v625 = v523[v624];
-                bool v626;
-                v626 = v557[v624];
-                float v627;
-                if (v626){
-                    v627 = v625;
-                } else {
-                    v627 = -1.0f / 0.0f;
-                }
+        v615 = v614 / 4;
+        auto v616 = cooperative_groups::labeled_partition(v613,v615);
+        Closure1 v617{};
+        int v618;
+        v618 = cooperative_groups::reduce(v616, v604, v617);
+        float v619;
+        v619 = (float)v618;
+        float v620;
+        v620 = v594 / v619;
+        float v621[4];
+        int v622;
+        v622 = 0;
+        while (while_method_1(v622)){
+            int v624;
+            v624 = 0;
+            while (while_method_0(v624)){
+                assert("Tensor range check" && 0 <= v622 && v622 < 1);
+                assert("Tensor range check" && 0 <= v624 && v624 < 4);
+                int v626;
+                v626 = 4 * v622;
+                int v627;
+                v627 = v626 + v624;
                 float v628;
-                v628 = v627 - v617;
-                float v629;
-                v629 = exp(v628);
-                bool v630;
-                v630 = v629 < 1.0f / 0.0f;
-                bool v631;
-                v631 = v630 == false;
-                if (v631){
-                    assert("The softmax values must not grow too large." && v630);
+                v628 = v526[v627];
+                bool v629;
+                v629 = v560[v627];
+                float v630;
+                if (v629){
+                    v630 = v628;
                 } else {
+                    v630 = -1.0f / 0.0f;
                 }
+                float v631;
+                v631 = v630 - v620;
+                float v632;
+                v632 = exp(v631);
                 bool v633;
-                v633 = isnan(v629);
+                v633 = v632 < 1.0f / 0.0f;
                 bool v634;
                 v634 = v633 == false;
-                bool v635;
-                v635 = v634 == false;
-                if (v635){
-                    assert("The softmax values must not be nans." && v634);
+                if (v634){
+                    assert("The softmax values must not grow too large." && v633);
                 } else {
                 }
-                assert("Tensor range check" && 0 <= v619 && v619 < 1);
-                assert("Tensor range check" && 0 <= v621 && v621 < 4);
-                v618[v624] = v629;
-                v621 += 1 ;
+                bool v636;
+                v636 = isnan(v632);
+                bool v637;
+                v637 = v636 == false;
+                bool v638;
+                v638 = v637 == false;
+                if (v638){
+                    assert("The softmax values must not be nans." && v637);
+                } else {
+                }
+                assert("Tensor range check" && 0 <= v622 && v622 < 1);
+                assert("Tensor range check" && 0 <= v624 && v624 < 4);
+                v621[v627] = v632;
+                v624 += 1 ;
             }
-            v619 += 1 ;
+            v622 += 1 ;
         }
-        float v637;
-        v637 = 0.0f;
-        int v638;
-        v638 = 0;
-        while (while_method_1(v638)){
-            int v640;
-            v640 = 0;
-            while (while_method_0(v640)){
-                assert("Tensor range check" && 0 <= v638 && v638 < 1);
-                assert("Tensor range check" && 0 <= v640 && v640 < 4);
-                int v642;
-                v642 = 4 * v638;
-                int v643;
-                v643 = v642 + v640;
-                float v644;
-                v644 = v618[v643];
-                float v645;
-                v645 = v637 + v644;
-                v637 = v645;
-                v640 += 1 ;
+        float v640;
+        v640 = 0.0f;
+        int v641;
+        v641 = 0;
+        while (while_method_1(v641)){
+            int v643;
+            v643 = 0;
+            while (while_method_0(v643)){
+                assert("Tensor range check" && 0 <= v641 && v641 < 1);
+                assert("Tensor range check" && 0 <= v643 && v643 < 4);
+                int v645;
+                v645 = 4 * v641;
+                int v646;
+                v646 = v645 + v643;
+                float v647;
+                v647 = v621[v646];
+                float v648;
+                v648 = v640 + v647;
+                v640 = v648;
+                v643 += 1 ;
             }
-            v638 += 1 ;
+            v641 += 1 ;
         }
-        auto v646 = cooperative_groups::coalesced_threads();
-        int v647;
-        v647 = threadIdx.x;
-        int v648;
-        v648 = v647 / 4;
-        auto v649 = cooperative_groups::labeled_partition(v646,v648);
-        float v650;
-        v650 = cooperative_groups::reduce(v649, v637, v590);
-        float v651[4];
-        int v652;
-        v652 = 0;
-        while (while_method_1(v652)){
-            int v654;
-            v654 = 0;
-            while (while_method_0(v654)){
-                assert("Tensor range check" && 0 <= v652 && v652 < 1);
-                assert("Tensor range check" && 0 <= v654 && v654 < 4);
-                int v656;
-                v656 = 4 * v652;
-                int v657;
-                v657 = v656 + v654;
-                float v658;
-                v658 = v618[v657];
-                float v659;
-                v659 = v658 / v650;
-                assert("Tensor range check" && 0 <= v652 && v652 < 1);
-                assert("Tensor range check" && 0 <= v654 && v654 < 4);
-                v651[v657] = v659;
-                v654 += 1 ;
+        auto v649 = cooperative_groups::coalesced_threads();
+        int v650;
+        v650 = threadIdx.x;
+        int v651;
+        v651 = v650 / 4;
+        auto v652 = cooperative_groups::labeled_partition(v649,v651);
+        float v653;
+        v653 = cooperative_groups::reduce(v652, v640, v593);
+        float v654[4];
+        int v655;
+        v655 = 0;
+        while (while_method_1(v655)){
+            int v657;
+            v657 = 0;
+            while (while_method_0(v657)){
+                assert("Tensor range check" && 0 <= v655 && v655 < 1);
+                assert("Tensor range check" && 0 <= v657 && v657 < 4);
+                int v659;
+                v659 = 4 * v655;
+                int v660;
+                v660 = v659 + v657;
+                float v661;
+                v661 = v621[v660];
+                float v662;
+                v662 = v661 / v653;
+                assert("Tensor range check" && 0 <= v655 && v655 < 1);
+                assert("Tensor range check" && 0 <= v657 && v657 < 4);
+                v654[v660] = v662;
+                v657 += 1 ;
             }
-            v652 += 1 ;
+            v655 += 1 ;
         }
-        float v660[4];
-        float v661;
-        v661 = 0.0f;
-        int v662;
-        v662 = 0;
-        while (while_method_1(v662)){
-            assert("Tensor range check" && 0 <= v662 && v662 < 1);
-            int v664;
-            v664 = 4 * v662;
-            assert("Tensor range check" && 0 <= v662 && v662 < 1);
-            float v665;
-            v665 = 0.0f;
-            int v666;
-            v666 = 0;
-            while (while_method_0(v666)){
-                assert("Tensor range check" && 0 <= v666 && v666 < 4);
-                int v668;
-                v668 = v666 + v664;
-                float v669;
-                v669 = v651[v668];
-                float v670;
-                v670 = v665 + v669;
-                v665 = v670;
-                v666 += 1 ;
+        float v663[4];
+        float v664;
+        v664 = 0.0f;
+        int v665;
+        v665 = 0;
+        while (while_method_1(v665)){
+            assert("Tensor range check" && 0 <= v665 && v665 < 1);
+            int v667;
+            v667 = 4 * v665;
+            assert("Tensor range check" && 0 <= v665 && v665 < 1);
+            float v668;
+            v668 = 0.0f;
+            int v669;
+            v669 = 0;
+            while (while_method_0(v669)){
+                assert("Tensor range check" && 0 <= v669 && v669 < 4);
+                int v671;
+                v671 = v669 + v667;
+                float v672;
+                v672 = v654[v671];
+                float v673;
+                v673 = v668 + v672;
+                v668 = v673;
+                v669 += 1 ;
             }
-            auto v671 = cooperative_groups::coalesced_threads();
-            int v672;
-            v672 = threadIdx.x;
-            int v673;
-            v673 = v672 / 4;
-            auto v674 = cooperative_groups::labeled_partition(v671,v673);
-            Closure2 v675{};
-            float v676;
-            v676 = cooperative_groups::inclusive_scan(v674, v665, v675);
-            float v677;
-            v677 = v674.shfl_up(v676,1);
-            bool v678;
-            v678 = v674.thread_rank() == 0;
+            auto v674 = cooperative_groups::coalesced_threads();
+            int v675;
+            v675 = threadIdx.x;
+            int v676;
+            v676 = v675 / 4;
+            auto v677 = cooperative_groups::labeled_partition(v674,v676);
+            Closure2 v678{};
             float v679;
-            if (v678){
-                v679 = 0.0f;
-            } else {
-                v679 = v677;
-            }
+            v679 = cooperative_groups::inclusive_scan(v677, v668, v678);
             float v680;
-            v680 = v674.shfl(v676,v674.num_threads()-1);
-            float v681;
-            v681 = v661 + v679;
+            v680 = v677.shfl_up(v679,1);
+            bool v681;
+            v681 = v677.thread_rank() == 0;
             float v682;
-            v682 = v681;
-            int v683;
-            v683 = 0;
-            while (while_method_0(v683)){
-                assert("Tensor range check" && 0 <= v683 && v683 < 4);
-                int v685;
-                v685 = v683 + v664;
-                float v686;
-                v686 = v651[v685];
-                float v687;
-                v687 = v682 + v686;
-                assert("Tensor range check" && 0 <= v683 && v683 < 4);
-                v660[v685] = v687;
-                v682 = v687;
-                v683 += 1 ;
+            if (v681){
+                v682 = 0.0f;
+            } else {
+                v682 = v680;
             }
-            float v688;
-            v688 = v661 + v680;
-            v661 = v688;
-            v662 += 1 ;
-        }
-        float v689[4];
-        bool v690[4];
-        int v691;
-        v691 = 0;
-        while (while_method_1(v691)){
-            int v693;
-            v693 = 0;
-            while (while_method_0(v693)){
-                assert("Tensor range check" && 0 <= v691 && v691 < 1);
-                assert("Tensor range check" && 0 <= v693 && v693 < 4);
-                int v695;
-                v695 = 4 * v691;
-                int v696;
-                v696 = v695 + v693;
-                float v697;
-                v697 = v660[v696];
-                float v698;
-                v698 = v651[v696];
-                bool v699;
-                v699 = v698 > 0.0f;
-                assert("Tensor range check" && 0 <= v691 && v691 < 1);
-                assert("Tensor range check" && 0 <= v693 && v693 < 4);
-                v689[v696] = v697;
-                v690[v696] = v699;
-                v693 += 1 ;
+            float v683;
+            v683 = v677.shfl(v679,v677.num_threads()-1);
+            float v684;
+            v684 = v664 + v682;
+            float v685;
+            v685 = v684;
+            int v686;
+            v686 = 0;
+            while (while_method_0(v686)){
+                assert("Tensor range check" && 0 <= v686 && v686 < 4);
+                int v688;
+                v688 = v686 + v667;
+                float v689;
+                v689 = v654[v688];
+                float v690;
+                v690 = v685 + v689;
+                assert("Tensor range check" && 0 <= v686 && v686 < 4);
+                v663[v688] = v690;
+                v685 = v690;
+                v686 += 1 ;
             }
-            v691 += 1 ;
+            float v691;
+            v691 = v664 + v683;
+            v664 = v691;
+            v665 += 1 ;
         }
-        float v700; bool v701;
+        float v692[4];
+        bool v693[4];
+        int v694;
+        v694 = 0;
+        while (while_method_1(v694)){
+            int v696;
+            v696 = 0;
+            while (while_method_0(v696)){
+                assert("Tensor range check" && 0 <= v694 && v694 < 1);
+                assert("Tensor range check" && 0 <= v696 && v696 < 4);
+                int v698;
+                v698 = 4 * v694;
+                int v699;
+                v699 = v698 + v696;
+                float v700;
+                v700 = v663[v699];
+                float v701;
+                v701 = v654[v699];
+                bool v702;
+                v702 = v701 > 0.0f;
+                assert("Tensor range check" && 0 <= v694 && v694 < 1);
+                assert("Tensor range check" && 0 <= v696 && v696 < 4);
+                v692[v699] = v700;
+                v693[v699] = v702;
+                v696 += 1 ;
+            }
+            v694 += 1 ;
+        }
+        float v703; bool v704;
         Tuple0 tmp0 = Tuple0{-1.0f / 0.0f, false};
-        v700 = tmp0.v0; v701 = tmp0.v1;
-        int v702;
-        v702 = 0;
-        while (while_method_1(v702)){
-            int v704;
-            v704 = 0;
-            while (while_method_0(v704)){
-                assert("Tensor range check" && 0 <= v702 && v702 < 1);
-                assert("Tensor range check" && 0 <= v704 && v704 < 4);
-                int v706;
-                v706 = 4 * v702;
-                int v707;
-                v707 = v706 + v704;
-                float v708;
-                v708 = v689[v707];
-                bool v709;
-                v709 = v690[v707];
-                float v716; bool v717;
-                if (v701){
-                    if (v709){
-                        bool v710;
-                        v710 = v700 >= v708;
-                        float v711;
-                        if (v710){
-                            v711 = v700;
+        v703 = tmp0.v0; v704 = tmp0.v1;
+        int v705;
+        v705 = 0;
+        while (while_method_1(v705)){
+            int v707;
+            v707 = 0;
+            while (while_method_0(v707)){
+                assert("Tensor range check" && 0 <= v705 && v705 < 1);
+                assert("Tensor range check" && 0 <= v707 && v707 < 4);
+                int v709;
+                v709 = 4 * v705;
+                int v710;
+                v710 = v709 + v707;
+                float v711;
+                v711 = v692[v710];
+                bool v712;
+                v712 = v693[v710];
+                float v719; bool v720;
+                if (v704){
+                    if (v712){
+                        bool v713;
+                        v713 = v703 >= v711;
+                        float v714;
+                        if (v713){
+                            v714 = v703;
                         } else {
-                            v711 = v708;
+                            v714 = v711;
                         }
-                        v716 = v711; v717 = true;
+                        v719 = v714; v720 = true;
                     } else {
-                        v716 = v700; v717 = v701;
+                        v719 = v703; v720 = v704;
                     }
                 } else {
-                    if (v709){
-                        v716 = v708; v717 = v709;
+                    if (v712){
+                        v719 = v711; v720 = v712;
                     } else {
-                        v716 = v700; v717 = v701;
+                        v719 = v703; v720 = v704;
                     }
                 }
-                v700 = v716;
-                v701 = v717;
-                v704 += 1 ;
+                v703 = v719;
+                v704 = v720;
+                v707 += 1 ;
             }
-            v702 += 1 ;
+            v705 += 1 ;
         }
-        auto v718 = cooperative_groups::coalesced_threads();
-        int v719;
-        v719 = threadIdx.x;
-        int v720;
-        v720 = v719 / 4;
-        auto v721 = cooperative_groups::labeled_partition(v718,v720);
-        Closure3 v722{};
-        float v723; bool v724;
-        Tuple0 tmp1 = cooperative_groups::reduce(v721, Tuple0{v700, v701}, v722);
-        v723 = tmp1.v0; v724 = tmp1.v1;
-        bool v725;
-        v725 = v724 == false;
-        if (v725){
-            assert("The local reduce must be true." && v724);
+        auto v721 = cooperative_groups::coalesced_threads();
+        int v722;
+        v722 = threadIdx.x;
+        int v723;
+        v723 = v722 / 4;
+        auto v724 = cooperative_groups::labeled_partition(v721,v723);
+        Closure3 v725{};
+        float v726; bool v727;
+        Tuple0 tmp1 = cooperative_groups::reduce(v724, Tuple0{v703, v704}, v725);
+        v726 = tmp1.v0; v727 = tmp1.v1;
+        bool v728;
+        v728 = v727 == false;
+        if (v728){
+            assert("The local reduce must be true." && v727);
         } else {
         }
-        float v727[4];
-        int v728[4];
-        int v729;
-        v729 = 0;
-        while (while_method_1(v729)){
-            int v731;
-            v731 = 0;
-            while (while_method_0(v731)){
-                assert("Tensor range check" && 0 <= v729 && v729 < 1);
-                assert("Tensor range check" && 0 <= v731 && v731 < 4);
-                int v733;
-                v733 = 4 * v729;
-                int v734;
-                v734 = v733 + v731;
-                int v735;
-                v735 = v524[v734];
-                float v736;
-                v736 = curand_uniform(&v484);
-                assert("Tensor range check" && 0 <= v729 && v729 < 1);
-                assert("Tensor range check" && 0 <= v731 && v731 < 4);
-                v727[v734] = v736;
-                v728[v734] = v735;
-                v731 += 1 ;
+        float v730[4];
+        int v731[4];
+        int v732;
+        v732 = 0;
+        while (while_method_1(v732)){
+            int v734;
+            v734 = 0;
+            while (while_method_0(v734)){
+                assert("Tensor range check" && 0 <= v732 && v732 < 1);
+                assert("Tensor range check" && 0 <= v734 && v734 < 4);
+                int v736;
+                v736 = 4 * v732;
+                int v737;
+                v737 = v736 + v734;
+                int v738;
+                v738 = v527[v737];
+                float v739;
+                v739 = curand_uniform(&v487);
+                assert("Tensor range check" && 0 <= v732 && v732 < 1);
+                assert("Tensor range check" && 0 <= v734 && v734 < 4);
+                v730[v737] = v739;
+                v731[v737] = v738;
+                v734 += 1 ;
             }
-            v729 += 1 ;
+            v732 += 1 ;
         }
-        float v737; int v738;
+        float v740; int v741;
         Tuple1 tmp2 = Tuple1{0.0f, 2147483647};
-        v737 = tmp2.v0; v738 = tmp2.v1;
-        int v739;
-        v739 = 0;
-        while (while_method_1(v739)){
-            int v741;
-            v741 = 0;
-            while (while_method_0(v741)){
-                assert("Tensor range check" && 0 <= v739 && v739 < 1);
-                assert("Tensor range check" && 0 <= v741 && v741 < 4);
-                int v743;
-                v743 = 4 * v739;
-                int v744;
-                v744 = v743 + v741;
-                float v745;
-                v745 = v727[v744];
+        v740 = tmp2.v0; v741 = tmp2.v1;
+        int v742;
+        v742 = 0;
+        while (while_method_1(v742)){
+            int v744;
+            v744 = 0;
+            while (while_method_0(v744)){
+                assert("Tensor range check" && 0 <= v742 && v742 < 1);
+                assert("Tensor range check" && 0 <= v744 && v744 < 4);
                 int v746;
-                v746 = v728[v744];
-                bool v747;
-                v747 = v738 < v746;
-                float v748; int v749;
-                if (v747){
-                    v748 = v737; v749 = v738;
+                v746 = 4 * v742;
+                int v747;
+                v747 = v746 + v744;
+                float v748;
+                v748 = v730[v747];
+                int v749;
+                v749 = v731[v747];
+                bool v750;
+                v750 = v741 < v749;
+                float v751; int v752;
+                if (v750){
+                    v751 = v740; v752 = v741;
                 } else {
-                    v748 = v745; v749 = v746;
+                    v751 = v748; v752 = v749;
                 }
-                v737 = v748;
-                v738 = v749;
-                v741 += 1 ;
+                v740 = v751;
+                v741 = v752;
+                v744 += 1 ;
             }
-            v739 += 1 ;
+            v742 += 1 ;
         }
-        auto v750 = cooperative_groups::coalesced_threads();
-        int v751;
-        v751 = threadIdx.x;
-        int v752;
-        v752 = v751 / 4;
-        auto v753 = cooperative_groups::labeled_partition(v750,v752);
-        Closure4 v754{};
-        float v755; int v756;
-        Tuple1 tmp3 = cooperative_groups::reduce(v753, Tuple1{v737, v738}, v754);
-        v755 = tmp3.v0; v756 = tmp3.v1;
-        float v757;
-        v757 = v723 * v755;
-        int v758[4];
-        bool v759[4];
-        int v760;
-        v760 = 0;
-        while (while_method_1(v760)){
-            int v762;
-            v762 = 0;
-            while (while_method_0(v762)){
-                assert("Tensor range check" && 0 <= v760 && v760 < 1);
-                assert("Tensor range check" && 0 <= v762 && v762 < 4);
-                int v764;
-                v764 = 4 * v760;
-                int v765;
-                v765 = v764 + v762;
-                float v766;
-                v766 = v689[v765];
-                bool v767;
-                v767 = v690[v765];
+        auto v753 = cooperative_groups::coalesced_threads();
+        int v754;
+        v754 = threadIdx.x;
+        int v755;
+        v755 = v754 / 4;
+        auto v756 = cooperative_groups::labeled_partition(v753,v755);
+        Closure4 v757{};
+        float v758; int v759;
+        Tuple1 tmp3 = cooperative_groups::reduce(v756, Tuple1{v740, v741}, v757);
+        v758 = tmp3.v0; v759 = tmp3.v1;
+        float v760;
+        v760 = v726 * v758;
+        int v761[4];
+        bool v762[4];
+        int v763;
+        v763 = 0;
+        while (while_method_1(v763)){
+            int v765;
+            v765 = 0;
+            while (while_method_0(v765)){
+                assert("Tensor range check" && 0 <= v763 && v763 < 1);
+                assert("Tensor range check" && 0 <= v765 && v765 < 4);
+                int v767;
+                v767 = 4 * v763;
                 int v768;
-                v768 = v524[v765];
-                int v771; bool v772;
-                if (v767){
-                    float v769;
-                    v769 = v766 - v757;
-                    bool v770;
-                    v770 = v769 >= 0.0f;
-                    v771 = v768; v772 = v770;
+                v768 = v767 + v765;
+                float v769;
+                v769 = v692[v768];
+                bool v770;
+                v770 = v693[v768];
+                int v771;
+                v771 = v527[v768];
+                int v774; bool v775;
+                if (v770){
+                    float v772;
+                    v772 = v769 - v760;
+                    bool v773;
+                    v773 = v772 >= 0.0f;
+                    v774 = v771; v775 = v773;
                 } else {
-                    v771 = 2147483647; v772 = false;
+                    v774 = 2147483647; v775 = false;
                 }
-                assert("Tensor range check" && 0 <= v760 && v760 < 1);
-                assert("Tensor range check" && 0 <= v762 && v762 < 4);
-                v758[v765] = v771;
-                v759[v765] = v772;
-                v762 += 1 ;
+                assert("Tensor range check" && 0 <= v763 && v763 < 1);
+                assert("Tensor range check" && 0 <= v765 && v765 < 4);
+                v761[v768] = v774;
+                v762[v768] = v775;
+                v765 += 1 ;
             }
-            v760 += 1 ;
+            v763 += 1 ;
         }
-        int v773; bool v774;
+        int v776; bool v777;
         Tuple2 tmp4 = Tuple2{2147483647, false};
-        v773 = tmp4.v0; v774 = tmp4.v1;
-        int v775;
-        v775 = 0;
-        while (while_method_1(v775)){
-            int v777;
-            v777 = 0;
-            while (while_method_0(v777)){
-                assert("Tensor range check" && 0 <= v775 && v775 < 1);
-                assert("Tensor range check" && 0 <= v777 && v777 < 4);
-                int v779;
-                v779 = 4 * v775;
-                int v780;
-                v780 = v779 + v777;
-                int v781;
-                v781 = v758[v780];
-                bool v782;
-                v782 = v759[v780];
-                int v789; bool v790;
-                if (v774){
-                    if (v782){
-                        bool v783;
-                        v783 = v773 < v781;
-                        int v784;
-                        if (v783){
-                            v784 = v773;
+        v776 = tmp4.v0; v777 = tmp4.v1;
+        int v778;
+        v778 = 0;
+        while (while_method_1(v778)){
+            int v780;
+            v780 = 0;
+            while (while_method_0(v780)){
+                assert("Tensor range check" && 0 <= v778 && v778 < 1);
+                assert("Tensor range check" && 0 <= v780 && v780 < 4);
+                int v782;
+                v782 = 4 * v778;
+                int v783;
+                v783 = v782 + v780;
+                int v784;
+                v784 = v761[v783];
+                bool v785;
+                v785 = v762[v783];
+                int v792; bool v793;
+                if (v777){
+                    if (v785){
+                        bool v786;
+                        v786 = v776 < v784;
+                        int v787;
+                        if (v786){
+                            v787 = v776;
                         } else {
-                            v784 = v781;
+                            v787 = v784;
                         }
-                        v789 = v784; v790 = true;
+                        v792 = v787; v793 = true;
                     } else {
-                        v789 = v773; v790 = v774;
+                        v792 = v776; v793 = v777;
                     }
                 } else {
-                    if (v782){
-                        v789 = v781; v790 = v782;
+                    if (v785){
+                        v792 = v784; v793 = v785;
                     } else {
-                        v789 = v773; v790 = v774;
+                        v792 = v776; v793 = v777;
                     }
                 }
-                v773 = v789;
-                v774 = v790;
-                v777 += 1 ;
+                v776 = v792;
+                v777 = v793;
+                v780 += 1 ;
             }
-            v775 += 1 ;
+            v778 += 1 ;
         }
-        auto v791 = cooperative_groups::coalesced_threads();
-        int v792;
-        v792 = threadIdx.x;
-        int v793;
-        v793 = v792 / 4;
-        auto v794 = cooperative_groups::labeled_partition(v791,v793);
-        Closure5 v795{};
-        int v796; bool v797;
-        Tuple2 tmp5 = cooperative_groups::reduce(v794, Tuple2{v773, v774}, v795);
-        v796 = tmp5.v0; v797 = tmp5.v1;
-        bool v798;
-        v798 = v797 == false;
-        if (v798){
-            assert("The local reduce must be true." && v797);
+        auto v794 = cooperative_groups::coalesced_threads();
+        int v795;
+        v795 = threadIdx.x;
+        int v796;
+        v796 = v795 / 4;
+        auto v797 = cooperative_groups::labeled_partition(v794,v796);
+        Closure5 v798{};
+        int v799; bool v800;
+        Tuple2 tmp5 = cooperative_groups::reduce(v797, Tuple2{v776, v777}, v798);
+        v799 = tmp5.v0; v800 = tmp5.v1;
+        bool v801;
+        v801 = v800 == false;
+        if (v801){
+            assert("The local reduce must be true." && v800);
         } else {
         }
-        int v800;
-        v800 = 0;
-        while (while_method_1(v800)){
-            assert("Tensor range check" && 0 <= v800 && v800 < 1);
-            assert("Tensor range check" && 0 <= v800 && v800 < 1);
-            v800 += 1 ;
+        int v803;
+        v803 = 0;
+        while (while_method_1(v803)){
+            assert("Tensor range check" && 0 <= v803 && v803 < 1);
+            assert("Tensor range check" && 0 <= v803 && v803 < 1);
+            v803 += 1 ;
         }
-        assert("Tensor range check" && 0 <= v515 && v515 < 256);
-        v492[v515] = v796;
-        v503 += 1 ;
+        assert("Tensor range check" && 0 <= v518 && v518 < 256);
+        v495[v518] = v799;
+        v506 += 1 ;
     }
     __syncthreads();
-    assert("Tensor range check" && 0 <= v494 && v494 < 256);
-    int v802;
-    v802 = v492[v494];
+    assert("Tensor range check" && 0 <= v497 && v497 < 256);
+    int v805;
+    v805 = v495[v497];
     __syncthreads();
-    int v803;
-    v803 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v803 && v803 < 6144);
-    v5[v803] = v802;
+    int v806;
+    v806 = threadIdx.x;
+    int v807;
+    v807 = blockIdx.x;
+    int v808;
+    v808 = v807 * 256;
+    int v809;
+    v809 = v806 + v808;
+    assert("Tensor range check" && 0 <= v809 && v809 < 6144);
+    v5[v809] = v805;
     return ;
 }
 """

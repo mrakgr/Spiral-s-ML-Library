@@ -817,17 +817,17 @@ inl test3 (n : int) head_dir =
         run fun _ =>
             open random
             inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-            inl input = apply (threads_in_grid().from) input
-            inl input_identity = apply (threads_in_grid().from) input_identity
-            inl output_op_map = apply (threads_in_grid().from) output_op_map
-            inl output_indices_map = apply (threads_in_grid().from) output_indices_map
-            inl output_identity_map = apply (threads_in_grid().from) output_identity_map
+            inl input = apply threads_in_grid().from input
+            inl input_identity = apply threads_in_grid().from input_identity
+            inl output_op_map = apply threads_in_grid().from output_op_map
+            inl output_indices_map = apply threads_in_grid().from output_indices_map
+            inl output_identity_map = apply threads_in_grid().from output_identity_map
             row_gather_map () (fun () config x i j_tns => 
                 local_map (fun j => i, j) j_tns
                 ) input output_indices_map
             row_gather_reduce () (fun () config x i j_tns =>
                 i
-                ) input |> fun v => tensor_set thread_index() v output_indices_reduce
+                ) input |> fun v => tensor_set threads_in_grid().from v output_indices_reduce
             row_gather_map () (fun () config x i j_tns => 
                 x
                 ) input output_identity_map
@@ -836,7 +836,7 @@ inl test3 (n : int) head_dir =
                 ) input output_op_map
             row_gather_reduce rng() (fun rng config x i j_tns =>
                 local_masked_softmax_and_discrete_sampling (fun config x i j => j < 3) rng config x i j_tns |> snd
-                ) input |> fun v => tensor_set thread_index() v output_sample_reduce
+                ) input |> fun v => tensor_set threads_in_grid().from v output_sample_reduce
 
     redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
         console.tensor.write_ln limit.max input_identity
