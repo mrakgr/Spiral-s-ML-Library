@@ -736,24 +736,17 @@ inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl probability = // TODO: Needs to be optimized and factored out into local_shared.
         j_tns
         |> local_map (fun j => random.uniform rng, j)
-        |> fun x =>
-            __syncthreads()
-            x
         // It's important that here the ordering is being preserved so all the threads get the same value.
         |> local_reduce config (0, limit.max) (fun a b => if snd a < snd b then a else b)
         |> fst |> conv |> (*) max_probability
 
-    __syncthreads()
-        
     local_map (fun (x,j) =>
         match x with
         | x, true => j, x - probability >= 0
         | _ => limit.max, false
         ) (zip x j_tns)
     |> local_masked_reduce config limit.max min
-    |> fun x =>
-        __syncthreads()
-        x
+
 inl local_softmax_and_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl x = local_softmax config x
     x, local_discrete_sampling rng config x i j_tns
@@ -882,7 +875,7 @@ inl test2 (m,n : int * int) head_dir =
     redirect_io_into "test_text_outputs/primitives/" head_dir "kernel_params.txt" fun () =>
         run fun _ =>
             open random
-            inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
+            inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_block().from; offset=0}
             tensor_set {} (reduce 0 0 (+) input) output_reduce
             // indices (identity)
             row_map (fun config x i j_tns => x) input_identity output_identity
