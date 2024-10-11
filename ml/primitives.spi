@@ -1037,6 +1037,11 @@ inl test5 (l,m,n : int * int * int) head_dir =
     console.tensor.write_ln limit.max output
 
 inl test6 (m,n : int * int) head_dir =
+    let sum_of_linear_series (from : u64) (nearTo : u64) =
+        let midpoint_times_two = from + nearTo - 1
+        let count = nearTo - from
+        midpoint_times_two * count / 2
+
     cupy.set_random_seed(cupy.constant_seed())
     inl input_identity : _ _ u64 = cupy.arange{from=0; nearTo=m,n; by=1}
     inl output_reduce_block = tensor_create {}
