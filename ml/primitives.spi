@@ -935,7 +935,7 @@ inl test2 (m,n : int * int) head_dir =
         console.tensor.write_ln 1024 output_sampling
     redirect_io_into "test_text_outputs/primitives/" head_dir "output_softmax'.txt" fun () =>
         console.tensor.write_ln 1024 output_softmax''
-    redirect_io_into "test_text_outputs/primitives/" head_dir "output_sampling.txt" fun () =>
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_sampling'.txt" fun () =>
         console.tensor.write_ln 1024 output_sampling'
     ()
 
