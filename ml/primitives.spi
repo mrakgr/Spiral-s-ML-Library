@@ -800,7 +800,7 @@ inl test1() =
 
 inl test3 (n : int) head_dir =
     cupy.set_random_seed(cupy.constant_seed())
-    inl m : int = threads_per_block()
+    inl m : int = threads_per_block() * blocks_per_grid()
     // inl m,n : int * int = threads_per_block(), (1 <<< 8)
     // inl [ma; mb; mc] = listm.map cupy.random_normal{mean=0; std=1} ([swap (m, k) a_trans; swap (k, n) b_trans; m, n])
     inl input_identity : _ _ float = cupy.arange{from=0; nearTo=m,n; by=1}
@@ -817,11 +817,11 @@ inl test3 (n : int) head_dir =
         run fun _ =>
             open random
             inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-            inl input = apply (thread_index()) input
-            inl input_identity = apply (thread_index()) input_identity
-            inl output_op_map = apply (thread_index()) output_op_map
-            inl output_indices_map = apply (thread_index()) output_indices_map
-            inl output_identity_map = apply (thread_index()) output_identity_map
+            inl input = apply (threads_in_grid().from) input
+            inl input_identity = apply (threads_in_grid().from) input_identity
+            inl output_op_map = apply (threads_in_grid().from) output_op_map
+            inl output_indices_map = apply (threads_in_grid().from) output_indices_map
+            inl output_identity_map = apply (threads_in_grid().from) output_identity_map
             row_gather_map () (fun () config x i j_tns => 
                 local_map (fun j => i, j) j_tns
                 ) input output_indices_map
@@ -1061,9 +1061,9 @@ inl test6 (m,n : int * int) head_dir =
         console.tensor.write_ln 1024 output_reduce_grid
 
 inl main() : () = 
-    test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
-    // test3((1 <<< 4)) "test3/a"
+    // test2((1 <<< 6), (1 <<< 7)) "test2/a/"
+    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    test3((1 <<< 4)) "test3/a"
     // test3((1 <<< 8)) "test3/b"
     // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
     // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
