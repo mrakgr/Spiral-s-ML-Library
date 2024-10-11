@@ -169,6 +169,7 @@ inl reduce_ forall dim a. loop' extern_offset neutral_element (f : a -> a -> a) 
         memcpy_sync (local, from)
         loop.for {from=0; nearTo=local.dim} (fun i x => f x (tensor_index i local)) result
         |> loop._set result
+    __syncwarp()
     block_reduce extern_offset neutral_element f result
 
 // Reduces all the elements of a tensor to a single one, given the neutral element as well as the reducer function. Blockwise version.
@@ -186,12 +187,13 @@ inl grid_reduce forall dim a. grid extern_offset neutral_element (f : a -> a -> 
     inl t : tensor int a = tensor_cuda.tensor_create_static blocks_in_grid.by
 
     // TODO: Test whether setting into a single location using every thread in a block like this hurts performance.
-    tensor_set blocks_in_grid.from (block_reduce extern_offset neutral_element f result) t
+    tensor_set blocks_in_grid.from result t
     sync grid
 
     inl result = loop._dup neutral_element
     loop.projective threads_in_warp(t.dim) fun i =>
         loop._set result (f result (tensor_index i t))
+    __syncwarp()
     cg_reduce create_coalesced_threads() f result
 
 // Allows the user to specify the output for the map operation.
@@ -298,12 +300,12 @@ inl local_scan forall a. is_inclusive config (neutral_element : a) f (from : ten
 
         inl block_prefix,block_sum = 
             // Reduces the individual thread elements.
-            loop.for {from=0; nearTo=from.dim} (fun i x => f x (tensor_index i from)) neutral_element
+            loop.linear' from.dim (fun i x => f x (tensor_index i from)) neutral_element
             // Scans the blockwise results.
             |> block_exclusive_scan_2d config neutral_element f
 
         // Scans the individual thread elements with the calculated prefix.
-        loop.for {from=0; nearTo=from.dim} (fun i s => 
+        loop.linear' from.dim (fun i s => 
             if is_inclusive then
                 inl s = f s (tensor_index i from)
                 tensor_set i s to
@@ -328,10 +330,7 @@ inl local_exclusive_scan config = local_scan false config
 inl local_reduce forall a. config (neutral_element : a) f (from : tensor (int * int) a) : a = 
     // Reduces the individual thread elements. 
     inl result = loop._dup neutral_element
-    loop.linear from.dim fun i =>
-        f result (tensor_index i from)
-        |> loop._set result
-
+    loop.linear from.dim fun i => loop._set result (f result (tensor_index i from))
     // Reduces the blockwise results. Broadcasts the final result to all the threads.
     block_reduce_2d config neutral_element f result
 
@@ -607,9 +606,9 @@ inl reduce_2d forall dim a. neutral_element (f : a -> a -> a) (from : tensor (di
             inl from = apply i from
             inl l_from = tensor_create from.dim
             memcpy_sync (l_from, from)
-            loop.for {from=0; nearTo=l_from.dim} (fun i x => f x (tensor_index i l_from)) result
-            |> loop._set result
+            loop.linear l_from.dim (fun i => loop._set result (f result (tensor_index i l_from)))
 
+        __syncwarp()
         tensor_set i (cg_reduce create_coalesced_threads() f result) to
 
     __syncthreads()
@@ -1062,14 +1061,14 @@ inl test6 (m,n : int * int) head_dir =
         console.tensor.write_ln 1024 output_reduce_grid
 
 inl main() : () = 
-    // test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
-    // test3((1 <<< 4)) "test3/a"
-    // test3((1 <<< 8)) "test3/b"
-    // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
-    // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
-    // test5 (2,4,8) "test5/a"
-    // test5 (2,128,256) "test5/b"
+    test2((1 <<< 6), (1 <<< 7)) "test2/a/"
+    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    test3((1 <<< 4)) "test3/a"
+    test3((1 <<< 8)) "test3/b"
+    test4((1 <<< 7), (1 <<< 6)) "test4/b/"
+    test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    test5 (2,4,8) "test5/a"
+    test5 (2,128,256) "test5/b"
     test6 (128,128) "test6/a"
     // frame_iter (frame_config {iters=7; min=16,16,8; max=1024,1024,1024} : _ (int * int * int) f32)
     // |> console.write_ln

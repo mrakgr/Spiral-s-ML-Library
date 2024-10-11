@@ -293,6 +293,7 @@ extern "C" __global__ void entry0(unsigned long long * v0, unsigned long long * 
         v4 = v23;
         v6 += 256 ;
     }
+    __syncwarp();
     auto v27 = cooperative_groups::coalesced_threads();
     Closure0 v28{};
     unsigned long long v29;
@@ -390,6 +391,7 @@ extern "C" __global__ void entry0(unsigned long long * v0, unsigned long long * 
         v42 = v64;
         v47 += 6144 ;
     }
+    __syncwarp();
     auto v68 = cooperative_groups::coalesced_threads();
     unsigned long long v69;
     v69 = cooperative_groups::reduce(v68, v42, v28);
@@ -425,78 +427,47 @@ extern "C" __global__ void entry0(unsigned long long * v0, unsigned long long * 
     int v82;
     v82 = blockIdx.x;
     static unsigned long long v83[24];
-    auto v84 = cooperative_groups::coalesced_threads();
-    unsigned long long v85;
-    v85 = cooperative_groups::reduce(v84, v81, v28);
-    int v86;
-    v86 = threadIdx.x;
-    int v87;
-    v87 = v86 / 32;
-    extern __shared__ unsigned char v88[];
-    unsigned long long * v89;
-    v89 = reinterpret_cast<unsigned long long *>(&v88[0ull]);
-    assert("Tensor range check" && 0 <= v87 && v87 < 8);
-    v89[v87] = v85;
-    __syncthreads();
-    int v91;
-    v91 = threadIdx.x;
-    int v92;
-    v92 = v91 % 32;
-    bool v93;
-    v93 = v92 < 8;
-    unsigned long long v95;
-    if (v93){
-        assert("Tensor range check" && 0 <= v92 && v92 < 8);
-        unsigned long long v94;
-        v94 = v89[v92];
-        v95 = v94;
-    } else {
-        v95 = 0ull;
-    }
-    __syncthreads();
-    auto v96 = cooperative_groups::coalesced_threads();
-    unsigned long long v97;
-    v97 = cooperative_groups::reduce(v96, v95, v28);
     assert("Tensor range check" && 0 <= v82 && v82 < 24);
-    v83[v82] = v97;
+    v83[v82] = v81;
     v3.sync() ;
-    unsigned long long v98;
-    v98 = 0ull;
-    int v99;
-    v99 = threadIdx.x;
-    int v100;
-    v100 = v99 % 32;
-    int v101;
-    v101 = v100;
-    while (while_method_2(v101)){
-        bool v103;
-        v103 = 0 <= v101;
-        bool v104;
-        v104 = v103 == false;
-        if (v104){
-            assert("The index needs to be zero or positive." && v103);
+    unsigned long long v84;
+    v84 = 0ull;
+    int v85;
+    v85 = threadIdx.x;
+    int v86;
+    v86 = v85 % 32;
+    int v87;
+    v87 = v86;
+    while (while_method_2(v87)){
+        bool v89;
+        v89 = 0 <= v87;
+        bool v90;
+        v90 = v89 == false;
+        if (v90){
+            assert("The index needs to be zero or positive." && v89);
         } else {
         }
-        bool v106;
-        v106 = v101 < 24;
-        bool v107;
-        v107 = v106 == false;
-        if (v107){
-            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v106);
+        bool v92;
+        v92 = v87 < 24;
+        bool v93;
+        v93 = v92 == false;
+        if (v93){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v92);
         } else {
         }
-        assert("Tensor range check" && 0 <= v101 && v101 < 24);
-        unsigned long long v109;
-        v109 = v83[v101];
-        unsigned long long v110;
-        v110 = v98 + v109;
-        v98 = v110;
-        v101 += 32 ;
+        assert("Tensor range check" && 0 <= v87 && v87 < 24);
+        unsigned long long v95;
+        v95 = v83[v87];
+        unsigned long long v96;
+        v96 = v84 + v95;
+        v84 = v96;
+        v87 += 32 ;
     }
-    auto v111 = cooperative_groups::coalesced_threads();
-    unsigned long long v112;
-    v112 = cooperative_groups::reduce(v111, v98, v28);
-    v2[0] = v112;
+    __syncwarp();
+    auto v97 = cooperative_groups::coalesced_threads();
+    unsigned long long v98;
+    v98 = cooperative_groups::reduce(v97, v84, v28);
+    v2[0] = v98;
     return ;
 }
 """
