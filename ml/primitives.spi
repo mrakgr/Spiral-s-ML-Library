@@ -132,11 +132,9 @@ inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) :
 inl grid_map forall dim a b. grid (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () = 
     map_ (loop.projective << threads_in_grid) f from to . cooperative_groups.sync grid
 
-// Does a blockwise reduction in shared memory and stores the final result into the 0th index of the tensor.
-inl block_reduce_store forall a. extern_offset f result (to : tensor int a) = 
-    assert (1 = to.dim) "The output answer has to be of size 1."
+// Does a blockwise reduction in shared memory and returns the final result in local memory.
+inl block_reduce extern_offset neutral_element f result = 
     global "#include <cooperative_groups.h>"
-
     open cooperative_groups
 
     // The final result for each of the warps.
@@ -153,25 +151,48 @@ inl block_reduce_store forall a. extern_offset f result (to : tensor int a) =
     
     inl threads_in_warp = threads_in_warp()
     assert (shared.dim <= threads_in_warp.by) "The amount of results in their shared array to be reduced should be less than the number of threads in the warp."
-    if warps_in_block.from = 0 && threads_in_warp.from < shared.dim then
-        // The first warp reduces the intermediate results in the shared tensor.
-        inl final_result = cg_reduce create_coalesced_threads() f (tensor_index threads_in_warp.from shared)
-        // Stores the final result into global memory.
-        tensor_set 0 final_result to
+
+    inl result = if threads_in_warp.from < shared.dim then tensor_index threads_in_warp.from shared else neutral_element
+
     __syncthreads() // We need to make sure the shared memory isn't reused by other threads.
-    
-// Reduces all the elements of a tensor to a single one, given the neutral element as well as the reducer function.
-inl reduce forall dim a. extern_offset neutral_element (f : a -> a -> a) (from : tensor dim a) (to : tensor int a) : () =
+
+    cg_reduce create_coalesced_threads() f result
+
+// Reduces all the elements of a tensor to a single one, given the neutral element as well as the reducer function. Template for the blockwise version.
+inl reduce_ forall dim a. loop' extern_offset neutral_element (f : a -> a -> a) (from : tensor dim a) : a =
     // The individual threads iterate over the global tensor, reducing the elements as they go along.
     inl from = factorize_sizeof_16 from
     inl result = loop._dup neutral_element
-    loop.projective threads_in_block(fst from.dim) fun i =>
+    loop' (fst from.dim) fun i =>
         inl from = apply i from
         inl local = tensor_create from.dim
         memcpy_sync (local, from)
         loop.for {from=0; nearTo=local.dim} (fun i x => f x (tensor_index i local)) result
         |> loop._set result
-    block_reduce_store extern_offset f result to
+    block_reduce extern_offset neutral_element f result
+
+// Reduces all the elements of a tensor to a single one, given the neutral element as well as the reducer function. Blockwise version.
+inl reduce forall dim a. extern_offset neutral_element (f : a -> a -> a) (from : tensor dim a) : a =
+    reduce_ (loop.projective << threads_in_block) extern_offset neutral_element f from
+
+// Reduces all the elements of a tensor to a single one, given the neutral element as well as the reducer function. Gridwise version.
+inl grid_reduce forall dim a. grid extern_offset neutral_element (f : a -> a -> a) (from : tensor dim a) : a =
+    // The initial blockwise pass.
+    inl result = reduce_ (loop.projective << threads_in_grid) extern_offset neutral_element f from
+
+    // The final part of the reduction is done using static global memory.
+    open cooperative_groups
+    inl blocks_in_grid = blocks_in_grid()
+    inl t : tensor int a = tensor_cuda.tensor_create_static blocks_in_grid.by
+
+    // TODO: Test whether setting into a single location using every thread in a block like this hurts performance.
+    tensor_set blocks_in_grid.from (block_reduce extern_offset neutral_element f result) t
+    sync grid
+
+    inl result = loop._dup neutral_element
+    loop.projective threads_in_warp(t.dim) fun i =>
+        loop._set result (f result (tensor_index i t))
+    cg_reduce create_coalesced_threads() f result
 
 // Allows the user to specify the output for the map operation.
 inl local_map' forall a b. f (from : tensor (int * int) a) (to : tensor (int * int) b) : () = 
@@ -836,7 +857,7 @@ inl test2 (m,n : int * int) head_dir =
     cupy.set_random_seed(cupy.constant_seed())
     inl input_identity : _ _ int = cupy.arange{from=0; nearTo=m,n; by=1}
     inl input : _ _ float = cupy.random_normal{mean=0; std=1} (m,n)
-    inl output_reduce = tensor_create 1
+    inl output_reduce = tensor_create {}
     inl output_identity = tensor_create (m,n)
     inl output_softmax = tensor_create (m,n)
     inl output_masked_softmax = tensor_create (m,n)
@@ -856,7 +877,7 @@ inl test2 (m,n : int * int) head_dir =
         run fun _ =>
             open random
             inl rng() : _ philox_state = init {seed = cupy.constant_seed(); subsequence=conv rangem.threads_in_grid().from; offset=0}
-            reduce 0 0 (+) input output_reduce
+            tensor_set {} (reduce 0 0 (+) input) output_reduce
             // indices (identity)
             row_map (fun config x i j_tns => x) input_identity output_identity
             // indices (map)
@@ -1015,6 +1036,25 @@ inl test5 (l,m,n : int * int * int) head_dir =
         grid_transpose_snd input_identity output
     console.tensor.write_ln limit.max output
 
+inl test6 (m,n : int * int) head_dir =
+    cupy.set_random_seed(cupy.constant_seed())
+    inl input_identity : _ _ u64 = cupy.arange{from=0; nearTo=m,n; by=1}
+    inl output_reduce_block = tensor_create {}
+    inl output_reduce_grid = tensor_create {}
+
+    open testing
+    redirect_io_into "test_text_outputs/primitives/" head_dir "kernel_params.txt" fun () =>
+        run fun _ =>
+            inl grid = cooperative_groups.create_grid()
+            tensor_set {} (reduce 0 0 (+) input_identity) output_reduce_block
+            tensor_set {} (grid_reduce grid 0 0 (+) input_identity) output_reduce_grid
+
+    redirect_io_into "test_text_outputs/primitives/" head_dir "input_identity.txt" fun () =>
+        console.tensor.write_ln 1024 input_identity
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_reduce_block.txt" fun () =>
+        console.tensor.write_ln 1024 output_reduce_block
+    redirect_io_into "test_text_outputs/primitives/" head_dir "output_reduce_grid.txt" fun () =>
+        console.tensor.write_ln 1024 output_reduce_grid
 
 inl main() : () = 
     // test2((1 <<< 6), (1 <<< 7)) "test2/a/"
@@ -1025,8 +1065,9 @@ inl main() : () =
     // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
     // test5 (2,4,8) "test5/a"
     // test5 (2,128,256) "test5/b"
-    frame_iter (frame_config {iters=7; min=16,16,8; max=1024,1024,1024} : _ (int * int * int) f32)
-    |> console.write_ln
+    test6 (128,128) "test6/a"
+    // frame_iter (frame_config {iters=7; min=16,16,8; max=1024,1024,1024} : _ (int * int * int) f32)
+    // |> console.write_ln
 
 
     

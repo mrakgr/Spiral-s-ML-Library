@@ -20,6 +20,20 @@ inl tensor_create_shared forall dim el. (dim : dim) : tensor dim el =
         }
     tensor {dim bodies=real infer_map `el create_body}
 
+// Create a tensor of the specified dimensions in static global memory. The elements of the dimension should be ints.
+inl tensor_create_static forall dim el. (dim : dim) : tensor dim el = 
+    inl stride, len = real calculate_stride_len dim
+    assert_long_length len dim
+    inl create_body forall t. : tensor_body dim t = tensor_body {
+        array = real 
+            typecase t with
+            | () => $"/* void static global array create \v */" : array t
+            | _ => $"static `t \v[!len]" : array t
+        offset = 0
+        stride 
+        }
+    tensor {dim bodies=real infer_map `el create_body}
+
 // Instantiates a partition using dynamic shared memory. Checks that the allocated memory is sufficient.
 inl tensor_create_from_extern_partition' forall t. (memory : partitionm.partition_offsets t) : t * size =
     inl smem_used = conv dynamic_shared_memory_used()

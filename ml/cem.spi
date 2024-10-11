@@ -135,7 +135,10 @@ inl apply_updates rng grid (weights : list weights) (model : model) : () =
     weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
         grid_transpose transposed_weights weights
         )
+    
     // cooperative_groups.sync grid
+
+    // Zeroes out the reward tensors.
     grid_map grid (const loop.zeroes) model.rewards model.rewards // grid map will do a sync
 
 open layers

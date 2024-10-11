@@ -151,6 +151,8 @@ inl lookahead forall dim. ({from nearTo by} : range dim) on_loop : () =
         on_loop {is_init=i = from; ping=i % 2} (proj nearTo i) (if i' < length then Some (proj nearTo i') else None)
         _set i i'
 
+
+
 // Linearly increases the indices. Unlike the projective loops which use a single index and module and division operations to project it
 // into the higher dimensional spaces, this function compiles into nested loops.
 inl linear forall dim. (dim : dim) body : () = 
@@ -168,6 +170,13 @@ inl linear forall dim. (dim : dim) body : () =
         // else
             for' {from=0; nearTo} (fun i => on_success (i :: l))
         ) (dim_to_list dim) (list_to_dim >> body) []
+
+// Linearly increases the indices. Unlike the projective loops which use a single index and module and division operations to project it
+// into the higher dimensional spaces, this function compiles into nested loops. Takes in state as an argument.
+inl linear' forall dim state. (dim : dim) body (s : state) : state = 
+    inl s = _dup s
+    linear dim fun i => _set s (body i s)
+    s
 
 // Iterates over the dimensions split by `rigid_split`.
 inl rigid forall dim. ({from nearTo=(a,b) by} : range (dim * dim)) (body : dim -> dim -> ()) : () = linear b (body (proj a from))
