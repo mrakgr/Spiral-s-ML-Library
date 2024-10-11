@@ -736,6 +736,11 @@ inl local_discrete_sampling rng config x i (j_tns : tensor (int * int) int) =
     inl probability = // TODO: Needs to be optimized and factored out into local_shared.
         j_tns
         |> local_map (fun j => random.uniform rng, j)
+        |> fun x =>
+            if block_index() = 0 && thread_index() < 8 then
+                console.write_ln {x tid=thread_index()}
+            __syncthreads()
+            x
         // It's important that here the ordering is being preserved so all the threads get the same value.
         |> local_reduce config (0, limit.max) (fun a b => if snd a < snd b then a else b)
         |> fst |> conv |> (*) max_probability
@@ -1062,14 +1067,14 @@ inl test6 (m,n : int * int) head_dir =
 
 inl main() : () = 
     test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
-    test3((1 <<< 4)) "test3/a"
-    test3((1 <<< 8)) "test3/b"
-    test4((1 <<< 7), (1 <<< 6)) "test4/b/"
-    test4((1 <<< 6), (1 <<< 7)) "test4/a/"
-    test5 (2,4,8) "test5/a"
-    test5 (2,128,256) "test5/b"
-    test6 (128,128) "test6/a"
+    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    // test3((1 <<< 4)) "test3/a"
+    // test3((1 <<< 8)) "test3/b"
+    // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
+    // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    // test5 (2,4,8) "test5/a"
+    // test5 (2,128,256) "test5/b"
+    // test6 (128,128) "test6/a"
     // frame_iter (frame_config {iters=7; min=16,16,8; max=1024,1024,1024} : _ (int * int * int) f32)
     // |> console.write_ln
 
