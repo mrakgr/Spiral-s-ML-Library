@@ -1060,32 +1060,30 @@ inl test6 (m,n : int * int) head_dir =
         console.tensor.write_ln 1024 output_reduce_grid
 
 inl main() : () = 
-    // console.write_ln "2"
-    // test2((1 <<< 6), (1 <<< 7)) "test2/a/"
-    // test2((1 <<< 7), (1 <<< 6)) "test2/b/"
-    // device_sync()
+    console.write_ln "2"
+    test2((1 <<< 6), (1 <<< 7)) "test2/a/"
+    test2((1 <<< 7), (1 <<< 6)) "test2/b/"
+    device_sync()
 
     console.write_ln "3"
     test3((1 <<< 4)) "test3/a"
     test3((1 <<< 8)) "test3/b"
     device_sync()
 
-    // console.write_ln "4"
-    // test4((1 <<< 7), (1 <<< 6)) "test4/b/"
-    // test4((1 <<< 6), (1 <<< 7)) "test4/a/"
-    // device_sync()
+    console.write_ln "4"
+    test4((1 <<< 7), (1 <<< 6)) "test4/b/"
+    test4((1 <<< 6), (1 <<< 7)) "test4/a/"
+    device_sync()
 
-    // console.write_ln "5"
-    // test5 (2,4,8) "test5/a"
-    // test5 (2,128,256) "test5/b"
-    // device_sync()
+    console.write_ln "5"
+    test5 (2,4,8) "test5/a"
+    test5 (2,128,256) "test5/b"
+    device_sync()
 
-    // console.write_ln "6"
-    // test6 (128,128) "test6/a"
-    // device_sync()
+    console.write_ln "6"
+    test6 (128,128) "test6/a"
+    device_sync()
+
     console.write_ln "Done."
-    // frame_iter (frame_config {iters=7; min=16,16,8; max=1024,1024,1024} : _ (int * int * int) f32)
-    // |> console.write_ln
-
-
+    
     
