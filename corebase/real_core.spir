@@ -28,6 +28,8 @@ inl log x = !!!!Log(x)
 inl exp x = !!!!Exp(x)
 // Hyperbolic tangent. 
 inl tanh x = !!!!Tanh(x)
+// Square.
+inl sqr forall t {number}. (x : t) : t = x * x
 // Square root.
 inl sqrt x = !!!!Sqrt(x)
 // Sin

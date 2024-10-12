@@ -22,10 +22,10 @@ inl event_loop_gpu = fun (msg, state : _ event * _ (state neural_ptr_type)) =>
 
     inl effects : plist ui_effects = plistm.create'
     match msg with
+    | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play_cem.vs_human seri neural
     | StartTrainingVsRando => train_cem.vs_rando neural |> plistm.from_2d_tensor |> AddRewardsRando |> plistm.push effects
-    | _ => failwith "WIP"
-    // | StartTrainingVsSelf => train_cem.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
-    // | StartGame | PlayerChanged | ActionSelected => serialize seri.msg msg . play_cem.vs_human seri neural
+    | StartTrainingVsSelf => train_cem.vs_self neural |> plistm.from_2d_tensor |> AddRewardsSelf |> plistm.push effects
+    // | _ => failwith "WIP"
 
     device_sync()
 

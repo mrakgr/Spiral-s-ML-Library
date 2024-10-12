@@ -49,7 +49,9 @@ inl integrate_rewards_
     inl player_prob ensemble_id = tensor_index ensemble_id player_probs
     inl total_prob = fold (*) 1 player_probs
     init (ensemble,player) fun ensemble_id,player_id =>
-        total_prob / player_prob player_id * individual_prob (ensemble_id, player_id)
+        inl x = if total_prob <> 0 then total_prob / player_prob player_id * individual_prob (ensemble_id, player_id) else 0
+        assert (not (nan_is x)) "The path probability after integration should not be a nan in integrate_rewards_."
+        x
 
 // Returns a tensor of the unnormalized true rewards and the path probabilities given the path probabilities and the rewards tensor integrated
 // over the player_id dimension.

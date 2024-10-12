@@ -374,6 +374,13 @@ inl softmax' forall dim t{float;number}. out (x : graph (tensor (int * dim * int
 inl softmax forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     softmax_ None x
 
+inl regret_matching_ forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    BlockRowMap (exists (fun _ config x _ _ => primitives.local_regret_matching config x), x, out)
+inl regret_matching' forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    regret_matching_ (Some out) x
+inl regret_matching forall dim t{float;number}. (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    regret_matching_ None x
+
 
 inl discrete_sample_ forall dim t{float;number}. out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim) int) = 
     inl f (layer_state {rng}) config x i j_tns = primitives.local_discrete_sampling rng config x i j_tns
@@ -404,6 +411,13 @@ inl masked_softmax' forall dim t{float;number}. size out (x : graph (tensor (int
     masked_softmax_ size (Some out) x
 inl masked_softmax forall dim t{float;number}. size (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
     masked_softmax_ size None x
+
+inl masked_regret_matching_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    BlockRowMap (exists (fun _ config x => primitives.local_masked_regret_matching (fun config x i j => j < size) config x), x, out)
+inl masked_regret_matching' forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    masked_regret_matching_ size (Some out) x
+inl masked_regret_matching forall dim t{float;number}. size (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t) = 
+    masked_regret_matching_ size None x
 
 inl masked_softmax_and_discrete_sample_ forall dim t{float;number}. size out (x : graph (tensor (int * dim * int) t)) : graph (tensor (int * dim * int) t * tensor (int * dim) int) = 
     inl f (layer_state {rng}) config x i j_tns = 
@@ -441,7 +455,9 @@ inl init_zero forall t. (x : t) : () = real
 
 // Takes the inverse of the sqrt of the product of the tensor dimensions. Similar to Xavier initialization.
 inl weight_init forall dim t. (to : tensor dim t) : () = // TODO: This would be xavier init if we were using 2d matrices. We're also missing a mult by a constant.
-    cupy.copy_to { to from=cupy.random_normal{mean=0; std=loop.prod to.dim |> conv |> (/) 1 |> sqrt} to.dim }
+    // inl std = loop.prod to.dim |> conv |> (/) 1 |> sqrt
+    inl std = 0.1
+    cupy.copy_to { to from=cupy.random_normal{mean=0; std} to.dim }
     
 inl weight' x init =  tensor weight_id() x init
 inl weight x = weight' x weight_init

@@ -1,5 +1,6 @@
 open corebase
 open corecuda
+open coreext
 open primitives
 
 type prob = float
@@ -50,7 +51,7 @@ inl graph (size : sizes) : _ (model * trace_state) =
     <| (key_graph .cem_trace_state (layer workspace_id() trace_state init_zero))
 
 // According to CEM papers, adding noise helps performance significantly in games like tetris.
-inl cross_entropy_noise() = 0.3
+inl cross_entropy_noise() = 0.1
 
 // This is the trick that we talked about in the Ghostlike's Cross Entropy Method video.
 // It's supposed to encourage the cross entropy method to gradually reduce the weights towards 0.
@@ -84,10 +85,10 @@ inl calculate_updates forall dim.
     path_probs.integrate_rewards_over_players log_path_probs (path_probs.sa_to_tensor reward)
     |> iteri (fun ensemble_id (reward, path_prob) =>
         inl path_prob = conv path_prob
+        assert (not (nan_is path_prob)) "The path probability after integration should not be a nan in calculate updates."
         tensor_cuda.tensor_atomic_add ensemble_id (reward * path_prob, path_prob) rewards
         )
     reset_trace_state trace_state
-
 
 inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) ({rewards} : model) =
     grid_row_map' (fun config x i j_tns =>
@@ -95,7 +96,11 @@ inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) 
         inl rewards = 
             local_map (fun ensemble_id => 
                 inl reward,count = tensor_index ensemble_id rewards 
-                if count <> 0 then reward / count else 0
+                assert (not (nan_is reward)) "The reward numerator must not be a nan."
+                assert (not (nan_is count)) "The reward count must not be a nan."
+                inl x = if count <> 0 then reward / count else 0
+                assert (not (nan_is x)) "The reward must not be a nan."
+                x
                 ) j_tns
         inl mask =
             inl average = local_average config rewards
@@ -110,8 +115,9 @@ inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) 
                 |> fun x => x / winner_count
             inl biased_std = sqrt variance
             if winner_count > 1 then biased_std * winner_count / (winner_count - 1) else 0
+            // biased_std
         local_map (fun x,b => 
-            inl r = conv (random.normal rng) * (winner_std + cross_entropy_noise()) + winner_mean
+            inl r = conv (random.normal rng) * (max winner_std cross_entropy_noise()) + winner_mean
             if b then x else r
             ) (tensorm.zip x mask)
         ) 
@@ -124,22 +130,28 @@ inl apply_updates rng grid (weights : list weights) (model : model) : () =
         tensorm.tensor_set {} (random.int_range {from=0; nearTo=model.rewards.dim} rng) model.exploratory_ensemble_id // Pick a random ensemble id
     __syncwarp() // Converge the first warp.
 
-    weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
+    weights |> listm.iter fun (exists dim. weights, transposed_weights) =>
         grid_transpose weights transposed_weights
-        )
     cooperative_groups.sync grid
-    weights |> listm.iter (fun (exists dim. _, transposed_weights) =>
+    weights |> listm.iter fun (exists dim. _, transposed_weights) =>
         cem rng transposed_weights model
-        )
     cooperative_groups.sync grid
-    weights |> listm.iter (fun (exists dim. weights, transposed_weights) =>
+
+    // prints out the weight norms.
+    weights |> listm.iter fun (exists dim. weights, transposed_weights) =>
+        inl norms : tensor dim float = tensor_cuda.tensor_create_static (fst transposed_weights.dim)
+        primitives.grid_map_reduce_map_2d grid sqr 0 (+) sqrt transposed_weights norms
+        primitives.grid_reduce grid 0 max norms
+        |> fun max_norm => print0 {max_norm}
+
+    weights |> listm.iter fun (exists dim. weights, transposed_weights) =>
         grid_transpose transposed_weights weights
-        )
     
-    // cooperative_groups.sync grid
+    cooperative_groups.sync grid
 
     // Zeroes out the reward tensors.
     grid_map grid (const loop.zeroes) model.rewards model.rewards // grid map will do a sync
+    ()
 
 open layers
 open tensorm
@@ -167,13 +179,21 @@ inl get_policy_probs model ensemble_id action_id =
 
 // Updates the trace state log path probabilities.
 inl push_trace (trace_state : trace_state) {thread_id ensemble_id player_id} (action_prob, action_id : action_prob * action_id) : () =
+    
     // Updates the log path probs in the trace_state.
     inl v = {
         sampling = log (conv action_prob.sampling)
         policy = log (conv action_prob.policy)
     }
+                
+
     // Updates the log path probs in the trace_state.
-    tensor_update (ensemble_id, thread_id, player_id) (loop.add v) trace_state.log_path_probs
+    tensor_update (ensemble_id, thread_id, player_id) (fun x => 
+        inl x = loop.add v x
+        assert (not (nan_is x.sampling)) "The sampling log probability shouldn't be nan."
+        assert (not (nan_is x.policy)) "The policy log probability shouldn't be nan."
+        x
+        ) trace_state.log_path_probs
 
 // Updates the trace state log path probabilities.
 inl update_trace_state_path_probs x = push_trace x

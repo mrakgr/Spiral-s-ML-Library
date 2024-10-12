@@ -284,20 +284,19 @@ __device__ void block_row_map_46(float * v0, int v1, float * v2);
 struct Tuple14;
 struct Tuple15;
 struct Tuple16;
-struct Tuple17;
 struct Union10;
-struct Tuple18;
+struct Tuple17;
 __device__ int loop_50(static_array<float,6> v0, float v1, int v2);
 __device__ int pick_discrete__49(static_array<float,6> v0, float v1);
 __device__ int sample_discrete__48(static_array<float,6> v0, curandStatePhilox4_32_10_t & v1);
-__device__ Union1 sample_discrete_47(static_array<Tuple18,6> v0, curandStatePhilox4_32_10_t & v1);
+__device__ Union1 sample_discrete_47(static_array<Tuple17,6> v0, curandStatePhilox4_32_10_t & v1);
+struct Tuple18;
 struct Tuple19;
-struct Tuple20;
 struct Union11;
-struct Tuple21;
+struct Tuple20;
 struct Union12;
+struct Tuple21;
 struct Tuple22;
-struct Tuple23;
 struct Union13;
 struct Union14;
 struct Union15;
@@ -1317,12 +1316,6 @@ struct Closure1 {
         return v2;
     }
 };
-struct Tuple14 {
-    int v0;
-    float v1;
-    __device__ Tuple14() = default;
-    __device__ Tuple14(int t0, float t1) : v0(t0), v1(t1) {}
-};
 struct Closure2 {
     __device__ float operator()(float tup0, float tup1){
         float v0 = tup0; float v1 = tup1;
@@ -1331,14 +1324,14 @@ struct Closure2 {
         return v2;
     }
 };
-struct Tuple15 {
+struct Tuple14 {
     float v0;
     bool v1;
-    __device__ Tuple15() = default;
-    __device__ Tuple15(float t0, bool t1) : v0(t0), v1(t1) {}
+    __device__ Tuple14() = default;
+    __device__ Tuple14(float t0, bool t1) : v0(t0), v1(t1) {}
 };
 struct Closure3 {
-    __device__ Tuple15 operator()(Tuple15 tup0, Tuple15 tup1){
+    __device__ Tuple14 operator()(Tuple14 tup0, Tuple14 tup1){
         float v0 = tup0.v0; bool v1 = tup0.v1; float v2 = tup1.v0; bool v3 = tup1.v1;
         if (v1){
             if (v3){
@@ -1350,45 +1343,45 @@ struct Closure3 {
                 } else {
                     v5 = v2;
                 }
-                return Tuple15{v5, true};
+                return Tuple14{v5, true};
             } else {
-                return Tuple15{v0, v1};
+                return Tuple14{v0, v1};
             }
         } else {
             if (v3){
-                return Tuple15{v2, v3};
+                return Tuple14{v2, v3};
             } else {
-                return Tuple15{v0, v1};
+                return Tuple14{v0, v1};
             }
         }
     }
 };
-struct Tuple16 {
+struct Tuple15 {
     float v0;
     int v1;
-    __device__ Tuple16() = default;
-    __device__ Tuple16(float t0, int t1) : v0(t0), v1(t1) {}
+    __device__ Tuple15() = default;
+    __device__ Tuple15(float t0, int t1) : v0(t0), v1(t1) {}
 };
 struct Closure4 {
-    __device__ Tuple16 operator()(Tuple16 tup0, Tuple16 tup1){
+    __device__ Tuple15 operator()(Tuple15 tup0, Tuple15 tup1){
         float v0 = tup0.v0; int v1 = tup0.v1; float v2 = tup1.v0; int v3 = tup1.v1;
         bool v4;
         v4 = v1 < v3;
         if (v4){
-            return Tuple16{v0, v1};
+            return Tuple15{v0, v1};
         } else {
-            return Tuple16{v2, v3};
+            return Tuple15{v2, v3};
         }
     }
 };
-struct Tuple17 {
+struct Tuple16 {
     int v0;
     bool v1;
-    __device__ Tuple17() = default;
-    __device__ Tuple17(int t0, bool t1) : v0(t0), v1(t1) {}
+    __device__ Tuple16() = default;
+    __device__ Tuple16(int t0, bool t1) : v0(t0), v1(t1) {}
 };
 struct Closure5 {
-    __device__ Tuple17 operator()(Tuple17 tup0, Tuple17 tup1){
+    __device__ Tuple16 operator()(Tuple16 tup0, Tuple16 tup1){
         int v0 = tup0.v0; bool v1 = tup0.v1; int v2 = tup1.v0; bool v3 = tup1.v1;
         if (v1){
             if (v3){
@@ -1400,35 +1393,35 @@ struct Closure5 {
                 } else {
                     v5 = v2;
                 }
-                return Tuple17{v5, true};
+                return Tuple16{v5, true};
             } else {
-                return Tuple17{v0, v1};
+                return Tuple16{v0, v1};
             }
         } else {
             if (v3){
-                return Tuple17{v2, v3};
+                return Tuple16{v2, v3};
             } else {
-                return Tuple17{v0, v1};
+                return Tuple16{v0, v1};
             }
         }
     }
 };
 struct Closure6 {
     int v0;
-    __device__ Tuple16 operator()(Tuple16 tup0, Tuple16 tup1){
+    __device__ Tuple15 operator()(Tuple15 tup0, Tuple15 tup1){
         int & v0 = this->v0;
         float v1 = tup0.v0; int v2 = tup0.v1; float v3 = tup1.v0; int v4 = tup1.v1;
         bool v5;
         v5 = v2 == v0;
         if (v5){
-            return Tuple16{v1, v2};
+            return Tuple15{v1, v2};
         } else {
             bool v6;
             v6 = v4 == v0;
             if (v6){
-                return Tuple16{v3, v4};
+                return Tuple15{v3, v4};
             } else {
-                return Tuple16{v1, v2};
+                return Tuple15{v1, v2};
             }
         }
     }
@@ -1504,24 +1497,24 @@ struct Union10 {
         this->tag = 255;
     }
 };
-struct Tuple18 {
+struct Tuple17 {
     Union1 v0;
     float v1;
-    __device__ Tuple18() = default;
-    __device__ Tuple18(Union1 t0, float t1) : v0(t0), v1(t1) {}
+    __device__ Tuple17() = default;
+    __device__ Tuple17(Union1 t0, float t1) : v0(t0), v1(t1) {}
 };
-struct Tuple19 {
+struct Tuple18 {
     int v1;
     bool v0;
-    __device__ Tuple19() = default;
-    __device__ Tuple19(bool t0, int t1) : v0(t0), v1(t1) {}
+    __device__ Tuple18() = default;
+    __device__ Tuple18(bool t0, int t1) : v0(t0), v1(t1) {}
 };
-struct Tuple20 {
+struct Tuple19 {
     int v0;
     int v1;
     int v2;
-    __device__ Tuple20() = default;
-    __device__ Tuple20(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+    __device__ Tuple19() = default;
+    __device__ Tuple19(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union11_0 { // Eq
 };
@@ -1589,12 +1582,12 @@ struct Union11 {
         this->tag = 255;
     }
 };
-struct Tuple21 {
+struct Tuple20 {
     int v0;
     int v1;
     unsigned char v2;
-    __device__ Tuple21() = default;
-    __device__ Tuple21(int t0, int t1, unsigned char t2) : v0(t0), v1(t1), v2(t2) {}
+    __device__ Tuple20() = default;
+    __device__ Tuple20(int t0, int t1, unsigned char t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union12_0 { // None
 };
@@ -1656,19 +1649,19 @@ struct Union12 {
         this->tag = 255;
     }
 };
-struct Tuple22 {
+struct Tuple21 {
     Union11 v1;
     int v0;
-    __device__ Tuple22() = default;
-    __device__ Tuple22(int t0, Union11 t1) : v0(t0), v1(t1) {}
+    __device__ Tuple21() = default;
+    __device__ Tuple21(int t0, Union11 t1) : v0(t0), v1(t1) {}
 };
-struct Tuple23 {
+struct Tuple22 {
     int v0;
     int v1;
     int v2;
     unsigned char v3;
-    __device__ Tuple23() = default;
-    __device__ Tuple23(int t0, int t1, int t2, unsigned char t3) : v0(t0), v1(t1), v2(t2), v3(t3) {}
+    __device__ Tuple22() = default;
+    __device__ Tuple22(int t0, int t1, int t2, unsigned char t3) : v0(t0), v1(t1), v2(t2), v3(t3) {}
 };
 struct Union13_0 { // None
 };
@@ -4652,6 +4645,24 @@ __device__ void block_row_map_46(float * v0, int v1, float * v2){
                 v143 = v142 - v132;
                 float v144;
                 v144 = exp(v143);
+                bool v145;
+                v145 = v144 < 1.0f / 0.0f;
+                bool v146;
+                v146 = v145 == false;
+                if (v146){
+                    assert("The softmax values must not grow too large." && v145);
+                } else {
+                }
+                bool v148;
+                v148 = isnan(v144);
+                bool v149;
+                v149 = v148 == false;
+                bool v150;
+                v150 = v149 == false;
+                if (v150){
+                    assert("The softmax values must not be nans." && v149);
+                } else {
+                }
                 assert("Tensor range check" && 0 <= v134 && v134 < 1);
                 assert("Tensor range check" && 0 <= v136 && v136 < 4);
                 v133[v139] = v144;
@@ -4659,82 +4670,82 @@ __device__ void block_row_map_46(float * v0, int v1, float * v2){
             }
             v134 += 1 ;
         }
-        float v145;
-        v145 = 0.0f;
-        int v146;
-        v146 = 0;
-        while (while_method_6(v146)){
-            int v148;
-            v148 = 0;
-            while (while_method_3(v148)){
-                assert("Tensor range check" && 0 <= v146 && v146 < 1);
-                assert("Tensor range check" && 0 <= v148 && v148 < 4);
-                int v150;
-                v150 = 4 * v146;
-                int v151;
-                v151 = v150 + v148;
-                float v152;
-                v152 = v133[v151];
-                float v153;
-                v153 = v145 + v152;
-                v145 = v153;
-                v148 += 1 ;
+        float v152;
+        v152 = 0.0f;
+        int v153;
+        v153 = 0;
+        while (while_method_6(v153)){
+            int v155;
+            v155 = 0;
+            while (while_method_3(v155)){
+                assert("Tensor range check" && 0 <= v153 && v153 < 1);
+                assert("Tensor range check" && 0 <= v155 && v155 < 4);
+                int v157;
+                v157 = 4 * v153;
+                int v158;
+                v158 = v157 + v155;
+                float v159;
+                v159 = v133[v158];
+                float v160;
+                v160 = v152 + v159;
+                v152 = v160;
+                v155 += 1 ;
             }
-            v146 += 1 ;
+            v153 += 1 ;
         }
-        auto v154 = cooperative_groups::coalesced_threads();
-        int v155;
-        v155 = threadIdx.x;
-        int v156;
-        v156 = v155 / 16;
-        auto v157 = cooperative_groups::labeled_partition(v154,v156);
-        float v158;
-        v158 = cooperative_groups::reduce(v157, v145, v105);
-        float v159[4];
-        int v160;
-        v160 = 0;
-        while (while_method_6(v160)){
-            int v162;
-            v162 = 0;
-            while (while_method_3(v162)){
-                assert("Tensor range check" && 0 <= v160 && v160 < 1);
-                assert("Tensor range check" && 0 <= v162 && v162 < 4);
-                int v164;
-                v164 = 4 * v160;
-                int v165;
-                v165 = v164 + v162;
-                float v166;
-                v166 = v133[v165];
-                float v167;
-                v167 = v166 / v158;
-                assert("Tensor range check" && 0 <= v160 && v160 < 1);
-                assert("Tensor range check" && 0 <= v162 && v162 < 4);
-                v159[v165] = v167;
-                v162 += 1 ;
+        auto v161 = cooperative_groups::coalesced_threads();
+        int v162;
+        v162 = threadIdx.x;
+        int v163;
+        v163 = v162 / 16;
+        auto v164 = cooperative_groups::labeled_partition(v161,v163);
+        float v165;
+        v165 = cooperative_groups::reduce(v164, v152, v105);
+        float v166[4];
+        int v167;
+        v167 = 0;
+        while (while_method_6(v167)){
+            int v169;
+            v169 = 0;
+            while (while_method_3(v169)){
+                assert("Tensor range check" && 0 <= v167 && v167 < 1);
+                assert("Tensor range check" && 0 <= v169 && v169 < 4);
+                int v171;
+                v171 = 4 * v167;
+                int v172;
+                v172 = v171 + v169;
+                float v173;
+                v173 = v133[v172];
+                float v174;
+                v174 = v173 / v165;
+                assert("Tensor range check" && 0 <= v167 && v167 < 1);
+                assert("Tensor range check" && 0 <= v169 && v169 < 4);
+                v166[v172] = v174;
+                v169 += 1 ;
             }
-            v160 += 1 ;
+            v167 += 1 ;
         }
         assert("Tensor range check" && 0 <= v23 && v23 < 16);
-        int v168;
-        v168 = v25 + v22;
-        int v169;
-        v169 = 0;
-        while (while_method_6(v169)){
-            assert("Tensor range check" && 0 <= v169 && v169 < 1);
-            int v171;
-            v171 = 64 * v169;
-            int v172;
-            v172 = v171 + v168;
-            assert("Tensor range check" && 0 <= v169 && v169 < 1);
-            int v173;
-            v173 = 4 * v169;
-            int4* v174;
-            v174 = reinterpret_cast<int4*>(v159 + v173);
-            int4* v175;
-            v175 = reinterpret_cast<int4*>(v0 + v172);
-            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v174) % 16 == 0 && reinterpret_cast<unsigned long long>(v175) % 16 == 0);
-            *v175 = *v174;
-            v169 += 1 ;
+        int v175;
+        v175 = v25 + v22;
+        int v176;
+        v176 = 0;
+        while (while_method_6(v176)){
+            assert("Tensor range check" && 0 <= v176 && v176 < 1);
+            int v178;
+            v178 = 64 * v176;
+            int v179;
+            v179 = v178 + v175;
+            assert("Tensor range check" && 0 <= v176 && v176 < 1);
+            int v180;
+            v180 = 4 * v176;
+            int4* v181;
+            v181 = reinterpret_cast<int4*>(v166 + v180);
+            int4* v182;
+            v182 = reinterpret_cast<int4*>(v0 + v179);
+            assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v181) % 16 == 0 && reinterpret_cast<unsigned long long>(v182) % 16 == 0);
+            *v182 = *v181;
+            v176 += 1 ;
         }
         v23 += 1 ;
     }
@@ -4877,7 +4888,7 @@ __device__ int sample_discrete__48(static_array<float,6> v0, curandStatePhilox4_
     v2 = curand_uniform(&v1);
     return pick_discrete__49(v0, v2);
 }
-__device__ Union1 sample_discrete_47(static_array<Tuple18,6> v0, curandStatePhilox4_32_10_t & v1){
+__device__ Union1 sample_discrete_47(static_array<Tuple17,6> v0, curandStatePhilox4_32_10_t & v1){
     static_array<float,6> v2;
     int v4;
     v4 = 0;
@@ -4899,8 +4910,8 @@ __device__ Union1 sample_discrete_47(static_array<Tuple18,6> v0, curandStatePhil
         } else {
         }
         Union1 v11; float v12;
-        Tuple18 tmp49 = v0[v4];
-        v11 = tmp49.v0; v12 = tmp49.v1;
+        Tuple17 tmp47 = v0[v4];
+        v11 = tmp47.v0; v12 = tmp47.v1;
         v2[v4] = v12;
         v4 += 1 ;
     }
@@ -4923,8 +4934,8 @@ __device__ Union1 sample_discrete_47(static_array<Tuple18,6> v0, curandStatePhil
     } else {
     }
     Union1 v21; float v22;
-    Tuple18 tmp50 = v0[v15];
-    v21 = tmp50.v0; v22 = tmp50.v1;
+    Tuple17 tmp48 = v0[v15];
+    v21 = tmp48.v0; v22 = tmp48.v1;
     return v21;
 }
 __device__ inline bool while_method_16(int v0){
@@ -4975,8 +4986,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,7> v12;
     bool v14; int v15;
-    Tuple19 tmp57 = Tuple19{true, 1};
-    v14 = tmp57.v0; v15 = tmp57.v1;
+    Tuple18 tmp55 = Tuple18{true, 1};
+    v14 = tmp55.v0; v15 = tmp55.v1;
     while (while_method_17(v1, v14, v15)){
         int v17;
         v17 = 0;
@@ -5004,8 +5015,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                 v25 = 7;
             }
             int v26; int v27; int v28;
-            Tuple20 tmp58 = Tuple20{v17, v21, v17};
-            v26 = tmp58.v0; v27 = tmp58.v1; v28 = tmp58.v2;
+            Tuple19 tmp56 = Tuple19{v17, v21, v17};
+            v26 = tmp56.v0; v27 = tmp56.v1; v28 = tmp56.v2;
             while (while_method_19(v25, v26, v27, v28)){
                 bool v30;
                 v30 = v26 < v21;
@@ -5285,8 +5296,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v130;
     int v132; int v133; unsigned char v134;
-    Tuple21 tmp59 = Tuple21{0, 0, 12u};
-    v132 = tmp59.v0; v133 = tmp59.v1; v134 = tmp59.v2;
+    Tuple20 tmp57 = Tuple20{0, 0, 12u};
+    v132 = tmp57.v0; v133 = tmp57.v1; v134 = tmp57.v2;
     while (while_method_16(v132)){
         bool v136;
         v136 = 0 <= v132;
@@ -5465,8 +5476,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v203;
     int v205; int v206; unsigned char v207;
-    Tuple21 tmp60 = Tuple21{0, 0, 12u};
-    v205 = tmp60.v0; v206 = tmp60.v1; v207 = tmp60.v2;
+    Tuple20 tmp58 = Tuple20{0, 0, 12u};
+    v205 = tmp58.v0; v206 = tmp58.v1; v207 = tmp58.v2;
     while (while_method_16(v205)){
         bool v209;
         v209 = 0 <= v205;
@@ -5661,8 +5672,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     Union11 v278;
                     v278 = Union11{Union11_0{}};
                     int v279; Union11 v280;
-                    Tuple22 tmp61 = Tuple22{0, v278};
-                    v279 = tmp61.v0; v280 = tmp61.v1;
+                    Tuple21 tmp59 = Tuple21{0, v278};
+                    v279 = tmp59.v0; v280 = tmp59.v1;
                     while (while_method_2(v279)){
                         bool v282;
                         v282 = 0 <= v279;
@@ -5758,8 +5769,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v313;
     int v315; int v316; unsigned char v317;
-    Tuple21 tmp62 = Tuple21{0, 0, 12u};
-    v315 = tmp62.v0; v316 = tmp62.v1; v317 = tmp62.v2;
+    Tuple20 tmp60 = Tuple20{0, 0, 12u};
+    v315 = tmp60.v0; v316 = tmp60.v1; v317 = tmp60.v2;
     while (while_method_16(v315)){
         bool v319;
         v319 = 0 <= v315;
@@ -5954,8 +5965,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     Union11 v388;
                     v388 = Union11{Union11_0{}};
                     int v389; Union11 v390;
-                    Tuple22 tmp63 = Tuple22{0, v388};
-                    v389 = tmp63.v0; v390 = tmp63.v1;
+                    Tuple21 tmp61 = Tuple21{0, v388};
+                    v389 = tmp61.v0; v390 = tmp61.v1;
                     while (while_method_2(v389)){
                         bool v392;
                         v392 = 0 <= v389;
@@ -6051,8 +6062,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
     }
     static_array<unsigned char,5> v423;
     int v425; int v426; unsigned char v427;
-    Tuple21 tmp64 = Tuple21{0, 0, 12u};
-    v425 = tmp64.v0; v426 = tmp64.v1; v427 = tmp64.v2;
+    Tuple20 tmp62 = Tuple20{0, 0, 12u};
+    v425 = tmp62.v0; v426 = tmp62.v1; v427 = tmp62.v2;
     while (while_method_16(v425)){
         bool v429;
         v429 = 0 <= v425;
@@ -6247,8 +6258,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     Union11 v498;
                     v498 = Union11{Union11_0{}};
                     int v499; Union11 v500;
-                    Tuple22 tmp65 = Tuple22{0, v498};
-                    v499 = tmp65.v0; v500 = tmp65.v1;
+                    Tuple21 tmp63 = Tuple21{0, v498};
+                    v499 = tmp63.v0; v500 = tmp63.v1;
                     while (while_method_2(v499)){
                         bool v502;
                         v502 = 0 <= v499;
@@ -6348,8 +6359,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
             static_array<unsigned char,4> v534;
             static_array<unsigned char,3> v536;
             int v538; int v539; int v540; unsigned char v541;
-            Tuple23 tmp66 = Tuple23{0, 0, 0, 12u};
-            v538 = tmp66.v0; v539 = tmp66.v1; v540 = tmp66.v2; v541 = tmp66.v3;
+            Tuple22 tmp64 = Tuple22{0, 0, 0, 12u};
+            v538 = tmp64.v0; v539 = tmp64.v1; v540 = tmp64.v2; v541 = tmp64.v3;
             while (while_method_16(v538)){
                 bool v543;
                 v543 = 0 <= v538;
@@ -6535,8 +6546,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                     static_array<unsigned char,3> v617;
                     static_array<unsigned char,4> v619;
                     int v621; int v622; int v623; unsigned char v624;
-                    Tuple23 tmp67 = Tuple23{0, 0, 0, 12u};
-                    v621 = tmp67.v0; v622 = tmp67.v1; v623 = tmp67.v2; v624 = tmp67.v3;
+                    Tuple22 tmp65 = Tuple22{0, 0, 0, 12u};
+                    v621 = tmp65.v0; v622 = tmp65.v1; v623 = tmp65.v2; v624 = tmp65.v3;
                     while (while_method_16(v621)){
                         bool v626;
                         v626 = 0 <= v621;
@@ -6637,8 +6648,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             static_array<unsigned char,2> v663;
                             static_array<unsigned char,2> v665;
                             int v667; int v668; int v669; unsigned char v670;
-                            Tuple23 tmp68 = Tuple23{0, 0, 0, 12u};
-                            v667 = tmp68.v0; v668 = tmp68.v1; v669 = tmp68.v2; v670 = tmp68.v3;
+                            Tuple22 tmp66 = Tuple22{0, 0, 0, 12u};
+                            v667 = tmp66.v0; v668 = tmp66.v1; v669 = tmp66.v2; v670 = tmp66.v3;
                             while (while_method_3(v667)){
                                 bool v672;
                                 v672 = 0 <= v667;
@@ -6803,8 +6814,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                         case 0: { // None
                             static_array<unsigned char,5> v738;
                             int v740; int v741;
-                            Tuple4 tmp69 = Tuple4{0, 0};
-                            v740 = tmp69.v0; v741 = tmp69.v1;
+                            Tuple4 tmp67 = Tuple4{0, 0};
+                            v740 = tmp67.v0; v741 = tmp67.v1;
                             while (while_method_16(v740)){
                                 bool v743;
                                 v743 = 0 <= v740;
@@ -6858,8 +6869,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             }
                             static_array<unsigned char,5> v760;
                             int v762; int v763;
-                            Tuple4 tmp70 = Tuple4{0, 0};
-                            v762 = tmp70.v0; v763 = tmp70.v1;
+                            Tuple4 tmp68 = Tuple4{0, 0};
+                            v762 = tmp68.v0; v763 = tmp68.v1;
                             while (while_method_16(v762)){
                                 bool v765;
                                 v765 = 0 <= v762;
@@ -6929,8 +6940,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             Union11 v784;
                                             v784 = Union11{Union11_0{}};
                                             int v785; Union11 v786;
-                                            Tuple22 tmp71 = Tuple22{0, v784};
-                                            v785 = tmp71.v0; v786 = tmp71.v1;
+                                            Tuple21 tmp69 = Tuple21{0, v784};
+                                            v785 = tmp69.v0; v786 = tmp69.v1;
                                             while (while_method_2(v785)){
                                                 bool v788;
                                                 v788 = 0 <= v785;
@@ -7026,8 +7037,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             }
                             static_array<unsigned char,5> v819;
                             int v821; int v822;
-                            Tuple4 tmp72 = Tuple4{0, 0};
-                            v821 = tmp72.v0; v822 = tmp72.v1;
+                            Tuple4 tmp70 = Tuple4{0, 0};
+                            v821 = tmp70.v0; v822 = tmp70.v1;
                             while (while_method_16(v821)){
                                 bool v824;
                                 v824 = 0 <= v821;
@@ -7097,8 +7108,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             Union11 v843;
                                             v843 = Union11{Union11_0{}};
                                             int v844; Union11 v845;
-                                            Tuple22 tmp73 = Tuple22{0, v843};
-                                            v844 = tmp73.v0; v845 = tmp73.v1;
+                                            Tuple21 tmp71 = Tuple21{0, v843};
+                                            v844 = tmp71.v0; v845 = tmp71.v1;
                                             while (while_method_2(v844)){
                                                 bool v847;
                                                 v847 = 0 <= v844;
@@ -7194,8 +7205,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                             }
                             static_array<unsigned char,5> v878;
                             int v880; int v881;
-                            Tuple4 tmp74 = Tuple4{0, 0};
-                            v880 = tmp74.v0; v881 = tmp74.v1;
+                            Tuple4 tmp72 = Tuple4{0, 0};
+                            v880 = tmp72.v0; v881 = tmp72.v1;
                             while (while_method_16(v880)){
                                 bool v883;
                                 v883 = 0 <= v880;
@@ -7265,8 +7276,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             Union11 v902;
                                             v902 = Union11{Union11_0{}};
                                             int v903; Union11 v904;
-                                            Tuple22 tmp75 = Tuple22{0, v902};
-                                            v903 = tmp75.v0; v904 = tmp75.v1;
+                                            Tuple21 tmp73 = Tuple21{0, v902};
+                                            v903 = tmp73.v0; v904 = tmp73.v1;
                                             while (while_method_2(v903)){
                                                 bool v906;
                                                 v906 = 0 <= v903;
@@ -7364,8 +7375,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                 case 0: { // None
                                     static_array<unsigned char,5> v938;
                                     int v940; int v941; unsigned char v942;
-                                    Tuple21 tmp76 = Tuple21{0, 0, 12u};
-                                    v940 = tmp76.v0; v941 = tmp76.v1; v942 = tmp76.v2;
+                                    Tuple20 tmp74 = Tuple20{0, 0, 12u};
+                                    v940 = tmp74.v0; v941 = tmp74.v1; v942 = tmp74.v2;
                                     while (while_method_16(v940)){
                                         bool v944;
                                         v944 = 0 <= v940;
@@ -7464,8 +7475,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                             static_array<unsigned char,3> v982;
                                             static_array<unsigned char,4> v984;
                                             int v986; int v987; int v988; unsigned char v989;
-                                            Tuple23 tmp77 = Tuple23{0, 0, 0, 12u};
-                                            v986 = tmp77.v0; v987 = tmp77.v1; v988 = tmp77.v2; v989 = tmp77.v3;
+                                            Tuple22 tmp75 = Tuple22{0, 0, 0, 12u};
+                                            v986 = tmp75.v0; v987 = tmp75.v1; v988 = tmp75.v2; v989 = tmp75.v3;
                                             while (while_method_16(v986)){
                                                 bool v991;
                                                 v991 = 0 <= v986;
@@ -7651,8 +7662,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                                     static_array<unsigned char,2> v1065;
                                                     static_array<unsigned char,5> v1067;
                                                     int v1069; int v1070; int v1071; unsigned char v1072;
-                                                    Tuple23 tmp78 = Tuple23{0, 0, 0, 12u};
-                                                    v1069 = tmp78.v0; v1070 = tmp78.v1; v1071 = tmp78.v2; v1072 = tmp78.v3;
+                                                    Tuple22 tmp76 = Tuple22{0, 0, 0, 12u};
+                                                    v1069 = tmp76.v0; v1070 = tmp76.v1; v1071 = tmp76.v2; v1072 = tmp76.v3;
                                                     while (while_method_16(v1069)){
                                                         bool v1074;
                                                         v1074 = 0 <= v1069;
@@ -7753,8 +7764,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                                             static_array<unsigned char,2> v1111;
                                                             static_array<unsigned char,3> v1113;
                                                             int v1115; int v1116; int v1117; unsigned char v1118;
-                                                            Tuple23 tmp79 = Tuple23{0, 0, 0, 12u};
-                                                            v1115 = tmp79.v0; v1116 = tmp79.v1; v1117 = tmp79.v2; v1118 = tmp79.v3;
+                                                            Tuple22 tmp77 = Tuple22{0, 0, 0, 12u};
+                                                            v1115 = tmp77.v0; v1116 = tmp77.v1; v1117 = tmp77.v2; v1118 = tmp77.v3;
                                                             while (while_method_2(v1115)){
                                                                 bool v1120;
                                                                 v1120 = 0 <= v1115;
@@ -7971,8 +7982,8 @@ __device__ Tuple0 score_51(static_array<unsigned char,7> v0){
                                                             static_array<unsigned char,2> v1207;
                                                             static_array<unsigned char,5> v1209;
                                                             int v1211; int v1212; int v1213; unsigned char v1214;
-                                                            Tuple23 tmp80 = Tuple23{0, 0, 0, 12u};
-                                                            v1211 = tmp80.v0; v1212 = tmp80.v1; v1213 = tmp80.v2; v1214 = tmp80.v3;
+                                                            Tuple22 tmp78 = Tuple22{0, 0, 0, 12u};
+                                                            v1211 = tmp78.v0; v1212 = tmp78.v1; v1213 = tmp78.v2; v1214 = tmp78.v3;
                                                             while (while_method_16(v1211)){
                                                                 bool v1216;
                                                                 v1216 = 0 <= v1211;
@@ -9594,19 +9605,20 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v513;
                                         v513 = 4 * v511;
                                         assert("Tensor range check" && 0 <= v511 && v511 < 1);
-                                        int v514; float v515;
-                                        Tuple14 tmp31 = Tuple14{0, 0.0f};
-                                        v514 = tmp31.v0; v515 = tmp31.v1;
-                                        while (while_method_3(v514)){
-                                            assert("Tensor range check" && 0 <= v514 && v514 < 4);
+                                        float v514;
+                                        v514 = 0.0f;
+                                        int v515;
+                                        v515 = 0;
+                                        while (while_method_3(v515)){
+                                            assert("Tensor range check" && 0 <= v515 && v515 < 4);
                                             int v517;
-                                            v517 = v514 + v513;
+                                            v517 = v515 + v513;
                                             float v518;
                                             v518 = v475[v517];
                                             float v519;
-                                            v519 = v515 + v518;
-                                            v515 = v519;
-                                            v514 += 1 ;
+                                            v519 = v514 + v518;
+                                            v514 = v519;
+                                            v515 += 1 ;
                                         }
                                         auto v520 = cooperative_groups::coalesced_threads();
                                         int v521;
@@ -9616,7 +9628,7 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         auto v523 = cooperative_groups::labeled_partition(v520,v522);
                                         Closure2 v524{};
                                         float v525;
-                                        v525 = cooperative_groups::inclusive_scan(v523, v515, v524);
+                                        v525 = cooperative_groups::inclusive_scan(v523, v514, v524);
                                         float v526;
                                         v526 = v523.shfl_up(v525,1);
                                         bool v527;
@@ -9631,21 +9643,22 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         v529 = v523.shfl(v525,v523.num_threads()-1);
                                         float v530;
                                         v530 = v510 + v528;
-                                        int v531; float v532;
-                                        Tuple14 tmp32 = Tuple14{0, v530};
-                                        v531 = tmp32.v0; v532 = tmp32.v1;
-                                        while (while_method_3(v531)){
-                                            assert("Tensor range check" && 0 <= v531 && v531 < 4);
+                                        float v531;
+                                        v531 = v530;
+                                        int v532;
+                                        v532 = 0;
+                                        while (while_method_3(v532)){
+                                            assert("Tensor range check" && 0 <= v532 && v532 < 4);
                                             int v534;
-                                            v534 = v531 + v513;
+                                            v534 = v532 + v513;
                                             float v535;
                                             v535 = v475[v534];
                                             float v536;
-                                            v536 = v532 + v535;
-                                            assert("Tensor range check" && 0 <= v531 && v531 < 4);
+                                            v536 = v531 + v535;
+                                            assert("Tensor range check" && 0 <= v532 && v532 < 4);
                                             v509[v534] = v536;
-                                            v532 = v536;
-                                            v531 += 1 ;
+                                            v531 = v536;
+                                            v532 += 1 ;
                                         }
                                         float v537;
                                         v537 = v510 + v529;
@@ -9681,8 +9694,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         v540 += 1 ;
                                     }
                                     float v549; bool v550;
-                                    Tuple15 tmp33 = Tuple15{-1.0f / 0.0f, false};
-                                    v549 = tmp33.v0; v550 = tmp33.v1;
+                                    Tuple14 tmp31 = Tuple14{-1.0f / 0.0f, false};
+                                    v549 = tmp31.v0; v550 = tmp31.v1;
                                     int v551;
                                     v551 = 0;
                                     while (while_method_6(v551)){
@@ -9735,8 +9748,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                     auto v570 = cooperative_groups::labeled_partition(v567,v569);
                                     Closure3 v571{};
                                     float v572; bool v573;
-                                    Tuple15 tmp34 = cooperative_groups::reduce(v570, Tuple15{v549, v550}, v571);
-                                    v572 = tmp34.v0; v573 = tmp34.v1;
+                                    Tuple14 tmp32 = cooperative_groups::reduce(v570, Tuple14{v549, v550}, v571);
+                                    v572 = tmp32.v0; v573 = tmp32.v1;
                                     bool v574;
                                     v574 = v573 == false;
                                     if (v574){
@@ -9770,8 +9783,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         v578 += 1 ;
                                     }
                                     float v586; int v587;
-                                    Tuple16 tmp35 = Tuple16{0.0f, 2147483647};
-                                    v586 = tmp35.v0; v587 = tmp35.v1;
+                                    Tuple15 tmp33 = Tuple15{0.0f, 2147483647};
+                                    v586 = tmp33.v0; v587 = tmp33.v1;
                                     int v588;
                                     v588 = 0;
                                     while (while_method_6(v588)){
@@ -9810,8 +9823,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                     auto v602 = cooperative_groups::labeled_partition(v599,v601);
                                     Closure4 v603{};
                                     float v604; int v605;
-                                    Tuple16 tmp36 = cooperative_groups::reduce(v602, Tuple16{v586, v587}, v603);
-                                    v604 = tmp36.v0; v605 = tmp36.v1;
+                                    Tuple15 tmp34 = cooperative_groups::reduce(v602, Tuple15{v586, v587}, v603);
+                                    v604 = tmp34.v0; v605 = tmp34.v1;
                                     float v606;
                                     v606 = v572 * v604;
                                     int v607[4];
@@ -9853,8 +9866,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         v609 += 1 ;
                                     }
                                     int v622; bool v623;
-                                    Tuple17 tmp37 = Tuple17{2147483647, false};
-                                    v622 = tmp37.v0; v623 = tmp37.v1;
+                                    Tuple16 tmp35 = Tuple16{2147483647, false};
+                                    v622 = tmp35.v0; v623 = tmp35.v1;
                                     int v624;
                                     v624 = 0;
                                     while (while_method_6(v624)){
@@ -9907,8 +9920,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                     auto v643 = cooperative_groups::labeled_partition(v640,v642);
                                     Closure5 v644{};
                                     int v645; bool v646;
-                                    Tuple17 tmp38 = cooperative_groups::reduce(v643, Tuple17{v622, v623}, v644);
-                                    v645 = tmp38.v0; v646 = tmp38.v1;
+                                    Tuple16 tmp36 = cooperative_groups::reduce(v643, Tuple16{v622, v623}, v644);
+                                    v645 = tmp36.v0; v646 = tmp36.v1;
                                     bool v647;
                                     v647 = v646 == false;
                                     if (v647){
@@ -9916,8 +9929,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                     } else {
                                     }
                                     float v649; int v650;
-                                    Tuple16 tmp39 = Tuple16{0.0f, 2147483647};
-                                    v649 = tmp39.v0; v650 = tmp39.v1;
+                                    Tuple15 tmp37 = Tuple15{0.0f, 2147483647};
+                                    v649 = tmp37.v0; v650 = tmp37.v1;
                                     int v651;
                                     v651 = 0;
                                     while (while_method_6(v651)){
@@ -9962,8 +9975,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                     auto v668 = cooperative_groups::labeled_partition(v665,v667);
                                     Closure6 v669{v645};
                                     float v670; int v671;
-                                    Tuple16 tmp40 = cooperative_groups::reduce(v668, Tuple16{v649, v650}, v669);
-                                    v670 = tmp40.v0; v671 = tmp40.v1;
+                                    Tuple15 tmp38 = cooperative_groups::reduce(v668, Tuple15{v649, v650}, v669);
+                                    v670 = tmp38.v0; v671 = tmp38.v1;
                                     bool v672;
                                     v672 = v671 == 2147483647;
                                     bool v673;
@@ -10024,8 +10037,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v690;
                                         v690 = v147[0];
                                         int v692; int v693;
-                                        Tuple4 tmp41 = Tuple4{1, v690};
-                                        v692 = tmp41.v0; v693 = tmp41.v1;
+                                        Tuple4 tmp39 = Tuple4{1, v690};
+                                        v692 = tmp39.v0; v693 = tmp39.v1;
                                         while (while_method_0(v692)){
                                             bool v695;
                                             v695 = 0 <= v692;
@@ -10129,8 +10142,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v735;
                                         v735 = v147[0];
                                         int v737; int v738;
-                                        Tuple4 tmp42 = Tuple4{1, v735};
-                                        v737 = tmp42.v0; v738 = tmp42.v1;
+                                        Tuple4 tmp40 = Tuple4{1, v735};
+                                        v737 = tmp40.v0; v738 = tmp40.v1;
                                         while (while_method_0(v737)){
                                             bool v740;
                                             v740 = 0 <= v737;
@@ -10221,8 +10234,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v770;
                                         v770 = v757[0];
                                         int v772; int v773;
-                                        Tuple4 tmp43 = Tuple4{1, v770};
-                                        v772 = tmp43.v0; v773 = tmp43.v1;
+                                        Tuple4 tmp41 = Tuple4{1, v770};
+                                        v772 = tmp41.v0; v773 = tmp41.v1;
                                         while (while_method_0(v772)){
                                             bool v775;
                                             v775 = 0 <= v772;
@@ -10418,8 +10431,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v1054;
                                         v1054 = v147[0];
                                         int v1056; int v1057;
-                                        Tuple4 tmp44 = Tuple4{1, v1054};
-                                        v1056 = tmp44.v0; v1057 = tmp44.v1;
+                                        Tuple4 tmp42 = Tuple4{1, v1054};
+                                        v1056 = tmp42.v0; v1057 = tmp42.v1;
                                         while (while_method_0(v1056)){
                                             bool v1059;
                                             v1059 = 0 <= v1056;
@@ -10728,8 +10741,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v852;
                                         v852 = v147[0];
                                         int v854; int v855;
-                                        Tuple4 tmp45 = Tuple4{1, v852};
-                                        v854 = tmp45.v0; v855 = tmp45.v1;
+                                        Tuple4 tmp43 = Tuple4{1, v852};
+                                        v854 = tmp43.v0; v855 = tmp43.v1;
                                         while (while_method_0(v854)){
                                             bool v857;
                                             v857 = 0 <= v854;
@@ -10931,8 +10944,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v932;
                                         v932 = v147[0];
                                         int v934; int v935;
-                                        Tuple4 tmp46 = Tuple4{1, v932};
-                                        v934 = tmp46.v0; v935 = tmp46.v1;
+                                        Tuple4 tmp44 = Tuple4{1, v932};
+                                        v934 = tmp44.v0; v935 = tmp44.v1;
                                         while (while_method_0(v934)){
                                             bool v937;
                                             v937 = 0 <= v934;
@@ -11260,8 +11273,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                 int v1185;
                                 v1185 = v147[0];
                                 int v1187; int v1188;
-                                Tuple4 tmp47 = Tuple4{1, v1185};
-                                v1187 = tmp47.v0; v1188 = tmp47.v1;
+                                Tuple4 tmp45 = Tuple4{1, v1185};
+                                v1187 = tmp45.v0; v1188 = tmp45.v1;
                                 while (while_method_0(v1187)){
                                     bool v1190;
                                     v1190 = 0 <= v1187;
@@ -11352,8 +11365,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                 int v1220;
                                 v1220 = v1207[0];
                                 int v1222; int v1223;
-                                Tuple4 tmp48 = Tuple4{1, v1220};
-                                v1222 = tmp48.v0; v1223 = tmp48.v1;
+                                Tuple4 tmp46 = Tuple4{1, v1220};
+                                v1222 = tmp46.v0; v1223 = tmp46.v1;
                                 while (while_method_0(v1222)){
                                     bool v1225;
                                     v1225 = 0 <= v1222;
@@ -11545,25 +11558,25 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                 } else {
                                     v1290 = 0.0f;
                                 }
-                                static_array<Tuple18,6> v1291;
+                                static_array<Tuple17,6> v1291;
                                 Union1 v1293;
                                 v1293 = Union1{Union1_2{}};
-                                v1291[0] = Tuple18{v1293, v1258};
+                                v1291[0] = Tuple17{v1293, v1258};
                                 Union1 v1295;
                                 v1295 = Union1{Union1_1{}};
-                                v1291[1] = Tuple18{v1295, 4.0f};
+                                v1291[1] = Tuple17{v1295, 4.0f};
                                 Union1 v1297;
                                 v1297 = Union1{Union1_3{v1259}};
-                                v1291[2] = Tuple18{v1297, v1269};
+                                v1291[2] = Tuple17{v1297, v1269};
                                 Union1 v1299;
                                 v1299 = Union1{Union1_3{v1270}};
-                                v1291[3] = Tuple18{v1299, v1280};
+                                v1291[3] = Tuple17{v1299, v1280};
                                 Union1 v1301;
                                 v1301 = Union1{Union1_3{v1223}};
-                                v1291[4] = Tuple18{v1301, v1290};
+                                v1291[4] = Tuple17{v1301, v1290};
                                 Union1 v1303;
                                 v1303 = Union1{Union1_0{}};
-                                v1291[5] = Tuple18{v1303, 1.0f};
+                                v1291[5] = Tuple17{v1303, 1.0f};
                                 Union1 v1305;
                                 v1305 = sample_discrete_47(v1291, v1166);
                                 int v1306;
@@ -11653,8 +11666,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v1542;
                                         v1542 = v147[0];
                                         int v1544; int v1545;
-                                        Tuple4 tmp51 = Tuple4{1, v1542};
-                                        v1544 = tmp51.v0; v1545 = tmp51.v1;
+                                        Tuple4 tmp49 = Tuple4{1, v1542};
+                                        v1544 = tmp49.v0; v1545 = tmp49.v1;
                                         while (while_method_0(v1544)){
                                             bool v1547;
                                             v1547 = 0 <= v1544;
@@ -11963,8 +11976,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v1340;
                                         v1340 = v147[0];
                                         int v1342; int v1343;
-                                        Tuple4 tmp52 = Tuple4{1, v1340};
-                                        v1342 = tmp52.v0; v1343 = tmp52.v1;
+                                        Tuple4 tmp50 = Tuple4{1, v1340};
+                                        v1342 = tmp50.v0; v1343 = tmp50.v1;
                                         while (while_method_0(v1342)){
                                             bool v1345;
                                             v1345 = 0 <= v1342;
@@ -12166,8 +12179,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                         int v1420;
                                         v1420 = v147[0];
                                         int v1422; int v1423;
-                                        Tuple4 tmp53 = Tuple4{1, v1420};
-                                        v1422 = tmp53.v0; v1423 = tmp53.v1;
+                                        Tuple4 tmp51 = Tuple4{1, v1420};
+                                        v1422 = tmp51.v0; v1423 = tmp51.v1;
                                         while (while_method_0(v1422)){
                                             bool v1425;
                                             v1425 = 0 <= v1422;
@@ -12498,8 +12511,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                 int v1965;
                                 v1965 = v1735[0];
                                 int v1967; int v1968;
-                                Tuple4 tmp54 = Tuple4{1, v1965};
-                                v1967 = tmp54.v0; v1968 = tmp54.v1;
+                                Tuple4 tmp52 = Tuple4{1, v1965};
+                                v1967 = tmp52.v0; v1968 = tmp52.v1;
                                 while (while_method_0(v1967)){
                                     bool v1970;
                                     v1970 = 0 <= v1967;
@@ -12810,8 +12823,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                 int v1761;
                                 v1761 = v1735[0];
                                 int v1763; int v1764;
-                                Tuple4 tmp55 = Tuple4{1, v1761};
-                                v1763 = tmp55.v0; v1764 = tmp55.v1;
+                                Tuple4 tmp53 = Tuple4{1, v1761};
+                                v1763 = tmp53.v0; v1764 = tmp53.v1;
                                 while (while_method_0(v1763)){
                                     bool v1766;
                                     v1766 = 0 <= v1763;
@@ -13015,8 +13028,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                                 int v1842;
                                 v1842 = v1735[0];
                                 int v1844; int v1845;
-                                Tuple4 tmp56 = Tuple4{1, v1842};
-                                v1844 = tmp56.v0; v1845 = tmp56.v1;
+                                Tuple4 tmp54 = Tuple4{1, v1842};
+                                v1844 = tmp54.v0; v1845 = tmp54.v1;
                                 while (while_method_0(v1844)){
                                     bool v1847;
                                     v1847 = 0 <= v1844;
@@ -13355,8 +13368,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                             v53 += 1 ;
                         }
                         static_array<unsigned char,5> v63; char v64;
-                        Tuple0 tmp81 = score_51(v42);
-                        v63 = tmp81.v0; v64 = tmp81.v1;
+                        Tuple0 tmp79 = score_51(v42);
+                        v63 = tmp79.v0; v64 = tmp79.v1;
                         static_array<unsigned char,2> v65;
                         v65 = v32[1];
                         static_array<unsigned char,7> v67;
@@ -13411,8 +13424,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                             v78 += 1 ;
                         }
                         static_array<unsigned char,5> v88; char v89;
-                        Tuple0 tmp82 = score_51(v67);
-                        v88 = tmp82.v0; v89 = tmp82.v1;
+                        Tuple0 tmp80 = score_51(v67);
+                        v88 = tmp80.v0; v89 = tmp80.v1;
                         int v90;
                         v90 = v34 % 2;
                         bool v91;
@@ -13571,8 +13584,8 @@ __device__ void play_loop_31(unsigned char * v0, unsigned char * v1, unsigned ch
                         curandStatePhilox4_32_10_t & v2099 = v3.v4;
                         curandStatePhilox4_32_10_t & v2100 = v2099;
                         static_array<unsigned char,1> v2101; unsigned long long v2102;
-                        Tuple12 tmp83 = draw_cards_40(v2100, v6);
-                        v2101 = tmp83.v0; v2102 = tmp83.v1;
+                        Tuple12 tmp81 = draw_cards_40(v2100, v6);
+                        v2101 = tmp81.v0; v2102 = tmp81.v1;
                         v3.v0 = v2102;
                         static_array_list<unsigned char,5> v2103;
                         v2103 = get_community_cards_41(v2098, v2101);
@@ -14355,8 +14368,8 @@ __device__ void f_75(unsigned char * v0, int v1, static_array<Tuple0,2> v2, int 
         } else {
         }
         static_array<unsigned char,5> v18; char v19;
-        Tuple0 tmp84 = v2[v6];
-        v18 = tmp84.v0; v19 = tmp84.v1;
+        Tuple0 tmp82 = v2[v6];
+        v18 = tmp82.v0; v19 = tmp82.v1;
         f_76(v11, v18, v19);
         v6 += 1 ;
     }

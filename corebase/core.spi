@@ -88,6 +88,8 @@ inl exp forall t {float}. (x : t) : t = !!!!Exp(x)
 inl tanh forall t {float}. (x : t) : t = !!!!Tanh(x)
 // Sigmoid operation.
 inl sigmoid x = 1 / (1 + exp -x)
+// Square.
+inl sqr forall t {number}. (x : t) : t = x * x
 // Square root.
 inl sqrt forall t {float}. (x : t) : t = !!!!Sqrt(x)
 // Sin
