@@ -445,13 +445,16 @@ inl fst' forall a b. (x : graph (a * b)) : graph a = Fst(exists x)
 inl layer id p init = Layer(id, p, init)
 inl tensor id dim' init = open partitionm in Layer(id, !dim', init)
 
-// Initializes all the elements of the tensors to zero.
-inl init_zero forall t. (x : t) : () = real
+// Initializes all the elements of the tensors to the given constant.
+inl init_const forall t. (x : t) (v : int) : () = real
     struct.iter (fun x =>
         struct.iter (fun x =>
-            $"!(x.array)[:] = 0" : ()
+            $"!(x.array)[:] = !v" : ()
             ) x.bodies
     ) x
+
+// Initializes all the elements of the tensors to zero.
+inl init_zero forall t. (x : t) : () = init_const x 0
 
 // Takes the inverse of the sqrt of the product of the tensor dimensions. Similar to Xavier initialization.
 inl weight_init forall dim t. (to : tensor dim t) : () = // TODO: This would be xavier init if we were using 2d matrices. We're also missing a mult by a constant.

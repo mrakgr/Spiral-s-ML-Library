@@ -32,14 +32,15 @@ type model =
     {
         exploratory_ensemble_id : tensor {} ensemble_id
         rewards : tensor ensemble_id ratio // actual reward is reward / count
+        mask : tensor ensemble_id bool // actual reward is reward / count
     }
 
 inl graph (size : sizes) : _ (model * trace_state) =
     open partitionm
 
     inl model' : partition model =
-        !{} *. !size.ensemble_id
-        |> reorder (fun exploratory_ensemble_id,rewards => {exploratory_ensemble_id rewards})
+        !{} *. (!size.ensemble_id *. !size.ensemble_id)
+        |> reorder (fun exploratory_ensemble_id,rewards,mask => {exploratory_ensemble_id rewards mask})
 
     inl trace_state : partition trace_state =
         !(size.ensemble_id, size.thread_id, size.player_id)
@@ -47,7 +48,9 @@ inl graph (size : sizes) : _ (model * trace_state) =
 
     inl (<|) a b = layers.pair a b
     open layers
-    (key_graph .cem_model (layer weight_id() model' init_zero))
+    (key_graph .cem_model (layer weight_id() model' (fun x =>
+        init_zero x.exploratory_ensemble_id . init_zero x.rewards . init_const x.mask 1
+        )))
     <| (key_graph .cem_trace_state (layer workspace_id() trace_state init_zero))
 
 type weights = exists dim. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float
@@ -68,7 +71,7 @@ inl cross_entropy_noise() = 0.1
 inl weight_decay() = 1
 
 inl calculate_updates forall dim. 
-        ({rewards} : model) 
+        ({rewards mask} : model) 
         (trace_state : trace_state) 
         (reward : sa dim reward) =
     open tensorm
@@ -77,7 +80,7 @@ inl calculate_updates forall dim.
         |> reorder (fun ensemble_id,thread_id,player_id => thread_id,ensemble_id,player_id)
         |> apply rangem.threads_in_grid().from
         |> apply_ptr
-    path_probs.integrate_rewards_over_players log_path_probs (path_probs.sa_to_tensor reward)
+    path_probs.integrate_rewards_over_players log_path_probs (path_probs.sa_to_tensor reward) mask
     |> iteri (fun ensemble_id (reward, path_prob) =>
         inl path_prob = conv path_prob
         assert (not (nan_is path_prob)) "The path probability after integration should not be a nan in calculate updates."
@@ -85,25 +88,23 @@ inl calculate_updates forall dim.
         )
     reset_trace_state trace_state
 
-inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) ({rewards} : model) =
+// Calculates the winner mask based on the model values.
+inl cem_calculate_rewards_mask ({rewards mask} : model) =
+    open tensorm
+    inl rewards = tensorm.map (fun reward,count => if count <> 0 then reward / count else 0) rewards
+    inl mask =
+        inl average = tensorm.fold 0 (+) rewards / conv (length rewards)
+        tensorm.map (fun x => x >= average) rewards
+    mask
+
+// Does the CEM update for the weight parameters, 
+inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) mask =
     grid_row_map' (fun config x i j_tns =>
         open tensorm
-        inl rewards = 
-            local_map (fun ensemble_id => 
-                inl reward,count = tensor_index ensemble_id rewards 
-                assert (not (nan_is reward)) "The reward numerator must not be a nan."
-                assert (not (nan_is count)) "The reward count must not be a nan."
-                inl x = if count <> 0 then reward / count else 0
-                assert (not (nan_is x)) "The reward must not be a nan."
-                x
-                ) j_tns
-        inl mask =
-            inl average = local_average config rewards
-            local_map (fun x => x >= average) rewards
+        inl mask = local_map (fun ensemble_id => tensor_index ensemble_id mask) j_tns
         inl winner_count = conv (local_masked_count config mask)
-        // TODO: Instead of getting the average, it might be better to take the max of the rewards.
         inl winner_mean = local_masked_sum config mask x / winner_count
-        inl winner_std = // TODO: The filtering will cause the variance to collapse, so research should be done on alternatives to adding noise.
+        inl winner_std =
             inl variance = 
                 local_map (fun x => inl r = x - winner_mean in r * r) x
                 |> local_masked_sum config mask
@@ -127,8 +128,9 @@ inl apply_updates rng grid (weights : list weights) (model : model) : () =
     weights |> listm.iter fun (exists dim. weights, transposed_weights) =>
         grid_transpose weights transposed_weights
     cooperative_groups.sync grid
+    inl mask = cem_calculate_rewards_mask model
     weights |> listm.iter fun (exists dim. _, transposed_weights) =>
-        cem rng transposed_weights model
+        cem rng transposed_weights mask
     cooperative_groups.sync grid
 
     // prints out the weight norms.
@@ -141,11 +143,11 @@ inl apply_updates rng grid (weights : list weights) (model : model) : () =
     weights |> listm.iter fun (exists dim. weights, transposed_weights) =>
         grid_transpose transposed_weights weights
     
-    cooperative_groups.sync grid
+    tensorm.copy {from=mask} model.mask
+    tensorm.reinit (const loop.zeroes) model.rewards
 
-    // Zeroes out the reward tensors.
-    grid_map grid (const loop.zeroes) model.rewards model.rewards // grid map will do a sync
-    ()
+    cooperative_groups.sync grid
+        
 
 open layers
 open tensorm
@@ -173,13 +175,11 @@ inl get_policy_probs model ensemble_id action_id =
 
 // Updates the trace state log path probabilities.
 inl push_trace (trace_state : trace_state) {thread_id ensemble_id player_id} (action_prob, action_id : action_prob * action_id) : () =
-    
     // Updates the log path probs in the trace_state.
     inl v = {
         sampling = log (conv action_prob.sampling)
         policy = log (conv action_prob.policy)
     }
-                
 
     // Updates the log path probs in the trace_state.
     tensor_update (ensemble_id, thread_id, player_id) (fun x => 
