@@ -50,16 +50,6 @@ inl graph (size : sizes) : _ (model * trace_state) =
     (key_graph .cem_model (layer weight_id() model' init_zero))
     <| (key_graph .cem_trace_state (layer workspace_id() trace_state init_zero))
 
-// According to CEM papers, adding noise helps performance significantly in games like tetris.
-inl cross_entropy_noise() = 0.1
-
-// This is the trick that we talked about in the Ghostlike's Cross Entropy Method video.
-// It's supposed to encourage the cross entropy method to gradually reduce the weights towards 0.
-// But I changed my mind on having it.
-// 
-// We're going to be using a curriculum training, so I don't want the weights being pruned prematurely.
-inl mean_decay() = 1
-
 type weights = exists dim. tensor (ensemble_id * dim) float * tensor (dim * ensemble_id) float
 
 // Sets the log_path_probs to 0.
@@ -71,6 +61,11 @@ inl reset_trace_state (trace_state : trace_state) =
         inl log_path_probs = trace_state.log_path_probs |> apply ensemble_id |> apply thread_id
         // Sets the log_path_probs to 0.
         (log_path_probs,log_path_probs) ||> row_gather_map () (fun () config x i j_tns => local_map (const loop.zeroes) x)
+
+// According to CEM papers, adding noise helps performance significantly in games like tetris.
+inl cross_entropy_noise() = 0.1
+// inl weight_decay() = 0.9
+inl weight_decay() = 1
 
 inl calculate_updates forall dim. 
         ({rewards} : model) 
@@ -107,7 +102,7 @@ inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) 
             local_map (fun x => x >= average) rewards
         inl winner_count = conv (local_masked_count config mask)
         // TODO: Instead of getting the average, it might be better to take the max of the rewards.
-        inl winner_mean = local_masked_sum config mask x / winner_count * mean_decay()
+        inl winner_mean = local_masked_sum config mask x / winner_count
         inl winner_std = // TODO: The filtering will cause the variance to collapse, so research should be done on alternatives to adding noise.
             inl variance = 
                 local_map (fun x => inl r = x - winner_mean in r * r) x
@@ -115,9 +110,8 @@ inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) 
                 |> fun x => x / winner_count
             inl biased_std = sqrt variance
             if winner_count > 1 then biased_std * winner_count / (winner_count - 1) else 0
-            // biased_std
         local_map (fun x,b => 
-            inl r = conv (random.normal rng) * (max winner_std cross_entropy_noise()) + winner_mean
+            inl r = (conv (random.normal rng) * (max winner_std cross_entropy_noise()) + winner_mean) * weight_decay()
             if b then x else r
             ) (tensorm.zip x mask)
         ) 

@@ -17,9 +17,17 @@ inl from_log_path_prob ({policy sampling} : log_path_prob) = exp (policy - sampl
 // 
 // Pseudo-code: 
 // init(fun player_id => sum (fun ensemble_id => p(player_id,ensemble_id)))
-inl integrate_path_probs_for_player (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) : tensor player_id prob =
+inl integrate_path_probs_for_player 
+        (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
+        (mask : tensor ensemble_id bool)
+        : tensor player_id prob
+        =
     inl ensemble, player = log_path_probs.dim
-    inl individual_prob (ensemble_id, player_id) = from_log_path_prob(tensor_index (ensemble_id, player_id) log_path_probs)
+    inl individual_prob (ensemble_id, player_id) = 
+        if tensor_index ensemble_id mask then
+            from_log_path_prob(tensor_index (ensemble_id, player_id) log_path_probs)
+        else
+            0
     init player fun player_id =>
         loop.for {from = 0; nearTo=ensemble} (fun ensemble_id s =>
             s + individual_prob (ensemble_id, player_id)
@@ -29,8 +37,8 @@ inl integrate_path_probs_for_player (log_path_probs : tensor (ensemble_id * play
 // 
 // Pseudo-code: 
 // prod (fun player_id => sum (fun ensemble_id => p(player_id,ensemble_id)))
-inl integrate_path_probs (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) = 
-    fold (*) 1 (integrate_path_probs_for_player log_path_probs)
+inl integrate_path_probs (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) mask = 
+    fold (*) 1 (integrate_path_probs_for_player log_path_probs mask)
 
 // Creates an integration structure such that the following holds:
 // 
@@ -42,10 +50,11 @@ inl integrate_path_probs (log_path_probs : tensor (ensemble_id * player_id) log_
 // sum (fun (ensemble_id,player_id) => reward(player_id) * path_prob(ensemble_id, player_id))
 inl integrate_rewards_
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob) 
+        (mask : tensor ensemble_id bool)
         : tensor (ensemble_id * player_id) prob =
     inl ensemble, player = log_path_probs.dim
     inl individual_prob (ensemble_id, player_id) = from_log_path_prob(tensor_index (ensemble_id, player_id) log_path_probs)
-    inl player_probs = integrate_path_probs_for_player log_path_probs
+    inl player_probs = integrate_path_probs_for_player log_path_probs mask
     inl player_prob ensemble_id = tensor_index ensemble_id player_probs
     inl total_prob = fold (*) 1 player_probs
     init (ensemble,player) fun ensemble_id,player_id =>
@@ -58,10 +67,11 @@ inl integrate_rewards_
 inl integrate_rewards_over_players
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
         (rewards : tensor player_id reward)
+        mask
         : tensor ensemble_id unnormaized_reward_and_prob =
     inl ensemble, player = log_path_probs.dim
     assert (player = rewards.dim) "The player_id dimensions must match for both tensors."
-    inl path_probs = integrate_rewards_ log_path_probs
+    inl path_probs = integrate_rewards_ log_path_probs mask
     inl path_prob (ensemble_id,player_id) = tensor_index (ensemble_id,player_id) path_probs
     inl reward player_id = tensor_index player_id rewards
     init ensemble (fun ensemble_id =>
@@ -75,10 +85,11 @@ inl integrate_rewards_over_players
 // Returns the unnormalized true reward and the path probability given the path probabilities, player_id and the reward.
 inl integrate_rewards_over_ensembles_for_player
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
+        mask
         (player_id, reward : player_id * reward)
         : unnormaized_reward_and_prob =
     inl ensemble, player = log_path_probs.dim
-    inl path_probs = integrate_rewards_ log_path_probs
+    inl path_probs = integrate_rewards_ log_path_probs mask
     inl path_prob (ensemble_id,player_id) = tensor_index (ensemble_id,player_id) path_probs
     loop.for {from=0; nearTo=ensemble} (fun ensemble_id (r,p) =>
         inl p',r' = path_prob (ensemble_id, player_id), reward
@@ -90,11 +101,12 @@ inl integrate_rewards_over_ensembles_for_player
 // over all the dimensions.
 inl integrate_rewards
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
+        mask
         (rewards : tensor player_id reward)
         : unnormaized_reward_and_prob =
     inl ensemble, player = log_path_probs.dim
     assert (player = rewards.dim) "The player_id dimensions must match for both tensors."
-    inl path_probs = integrate_rewards_ log_path_probs
+    inl path_probs = integrate_rewards_ log_path_probs mask
     inl path_prob (ensemble_id,player_id) = tensor_index (ensemble_id,player_id) path_probs
     inl reward player_id = tensor_index player_id rewards
     loop.for {from=0; nearTo=ensemble} (fun ensemble_id =>
