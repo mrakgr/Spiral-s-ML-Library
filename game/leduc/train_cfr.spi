@@ -158,7 +158,7 @@ inl vs_self (neural : state_neural .cfr) =
                 // Does a purely evalutation run, not modifying the trace state.
                 train_loop false model state None game_start()
                 // Returns the integrate rewards and path probabilities.
-                ml.path_probs.integrate_rewards_over_players (ml.cfr_models.extract_log_path_probs model) (ml.path_probs.sa_to_tensor state.rewards)
+                ml.path_probs.integrate_rewards_over_players (ml.cfr_models.extract_log_path_probs model) (ml.path_probs.sa_to_tensor state.rewards) None
                 |> tensorm.iteri fun ensemble_id unnormaized_reward_and_prob =>
                     // Adds the rewards to the trace.
                     tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider) unnormaized_reward_and_prob trace_rewards
@@ -189,7 +189,7 @@ inl vs_rando (neural : state_neural .cfr) =
                     train_loop true model state (Some player_id) game_start()
                     // Adds the rewards to the trace.
                     inl reward = index state.rewards player_id
-                    inl path_probs = ml.path_probs.integrate_rewards_ (ml.cfr_models.extract_log_path_probs model)
+                    inl path_probs = ml.path_probs.integrate_rewards_ (ml.cfr_models.extract_log_path_probs model) None
                     loop.linear sizes.ensemble_id fun ensemble_id =>
                         inl path_prob = conv (tensorm.tensor_index (ensemble_id, player_id) path_probs)
                         tensor_cuda.tensor_atomic_add (ensemble_id,outer / config.frontend_divider)

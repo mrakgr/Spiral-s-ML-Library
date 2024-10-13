@@ -173,6 +173,11 @@ inl extract_log_path_probs forall inp out.
     |> reorder (fun ensemble_id,thread_id,player_id => thread_id,ensemble_id,player_id)
     |> apply rangem.threads_in_grid().from
 
+inl extract_cem_model forall inp out. 
+        (cem_game_model {model sizes} : cem_game_model inp out) 
+        : cem.model =
+    (key_extract model .cem_model : cem.model)
+
 inl trace_and_train forall inp out. rng (cem_game_model {model sizes input output} : cem_game_model inp out) = 
     trace_and_play_ true rng model sizes input output
 

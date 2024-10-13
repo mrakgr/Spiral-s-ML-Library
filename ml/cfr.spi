@@ -170,11 +170,11 @@ inl calculate_updates forall dim.
                     log_path_probs
                     |> rezip (fun x => x.policy)
                     |> tensorm.mapi (fun i x => if player_id = i then 0 else x)
-                    |> tensorm.fold (+) 0
+                    |> tensorm.fold 0 (+)
                 inl log_path_sampling_prob =
                     log_path_probs
                     |> rezip (fun x => x.sampling)
-                    |> tensorm.fold (+) 0
+                    |> tensorm.fold 0 (+)
                 conv (exp (log_path_policy_prob - log_path_sampling_prob))
 
             inl () = // Calculates the value update

@@ -80,7 +80,7 @@ inl calculate_updates forall dim.
         |> reorder (fun ensemble_id,thread_id,player_id => thread_id,ensemble_id,player_id)
         |> apply rangem.threads_in_grid().from
         |> apply_ptr
-    path_probs.integrate_rewards_over_players log_path_probs (path_probs.sa_to_tensor reward) mask
+    path_probs.integrate_rewards_over_players log_path_probs (path_probs.sa_to_tensor reward) (Some mask)
     |> iteri (fun ensemble_id (reward, path_prob) =>
         inl path_prob = conv path_prob
         assert (not (nan_is path_prob)) "The path probability after integration should not be a nan in calculate updates."
@@ -88,17 +88,21 @@ inl calculate_updates forall dim.
         )
     reset_trace_state trace_state
 
-// Calculates the winner mask based on the model values.
-inl cem_calculate_rewards_mask ({rewards mask} : model) =
+// Zeroes out the reward and updates the mask. Needs a grid sync before the updated mask should be read.
+inl grid_update_rewards_mask ({rewards mask} : model) =
     open tensorm
-    inl rewards = tensorm.map (fun reward,count => if count <> 0 then reward / count else 0) rewards
-    inl mask =
-        inl average = tensorm.fold 0 (+) rewards / conv (length rewards)
-        tensorm.map (fun x => x >= average) rewards
-    mask
+    inl io = zip rewards mask |> reorder (fun x => {}, x)
+    grid_row_map' (fun config x i j_tns =>
+        inl rewards, mask = unzip x
+        inl rewards = local_map (fun reward,count => if count <> 0 then reward / count else 0) rewards
+        inl mask =
+            inl average = local_average config rewards
+            tensorm.map (fun x => x >= average) rewards
+        zip (local_map loop.zeroes j_tns) mask
+        ) io io
 
 // Does the CEM update for the weight parameters, 
-inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) mask =
+inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) ({mask} : model) =
     grid_row_map' (fun config x i j_tns =>
         open tensorm
         inl mask = local_map (fun ensemble_id => tensor_index ensemble_id mask) j_tns
@@ -125,12 +129,15 @@ inl apply_updates rng grid (weights : list weights) (model : model) : () =
         tensorm.tensor_set {} (random.int_range {from=0; nearTo=model.rewards.dim} rng) model.exploratory_ensemble_id // Pick a random ensemble id
     __syncwarp() // Converge the first warp.
 
+    grid_update_rewards_mask model
     weights |> listm.iter fun (exists dim. weights, transposed_weights) =>
         grid_transpose weights transposed_weights
+
     cooperative_groups.sync grid
-    inl mask = cem_calculate_rewards_mask model
+
     weights |> listm.iter fun (exists dim. _, transposed_weights) =>
-        cem rng transposed_weights mask
+        cem rng transposed_weights model
+
     cooperative_groups.sync grid
 
     // prints out the weight norms.
@@ -143,9 +150,6 @@ inl apply_updates rng grid (weights : list weights) (model : model) : () =
     weights |> listm.iter fun (exists dim. weights, transposed_weights) =>
         grid_transpose transposed_weights weights
     
-    tensorm.copy {from=mask} model.mask
-    tensorm.reinit (const loop.zeroes) model.rewards
-
     cooperative_groups.sync grid
         
 
