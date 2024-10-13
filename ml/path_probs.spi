@@ -67,7 +67,7 @@ inl integrate_rewards_
 inl integrate_rewards_over_players
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
         (rewards : tensor player_id reward)
-        mask
+        (mask : tensor ensemble_id bool)
         : tensor ensemble_id unnormaized_reward_and_prob =
     inl ensemble, player = log_path_probs.dim
     assert (player = rewards.dim) "The player_id dimensions must match for both tensors."
@@ -85,7 +85,7 @@ inl integrate_rewards_over_players
 // Returns the unnormalized true reward and the path probability given the path probabilities, player_id and the reward.
 inl integrate_rewards_over_ensembles_for_player
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
-        mask
+        (mask : tensor ensemble_id bool)
         (player_id, reward : player_id * reward)
         : unnormaized_reward_and_prob =
     inl ensemble, player = log_path_probs.dim
@@ -101,7 +101,7 @@ inl integrate_rewards_over_ensembles_for_player
 // over all the dimensions.
 inl integrate_rewards
         (log_path_probs : tensor (ensemble_id * player_id) log_path_prob)
-        mask
+        (mask : tensor ensemble_id bool)
         (rewards : tensor player_id reward)
         : unnormaized_reward_and_prob =
     inl ensemble, player = log_path_probs.dim
