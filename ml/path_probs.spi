@@ -26,7 +26,7 @@ inl integrate_path_probs_for_player
     inl individual_prob (ensemble_id, player_id) = 
         match mask with
         | Some mask when not (tensor_index ensemble_id mask) => 0
-        | None => from_log_path_prob(tensor_index (ensemble_id, player_id) log_path_probs)
+        | _ => from_log_path_prob(tensor_index (ensemble_id, player_id) log_path_probs)
     init player fun player_id =>
         loop.for {from = 0; nearTo=ensemble} (fun ensemble_id s =>
             s + individual_prob (ensemble_id, player_id)

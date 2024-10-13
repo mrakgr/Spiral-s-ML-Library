@@ -83,6 +83,17 @@ inl trace_and_play_ forall inp out.
 
     output action_id
 
+inl select_id_from_mask rng mask =
+    inl nearTo : int = tensorm.fold 0 (fun s x => if x then s + 1 else s) mask
+    inl r = random.int_range {from=0; nearTo} rng
+    inl s = loop._dup 0
+    tensorm.iteri (fun i x => 
+        if x then 
+            if r = 0 then loop._set s i
+            loop._set r (r - 1)
+        ) mask
+    s
+
 inl run_ forall inp out.
         rng
         (model : model graph_body)
@@ -119,9 +130,13 @@ inl run_ forall inp out.
 
     // TODO: Might have to change this to a loop once we do RNNs.
 
-    // Randomly pick an ensemble id for each thread.
+    // Randomly pick an ensemble id for each thread using the mask and share it via shared memory.
     inl ensemble_id : int = 
-        random.int_range {from=0; nearTo=ensemble} rng
+        // Extract the cem model.
+        inl cem_model = (key_extract model .cem_model : cem.model)
+        // Uses the mask to randomly select an index from the ensemble.
+        select_id_from_mask rng cem_model.mask
+        // Shared the selected ensemble id across the block.
         |> transposing_loop.shuffle 0
 
     // Creates the layer state.

@@ -89,17 +89,11 @@ inl calculate_updates forall dim.
     reset_trace_state trace_state
 
 // Zeroes out the reward and updates the mask. Needs a grid sync before the updated mask should be read.
-inl grid_update_rewards_mask ({rewards mask} : model) =
-    open tensorm
-    inl io = zip rewards mask |> reorder (fun x => {}, x)
-    grid_row_map' (fun config x i j_tns =>
-        inl rewards, mask = unzip x
-        inl rewards = local_map (fun reward,count => if count <> 0 then reward / count else 0) rewards
-        inl mask =
-            inl average = local_average config rewards
-            tensorm.map (fun x => x >= average) rewards
-        zip (local_map loop.zeroes j_tns) mask
-        ) io io
+inl grid_update_rewards_mask (m : model) =
+    inl rewards = tensorm.map (fun reward,count => if count <> 0 then reward / count else 0) m.rewards
+    inl average = tensorm.fold 0 (+) rewards / conv (length rewards)
+    tensorm.reinit (const loop.zeroes) m.rewards
+    tensorm.copy {from = tensorm.map (fun x => x >= average) rewards} m.mask
 
 // Does the CEM update for the weight parameters, 
 inl cem forall dim. rng (transposed_weights : tensor (dim * ensemble_id) float) ({mask} : model) =
