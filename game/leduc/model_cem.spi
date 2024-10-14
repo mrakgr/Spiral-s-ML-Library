@@ -49,12 +49,15 @@ inl leduc_graph() : ml.layers.graph ml.cem_models.graph_body =
         block = blocks_per_grid()
         thread = threads_per_block()
         inner = modup pu_history.size 128
+        mid = 64 : int
         final = cem_sizes.action_id
     }
 
     inl neural =
         (input .input (sizes.block,sizes.thread,sizes.inner) : graph (tensor (int * int * int) float))
-        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.inner,sizes.final)
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.inner,sizes.mid)
+        |> relu // TODO: Fuse this relu with the matmult kernel.
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.final)
         |> masked_regret_matching' cem_sizes.number_of_valid_actions (
             input .output_probs (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble
         )
