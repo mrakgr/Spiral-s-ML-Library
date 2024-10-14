@@ -94,7 +94,7 @@ inl nlholdem_graph() : ml.layers.graph ml.cem_models.graph_body =
         |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.mid)
         |> relu
         |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.final)
-        |> masked_softmax' cem_sizes.number_of_valid_actions (
+        |> masked_regret_matching' cem_sizes.number_of_valid_actions (
             input .output_probs (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble
         )
 

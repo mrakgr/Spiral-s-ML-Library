@@ -62,7 +62,7 @@ class Games_UI extends LitElement {
             <sl-tab-group>
                 <sl-tab slot="nav" panel="rps"><span class="tab">RPS</span></sl-tab>
                 <sl-tab slot="nav" panel="leduc-full"><span class="tab">Leduc (Full)</span></sl-tab>
-                <sl-tab slot="nav" panel="nl-holdem" active><span class="tab">NL Holdem</span></sl-tab>
+                <sl-tab slot="nav" panel="nl-holdem" activeI><span class="tab">NL Holdem</span></sl-tab>
                 <sl-tab-panel name="rps">
                     <rps-ui></rps-ui>
                 </sl-tab-panel>
