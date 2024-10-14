@@ -79,7 +79,7 @@ type Game_Events =
     | ['StartGame', []]
     | ['PlayerChanged', Players[]]
     | ['ActionSelected', Action]
-    | ["StartTrainingVsRando",[]]
+    | ["StartTrainingVsCallingMachine",[]]
     | ["StartTrainingVsSelf",[]]
 
 type Game_State =
@@ -101,7 +101,7 @@ type UI_State = {
 }
 
 type UI_Effect = 
-    | ["AddRewardsRando", number[][]]
+    | ["AddRewardsCallingMachine", number[][]]
     | ["AddRewardsSelf", number[][]]
 
 // Creates a span with the specified gap in pixels.
@@ -135,19 +135,19 @@ class UI extends GameElement {
         })
     }
 
-    vs_rando_chart = createRef<Training_Chart>()
+    vs_calling_machine_chart = createRef<Training_Chart>()
     vs_self_chart = createRef<Training_Chart>()
     process_effects(l: UI_Effect[]) {
         const average = (data : number[][]) => data.map(x => x.reduce((a,b) => a+b) / x.length)
         l.forEach(l => {
             const [tag, data] = l
             switch (tag) {
-                case 'AddRewardsRando': {
+                case 'AddRewardsCallingMachine': {
                     console.log({
-                        rando_data: data,
-                        rando_average: average(data)
+                        calling_machine_data: data,
+                        calling_machine_average: average(data)
                     });
-                    this.vs_rando_chart.value?.add_rewards(data)
+                    this.vs_calling_machine_chart.value?.add_rewards(data)
                     break;
                 }
                 case 'AddRewardsSelf': {
@@ -209,7 +209,7 @@ class UI extends GameElement {
         }
     `
 
-    on_train_vs_rando = () => this.dispatch_game_event(["StartTrainingVsRando",[]])
+    on_train_vs_calling_machine = () => this.dispatch_game_event(["StartTrainingVsCallingMachine",[]])
     on_train_vs_self = () => this.dispatch_game_event(["StartTrainingVsSelf",[]])
 
     render(){ 
@@ -225,9 +225,9 @@ class UI extends GameElement {
             </div>
             ${gap(10)}
             <div class="train_area">
-                <training-full-chart ${ref(this.vs_rando_chart)}></training-full-chart>
+                <training-full-chart ${ref(this.vs_calling_machine_chart)}></training-full-chart>
                 <br/>
-                <sl-button variant="primary" @click=${this.on_train_vs_rando}>Train (vs Random)</sl-button>
+                <sl-button variant="primary" @click=${this.on_train_vs_calling_machine}>Train (vs Calling Machine)</sl-button>
             </div>
             ${gap(10)}
             <div class="train_area">

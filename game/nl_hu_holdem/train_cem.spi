@@ -49,7 +49,7 @@ inl state_internal_train_reset (x : state_internal_train) (player_id : option ml
     sa_listm.unsafe_set_length x.messages 0
     inl player_types = arraym.fromList [Computer;Computer]
     player_id |> optionm.iter fun player_id =>
-        set player_types (player_id ^^^ 1) Random
+        set player_types (player_id ^^^ 1) CallingMachine
     x.pl_type <- player_types
 
 union training_nodes =
@@ -191,7 +191,7 @@ inl vs_self (neural : state_neural .cem) =
     frontend_rewards
 
 // Does a training run against the random player.
-inl vs_rando (neural : state_neural .cem) =
+inl vs_calling_machine (neural : state_neural .cem) =
     inl sizes = model_cem.nlholdem_sizes()
     inl config = event_config()
     inl trace_rewards : _ _ (float * float) = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)

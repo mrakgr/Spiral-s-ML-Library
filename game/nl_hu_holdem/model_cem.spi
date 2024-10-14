@@ -77,12 +77,23 @@ inl nlholdem_graph() : ml.layers.graph ml.cem_models.graph_body =
         block = blocks_per_grid()
         thread = threads_per_block()
         input = modup pu_history.size 128
+        mid = 256 : int
         final = cem_sizes.action_id
     }
 
     inl neural =
         (input .input (sizes.block,sizes.thread,sizes.input) : graph (tensor (int * int * int) float))
-        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.input,sizes.final)
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.input,sizes.mid)
+        |> relu
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.mid)
+        |> relu
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.mid)
+        |> relu
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.mid)
+        |> relu
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.mid)
+        |> relu
+        |> matmul_ensemble_with_adjoint (sizes.ensemble,sizes.mid,sizes.final)
         |> masked_softmax' cem_sizes.number_of_valid_actions (
             input .output_probs (sizes.ensemble, sizes.block, sizes.thread, sizes.final) |> apply .ensemble
         )

@@ -19,10 +19,10 @@ union event =
     | ActionSelected : action
     // train events
     | StartTrainingVsSelf
-    | StartTrainingVsRando
+    | StartTrainingVsCallingMachine
 
 union ui_effects =
-    | AddRewardsRando : plist (plist float)
+    | AddRewardsCallingMachine : plist (plist float)
     | AddRewardsSelf : plist (plist float)
 
 type state_public =
