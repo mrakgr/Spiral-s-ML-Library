@@ -16600,7 +16600,7 @@ __device__ void f_55(unsigned char * v0, unsigned long long v1, Union3 v2, stati
 }
 __device__ inline bool while_method_23(int v0){
     bool v1;
-    v1 = v0 < 2048;
+    v1 = v0 < 1024;
     return v1;
 }
 __device__ inline bool while_method_24(int v0){
@@ -20778,7 +20778,7 @@ __device__ void method_83(unsigned char * v0, unsigned char * v1, unsigned char 
 }
 __device__ inline bool while_method_26(int v0){
     bool v1;
-    v1 = v0 < 1024;
+    v1 = v0 < 2048;
     return v1;
 }
 __device__ inline bool while_method_27(int v0){
@@ -28997,9 +28997,9 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
                     float v111;
                     v111 = v40 * v110;
                     assert("Tensor range check" && 0 <= v105 && v105 < 4);
-                    assert("Tensor range check" && 0 <= v27 && v27 < 2048);
+                    assert("Tensor range check" && 0 <= v27 && v27 < 1024);
                     int v112;
-                    v112 = 2048 * v105;
+                    v112 = 1024 * v105;
                     int v113;
                     v113 = v112 + v27;
                     float * v114;
@@ -29722,7 +29722,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
         v442 = blockIdx.x;
         int v443;
         v443 = v442;
-        while (while_method_26(v443)){
+        while (while_method_23(v443)){
             bool v445;
             v445 = 0 <= v443;
             bool v446;
@@ -29761,7 +29761,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v459 = threadIdx.x;
             int v460;
             v460 = v459;
-            while (while_method_23(v460)){
+            while (while_method_26(v460)){
                 bool v462;
                 v462 = 0 <= v460;
                 bool v463;
@@ -29806,7 +29806,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v476 = threadIdx.x;
             int v477;
             v477 = v476;
-            while (while_method_23(v477)){
+            while (while_method_26(v477)){
                 bool v479;
                 v479 = 0 <= v477;
                 bool v480;
@@ -29895,7 +29895,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v513 = threadIdx.x;
             int v514;
             v514 = v513;
-            while (while_method_23(v514)){
+            while (while_method_26(v514)){
                 bool v516;
                 v516 = 0 <= v514;
                 bool v517;
@@ -29940,7 +29940,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v530 = threadIdx.x;
             int v531;
             v531 = v530;
-            while (while_method_23(v531)){
+            while (while_method_26(v531)){
                 bool v533;
                 v533 = 0 <= v531;
                 bool v534;
@@ -30029,7 +30029,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v567 = threadIdx.x;
             int v568;
             v568 = v567;
-            while (while_method_23(v568)){
+            while (while_method_26(v568)){
                 bool v570;
                 v570 = 0 <= v568;
                 bool v571;
@@ -30074,7 +30074,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v584 = threadIdx.x;
             int v585;
             v585 = v584;
-            while (while_method_23(v585)){
+            while (while_method_26(v585)){
                 bool v587;
                 v587 = 0 <= v585;
                 bool v588;
@@ -30163,7 +30163,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v621 = threadIdx.x;
             int v622;
             v622 = v621;
-            while (while_method_23(v622)){
+            while (while_method_26(v622)){
                 bool v624;
                 v624 = 0 <= v622;
                 bool v625;
@@ -30208,7 +30208,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v638 = threadIdx.x;
             int v639;
             v639 = v638;
-            while (while_method_23(v639)){
+            while (while_method_26(v639)){
                 bool v641;
                 v641 = 0 <= v639;
                 bool v642;
@@ -30297,7 +30297,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v675 = threadIdx.x;
             int v676;
             v676 = v675;
-            while (while_method_23(v676)){
+            while (while_method_26(v676)){
                 bool v678;
                 v678 = 0 <= v676;
                 bool v679;
@@ -30342,7 +30342,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v692 = threadIdx.x;
             int v693;
             v693 = v692;
-            while (while_method_23(v693)){
+            while (while_method_26(v693)){
                 bool v695;
                 v695 = 0 <= v693;
                 bool v696;
@@ -30431,7 +30431,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v729 = threadIdx.x;
             int v730;
             v730 = v729;
-            while (while_method_23(v730)){
+            while (while_method_26(v730)){
                 bool v732;
                 v732 = 0 <= v730;
                 bool v733;
@@ -30476,7 +30476,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v746 = threadIdx.x;
             int v747;
             v747 = v746;
-            while (while_method_23(v747)){
+            while (while_method_26(v747)){
                 bool v749;
                 v749 = 0 <= v747;
                 bool v750;
@@ -30564,7 +30564,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
         v778 = blockIdx.x;
         int v779;
         v779 = v778;
-        while (while_method_23(v779)){
+        while (while_method_26(v779)){
             bool v781;
             v781 = 0 <= v779;
             bool v782;
@@ -35447,7 +35447,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
         v2659 = blockIdx.x;
         int v2660;
         v2660 = v2659;
-        while (while_method_26(v2660)){
+        while (while_method_23(v2660)){
             bool v2662;
             v2662 = 0 <= v2660;
             bool v2663;
@@ -35484,7 +35484,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2675 = threadIdx.x;
             int v2676;
             v2676 = v2675;
-            while (while_method_23(v2676)){
+            while (while_method_26(v2676)){
                 bool v2678;
                 v2678 = 0 <= v2676;
                 bool v2679;
@@ -35529,7 +35529,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2692 = threadIdx.x;
             int v2693;
             v2693 = v2692;
-            while (while_method_23(v2693)){
+            while (while_method_26(v2693)){
                 bool v2695;
                 v2695 = 0 <= v2693;
                 bool v2696;
@@ -35616,7 +35616,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2728 = threadIdx.x;
             int v2729;
             v2729 = v2728;
-            while (while_method_23(v2729)){
+            while (while_method_26(v2729)){
                 bool v2731;
                 v2731 = 0 <= v2729;
                 bool v2732;
@@ -35661,7 +35661,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2745 = threadIdx.x;
             int v2746;
             v2746 = v2745;
-            while (while_method_23(v2746)){
+            while (while_method_26(v2746)){
                 bool v2748;
                 v2748 = 0 <= v2746;
                 bool v2749;
@@ -35748,7 +35748,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2781 = threadIdx.x;
             int v2782;
             v2782 = v2781;
-            while (while_method_23(v2782)){
+            while (while_method_26(v2782)){
                 bool v2784;
                 v2784 = 0 <= v2782;
                 bool v2785;
@@ -35793,7 +35793,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2798 = threadIdx.x;
             int v2799;
             v2799 = v2798;
-            while (while_method_23(v2799)){
+            while (while_method_26(v2799)){
                 bool v2801;
                 v2801 = 0 <= v2799;
                 bool v2802;
@@ -35880,7 +35880,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2834 = threadIdx.x;
             int v2835;
             v2835 = v2834;
-            while (while_method_23(v2835)){
+            while (while_method_26(v2835)){
                 bool v2837;
                 v2837 = 0 <= v2835;
                 bool v2838;
@@ -35925,7 +35925,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2851 = threadIdx.x;
             int v2852;
             v2852 = v2851;
-            while (while_method_23(v2852)){
+            while (while_method_26(v2852)){
                 bool v2854;
                 v2854 = 0 <= v2852;
                 bool v2855;
@@ -36012,7 +36012,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2887 = threadIdx.x;
             int v2888;
             v2888 = v2887;
-            while (while_method_23(v2888)){
+            while (while_method_26(v2888)){
                 bool v2890;
                 v2890 = 0 <= v2888;
                 bool v2891;
@@ -36057,7 +36057,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2904 = threadIdx.x;
             int v2905;
             v2905 = v2904;
-            while (while_method_23(v2905)){
+            while (while_method_26(v2905)){
                 bool v2907;
                 v2907 = 0 <= v2905;
                 bool v2908;
@@ -36144,7 +36144,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2940 = threadIdx.x;
             int v2941;
             v2941 = v2940;
-            while (while_method_23(v2941)){
+            while (while_method_26(v2941)){
                 bool v2943;
                 v2943 = 0 <= v2941;
                 bool v2944;
@@ -36189,7 +36189,7 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
             v2957 = threadIdx.x;
             int v2958;
             v2958 = v2957;
-            while (while_method_23(v2958)){
+            while (while_method_26(v2958)){
                 bool v2960;
                 v2960 = 0 <= v2958;
                 bool v2961;
@@ -36257,9 +36257,9 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
         } else {
         }
         int v2985;
-        v2985 = v2980 % 512;
+        v2985 = v2980 % 256;
         int v2986;
-        v2986 = v2980 / 512;
+        v2986 = v2980 / 256;
         bool v2987;
         v2987 = v2986 < 4;
         bool v2988;
@@ -36269,15 +36269,15 @@ extern "C" __global__ void entry1(unsigned char * v0, unsigned char * v1, unsign
         } else {
         }
         assert("Tensor range check" && 0 <= v2986 && v2986 < 4);
-        assert("Tensor range check" && 0 <= v2985 && v2985 < 512);
+        assert("Tensor range check" && 0 <= v2985 && v2985 < 256);
         int v2990;
         v2990 = 4 * v2985;
         int v2991;
-        v2991 = 2048 * v2986;
+        v2991 = 1024 * v2986;
         int v2992;
         v2992 = v2991 + v2990;
         assert("Tensor range check" && 0 <= v2986 && v2986 < 4);
-        assert("Tensor range check" && 0 <= v2985 && v2985 < 512);
+        assert("Tensor range check" && 0 <= v2985 && v2985 < 256);
         float v2993[4];
         float v2994[4];
         float v2995[4];
@@ -37154,9 +37154,9 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
                 float v371;
                 v371 = v352[v368];
                 assert("Tensor range check" && 0 <= v368 && v368 < 4);
-                assert("Tensor range check" && 0 <= v27 && v27 < 2048);
+                assert("Tensor range check" && 0 <= v27 && v27 < 1024);
                 int v372;
-                v372 = 2048 * v368;
+                v372 = 1024 * v368;
                 int v373;
                 v373 = v372 + v27;
                 float * v374;
@@ -37641,7 +37641,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
         v596 = blockIdx.x;
         int v597;
         v597 = v596;
-        while (while_method_26(v597)){
+        while (while_method_23(v597)){
             bool v599;
             v599 = 0 <= v597;
             bool v600;
@@ -37680,7 +37680,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v613 = threadIdx.x;
             int v614;
             v614 = v613;
-            while (while_method_23(v614)){
+            while (while_method_26(v614)){
                 bool v616;
                 v616 = 0 <= v614;
                 bool v617;
@@ -37725,7 +37725,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v630 = threadIdx.x;
             int v631;
             v631 = v630;
-            while (while_method_23(v631)){
+            while (while_method_26(v631)){
                 bool v633;
                 v633 = 0 <= v631;
                 bool v634;
@@ -37814,7 +37814,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v667 = threadIdx.x;
             int v668;
             v668 = v667;
-            while (while_method_23(v668)){
+            while (while_method_26(v668)){
                 bool v670;
                 v670 = 0 <= v668;
                 bool v671;
@@ -37859,7 +37859,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v684 = threadIdx.x;
             int v685;
             v685 = v684;
-            while (while_method_23(v685)){
+            while (while_method_26(v685)){
                 bool v687;
                 v687 = 0 <= v685;
                 bool v688;
@@ -37948,7 +37948,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v721 = threadIdx.x;
             int v722;
             v722 = v721;
-            while (while_method_23(v722)){
+            while (while_method_26(v722)){
                 bool v724;
                 v724 = 0 <= v722;
                 bool v725;
@@ -37993,7 +37993,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v738 = threadIdx.x;
             int v739;
             v739 = v738;
-            while (while_method_23(v739)){
+            while (while_method_26(v739)){
                 bool v741;
                 v741 = 0 <= v739;
                 bool v742;
@@ -38082,7 +38082,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v775 = threadIdx.x;
             int v776;
             v776 = v775;
-            while (while_method_23(v776)){
+            while (while_method_26(v776)){
                 bool v778;
                 v778 = 0 <= v776;
                 bool v779;
@@ -38127,7 +38127,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v792 = threadIdx.x;
             int v793;
             v793 = v792;
-            while (while_method_23(v793)){
+            while (while_method_26(v793)){
                 bool v795;
                 v795 = 0 <= v793;
                 bool v796;
@@ -38216,7 +38216,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v829 = threadIdx.x;
             int v830;
             v830 = v829;
-            while (while_method_23(v830)){
+            while (while_method_26(v830)){
                 bool v832;
                 v832 = 0 <= v830;
                 bool v833;
@@ -38261,7 +38261,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v846 = threadIdx.x;
             int v847;
             v847 = v846;
-            while (while_method_23(v847)){
+            while (while_method_26(v847)){
                 bool v849;
                 v849 = 0 <= v847;
                 bool v850;
@@ -38350,7 +38350,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v883 = threadIdx.x;
             int v884;
             v884 = v883;
-            while (while_method_23(v884)){
+            while (while_method_26(v884)){
                 bool v886;
                 v886 = 0 <= v884;
                 bool v887;
@@ -38395,7 +38395,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v900 = threadIdx.x;
             int v901;
             v901 = v900;
-            while (while_method_23(v901)){
+            while (while_method_26(v901)){
                 bool v903;
                 v903 = 0 <= v901;
                 bool v904;
@@ -38483,7 +38483,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
         v932 = blockIdx.x;
         int v933;
         v933 = v932;
-        while (while_method_23(v933)){
+        while (while_method_26(v933)){
             bool v935;
             v935 = 0 <= v933;
             bool v936;
@@ -43366,7 +43366,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
         v2813 = blockIdx.x;
         int v2814;
         v2814 = v2813;
-        while (while_method_26(v2814)){
+        while (while_method_23(v2814)){
             bool v2816;
             v2816 = 0 <= v2814;
             bool v2817;
@@ -43403,7 +43403,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v2829 = threadIdx.x;
             int v2830;
             v2830 = v2829;
-            while (while_method_23(v2830)){
+            while (while_method_26(v2830)){
                 bool v2832;
                 v2832 = 0 <= v2830;
                 bool v2833;
@@ -43448,7 +43448,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v2846 = threadIdx.x;
             int v2847;
             v2847 = v2846;
-            while (while_method_23(v2847)){
+            while (while_method_26(v2847)){
                 bool v2849;
                 v2849 = 0 <= v2847;
                 bool v2850;
@@ -43535,7 +43535,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v2882 = threadIdx.x;
             int v2883;
             v2883 = v2882;
-            while (while_method_23(v2883)){
+            while (while_method_26(v2883)){
                 bool v2885;
                 v2885 = 0 <= v2883;
                 bool v2886;
@@ -43580,7 +43580,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v2899 = threadIdx.x;
             int v2900;
             v2900 = v2899;
-            while (while_method_23(v2900)){
+            while (while_method_26(v2900)){
                 bool v2902;
                 v2902 = 0 <= v2900;
                 bool v2903;
@@ -43667,7 +43667,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v2935 = threadIdx.x;
             int v2936;
             v2936 = v2935;
-            while (while_method_23(v2936)){
+            while (while_method_26(v2936)){
                 bool v2938;
                 v2938 = 0 <= v2936;
                 bool v2939;
@@ -43712,7 +43712,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v2952 = threadIdx.x;
             int v2953;
             v2953 = v2952;
-            while (while_method_23(v2953)){
+            while (while_method_26(v2953)){
                 bool v2955;
                 v2955 = 0 <= v2953;
                 bool v2956;
@@ -43799,7 +43799,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v2988 = threadIdx.x;
             int v2989;
             v2989 = v2988;
-            while (while_method_23(v2989)){
+            while (while_method_26(v2989)){
                 bool v2991;
                 v2991 = 0 <= v2989;
                 bool v2992;
@@ -43844,7 +43844,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v3005 = threadIdx.x;
             int v3006;
             v3006 = v3005;
-            while (while_method_23(v3006)){
+            while (while_method_26(v3006)){
                 bool v3008;
                 v3008 = 0 <= v3006;
                 bool v3009;
@@ -43931,7 +43931,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v3041 = threadIdx.x;
             int v3042;
             v3042 = v3041;
-            while (while_method_23(v3042)){
+            while (while_method_26(v3042)){
                 bool v3044;
                 v3044 = 0 <= v3042;
                 bool v3045;
@@ -43976,7 +43976,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v3058 = threadIdx.x;
             int v3059;
             v3059 = v3058;
-            while (while_method_23(v3059)){
+            while (while_method_26(v3059)){
                 bool v3061;
                 v3061 = 0 <= v3059;
                 bool v3062;
@@ -44063,7 +44063,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v3094 = threadIdx.x;
             int v3095;
             v3095 = v3094;
-            while (while_method_23(v3095)){
+            while (while_method_26(v3095)){
                 bool v3097;
                 v3097 = 0 <= v3095;
                 bool v3098;
@@ -44108,7 +44108,7 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
             v3111 = threadIdx.x;
             int v3112;
             v3112 = v3111;
-            while (while_method_23(v3112)){
+            while (while_method_26(v3112)){
                 bool v3114;
                 v3114 = 0 <= v3112;
                 bool v3115;
@@ -44176,9 +44176,9 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
         } else {
         }
         int v3139;
-        v3139 = v3134 % 512;
+        v3139 = v3134 % 256;
         int v3140;
-        v3140 = v3134 / 512;
+        v3140 = v3134 / 256;
         bool v3141;
         v3141 = v3140 < 4;
         bool v3142;
@@ -44188,15 +44188,15 @@ extern "C" __global__ void entry2(unsigned char * v0, unsigned char * v1, unsign
         } else {
         }
         assert("Tensor range check" && 0 <= v3140 && v3140 < 4);
-        assert("Tensor range check" && 0 <= v3139 && v3139 < 512);
+        assert("Tensor range check" && 0 <= v3139 && v3139 < 256);
         int v3144;
         v3144 = 4 * v3139;
         int v3145;
-        v3145 = 2048 * v3140;
+        v3145 = 1024 * v3140;
         int v3146;
         v3146 = v3145 + v3144;
         assert("Tensor range check" && 0 <= v3140 && v3140 < 4);
-        assert("Tensor range check" && 0 <= v3139 && v3139 < 512);
+        assert("Tensor range check" && 0 <= v3139 && v3139 < 256);
         float v3147[4];
         float v3148[4];
         float v3149[4];
@@ -44547,9 +44547,9 @@ def Closure0():
                 v68((24,),(256,),(v12, v11, v8, v9, v10),shared_mem=98304)
                 del v68
             case US0_3(): # StartTrainingVsCallingMachine
-                v19 = cp.zeros(8192,dtype=cp.float32) # type: ignore
-                v20 = cp.zeros(8192,dtype=cp.float32) # type: ignore
-                v21 = cp.empty(8192,dtype=cp.float32)
+                v19 = cp.zeros(4096,dtype=cp.float32) # type: ignore
+                v20 = cp.zeros(4096,dtype=cp.float32) # type: ignore
+                v21 = cp.empty(4096,dtype=cp.float32)
                 v22 = cp.cuda.Device().attributes['MultiProcessorCount']
                 v23 = v22 == 24
                 del v22
@@ -44579,8 +44579,8 @@ def Closure0():
                     v35 = 0
                     while method81(v35):
                         assert 0 <= v32 < 4, 'Tensor range check'
-                        assert 0 <= v35 < 2048, 'Tensor range check'
-                        v37 = 2048 * v32
+                        assert 0 <= v35 < 1024, 'Tensor range check'
+                        v37 = 1024 * v32
                         v38 = v37 + v35
                         del v37
                         v39 = v31[v38].item()
@@ -44598,9 +44598,9 @@ def Closure0():
                 v18.append(v40)
                 del v40
             case US0_4(): # StartTrainingVsSelf
-                v41 = cp.zeros(8192,dtype=cp.float32) # type: ignore
-                v42 = cp.zeros(8192,dtype=cp.float32) # type: ignore
-                v43 = cp.empty(8192,dtype=cp.float32)
+                v41 = cp.zeros(4096,dtype=cp.float32) # type: ignore
+                v42 = cp.zeros(4096,dtype=cp.float32) # type: ignore
+                v43 = cp.empty(4096,dtype=cp.float32)
                 v44 = cp.cuda.Device().attributes['MultiProcessorCount']
                 v45 = v44 == 24
                 del v44
@@ -44630,8 +44630,8 @@ def Closure0():
                     v57 = 0
                     while method81(v57):
                         assert 0 <= v54 < 4, 'Tensor range check'
-                        assert 0 <= v57 < 2048, 'Tensor range check'
-                        v59 = 2048 * v54
+                        assert 0 <= v57 < 1024, 'Tensor range check'
+                        v59 = 1024 * v54
                         v60 = v59 + v57
                         del v59
                         v61 = v53[v60].item()
@@ -46328,7 +46328,7 @@ def method78(v0 : cp.ndarray, v1 : US0) -> None:
         case t:
             raise Exception(f'Pattern matching miss. Got: {t}')
 def method81(v0 : i32) -> bool:
-    v1 = v0 < 2048
+    v1 = v0 < 1024
     del v0
     return v1
 def method83(v0 : cp.ndarray) -> u64:
