@@ -709,6 +709,7 @@ inl local_argmax config x (j_tns : tensor (int * int) int) =
 
 // Numerically stable softmax.
 inl local_softmax config x =
+    // TODO: I fucked up the softmax. It'd be numerically stable had I been getting the max instead of the average.
     inl average = local_average config x
     inl x = local_map (fun x => exp (x - average)) x
     inl sum = local_sum config x
