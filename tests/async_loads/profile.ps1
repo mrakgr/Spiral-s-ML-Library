@@ -1,5 +1,5 @@
 ncu -k entry0 `
     --set full `
-    python test0.py `
+    python test4.py `
     | tee profile.txt
     

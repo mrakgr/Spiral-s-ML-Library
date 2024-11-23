@@ -206,38 +206,38 @@ struct dynamic_array_list
 
 __device__ inline bool while_method_0(int v0){
     bool v1;
-    v1 = v0 < 262144l;
+    v1 = v0 < 262144;
     return v1;
 }
 __device__ inline bool while_method_1(int v0){
     bool v1;
-    v1 = v0 < 4l;
+    v1 = v0 < 4;
     return v1;
 }
 extern "C" __global__ void entry0(float * v0, float * v1) {
     cuda::pipeline<cuda::thread_scope_thread> v2 = cuda::make_pipeline();
     int v3;
     v3 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v3 && v3 < 256l);
+    assert("Tensor range check" && 0 <= v3 && v3 < 256);
     int v4;
-    v4 = 4l * v3;
+    v4 = 4 * v3;
     extern __shared__ unsigned char v5[];
     float * v6;
     v6 = reinterpret_cast<float *>(&v5[0ull]);
     int v8;
     v8 = threadIdx.x;
-    assert("Tensor range check" && 0 <= v8 && v8 < 256l);
+    assert("Tensor range check" && 0 <= v8 && v8 < 256);
     int v9;
-    v9 = 4l * v8;
-    float v10[4l];
-    float v11[4l];
+    v9 = 4 * v8;
+    float v10[4];
+    float v11[4];
     int v12;
     v12 = blockIdx.x;
     int v13;
     v13 = v12;
     while (while_method_0(v13)){
         bool v15;
-        v15 = 0l <= v13;
+        v15 = 0 <= v13;
         bool v16;
         v16 = v15 == false;
         if (v16){
@@ -245,20 +245,20 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         } else {
         }
         bool v18;
-        v18 = v13 < 262144l;
+        v18 = v13 < 262144;
         bool v19;
         v19 = v18 == false;
         if (v19){
             assert("The last element of the projection dimensions needs to be greater than the index remainder." && v18);
         } else {
         }
-        assert("Tensor range check" && 0 <= v13 && v13 < 262144l);
+        assert("Tensor range check" && 0 <= v13 && v13 < 262144);
         int v21;
-        v21 = 1024l * v13;
+        v21 = 1024 * v13;
         int v22;
         v22 = v21 + v4;
         v2.producer_acquire();
-        constexpr int v23 = sizeof(float) * 4l;
+        constexpr int v23 = sizeof(float) * 4;
         assert("Pointer alignment check" && (unsigned long long)(v0 + v22) % v23 == 0 && (unsigned long long)(v6 + v9) % v23 == 0);
         cuda::memcpy_async(v6 + v9, v0 + v22, cuda::aligned_size_t<v23>(v23), v2);
         v2.producer_commit();
@@ -266,33 +266,32 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         int4* v24;
         v24 = reinterpret_cast<int4*>(v6 + v9);
         int4* v25;
-        v25 = reinterpret_cast<int4*>(v10 + 0l);
-        assert("Pointer alignment check" && (unsigned long long)(v24) % 4l == 0 && (unsigned long long)(v25) % 4l == 0);
+        v25 = reinterpret_cast<int4*>(v10 + 0);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v24) % 16 == 0 && reinterpret_cast<unsigned long long>(v25) % 16 == 0);
         *v25 = *v24;
         // Pushing the loop unrolling to: 0
         int v26;
-        v26 = 0l;
+        v26 = 0;
         #pragma unroll
         while (while_method_1(v26)){
-            assert("Tensor range check" && 0 <= v26 && v26 < 4l);
+            assert("Tensor range check" && 0 <= v26 && v26 < 4);
             float v28;
             v28 = v10[v26];
-            __nanosleep(128ul);
             float v29;
             v29 = v28 + 10.0f;
-            assert("Tensor range check" && 0 <= v26 && v26 < 4l);
+            assert("Tensor range check" && 0 <= v26 && v26 < 4);
             v11[v26] = v29;
-            v26 += 1l ;
+            v26 += 1 ;
         }
         // Poping the loop unrolling to: 0
         int4* v30;
-        v30 = reinterpret_cast<int4*>(v11 + 0l);
+        v30 = reinterpret_cast<int4*>(v11 + 0);
         int4* v31;
         v31 = reinterpret_cast<int4*>(v1 + v22);
-        assert("Pointer alignment check" && (unsigned long long)(v30) % 4l == 0 && (unsigned long long)(v31) % 4l == 0);
+        assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v30) % 16 == 0 && reinterpret_cast<unsigned long long>(v31) % 16 == 0);
         *v31 = *v30;
         v2.consumer_release();
-        v13 += 24l ;
+        v13 += 132 ;
     }
     return ;
 }
@@ -354,7 +353,7 @@ options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
 options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
-options.append('--maxrregcount=256')
+options.append('--maxrregcount=255')
 options.append('--std=c++20')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
@@ -370,7 +369,7 @@ def main_body():
     v4 = cp.ones(268435456,dtype=cp.float32) # type: ignore
     v5 = cp.empty(268435456,dtype=cp.float32)
     v6 = cp.cuda.Device().attributes['MultiProcessorCount']
-    v7 = v6 == 24
+    v7 = v6 == 132
     del v6
     v8 = v7 == False
     if v8:
@@ -383,8 +382,9 @@ def main_body():
     v10 = 0
     v11 = raw_module.get_function(f"entry{v10}")
     del v10
-    v11.max_dynamic_shared_size_bytes = 81920 
-    v11((24,),(256,),(v4, v5),shared_mem=81920)
+    v11.max_dynamic_shared_size_bytes = 229376 
+    print(f'Threads per block, blocks per grid: {256}, {132}')
+    v11((132,),(256,),(v4, v5),shared_mem=229376)
     del v4, v11
     v23 = 0
     v24 = "{}"

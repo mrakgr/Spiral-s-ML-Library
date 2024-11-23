@@ -36,7 +36,7 @@ inl main() =
     inl out : tensor int float = tensor_create in_.dim
     run fun () =>
         map (fun x => 
-            nanosleep_128()
+            // nanosleep_128()
             x + 10
             ) in_ out
     console.write_ln (view (const {from=0; nearTo=16}) out)
