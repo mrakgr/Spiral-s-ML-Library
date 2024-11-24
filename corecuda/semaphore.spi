@@ -8,12 +8,12 @@ type binary_semaphore scope = counting_semaphore 1 scope
 
 inl globals() = global "#include <cuda/semaphore>"
 
-inl create_counting_semaphore_in_thread forall count. (i : int) : ref (counting_semaphore count thread_scope_thread) = globals() . create_thread_var (const i)
-inl create_binary_semaphore_in_thread (i : int) : ref (binary_semaphore thread_scope_thread) = globals() . create_thread_var (const i)
-inl create_counting_semaphore_in_grid forall count. (i : int) : ref (counting_semaphore count thread_scope_device) = globals() . create_static_var (const i)
-inl create_binary_semaphore_in_grid (i : int) : ref (binary_semaphore thread_scope_device) = globals() . create_static_var (const i)
-inl create_counting_semaphore_in_block forall count. (i : int) : ref (counting_semaphore count thread_scope_block) = globals() . create_shared_var (const i)
-inl create_binary_semaphore_in_block (i : int) : ref (binary_semaphore thread_scope_block) = globals() . create_shared_var (const i)
+inl create_counting_semaphore_in_thread forall count. (i : int) : ref (counting_semaphore count thread_scope.thread) = globals() . create_thread_var (const i)
+inl create_binary_semaphore_in_thread (i : int) : ref (binary_semaphore thread_scope.thread) = globals() . create_thread_var (const i)
+inl create_counting_semaphore_in_grid forall count. (i : int) : ref (counting_semaphore count thread_scope.device) = globals() . create_static_var (const i)
+inl create_binary_semaphore_in_grid (i : int) : ref (binary_semaphore thread_scope.device) = globals() . create_static_var (const i)
+inl create_counting_semaphore_in_block forall count. (i : int) : ref (counting_semaphore count thread_scope.block) = globals() . create_shared_var (const i)
+inl create_binary_semaphore_in_block (i : int) : ref (binary_semaphore thread_scope.block) = globals() . create_shared_var (const i)
 
 inl acquire forall count scope. (semaphore : ref (counting_semaphore count scope)) : () = $"!semaphore.acquire()"
 inl release forall count scope. (semaphore : ref (counting_semaphore count scope)) : () = $"!semaphore.release()"

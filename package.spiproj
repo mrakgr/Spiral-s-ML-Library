@@ -1,7 +1,7 @@
 // Spiral's ML Library
 
 // 8/24/2024:
-// Has the new core libs, the RPS, the Leduc and HU NL Holdem games running on the GPU, and currently tabular CFR training is being worked on.
+// Has the new core libs, the RPS, the Leduc and HU NL Holdem games running on the GPU, and currently Hopfield dictionary CFR training is being worked on.
 
 // The games have a web based UI frontend, and a Flask based backend. If you are reading this in VS Code, press Ctrl + Shift + B to run it.
 // Most likely you'll have to run `npm install` and `poetry install` to install the necessary dependencies first.
@@ -9,11 +9,6 @@
 // Notes:
 // The default int and float for this project should be: i32 and f32.
 // It hasn't been tested with any other default types.
-
-// TODO (9/13/2024): After finishing Cutlass integration, look into adding noise to the average policy. Some of the weird behavior like 
-// the trained Leduc agent folding King preflop might not be simply due to model bias, but inefficient exploration as well.
-
-// packages: |core
 
 modules:
     corebase/
@@ -68,6 +63,7 @@ modules:
         cupy
         thread_scope
         pipeline
+        barrier 
         wmma
         pragma 
         cooperative_groups

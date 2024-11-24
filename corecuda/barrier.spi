@@ -1,0 +1,10 @@
+open corebase
+open refm
+open tensorm
+open thread_scope
+
+nominal barrier scope = $'cuda::barrier<`scope>'
+ 
+inl make_barrier_thread() : ref (barrier thread_scope.thread) = 
+    global "#include <cuda/barrier>"
+    $"`(barrier thread_scope.thread)> \v = cuda::make_pipeline()"

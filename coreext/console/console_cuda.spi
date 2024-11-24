@@ -93,7 +93,7 @@ inl single_threaded write_ l =
     global "#include <cooperative_groups.h>"
     global "#include <cuda/semaphore>"
     global "__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);" // It is global so that only one instance of printf can be executed at any given time.
-    inl lock : ref (binary_semaphore thread_scope_system) = $"`(binary_semaphore thread_scope_system) & \v = console_lock"
+    inl lock : ref (binary_semaphore thread_scope.system) = $"`(binary_semaphore thread_scope.system) & \v = console_lock"
     inl active_warp_threads = create_coalesced_threads()
     acquire lock // This is so only one instance of print can be executed at a time.
     write_ l

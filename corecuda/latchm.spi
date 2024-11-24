@@ -1,14 +1,13 @@
 open corebase
 open refm
-open thread_scope
 
 nominal latch scope = $'cuda::latch<`scope>'
 
 inl globals() = global "#include <cuda/latch>"
 
-inl create_latch_in_thread (i : int) : ref (latch thread_scope_thread) = globals() . create_thread_var (const i)
-inl create_latch_in_grid (i : int) : ref (latch thread_scope_device) = globals() . create_static_var (const i)
-inl create_latch_in_block (i : int) : ref (latch thread_scope_block) = globals() . create_shared_var (const i)
+inl create_latch_in_thread (i : int) : ref (latch thread_scope.thread) = globals() . create_thread_var (const i)
+inl create_latch_in_grid (i : int) : ref (latch thread_scope.device) = globals() . create_static_var (const i)
+inl create_latch_in_block (i : int) : ref (latch thread_scope.block) = globals() . create_shared_var (const i)
 
 inl count_down' forall scope. (x : ref (latch scope)) (i : int) : () = $"!x.count_down(!i)"
 inl count_down forall scope. (x : ref (latch scope)) : () = $"!x.count_down()"
