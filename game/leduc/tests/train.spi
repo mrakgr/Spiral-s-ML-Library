@@ -117,7 +117,7 @@ inl test3() =
 
     console.write_ln "Running the kernel."
 
-    run' fun () =>
+    run fun () =>
         inl rng = random.init {seed = cupy.constant_seed(); subsequence = conv rangem.threads_in_grid().from; offset=0}
         inl data : history = arraym.fromList [C2of2 King; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call; C2of2 Queen; C1of2 Call; C1of2 Raise; C1of2 Raise; C1of2 Call]
         ml.models.run rng game_model (Some data)

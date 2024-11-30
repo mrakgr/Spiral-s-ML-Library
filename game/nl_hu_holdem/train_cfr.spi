@@ -164,7 +164,7 @@ inl vs_self (neural : state_neural .cfr) =
     inl config = event_config()
     inl trace_rewards = cupy.zeros (sizes.player_id, config.outer / config.frontend_divider)
     inl frontend_rewards = tensorm.tensor_create trace_rewards.dim
-    run' fun () =>
+    run fun () =>
         inl state =
             inl grid = cooperative_groups.create_grid()
             random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}
@@ -194,7 +194,7 @@ inl vs_rando (neural : state_neural .cfr) =
     inl config = event_config()
     inl trace_rewards : _ _ (float * float) = cupy.zeros (sizes.ensemble_id, config.outer / config.frontend_divider)
     inl frontend_rewards : _ _ float = tensorm.tensor_create trace_rewards.dim
-    run' fun () =>
+    run fun () =>
         inl state =
             inl grid = cooperative_groups.create_grid()
             random.init {seed = random.clock64(); subsequence=conv rangem.threads_in_grid().from; offset=0}

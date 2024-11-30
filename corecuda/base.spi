@@ -40,6 +40,15 @@ union compiler =
     | NVCC
     | NVRTC
 
+union cuda_global_function_annotation =
+    | ClusterDims : {cluster_dims : {x : int; y : int; z : int}}
+    | Void
+
+inl blocks_per_cluster() : int =
+    match gpu() with
+    | RTX4060 => 1
+    | H100_SMX => 16
+
 // Executes the lambda on the GPU device.
 inl run' f =
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
@@ -67,14 +76,22 @@ inl run' f =
         global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
         global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
         global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
-    inl kernel_i, vars = join_backend Cuda
-        match compiler with
-        | NVRTC => ()
-        | NVCC =>
-            global "#include <new>"
-            global "#include <assert.h>"
-            global "#include <stdio.h>"
-        f () : ()
+    inl kernel_i, vars = 
+        inl body ret = join_backend Cuda
+            match compiler with
+            | NVRTC => ()
+            | NVCC =>
+                global "#include <new>"
+                global "#include <assert.h>"
+                global "#include <stdio.h>"
+            f () : ()
+            ret // `ret` is responsible for whether the return type is just void or also has the __cluster_dims__ annotation.
+        inl cuda_global_function_annotation() =
+            inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
+            if x = 1 then Void else ClusterDims{cluster_dims={x y=1; z=1}} 
+        match cuda_global_function_annotation() with
+        | ClusterDims x => body x
+        | Void => body()
     inl entry = $'raw_module.get_function(f"entry{!kernel_i}")' : $"cp.RawKernel"
     inl shared_mem = dynamic_shared_memory_used()
     $'!entry.max_dynamic_shared_size_bytes = !shared_mem '

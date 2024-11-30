@@ -17,7 +17,7 @@ inl matmul_config_tf32 a_trans b_trans =
 inl matmul_tf32' a_transpose b_transpose = matmul_tf32_template (matmul_config_tf32 a_transpose b_transpose)
 inl matmul_tf32 a_transpose b_transpose (alpha : float) (a : tensor (int * int) f32) (b : tensor (int * int) f32) (beta : float) (c : tensor (int * int) f32) = 
     inl body = matmul_tf32' a_transpose b_transpose
-    run' fun () => body alpha a b beta c
+    run fun () => body alpha a b beta c
 
 inl main() =
     inl get_body forall dim el. (x : tensor dim el) : array el =

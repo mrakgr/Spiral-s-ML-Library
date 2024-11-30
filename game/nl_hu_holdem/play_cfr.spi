@@ -185,7 +185,7 @@ inl event_loop_play state_neural (msg, state_internal : event * state_internal) 
 
 open serializerm
 inl vs_human (seri : {game_state : serializer state_game; msg : serializer event}) (neural : state_neural .cfr) =
-    run' fun () =>
+    run fun () =>
         inl msg, game_state = deserialize seri.msg, deserialize seri.game_state
         inl state = state_to_internal_play game_state
         event_loop_play neural (msg, state)

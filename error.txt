@@ -1,153 +1,50 @@
-Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 275, column: 24 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-                       ^
-Error trace on line: 275, column: 34 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-                                 ^
-Error trace on line: 275, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-                                   ^
-Error trace on line: 275, column: 46 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-                                             ^
-Error trace on line: 275, column: 52 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-                                                   ^
-Error trace on line: 6, column: 16 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
-               ^
-Error trace on line: 6, column: 29 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
-                            ^
-Error trace on line: 6, column: 34 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
-                                 ^
-Error trace on line: 6, column: 39 in module: c:\Spiral_s_ML_Library\corebase\optionm.spi.
-inl iter f x = match x with Some a => f a | None => ()
-                                      ^
-Error trace on line: 68, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match compile_time.hashmapm.try_get h k with
+Error trace on line: 8, column: 9 in module: c:\Spiral_s_ML_Library\tests\distributed_shared_memory\test0.spi.
+inl main() =
+        ^
+Error trace on line: 9, column: 5 in module: c:\Spiral_s_ML_Library\tests\distributed_shared_memory\test0.spi.
+    console.write_ln "Running test 0. How long does the memory transfer take?"
     ^
-Error trace on line: 69, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 70, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in compile_time.hashmapm.add h k v . v
-      ^
-Error trace on line: 70, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in compile_time.hashmapm.add h k v . v
-              ^
-Error trace on line: 70, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in compile_time.hashmapm.add h k v . v
-                      ^
-Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 276, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMap(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 277, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowReduce(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 278, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMapReduce(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 279, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => f a . f b
-              ^
-Error trace on line: 280, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => f a . f b
-              ^
-Error trace on line: 280, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => f a . f b
-                    ^
-Error trace on line: 280, column: 31 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => f a . f b
-                              ^
-Error trace on line: 280, column: 39 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => f a . f b
-                                      ^
-Error trace on line: 68, column: 5 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    match compile_time.hashmapm.try_get h k with
+Error trace on line: 10, column: 5 in module: c:\Spiral_s_ML_Library\tests\distributed_shared_memory\test0.spi.
+    run' ClusterDims{cluster_dims={x=16i32; y=1i32; z=1i32}} fun () =>
     ^
-Error trace on line: 69, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | Some v => v
-      ^
-Error trace on line: 70, column: 7 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in compile_time.hashmapm.add h k v . v
-      ^
-Error trace on line: 70, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in compile_time.hashmapm.add h k v . v
-              ^
-Error trace on line: 70, column: 23 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-    | None => inl v = f k in compile_time.hashmapm.add h k v . v
-                      ^
-Error trace on line: 275, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMap(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 276, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMap(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 277, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowReduce(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 278, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockRowMapReduce(exists a. _,a,out) => f a . optionm.iter f out
-              ^
-Error trace on line: 279, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | BlockMatmul(a,b) => f a . f b
-              ^
-Error trace on line: 280, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Apply(exists a. a,b) => f a . f b
-              ^
-Error trace on line: 281, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Zip(a,b) => f a . f b
-              ^
-Error trace on line: 282, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Pair(a,b) => f a . f b
-              ^
-Error trace on line: 283, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Fst(exists a. x) => f x
-              ^
-Error trace on line: 284, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Snd(exists b. x) => f x
-              ^
-Error trace on line: 285, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | KeyScalar => ()
-              ^
-Error trace on line: 286, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | Layer(sid,_,init) as graph =>
-              ^
-Error trace on line: 292, column: 15 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | KeyGraph((exists key'. _),graph) =>
-              ^
-Error trace on line: 292, column: 25 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-            | KeyGraph((exists key'. _),graph) =>
-                        ^
-Error trace on line: 294, column: 17 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                match ex with
-                ^
-Error trace on line: 296, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
-                  ^
-Error trace on line: 296, column: 31 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
-                              ^
-Error trace on line: 296, column: 19 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                | Ex_KeyGraph(exists key. _) when real open real_core in `key `= `key' =>
-                  ^
-Error trace on line: 297, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    inl g = graph_extract (model {m with graph}) {} // TODO: Add the env as an argument.
-                    ^
-Error trace on line: 298, column: 21 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    add_item (real g : ex_t) // If you get a type error here, then the input type doesn't match graph type.
-                    ^
-Error trace on line: 298, column: 36 in module: c:\Spiral_s_ML_Library\ml\layers.spi.
-                    add_item (real g : ex_t) // If you get a type error here, then the input type doesn't match graph type.
-                                   ^
-The body does not match the annotation.
-Got: tensor (i32 * i32 * i32 * i32) f32
-Expected: tensor (i32 * i32 * i32) f32
+Error trace on line: 49, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+    ^
+Error trace on line: 49, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+        ^
+Error trace on line: 51, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options = []"
+    ^
+Error trace on line: 52, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    if debug_mode() = false then global "options.append('--define-macro=NDEBUG')" // turns off the macros
+    ^
+Error trace on line: 53, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--dopt=on')" // turns on the device optimizations
+    ^
+Error trace on line: 54, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
+    ^
+Error trace on line: 55, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    global "options.append('--restrict')" // assumes all the pointers are restricted
+    ^
+Error trace on line: 59, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match threads_per_block with
+    ^
+Error trace on line: 65, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" = sms_per_gpu()) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+    ^
+Error trace on line: 67, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl compiler = NVCC
+    ^
+Error trace on line: 68, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    match compiler with
+    ^
+Error trace on line: 74, column: 5 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+    inl kernel_i, vars = join_backend Cuda
+    ^
+Error trace on line: 75, column: 9 in module: c:\Spiral_s_ML_Library\corecuda\base.spi.
+        match compiler with
+        ^
+The annotation of the join point does not match its body's type.Got: {cluster_dims : {x : i32; y : i32; z : i32}}
+Expected: .cluster_dims_or_void

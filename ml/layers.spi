@@ -337,7 +337,7 @@ inl create_layer_state rng =
 
 // Runs the graph on the host.
 inl graph_run_host forall t_top sizes. (model {graph} & m : model t_top) (sizes : sizes) =
-    run' fun () =>
+    run fun () =>
         inl rng = random.init {seed = cupy.constant_seed(); subsequence = conv rangem.threads_in_grid().from; offset=0}
         inl ls : layer_state = create_layer_state rng
         loop.linear sizes fun indices =>

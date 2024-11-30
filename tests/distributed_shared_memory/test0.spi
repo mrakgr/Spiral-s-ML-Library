@@ -5,25 +5,7 @@ open refm
 open rangem
 open tensorm
 
-// Maps all the elements of a tensor given the mapping function.
-inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () =
-    assert (from.dim = to.dim) "The dimensions of the two inputs to the map kernel need to be the same."
-    inl from,to = factorize_sizeof_16 from, factorize_sizeof_16 to
-    loop.projective threads_in_grid(fst from.dim) fun i =>
-        inl from, to = apply i from, apply i to
-        inl l_from, l_to = tensor_create from.dim, tensor_create to.dim
-        memcpy_sync (l_from, from)
-        pragma.unroll fun _ =>
-            loop.linear from.dim fun j => 
-                tensor_set j f(tensor_index j l_from) l_to
-        memcpy_sync (to, l_to)
-
 inl main() =
     console.write_ln "Running test 0. How long does the memory transfer take?"
-    inl in_ : tensor int float = cupy.ones _2_pow_28()
-    inl out : tensor int float = tensor_create in_.dim
     run fun () =>
-        map (fun x => 
-            x + 10
-            ) in_ out
-    console.write_ln (view (const {from=0; nearTo=16}) out)
+        ()
