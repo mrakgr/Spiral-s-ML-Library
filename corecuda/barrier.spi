@@ -5,6 +5,11 @@ open thread_scope
 
 nominal barrier scope = $'cuda::barrier<`scope>'
  
-inl make_barrier_thread() : ref (barrier thread_scope.thread) = 
+inl make_barrier_block() : ref (barrier thread_scope.block) = 
     global "#include <cuda/barrier>"
-    $"`(barrier thread_scope.thread)> \v = cuda::make_pipeline()"
+    inl bar = $"__shared__ `(barrier thread_scope.block)> \v"
+    if thread_index() = 0 then
+        $"init(&!bar, !(threads_per_block()))"
+    __syncthreads()
+    bar
+
