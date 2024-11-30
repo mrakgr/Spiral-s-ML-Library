@@ -1,31 +1,33 @@
-open corebase
-open corecuda
-open coreext
-open refm
-open rangem
-open tensorm
+// TODO: TMA async map test.
 
-// Maps all the elements of a tensor given the mapping function.
-inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () =
-    inl io = zip from to |> split_into_swapped (loop.rigid_split threads_per_block())
-    inl (shared : tensor dim (a * b)),_ = tensor_cuda.tensor_create_extern_shared 0 (fst io.dim)
-    // inl io = io |> threads_in_block |> apply_proj
-    inl i = loop.proj (fst io.dim) threads_in_block().from
-    inl io = io |> reorder (fun a,b => b,a)
-    loop.linear (fst io.dim) fun i =>
-        inl io = apply i io
-        inl (from_io, to_io), (from_shared, to_shared) = unzip io, unzip shared
-        tma_copy from_io from_shared
-        tensor_set i f(tensor_index i from_shared) to_shared
-        tma_copy to_shared to_io
+// open corebase
+// open corecuda
+// open coreext
+// open refm
+// open rangem
+// open tensorm
+
+// // Maps all the elements of a tensor given the mapping function.
+// inl map forall dim a b. (f : a -> b) (from : tensor dim a) (to : tensor dim b) : () =
+//     inl io = zip from to |> split_into_swapped (loop.rigid_split threads_per_block())
+//     inl (shared : tensor dim (a * b)),_ = tensor_cuda.tensor_create_extern_shared 0 (fst io.dim)
+//     // inl io = io |> threads_in_block |> apply_proj
+//     inl i = loop.proj (fst io.dim) threads_in_block().from
+//     inl io = io |> reorder (fun a,b => b,a)
+//     loop.linear (fst io.dim) fun i =>
+//         inl io = apply i io
+//         inl (from_io, to_io), (from_shared, to_shared) = unzip io, unzip shared
+//         tma_copy from_io from_shared
+//         tensor_set i f(tensor_index i from_shared) to_shared
+//         tma_copy to_shared to_io
 
 
-inl main() =
-    console.write_ln "Running test 4. Non-interleaved asynchronous loads."
-    inl in_ : tensor int float = cupy.ones _2_pow_28()
-    inl out : tensor int float = tensor_create in_.dim
-    run fun () =>
-        map (fun x => 
-            x + 10
-            ) in_ out
-    console.write_ln (view (const {from=0; nearTo=16}) out)
+// inl main() =
+//     console.write_ln "Running test 4. Non-interleaved asynchronous loads."
+//     inl in_ : tensor int float = cupy.ones _2_pow_28()
+//     inl out : tensor int float = tensor_create in_.dim
+//     run fun () =>
+//         map (fun x => 
+//             x + 10
+//             ) in_ out
+//     console.write_ln (view (const {from=0; nearTo=16}) out)

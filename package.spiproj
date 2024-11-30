@@ -65,7 +65,7 @@ modules:
         pipeline
         barrier 
         wmma
-        pragma 
+        pragma
         cooperative_groups
         semaphore
         latchm
@@ -168,6 +168,10 @@ modules:
             test3
             test4
             test5
+        
+        distributed_shared_memory/
+            test0
+
 
         matmul/
             test1_kernel
