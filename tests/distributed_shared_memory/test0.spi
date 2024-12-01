@@ -6,6 +6,6 @@ open rangem
 open tensorm
 
 inl main() =
-    console.write_ln "Running test 0. How long does the memory transfer take?"
+    console.write_ln "Does the __cluster_dims__ annotation work?"
     run fun () =>
         ()

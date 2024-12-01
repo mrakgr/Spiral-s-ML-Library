@@ -28,7 +28,7 @@ inl blocks_per_grid() : int =
 inl blocks_per_cluster() : int =
     match gpu() with
     | RTX4060 => 1
-    | H100_SMX => 16
+    | H100_SMX => 8
 
 // Returns the dynamic shared memory that should be used in bytes.
 inl dynamic_shared_memory_used() : int = 
