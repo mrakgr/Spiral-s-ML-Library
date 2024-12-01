@@ -202,16 +202,8 @@ struct dynamic_array_list
     }
 };
 
-struct Tuple0;
-struct Tuple0 {
-    int v0;
-    int v1;
-    int v2;
-    __device__ Tuple0() = default;
-    __device__ Tuple0(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
-};
-extern "C" __global__ void __cluster_dims(8,1,1) entry0() {
-    return Tuple0{8, 1, 1};
+extern "C" __global__ void __cluster_dims__(16,1,1) entry0() {
+    return ;
 }
 """
 class static_array():
@@ -281,7 +273,7 @@ def main_body():
     print(v2.format(v3),end="")
     del v2, v3
     v4 = cp.cuda.Device().attributes['MultiProcessorCount']
-    v5 = v4 == 132
+    v5 = v4 >= 128
     del v4
     v6 = v5 == False
     if v6:
@@ -295,8 +287,8 @@ def main_body():
     v9 = raw_module.get_function(f"entry{v8}")
     del v8
     v9.max_dynamic_shared_size_bytes = 229376 
-    print(f'Threads per block, blocks per grid: {256}, {132}')
-    v9((132,),(256,),(),shared_mem=229376)
+    print(f'Threads per block, blocks per grid: {256}, {128}')
+    v9((128,),(256,),(),shared_mem=229376)
     del v9
     return 
 

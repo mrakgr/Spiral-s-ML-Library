@@ -249,6 +249,9 @@ inl type_to_symbol forall t. = !!!!TypeToSymbol(`t)
 // Converts a string literal to a symbol.
 inl string_lit_to_symbol x = !!!!StringLitToSymbol(x)
 
+// Converts a literal to a symbol.
+inl lit_to_symbol x = !!!!LitToSymbol(x)
+
 // Converts a symbol to a string literal.
 inl symbol_to_string x = !!!!SymbolToString(x)
 

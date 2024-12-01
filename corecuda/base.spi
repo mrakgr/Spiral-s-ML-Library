@@ -25,6 +25,11 @@ inl blocks_per_grid() : int =
     // 1 // Debug
     sms_per_gpu() // Release
 
+inl blocks_per_cluster() : int =
+    match gpu() with
+    | RTX4060 => 1
+    | H100_SMX => 16
+
 // Returns the dynamic shared memory that should be used in bytes.
 inl dynamic_shared_memory_used() : int = 
     // On a RTX 4060, 99kb is the limit. 1 kb = 1024 bytes.
@@ -39,15 +44,6 @@ inl device_sync() : () = $"cp.cuda.get_current_stream().synchronize()"
 union compiler =
     | NVCC
     | NVRTC
-
-union cuda_global_function_annotation =
-    | ClusterDims : {cluster_dims : {x : int; y : int; z : int}}
-    | Void
-
-inl blocks_per_cluster() : int =
-    match gpu() with
-    | RTX4060 => 1
-    | H100_SMX => 16
 
 // Executes the lambda on the GPU device.
 inl run' f =
@@ -77,7 +73,7 @@ inl run' f =
         global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
         global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
     inl kernel_i, vars = 
-        inl body ret = join_backend Cuda
+        inl body cuda_global_function_annotation = join_backend Cuda
             match compiler with
             | NVRTC => ()
             | NVCC =>
@@ -85,13 +81,14 @@ inl run' f =
                 global "#include <assert.h>"
                 global "#include <stdio.h>"
             f () : ()
-            ret // `ret` is responsible for whether the return type is just void or also has the __cluster_dims__ annotation.
-        inl cuda_global_function_annotation() =
-            inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
-            if x = 1 then Void else ClusterDims{cluster_dims={x y=1; z=1}} 
-        match cuda_global_function_annotation() with
-        | ClusterDims x => body x
-        | Void => body()
+            cuda_global_function_annotation
+        inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
+        if x = 1 then 
+            body () 
+        else real 
+            open real_core 
+            inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}
+            body `(`cluster_dims) cluster_dims
     inl entry = $'raw_module.get_function(f"entry{!kernel_i}")' : $"cp.RawKernel"
     inl shared_mem = dynamic_shared_memory_used()
     $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
