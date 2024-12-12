@@ -10,22 +10,23 @@ inline void gpuAssert(cudaError error, const char *file, int line, bool abort=tr
     }
 }
 
-__global__ void __cluster_dims__(8) hello(int a, int b) {
-    if (threadIdx.x == 0 && blockIdx.x == 0) {
-        printf("Hello, CUDA! %i + %i = %i\n", a, b, a + b);
+__global__ void __cluster_dims__(16) hello(int a, int b) {
+    if (threadIdx.x == 0) {
+        printf("Hello, CUDA from %i! %i + %i = %i\n", blockIdx.x, a, b, a + b);
     }
 }
 
 int main() {
-    size_t maxDynamicSharedMemory = 114 * (1 << 10);
-    cudaError_t error = cudaFuncSetAttribute(hello, cudaFuncAttributeMaxDynamicSharedMemorySize, maxDynamicSharedMemory);
+    size_t maxDynamicSharedMemory = 214 * (1 << 10);
+    gpuErrchk(cudaFuncSetAttribute(hello, cudaFuncAttributeMaxDynamicSharedMemorySize, maxDynamicSharedMemory));
+    gpuErrchk(cudaFuncSetAttribute(hello, cudaFuncAttributeNonPortableClusterSizeAllowed, 16));
 
     int i = 0;
     int dev = 0;
     cudaDeviceProp deviceProp;
     cudaGetDeviceProperties(&deviceProp, dev);
     void * args[] = {reinterpret_cast<void*>(&i), reinterpret_cast<void*>(&i)};
-    gpuErrchk(cudaLaunchCooperativeKernel(hello, 128, 256, args, maxDynamicSharedMemory));
+    gpuErrchk(cudaLaunchCooperativeKernel(hello, 112, 256, args, maxDynamicSharedMemory));
     gpuErrchk(cudaDeviceSynchronize());
     std::cout << "Done." << std::endl;
     return 0;
