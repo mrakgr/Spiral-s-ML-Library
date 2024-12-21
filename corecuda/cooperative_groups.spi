@@ -10,6 +10,7 @@ inl thread_block_num_threads() : int = $"cooperative_groups::thread_block::num_t
 inl thread_block_thread_rank() : int = $"cooperative_groups::thread_block::thread_rank()"
 
 nominal grid_group = $"cooperative_groups::grid_group"
+nominal cluster_group = $"cooperative_groups::cluster_group"
 nominal thread_block = $"cooperative_groups::thread_block"
 nominal thread_block_tile parent size = $"cooperative_groups::thread_block_tile<@size, `parent>"
 nominal thread = $"cooperative_groups::thread_block_tile<1>"
@@ -20,6 +21,7 @@ instance groupable thread = fun _ => ()
 instance groupable thread_block = fun _ => ()
 instance groupable coalesced_group = fun _ => ()
 instance groupable thread_block_tile parent size = fun _ => ()
+instance groupable cluster_group = fun _ => ()
 instance groupable grid_group = fun _ => ()
 
 inl wait forall group {groupable}. (group : ref group) : () = $"cooperative_groups::wait(!group)"
@@ -37,6 +39,9 @@ inl meta_group_rank forall group {tileable}. (cg : ref group) : int = $"!cg.meta
 inl create_grid() : ref grid_group = 
     global "#include <cooperative_groups.h>"
     $"auto \v = cooperative_groups::this_grid()"
+inl create_cluster() : ref cluster_group = 
+    global "#include <cooperative_groups.h>"
+    $"auto \v = cooperative_groups::this_cluster()"
 inl create_block() : ref thread_block = 
     global "#include <cooperative_groups.h>"
     $"auto \v = cooperative_groups::this_thread_block()"
@@ -73,3 +78,23 @@ inl cg_exclusive_scan' forall el. (tile : ref coalesced_group) neutral_element (
     inl inclusive : el = cg_inclusive_scan tile f x
     inl exclusive = $"!tile.shfl_up(!inclusive,1)"
     if $"!tile.thread_rank() == 0" then neutral_element else exclusive
+
+// Returns a tensor mapped to a particular cluster rank.
+inl cg_map_shared_rank forall dim el. (cluster : ref cluster_group) (rank : int) (t : tensor dim el) : tensor dim el = 
+    open tensorm
+    open struct
+    assert (0 <= rank && rank < blocks_per_cluster()) "0 <= rank && rank < blocks_per_cluster()"
+    inl (tensor {dim bodies}) = t |> apply_ptr
+    tensor {
+        dim = real
+            iter (fun dim =>
+                open real_core
+                assert (lit_is dim) "The tensor dimension needs to be known at compile time." 
+                ) dim
+            dim
+        bodies = real
+            map (fun (tensor_body ({array} & x)) =>
+                typecase `array with array ~el => 
+                tensor_body `dim `el {x with array = $"!cluster.map_shared_rank(!array,!rank)" : array el}
+                ) bodies
+    }
