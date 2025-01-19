@@ -173,6 +173,10 @@ modules:
             test0
             test1
 
+        thunderkittens/
+            test0
+            
+
         matmul/
             test1_kernel
             test1_run

@@ -57,6 +57,10 @@ inl run' f =
     global "options.append('--dopt=on')" // turns on the device optimizations
     global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
     global "options.append('--restrict')" // assumes all the pointers are restricted
+
+    global "import os"
+    global "home = os.getenv('HOME')"
+    global "options.append(f'-I={home}/ThunderKittens/include')"
     // if debug_mode() <> false then // Doesn't work well currently.
     //     global "options.append('--Ofast-compile=max')" // experimental fast compilation option
     
@@ -73,6 +77,7 @@ inl run' f =
     | NVRTC => global "raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))"
     | NVCC => 
         global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
+        global "options.append('--expt-relaxed-constexpr')"
         global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
         global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
     inl kernel_i, vars = 
@@ -86,7 +91,7 @@ inl run' f =
             f () : ()
             cuda_global_function_annotation
         inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
-        if x = 1 then 
+        if x = 1 then
             body ()
         else real 
             open real_core 
