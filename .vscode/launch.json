@@ -9,7 +9,7 @@
             "type": "cuda-gdb",
             "request": "launch",
             "program": "${workspaceFolder}/cpp_tests/hello.out",
-            "breakOnLaunch": true,
+            "breakOnLaunch": false,
             "preLaunchTask": "Build Cuda Program"
         },
         {

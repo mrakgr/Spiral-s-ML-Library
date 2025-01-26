@@ -4,6 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "/usr/local/cuda/include",
                 "${userHome}/ThunderKittens/include/"
             ],
             "defines": [],
