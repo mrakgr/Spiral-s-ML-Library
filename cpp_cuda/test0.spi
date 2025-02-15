@@ -1,0 +1,23 @@
+open corebase
+
+inl run f =
+    inl body cuda_global_function_annotation = join_backend Cuda
+        f () : ()
+        cuda_global_function_annotation
+    inl kernel_i, vars = 
+        inl x : int = 1
+        if x = 1 then 
+            body () 
+        else real 
+            open real_core 
+            inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}
+            body `(`cluster_dims) cluster_dims
+    ()
+
+inl main() : int =
+    inl ~y : int = dyn 2 * dyn 8
+    run (fun x =>
+        inl ~y : int = dyn 5 + dyn 3
+        ()
+        )
+    0

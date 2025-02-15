@@ -182,3 +182,6 @@ modules:
             
             test3_kernel
             test3_run
+
+    cpp_cuda/
+        test0
