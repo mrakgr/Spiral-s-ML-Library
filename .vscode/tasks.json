@@ -42,6 +42,17 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+		{
+            "label": "Build Cuda Program",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["build.ps1"],
+            "options": {
+                "cwd": "${workspaceFolder}/cpp_tests/"
+            },
+            "problemMatcher": ["$nvcc"],
+            "group": "build"
         }
     ]
   }

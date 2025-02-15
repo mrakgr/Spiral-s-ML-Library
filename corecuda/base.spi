@@ -14,7 +14,7 @@ inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
 inl sms_per_gpu() : int = 
     match gpu() with
     | RTX4060 => 24 // Marko Grdinić: My RTX 4060 has 24 SMs. A RTX 4090 for example would have 128. This should be changed to reflect your configuration.
-    | H100_SMX => 128 // The H100 actually has 132 SMs, but the thread block cluster launches need a multiple of 16, so we're leaving 4 SMs out.
+    | H100_SMX => 132
 
 inl threads_per_block() : int = 
     // 32 // Debug
@@ -22,13 +22,16 @@ inl threads_per_block() : int =
     256 // Release
 
 inl blocks_per_grid() : int = 
-    // 1 // Debug
-    sms_per_gpu() // Release
+    match gpu() with
+    | RTX4060 => sms_per_gpu()
+    // The H100 actually has 132 SMs, but the thread block cluster launches need a multiple of 16, and also due to the we can only launch 112 block 
+    // with thread block clusters of size 16 and 120 blocks with thread block clusters of size 8.
+    | H100_SMX => 112 
 
 inl blocks_per_cluster() : int =
     match gpu() with
     | RTX4060 => 1
-    | H100_SMX => 16
+    | H100_SMX => 8
 
 // Returns the dynamic shared memory that should be used in bytes.
 inl dynamic_shared_memory_used() : int = 
@@ -54,6 +57,10 @@ inl run' f =
     global "options.append('--dopt=on')" // turns on the device optimizations
     global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
     global "options.append('--restrict')" // assumes all the pointers are restricted
+
+    global "import os"
+    global "home = os.getenv('HOME')"
+    global "options.append(f'-I={home}/ThunderKittens/include')"
     // if debug_mode() <> false then // Doesn't work well currently.
     //     global "options.append('--Ofast-compile=max')" // experimental fast compilation option
     
@@ -63,13 +70,14 @@ inl run' f =
     | 256 => global "options.append('--maxrregcount=255')" // The manual states the max is 255 instead of 256. I've confirmed this empirically as well.
     | _ => ()
 
-    assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" >= sms_per_gpu()) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+    assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" >= blocks_per_grid) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
 
     inl compiler = NVCC
     match compiler with
     | NVRTC => global "raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))"
     | NVCC => 
         global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
+        global "options.append('--expt-relaxed-constexpr')"
         global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
         global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
     inl kernel_i, vars = 
@@ -83,8 +91,8 @@ inl run' f =
             f () : ()
             cuda_global_function_annotation
         inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
-        if x = 1 then 
-            body () 
+        if x = 1 then
+            body ()
         else real 
             open real_core 
             inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}

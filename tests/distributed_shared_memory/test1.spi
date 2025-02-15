@@ -1,0 +1,35 @@
+open corebase
+open corecuda
+open coreext
+open refm
+open rangem
+open tensorm
+
+inl main() =
+    console.write_ln "Can we access distributed shared memory?"
+    run fun () =>
+        open cooperative_groups
+        inl cluster = create_cluster()
+
+        open tensor_cuda
+        let shared,_ : _ _ float * _ =
+            open partitionm
+            tensor_create_from_extern_partition 0 !(2,2,4 : int * int * int)
+        
+        loop.projective rangem.threads_in_block(shared.dim) fun i =>
+            tensor_set i (block_index() |> conv) shared
+
+        sync cluster
+
+        inl v = 
+            shared
+            |> cg_map_shared_rank cluster 7
+            |> tensor_index (1,1,3)
+
+        if thread_index() = 0 then
+            console.write_ln {
+                bid = block_index()
+                v
+            }
+
+        ()

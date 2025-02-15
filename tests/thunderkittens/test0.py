@@ -2,6 +2,11 @@ kernel = r"""
 #include <new>
 #include <assert.h>
 #include <stdio.h>
+#include "kittens.cuh"
+using namespace kittens;
+#include <cooperative_groups.h>
+#include <cuda/semaphore>
+__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
 using default_int = int;
 using default_uint = unsigned int;
 template <typename el>
@@ -202,7 +207,85 @@ struct dynamic_array_list
     }
 };
 
-extern "C" __global__ void __cluster_dims__(16,1,1) entry0() {
+__device__ inline bool while_method_0(int v0){
+    bool v1;
+    v1 = v0 < 16;
+    return v1;
+}
+extern "C" __global__ void __cluster_dims__(8,1,1) entry0() {
+    auto v0 = cooperative_groups::this_cluster();
+    extern __shared__ unsigned char v1[];
+    float * v2;
+    v2 = reinterpret_cast<float *>(&v1[0ull]);
+    int v4;
+    v4 = threadIdx.x;
+    int v5;
+    v5 = v4;
+    while (while_method_0(v5)){
+        bool v7;
+        v7 = 0 <= v5;
+        bool v8;
+        v8 = v7 == false;
+        if (v8){
+            assert("The index needs to be zero or positive." && v7);
+        } else {
+        }
+        int v10;
+        v10 = v5 % 4;
+        int v11;
+        v11 = v5 / 4;
+        int v12;
+        v12 = v11 % 2;
+        int v13;
+        v13 = v11 / 2;
+        bool v14;
+        v14 = v13 < 2;
+        bool v15;
+        v15 = v14 == false;
+        if (v15){
+            assert("The last element of the projection dimensions needs to be greater than the index remainder." && v14);
+        } else {
+        }
+        int v17;
+        v17 = blockIdx.x;
+        float v18;
+        v18 = (float)v17;
+        assert("Tensor range check" && 0 <= v13 && v13 < 2);
+        assert("Tensor range check" && 0 <= v12 && v12 < 2);
+        assert("Tensor range check" && 0 <= v10 && v10 < 4);
+        int v19;
+        v19 = 4 * v12;
+        int v20;
+        v20 = v19 + v10;
+        int v21;
+        v21 = 8 * v13;
+        int v22;
+        v22 = v21 + v20;
+        v2[v22] = v18;
+        v5 += 256 ;
+    }
+    v0.sync() ;
+    float * v23;
+    v23 = v2+0;
+    float * v25;
+    v25 = v0.map_shared_rank(v23,7);
+    float v26;
+    v26 = v25[15];
+    int v27;
+    v27 = threadIdx.x;
+    bool v28;
+    v28 = v27 == 0;
+    if (v28){
+        int v29;
+        v29 = blockIdx.x;
+        cuda::counting_semaphore<cuda::thread_scope_system, 1> & v30 = console_lock;
+        auto v31 = cooperative_groups::coalesced_threads();
+        v30.acquire();
+        printf("{%s = %d; %s = %f}\n","bid", v29, "v", v26);
+        v30.release();
+        v31.sync() ;
+    } else {
+    }
     return ;
 }
 """
@@ -263,13 +346,17 @@ options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
 options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
+import os
+home = os.getenv('HOME')
+options.append(f'-I={home}/ThunderKittens/include')
 options.append('--maxrregcount=255')
 options.append('--std=c++20')
+options.append('--expt-relaxed-constexpr')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
 raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
 def main_body():
     v2 = "{}\n"
-    v3 = "Does the __cluster_dims__ annotation work?"
+    v3 = "Can we use the Thunderkittens library in Spiral?"
     print(v2.format(v3),end="")
     del v2, v3
     v4 = cp.cuda.Device().attributes['MultiProcessorCount']

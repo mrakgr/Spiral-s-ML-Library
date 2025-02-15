@@ -2,3 +2,4 @@ node_modules/
 __pycache__/
 static/bundles/
 .fake
+bin/
