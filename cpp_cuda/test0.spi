@@ -17,6 +17,7 @@ inl run f =
 inl main() : int =
     inl ~y : int = dyn 2 * dyn 8
     run (fun x =>
+        global "#include \"something\""
         inl ~y : int = dyn 5 + dyn 3
         ()
         )

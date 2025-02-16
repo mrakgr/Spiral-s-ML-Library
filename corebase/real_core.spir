@@ -265,7 +265,11 @@ inl lit_to_type_lit x = !!!!LitToTypeLit(x)
 inl failwith forall t. msg = !!!!FailWith(`t,msg)
 
 // Backend switch for Python/Cuda.
-inl backend_switch forall t. x = !!!!BackendSwitch(("Cuda", x.Cuda()), ("Python", x.Python()))
+inl backend_switch forall t. x = 
+    record_fold_back (fun {state=next key value} res =>
+        let q = symbol_to_string key, value 
+        ) a id 
+    // !!!!BackendSwitch(("Cuda", x.Cuda()), ("Python", x.Python()))
 
 // Asserts an term. If the conditional and the message are literals it raises a type error instead.
 inl assert c msg = 

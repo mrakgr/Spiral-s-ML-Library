@@ -51,64 +51,67 @@ union compiler =
 // Executes the lambda on the GPU device.
 inl run' f =
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
-    // Global statements only get executed once.
-    global "options = []"
-    if debug_mode() = false then global "options.append('--define-macro=NDEBUG')" // turns off the macros
-    global "options.append('--dopt=on')" // turns on the device optimizations
-    global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
-    global "options.append('--restrict')" // assumes all the pointers are restricted
+    backend_switch {
+        Python = fun () =>
+            // Global statements only get executed once.
+            global "options = []"
+            if debug_mode() = false then global "options.append('--define-macro=NDEBUG')" // turns off the macros
+            global "options.append('--dopt=on')" // turns on the device optimizations
+            global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
+            global "options.append('--restrict')" // assumes all the pointers are restricted
 
-    global "import os"
-    global "home = os.getenv('HOME')"
-    global "options.append(f'-I={home}/ThunderKittens/include')"
-    // if debug_mode() <> false then // Doesn't work well currently.
-    //     global "options.append('--Ofast-compile=max')" // experimental fast compilation option
-    
-    match threads_per_block with
-    | 1024 => global "options.append('--maxrregcount=64')"
-    | 512 => global "options.append('--maxrregcount=128')"
-    | 256 => global "options.append('--maxrregcount=255')" // The manual states the max is 255 instead of 256. I've confirmed this empirically as well.
-    | _ => ()
+            global "import os"
+            global "home = os.getenv('HOME')"
+            global "options.append(f'-I={home}/ThunderKittens/include')"
+            // if debug_mode() <> false then // Doesn't work well currently.
+            //     global "options.append('--Ofast-compile=max')" // experimental fast compilation option
+            
+            match threads_per_block with
+            | 1024 => global "options.append('--maxrregcount=64')"
+            | 512 => global "options.append('--maxrregcount=128')"
+            | 256 => global "options.append('--maxrregcount=255')" // The manual states the max is 255 instead of 256. I've confirmed this empirically as well.
+            | _ => ()
 
-    assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" >= blocks_per_grid) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+            assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" >= blocks_per_grid) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
 
-    inl compiler = NVCC
-    match compiler with
-    | NVRTC => global "raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))"
-    | NVCC => 
-        global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
-        global "options.append('--expt-relaxed-constexpr')"
-        global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
-        global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
-    inl kernel_i, vars = 
-        inl body cuda_global_function_annotation = join_backend Cuda
+            inl compiler = NVCC
             match compiler with
-            | NVRTC => ()
-            | NVCC =>
-                global "#include <new>"
-                global "#include <assert.h>"
-                global "#include <stdio.h>"
-            f () : ()
-            cuda_global_function_annotation
-        inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
-        if x = 1 then
-            body ()
-        else real 
-            open real_core 
-            inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}
-            body `(`cluster_dims) cluster_dims
-    inl entry = $'raw_module.get_function(f"entry{!kernel_i}")' : $"cp.RawKernel"
-    inl shared_mem = dynamic_shared_memory_used()
-    $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
-    // It's easy to forget whether the debug mode is on or off.
-    if debug_mode() then $"print(f'DEBUG MODE. Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
-    else $"print(f'Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
-    real
-        match vars with
-        | _,_ => $'!entry((!blocks_per_grid,),(!threads_per_block,),!vars,shared_mem=!shared_mem)' : ()
-        | () => $'!entry((!blocks_per_grid,),(!threads_per_block,),(),shared_mem=!shared_mem)' : ()
-        | _ => $'!entry((!blocks_per_grid,),(!threads_per_block,),(!vars,),shared_mem=!shared_mem)' : ()
-    ()
+            | NVRTC => global "raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))"
+            | NVCC => 
+                global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
+                global "options.append('--expt-relaxed-constexpr')"
+                global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
+                global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
+            inl kernel_i, vars = 
+                inl body cuda_global_function_annotation = join_backend Cuda
+                    match compiler with
+                    | NVRTC => ()
+                    | NVCC =>
+                        global "#include <new>"
+                        global "#include <assert.h>"
+                        global "#include <stdio.h>"
+                    f () : ()
+                    cuda_global_function_annotation
+                inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
+                if x = 1 then
+                    body ()
+                else real 
+                    open real_core 
+                    inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}
+                    body `(`cluster_dims) cluster_dims
+            inl entry = $'raw_module.get_function(f"entry{!kernel_i}")' : $"cp.RawKernel"
+            inl shared_mem = dynamic_shared_memory_used()
+            $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
+            // It's easy to forget whether the debug mode is on or off.
+            if debug_mode() then $"print(f'DEBUG MODE. Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
+            else $"print(f'Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
+            real
+                match vars with
+                | _,_ => $'!entry((!blocks_per_grid,),(!threads_per_block,),!vars,shared_mem=!shared_mem)' : ()
+                | () => $'!entry((!blocks_per_grid,),(!threads_per_block,),(),shared_mem=!shared_mem)' : ()
+                | _ => $'!entry((!blocks_per_grid,),(!threads_per_block,),(!vars,),shared_mem=!shared_mem)' : ()
+            ()
+    }
     
 // Executes the lambda on the GPU device.
 inl run f = run' f
