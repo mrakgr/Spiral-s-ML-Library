@@ -167,3 +167,5 @@ inl error_type (msg : string) = real error_type msg
 inl nominal_recreate forall a b. (x : a): b = real nominal_recreate `b x
 // Backend switch for Python/Cuda.
 inl backend_switch forall t. (x : {Cuda : () -> t; Python : () -> t}) : t = real backend_switch `t x
+// Backend switch for Python/Cpp.
+inl backend_switch_host forall t. (x : {Python : () -> t; Cpp : () -> t}) : t = real backend_switch `t x

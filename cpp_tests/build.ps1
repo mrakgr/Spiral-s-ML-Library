@@ -1,7 +1,4 @@
-# Suppresses warnings.
-$WarningPreference = 'SilentlyContinue'
-# This instructs PowerShell to treat non-terminating errors as terminating errors, which will halt script execution.
-$ErrorActionPreference = "Stop"
+$WarningPreference = 'SilentlyContinue'; $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
 
 $path_input = "./hello.cu"
 $path_output = Join-Path (Split-Path $path_input -Parent) "bin" (Split-Path $path_input -LeafBase)

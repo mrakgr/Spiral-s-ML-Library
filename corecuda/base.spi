@@ -1,10 +1,11 @@
 open corebase
 
 union gpu = // Feel free to extend this.
+    | Debug
     | RTX4060
     | H100_SMX
 
-inl gpu() = H100_SMX // Marko Grdinić: The GPU I am working on currently. Feel free to change this.
+inl gpu() = Debug // Marko Grdinić: The GPU I am working on currently. Feel free to change this.
 
 // Controls the asserts. Easier to change this than to comment out the option directly.
 inl debug_mode() = false
@@ -13,16 +14,18 @@ type warp_size = 32
 inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
 inl sms_per_gpu() : int = 
     match gpu() with
+    | Debug => 1
     | RTX4060 => 24 // Marko Grdinić: My RTX 4060 has 24 SMs. A RTX 4090 for example would have 128. This should be changed to reflect your configuration.
     | H100_SMX => 132
 
 inl threads_per_block() : int = 
-    // 32 // Debug
-    // 512 // Release
-    256 // Release
+    match gpu() with
+    | Debug => 1
+    | _ => 256 // Release
 
 inl blocks_per_grid() : int = 
     match gpu() with
+    | Debug => 1
     | RTX4060 => sms_per_gpu()
     // The H100 actually has 132 SMs, but the thread block cluster launches need a multiple of 16, and also due to the we can only launch 112 block 
     // with thread block clusters of size 16 and 120 blocks with thread block clusters of size 8.
@@ -30,6 +33,7 @@ inl blocks_per_grid() : int =
 
 inl blocks_per_cluster() : int =
     match gpu() with
+    | Debug => 1
     | RTX4060 => 1
     | H100_SMX => 8
 
@@ -37,81 +41,143 @@ inl blocks_per_cluster() : int =
 inl dynamic_shared_memory_used() : int = 
     // On a RTX 4060, 99kb is the limit. 1 kb = 1024 bytes.
     match gpu() with
+    | Debug => 96
     | RTX4060 => 96 // 99kb is the limit
     | H100_SMX => 224 // 227kb is the limit
     * (1 <<< 10)
 
-// Synchronizes the device on the host. Should be used on the Python side.
-inl device_sync() : () = $"cp.cuda.get_current_stream().synchronize()"
+// Synchronizes the device on the host. Should be used on the host side.
+inl device_sync() : () = 
+    backend_switch_host {
+        Python = fun () => $"cp.cuda.get_current_stream().synchronize()"
+        Cpp = fun () => $"gpuErrchk(cudaDeviceSynchronize())"
+    }
 
 union compiler =
     | NVCC
     | NVRTC
 
-// Executes the lambda on the GPU device.
-inl run' f =
+inl run_python f =
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
-    backend_switch {
-        Python = fun () =>
-            // Global statements only get executed once.
-            global "options = []"
-            if debug_mode() = false then global "options.append('--define-macro=NDEBUG')" // turns off the macros
-            global "options.append('--dopt=on')" // turns on the device optimizations
-            global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
-            global "options.append('--restrict')" // assumes all the pointers are restricted
+    // Global statements only get executed once.
+    global "options = []"
+    if debug_mode() = false then global "options.append('--define-macro=NDEBUG')" // turns off the macros
+    global "options.append('--dopt=on')" // turns on the device optimizations
+    global "options.append('--diag-suppress=550,20012,68,39,177')" // suppresses some warnings
+    global "options.append('--restrict')" // assumes all the pointers are restricted
 
-            global "import os"
-            global "home = os.getenv('HOME')"
-            global "options.append(f'-I={home}/ThunderKittens/include')"
-            // if debug_mode() <> false then // Doesn't work well currently.
-            //     global "options.append('--Ofast-compile=max')" // experimental fast compilation option
-            
-            match threads_per_block with
-            | 1024 => global "options.append('--maxrregcount=64')"
-            | 512 => global "options.append('--maxrregcount=128')"
-            | 256 => global "options.append('--maxrregcount=255')" // The manual states the max is 255 instead of 256. I've confirmed this empirically as well.
-            | _ => ()
+    global "import os"
+    global "home = os.getenv('HOME')"
+    global "options.append(f'-I={home}/ThunderKittens/include')"
+    // if debug_mode() <> false then // Doesn't work well currently.
+    //     global "options.append('--Ofast-compile=max')" // experimental fast compilation option
+    
+    match threads_per_block with
+    | 1024 => global "options.append('--maxrregcount=64')"
+    | 512 => global "options.append('--maxrregcount=128')"
+    | 256 => global "options.append('--maxrregcount=255')" // The manual states the max is 255 instead of 256. I've confirmed this empirically as well.
+    | _ => ()
 
-            assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" >= blocks_per_grid) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+    assert ($"cp.cuda.Device().attributes['MultiProcessorCount']" >= blocks_per_grid) "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
 
-            inl compiler = NVCC
+    inl compiler = NVCC
+    match compiler with
+    | NVRTC => global "raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))"
+    | NVCC => 
+        global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
+        global "options.append('--expt-relaxed-constexpr')"
+        global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
+        global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
+    inl vars = 
+        inl body cuda_global_function_annotation = join_backend Cuda
             match compiler with
-            | NVRTC => global "raw_module = cp.RawModule(code=kernel, backend='nvrtc', enable_cooperative_groups=True, options=tuple(options))"
-            | NVCC => 
-                global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
-                global "options.append('--expt-relaxed-constexpr')"
-                global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
-                global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
-            inl kernel_i, vars = 
-                inl body cuda_global_function_annotation = join_backend Cuda
-                    match compiler with
-                    | NVRTC => ()
-                    | NVCC =>
-                        global "#include <new>"
-                        global "#include <assert.h>"
-                        global "#include <stdio.h>"
-                    f () : ()
-                    cuda_global_function_annotation
-                inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
-                if x = 1 then
-                    body ()
-                else real 
-                    open real_core 
-                    inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}
-                    body `(`cluster_dims) cluster_dims
-            inl entry = $'raw_module.get_function(f"entry{!kernel_i}")' : $"cp.RawKernel"
-            inl shared_mem = dynamic_shared_memory_used()
-            $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
-            // It's easy to forget whether the debug mode is on or off.
-            if debug_mode() then $"print(f'DEBUG MODE. Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
-            else $"print(f'Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
-            real
-                match vars with
-                | _,_ => $'!entry((!blocks_per_grid,),(!threads_per_block,),!vars,shared_mem=!shared_mem)' : ()
-                | () => $'!entry((!blocks_per_grid,),(!threads_per_block,),(),shared_mem=!shared_mem)' : ()
-                | _ => $'!entry((!blocks_per_grid,),(!threads_per_block,),(!vars,),shared_mem=!shared_mem)' : ()
-            ()
-    }
+            | NVRTC => ()
+            | NVCC =>
+                global "#include <new>"
+                global "#include <assert.h>"
+                global "#include <stdio.h>"
+            f () : ()
+            cuda_global_function_annotation
+        inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
+        if x = 1 then
+            body ()
+        else real 
+            open real_core 
+            inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}
+            body `(`cluster_dims) cluster_dims
+    inl entry = $'raw_module.get_function(kernel)' : $"cp.RawKernel"
+    inl shared_mem = dynamic_shared_memory_used()
+    $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
+    // It's easy to forget whether the debug mode is on or off.
+    if debug_mode() then $"print(f'DEBUG MODE. Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
+    else $"print(f'Threads per block, blocks per grid: {!threads_per_block}, {!blocks_per_grid}')"
+    real
+        match vars with
+        | _,_ => $'!entry((!blocks_per_grid,),(!threads_per_block,),!vars,shared_mem=!shared_mem)' : ()
+        | () => $'!entry((!blocks_per_grid,),(!threads_per_block,),(),shared_mem=!shared_mem)' : ()
+        | _ => $'!entry((!blocks_per_grid,),(!threads_per_block,),(!vars,),shared_mem=!shared_mem)' : ()
+    ()
+
+inl run_cpp f = join
+    global "#include <new>"
+    global "#include <assert.h>"
+    global "#include <stdio.h>"
+    global "#include <cuda_runtime.h>"
+
+    inl blocks_per_grid, threads_per_block, blocks_per_cluster = blocks_per_grid(), threads_per_block(), blocks_per_cluster()
+    inl shared_mem = dynamic_shared_memory_used()
+    inl vars = 
+        inl body cuda_global_function_annotation = join_backend Cuda
+            f () : ()
+            cuda_global_function_annotation
+        if blocks_per_cluster = 1 then
+            body ()
+        else real 
+            open real_core 
+            inl cluster_dims = {cluster_dims={x=lit_to_symbol blocks_per_cluster; y=lit_to_symbol 1; z=lit_to_symbol 1}}
+            body `(`cluster_dims) cluster_dims
+
+    // Since v2.16.0 the kernel variable gets generated directly when a backend join point is hit.
+    $"gpuErrchk(cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, !shared_mem))"
+    $"gpuErrchk(cudaFuncSetAttribute(kernel, cudaFuncAttributeNonPortableClusterSizeAllowed, !blocks_per_cluster))"
+
+    // Creates the base launch attribute.
+    inl attr_base() = $"cudaLaunchAttribute \v" : $"cudaLaunchAttribute"
+
+    // Passing this attribute into cudaLaunchConfig_t will make the kernel launch a cooperative one.
+    inl attr_coop() =
+        inl x = attr_base()
+        $"!x.id = cudaLaunchAttributeCooperative"
+        $"!x.val.cooperative = 1"
+        x
+    
+    // The attribute for the dynamic cluster launch.
+    inl attr_cluster() =
+        inl x = attr_base()
+        $"!x.id = cudaLaunchAttributeClusterDimension"
+        $"!x.val.clusterDim.x = !blocks_per_cluster"
+        $"!x.val.clusterDim.y = 1"
+        $"!x.val.clusterDim.z = 1"
+        x
+
+    inl config = $"cudaLaunchConfig_t \v = {0}" : $"cudaLaunchConfig_t"
+    $"!config.gridDim = !blocks_per_grid"
+    $"!config.blockDim = !threads_per_block"
+    $"!config.dynamicSmemBytes = !shared_mem"
+
+    // Not using the cluster attribute since the annotations are generated on the kernel itself.
+    let attrs = attr_coop()
+    $"!config.numAttrs = !(real struct.count attrs)"
+    inl attrs_array = $"cudaLaunchAttribute \v[] = { #attrs }" : $"cudaLaunchAttribute[]"
+    $"!config.attrs = !attrs_array"
+    real
+        match vars with
+        | () => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel))" : ()
+        | _ => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel, #vars))" : ()
+    ()
+    
+// Executes the lambda on the GPU device.
+inl run' f = run_python f
     
 // Executes the lambda on the GPU device.
 inl run f = run' f

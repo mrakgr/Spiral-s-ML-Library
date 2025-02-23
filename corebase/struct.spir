@@ -157,3 +157,6 @@ inl map2 set ar v =
 
 // Calculates the integer product of the argument.
 inl prod dim = open real_core in foldBack (*) dim 1
+
+// Counts the number of elements in the structure.
+inl count x = open real_core in foldBack (fun _ s => s + 1) x 0

@@ -264,12 +264,10 @@ inl lit_to_type_lit x = !!!!LitToTypeLit(x)
 // Raises an exception at runtime.
 inl failwith forall t. msg = !!!!FailWith(`t,msg)
 
-// Backend switch for Python/Cuda.
-inl backend_switch forall t. x = 
-    record_fold_back (fun {state=next key value} res =>
-        let q = symbol_to_string key, value 
-        ) a id 
-    // !!!!BackendSwitch(("Cuda", x.Cuda()), ("Python", x.Python()))
+// Backend switch for various backends. Expects a record where keys are backend names and values are functions that take in an unit argument.
+// All of the branches must return the same type and all will be evaluated at compile time regardless of the currently selected backend.
+// The term returned by the selected backend is dyned.
+inl backend_switch forall t. x = !!!!BackendSwitch(x)
 
 // Asserts an term. If the conditional and the message are literals it raises a type error instead.
 inl assert c msg = 
