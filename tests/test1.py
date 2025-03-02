@@ -228,13 +228,13 @@ extern "C" __global__ void entry0() {
     bool v4;
     v4 = v3 == 0l;
     if (v4){
-        Fun0 v5{new Closure0{}};
-        int v6;
-        v6 = v5(1l, 2l);
+        # Fun0 v5{new Closure0{}};
+        # int v6;
+        # v6 = v5(1l, 2l);
         cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v7 = console_lock;
         auto v8 = cooperative_groups::coalesced_threads();
         v7.acquire();
-        printf("%d\n",v6);
+        printf("%d\n",7);
         v7.release();
         v8.sync() ;
         return ;
