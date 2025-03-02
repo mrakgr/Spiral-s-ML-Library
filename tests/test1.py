@@ -228,9 +228,11 @@ extern "C" __global__ void entry0() {
     bool v4;
     v4 = v3 == 0l;
     if (v4){
-        # Fun0 v5{new Closure0{}};
-        # int v6;
-        # v6 = v5(1l, 2l);
+        auto x = new Closure0{};
+        delete x;
+//        Fun0 v5{x};
+//        int v6;
+//        v6 = v5(1l, 2l);
         cuda::counting_semaphore<cuda::thread_scope_system, 1l> & v7 = console_lock;
         auto v8 = cooperative_groups::coalesced_threads();
         v7.acquire();
