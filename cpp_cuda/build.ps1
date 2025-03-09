@@ -26,7 +26,10 @@ if (-not (Test-Path $path_output) -or
     # Write-Host "The '$path_output' is up to date."
 }
 
-& $path_output
+if ($?){
+    & $path_output
+}
+
 
 <#
 cd /mnt/c/Spiral_s_ML_Library/cpp_cuda

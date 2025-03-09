@@ -2,7 +2,7 @@ kernels_main = r"""
 #include <cooperative_groups.h>
 #include <cuda/semaphore>
 __device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
-struct ClosureBase0 { int refc{0}; __device__ virtual int operator()(int, int) = 0; virtual ~ClosureBase0() = default; };
+struct ClosureBase0 { int refc{0}; __device__ virtual int operator()(int, int) = 0; __device__ virtual ~ClosureBase0(){}; };
 typedef csptr<ClosureBase0> Fun0;
 struct Closure0 : public ClosureBase0 {
     __device__ int operator()(int tup0, int tup1) override {
@@ -11,7 +11,7 @@ struct Closure0 : public ClosureBase0 {
         v2 = v0 + v1;
         return v2;
     }
-    ~Closure0() override {  }
+    __device__ ~Closure0() override {  }
 };
 extern "C" __global__ void entry0() {
     int v0;
