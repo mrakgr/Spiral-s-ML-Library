@@ -87,7 +87,7 @@ inl run_python f =
         global "options.append('--std=c++20')" // We'll need this one for Cutlass later.
         global "options.append('--expt-relaxed-constexpr')"
         global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
-        global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
+        global "raw_module = cp.RawModule(code=kernels, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
     inl vars = 
         inl body cuda_global_function_annotation = join_backend Cuda
             f () : ()
