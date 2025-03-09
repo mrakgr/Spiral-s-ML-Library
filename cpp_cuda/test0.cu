@@ -1,38 +1,35 @@
-using default_int = int;
-using default_uint = unsigned int;
-// #include <new>
-#include <assert.h>
-#include <stdio.h>
-
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-inline void gpuAssert(cudaError error, const char *file, int line, bool abort=true) {
-    if (error != cudaSuccess) {
-        fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(error), file, line);
-        if (abort) exit(error);
-    }
-}
-
+#include "test0.auto.cu"
+#include <cooperative_groups.h>
+#include <cuda/semaphore>
+__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
 namespace Device {
-    struct ClosureBase0 { int refc{0}; __device__ virtual int operator()(int, int) = 0; __device__ virtual ~ClosureBase0() = default; };
-    struct Closure0 : ClosureBase0 {
-        __device__ int operator()(int tup0, int tup1) override {
-            int v0 = tup0; int v1 = tup1;
-            int v2;
-            v2 = v0 + v1;
-            return v2;
-        }
-        ~Closure0() override = default;
-    };
-    extern "C" __global__ void entry0() {
-        auto x = new Closure0{};
-        delete x;
-    }
+    extern "C" __global__ void entry0() {        int v0;        v0 = 5;        int v1;        v1 = 3;        int v2;        v2 = v0 + v1;        cuda::counting_semaphore<cuda::thread_scope_system, 1> & v3 = console_lock;        auto v4 = cooperative_groups::coalesced_threads();        v3.acquire();        printf("%s\n","hello");        v3.release();        v4.sync() ;        return ;    }}
+void run_cpp_0();
+void run_cpp_0(){
+    auto kernel = Device::entry0;
+    gpuErrchk(cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, 98304));
+    gpuErrchk(cudaFuncSetAttribute(kernel, cudaFuncAttributeNonPortableClusterSizeAllowed, 1));
+    cudaLaunchConfig_t v0 = {0};
+    v0.gridDim = 1;
+    v0.blockDim = 1;
+    v0.dynamicSmemBytes = 98304;
+    cudaLaunchAttribute v1;
+    v1.id = cudaLaunchAttributeCooperative;
+    v1.val.cooperative = 1;
+    v0.numAttrs = 1;
+    cudaLaunchAttribute v2[] = { v1 };
+    v0.attrs = v2;
+    gpuErrchk(cudaLaunchKernelEx(&v0, kernel));
+    return ;
 }
 int main() {
-    printf("launching kernel\n");
-    Device::entry0<<<1,1>>>();
-    printf("done with kernel\n");
+    int v0;
+    v0 = 2;
+    int v1;
+    v1 = 8;
+    int v2;
+    v2 = v0 * v1;
+    run_cpp_0();
     gpuErrchk(cudaDeviceSynchronize());
-    printf("done with sync\n");
     return 0;
 }

@@ -90,12 +90,6 @@ inl run_python f =
         global "raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
     inl vars = 
         inl body cuda_global_function_annotation = join_backend Cuda
-            match compiler with
-            | NVRTC => ()
-            | NVCC =>
-                global "#include <new>"
-                global "#include <assert.h>"
-                global "#include <stdio.h>"
             f () : ()
             cuda_global_function_annotation
         inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
@@ -119,11 +113,6 @@ inl run_python f =
     ()
 
 inl run_cpp f = join
-    global "#include <new>"
-    global "#include <assert.h>"
-    global "#include <stdio.h>"
-    global "#include <cuda_runtime.h>"
-
     inl blocks_per_grid, threads_per_block, blocks_per_cluster = blocks_per_grid(), threads_per_block(), blocks_per_cluster()
     inl shared_mem = dynamic_shared_memory_used()
     inl vars = 

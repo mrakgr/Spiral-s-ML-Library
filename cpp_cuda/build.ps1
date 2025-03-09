@@ -23,9 +23,12 @@ if (-not (Test-Path $path_output) -or
         -o $path_output `
         $path_input
 } else {
-    Write-Host "The '$path_output' is up to date."
+    # Write-Host "The '$path_output' is up to date."
 }
 
+& $path_output
+
 <#
+cd /mnt/c/Spiral_s_ML_Library/cpp_cuda
 pwsh build.ps1
 #>
