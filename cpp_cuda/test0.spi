@@ -4,10 +4,9 @@ open coreext
 
 inl main() : int =
     inl ~y : int = dyn 2 * dyn 8
-    run_cpp (fun x =>
+    run (fun x =>
         inl ~y : int = dyn 5 + dyn 3
         console.write_ln "hello"
         ()
         )
-    device_sync()
     0

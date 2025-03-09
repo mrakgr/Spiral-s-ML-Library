@@ -57,8 +57,22 @@ union compiler =
     | NVCC
     | NVRTC
 
-inl run_python f =
+// Calls the Cuda backend join point, returns the free vars needed to execute it. Also does a side effecting step of assigning the kernel to a variable.
+// The reason this is factored out is memoize the computation between the Cuda and the Python backends.
+inl call_backend f =
+    inl body cuda_global_function_annotation = join_backend Cuda
+        f () : ()
+        cuda_global_function_annotation
+    if blocks_per_cluster() = 1 then
+        body ()
+    else real 
+        open real_core 
+        inl cluster_dims = {cluster_dims={x=lit_to_symbol blocks_per_cluster; y=lit_to_symbol 1; z=lit_to_symbol 1}}
+        body `(`cluster_dims) cluster_dims
+
+inl run_python f = join
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+    inl vars = call_backend f
     // Global statements only get executed once.
     global "options = []"
     if debug_mode() = false then global "options.append('--define-macro=NDEBUG')" // turns off the macros
@@ -88,17 +102,6 @@ inl run_python f =
         global "options.append('--expt-relaxed-constexpr')"
         global "options.append('-D__CUDA_NO_HALF_CONVERSIONS__')" // To avoid `instance of overloaded function "__half::__half" matches the specified type` error with NVCC
         global "raw_module = cp.RawModule(code=kernels, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))"
-    inl vars = 
-        inl body cuda_global_function_annotation = join_backend Cuda
-            f () : ()
-            cuda_global_function_annotation
-        inl x = blocks_per_cluster() // The number of blocks per cluster depends on the type of the GPU.
-        if x = 1 then
-            body ()
-        else real 
-            open real_core 
-            inl cluster_dims = {cluster_dims={x=lit_to_symbol x; y=lit_to_symbol 1; z=lit_to_symbol 1}}
-            body `(`cluster_dims) cluster_dims
     inl entry = $'raw_module.get_function(kernel)' : $"cp.RawKernel"
     inl shared_mem = dynamic_shared_memory_used()
     $'!entry.max_dynamic_shared_size_bytes = !shared_mem '
@@ -115,16 +118,7 @@ inl run_python f =
 inl run_cpp f = join
     inl blocks_per_grid, threads_per_block, blocks_per_cluster = blocks_per_grid(), threads_per_block(), blocks_per_cluster()
     inl shared_mem = dynamic_shared_memory_used()
-    inl vars = 
-        inl body cuda_global_function_annotation = join_backend Cuda
-            f () : ()
-            cuda_global_function_annotation
-        if blocks_per_cluster = 1 then
-            body ()
-        else real 
-            open real_core 
-            inl cluster_dims = {cluster_dims={x=lit_to_symbol blocks_per_cluster; y=lit_to_symbol 1; z=lit_to_symbol 1}}
-            body `(`cluster_dims) cluster_dims
+    inl vars = call_backend f
 
     // Since v2.16.0 the kernel variable gets generated directly when a backend join point is hit.
     $"gpuErrchk(cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, !shared_mem))"
@@ -166,8 +160,12 @@ inl run_cpp f = join
     ()
     
 // Executes the lambda on the GPU device.
-inl run' f = run_python f
-    
+inl run' f =
+    backend_switch_host {
+        Cpp = fun () => run_cpp f
+        Python = fun () => run_python f
+    }
+
 // Executes the lambda on the GPU device.
 inl run f = run' f
 
