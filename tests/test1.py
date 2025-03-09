@@ -13,6 +13,18 @@ struct Closure0 : public ClosureBase0 {
     }
     __device__ ~Closure0() override {  }
 };
+struct Closure1 : public ClosureBase0 {
+    Fun0 v0;
+    __device__ int operator()(int tup0, int tup1) override {
+        Fun0 & v0 = this->v0;
+        int v1 = tup0; int v2 = tup1;
+        return v0(v1, v2);
+    }
+    __device__ Closure1(Fun0 _v0) : v0(_v0) { }
+    __device__ ~Closure1() override { 
+        printf("Destroying closure...\n");
+        destroy(v0); }
+};
 extern "C" __global__ void entry0() {
     int v0;
     v0 = threadIdx.x;
@@ -24,14 +36,15 @@ extern "C" __global__ void entry0() {
     v3 = v2 == 0;
     if (v3){
         Fun0 v4{new Closure0{}};
-        int v5;
-        v5 = v4(1, 2);
-        cuda::counting_semaphore<cuda::thread_scope_system, 1> & v6 = console_lock;
-        auto v7 = cooperative_groups::coalesced_threads();
-        v6.acquire();
-        printf("%d\n",v5);
-        v6.release();
-        v7.sync() ;
+        Fun0 v5{new Closure1{v4}};
+        int v6;
+        v6 = v5(1, 2);
+        cuda::counting_semaphore<cuda::thread_scope_system, 1> & v7 = console_lock;
+        auto v8 = cooperative_groups::coalesced_threads();
+        v7.acquire();
+        printf("%d\n",v6);
+        v7.release();
+        v8.sync() ;
         return ;
     } else {
         return ;

@@ -1,33 +1,23 @@
-kernel = r"""
-using default_int = long;
-using default_uint = unsigned long;
-#include "reference_counting.cuh"
-#include <assert.h>
-#include <stdio.h>
-struct ClosureBase0 { int refc{0}; __device__ virtual void operator()() = 0; __device__ virtual ~ClosureBase0() = default; };
+kernels_main = r"""
+#include <cooperative_groups.h>
+#include <cuda/semaphore>
+__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
+struct ClosureBase0 { int refc{0}; __device__ virtual void operator()() = 0; __device__ virtual ~ClosureBase0(){}; };
 typedef csptr<ClosureBase0> Fun0;
 struct Union1;
 struct Union0;
 struct Mut0;
-__device__ void write_3(const char * v0);
-__device__ void write_2();
-__device__ void write_4();
-__device__ void write_6(long v0);
-__device__ void write_8();
-__device__ void write_9();
-__device__ void write_10(long v0, sptr<Union1> v1);
-__device__ void write_7(sptr<Union0> v0);
-__device__ void write_5(long v0, sptr<Union0> v1);
-__device__ void write_1(sptr<Union1> v0);
+__device__ void method_2(sptr<Union0> v0);
+__device__ void method_1(sptr<Union1> v0);
 __device__ Fun0 method_0();
 typedef void (* Fun1)();
-__device__ Fun1 method_11();
+__device__ Fun1 method_3();
 struct Union1_0 { // A_Done
 };
 struct Union1_1 { // A_Rest
     sptr<Union0> v1;
-    long v0;
-    __device__ Union1_1(long t0, sptr<Union0> t1) : v0(t0), v1(t1) {}
+    int v0;
+    __device__ Union1_1(int t0, sptr<Union0> t1) : v0(t0), v1(t1) {}
     __device__ Union1_1() = delete;
 };
 struct Union1 {
@@ -88,8 +78,8 @@ struct Union0_0 { // B_Done
 };
 struct Union0_1 { // B_Rest
     sptr<Union1> v1;
-    long v0;
-    __device__ Union0_1(long t0, sptr<Union1> t1) : v0(t0), v1(t1) {}
+    int v0;
+    __device__ Union0_1(int t0, sptr<Union1> t1) : v0(t0), v1(t1) {}
     __device__ Union0_1() = delete;
 };
 struct Union0 {
@@ -154,12 +144,12 @@ struct Mut0 {
 };
 struct Closure0 : public ClosureBase0 {
     __device__ void operator()() override {
-        long v0;
-        v0 = 1l;
-        long v1;
-        v1 = 2l;
-        long v2;
-        v2 = 3l;
+        int v0;
+        v0 = 1;
+        int v1;
+        v1 = 2;
+        int v2;
+        v2 = 3;
         sptr<Union0> v3;
         v3 = sptr<Union0>{new Union0{Union0_0{}}};
         sptr<Union1> v4;
@@ -168,12 +158,12 @@ struct Closure0 : public ClosureBase0 {
         v5 = sptr<Union0>{new Union0{Union0_1{v1, v4}}};
         sptr<Union1> v6;
         v6 = sptr<Union1>{new Union1{Union1_1{v0, v5}}};
-        long v7;
-        v7 = 12l;
-        long v8;
-        v8 = 23l;
-        long v9;
-        v9 = 34l;
+        int v7;
+        v7 = 12;
+        int v8;
+        v8 = 23;
+        int v9;
+        v9 = 34;
         sptr<Union0> v10;
         v10 = sptr<Union0>{new Union0{Union0_0{}}};
         sptr<Union1> v11;
@@ -185,103 +175,56 @@ struct Closure0 : public ClosureBase0 {
         sptr<Mut0> v14;
         v14 = sptr<Mut0>{new Mut0{v6}};
         v14.base->v0 = v13;
-        sptr<Union1> v15;
-        v15 = v14.base->v0;
-        write_1(v15);
+        sptr<Union1> & v15 = v14.base->v0;
+        cuda::counting_semaphore<cuda::thread_scope_system, 1> & v16 = console_lock;
+        auto v17 = cooperative_groups::coalesced_threads();
+        v16.acquire();
+        printf("");
+        method_1(v15);
         printf("\n");
+        v16.release();
+        v17.sync() ;
         return ;
     }
-    ~Closure0() override = default;
+    __device__ ~Closure0() override {  }
 };
-__device__ void write_3(const char * v0){
-    const char * v1;
-    v1 = "%s";
-    printf(v1,v0);
-    return ;
-}
-__device__ void write_2(){
-    const char * v0;
-    v0 = "A_Done";
-    return write_3(v0);
-}
-__device__ void write_4(){
-    const char * v0;
-    v0 = "A_Rest";
-    return write_3(v0);
-}
-__device__ void write_6(long v0){
-    const char * v1;
-    v1 = "%d";
-    printf(v1,v0);
-    return ;
-}
-__device__ void write_8(){
-    const char * v0;
-    v0 = "B_Done";
-    return write_3(v0);
-}
-__device__ void write_9(){
-    const char * v0;
-    v0 = "B_Rest";
-    return write_3(v0);
-}
-__device__ void write_10(long v0, sptr<Union1> v1){
-    write_6(v0);
-    const char * v2;
-    v2 = ", ";
-    write_3(v2);
-    return write_1(v1);
-}
-__device__ void write_7(sptr<Union0> v0){
+__device__ void method_2(sptr<Union0> v0){
     switch (v0.base->tag) {
         case 0: { // B_Done
-            return write_8();
+            printf("%s","B_Done");
+            return ;
             break;
         }
         case 1: { // B_Rest
-            long v1 = v0.base->case1.v0; sptr<Union1> v2 = v0.base->case1.v1;
-            write_9();
-            const char * v3;
-            v3 = "(";
-            write_3(v3);
-            write_10(v1, v2);
-            const char * v4;
-            v4 = ")";
-            return write_3(v4);
+            int v1 = v0.base->case1.v0; sptr<Union1> v2 = v0.base->case1.v1;
+            printf("%s(%d, ","B_Rest", v1);
+            method_1(v2);
+            printf(")");
+            return ;
             break;
         }
         default: {
-            assert("Invalid tag." && false);
+            assert("Invalid tag." && false); __trap();
         }
     }
 }
-__device__ void write_5(long v0, sptr<Union0> v1){
-    write_6(v0);
-    const char * v2;
-    v2 = ", ";
-    write_3(v2);
-    return write_7(v1);
-}
-__device__ void write_1(sptr<Union1> v0){
+__device__ void method_1(sptr<Union1> v0){
     switch (v0.base->tag) {
         case 0: { // A_Done
-            return write_2();
+            printf("%s","A_Done");
+            return ;
             break;
         }
         case 1: { // A_Rest
-            long v1 = v0.base->case1.v0; sptr<Union0> v2 = v0.base->case1.v1;
-            write_4();
-            const char * v3;
-            v3 = "(";
-            write_3(v3);
-            write_5(v1, v2);
-            const char * v4;
-            v4 = ")";
-            return write_3(v4);
+            int v1 = v0.base->case1.v0; sptr<Union0> v2 = v0.base->case1.v1;
+            printf("%s(%d, ","A_Rest", v1);
+            method_2(v2);
+            printf(")");
+            return ;
             break;
         }
         default: {
-            assert("Invalid tag." && false);
+            assert("Invalid tag." && false); __trap();
         }
     }
 }
@@ -289,12 +232,12 @@ __device__ Fun0 method_0(){
     return csptr<ClosureBase0>{new Closure0{}};
 }
 __device__ void FunPointerMethod1(){
-    long v0;
-    v0 = 1l;
-    long v1;
-    v1 = 2l;
-    long v2;
-    v2 = 3l;
+    int v0;
+    v0 = 1;
+    int v1;
+    v1 = 2;
+    int v2;
+    v2 = 3;
     sptr<Union0> v3;
     v3 = sptr<Union0>{new Union0{Union0_0{}}};
     sptr<Union1> v4;
@@ -303,12 +246,12 @@ __device__ void FunPointerMethod1(){
     v5 = sptr<Union0>{new Union0{Union0_1{v1, v4}}};
     sptr<Union1> v6;
     v6 = sptr<Union1>{new Union1{Union1_1{v0, v5}}};
-    long v7;
-    v7 = 12l;
-    long v8;
-    v8 = 23l;
-    long v9;
-    v9 = 34l;
+    int v7;
+    v7 = 12;
+    int v8;
+    v8 = 23;
+    int v9;
+    v9 = 34;
     sptr<Union0> v10;
     v10 = sptr<Union0>{new Union0{Union0_0{}}};
     sptr<Union1> v11;
@@ -320,96 +263,83 @@ __device__ void FunPointerMethod1(){
     sptr<Mut0> v14;
     v14 = sptr<Mut0>{new Mut0{v6}};
     v14.base->v0 = v13;
-    sptr<Union1> v15;
-    v15 = v14.base->v0;
-    write_1(v15);
+    sptr<Union1> & v15 = v14.base->v0;
+    cuda::counting_semaphore<cuda::thread_scope_system, 1> & v16 = console_lock;
+    auto v17 = cooperative_groups::coalesced_threads();
+    v16.acquire();
+    printf("");
+    method_1(v15);
     printf("\n");
+    v16.release();
+    v17.sync() ;
     return ;
 }
-__device__ Fun1 method_11(){
+__device__ Fun1 method_3(){
     return FunPointerMethod1;
 }
 extern "C" __global__ void entry0() {
-    long v0;
+    int v0;
     v0 = threadIdx.x;
-    long v1;
+    int v1;
     v1 = blockIdx.x;
-    long v2;
-    v2 = v1 * 32l;
-    long v3;
-    v3 = v0 + v2;
-    bool v4;
-    v4 = v3 == 0l;
-    if (v4){
-        Fun0 v5;
-        v5 = method_0();
-        v5();
-        Fun1 v6;
-        v6 = method_11();
-        return v6();
+    int v2;
+    v2 = v0 + v1;
+    bool v3;
+    v3 = v2 == 0;
+    if (v3){
+        Fun0 v4;
+        v4 = method_0();
+        v4();
+        Fun1 v5;
+        v5 = method_3();
+        return v5();
     } else {
         return ;
     }
 }
 """
-class static_array():
-    def __init__(self, length):
-        self.ptr = []
-        for _ in range(length):
-            self.ptr.append(None)
-
-    def __getitem__(self, index):
-        assert 0 <= index < len(self.ptr), "The get index needs to be in range."
-        return self.ptr[index]
-    
-    def __setitem__(self, index, value):
-        assert 0 <= index < len(self.ptr), "The set index needs to be in range."
-        self.ptr[index] = value
-
-class static_array_list(static_array):
-    def __init__(self, length):
-        super().__init__(length)
-        self.length = 0
-
-    def __getitem__(self, index):
-        assert 0 <= index < self.length, "The get index needs to be in range."
-        return self.ptr[index]
-    
-    def __setitem__(self, index, value):
-        assert 0 <= index < self.length, "The set index needs to be in range."
-        self.ptr[index] = value
-
-    def push(self,value):
-        assert (self.length < len(self.ptr)), "The length before pushing has to be less than the maximum length of the array."
-        self.ptr[self.length] = value
-        self.length += 1
-
-    def pop(self):
-        assert (0 < self.length), "The length before popping has to be greater than 0."
-        self.length -= 1
-        return self.ptr[self.length]
-
-    def unsafe_set_length(self,i):
-        assert 0 <= i <= len(self.ptr), "The new length has to be in range."
-        self.length = i
+from test3_auto import *
+kernels = kernels_aux + kernels_main
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
-i8 = i16 = i32 = i64 = u8 = u16 = u32 = u64 = int; f32 = f64 = float; char = string = str
+i8 = int; i16 = int; i32 = int; i64 = int; u8 = int; u16 = int; u32 = int; u64 = int; f32 = float; f64 = float; char = str; string = str
 
 options = []
-options.append('--diag-suppress=550,20012,68')
+options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
+options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
-options.append('-I C:/Spiral_s_ML_Library/cpplib')
-raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
-def main():
-    v0 = 0
-    v1 = raw_module.get_function(f"entry{v0}")
+import os
+home = os.getenv('HOME')
+options.append(f'-I={home}/ThunderKittens/include')
+options.append('--std=c++20')
+options.append('--expt-relaxed-constexpr')
+options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
+raw_module = cp.RawModule(code=kernels, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
+def main_body():
+    v0 = cp.cuda.Device().attributes['MultiProcessorCount']
+    v1 = v0 >= 1
     del v0
-    v1.max_dynamic_shared_size_bytes = 0 
-    v1((1,),(32,),(),shared_mem=0)
-    del v1
+    v2 = v1 == False
+    if v2:
+        v3 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+        assert v1, v3
+        del v3
+    else:
+        pass
+    del v1, v2
+    kernel = "entry0"
+    v4 = raw_module.get_function(kernel)
+    v4.max_dynamic_shared_size_bytes = 98304 
+    print(f'Threads per block, blocks per grid: {1}, {1}')
+    v4((1,),(1,),(),shared_mem=98304)
+    del v4
     return 
+
+def main():
+    r = main_body()
+    cp.cuda.get_current_stream().synchronize() # This line is here so the `__trap()` calls on the kernel aren't missed.
+    return r
 
 if __name__ == '__main__': print(main())

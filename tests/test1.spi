@@ -9,6 +9,8 @@ inl main() =
             // inl f (x : int) = x + y
             inl f (x,y : int * int) = x + y
             inl ~f = to_closure f
-            inl ~r = f(1,2)
+            inl g x = f x
+            inl ~g = to_closure g
+            inl ~r = g(1,2)
             console.write_ln r
             ()

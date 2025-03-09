@@ -1,12 +1,7 @@
-kernel = r"""
-using default_int = long;
-using default_uint = unsigned long;
-#include "reference_counting.cuh"
-#include <assert.h>
-#include <stdio.h>
+kernels_main = r"""
 struct Union0;
 struct Tuple0;
-__device__ static_array<Tuple0,1l> method_0();
+__device__ static_array<Tuple0,1> method_0();
 struct Union0_0 { // None
 };
 struct Union0_1 { // Some
@@ -74,97 +69,73 @@ struct Tuple0 {
     __device__ Tuple0() = default;
     __device__ Tuple0(bool t0, Union0 t1) : v0(t0), v1(t1) {}
 };
-__device__ static_array<Tuple0,1l> method_0(){
-    static_array<Tuple0,1l> v0;
-    Union0 v1;
-    v1 = Union0{Union0_1{true, false}};
-    v0[0l] = Tuple0{true, v1};
+__device__ static_array<Tuple0,1> method_0(){
+    static_array<Tuple0,1> v0;
+    Union0 v2;
+    v2 = Union0{Union0_1{true, false}};
+    v0[0] = Tuple0{true, v2};
     return v0;
 }
 extern "C" __global__ void entry0() {
-    long v0;
+    int v0;
     v0 = threadIdx.x;
-    long v1;
+    int v1;
     v1 = blockIdx.x;
-    long v2;
-    v2 = v1 * 32l;
-    long v3;
-    v3 = v0 + v2;
-    bool v4;
-    v4 = v3 == 0l;
-    if (v4){
-        static_array<Tuple0,1l> v5;
-        v5 = method_0();
+    int v2;
+    v2 = v0 + v1;
+    bool v3;
+    v3 = v2 == 0;
+    if (v3){
+        static_array<Tuple0,1> v4;
+        v4 = method_0();
         return ;
     } else {
         return ;
     }
 }
 """
-class static_array():
-    def __init__(self, length):
-        self.ptr = []
-        for _ in range(length):
-            self.ptr.append(None)
-
-    def __getitem__(self, index):
-        assert 0 <= index < len(self.ptr), "The get index needs to be in range."
-        return self.ptr[index]
-    
-    def __setitem__(self, index, value):
-        assert 0 <= index < len(self.ptr), "The set index needs to be in range."
-        self.ptr[index] = value
-
-class static_array_list(static_array):
-    def __init__(self, length):
-        super().__init__(length)
-        self.length = 0
-
-    def __getitem__(self, index):
-        assert 0 <= index < self.length, "The get index needs to be in range."
-        return self.ptr[index]
-    
-    def __setitem__(self, index, value):
-        assert 0 <= index < self.length, "The set index needs to be in range."
-        self.ptr[index] = value
-
-    def push(self,value):
-        assert (self.length < len(self.ptr)), "The length before pushing has to be less than the maximum length of the array."
-        self.ptr[self.length] = value
-        self.length += 1
-
-    def pop(self):
-        assert (0 < self.length), "The length before popping has to be greater than 0."
-        self.length -= 1
-        x = self.ptr[self.length]
-        self.ptr[self.length] = None
-        return x
-
-    def unsafe_set_length(self,i):
-        assert 0 <= i <= len(self.ptr), "The new length has to be in range."
-        self.length = i
-
-class dynamic_array(static_array): pass
-class dynamic_array_list(static_array_list): pass
-        
+from test4_auto import *
+kernels = kernels_aux + kernels_main
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
-i8 = i16 = i32 = i64 = u8 = u16 = u32 = u64 = int; f32 = f64 = float; char = string = str
+i8 = int; i16 = int; i32 = int; i64 = int; u8 = int; u16 = int; u32 = int; u64 = int; f32 = float; f64 = float; char = str; string = str
 
 options = []
-options.append('--diag-suppress=550,20012,68')
+options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
+options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
-options.append('-I C:/Spiral_s_ML_Library/cpplib')
-raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
-def main():
-    v0 = 0
-    v1 = raw_module.get_function(f"entry{v0}")
+import os
+home = os.getenv('HOME')
+options.append(f'-I={home}/ThunderKittens/include')
+options.append('--std=c++20')
+options.append('--expt-relaxed-constexpr')
+options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
+raw_module = cp.RawModule(code=kernels, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
+def main_body():
+    v0 = cp.cuda.Device().attributes['MultiProcessorCount']
+    v1 = v0 >= 1
     del v0
-    v1.max_dynamic_shared_size_bytes = 0 
-    v1((1,),(32,),(),shared_mem=0)
-    del v1
+    v2 = v1 == False
+    if v2:
+        v3 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+        assert v1, v3
+        del v3
+    else:
+        pass
+    del v1, v2
+    kernel = "entry0"
+    v4 = raw_module.get_function(kernel)
+    v4.max_dynamic_shared_size_bytes = 98304 
+    print(f'Threads per block, blocks per grid: {1}, {1}')
+    v4((1,),(1,),(),shared_mem=98304)
+    del v4
     return 
+
+def main():
+    r = main_body()
+    cp.cuda.get_current_stream().synchronize() # This line is here so the `__trap()` calls on the kernel aren't missed.
+    return r
 
 if __name__ == '__main__': print(main())
