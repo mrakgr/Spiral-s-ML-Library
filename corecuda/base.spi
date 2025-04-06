@@ -55,7 +55,7 @@ inl dynamic_shared_memory_used() : int =
 inl device_sync() : () = 
     backend_switch_host {
         Python = fun () => $"cp.cuda.get_current_stream().synchronize()"
-        Cpp = fun () => $"gpuErrchk(cudaDeviceSynchronize())"
+        CudaHost = fun () => $"gpuErrchk(cudaDeviceSynchronize())"
     }
 
 union compiler =
@@ -65,7 +65,7 @@ union compiler =
 // Calls the Cuda backend join point, returns the free vars needed to execute it. Also does a side effecting step of assigning the kernel to a variable.
 // The reason this is factored out is memoize the computation between the Cuda and the Python backends.
 inl call_backend f =
-    inl body cuda_global_function_annotation = join_backend Cuda
+    inl body cuda_global_function_annotation = join_backend CudaDevice
         f () : ()
         cuda_global_function_annotation
     if blocks_per_cluster() = 1 then
@@ -120,7 +120,7 @@ inl run_python f = join
         | _ => $'!entry((!blocks_per_grid,),(!threads_per_block,),(!vars,),shared_mem=!shared_mem)' : ()
     ()
 
-inl run_cpp f = join
+inl run_cuda_host f = join
     inl blocks_per_grid, threads_per_block, blocks_per_cluster = blocks_per_grid(), threads_per_block(), blocks_per_cluster()
     inl shared_mem = dynamic_shared_memory_used()
     inl vars = call_backend f
@@ -159,6 +159,12 @@ inl run_cpp f = join
     inl attrs_array = $"cudaLaunchAttribute \v[] = { #attrs }" : $"cudaLaunchAttribute[]"
     $"!config.attrs = !attrs_array"
     real
+        inl vars = 
+            struct.map (fun x => 
+                typecase `x with
+                | array_base ~t => $"`t * \v = !x.data().get()" : $"`t *"
+                | _ => x
+                ) vars
         match vars with
         | () => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel))" : ()
         | _ => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel, #vars))" : ()
@@ -167,8 +173,8 @@ inl run_cpp f = join
 // Executes the lambda on the GPU device.
 inl run' f =
     backend_switch_host {
-        Cpp = fun () => run_cpp f
         Python = fun () => run_python f
+        CudaHost = fun () => run_cuda_host f
     }
 
 // Executes the lambda on the GPU device.

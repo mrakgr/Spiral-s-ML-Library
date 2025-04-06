@@ -6,21 +6,23 @@ open corecuda
 inl single_threaded write x =
     backend_switch {
         Python = fun () => write x
-        Cuda = fun () => console_cuda.single_threaded write x
+        CudaDevice = fun () => console_cuda.single_threaded write x
     }
 
 // These don't do locking on the CUDA side.
 // Should only be used when implementing printing functions for custom datatypes.
 inl printable_funs () : printable_funs = 
     inl write_ln x =
-        backend_switch {
+        backend_switch' {
             Python = fun () => console_python.write_ln x
-            Cuda = fun () => console_cuda.write_ln x
+            CudaDevice = fun () => console_cuda.write_ln x
+            CudaHost = fun () => console_cuda.write_ln x
         }
     inl write x =
-        backend_switch {
+        backend_switch' {
             Python = fun () => console_python.write x
-            Cuda = fun () => console_cuda.write x
+            CudaDevice = fun () => console_cuda.write x
+            CudaHost = fun () => console_cuda.write_ln x
         }
     {
         write = `$write
@@ -30,16 +32,18 @@ inl printable_funs () : printable_funs =
 // Writes the argument to the console. On the Cuda side it uses a global lock to make sure the printing is thread safe and consistent.
 // Puts a newline at the end.
 inl write_ln x =
-    backend_switch {
+    backend_switch' {
         Python = fun () => console_python.write_ln x
-        Cuda = fun () => console_cuda.single_threaded console_cuda.write_ln x
+        CudaDevice = fun () => console_cuda.single_threaded console_cuda.write_ln x
+        CudaHost = fun () => console_cuda.write_ln x
     }
 
 // Writes the argument to the console. On the Cuda side it uses a global lock to make sure the printing is thread safe and consistent.
 inl write x =
-    backend_switch {
+    backend_switch' {
         Python = fun () => console_python.write x
-        Cuda = fun () => console_cuda.single_threaded console_cuda.write x
+        CudaDevice = fun () => console_cuda.single_threaded console_cuda.write x
+        CudaHost = fun () => console_cuda.write x
     }
 
 inl main() =

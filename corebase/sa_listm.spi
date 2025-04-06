@@ -3,7 +3,7 @@ instance sa_create sa_list =
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
     backend_switch {
         Python = fun () => $"static_array_list(@dim)"
-        Cuda = fun () => $"static_array_list<`el,@dim>{}"
+        CudaDevice = fun () => $"static_array_list<`el,@dim>{}"
     }
     
 // Returns the length of an array.
@@ -24,14 +24,14 @@ inl max_length forall dim el. (ar : sa_list dim el) : int = real real_core.type_
 // Indexes into an array.
 instance index sa_list dim = fun ar i => 
     backend_switch {
-        Cuda = fun () => $"!ar[!i]"
+        CudaDevice = fun () => $"!ar[!i]"
         Python = fun () => $"!ar[!i]"
     }
 
 // Sets the value of an array at the specified index.
 instance set sa_list dim = fun ar i v =>
     backend_switch {
-        Cuda = fun () => $"!ar[!i] = !v"
+        CudaDevice = fun () => $"!ar[!i] = !v"
         Python = fun () => $"!ar[!i] = !v"
     }
 

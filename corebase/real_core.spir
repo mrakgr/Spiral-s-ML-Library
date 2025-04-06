@@ -276,7 +276,7 @@ inl assert c msg =
         else 
             backend_switch `(()) {
                 Python = fun () => $"assert !c, !msg" : ()
-                Cuda = fun () => 
+                CudaDevice = fun () => 
                     typecase `(lit_to_type_lit msg) with ~msg =>
                     $'assert(@msg && !c)' : ()
                 }

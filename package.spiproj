@@ -189,3 +189,4 @@ modules:
 
     cpp_cuda/
         test0
+        test1

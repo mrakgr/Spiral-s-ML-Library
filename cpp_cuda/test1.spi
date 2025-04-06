@@ -1,0 +1,14 @@
+open corebase
+open corecuda
+open coreext
+
+inl main() : int =
+    inl x : array int = ;[1;2;3;4]
+    console.write_ln (length x)
+    console.write_ln (index x 2)
+    run (fun _ =>
+        inl ~y : int = index x 0 + index x 1
+        console.write_ln "hello"
+        ()
+        )
+    0

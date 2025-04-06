@@ -84,7 +84,7 @@ inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d e
                         Python = fun () => 
                             inl s = !!!!SizeOf(`t) 
                             $"!base[!i:!i+!s*!len].view(`(cupy_type t))" : array t
-                        Cuda = fun () => 
+                        CudaDevice = fun () => 
                             $"reinterpret_cast<`t *>(&!base[!i])" : array t
                         }
                 offset = 0

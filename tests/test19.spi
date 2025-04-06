@@ -7,7 +7,7 @@ open coreext
 inl shl forall t{number; int}. (a : t) b = 
     backend_switch {
         Python = fun () => if b < (sizeof : _ t).value * 8 then a <<< b else 0
-        Cuda = fun () => a <<< b
+        CudaDevice = fun () => a <<< b
     }
 
 inl main() =

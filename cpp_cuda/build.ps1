@@ -1,7 +1,10 @@
+param (
+    $path_input = "./test1.cu"
+)
+
 $WarningPreference = 'SilentlyContinue'; $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
 
 $path_script = "./build.ps1" 
-$path_input = "./test0.cu"
 $path_output = Join-Path (New-Item "./bin" -ItemType Directory -Force) (Split-Path $path_input -LeafBase)
 
 if (-not (Test-Path $path_output) -or 
@@ -32,6 +35,5 @@ if ($?){
 
 
 <#
-cd /mnt/c/Spiral_s_ML_Library/cpp_cuda
 pwsh build.ps1
 #>

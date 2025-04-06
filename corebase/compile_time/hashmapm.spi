@@ -42,7 +42,7 @@ inl main() =
             inl h = create()
             add h obj 1i32
             ()
-        Cuda = fun () => 
+        CudaDevice = fun () => 
             add h obj 1f32
             ()
     }
