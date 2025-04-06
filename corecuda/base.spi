@@ -3,6 +3,7 @@ open corebase
 union gpu = // Feel free to extend this.
     | Debug
     | RTX4060
+    | RTX5080
     | H100_SMX
 
 inl gpu() = Debug // Marko Grdinić: The GPU I am working on currently. Feel free to change this.
@@ -15,7 +16,8 @@ inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
 inl sms_per_gpu() : int = 
     match gpu() with
     | Debug => 1
-    | RTX4060 => 24 // Marko Grdinić: My RTX 4060 has 24 SMs. A RTX 4090 for example would have 128. This should be changed to reflect your configuration.
+    | RTX4060 => 24
+    | RTX5080 => 84 // Marko Grdinić: My RTX 5080 has 84 SMs. A RTX 4090 for example would have 128. This should be changed to reflect your configuration.
     | H100_SMX => 132
 
 inl threads_per_block() : int = 
@@ -27,6 +29,7 @@ inl blocks_per_grid() : int =
     match gpu() with
     | Debug => 1
     | RTX4060 => sms_per_gpu()
+    | RTX5080 => sms_per_gpu() // TODO
     // The H100 actually has 132 SMs, but the thread block cluster launches need a multiple of 16, and also due to the we can only launch 112 block 
     // with thread block clusters of size 16 and 120 blocks with thread block clusters of size 8.
     | H100_SMX => 112 
@@ -35,7 +38,8 @@ inl blocks_per_cluster() : int =
     match gpu() with
     | Debug => 1
     | RTX4060 => 1
-    | H100_SMX => 8
+    | RTX5080 => 8 // TODO
+    | H100_SMX => 8 // TODO
 
 // Returns the dynamic shared memory that should be used in bytes.
 inl dynamic_shared_memory_used() : int = 
@@ -43,6 +47,7 @@ inl dynamic_shared_memory_used() : int =
     match gpu() with
     | Debug => 96
     | RTX4060 => 96 // 99kb is the limit
+    | RTX5080 => 96 // 99kb is the limit
     | H100_SMX => 224 // 227kb is the limit
     * (1 <<< 10)
 
