@@ -1,15 +1,15 @@
 open corebase
 
+// Controls the asserts. Easier to change this than to comment out the option directly.
+inl debug_mode() = false
+
 union gpu = // Feel free to extend this.
     | Debug
     | RTX4060
     | RTX5080
     | H100_SMX
 
-inl gpu() = Debug // Marko Grdinić: The GPU I am working on currently. Feel free to change this.
-
-// Controls the asserts. Easier to change this than to comment out the option directly.
-inl debug_mode() = false
+inl gpu() = RTX5080 // Marko Grdinić: The GPU I am working on currently. Feel free to change this.
 
 type warp_size = 32
 inl threads_per_warp() : int = real real_core.type_lit_to_lit `warp_size
@@ -28,18 +28,19 @@ inl threads_per_block() : int =
 inl blocks_per_grid() : int = 
     match gpu() with
     | Debug => 1
-    | RTX4060 => sms_per_gpu()
-    | RTX5080 => sms_per_gpu() // TODO
-    // The H100 actually has 132 SMs, but the thread block cluster launches need a multiple of 16, and also due to the we can only launch 112 block 
+    | RTX4060 => 24
+    | RTX5080 => 84
+    // The H100 actually has 132 SMs, but the thread block cluster launches need a multiple of 16, and unfortunately we can only launch 112 blocks
     // with thread block clusters of size 16 and 120 blocks with thread block clusters of size 8.
+    // See: https://forums.developer.nvidia.com/t/why-is-the-amount-of-thread-blocks-per-cluster-and-the-dynamic-shared-memory-that-i-can-allocate-much-lower-than-expected
     | H100_SMX => 112 
 
 inl blocks_per_cluster() : int =
     match gpu() with
     | Debug => 1
     | RTX4060 => 1
-    | RTX5080 => 8 // TODO
-    | H100_SMX => 8 // TODO
+    | RTX5080 => 12
+    | H100_SMX => 16
 
 // Returns the dynamic shared memory that should be used in bytes.
 inl dynamic_shared_memory_used() : int = 
@@ -72,11 +73,14 @@ inl call_backend f =
         body ()
     else real 
         open real_core 
-        inl cluster_dims = {cluster_dims={x=lit_to_symbol blocks_per_cluster; y=lit_to_symbol 1; z=lit_to_symbol 1}}
+        inl cluster_dims = {cluster_dims={x=lit_to_symbol blocks_per_cluster(); y=lit_to_symbol 1; z=lit_to_symbol 1}}
         body `(`cluster_dims) cluster_dims
+
+inl assert_blocks_per_cluster_divides_blocks_per_grid() = assert (blocks_per_grid() % blocks_per_cluster() = 0) "The number of blocks per grid has to be divisible by blocks per cluster."
 
 inl run_python f = join
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
+    assert_blocks_per_cluster_divides_blocks_per_grid()
     inl vars = call_backend f
     // Global statements only get executed once.
     global "options = []"
@@ -122,6 +126,7 @@ inl run_python f = join
 
 inl run_cuda_host f = join
     inl blocks_per_grid, threads_per_block, blocks_per_cluster = blocks_per_grid(), threads_per_block(), blocks_per_cluster()
+    assert_blocks_per_cluster_divides_blocks_per_grid()
     inl shared_mem = dynamic_shared_memory_used()
     inl vars = call_backend f
 
@@ -158,6 +163,14 @@ inl run_cuda_host f = join
     $"!config.numAttrs = !(real struct.count attrs)"
     inl attrs_array = $"cudaLaunchAttribute \v[] = { #attrs }" : $"cudaLaunchAttribute[]"
     $"!config.attrs = !attrs_array"
+
+    inl max_potential_cluster_size() : i32 =
+        inl ~max_cluster_size : i32 = 0
+        $"cudaOccupancyMaxPotentialClusterSize(&!max_cluster_size, (void *)kernel, &!config)"
+        max_cluster_size
+
+    assert (max_potential_cluster_size() >= blocks_per_cluster) "Max potential cluster size must be greater than or equal to the given cluster size."
+    
     real
         inl vars = 
             struct.map (fun x => 

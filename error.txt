@@ -1,16 +1,16 @@
-Error trace on line: 5, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/cpp_cuda/test1.spi.
-inl main() : int =
+Error trace on line: 172, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corecuda/base.spi.
+    assert (max_potential_cluster_size() >= blocks_per_cluster) "Max potential cluster size must be greater than or equal to the given cluster size."
+    ^
+Error trace on line: 147, column: 50 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 274, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 275, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
         ^
-Error trace on line: 6, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/cpp_cuda/test1.spi.
-    inl x : array int = ;[1;2;3;4]
-    ^
-Error trace on line: 7, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/cpp_cuda/test1.spi.
-    console.write_ln (length x)
-    ^
-Error trace on line: 33, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console.spi.
-    backend_switch {
-    ^
-Error trace on line: 169, column: 88 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
-inl backend_switch forall t. (x : {CudaDevice : () -> t; Python : () -> t}) : t = real backend_switch `t x
-                                                                                       ^
+Error trace on line: 277, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+            backend_switch `(()) {
+            ^
 Cannot find the backend CudaHost in the backend switch op.

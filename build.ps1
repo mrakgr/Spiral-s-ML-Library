@@ -1,16 +1,16 @@
 param (
-    $path_input = "./test1.cu"
+    [string]$Path
 )
 
 $WarningPreference = 'SilentlyContinue'; $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
 
-$path_script = "./build.ps1" 
-$path_output = Join-Path (New-Item "./bin" -ItemType Directory -Force) (Split-Path $path_input -LeafBase)
+$path_bin = Join-Path (Split-Path $Path -Parent) "bin"
+$path_output = Join-Path (New-Item $path_bin -ItemType Directory -Force) (Split-Path $Path -LeafBase)
 
 if (-not (Test-Path $path_output) -or 
-    ($(Get-Item $path_input).LastWriteTime -ge $(Get-Item $path_output).LastWriteTime) -or 
-    ($(Get-Item $path_script).LastWriteTime -ge $(Get-Item $path_output).LastWriteTime)) {
-    Write-Host "Compiling '$path_input' into '$path_output'"
+    ($(Get-Item $Path).LastWriteTime -ge $(Get-Item $path_output).LastWriteTime) -or 
+    ($(Get-Item $PSCommandPath).LastWriteTime -ge $(Get-Item $path_output).LastWriteTime)) {
+    Write-Host "Compiling '$Path' into '$path_output'"
     nvcc `
         -arch=native `
         -D=NDEBUG `
@@ -24,16 +24,15 @@ if (-not (Test-Path $path_output) -or
         -D__CUDA_NO_HALF_CONVERSIONS__ `
         -diag-suppress 550,20012,68,39,177 `
         -o $path_output `
-        $path_input
+        $Path
 } else {
     # Write-Host "The '$path_output' is up to date."
 }
 
-if ($?){
+if ($?){ # Runs the executable if the compilation was successful or if it is already up to date.
     & $path_output
 }
 
-
 <#
-pwsh build.ps1
+pwsh build.ps1 -Path cpp_cuda/test1.cu
 #>

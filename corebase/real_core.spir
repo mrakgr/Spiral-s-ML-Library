@@ -279,6 +279,9 @@ inl assert c msg =
                 CudaDevice = fun () => 
                     typecase `(lit_to_type_lit msg) with ~msg =>
                     $'assert(@msg && !c)' : ()
+                CudaHost = fun () => 
+                    typecase `(lit_to_type_lit msg) with ~msg =>
+                    $'assert(@msg && !c)' : ()
                 }
 
 // Structural polymorphic equality for every type in the language (apart from functions.)

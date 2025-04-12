@@ -1,14 +1,22 @@
 open corebase
 open corecuda
 open coreext
+open rangem
 
 inl main() : int =
     inl x : array int = ;[1;2;3;4]
-    console.write_ln (length x)
-    console.write_ln (index x 2)
+    console.write_ln {
+        message = "hello from host"
+        length_of_array = length x
+        index_2 = index x 2
+    }
     run (fun _ =>
         inl ~y : int = index x 0 + index x 1
-        console.write_ln "hello"
+        if threads_in_grid().from = 0 then
+            console.write_ln {
+                message = "hello from cuda"
+                result = y
+                }
         ()
         )
     0
