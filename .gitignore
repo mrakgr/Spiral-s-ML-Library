@@ -3,3 +3,4 @@ __pycache__/
 static/bundles/
 .fake
 bin/
+build/

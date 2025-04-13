@@ -17,12 +17,12 @@ if (-not (Test-Path $path_output) -or
         -g -G `
         -dopt=on `
         -restrict `
-        -I="$Env:HOME/ThunderKittens/include" `
-        -maxrregcount=255 `
-        -std=c++20 `
         -expt-relaxed-constexpr `
         -D__CUDA_NO_HALF_CONVERSIONS__ `
+        -maxrregcount=255 `
         -diag-suppress 550,20012,68,39,177 `
+        -I="$Env:HOME/ThunderKittens/include" `
+        -std=c++20 `
         -o $path_output `
         $Path
 } else {
