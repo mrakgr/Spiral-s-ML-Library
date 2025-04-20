@@ -1,5 +1,5 @@
 param (
-    [string]$Path
+    [Parameter(Mandatory)][string]$Path
 )
 
 $WarningPreference = 'SilentlyContinue'; $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
@@ -21,8 +21,9 @@ if (-not (Test-Path $path_output) -or
         -D__CUDA_NO_HALF_CONVERSIONS__ `
         -maxrregcount=255 `
         -diag-suppress 550,20012,68,39,177 `
-        -I="$Env:HOME/ThunderKittens/include" `
+        -I="$PSScriptRoot/cpp_libs/ThunderKittens/include" `
         -std=c++20 `
+        -lpthread `
         -o $path_output `
         $Path
 } else {
@@ -35,4 +36,6 @@ if ($?){ # Runs the executable if the compilation was successful or if it is alr
 
 <#
 pwsh build.ps1 -Path cpp_cuda/test1.cu
+pwsh build.ps1 -Path cpp_tests/hello.cu
+g++ cpp_tests/hello.cpp -lpthread
 #>

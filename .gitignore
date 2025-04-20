@@ -4,3 +4,4 @@ static/bundles/
 .fake
 bin/
 build/
+cpp_libs/
