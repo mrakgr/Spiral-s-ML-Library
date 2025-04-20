@@ -184,11 +184,11 @@ inl run_cuda_host f = join
     ()
     
 // Executes the lambda on the GPU device.
-inl run' f =
-    backend_switch_host {
-        Python = fun () => run_python f
-        CudaHost = fun () => run_cuda_host f
-    }
+inl run' (f : () -> ()) : () =
+    !!!!UnsafeBackendSwitch({
+        Python = fun () => run_python f : ()
+        CudaHost = fun () => run_cuda_host f : ()
+    })
 
 // Executes the lambda on the GPU device.
 inl run f = run' f
