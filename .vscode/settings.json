@@ -33,5 +33,6 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "ostream": "cpp"
-    }
+    },
+    "C_Cpp.default.cppStandard": "c++20"
 }
