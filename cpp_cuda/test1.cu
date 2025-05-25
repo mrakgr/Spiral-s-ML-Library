@@ -41,7 +41,7 @@ void run_cuda_host_0(thrust::device_vector<int> v0){
     cudaLaunchConfig_t v1 = {0};
     v1.gridDim = 84;
     v1.blockDim = 256;
-    v1.dynamicSmemBytes = 58304;
+    v1.dynamicSmemBytes = 98304;
     cudaLaunchAttribute v2;
     v2.id = cudaLaunchAttributeCooperative;
     v2.val.cooperative = 1;
@@ -63,7 +63,7 @@ void run_cuda_host_0(thrust::device_vector<int> v0){
     gpuErrchk(cudaLaunchKernelEx(&v1, kernel, v8));
     return ;
 }
-int main_body() {
+int main() {
     thrust::device_vector<int> v0 = {1,2,3,4};
     int v1;
     v1 = v0.size();
@@ -71,10 +71,6 @@ int main_body() {
     v2 = v0[2];
     printf("{%s = %d; %s = %d; %s = %s}\n","index_2", v2, "length_of_array", v1, "message", "hello from host");
     run_cuda_host_0(v0);
+    gpuErrchk(cudaDeviceSynchronize());
     return 0;
-}
-int main(){
-    auto r = main_body();
-    gpuErrchk(cudaDeviceSynchronize()); // This line is here so the `__trap()` calls on the kernel aren't missed.
-    return r;
 }

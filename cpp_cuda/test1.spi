@@ -19,4 +19,5 @@ inl main() : int =
                 }
         ()
         )
+    device_sync()
     0
