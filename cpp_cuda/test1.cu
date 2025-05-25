@@ -41,7 +41,7 @@ void run_cuda_host_0(thrust::device_vector<int> v0){
     cudaLaunchConfig_t v1 = {0};
     v1.gridDim = 84;
     v1.blockDim = 256;
-    v1.dynamicSmemBytes = 98304;
+    v1.dynamicSmemBytes = 58304;
     cudaLaunchAttribute v2;
     v2.id = cudaLaunchAttributeCooperative;
     v2.val.cooperative = 1;

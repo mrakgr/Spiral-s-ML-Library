@@ -1,5 +1,6 @@
 param (
-    [Parameter(Mandatory)][string]$Path
+    [Parameter(Mandatory)][string]$Path,
+    [string]$BuildOnly = $null
 )
 
 $WarningPreference = 'SilentlyContinue'; $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
@@ -29,7 +30,7 @@ if (-not (Test-Path $path_output) -or
     # Write-Host "The '$path_output' is up to date."
 }
 
-if ($?){ # Runs the executable if the compilation was successful or if it is already up to date.
+if ($? -and $BuildOnly -ne "true"){ # Runs the executable if the compilation was successful or if it is already up to date.
     & $path_output
 }
 

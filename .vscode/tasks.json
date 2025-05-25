@@ -47,7 +47,7 @@
             "label": "Build Cuda Program",
             "type": "shell",
             "command": "pwsh",
-            "args": ["build.ps1", "-Path", "cpp_cuda/test1.cu"],
+            "args": ["build.ps1", "-Path", "cpp_cuda/test1.cu", "-BuildOnly", "true"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
