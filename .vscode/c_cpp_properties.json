@@ -5,9 +5,14 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/local/cuda/include",
-                "${userHome}/ThunderKittens/include/"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/cpp_libs/ThunderKittens/include/",
+                "${workspaceFolder}/cpp_libs/cutlass/include/"
             ],
-            "defines": [],
+            "defines": [
+                "__NVCC__",
+                "__CUDA_ARCH__=1200"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "c++20",

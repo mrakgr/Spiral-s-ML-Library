@@ -8,7 +8,7 @@
             "name": "CUDA C++: Launch",
             "type": "cuda-gdb",
             "request": "launch",
-            "program": "${workspaceFolder}/cpp_tests/hello.out",
+            "program": "${workspaceFolder}/cpp_cuda/bin/test1",
             "breakOnLaunch": false,
             "preLaunchTask": "Build Cuda Program"
         },
