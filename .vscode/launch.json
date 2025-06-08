@@ -8,9 +8,9 @@
             "name": "CUDA C++: Launch",
             "type": "cuda-gdb",
             "request": "launch",
-            "program": "${workspaceFolder}/cpp_cuda/bin/test1",
+            "program": "${workspaceFolder}/cpp_libs/cutlass/examples/12_gemm_bias_relu/gemm_bias_relu",
             "breakOnLaunch": false,
-            "preLaunchTask": "Build Cuda Program"
+            // "preLaunchTask": "Build Cuda Program"
         },
         {
             "name": "CUDA C++: Attach",

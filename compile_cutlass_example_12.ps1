@@ -20,5 +20,5 @@ nvcc `
     -expt-relaxed-constexpr `
     -D__CUDA_NO_HALF_CONVERSIONS__ `
     -std=c++20 `
-    -o /home/mrakgr/Spiral-s-ML-Library/cpp_libs/cutlass/build/examples/12_gemm_bias_relu/12_gemm_bias_relu `
+    -o /home/mrakgr/Spiral-s-ML-Library/cpp_libs/cutlass/examples/12_gemm_bias_relu/gemm_bias_relu `
     /home/mrakgr/Spiral-s-ML-Library/cpp_libs/cutlass/examples/12_gemm_bias_relu/gemm_bias_relu.cu
