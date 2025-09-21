@@ -1,3 +1,5 @@
+// Various combinator functions (like map and fold) to iterate over the tuple and record types.
+
 open real_core
 
 inl infer_map forall el. g =
