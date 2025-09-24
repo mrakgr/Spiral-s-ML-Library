@@ -11,12 +11,6 @@ keys = np.array([
     [0,1,0],
     [0,0,1],
 ],dtype=float)
-
-count = np.array([
-    [1],
-    [1],
-    [1],
-],dtype=float)
 average_policy = np.array([
     [0,0,0],
     [0,0,0],
@@ -67,11 +61,11 @@ def calculate_expected_values(expected_values : np.ndarray, sampling_prob : floa
     return e
 
 def cfr_update(key : np.ndarray, action_index : int, action_reward : float, path_prob_self : float, path_prob_opponent : float, path_probability_sampling : float):
-    global count, keys, current_policy, count, average_policy, expected_values_nom, expected_values_den
+    global keys, current_policy, average_policy, expected_values_nom, expected_values_den
     epsilon = 0.0
     def get(values : np.ndarray):
         return hopfield_dict(key, keys, values)
-    a,c,current_count,e = get(average_policy), get(current_policy), get(count), expected_values(key)
+    a,c,e = get(average_policy), get(current_policy), expected_values(key)
     current_policy_probs = get_prob_distr(c)
     uniform_prob = 1 / len(current_policy_probs)
     action_prob : float = current_policy_probs[action_index]
@@ -81,14 +75,12 @@ def cfr_update(key : np.ndarray, action_index : int, action_reward : float, path
     # print(f"current_policy_probs: {current_policy_probs}")
     mean_of_ev = np.dot(new_expected_values, current_policy_probs)
     # print(f"mean_of_ev: {mean_of_ev}")
-    current_policy_update_num = (new_expected_values - mean_of_ev) * path_prob_opponent / path_probability_sampling
+    current_policy_update = (new_expected_values - mean_of_ev) * path_prob_opponent / path_probability_sampling
     # print(f"current_policy_update: {current_policy_update}")
 
-    average_policy_update = get_prob_distr(c + current_policy_update_num * current_count[0])
+    average_policy_update = current_policy_probs
     print(f"c: {c}")
-    print(f"current_count: {current_count[0]}")
-    print(f"current_policy_update: {current_policy_update_num}")
-    # print(f"updated_current_policy: {c_num + current_policy_update}")
+    print(f"current_policy_update: {current_policy_update}")
     print(f"average_policy_update: {average_policy_update}")
     e_update_nom = np.zeros_like(e)
     e_update_den = np.zeros_like(e)
@@ -97,11 +89,10 @@ def cfr_update(key : np.ndarray, action_index : int, action_reward : float, path
 
     # Mutable updates
     keys = np.vstack([keys, key])
-    current_policy = np.vstack([current_policy, current_policy_update_num])
-    count = np.vstack([count, np.array([1],dtype=float)])
-    average_policy = np.vstack([average_policy, average_policy_update])
+    current_policy = np.vstack([current_policy, current_policy_update])
     expected_values_nom = np.vstack([expected_values_nom, e_update_nom])
     expected_values_den = np.vstack([expected_values_den, e_update_den])
+    average_policy = np.vstack([average_policy, average_policy_update])
 
 # get_prob_distr(average_policy["state_a"])
 input = np.array([1,0,0])
