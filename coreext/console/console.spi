@@ -11,7 +11,7 @@ inl single_threaded write x =
 
 // These don't do locking on the CUDA side.
 // Should only be used when implementing printing functions for custom datatypes.
-inl printable_funs () : printable_funs = 
+inl printable_funs () : printable_funs =
     inl write_ln x =
         backend_switch' {
             Python = fun () => console_python.write_ln x

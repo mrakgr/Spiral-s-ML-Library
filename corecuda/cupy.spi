@@ -1,7 +1,6 @@
 open corebase
 open tensorm
 
-
 // The top level random seed set as an arbitrary constant.
 inl constant_seed() : u64 = 12344321
 

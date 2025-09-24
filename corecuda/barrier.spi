@@ -12,4 +12,3 @@ inl make_barrier_block() : ref (barrier thread_scope.block) =
         $"init(&!bar, !(threads_per_block()))"
     __syncthreads()
     bar
-

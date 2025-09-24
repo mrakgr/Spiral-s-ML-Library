@@ -5,7 +5,7 @@ open sam
 // This merge sort is intended for short arrays that can be evaluated in registers.
 inl merge_sort forall dim el. f (inp : sa dim el) : sa dim el =
     inl ~inp = map id inp
-    
+
     if length inp = 1 then map id inp else
 
     inl ~out : sa _ _ = sa_create

@@ -619,7 +619,7 @@ inl map_reduce_map_2d_ forall dim a b c. loop'
 // 
 // The first argument is the neutral element.
 // 
-// The second argument is the reduction funciton.
+// The second argument is the reduction function.
 inl reduce_2d forall dim a. neutral_element (f : a -> a -> a) (from : tensor (dim * int) a) (to : tensor dim a) : () =
     map_reduce_map_2d_ (loop.projective << warps_in_block) id neutral_element f id from to
 
@@ -638,7 +638,7 @@ inl grid_reduce_2d forall dim a. grid neutral_element (f : a -> a -> a) (from : 
 // 
 // The second argument is the neutral element.
 // 
-// The third argument is the reduction funciton.
+// The third argument is the reduction function.
 // 
 // The fourth argument is the output mapper function.
 inl map_reduce_map_2d forall dim a b c. 
