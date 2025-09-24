@@ -3,7 +3,7 @@ import numpy as np
 def softmax(x):
     e_x = np.exp(x - np.max(x))  # subtract max for numerical stability
     return e_x / e_x.sum(axis=0)
-def hopfield_dict(input : np.ndarray, keys : np.ndarray, values : np.ndarray, temperature = 0.01):
+def hopfield_dict(input : np.ndarray, keys : np.ndarray, values : np.ndarray, temperature = 0.0001):
     return np.matmul(softmax(np.matmul(keys, input) / temperature), values)
 
 average_policy_keys = np.array([
@@ -52,7 +52,9 @@ expected_values_den_values = np.array([
 
 def expected_values(key : np.ndarray):
     a,b = hopfield_dict(key,expected_values_nom_keys, expected_values_nom_values), hopfield_dict(key,expected_values_den_keys, expected_values_den_values)
-    return np.divide(a, b, where=(b != 0))
+    # print(f"a: {a}")
+    # print(f"b: {b}")
+    return np.divide(a, np.maximum(2 ** -30, b))
 
 def relu(x):
     return np.maximum(0, x)
@@ -63,6 +65,7 @@ def get_prob_distr(x : np.ndarray) -> np.ndarray:
     return x / s if s != 0 else np.full_like(x, 1 / len(x))
 
 def calculate_expected_values(expected_values : np.ndarray, sampling_prob : float, action_index : int, action_reward : float):
+    print(f"In calculate_expected_values the expected_values: {expected_values}")
     e = np.zeros_like(expected_values)
     # print(f"sampling_prob: {sampling_prob}")
     # print(f"action_index: {action_index}")
@@ -112,13 +115,13 @@ def cfr_update(key : np.ndarray, action_index : int, action_reward : float, path
 
 # get_prob_distr(average_policy["state_a"])
 input = np.array([1,0,0])
-print(hopfield_dict(input, expected_values_nom_keys, expected_values_nom_values))
-print(hopfield_dict(input, expected_values_den_keys, expected_values_den_values))
+print(hopfield_dict(input, current_policy_keys, current_policy_values))
+print(hopfield_dict(input, average_policy_keys, average_policy_values))
 cfr_update(input,1,150,1,1,1)
-print(hopfield_dict(input, expected_values_nom_keys, expected_values_nom_values))
-print(hopfield_dict(input, expected_values_den_keys, expected_values_den_values))
+print(hopfield_dict(input, current_policy_keys, current_policy_values))
+print(hopfield_dict(input, average_policy_keys, average_policy_values))
 cfr_update(input,0,225,1,1,1)
-print(hopfield_dict(input, expected_values_nom_keys, expected_values_nom_values))
-print(hopfield_dict(input, expected_values_den_keys, expected_values_den_values))
+print(hopfield_dict(input, current_policy_keys, current_policy_values))
+print(hopfield_dict(input, average_policy_keys, average_policy_values))
 # print((expected_values_nom_keys, expected_values_nom_values))
 # print((expected_values_den_keys, expected_values_den_values))

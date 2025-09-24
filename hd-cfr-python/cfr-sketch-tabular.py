@@ -22,7 +22,7 @@ expected_values_den = {
 }
 def expected_values(key : str):
     a,b = expected_values_nom[key], expected_values_den[key]
-    return np.divide(a, b, where=(b != 0))
+    return np.divide(a, np.maximum(2 ** -30, b))
 
 count = 2.
 
@@ -63,14 +63,15 @@ def cfr_update(key : str, action_index : int, action_reward : float, path_prob_s
     action_prob : float = current_policy_probs[action_index]
     sampling_prob : float = (1 - epsilon) * action_prob + epsilon * uniform_prob
     new_expected_values = calculate_expected_values(e, sampling_prob, action_index, action_reward)
-    # print(f"new_expected_values: {new_expected_values}")
+    print(f"new_expected_values: {new_expected_values}")
     # print(f"current_policy_probs: {current_policy_probs}")
     mean_of_ev = np.dot(new_expected_values, current_policy_probs)
     # print(f"mean_of_ev: {mean_of_ev}")
     current_policy_update = (new_expected_values - mean_of_ev) * path_prob_opponent / path_probability_sampling
-    # print(f"current_policy_update: {current_policy_update}")
+    print(f"current_policy_update: {current_policy_update}")
 
     updated_current_policy = (1 - alpha) * c + alpha * current_policy_update
+    print(f"updated_current_policy: {updated_current_policy}")
     average_policy_update = get_prob_distr(updated_current_policy)
     e_update_nom = np.zeros_like(e)
     e_update_den = np.zeros_like(e)
@@ -84,13 +85,11 @@ def cfr_update(key : str, action_index : int, action_reward : float, path_prob_s
     expected_values_den[key] = (1 - alpha) * expected_values_den[key] + alpha * e_update_den
     count = count + 1.
 
-# get_prob_distr(average_policy["state_a"])
-print(expected_values_nom.get("state_a"))
-print(expected_values_den.get("state_a"))
+print(current_policy.get("state_a"))
+print(average_policy.get("state_a"))
 cfr_update("state_a",1,150,1,1,1)
-print(expected_values_nom.get("state_a"))
-print(expected_values_den.get("state_a"))
-cfr_update("state_a",1,225,1,1,1)
-print(expected_values_nom.get("state_a"))
-print(expected_values_den.get("state_a"))
-# print((np.array([10,30,-10],dtype=float) + np.array([100,100,-200],dtype=float) + np.array([100,100,-200],dtype=float)) / 3)
+print(current_policy.get("state_a"))
+print(average_policy.get("state_a"))
+cfr_update("state_a",0,225,1,1,1)
+print(current_policy.get("state_a"))
+print(average_policy.get("state_a"))

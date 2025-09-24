@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "CUDA C++: Launch",
             "type": "cuda-gdb",
             "request": "launch",
@@ -16,6 +23,6 @@
             "name": "CUDA C++: Attach",
             "type": "cuda-gdb",
             "request": "attach"
-        }
+        },
     ]
 }
