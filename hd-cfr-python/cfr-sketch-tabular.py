@@ -63,16 +63,19 @@ def cfr_update(key : str, action_index : int, action_reward : float, path_prob_s
     action_prob : float = current_policy_probs[action_index]
     sampling_prob : float = (1 - epsilon) * action_prob + epsilon * uniform_prob
     new_expected_values = calculate_expected_values(e, sampling_prob, action_index, action_reward)
-    print(f"new_expected_values: {new_expected_values}")
+    # print(f"new_expected_values: {new_expected_values}")
     # print(f"current_policy_probs: {current_policy_probs}")
     mean_of_ev = np.dot(new_expected_values, current_policy_probs)
     # print(f"mean_of_ev: {mean_of_ev}")
     current_policy_update = (new_expected_values - mean_of_ev) * path_prob_opponent / path_probability_sampling
-    print(f"current_policy_update: {current_policy_update}")
+    # print(f"current_policy_update: {current_policy_update}")
 
     updated_current_policy = (1 - alpha) * c + alpha * current_policy_update
-    print(f"updated_current_policy: {updated_current_policy}")
     average_policy_update = get_prob_distr(updated_current_policy)
+    print(f"c: {c}")
+    print(f"current_policy_update: {current_policy_update}")
+    print(f"updated_current_policy: {updated_current_policy}")
+    print(f"average_policy_update: {average_policy_update}")
     e_update_nom = np.zeros_like(e)
     e_update_den = np.zeros_like(e)
     e_update_nom[action_index] = action_reward
