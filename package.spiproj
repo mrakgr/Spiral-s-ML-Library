@@ -86,6 +86,17 @@ modules:
         serializer
         pickler
 
+    hopfield_dictionary/
+        game/
+            leduc/
+                base-
+                cardm
+                deckm
+                game
+                
+
+                
+
     ml/
         helpers-
         primitives
