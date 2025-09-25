@@ -7,6 +7,30 @@ inl create () = deck ((1 <<< 6) - 1)
 inl index (deck d) i : bool = d &&& (1 <<< i) <> 0
 inl toggle (deck d) i : deck = deck (d ^^^ (1 <<< i))
 
+// def find_nth_set_bit(mask, base, offset):
+//     # Consider bits starting from 'base'
+//     masked_bits = mask >> base
+//     count = 0
+//     for i in range(32 - base):
+//         if masked_bits & (1 << i):
+//             count += 1
+//             if count == offset:
+//                 return base + i
+//     return 0xFFFFFFFF  # Not found
+
+let find_nth_set_bit (mask : i32) (base : i32) (offset : i32) : i32 =
+    inl masked_bits = mask >>> base
+    inl count = mut 0i32
+    inl solution = mut (limit.min : i32)
+    loop.for' {from=0; nearTo=32 - base} fun i =>
+        if masked_bits &&& (1 <<< i) <> 0 then
+            inl c = *count
+            count <- c + 1
+            if c = offset then
+                solution <- base + i
+                $"break"
+    *solution
+
 // // Draws a single card from a deck.
 // let draw_card rng deck : card * deck =
 //     inl (deck d) = deck
@@ -24,9 +48,17 @@ inl toggle (deck d) i : deck = deck (d ^^^ (1 <<< i))
 //         deck
 //         ) deck
 
+// inl main() = 
+//     global "import random"
+//     inl ~x = create()
+//     inl (deck mask) = toggle (toggle x 0) 2
+//     console.write_ln ($"!mask.bit_count()" : int)
+//     console.write_ln ($"bin(!mask)" : string)
+//     console.write_ln ($"!(find_nth_set_bit (conv mask) 0 0)" : int)
+//     // console.write_ln ($"random.randrange(10)" : int)
+//     // console.write_ln (index x 0)
+//     ()
+
 inl main() = 
-    inl ~x = create()
-    console.write_ln x
-    console.write_ln (toggle x 0)
-    console.write_ln (index x 0)
+    
     ()

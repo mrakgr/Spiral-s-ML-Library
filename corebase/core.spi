@@ -115,7 +115,7 @@ inl heap forall t. (x : t): heap t = !!!!LayoutToHeap(x)
 inl (~!) forall t. (x : heap t): t = !!!!LayoutIndex(x)
 // Creates a stack mutable layout type.
 inl stack_mut forall t. (x : t): stack_mut t = !!!!LayoutToStackMutable(x)
-// Unboxes a heap layout type.
+// Unboxes a stack mutable layout type.
 inl (~@) forall t. (x : stack_mut t): t = !!!!LayoutIndex(x)
 
 // Converts a symbol to a string literal.

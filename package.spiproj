@@ -93,7 +93,7 @@ modules:
                 cardm
                 deckm
                 game
-                
+
 
                 
 
@@ -170,6 +170,7 @@ modules:
         test17
         test18
         test19
+        test20
 
         async_loads/
             config-
