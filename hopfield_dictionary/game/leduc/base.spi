@@ -1,2 +1,5 @@
 union card = King | Queen | Jack
 nominal deck = u32
+
+open corebase
+instance printable deck = fun {write} (deck d) => write d

@@ -1,16 +1,16 @@
-Error trace on line: 172, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corecuda/base.spi.
-    assert (max_potential_cluster_size() >= blocks_per_cluster) "Max potential cluster size must be greater than or equal to the given cluster size."
-    ^
-Error trace on line: 147, column: 50 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
-inl assert (c : bool) (msg : string) : () = real assert c msg
-                                                 ^
-Error trace on line: 274, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-    if c = false then 
-    ^
-Error trace on line: 275, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-        ^
-Error trace on line: 277, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-            backend_switch `(()) {
+Error trace on line: 55, column: 11 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+        | x => 
+          ^
+Error trace on line: 56, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            inl printable_funs =
             ^
-Cannot find the backend CudaHost in the backend switch op.
+Error trace on line: 61, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            if union_is x then
+            ^
+Error trace on line: 78, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) printable_funs x
+            ^
+Error trace on line: 80, column: 18 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            else error_type "Unsupported type."
+                 ^
+Unsupported type.
