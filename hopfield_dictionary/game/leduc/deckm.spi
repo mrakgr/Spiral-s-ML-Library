@@ -64,7 +64,7 @@ inl sample_masked_bit_u32 (x : u32) i = sample_masked_bit_list_u32 [x] i
 //         deck
 //         ) deck
 
-inl main() = 
+inl test0() = 
     inl ~x = create()
     inl (deck mask) = toggle (toggle x 0) 2
     inl offset = 2
@@ -76,3 +76,12 @@ inl main() =
             ()
     device_sync()
     0i32
+
+inl test1() = 
+    open xoshiro
+    global "#include <random>"
+
+    device_sync()
+    0i32
+
+inl main() = test1()

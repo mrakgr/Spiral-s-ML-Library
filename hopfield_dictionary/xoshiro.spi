@@ -1,0 +1,9 @@
+open corebase
+
+inl globals() = global "#include <xoshiro.h>"
+
+nominal xoshiro_rng = $"xso::rng"
+
+open corecuda.random
+
+instance u32 xoshiro_rng = fun s => $"s()"

@@ -87,6 +87,8 @@ modules:
         pickler
 
     hopfield_dictionary/
+        xoshiro
+        
         game/
             leduc/
                 base-
