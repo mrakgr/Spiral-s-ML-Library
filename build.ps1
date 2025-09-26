@@ -1,6 +1,9 @@
+# The build script for the .cu files.
+# Gets used the VS Code tasks.
+
 param (
     [Parameter(Mandatory)][string]$Path,
-    [string]$BuildOnly = $null
+    [switch]$BuildOnly
 )
 
 $WarningPreference = 'SilentlyContinue'; $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
@@ -13,16 +16,14 @@ if (-not (Test-Path $path_output) -or
     ($(Get-Item $PSCommandPath).LastWriteTime -ge $(Get-Item $path_output).LastWriteTime)) {
     Write-Host "Compiling '$Path' into '$path_output'"
     nvcc `
-        -arch=native `
+        -arch=sm_120a `
         -D=NDEBUG `
         -g -G `
         -dopt=on `
         -restrict `
         -expt-relaxed-constexpr `
         -D__CUDA_NO_HALF_CONVERSIONS__ `
-        -maxrregcount=255 `
         -diag-suppress 550,20012,68,39,177 `
-        -I="$PSScriptRoot/cpp_libs/ThunderKittens/include" `
         -std=c++20 `
         -o $path_output `
         $Path
@@ -30,7 +31,7 @@ if (-not (Test-Path $path_output) -or
     # Write-Host "The '$path_output' is up to date."
 }
 
-if ($? -and $BuildOnly -ne "true"){ # Runs the executable if the compilation was successful or if it is already up to date.
+if ($? -and $BuildOnly){ # Runs the executable if the compilation was successful or if it is already up to date.
     & $path_output
 }
 
