@@ -7,29 +7,23 @@ inl create () = deck ((1 <<< 6) - 1)
 inl index (deck d) i : bool = d &&& (1 <<< i) <> 0
 inl toggle (deck d) i : deck = deck (d ^^^ (1 <<< i))
 
-// def find_nth_set_bit(mask, base, offset):
-//     # Consider bits starting from 'base'
-//     masked_bits = mask >> base
-//     count = 0
-//     for i in range(32 - base):
-//         if masked_bits & (1 << i):
-//             count += 1
-//             if count == offset:
-//                 return base + i
-//     return 0xFFFFFFFF  # Not found
-
-let find_nth_set_bit (mask : i32) (base : i32) (offset : i32) : i32 =
-    inl masked_bits = mask >>> base
-    inl count = mut 0i32
-    inl solution = mut (limit.min : i32)
-    loop.for' {from=0; nearTo=32 - base} fun i =>
-        if masked_bits &&& (1 <<< i) <> 0 then
-            inl c = *count
-            count <- c + 1
-            if c = offset then
-                solution <- base + i
-                $"break"
-    *solution
+let find_nth_set_bit (mask : u32) (base : u32) (offset : i32) : u32 =
+    backend_switch_cuda {
+        CudaHost = fun () =>
+            inl masked_bits = mask >>> conv base
+            inl count = stack_mut 0i32
+            inl solution = stack_mut limit.max
+            loop.for' {from=0; nearTo=32 - base} fun i =>
+                if (masked_bits >>> conv i) &&& 1 <> 0 then
+                    inl c = @count + 1
+                    count <- c
+                    if c = offset then
+                        solution <- base + i
+                        $"break"
+            @solution
+        CudaDevice = fun () =>
+            corecuda.intrinsic.fns mask base offset
+    }
 
 // // Draws a single card from a deck.
 // let draw_card rng deck : card * deck =
@@ -48,17 +42,16 @@ let find_nth_set_bit (mask : i32) (base : i32) (offset : i32) : i32 =
 //         deck
 //         ) deck
 
-// inl main() = 
-//     global "import random"
-//     inl ~x = create()
-//     inl (deck mask) = toggle (toggle x 0) 2
-//     console.write_ln ($"!mask.bit_count()" : int)
-//     console.write_ln ($"bin(!mask)" : string)
-//     console.write_ln ($"!(find_nth_set_bit (conv mask) 0 0)" : int)
-//     // console.write_ln ($"random.randrange(10)" : int)
-//     // console.write_ln (index x 0)
-//     ()
-
+open corecuda
 inl main() = 
-    
-    ()
+    inl ~x = create()
+    inl (deck mask) = toggle (toggle x 0) 2
+    inl offset = 2
+    console.write_ln ($"!mask" : int)
+    console.write_ln ($"!(find_nth_set_bit (conv mask) 0 offset)" : int)
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            console.write_ln (intrinsic.fns mask 0 offset)
+            ()
+    device_sync()
+    0i32

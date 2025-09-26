@@ -2,7 +2,7 @@ open corebase
 
 // // Shuffles the array.
 // inl shuffle forall dim el. (ar : sa_list dim el) : () =
-//     backend_switch {
+//     backend_switch_python {
 //         CudaDevice = fun _ => corecuda.random.shuffle ar
 //         Python = fun _ => 
 //             global "import random"

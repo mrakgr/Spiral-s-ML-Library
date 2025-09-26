@@ -18,7 +18,7 @@
             "program": "${fileDirname}/bin/${fileBasenameNoExtension}",
             "cwd": "${fileDirname}/bin/",
             "breakOnLaunch": false,
-            "preLaunchTask": "Build Cuda Program"
+            "preLaunchTask": "Build Cuda Program",
         }
     ]
 }

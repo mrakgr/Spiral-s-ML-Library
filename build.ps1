@@ -16,22 +16,24 @@ if (-not (Test-Path $path_output) -or
     ($(Get-Item $PSCommandPath).LastWriteTime -ge $(Get-Item $path_output).LastWriteTime)) {
     Write-Host "Compiling '$Path' into '$path_output'"
     nvcc `
-        -arch=sm_120a `
-        -D=NDEBUG `
-        -g -G `
-        -dopt=on `
-        -restrict `
-        -expt-relaxed-constexpr `
-        -D__CUDA_NO_HALF_CONVERSIONS__ `
-        -diag-suppress 550,20012,68,39,177 `
-        -std=c++20 `
-        -o $path_output `
-        $Path
+    -arch=sm_120a `
+    -D=NDEBUG `
+    -g -G `
+    -dopt=on `
+    -restrict `
+    -expt-relaxed-constexpr `
+    -D__CUDA_NO_HALF_CONVERSIONS__ `
+    -diag-suppress 550,20012,68,39,177 `
+    -std=c++20 `
+    -o $path_output `
+    $Path
 } else {
     # Write-Host "The '$path_output' is up to date."
 }
 
-if ($? -and $BuildOnly){ # Runs the executable if the compilation was successful or if it is already up to date.
+if ($? -and (-not $BuildOnly)){ # Runs the executable if the compilation was successful or if it is already up to date.
+    Set-Location $path_bin
+    Write-Host "Running: $path_output"
     & $path_output
 }
 

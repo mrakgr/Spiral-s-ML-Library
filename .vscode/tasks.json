@@ -59,18 +59,17 @@
         },
 		{
             "label": "Run Cuda Program",
-            "type": "process",
-            "command": "${fileDirname}/bin/${fileBasenameNoExtension}",
+            "type": "shell",
+            "command": "pwsh",
+            "args": ["build.ps1", "-Path", "${file}"],
             "options": {
-                "cwd": "${fileDirname}/bin/"
+                "cwd": "${workspaceFolder}"
             },
-            "dependsOn": [
-                "Build Cuda Program",
-            ],
+            "problemMatcher": ["$nvcc"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
-        }
+        },
     ]
   }

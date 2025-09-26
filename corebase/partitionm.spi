@@ -80,7 +80,7 @@ inl tensor_from_offsets forall d el. (base : ptr) (offsets {dim offsets} : _ d e
             typecase `z with offset ~t =>
             tensor_body `d `t {
                 array = 
-                    real_core.backend_switch `(array t) {
+                    real_core.backend_switch_real {
                         Python = fun () => 
                             inl s = !!!!SizeOf(`t) 
                             $"!base[!i:!i+!s*!len].view(`(cupy_type t))" : array t

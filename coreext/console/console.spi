@@ -4,8 +4,9 @@ open corecuda
 // Uses a global lock to make sure the printing comes out correctly in the presence of multithreading on the Cuda side.
 // `write` and `write_ln` already use this one automatically. It's only useful when custom printing functions.
 inl single_threaded write x =
-    backend_switch {
+    backend_switch_all {
         Python = fun () => write x
+        CudaHost = fun () => write x
         CudaDevice = fun () => console_cuda.single_threaded write x
     }
 
@@ -13,13 +14,13 @@ inl single_threaded write x =
 // Should only be used when implementing printing functions for custom datatypes.
 inl printable_funs () : printable_funs =
     inl write_ln x =
-        backend_switch' {
+        backend_switch_all {
             Python = fun () => console_python.write_ln x
             CudaDevice = fun () => console_cuda.write_ln x
             CudaHost = fun () => console_cuda.write_ln x
         }
     inl write x =
-        backend_switch' {
+        backend_switch_all {
             Python = fun () => console_python.write x
             CudaDevice = fun () => console_cuda.write x
             CudaHost = fun () => console_cuda.write_ln x
@@ -32,7 +33,7 @@ inl printable_funs () : printable_funs =
 // Writes the argument to the console. On the Cuda side it uses a global lock to make sure the printing is thread safe and consistent.
 // Puts a newline at the end.
 inl write_ln x =
-    backend_switch' {
+    backend_switch_all {
         Python = fun () => console_python.write_ln x
         CudaDevice = fun () => console_cuda.single_threaded console_cuda.write_ln x
         CudaHost = fun () => console_cuda.write_ln x
@@ -40,7 +41,7 @@ inl write_ln x =
 
 // Writes the argument to the console. On the Cuda side it uses a global lock to make sure the printing is thread safe and consistent.
 inl write x =
-    backend_switch' {
+    backend_switch_all {
         Python = fun () => console_python.write x
         CudaDevice = fun () => console_cuda.single_threaded console_cuda.write x
         CudaHost = fun () => console_cuda.write x

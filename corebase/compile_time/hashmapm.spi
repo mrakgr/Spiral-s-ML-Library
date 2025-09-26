@@ -37,7 +37,7 @@ inl main() =
     inl h = create()
     inl obj = ()
     // inl x : exists a. a = exists [float] 1234i32
-    backend_switch {
+    backend_switch_python {
         Python = fun () => 
             inl h = create()
             add h obj 1i32

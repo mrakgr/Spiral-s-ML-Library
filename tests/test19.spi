@@ -5,7 +5,7 @@ open coreext
 // Shifts have different semantics on the GPU than they do on the CPU. See:
 // https://forums.developer.nvidia.com/t/32bit-shift-on-32bit-integer/188953
 inl shl forall t{number; int}. (a : t) b = 
-    backend_switch {
+    backend_switch_python {
         Python = fun () => if b < (sizeof : _ t).value * 8 then a <<< b else 0
         CudaDevice = fun () => a <<< b
     }
