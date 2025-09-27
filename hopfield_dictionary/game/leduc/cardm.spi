@@ -1,8 +1,0 @@
-open corebase
-
-inl u32_to_card (i : u32) =
-    match i with
-    | 0 | 1 => King
-    | 2 | 3 => Queen
-    | 4 | 5 => Jack
-    | _ => failwith "Invalid int in int_to_card."

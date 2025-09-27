@@ -15,7 +15,6 @@ instance length sa dim = fun ar => real real_core.type_lit_to_lit `dim : int
 
 // Indexes into an array.
 instance index sa dim = fun ar i => 
-    assert (0 <= i && i < length ar) "Index must be in range in index."
     backend_switch_all {
         CudaHost = fun () => $"!ar[!i]"
         CudaDevice = fun () => $"!ar[!i]"
@@ -25,7 +24,6 @@ instance index sa dim = fun ar i =>
 // Sets the value of an array at the specified index.
 // Should be used with care. The static array should be used in an immutable fashion preferably.
 instance set sa dim = fun ar i v => 
-    assert (0 <= i && i < length ar) "Index must be in range in set."
     backend_switch_all {
         CudaHost = fun () => $"!ar[!i] = !v"
         CudaDevice = fun () => $"!ar[!i] = !v"

@@ -1,5 +1,5 @@
 # The build script for the .cu files.
-# Gets used the VS Code tasks.
+# Gets used in the VS Code tasks.
 
 param (
     [Parameter(Mandatory)][string]$Path,

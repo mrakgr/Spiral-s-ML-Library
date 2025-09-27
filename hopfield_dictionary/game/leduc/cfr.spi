@@ -1,0 +1,5 @@
+open corebase
+open game
+inl train_loop (node : game_node) =
+    
+    ()

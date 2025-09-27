@@ -92,9 +92,9 @@ modules:
         game/
             leduc/
                 base-
-                cardm
-                deckm
                 game
+                cfr
+
 
 
                 
