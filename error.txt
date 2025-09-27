@@ -1,1 +1,16 @@
-The return type of main function in the Cuda host backend should be a i32.
+Error trace on line: 28, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/sam.spi.
+    assert (0 <= i && i < length ar) "Index must be in range in set."
+    ^
+Error trace on line: 147, column: 50 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 274, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 275, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 275, column: 40 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+Index must be in range in set.

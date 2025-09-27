@@ -47,6 +47,7 @@ inl u32_4 (s : philox_state) : u32 * u32 * u32 * u32=
 // 32 bit instructructions, I won't be implementing the integer sampling that requires 64-bit 
 // multiplcation as most likely it'd be slower than these.
 inl uint_ubound rand range s =
+    assert (0 < range) "The range has to be greater than 0."
     if lit_is range then
         // calculates 2**32 % range
         inl bottom = (0 - range) % range

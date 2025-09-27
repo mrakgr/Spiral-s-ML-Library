@@ -1,9 +1,12 @@
 open corebase
+open corecuda
+open random
 
 inl globals() = global "#include <xoshiro.h>"
 
 nominal xoshiro_rng = $"xso::rng"
+instance u32 xoshiro_rng = fun s => $"!s()"
 
-open corecuda.random
-
-instance u32 xoshiro_rng = fun s => $"s()"
+inl create() : ref xoshiro_rng =
+    globals()
+    $"`xoshiro_rng \v"

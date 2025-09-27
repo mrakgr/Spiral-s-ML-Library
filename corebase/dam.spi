@@ -1,8 +1,9 @@
 // Creates an empty array.
 instance sa_create da = 
     assert ((0 : int) <= (real real_core.type_lit_to_lit `dim)) "The dimension of the array has to be positive."
-    backend_switch_python {
+    backend_switch_all {
         Python = fun () => $"dynamic_array(@dim)" : da dim el
+        CudaHost = fun () => $"dynamic_array<`el,@dim> \v{true}"
         CudaDevice = fun () => $"dynamic_array<`el,@dim> \v{true}"
     }
     
@@ -14,7 +15,8 @@ instance create da dim = fun dim =>
 instance length da dim = fun ar => real real_core.type_lit_to_lit `dim : int
 // Indexes into an array.
 instance index da dim = fun ar i => 
-    backend_switch_python {
+    backend_switch_all {
+        CudaHost = fun () => $"!ar[!i]"
         CudaDevice = fun () => $"!ar[!i]"
         Python = fun () => $"!ar[!i]"
     }
@@ -22,7 +24,8 @@ instance index da dim = fun ar i =>
 // Sets the value of an array at the specified index.
 // Should be used with care. The static array should be used in an immutable fashion preferably.
 instance set da dim = fun ar i v => 
-    backend_switch_python {
+    backend_switch_all {
+        CudaHost = fun () => $"!ar[!i] = !v"
         CudaDevice = fun () => $"!ar[!i] = !v"
         Python = fun () => $"!ar[!i] = !v"
     }

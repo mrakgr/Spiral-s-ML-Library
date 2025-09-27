@@ -47,22 +47,22 @@ inl sample_masked_bit_u64 (x : u64) i = sample_masked_bit_list_u32 [conv x; conv
 // Gets the position of the i-th (starting at 0) set bit from an u32 integer mask.
 inl sample_masked_bit_u32 (x : u32) i = sample_masked_bit_list_u32 [x] i
 
-// // Draws a single card from a deck.
-// let draw_card rng deck : card * deck =
-//     inl (deck d) = deck
-//     inl base = u32_ubound conv(intrinsic.popc_u32 d) rng
-//     inl i = sample_masked_bit_u32 d (conv base)
-//     u32_to_card i, toggle deck (conv i)
+// Draws a single card from a deck.
+let draw_card rng deck : card * deck =
+    inl (deck d) = deck
+    inl base = random.u32_ubound conv(popc_u32 d) rng
+    inl i = sample_masked_bit_u32 d (conv base)
+    u32_to_card i, toggle deck (conv i)
 
-// // Draws an array of cards from a deck.
-// let draw_cards forall dim. rng deck : sa dim card * deck =
-//     open sam
-//     inl out : sa dim card = sa_create
-//     out, loop.for {from=0; nearTo=length out} (fun i deck =>
-//         inl card, deck = draw_card rng deck
-//         set out i card
-//         deck
-//         ) deck
+// Draws an array of cards from a deck.
+let draw_cards forall dim. rng deck : sa dim card * deck =
+    open sam
+    inl out : sa dim card = sa_create
+    out, loop.for {from=0; nearTo=length out} (fun i deck =>
+        inl card, deck = draw_card rng deck
+        set out i card
+        deck
+        ) deck
 
 inl test0() = 
     inl ~x = create()
@@ -78,9 +78,11 @@ inl test0() =
     0i32
 
 inl test1() = 
-    open xoshiro
-    global "#include <random>"
-
+    inl out : sa 3 card = sa_create
+    inl ~deck = create()
+    inl ~rng = xoshiro.create()
+    inl cards : sa 6 card * deck = draw_cards rng deck
+    console.write_ln cards
     device_sync()
     0i32
 
