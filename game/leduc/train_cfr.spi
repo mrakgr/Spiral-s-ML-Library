@@ -20,7 +20,7 @@ inl event_config () : event_config =
     }
 
 type state_internal_train =
-    stack_mut {
+    stack_refs {
         pl_type : sa 2 player_type
         deck : deck
         messages : messages
@@ -32,7 +32,7 @@ type state_internal_train =
 // Converts the given state to internal one.
 // The refs will point to the original locations.
 inl state_to_internal_train grid rng : state_internal_train =
-    stack_mut {
+    stack_refs {
         pl_type = arraym.fromList [Random;Random]
         deck = deckm.create()
         messages = sa_create

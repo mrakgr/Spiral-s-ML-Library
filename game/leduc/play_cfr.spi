@@ -5,7 +5,7 @@ open corecuda
 open coreext
 
 type state_internal_play =
-    stack_mut {
+    stack_refs {
         ui_game_state : ui_game_state
         pl_type : sa 2 player_type
         game : option game_node
@@ -16,7 +16,7 @@ type state_internal_play =
 
 // Converts the given state to internal one.
 inl state_to_internal_play (state : state_game) : state_internal_play =
-    stack_mut {
+    stack_refs {
         ui_game_state = state.public.ui_game_state
         pl_type = state.public.pl_type
         game = state.private.game
