@@ -145,6 +145,8 @@ open real_core
 inl (=) forall t. (a : t) (b : t) : bool = real a = b
 // Structural polymorphic inequality for every type in the language (apart from functions.)
 inl (<>) forall t. (a : t) (b : t) : bool = real a <> b
+// Structural polymorphic hashing for every type in the language (apart from functions.)
+inl hash forall t. (a : t) : int = real hash a
 // Structural polymorphic comparison for every type in the language (apart from functions.)
 inl comp forall t. (a : t) (b : t) : order = real comp a b
 // Asserts an term. If the conditional and the message are literals it raises a type error instead.

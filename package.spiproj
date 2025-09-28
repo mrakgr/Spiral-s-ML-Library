@@ -51,7 +51,7 @@ modules:
         base-
         plistm
         jsonm
-        
+
     corecuda/
         base-
         refm
@@ -79,6 +79,9 @@ modules:
             console_python
             console-
             tensor
+
+        dictm
+
 
         testing
             

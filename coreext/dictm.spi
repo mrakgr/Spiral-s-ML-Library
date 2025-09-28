@@ -1,0 +1,35 @@
+// Provides an interface to the C++ `unordered_map`.
+
+open corebase
+
+inl globals() = global "#include <unordered_map>"
+
+nominal dict key value = $"std::unordered_map<`key, `value, `(fptr (key * key) int), `(fptr (key * key) bool)>"
+
+inl create_dict forall key value. (capacity : int) : dict key value =
+    globals()
+    $"std::unordered_map<`key, `value, `(fptr (arg key) int), `(fptr (arg key * arg key) bool)> \v(!capacity, !(to_fptr hash : fptr (arg key) int), !(to_fptr (fun a,b => a = b) : fptr (arg key * arg key) bool))"
+
+inl get forall key value. (d : dict key value) (key : key) : option value =
+    inl it : $"auto" = $"auto \v = !d.find(!key)"
+    if $"!it !!= !d.end()" then Some $"!it->second" else None
+inl set forall key value. (d : dict key value) (key : key) (value : value) : () = $"!d[!key] = !value"
+inl contains forall key value. (d : dict key value) (key : key) : bool = $"!d.contains(!key)"
+inl clear forall key value. (d : dict key value) : () = $"!d.clear()"
+inl erase forall key value. (d : dict key value) (key : key) : bool = $"static_cast<bool>(!d.erase(!key))"
+        
+inl main() =
+    globals()
+    inl d : dict (i32 * bool) string =  create_dict 8
+    set d (1, true) "Hello"
+    set d (2, false) "World"
+    console.write_ln (get d (1,true))
+    console.write_ln (get d (2,false))
+    console.write_ln (get d (3,true))
+    
+    console.write_ln (contains d (2,false))
+    console.write_ln (contains d (3,true))
+
+    console.write_ln ("Removing", erase d (2,false))
+    console.write_ln ("Contains", contains d (2,false))
+    0i32

@@ -79,3 +79,21 @@ inl game_round (table : table) action =
 inl game_chance_community_card (table : table) card = Round {table with is_button_s_first_move=true; player_turn=0; raises_left=dyn 2; community_card=Some card; pot#=pot_call}
 inl game_chance_init (c0,c1) = Round {is_button_s_first_move=true; player_turn=0; raises_left=dyn 2; community_card=None; pot=arraym.fromList [1;1]; pl_card=arraym.fromList [c0;c1]}
 inl game_start() = ChanceInit
+
+nominal dict key value = $"std::unordered_map<`key, `value, `(fptr (key * key) int), `(fptr (key * key) bool)>"
+
+// using h = std::hash<int>;
+// auto hash = [](const Node& n){return ((17 * 31 + h()(n.a)) * 31 + h()(n.b)) * 31 + h()(n.c);};
+// auto equal = [](const Node& l, const Node& r){return l.a == r.a && l.b == r.b && l.c == r.c;};
+// std::unordered_map<Node, int, decltype(hash), decltype(equal)> m(8, hash, equal);
+
+inl create_dict forall key value. (capacity : int) : dict key value =
+    $"std::unordered_map<`key, `value, `(fptr key int), `(fptr (key * key) bool)> \v(!capacity, !(to_fptr hash : fptr key int), !(to_fptr (fun a,b => a = b) : fptr (key * key) bool))"
+
+inl main() =
+    global "#include <unordered_map>"
+    inl ~key = 1i32, true, 3i64
+    inl ~value = "asdf"
+    inl dict : dict (i32 * bool * i64) string =  create_dict 8
+    inl dict2 : dict (i32 * bool * i64) string =  create_dict 16
+    0i32
