@@ -1,0 +1,45 @@
+// Various functions to make dealing with sampling bits from an integer easier.
+// Are used to sample cards from a deck in poker games.
+
+open corebase
+
+// Finds the position of the nth set bit in a mask shifted right by base. The target bit is given by the last argument that is the offset.
+// Link: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#integer-arithmetic-instructions-fns
+let find_nth_set_bit ({mask base offset} : {mask : u32; base : u32; offset : i32}) : u32 =
+    backend_switch_cuda {
+        CudaHost = fun () =>
+            inl masked_bits = mask >>> conv base
+            inl count = stack_mut 0i32
+            inl solution = stack_mut limit.max
+            loop.for' {from=0; nearTo=32 - base} fun i =>
+                if (masked_bits >>> conv i) &&& 1 <> 0 then
+                    inl c = @count + 1
+                    count <- c
+                    if c = offset then
+                        solution <- base + i
+                        $"break"
+            @solution
+        CudaDevice = fun () =>
+            corecuda.intrinsic.fns mask base offset
+    }
+
+// Gets the population count of the set bits.
+inl popc_u32 (x : u32) =
+    backend_switch_cuda {
+        CudaHost = fun () => $"__builtin_popcount(!x)"
+        CudaDevice = fun () => corecuda.intrinsic.popc_u32 x
+    }
+
+// Gets the position of the i-th (starting at 0) set bit in a list of u32 masks.
+inl sample_masked_bit_list_u32 (l : list u32) (i : i32) =
+    inl fns (mask : u32) (offset : i32) : u32 = find_nth_set_bit {mask base=0; offset=conv offset + 1}
+    listm.foldBack (fun a next (i,o) =>
+        inl a_popc = popc_u32 a
+        if i < a_popc then fns a i + o else next (i - a_popc, o + 32)
+        ) l (fun _ => failwith "Cannot find the n-th set bit.") (i, 0)
+
+// Gets the position of the i-th (starting at 0) set bit from an u64 integer mask.
+inl sample_masked_bit_u64 (x : u64) i = sample_masked_bit_list_u32 [conv x; conv (x >>> 32)] i
+
+// Gets the position of the i-th (starting at 0) set bit from an u32 integer mask.
+inl sample_masked_bit_u32 (x : u32) i = sample_masked_bit_list_u32 [x] i

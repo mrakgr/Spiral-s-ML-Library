@@ -1,7 +1,12 @@
+open corebase
+open corecuda
+open coreext
+open console
+open sampling
+
 union card = King | Queen | Jack
 nominal deck = u32
 
-open corebase
 instance printable deck = fun {write} (deck d) => write d
 
 inl u32_to_card (i : u32) =
@@ -11,52 +16,9 @@ inl u32_to_card (i : u32) =
     | 4 | 5 => Jack
     | _ => failwith "Invalid int in int_to_card."
 
-open corecuda
-open coreext
-open console
-
 inl create () = deck ((1 <<< 6) - 1)
 inl index (deck d) i : bool = d &&& (1 <<< i) <> 0
 inl toggle (deck d) i : deck = deck (d ^^^ (1 <<< i))
-
-let find_nth_set_bit (mask : u32) (base : u32) (offset : i32) : u32 =
-    backend_switch_cuda {
-        CudaHost = fun () =>
-            inl masked_bits = mask >>> conv base
-            inl count = stack_mut 0i32
-            inl solution = stack_mut limit.max
-            loop.for' {from=0; nearTo=32 - base} fun i =>
-                if (masked_bits >>> conv i) &&& 1 <> 0 then
-                    inl c = @count + 1
-                    count <- c
-                    if c = offset then
-                        solution <- base + i
-                        $"break"
-            @solution
-        CudaDevice = fun () =>
-            intrinsic.fns mask base offset
-    }
-
-// Gets the population count of the set bits.
-inl popc_u32 (x : u32) =
-    backend_switch_cuda {
-        CudaHost = fun () => $"__builtin_popcount(!x)"
-        CudaDevice = fun () => intrinsic.popc_u32 x
-    }
-
-// Gets the position of the i-th (starting at 0) set bit in a list of u32 masks.
-inl sample_masked_bit_list_u32 (l : list u32) (i : i32) =
-    inl fns (mask : u32) (offset : i32) : u32 = find_nth_set_bit mask 0 (conv offset + 1)
-    listm.foldBack (fun a next (i,o) =>
-        inl a_popc = popc_u32 a
-        if i < a_popc then fns a i + o else next (i - a_popc, o + 32)
-        ) l (fun _ => failwith "Cannot find the n-th set bit.") (i, 0)
-
-// Gets the position of the i-th (starting at 0) set bit from an u64 integer mask.
-inl sample_masked_bit_u64 (x : u64) i = sample_masked_bit_list_u32 [conv x; conv (x >>> 32)] i
-
-// Gets the position of the i-th (starting at 0) set bit from an u32 integer mask.
-inl sample_masked_bit_u32 (x : u32) i = sample_masked_bit_list_u32 [x] i
 
 // Draws a single card from a deck.
 let draw_card rng deck : card * deck =
@@ -74,4 +36,3 @@ let draw_cards forall dim. rng deck : sa dim card * deck =
         set out i card
         deck
         ) deck
-

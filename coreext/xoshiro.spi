@@ -1,3 +1,6 @@
+// Provides an interface to the Xoshiro RNG.
+// Link: https://github.com/nessan/xoshiro
+
 open corebase
 open corecuda
 open random

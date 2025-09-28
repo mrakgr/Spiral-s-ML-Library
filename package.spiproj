@@ -81,7 +81,8 @@ modules:
             tensor
 
         dictm
-
+        xoshiro
+        sampling
 
         testing
             
@@ -90,16 +91,11 @@ modules:
         pickler
 
     hopfield_dictionary/
-        xoshiro
-        
         game/
             leduc/
                 base-
                 game
                 cfr
-
-
-
                 
 
     ml/
