@@ -213,9 +213,8 @@ inl flatten_snd forall a b el. : tensor (a * b) el -> tensor (a * int) el = swap
 inl flatten forall dim el. : tensor dim el -> tensor int el = reorder (fun x => x, ()) >> flatten_fst >> reorder fst
 
 // Returns the pointer at the current offset. The tensor must be a singleton.
-// Note that it doesn't check whether the tensor is contiguous.
 inl ptr_at_current_offset forall dim el. (t : tensor dim el) : array el = 
-    inl (tensor {dim bodies}) = apply_ptr t
+    inl (tensor {dim bodies}) = apply_ptr (flatten t)
     real map (fun x => x.array) bodies : array el
 
 // Returns the pointer at the specified index. The tensor must be a singleton.

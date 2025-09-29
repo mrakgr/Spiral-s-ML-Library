@@ -5,7 +5,7 @@ open layers
 open tensorm
 open rangem
 
-// The noinline prefix will force the __noinline__ annotation in the generated code.
+// The noinline prefix in the function name will force the __noinline__ annotation in the generated code if there is a join point around its body.
 inl noinline_run forall inp out.
         rng
         (exists t. model : exists t. model t) 

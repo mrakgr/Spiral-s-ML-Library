@@ -43,7 +43,7 @@ modules:
         partitionm
         serializerm/
             utils*
-            seriazer_main-
+            serializer_main-
         pickler
         types-
         
