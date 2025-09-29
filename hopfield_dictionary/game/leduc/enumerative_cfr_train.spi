@@ -1,0 +1,87 @@
+open corebase
+open corecuda
+open coreext
+open game
+
+type state_train =
+    {
+        deck : deck
+    }
+
+inl state_init() : state_train =
+    {
+        deck = deckm.create()
+    }
+
+union training_nodes =
+    | T_game_round : table * action
+    | T_game_chance_community_card : table * card
+    | T_game_chance_init : card * card
+    | T_none
+
+type reward_for_pl1 = float
+
+let train_loop () : reward_for_pl1 =
+    inl state_outer = stack_refs {messages = sa_create : messages}
+    inl push_message = sa_listm.push state_outer.messages
+    let rec body (state : state_train) node =
+        inl reward = stack_mut 0
+        inl set_rewards winner_id (chips_won : int) =
+            inl chips_won = conv chips_won
+            reward <- chips_won * if winner_id = 0 then 1 else -1
+        match node with
+        | TerminalFold table =>
+            inl msg = 
+                inl chips_won = index table.pot table.player_turn
+                set_rewards table.player_turn -chips_won
+                Showdown{cards_shown=table.pl_card; chips_won winner_id=toggle table.player_turn}
+            push_message msg
+            T_none
+        | TerminalCall table =>
+            inl msg =
+                inl chips_won, winner_id =
+                    inl chips_won = index table.pot table.player_turn
+                    match compare_hands table with
+                    | Gt => chips_won, 0
+                    | Eq => 0, -1
+                    | Lt => chips_won, 1
+                set_rewards (abs winner_id) chips_won
+                Showdown{cards_shown=table.pl_card; chips_won winner_id}
+            push_message msg
+            T_none
+        | Round table => 
+            inl action =
+                inl data = table, state.messages
+                if is_train then
+                    ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                else
+                    ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
+                |> model_cfr.action_conv table
+
+            inl msg = PlayerAction(table.player_turn, action)
+            push_message msg
+            T_game_round (table, action)
+        | RoundWithAction(table,action) =>
+            inl msg = PlayerAction(table.player_turn, action)
+            push_message msg
+            T_game_round (table, action)
+        | ChanceCommunityCard table =>
+            inl card = pop_deck()
+            inl msg = CommunityCardIs card
+            push_message msg
+            T_game_chance_community_card (table, card)
+        | ChanceInit () => 
+            inl c0,c1 = pop_deck(), pop_deck()
+            push_message PlayerGotCard(0, c0)
+            push_message PlayerGotCard(1, c1)
+            T_game_chance_init (c0, c1)
+        |> function // This is so game_round only gets generated once instead of 3 times in the compiled code.
+        | T_none => None
+        | T_game_chance_community_card(a,b) => Some(game_chance_community_card a b)
+        | T_game_chance_init(a,b) => Some(game_chance_init (a, b))
+        | T_game_round(a,b) => Some(game_round a b)
+    body game_start()
+
+    
+    // loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
+

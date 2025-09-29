@@ -1,0 +1,7 @@
+open corebase
+
+inl create () = deck ((1 <<< 6) - 1)
+inl index (deck d) i : bool = d &&& (1 <<< i) <> 0
+inl toggle (deck d) i : deck = deck (d ^^^ (1 <<< i))
+
+instance printable deck = fun {write} (deck d) => write d

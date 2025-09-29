@@ -93,9 +93,11 @@ modules:
     hopfield_dictionary/
         game/
             leduc/
+                types-
+                deckm
                 base-
                 game
-                cfr
+                enumerative_cfr_train
                 
 
     ml/

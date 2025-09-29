@@ -5,9 +5,13 @@ open console
 open sampling
 
 union card = King | Queen | Jack
-nominal deck = u32
-
-instance printable deck = fun {write} (deck d) => write d
+union action = Raise | Call | Fold
+union message =
+    | PlayerGotCard : int * card
+    | CommunityCardIs : card
+    | PlayerAction : int * action
+    | Showdown : {winner_id : int; chips_won : int; cards_shown : sa 2 card}
+type messages = sa_list 32 message
 
 inl u32_to_card (i : u32) =
     match i with
@@ -16,16 +20,12 @@ inl u32_to_card (i : u32) =
     | 4 | 5 => Jack
     | _ => failwith "Invalid int in int_to_card."
 
-inl create () = deck ((1 <<< 6) - 1)
-inl index (deck d) i : bool = d &&& (1 <<< i) <> 0
-inl toggle (deck d) i : deck = deck (d ^^^ (1 <<< i))
-
 // Draws a single card from a deck.
 let draw_card rng deck : card * deck =
     inl (deck d) = deck
     inl base = random.u32_ubound conv(popc_u32 d) rng
     inl i = sample_masked_bit_u32 d (conv base)
-    u32_to_card i, toggle deck (conv i)
+    u32_to_card i, deckm.toggle deck (conv i)
 
 // Draws an array of cards from a deck.
 let draw_cards forall dim. rng deck : sa dim card * deck =
