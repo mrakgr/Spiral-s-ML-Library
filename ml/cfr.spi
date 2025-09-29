@@ -27,12 +27,12 @@ type trace_elem =
         player_id : player_id
         action_sampling_prob : prob
     }
-type trace =
+type trace = // The history of actions and log probs.
     {
         actions : tensor (ensemble_id * seq_id * thread_id) trace_elem
         log_path_probs : tensor (ensemble_id * seq_id * thread_id * player_id) log_path_prob
     }
-type trace_state =
+type trace_state = // The state of for the current timestep. Probably shouldn't have been called trace_state.
     {
         log_path_probs : tensor (ensemble_id * thread_id * player_id) log_path_prob
         seq_id : tensor (ensemble_id * thread_id) seq_id

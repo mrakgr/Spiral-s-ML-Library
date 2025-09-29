@@ -154,6 +154,7 @@ inl vs_self (neural : state_neural .cfr) =
             loop.linear config.inner fun (inner : int) =>
                 // Does a training run, modifying the trace state.
                 train_loop true model state None game_start() 
+                // Also resets the trace state.
                 ml.cfr_models.calculate_updates model state.rewards
                 // Does a purely evalutation run, not modifying the trace state.
                 train_loop false model state None game_start()
