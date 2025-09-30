@@ -13,12 +13,12 @@ let find_nth_set_bit ({mask base offset} : {mask : u32; base : u32; offset : i32
             inl solution = stack_mut limit.max
             loop.for' {from=0; nearTo=32 - base} fun i =>
                 if (masked_bits >>> conv i) &&& 1 <> 0 then
-                    inl c = @count + 1
+                    inl c = *count + 1
                     count <- c
                     if c = offset then
                         solution <- base + i
                         $"break"
-            @solution
+            *solution
         CudaDevice = fun () =>
             corecuda.intrinsic.fns mask base offset
     }
@@ -43,3 +43,6 @@ inl sample_masked_bit_u64 (x : u64) i = sample_masked_bit_list_u32 [conv x; conv
 
 // Gets the position of the i-th (starting at 0) set bit from an u32 integer mask.
 inl sample_masked_bit_u32 (x : u32) i = sample_masked_bit_list_u32 [x] i
+
+inl test0() =
+    find_nth_set_bit 
