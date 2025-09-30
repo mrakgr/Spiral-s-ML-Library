@@ -1,0 +1,29 @@
+open corebase
+open corecuda
+open coreext
+open sampling
+open deckm
+
+inl test0() = 
+    inl ~x = create()
+    inl (deck mask) = toggle (toggle x 0) 2
+    inl offset = 2
+    console.write_ln ($"!mask" : int)
+    console.write_ln ($"!(find_nth_set_bit {mask=conv mask; base=0; offset})" : int)
+    run fun () =>
+        if rangem.threads_in_grid().from = 0 then
+            console.write_ln (intrinsic.fns mask 0 offset)
+    device_sync()
+
+inl test1() = 
+    inl out : sa 3 card = sa_create
+    inl ~deck = create()
+    inl ~rng = xoshiro.create()
+    inl cards : sa 6 card * deck = draw_cards rng deck
+    console.write_ln cards
+    device_sync()
+
+inl main() = 
+    test0()
+    test1()
+    0i32

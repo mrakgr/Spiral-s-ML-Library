@@ -43,6 +43,3 @@ inl sample_masked_bit_u64 (x : u64) i = sample_masked_bit_list_u32 [conv x; conv
 
 // Gets the position of the i-th (starting at 0) set bit from an u32 integer mask.
 inl sample_masked_bit_u32 (x : u32) i = sample_masked_bit_list_u32 [x] i
-
-inl test0() =
-    find_nth_set_bit 

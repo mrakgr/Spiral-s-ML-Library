@@ -96,6 +96,7 @@ modules:
                 types-
                 deckm
                 base-
+                tests
                 game
                 enumerative_cfr_train
                 
