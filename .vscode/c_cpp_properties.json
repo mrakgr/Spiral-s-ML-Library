@@ -6,8 +6,11 @@
                 "${workspaceFolder}/**",
                 "/usr/local/cuda/include",
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/cpp_libs/ThunderKittens/include/",
-                "${workspaceFolder}/cpp_libs/cutlass/include/"
+                // "${workspaceFolder}/cpp_libs/ThunderKittens/include/",
+                // "${workspaceFolder}/cpp_libs/cutlass/include/",
+                "${workspaceFolder}/cpp_libs/cpp-httplib",
+                "${workspaceFolder}/cpp_libs/xoshiro/include",
+                "${workspaceFolder}/cpp_libs/json/include"
             ],
             "defines": [
                 "__NVCC__",

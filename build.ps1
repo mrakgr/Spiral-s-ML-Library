@@ -8,6 +8,10 @@ param (
 
 $WarningPreference = 'SilentlyContinue'; $ErrorActionPreference = "Stop"; Set-StrictMode -Version Latest
 
+if ((Split-Path $Path -Extension) -ne ".cu") {
+    throw "Expected a .cu file as the build target."
+}
+
 $path_bin = Join-Path (Split-Path $Path -Parent) "bin"
 $path_output = Join-Path (New-Item $path_bin -ItemType Directory -Force) (Split-Path $Path -LeafBase)
 
@@ -19,6 +23,9 @@ if (-not (Test-Path $path_output) -or
     $cpp_libs_includes = 
         @(
             "xoshiro/include"
+            # "Crow/include"
+            "cpp-httplib"
+            "json/include"
         ) | ForEach-Object { "-Icpp_libs/$_" }
     $nvcc_args = @(
         $cpp_libs_includes
@@ -48,7 +55,3 @@ if ($? -and (-not $BuildOnly)){ # Runs the executable if the compilation was suc
     & $path_output
     if (-not $?) { throw "The program execution failed." }
 }
-
-<#
-pwsh build.ps1 -Path cpp_cuda/test1.cu
-#>

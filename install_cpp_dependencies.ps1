@@ -54,6 +54,8 @@ function Install-Git-Repo {
 
 $repos = @( # The list of dependencies that need installing.
     @{Url = "https://github.com/nessan/xoshiro"; Commit = "176fa191c8493e4c5cb06a44bc083010664fe39b"}
+    @{Url = "https://github.com/yhirose/cpp-httplib"; Commit = "89c932f313c6437c38f2982869beacc89c2f2246"}
+    @{Url = "https://github.com/nlohmann/json"; Commit = "55f93686c01528224f448c19128836e7df245f72"}
 )
 
 foreach ($repos in $repos) {
