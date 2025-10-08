@@ -1,17 +1,18 @@
-Error trace on line: 49, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+Error trace on line: 18, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+        inl serialize_sa forall array el. =
+        ^
+Error trace on line: 24, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
         typecase t' with
         ^
-Error trace on line: 51, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-            $"!l.push_back(!(f `a (fst x)))" : ()
+Error trace on line: 36, column: 26 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+        | sa ~dim ~el => serialize_sa `(sa dim) `el
+                         ^
+Error trace on line: 19, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+            inl ar : json (array el) = empty `el ()
             ^
-Error trace on line: 51, column: 30 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-            $"!l.push_back(!(f `a (fst x)))" : ()
-                             ^
-Error trace on line: 11, column: 27 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-    let rec f forall t'. (x : t') : json t' = real
-                          ^
-Error trace on line: 12, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-        open real_core
-        ^
-The annotation of the join point does not match its body's type.Got: json (i32 * u64 * bool)
-Expected: json i32
+Error trace on line: 19, column: 40 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+            inl ar : json (array el) = empty `el ()
+                                       ^
+The body does not match the annotation.
+Got: json i32
+Expected: json (sa 4i32 i32)

@@ -16,7 +16,7 @@ let serialize forall t. (x : t) : json t =
     let rec f forall t'. (x : t') : json t' = real
         open real_core
         inl serialize_sa forall array el. =
-            inl ar : json el = empty `el ()
+            inl ar = empty `(array el) ()
             loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
                 inl x = f `el (index `array `el x i)
                 $"!ar.push_back(!x)" : ()
@@ -42,7 +42,7 @@ let serialize forall t. (x : t) : json t =
                 unbox x (fun (k,v) =>
                     inl k = symbol_to_string k
                     inl v = f `(`(v)) v
-                    $"`(json t) \v{!k, !v}" : json t
+                    $"`(json t) \v{!k, !(union_tag x), !v}" : json t'
                     )
             elif nominal_type_is `t' then
                 inl (exists t''. _) = nominal_type_apply `t'
