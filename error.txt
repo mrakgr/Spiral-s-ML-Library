@@ -1,16 +1,17 @@
-Error trace on line: 28, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/sam.spi.
-    assert (0 <= i && i < length ar) "Index must be in range in set."
-    ^
-Error trace on line: 147, column: 50 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
-inl assert (c : bool) (msg : string) : () = real assert c msg
-                                                 ^
-Error trace on line: 274, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-    if c = false then 
-    ^
-Error trace on line: 275, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
+Error trace on line: 49, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+        typecase t' with
         ^
-Error trace on line: 275, column: 40 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-                                       ^
-Index must be in range in set.
+Error trace on line: 51, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+            $"!l.push_back(!(f `a (fst x)))" : ()
+            ^
+Error trace on line: 51, column: 30 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+            $"!l.push_back(!(f `a (fst x)))" : ()
+                             ^
+Error trace on line: 11, column: 27 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+    let rec f forall t'. (x : t') : json t' = real
+                          ^
+Error trace on line: 12, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+        open real_core
+        ^
+The annotation of the join point does not match its body's type.Got: json (i32 * u64 * bool)
+Expected: json i32

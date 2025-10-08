@@ -70,6 +70,9 @@ modules:
         semaphore
         latchm
         transposing_loop
+
+    corecudahost/
+        jsonm
         
     coreext/
         console/
@@ -89,6 +92,8 @@ modules:
     coretests/
         serializer
         pickler
+        cudahost/
+            jsonm
 
     hopfield_dictionary/
         game/

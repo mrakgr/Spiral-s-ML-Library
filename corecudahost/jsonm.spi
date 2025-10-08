@@ -1,0 +1,60 @@
+open corebase
+
+inl globals() = global "#include \"nlohmann/json.hpp\""
+
+nominal json t = $"nlohmann::json"
+
+instance printable json t = fun {write} x =>
+    if dyn true then
+        inl s : $"auto" = $"auto \v = !x.dump(4)"
+        write ($"!s.c_str()" : string)
+
+inl empty forall t. () : json t = $"`(json t) \v"
+
+let serialize forall t. (x : t) : json t =
+    globals()
+    let rec f forall t'. (x : t') : json t' = real
+        open real_core
+        inl serialize_sa forall array el. =
+            inl ar : json el = empty `el ()
+            loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
+                inl x = f `el (index `array `el x i)
+                $"!ar.push_back(!x)" : ()
+            ar
+        typecase t' with
+        | () => empty `t' ()
+        | ~a * ~b => 
+            inl l = empty `t' () 
+            f_tuple `t' l x 
+            l
+        | {} => 
+            inl l : json t' = $"`(json t') \v = nlohmann::json::object()"
+            record_type_iter (fun k => forall v. => 
+                $"!l[!(symbol_to_string k)] = !(f `v (x k))" : ()
+                ) `t'
+            l
+        | sa ~dim ~el => serialize_sa `(sa dim) `el
+        | da ~dim ~el => serialize_sa `(dam.sa dim) `el
+        | sa_list ~dim ~el => serialize_sa `(sa_list dim) `el
+        | da_list ~dim ~el => serialize_sa `(da_list dim) `el
+        | _ =>
+            if union_type_is `t' then 
+                unbox x (fun (k,v) =>
+                    inl k = symbol_to_string k
+                    inl v = f `(`(v)) v
+                    $"`(json t) \v{!k, !v}" : json t
+                    )
+            elif nominal_type_is `t' then
+                inl (exists t''. _) = nominal_type_apply `t'
+                f `t'' (nominal_strip x)
+            else
+                $"`(json t') \v = !x" : json t'
+    and inl f_tuple forall t'. (l : json t') (x : t') : () = real
+        open real_core
+        typecase t' with
+        | ~a * ~b => 
+            $"!l.push_back(!(f `a (fst x)))" : ()
+            f_tuple `b l (snd x)
+        | _ => 
+            $"!l.push_back(!(f `t' x))" : ()
+    f x

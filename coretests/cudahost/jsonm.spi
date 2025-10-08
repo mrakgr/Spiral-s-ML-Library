@@ -1,0 +1,13 @@
+open corebase
+open corecudahost
+open jsonm
+open coreext
+
+inl test0() =
+    inl t = serialize {x = 1i32,2u64,false; y = "hello"; z = {}}
+    console.write_ln t
+    ()
+
+inl main() =
+    test0()
+    0i32

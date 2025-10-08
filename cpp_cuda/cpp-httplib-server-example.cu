@@ -6,11 +6,13 @@ int main() {
     httplib::Server svr;
     
     svr.Get("/hi", [](const httplib::Request &, httplib::Response &res) {
-      nlohmann::json j;
+      nlohmann::json j{"name", "example"};
 
-      j["name"] = "example";
-      j["value"] = 123;
-      j["items"] = { "one", "two", "three" };
+
+
+      // j["name"] = "example";
+      // j["value"] = 123;
+      // j["items"] = { "one", "two", "three" };
 
       std::string json_str = j.dump();
       res.set_content(json_str, "application/json");
