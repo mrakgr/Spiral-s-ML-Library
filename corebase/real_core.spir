@@ -342,10 +342,21 @@ inl rec comp a b =
 inl comp a b = if `(`(a)) `= `(`(b)) then comp a b else error_type "The variables compared have to have the same type."
 
 // Structural polymorphic hashing for every type in the language (apart from functions.)
-inl hash_template prim tag_conv zero one max_half seed x = 
+inl hash_template prim init_seed x = 
+    typecase `init_seed with ~t =>
+    inl zero, one = conv `t 0, conv `t 1
+    inl max_half = limit.max `t / conv `t 2
     inl rec f = function
-        | (a, a') => f a * seed + f a'
-        | {} & a => inl s,_ = record_fold_back (fun {state=(s,seed') key value} => s + value * seed', seed * seed') a (zero, one) in s
+        | (a, a') => f a * init_seed + f a'
+        | {} & a => 
+            record_fold_back (fun {state=(s,seed) key value} => 
+                inl a,b = f value, seed
+                print_static {s a b value key}
+                s + a * b, seed * init_seed
+                ) 
+                a 
+                (zero, one) 
+                |> fst
         | () => zero
         | a => 
             if symbol_is a then zero
@@ -353,21 +364,21 @@ inl hash_template prim tag_conv zero one max_half seed x =
             elif union_is a then
                 inl body () = 
                     if prototype_has `(`a) hashable then hashable `(`a) a
-                    else !!!!Unbox(a,(fun (k,a') => (max_half + f a') * seed * (one + tag_conv (union_tag a))))
-                if heap_union_is a && var_is a then (join body()) : `zero
+                    else !!!!Unbox(a,(fun (k,a') => (max_half + f a') * init_seed * (one + conv `t (union_tag a))))
+                if heap_union_is a && var_is a then (join body()) : t
                 else body()
             elif nominal_is a then
-                if prototype_has `(`a) hashable then hashable `(`a) a
+                if prototype_has `(`a) hashable then hashable `(`a) a : t
                 else f (nominal_strip a)
-            elif prim_is a then prim a
+            elif prim_is a then prim a : t
             else error_type "The input must be hashable."
     f x
 
-inl hash x = 
-    inl hash_cpp () : int = hash_template (fun x => typecase `x with ~x => $"std::hash<`x>()(!x)" : int) (conv `int) 0 1 (limit.max `int / 2) 9973 x
+inl hash x : u64 = 
+    inl hash_cpp () = hash_template (fun x => typecase `x with ~x => $"std::hash<`x>()(!x)" : u64) 9973u64 x
     !!!!UnsafeBackendSwitch({
-        Fsharp = fun () => conv `int (hash_template (fun x => $"hash !x" : i32) id 0 1 (limit.min `i32 / 2i32) 31 x)
-        Python = fun () => conv `int (hash_template (fun x => $"hash(!x)" : u64) (fun x => $"!x" : u64) 0u64 1u64 (limit.max `u64 / 2u64) 9973u64 x)
+        Fsharp = fun () => hash_template (fun x => $"uint64 (hash !x)" : u64) 9973u64 x
+        Python = fun () => hash_template (fun x => $"hash(!x)" : u64) 9973u64 x
         CudaDevice = hash_cpp
         CudaHost = hash_cpp
     }) 

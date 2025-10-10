@@ -9,22 +9,22 @@ instance printable json t = fun {write} x =>
         inl s : $"auto" = $"auto \v = !x.dump(4)"
         write ($"!s.c_str()" : string)
 
-inl empty forall t. () : json t = $"`(json t) \v"
+inl empty forall t. : json t = $"`(json t) \v"
 
 let serialize forall t. (x : t) : json t =
     globals()
     let rec f forall t'. (x : t') : json t' = real
         open real_core
         inl serialize_sa forall array el. =
-            inl ar = empty `(array el) ()
+            inl ar = empty `(array el)
             loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
                 inl x = f `el (index `array `el x i)
                 $"!ar.push_back(!x)" : ()
             ar
         typecase t' with
-        | () => empty `t' ()
+        | () => empty `t'
         | ~a * ~b => 
-            inl l = empty `t' () 
+            inl l = empty `t'
             f_tuple `t' l x 
             l
         | {} => 
@@ -37,6 +37,13 @@ let serialize forall t. (x : t) : json t =
         | da ~dim ~el => serialize_sa `(dam.sa dim) `el
         | sa_list ~dim ~el => serialize_sa `(sa_list dim) `el
         | da_list ~dim ~el => serialize_sa `(da_list dim) `el
+        | dict ~k ~v =>
+            inl ar = empty `(dict k v)
+            dictm.iter `k `v (fun k v =>
+                inl k, v = f `k k, f `v v
+                $"!ar.push_back(`(json (k * v))({!k, !v}))" : ()
+                ) x
+            ar
         | _ =>
             if union_type_is `t' then 
                 unbox x (fun (k,v) =>

@@ -1,14 +1,11 @@
 // Provides an interface to the C++ `unordered_map`.
-
 open corebase
 
 inl globals() = global "#include <unordered_map>"
 
-nominal dict k v = $"std::unordered_map<`k, `v, `(fptr (arg k) int), `(fptr (arg k * arg k) bool)>"
-
 inl create forall k v. (buckets : int) : dict k v =
     globals()
-    $"std::unordered_map<`k, `v, `(fptr (arg k) int), `(fptr (arg k * arg k) bool)> \v(!buckets, !(to_fptr hash : fptr (arg k) int), !(to_fptr (fun a,b => a = b) : fptr (arg k * arg k) bool))"
+    $"`(dict k v) \v(!buckets, !(to_fptr hash : fptr (arg k) u64), !(to_fptr (fun a,b => a = b) : fptr (arg k * arg k) bool))"
 
 // Gets an item from the dictionary.
 inl get forall k v. (d : dict k v) (k : k) : option v =
@@ -29,32 +26,3 @@ inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
     loop.while' (fun () => $"!it !!= !d.end()") fun () =>
         f $"!it->first" $"!it->second"
         $"++!it"
-
-inl test0() =
-    globals()
-    inl d : dict (i32 * bool) string =  create 8
-    set d (1, true) "Hello"
-    set d (2, false) "World"
-    console.write_ln (get d (1,true))
-    console.write_ln (get d (2,false))
-    console.write_ln (get d (3,true))
-    
-    console.write_ln (contains d (2,false))
-    console.write_ln (contains d (3,true))
-
-    console.write_ln ("Removing", erase d (2,false))
-    console.write_ln ("Contains", contains d (2,false))
-
-inl test1() =
-    globals()
-    inl d : dict i32 string = create 8
-    set d 1 "Hello"
-    set d 2 "World"
-    set d 3 "!!!"
-    iter (fun k v => console.write_ln (k,v)) d
-    ()
-    
-        
-inl main() =
-    test1()
-    0i32

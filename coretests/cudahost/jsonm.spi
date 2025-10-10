@@ -1,15 +1,56 @@
 open corebase
 open corecudahost
-open jsonm
 open coreext
+open jsonm
 
 inl test0() =
     let ar : sa 4 i32 = sam.init (fun i => i)
     inl t = serialize {x = 1i32,2u64,false; y = "hello"; z = {}; q = Some ar; w = [11;22;33i32]}
-    // inl x = dist
     console.write_ln t
-    ()
+
+inl test1() =
+    inl d : dict i32 string = dictm.create 8
+    dictm.set d 1 "Hello"
+    dictm.set d 2 "World"
+    dictm.set d 3 "!!!"
+    inl t = serialize d
+    console.write_ln t
+
+union card = King | Queen | Jack
+union action = Raise | Call | Fold
+union message =
+    | PlayerGotCard : int * card
+    | CommunityCardIs : card
+    | PlayerAction : int * action
+    | Showdown : {winner_id : int; chips_won : int; cards_shown : sa 2 card}
+type messages = sa_list 32 message
+
+type values = 
+    {
+        average_policy : sa 3 f32
+        current_policy : sa 3 f32
+        expected_values : sa 3 f32
+    }
+
+inl test2() =
+    inl make l =
+        inl q = sa_create
+        listm.iter (sa_listm.push q) l
+        q
+    inl d : dict messages values = dictm.create 8
+    inl add l = dictm.set d (make l)
+    inl def : values = {
+        average_policy = sam.init (const 0)
+        current_policy = sam.init (const 0)
+        expected_values = sam.init (const 0)
+    }
+    add [PlayerGotCard(0, King); PlayerGotCard(1, Jack); PlayerAction(0, Raise)] def
+    add [PlayerGotCard(0, King); PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise)] def
+    add [PlayerGotCard(0, King); PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call)] def
+    inl t = serialize d
+    console.write_ln t
+
 
 inl main() =
-    test0()
+    test2()
     0i32

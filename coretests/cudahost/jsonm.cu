@@ -1,118 +1,66 @@
 #include "jsonm.auto.cu"
 #include <thrust/device_vector.h>
+#include <unordered_map>
 #include "nlohmann/json.hpp"
-namespace Device {
-}
-struct Union0;
 struct Union1;
-nlohmann::json f_3();
-nlohmann::json f_5(int v0);
-nlohmann::json f_4(static_array<int,4> v0);
-nlohmann::json f_2(Union0 v0);
-nlohmann::json f_7(int v0, sptr<Union1> v1);
-nlohmann::json f_6(sptr<Union1> v0);
-nlohmann::json f_9(unsigned long long v0);
-nlohmann::json f_10(bool v0);
-nlohmann::json f_8(int v0, unsigned long long v1, bool v2);
-nlohmann::json f_11(const char * v0);
-nlohmann::json f_12();
-nlohmann::json f_1(Union0 v0, sptr<Union1> v1, int v2, unsigned long long v3, bool v4, const char * v5);
-nlohmann::json serialize_0(Union0 v0, sptr<Union1> v1, int v2, unsigned long long v3, bool v4, const char * v5);
-struct Union0_0 { // None
+struct Union2;
+struct Union0;
+struct Tuple0;
+typedef unsigned long long (* Fun0)(static_array_list<Union0,32>);
+typedef bool (* Fun1)(static_array_list<Union0,32>, static_array_list<Union0,32>);
+struct Tuple1;
+nlohmann::json f_5();
+nlohmann::json f_4(Union1 v0);
+nlohmann::json f_7(int v0);
+nlohmann::json f_8(Union2 v0);
+nlohmann::json f_6(int v0, Union2 v1);
+nlohmann::json f_9(int v0, Union1 v1);
+nlohmann::json f_11(static_array<Union1,2> v0);
+nlohmann::json f_10(static_array<Union1,2> v0, int v1, int v2);
+nlohmann::json f_3(Union0 v0);
+nlohmann::json f_2(static_array_list<Union0,32> v0);
+nlohmann::json f_14(float v0);
+nlohmann::json f_13(static_array<float,3> v0);
+nlohmann::json f_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2);
+nlohmann::json f_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
+nlohmann::json serialize_0(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
+struct Union1_0 { // Jack
 };
-struct Union0_1 { // Some
-    static_array<int,4> v0;
-    Union0_1(static_array<int,4> t0) : v0(t0) {}
-    Union0_1() = delete;
+struct Union1_1 { // King
 };
-struct Union0 {
-    union {
-        Union0_0 case0; // None
-        Union0_1 case1; // Some
-    };
-    unsigned char tag{255};
-    Union0() {}
-    Union0(Union0_0 t) : tag(0), case0(t) {} // None
-    Union0(Union0_1 t) : tag(1), case1(t) {} // Some
-    Union0(Union0 & x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union0_0(x.case0); break; // None
-            case 1: new (&this->case1) Union0_1(x.case1); break; // Some
-        }
-    }
-    Union0(Union0 && x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // Some
-        }
-    }
-    Union0 & operator=(Union0 & x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = x.case0; break; // None
-                case 1: this->case1 = x.case1; break; // Some
-            }
-        } else {
-            this->~Union0();
-            new (this) Union0{x};
-        }
-        return *this;
-    }
-    Union0 & operator=(Union0 && x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // None
-                case 1: this->case1 = std::move(x.case1); break; // Some
-            }
-        } else {
-            this->~Union0();
-            new (this) Union0{std::move(x)};
-        }
-        return *this;
-    }
-    ~Union0() {
-        switch(this->tag){
-            case 0: this->case0.~Union0_0(); break; // None
-            case 1: this->case1.~Union0_1(); break; // Some
-        }
-        this->tag = 255;
-    }
-};
-struct Union1_0 { // Cons
-    sptr<Union1> v1;
-    int v0;
-    Union1_0(int t0, sptr<Union1> t1) : v0(t0), v1(t1) {}
-    Union1_0() = delete;
-};
-struct Union1_1 { // Nil
+struct Union1_2 { // Queen
 };
 struct Union1 {
     union {
-        Union1_0 case0; // Cons
-        Union1_1 case1; // Nil
+        Union1_0 case0; // Jack
+        Union1_1 case1; // King
+        Union1_2 case2; // Queen
     };
-    int refc{0};
     unsigned char tag{255};
-    Union1() {}
-    Union1(Union1_0 t) : tag(0), case0(t) {} // Cons
-    Union1(Union1_1 t) : tag(1), case1(t) {} // Nil
-    Union1(Union1 & x) : tag(x.tag) {
+    __host__ __device__ Union1() {}
+    __host__ __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Jack
+    __host__ __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // King
+    __host__ __device__ Union1(Union1_2 t) : tag(2), case2(t) {} // Queen
+    __host__ __device__ Union1(const Union1 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union1_0(x.case0); break; // Cons
-            case 1: new (&this->case1) Union1_1(x.case1); break; // Nil
+            case 0: new (&this->case0) Union1_0(x.case0); break; // Jack
+            case 1: new (&this->case1) Union1_1(x.case1); break; // King
+            case 2: new (&this->case2) Union1_2(x.case2); break; // Queen
         }
     }
-    Union1(Union1 && x) : tag(x.tag) {
+    __host__ __device__ Union1(const Union1 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Cons
-            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // Nil
+            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Jack
+            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // King
+            case 2: new (&this->case2) Union1_2(std::move(x.case2)); break; // Queen
         }
     }
-    Union1 & operator=(Union1 & x) {
+    __host__ __device__ Union1 & operator=(const Union1 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = x.case0; break; // Cons
-                case 1: this->case1 = x.case1; break; // Nil
+                case 0: this->case0 = x.case0; break; // Jack
+                case 1: this->case1 = x.case1; break; // King
+                case 2: this->case2 = x.case2; break; // Queen
             }
         } else {
             this->~Union1();
@@ -120,11 +68,12 @@ struct Union1 {
         }
         return *this;
     }
-    Union1 & operator=(Union1 && x) {
+    __host__ __device__ Union1 & operator=(const Union1 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Cons
-                case 1: this->case1 = std::move(x.case1); break; // Nil
+                case 0: this->case0 = std::move(x.case0); break; // Jack
+                case 1: this->case1 = std::move(x.case1); break; // King
+                case 2: this->case2 = std::move(x.case2); break; // Queen
             }
         } else {
             this->~Union1();
@@ -132,208 +81,922 @@ struct Union1 {
         }
         return *this;
     }
-    ~Union1() {
-        printf("in destructor\n");
+    __host__ __device__ ~Union1() {
         switch(this->tag){
-            case 0: this->case0.~Union1_0(); break; // Cons
-            case 1: this->case1.~Union1_1(); break; // Nil
+            case 0: this->case0.~Union1_0(); break; // Jack
+            case 1: this->case1.~Union1_1(); break; // King
+            case 2: this->case2.~Union1_2(); break; // Queen
         }
         this->tag = 255;
     }
 };
-inline bool while_method_0(int v0){
+struct Union2_0 { // Call
+};
+struct Union2_1 { // Fold
+};
+struct Union2_2 { // Raise
+};
+struct Union2 {
+    union {
+        Union2_0 case0; // Call
+        Union2_1 case1; // Fold
+        Union2_2 case2; // Raise
+    };
+    unsigned char tag{255};
+    __host__ __device__ Union2() {}
+    __host__ __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // Call
+    __host__ __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Fold
+    __host__ __device__ Union2(Union2_2 t) : tag(2), case2(t) {} // Raise
+    __host__ __device__ Union2(const Union2 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(x.case0); break; // Call
+            case 1: new (&this->case1) Union2_1(x.case1); break; // Fold
+            case 2: new (&this->case2) Union2_2(x.case2); break; // Raise
+        }
+    }
+    __host__ __device__ Union2(const Union2 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(std::move(x.case0)); break; // Call
+            case 1: new (&this->case1) Union2_1(std::move(x.case1)); break; // Fold
+            case 2: new (&this->case2) Union2_2(std::move(x.case2)); break; // Raise
+        }
+    }
+    __host__ __device__ Union2 & operator=(const Union2 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Call
+                case 1: this->case1 = x.case1; break; // Fold
+                case 2: this->case2 = x.case2; break; // Raise
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{x};
+        }
+        return *this;
+    }
+    __host__ __device__ Union2 & operator=(const Union2 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Call
+                case 1: this->case1 = std::move(x.case1); break; // Fold
+                case 2: this->case2 = std::move(x.case2); break; // Raise
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{std::move(x)};
+        }
+        return *this;
+    }
+    __host__ __device__ ~Union2() {
+        switch(this->tag){
+            case 0: this->case0.~Union2_0(); break; // Call
+            case 1: this->case1.~Union2_1(); break; // Fold
+            case 2: this->case2.~Union2_2(); break; // Raise
+        }
+        this->tag = 255;
+    }
+};
+struct Union0_0 { // CommunityCardIs
+    Union1 v0;
+    __host__ __device__ Union0_0(Union1 t0) : v0(t0) {}
+    __host__ __device__ Union0_0() = delete;
+};
+struct Union0_1 { // PlayerAction
+    Union2 v1;
+    int v0;
+    __host__ __device__ Union0_1(int t0, Union2 t1) : v0(t0), v1(t1) {}
+    __host__ __device__ Union0_1() = delete;
+};
+struct Union0_2 { // PlayerGotCard
+    Union1 v1;
+    int v0;
+    __host__ __device__ Union0_2(int t0, Union1 t1) : v0(t0), v1(t1) {}
+    __host__ __device__ Union0_2() = delete;
+};
+struct Union0_3 { // Showdown
+    static_array<Union1,2> v0;
+    int v1;
+    int v2;
+    __host__ __device__ Union0_3(static_array<Union1,2> t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ Union0_3() = delete;
+};
+struct Union0 {
+    union {
+        Union0_0 case0; // CommunityCardIs
+        Union0_1 case1; // PlayerAction
+        Union0_2 case2; // PlayerGotCard
+        Union0_3 case3; // Showdown
+    };
+    unsigned char tag{255};
+    __host__ __device__ Union0() {}
+    __host__ __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // CommunityCardIs
+    __host__ __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // PlayerAction
+    __host__ __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // PlayerGotCard
+    __host__ __device__ Union0(Union0_3 t) : tag(3), case3(t) {} // Showdown
+    __host__ __device__ Union0(const Union0 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(x.case0); break; // CommunityCardIs
+            case 1: new (&this->case1) Union0_1(x.case1); break; // PlayerAction
+            case 2: new (&this->case2) Union0_2(x.case2); break; // PlayerGotCard
+            case 3: new (&this->case3) Union0_3(x.case3); break; // Showdown
+        }
+    }
+    __host__ __device__ Union0(const Union0 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // CommunityCardIs
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // PlayerAction
+            case 2: new (&this->case2) Union0_2(std::move(x.case2)); break; // PlayerGotCard
+            case 3: new (&this->case3) Union0_3(std::move(x.case3)); break; // Showdown
+        }
+    }
+    __host__ __device__ Union0 & operator=(const Union0 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // CommunityCardIs
+                case 1: this->case1 = x.case1; break; // PlayerAction
+                case 2: this->case2 = x.case2; break; // PlayerGotCard
+                case 3: this->case3 = x.case3; break; // Showdown
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
+        }
+        return *this;
+    }
+    __host__ __device__ Union0 & operator=(const Union0 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // CommunityCardIs
+                case 1: this->case1 = std::move(x.case1); break; // PlayerAction
+                case 2: this->case2 = std::move(x.case2); break; // PlayerGotCard
+                case 3: this->case3 = std::move(x.case3); break; // Showdown
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
+        }
+        return *this;
+    }
+    __host__ __device__ ~Union0() {
+        switch(this->tag){
+            case 0: this->case0.~Union0_0(); break; // CommunityCardIs
+            case 1: this->case1.~Union0_1(); break; // PlayerAction
+            case 2: this->case2.~Union0_2(); break; // PlayerGotCard
+            case 3: this->case3.~Union0_3(); break; // Showdown
+        }
+        this->tag = 255;
+    }
+};
+struct Tuple0 {
+    unsigned long long v1;
+    unsigned long long v2;
+    int v0;
+    __host__ __device__ Tuple0() = default;
+    __host__ __device__ Tuple0(int t0, unsigned long long t1, unsigned long long t2) : v0(t0), v1(t1), v2(t2) {}
+};
+struct Tuple1 {
+    static_array<float,3> v0;
+    static_array<float,3> v1;
+    static_array<float,3> v2;
+    __host__ __device__ Tuple1() = default;
+    __host__ __device__ Tuple1(static_array<float,3> t0, static_array<float,3> t1, static_array<float,3> t2) : v0(t0), v1(t1), v2(t2) {}
+};
+inline bool while_method_0(int v0, int v1){
+    bool v2;
+    v2 = v1 < v0;
+    return v2;
+}
+inline bool while_method_1(int v0){
     bool v1;
-    v1 = v0 < 4;
+    v1 = v0 < 2;
     return v1;
 }
-nlohmann::json f_3(){
+unsigned long long FunPointerMethod0(static_array_list<Union0,32> tup0){
+    static_array_list<Union0,32> v0 = tup0;
+    int v1;
+    v1 = v0.length;
+    int v2; unsigned long long v3; unsigned long long v4;
+    Tuple0 tmp0 = Tuple0{0, 0ull, 1ull};
+    v2 = tmp0.v0; v3 = tmp0.v1; v4 = tmp0.v2;
+    while (while_method_0(v1, v2)){
+        Union0 v7;
+        v7 = v0[v2];
+        unsigned long long v52;
+        switch (v7.tag) {
+            case 0: { // CommunityCardIs
+                Union1 v9 = v7.case0.v0;
+                unsigned long long v10;
+                switch (v9.tag) {
+                    case 0: { // Jack
+                        v10 = 9223372036854765835ull;
+                        break;
+                    }
+                    case 1: { // King
+                        v10 = 18446744073709531670ull;
+                        break;
+                    }
+                    case 2: { // Queen
+                        v10 = 9223372036854745889ull;
+                        break;
+                    }
+                    default: {
+                        assert("Invalid tag." && false);
+                        exit(-1);
+                    }
+                }
+                unsigned long long v11;
+                v11 = 9223372036854775807ull + v10;
+                unsigned long long v12;
+                v12 = v11 * 9973ull;
+                v52 = v12;
+                break;
+            }
+            case 1: { // PlayerAction
+                int v13 = v7.case1.v0; Union2 v14 = v7.case1.v1;
+                unsigned long long v15;
+                v15 = std::hash<int>()(v13);
+                unsigned long long v16;
+                v16 = v15 * 9973ull;
+                unsigned long long v17;
+                switch (v14.tag) {
+                    case 0: { // Call
+                        v17 = 9223372036854765835ull;
+                        break;
+                    }
+                    case 1: { // Fold
+                        v17 = 18446744073709531670ull;
+                        break;
+                    }
+                    case 2: { // Raise
+                        v17 = 9223372036854745889ull;
+                        break;
+                    }
+                    default: {
+                        assert("Invalid tag." && false);
+                        exit(-1);
+                    }
+                }
+                unsigned long long v18;
+                v18 = v16 + v17;
+                unsigned long long v19;
+                v19 = 9223372036854775807ull + v18;
+                unsigned long long v20;
+                v20 = v19 * 9973ull;
+                unsigned long long v21;
+                v21 = v20 * 2ull;
+                v52 = v21;
+                break;
+            }
+            case 2: { // PlayerGotCard
+                int v22 = v7.case2.v0; Union1 v23 = v7.case2.v1;
+                unsigned long long v24;
+                v24 = std::hash<int>()(v22);
+                unsigned long long v25;
+                v25 = v24 * 9973ull;
+                unsigned long long v26;
+                switch (v23.tag) {
+                    case 0: { // Jack
+                        v26 = 9223372036854765835ull;
+                        break;
+                    }
+                    case 1: { // King
+                        v26 = 18446744073709531670ull;
+                        break;
+                    }
+                    case 2: { // Queen
+                        v26 = 9223372036854745889ull;
+                        break;
+                    }
+                    default: {
+                        assert("Invalid tag." && false);
+                        exit(-1);
+                    }
+                }
+                unsigned long long v27;
+                v27 = v25 + v26;
+                unsigned long long v28;
+                v28 = 9223372036854775807ull + v27;
+                unsigned long long v29;
+                v29 = v28 * 9973ull;
+                unsigned long long v30;
+                v30 = v29 * 3ull;
+                v52 = v30;
+                break;
+            }
+            case 3: { // Showdown
+                static_array<Union1,2> v31 = v7.case3.v0; int v32 = v7.case3.v1; int v33 = v7.case3.v2;
+                unsigned long long v34;
+                v34 = std::hash<int>()(v33);
+                unsigned long long v35;
+                v35 = std::hash<int>()(v32);
+                unsigned long long v36;
+                v36 = v35 * 9973ull;
+                unsigned long long v37;
+                v37 = v34 + v36;
+                int v38; unsigned long long v39; unsigned long long v40;
+                Tuple0 tmp1 = Tuple0{0, 0ull, 1ull};
+                v38 = tmp1.v0; v39 = tmp1.v1; v40 = tmp1.v2;
+                while (while_method_1(v38)){
+                    Union1 v43;
+                    v43 = v31[v38];
+                    unsigned long long v45;
+                    switch (v43.tag) {
+                        case 0: { // Jack
+                            v45 = 9223372036854765835ull;
+                            break;
+                        }
+                        case 1: { // King
+                            v45 = 18446744073709531670ull;
+                            break;
+                        }
+                        case 2: { // Queen
+                            v45 = 9223372036854745889ull;
+                            break;
+                        }
+                        default: {
+                            assert("Invalid tag." && false);
+                            exit(-1);
+                        }
+                    }
+                    unsigned long long v46;
+                    v46 = v45 * v40;
+                    unsigned long long v47;
+                    v47 = v39 + v46;
+                    unsigned long long v48;
+                    v48 = v40 * 9973ull;
+                    v39 = v47;
+                    v40 = v48;
+                    v38 += 1 ;
+                }
+                unsigned long long v49;
+                v49 = 9223372036854775807ull + v37;
+                unsigned long long v50;
+                v50 = v49 * 9973ull;
+                unsigned long long v51;
+                v51 = v50 * 4ull;
+                v52 = v51;
+                break;
+            }
+            default: {
+                assert("Invalid tag." && false);
+                exit(-1);
+            }
+        }
+        unsigned long long v53;
+        v53 = v52 * v4;
+        unsigned long long v54;
+        v54 = v3 + v53;
+        unsigned long long v55;
+        v55 = v4 * 9973ull;
+        v3 = v54;
+        v4 = v55;
+        v2 += 1 ;
+    }
+    return 0ull;
+}
+bool FunPointerMethod1(static_array_list<Union0,32> tup0, static_array_list<Union0,32> tup1){
+    static_array_list<Union0,32> v0 = tup0; static_array_list<Union0,32> v1 = tup1;
+    int v2;
+    v2 = v0.length;
+    int v3;
+    v3 = v1.length;
+    bool v4;
+    v4 = v2 == v3;
+    if (v4){
+        bool v5;
+        v5 = true;
+        int v6;
+        v6 = v1.length;
+        int v7;
+        v7 = 0;
+        while (while_method_0(v6, v7)){
+            Union0 v10;
+            v10 = v0[v7];
+            Union0 v13;
+            v13 = v1[v7];
+            bool v54;
+            switch (v10.tag == v13.tag ? v10.tag : 255) {
+                case 0: { // CommunityCardIs
+                    Union1 v15 = v10.case0.v0;
+                    Union1 v16 = v13.case0.v0;
+                    switch (v15.tag == v16.tag ? v15.tag : 255) {
+                        case 0: { // Jack
+                            v54 = true;
+                            break;
+                        }
+                        case 1: { // King
+                            v54 = true;
+                            break;
+                        }
+                        case 2: { // Queen
+                            v54 = true;
+                            break;
+                        }
+                        default: {
+                            v54 = false;
+                        }
+                    }
+                    break;
+                }
+                case 1: { // PlayerAction
+                    int v18 = v10.case1.v0; Union2 v19 = v10.case1.v1;
+                    int v20 = v13.case1.v0; Union2 v21 = v13.case1.v1;
+                    bool v22;
+                    v22 = v18 == v20;
+                    if (v22){
+                        switch (v19.tag == v21.tag ? v19.tag : 255) {
+                            case 0: { // Call
+                                v54 = true;
+                                break;
+                            }
+                            case 1: { // Fold
+                                v54 = true;
+                                break;
+                            }
+                            case 2: { // Raise
+                                v54 = true;
+                                break;
+                            }
+                            default: {
+                                v54 = false;
+                            }
+                        }
+                    } else {
+                        v54 = false;
+                    }
+                    break;
+                }
+                case 2: { // PlayerGotCard
+                    int v25 = v10.case2.v0; Union1 v26 = v10.case2.v1;
+                    int v27 = v13.case2.v0; Union1 v28 = v13.case2.v1;
+                    bool v29;
+                    v29 = v25 == v27;
+                    if (v29){
+                        switch (v26.tag == v28.tag ? v26.tag : 255) {
+                            case 0: { // Jack
+                                v54 = true;
+                                break;
+                            }
+                            case 1: { // King
+                                v54 = true;
+                                break;
+                            }
+                            case 2: { // Queen
+                                v54 = true;
+                                break;
+                            }
+                            default: {
+                                v54 = false;
+                            }
+                        }
+                    } else {
+                        v54 = false;
+                    }
+                    break;
+                }
+                case 3: { // Showdown
+                    static_array<Union1,2> v32 = v10.case3.v0; int v33 = v10.case3.v1; int v34 = v10.case3.v2;
+                    static_array<Union1,2> v35 = v13.case3.v0; int v36 = v13.case3.v1; int v37 = v13.case3.v2;
+                    bool v38;
+                    v38 = true;
+                    int v39;
+                    v39 = 0;
+                    while (while_method_1(v39)){
+                        Union1 v42;
+                        v42 = v32[v39];
+                        Union1 v45;
+                        v45 = v35[v39];
+                        bool v47;
+                        switch (v42.tag == v45.tag ? v42.tag : 255) {
+                            case 0: { // Jack
+                                v47 = true;
+                                break;
+                            }
+                            case 1: { // King
+                                v47 = true;
+                                break;
+                            }
+                            case 2: { // Queen
+                                v47 = true;
+                                break;
+                            }
+                            default: {
+                                v47 = false;
+                            }
+                        }
+                        bool v48;
+                        v48 = v47 != true;
+                        if (v48){
+                            bool v49;
+                            v49 = false;
+                            v38 = v49;
+                            break;
+                        } else {
+                        }
+                        v39 += 1 ;
+                    }
+                    if (v38){
+                        bool v50;
+                        v50 = v33 == v36;
+                        if (v50){
+                            bool v51;
+                            v51 = v34 == v37;
+                            v54 = v51;
+                        } else {
+                            v54 = false;
+                        }
+                    } else {
+                        v54 = false;
+                    }
+                    break;
+                }
+                default: {
+                    v54 = false;
+                }
+            }
+            bool v55;
+            v55 = v54 != true;
+            if (v55){
+                bool v56;
+                v56 = false;
+                v5 = v56;
+                break;
+            } else {
+            }
+            v7 += 1 ;
+        }
+        return v5;
+    } else {
+        return false;
+    }
+}
+inline bool while_method_2(int v0){
+    bool v1;
+    v1 = v0 < 3;
+    return v1;
+}
+inline bool while_method_3(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v0, std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1>::iterator & v1){
+    bool v2;
+    v2 = v1 != v0.end();
+    return v2;
+}
+nlohmann::json f_5(){
     nlohmann::json v0;
     return v0;
 }
-nlohmann::json f_5(int v0){
+nlohmann::json f_4(Union1 v0){
+    switch (v0.tag) {
+        case 0: { // Jack
+            nlohmann::json v1;
+            v1 = f_5();
+            const char * v2;
+            v2 = "Jack";
+            nlohmann::json v3{v2, 0, v1};
+            return v3;
+            break;
+        }
+        case 1: { // King
+            nlohmann::json v4;
+            v4 = f_5();
+            const char * v5;
+            v5 = "King";
+            nlohmann::json v6{v5, 1, v4};
+            return v6;
+            break;
+        }
+        case 2: { // Queen
+            nlohmann::json v7;
+            v7 = f_5();
+            const char * v8;
+            v8 = "Queen";
+            nlohmann::json v9{v8, 2, v7};
+            return v9;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+            exit(-1);
+        }
+    }
+}
+nlohmann::json f_7(int v0){
     nlohmann::json v1 = v0;
     return v1;
 }
-nlohmann::json f_4(static_array<int,4> v0){
+nlohmann::json f_8(Union2 v0){
+    switch (v0.tag) {
+        case 0: { // Call
+            nlohmann::json v1;
+            v1 = f_5();
+            const char * v2;
+            v2 = "Call";
+            nlohmann::json v3{v2, 0, v1};
+            return v3;
+            break;
+        }
+        case 1: { // Fold
+            nlohmann::json v4;
+            v4 = f_5();
+            const char * v5;
+            v5 = "Fold";
+            nlohmann::json v6{v5, 1, v4};
+            return v6;
+            break;
+        }
+        case 2: { // Raise
+            nlohmann::json v7;
+            v7 = f_5();
+            const char * v8;
+            v8 = "Raise";
+            nlohmann::json v9{v8, 2, v7};
+            return v9;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+            exit(-1);
+        }
+    }
+}
+nlohmann::json f_6(int v0, Union2 v1){
+    nlohmann::json v2;
+    nlohmann::json v3;
+    v3 = f_7(v0);
+    v2.push_back(v3);
+    nlohmann::json v4;
+    v4 = f_8(v1);
+    v2.push_back(v4);
+    return v2;
+}
+nlohmann::json f_9(int v0, Union1 v1){
+    nlohmann::json v2;
+    nlohmann::json v3;
+    v3 = f_7(v0);
+    v2.push_back(v3);
+    nlohmann::json v4;
+    v4 = f_4(v1);
+    v2.push_back(v4);
+    return v2;
+}
+nlohmann::json f_11(static_array<Union1,2> v0){
     nlohmann::json v1;
     int v2;
     v2 = 0;
-    while (while_method_0(v2)){
-        int v5;
+    while (while_method_1(v2)){
+        Union1 v5;
         v5 = v0[v2];
         nlohmann::json v7;
-        v7 = f_5(v5);
+        v7 = f_4(v5);
         v1.push_back(v7);
         v2 += 1 ;
     }
     return v1;
 }
-nlohmann::json f_2(Union0 v0){
-    switch (v0.tag) {
-        case 0: { // None
-            nlohmann::json v1;
-            v1 = f_3();
-            const char * v2;
-            v2 = "None";
-            nlohmann::json v3{v2, 0, v1};
-            return v3;
-            break;
-        }
-        case 1: { // Some
-            static_array<int,4> v4 = v0.case1.v0;
-            nlohmann::json v5;
-            v5 = f_4(v4);
-            const char * v6;
-            v6 = "Some";
-            nlohmann::json v7{v6, 1, v5};
-            return v7;
-            break;
-        }
-        default: {
-            assert("Invalid tag." && false);
-            exit(-1);
-        }
-    }
-}
-nlohmann::json f_7(int v0, sptr<Union1> v1){
-    nlohmann::json v2;
-    nlohmann::json v3;
-    v3 = f_5(v0);
-    v2.push_back(v3);
-    nlohmann::json v4;
-    v4 = f_6(v1);
-    v2.push_back(v4);
-    return v2;
-}
-nlohmann::json f_6(sptr<Union1> v0){
-    switch (v0.base->tag) {
-        case 0: { // Cons
-            int v1 = v0.base->case0.v0; sptr<Union1> v2 = v0.base->case0.v1;
-            nlohmann::json v3;
-            v3 = f_7(v1, v2);
-            const char * v4;
-            v4 = "Cons";
-            nlohmann::json v5{v4, 0, v3};
-            return v5;
-            break;
-        }
-        case 1: { // Nil
-            nlohmann::json v6;
-            v6 = f_3();
-            const char * v7;
-            v7 = "Nil";
-            nlohmann::json v8{v7, 1, v6};
-            return v8;
-            break;
-        }
-        default: {
-            assert("Invalid tag." && false);
-            exit(-1);
-        }
-    }
-}
-nlohmann::json f_9(unsigned long long v0){
-    nlohmann::json v1 = v0;
-    return v1;
-}
-nlohmann::json f_10(bool v0){
-    nlohmann::json v1 = v0;
-    return v1;
-}
-nlohmann::json f_8(int v0, unsigned long long v1, bool v2){
-    nlohmann::json v3;
-    nlohmann::json v4;
-    v4 = f_5(v0);
-    v3.push_back(v4);
+nlohmann::json f_10(static_array<Union1,2> v0, int v1, int v2){
+    nlohmann::json v3 = nlohmann::json::object();
+    const char * v4;
+    v4 = "cards_shown";
     nlohmann::json v5;
-    v5 = f_9(v1);
-    v3.push_back(v5);
-    nlohmann::json v6;
-    v6 = f_10(v2);
-    v3.push_back(v6);
+    v5 = f_11(v0);
+    v3[v4] = v5;
+    const char * v6;
+    v6 = "chips_won";
+    nlohmann::json v7;
+    v7 = f_7(v1);
+    v3[v6] = v7;
+    const char * v8;
+    v8 = "winner_id";
+    nlohmann::json v9;
+    v9 = f_7(v2);
+    v3[v8] = v9;
     return v3;
 }
-nlohmann::json f_11(const char * v0){
+nlohmann::json f_3(Union0 v0){
+    switch (v0.tag) {
+        case 0: { // CommunityCardIs
+            Union1 v1 = v0.case0.v0;
+            nlohmann::json v2;
+            v2 = f_4(v1);
+            const char * v3;
+            v3 = "CommunityCardIs";
+            nlohmann::json v4{v3, 0, v2};
+            return v4;
+            break;
+        }
+        case 1: { // PlayerAction
+            int v5 = v0.case1.v0; Union2 v6 = v0.case1.v1;
+            nlohmann::json v7;
+            v7 = f_6(v5, v6);
+            const char * v8;
+            v8 = "PlayerAction";
+            nlohmann::json v9{v8, 1, v7};
+            return v9;
+            break;
+        }
+        case 2: { // PlayerGotCard
+            int v10 = v0.case2.v0; Union1 v11 = v0.case2.v1;
+            nlohmann::json v12;
+            v12 = f_9(v10, v11);
+            const char * v13;
+            v13 = "PlayerGotCard";
+            nlohmann::json v14{v13, 2, v12};
+            return v14;
+            break;
+        }
+        case 3: { // Showdown
+            static_array<Union1,2> v15 = v0.case3.v0; int v16 = v0.case3.v1; int v17 = v0.case3.v2;
+            nlohmann::json v18;
+            v18 = f_10(v15, v16, v17);
+            const char * v19;
+            v19 = "Showdown";
+            nlohmann::json v20{v19, 3, v18};
+            return v20;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+            exit(-1);
+        }
+    }
+}
+nlohmann::json f_2(static_array_list<Union0,32> v0){
+    nlohmann::json v1;
+    int v2;
+    v2 = v0.length;
+    int v3;
+    v3 = 0;
+    while (while_method_0(v2, v3)){
+        Union0 v6;
+        v6 = v0[v3];
+        nlohmann::json v8;
+        v8 = f_3(v6);
+        v1.push_back(v8);
+        v3 += 1 ;
+    }
+    return v1;
+}
+nlohmann::json f_14(float v0){
     nlohmann::json v1 = v0;
     return v1;
 }
-nlohmann::json f_12(){
-    nlohmann::json v0 = nlohmann::json::object();
-    return v0;
+nlohmann::json f_13(static_array<float,3> v0){
+    nlohmann::json v1;
+    int v2;
+    v2 = 0;
+    while (while_method_2(v2)){
+        float v5;
+        v5 = v0[v2];
+        nlohmann::json v7;
+        v7 = f_14(v5);
+        v1.push_back(v7);
+        v2 += 1 ;
+    }
+    return v1;
 }
-nlohmann::json f_1(Union0 v0, sptr<Union1> v1, int v2, unsigned long long v3, bool v4, const char * v5){
-    nlohmann::json v6 = nlohmann::json::object();
-    const char * v7;
-    v7 = "q";
-    nlohmann::json v8;
-    v8 = f_2(v0);
-    v6[v7] = v8;
-    const char * v9;
-    v9 = "w";
-    nlohmann::json v10;
-    v10 = f_6(v1);
-    v6[v9] = v10;
-    const char * v11;
-    v11 = "x";
-    nlohmann::json v12;
-    v12 = f_8(v2, v3, v4);
-    v6[v11] = v12;
-    const char * v13;
-    v13 = "y";
-    nlohmann::json v14;
-    v14 = f_11(v5);
-    v6[v13] = v14;
-    const char * v15;
-    v15 = "z";
-    nlohmann::json v16;
-    v16 = f_12();
-    v6[v15] = v16;
-    return v6;
+nlohmann::json f_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2){
+    nlohmann::json v3 = nlohmann::json::object();
+    const char * v4;
+    v4 = "average_policy";
+    nlohmann::json v5;
+    v5 = f_13(v0);
+    v3[v4] = v5;
+    const char * v6;
+    v6 = "current_policy";
+    nlohmann::json v7;
+    v7 = f_13(v1);
+    v3[v6] = v7;
+    const char * v8;
+    v8 = "expected_values";
+    nlohmann::json v9;
+    v9 = f_13(v2);
+    v3[v8] = v9;
+    return v3;
 }
-nlohmann::json serialize_0(Union0 v0, sptr<Union1> v1, int v2, unsigned long long v3, bool v4, const char * v5){
-    return f_1(v0, v1, v2, v3, v4, v5);
+nlohmann::json f_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
+    nlohmann::json v1;
+    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v2 = v0;
+    auto v3 = v2.begin();
+    while (while_method_3(v2, v3)){
+        static_array_list<Union0,32> v5;
+        v5 = v3->first;
+        static_array<float,3> v6; static_array<float,3> v7; static_array<float,3> v8;
+        Tuple1 tmp2 = v3->second;
+        v6 = tmp2.v0; v7 = tmp2.v1; v8 = tmp2.v2;
+        nlohmann::json v9;
+        v9 = f_2(v5);
+        nlohmann::json v10;
+        v10 = f_12(v6, v7, v8);
+        v1.push_back(nlohmann::json({v9, v10}));
+        ++v3;
+    }
+    return v1;
+}
+nlohmann::json serialize_0(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
+    return f_1(v0);
 }
 int main() {
-    static_array<int,4> v1;
-    int v3;
-    v3 = 0;
-    while (while_method_0(v3)){
-        v1[v3] = v3;
-        v3 += 1 ;
-    }
-    Union0 v5;
-    v5 = Union0{Union0_1{v1}};
+    Fun0 v0 = FunPointerMethod0;
+    Fun1 v1 = FunPointerMethod1;
+    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v2(8, v0, v1);
+    static_array<float,3> v4;
     int v6;
-    v6 = 11;
-    int v7;
-    v7 = 22;
-    int v8;
-    v8 = 33;
-    sptr<Union1> v9;
-    v9 = sptr<Union1>{new Union1{Union1_1{}}};
-    sptr<Union1> v10;
-    v10 = sptr<Union1>{new Union1{Union1_0{v8, v9}}};
-    sptr<Union1> v11;
-    v11 = sptr<Union1>{new Union1{Union1_0{v7, v10}}};
-    sptr<Union1> v12;
-    v12 = sptr<Union1>{new Union1{Union1_0{v6, v11}}};
-    int v13;
-    v13 = 1;
-    unsigned long long v14;
-    v14 = 2ull;
-    bool v15;
-    v15 = false;
-    const char * v16;
-    v16 = "hello";
-    nlohmann::json v17;
-    v17 = serialize_0(v5, v12, v13, v14, v15, v16);
-    bool v23;
-    v23 = true;
-    if (v23){
-        auto v24 = v17.dump(4);
-        const char * v25;
-        v25 = v24.c_str();
-        printf("%s",v25);
+    v6 = 0;
+    while (while_method_2(v6)){
+        v4[v6] = 0.0f;
+        v6 += 1 ;
+    }
+    static_array<float,3> v9;
+    int v11;
+    v11 = 0;
+    while (while_method_2(v11)){
+        v9[v11] = 0.0f;
+        v11 += 1 ;
+    }
+    static_array<float,3> v14;
+    int v16;
+    v16 = 0;
+    while (while_method_2(v16)){
+        v14[v16] = 0.0f;
+        v16 += 1 ;
+    }
+    static_array_list<Union0,32> v19;
+    v19 = static_array_list<Union0,32>{};
+    Union1 v21;
+    v21 = Union1{Union1_1{}};
+    Union0 v22;
+    v22 = Union0{Union0_2{0, v21}};
+    v19.push(v22);
+    Union1 v23;
+    v23 = Union1{Union1_0{}};
+    Union0 v24;
+    v24 = Union0{Union0_2{1, v23}};
+    v19.push(v24);
+    Union2 v25;
+    v25 = Union2{Union2_2{}};
+    Union0 v26;
+    v26 = Union0{Union0_1{0, v25}};
+    v19.push(v26);
+    v2[v19] = Tuple1{v4, v9, v14};
+    static_array_list<Union0,32> v28;
+    v28 = static_array_list<Union0,32>{};
+    Union1 v30;
+    v30 = Union1{Union1_1{}};
+    Union0 v31;
+    v31 = Union0{Union0_2{0, v30}};
+    v28.push(v31);
+    Union1 v32;
+    v32 = Union1{Union1_0{}};
+    Union0 v33;
+    v33 = Union0{Union0_2{1, v32}};
+    v28.push(v33);
+    Union2 v34;
+    v34 = Union2{Union2_2{}};
+    Union0 v35;
+    v35 = Union0{Union0_1{0, v34}};
+    v28.push(v35);
+    Union2 v36;
+    v36 = Union2{Union2_2{}};
+    Union0 v37;
+    v37 = Union0{Union0_1{1, v36}};
+    v28.push(v37);
+    v2[v28] = Tuple1{v4, v9, v14};
+    static_array_list<Union0,32> v39;
+    v39 = static_array_list<Union0,32>{};
+    Union1 v41;
+    v41 = Union1{Union1_1{}};
+    Union0 v42;
+    v42 = Union0{Union0_2{0, v41}};
+    v39.push(v42);
+    Union1 v43;
+    v43 = Union1{Union1_0{}};
+    Union0 v44;
+    v44 = Union0{Union0_2{1, v43}};
+    v39.push(v44);
+    Union2 v45;
+    v45 = Union2{Union2_2{}};
+    Union0 v46;
+    v46 = Union0{Union0_1{0, v45}};
+    v39.push(v46);
+    Union2 v47;
+    v47 = Union2{Union2_2{}};
+    Union0 v48;
+    v48 = Union0{Union0_1{1, v47}};
+    v39.push(v48);
+    Union2 v49;
+    v49 = Union2{Union2_0{}};
+    Union0 v50;
+    v50 = Union0{Union0_1{0, v49}};
+    v39.push(v50);
+    v2[v39] = Tuple1{v4, v9, v14};
+    nlohmann::json v51;
+    v51 = serialize_0(v2);
+    bool v57;
+    v57 = true;
+    if (v57){
+        auto v58 = v51.dump(4);
+        const char * v59;
+        v59 = v58.c_str();
+        printf("%s",v59);
     } else {
     }
     printf("\n");

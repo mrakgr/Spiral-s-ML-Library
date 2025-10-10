@@ -1,0 +1,34 @@
+open corebase
+open coreext
+open corecudahost
+
+inl test0() =
+    open dictm
+    globals()
+    inl d : dict (i32 * bool) string =  create 8
+    set d (1, true) "Hello"
+    set d (2, false) "World"
+    console.write_ln (get d (1,true))
+    console.write_ln (get d (2,false))
+    console.write_ln (get d (3,true))
+    
+    console.write_ln (contains d (2,false))
+    console.write_ln (contains d (3,true))
+
+    console.write_ln ("Removing", erase d (2,false))
+    console.write_ln ("Contains", contains d (2,false))
+
+inl test1() =
+    open dictm
+    globals()
+    inl d : dict i32 string = create 8
+    set d 1 "Hello"
+    set d 2 "World"
+    set d 3 "!!!"
+    iter (fun k v => console.write_ln (k,v)) d
+    ()
+    
+        
+inl main() =
+    test1()
+    0i32

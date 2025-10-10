@@ -1,0 +1,3 @@
+open corebase
+
+nominal dict k v = $"std::unordered_map<`k, `v, `(fptr (arg k) u64), `(fptr (arg k * arg k) bool)>"

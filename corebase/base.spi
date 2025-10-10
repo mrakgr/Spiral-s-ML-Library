@@ -9,7 +9,7 @@ inl lt_is = function Lt => true | _ => false
 inl gt() = Gt
 inl gt_is = function Gt => true | _ => false
 
-prototype hashable a : a -> i32
+prototype hashable a : a -> u64
 
 union option a = Some : a | None
 union choice2 a b = C1of2 : a | C2of2 : b

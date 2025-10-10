@@ -212,8 +212,18 @@ inl generic_comparable x1 x2 =
                 _set result x . break()
         result
 
+// Generic hashable function that data structures other than regular arrays can reuse.
+inl generic_hashable x =
+    inl init_seed : u64 = 9973
+    inl t =
+        for {from=0; nearTo=length x} (fun i (s,seed) =>
+            s + hash (index x i) * seed, seed * init_seed
+            ) (0, 1) 
+    0
+
 instance equable array t = generic_equable
 instance comparable array t = generic_comparable
+instance hashable array t = generic_hashable
 
 // Prints the array to the console. Doesn't work on Cuda arrays they are pointers
 // and such they don't have their length known at runtime.

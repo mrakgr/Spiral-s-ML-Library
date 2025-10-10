@@ -72,6 +72,8 @@ modules:
         transposing_loop
 
     corecudahost/
+        types-
+        dictm
         jsonm
         
     coreext/
@@ -83,7 +85,6 @@ modules:
             console-
             tensor
 
-        dictm
         xoshiro
         sampling
 
@@ -93,6 +94,7 @@ modules:
         serializer
         pickler
         cudahost/
+            dictm
             jsonm
 
     hopfield_dictionary/
