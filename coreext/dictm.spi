@@ -4,23 +4,35 @@ open corebase
 
 inl globals() = global "#include <unordered_map>"
 
-nominal dict key value = $"std::unordered_map<`key, `value, `(fptr (key * key) int), `(fptr (key * key) bool)>"
+nominal dict k v = $"std::unordered_map<`k, `v, `(fptr (arg k) int), `(fptr (arg k * arg k) bool)>"
 
-inl create_dict forall key value. (capacity : int) : dict key value =
+inl create forall k v. (buckets : int) : dict k v =
     globals()
-    $"std::unordered_map<`key, `value, `(fptr (arg key) int), `(fptr (arg key * arg key) bool)> \v(!capacity, !(to_fptr hash : fptr (arg key) int), !(to_fptr (fun a,b => a = b) : fptr (arg key * arg key) bool))"
+    $"std::unordered_map<`k, `v, `(fptr (arg k) int), `(fptr (arg k * arg k) bool)> \v(!buckets, !(to_fptr hash : fptr (arg k) int), !(to_fptr (fun a,b => a = b) : fptr (arg k * arg k) bool))"
 
-inl get forall key value. (d : dict key value) (key : key) : option value =
-    inl it : $"auto" = $"auto \v = !d.find(!key)"
+// Gets an item from the dictionary.
+inl get forall k v. (d : dict k v) (k : k) : option v =
+    inl it : $"auto" = $"auto \v = !d.find(!k)"
     if $"!it !!= !d.end()" then Some $"!it->second" else None
-inl set forall key value. (d : dict key value) (key : key) (value : value) : () = $"!d[!key] = !value"
-inl contains forall key value. (d : dict key value) (key : key) : bool = $"!d.contains(!key)"
-inl clear forall key value. (d : dict key value) : () = $"!d.clear()"
-inl erase forall key value. (d : dict key value) (key : key) : bool = $"static_cast<bool>(!d.erase(!key))"
-        
-inl main() =
+// Sets the item to the dictionary at the specified key.
+inl set forall k v. (d : dict k v) (k : k) (v : v) : () = $"!d[!k] = !v"
+// Checks whether the key exists in the dictionary.
+inl contains forall k v. (d : dict k v) (k : k) : bool = $"!d.contains(!k)"
+// Clears the dictionary of keys.
+inl clear forall k v. (d : dict k v) : () = $"!d.clear()"
+// Removes the key from the dictionary and returns boolean whether the operation was successful.
+inl erase forall k v. (d : dict k v) (k : k) : bool = $"static_cast<bool>(!d.erase(!k))"
+// Iterates over the dictionary with the iterator function.
+inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
+    inl d = corecuda.refm.from_local d
+    inl it : $"`(dict k v)::iterator &" = $"auto \v = !d.begin()"
+    loop.while' (fun () => $"!it !!= !d.end()") fun () =>
+        f $"!it->first" $"!it->second"
+        $"++!it"
+
+inl test0() =
     globals()
-    inl d : dict (i32 * bool) string =  create_dict 8
+    inl d : dict (i32 * bool) string =  create 8
     set d (1, true) "Hello"
     set d (2, false) "World"
     console.write_ln (get d (1,true))
@@ -32,4 +44,17 @@ inl main() =
 
     console.write_ln ("Removing", erase d (2,false))
     console.write_ln ("Contains", contains d (2,false))
+
+inl test1() =
+    globals()
+    inl d : dict i32 string = create 8
+    set d 1 "Hello"
+    set d 2 "World"
+    set d 3 "!!!"
+    iter (fun k v => console.write_ln (k,v)) d
+    ()
+    
+        
+inl main() =
+    test1()
     0i32
