@@ -1,18 +1,18 @@
-Error trace on line: 363, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-            elif layout_is a then f *a
+Error trace on line: 129, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+        inl rec loop forall t'. (i : int) : t =
+                                 ^
+Error trace on line: 130, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+            typecase t' with
             ^
-Error trace on line: 364, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-            elif union_is a then
+Error trace on line: 131, column: 53 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+            | ~a * ~b => f `a ($"!x[!i]" : json a), loop `b (i+1)
+                                                    ^
+Error trace on line: 129, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+        inl rec loop forall t'. (i : int) : t =
+                                 ^
+Error trace on line: 130, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
+            typecase t' with
             ^
-Error trace on line: 370, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-            elif nominal_is a then
-            ^
-Error trace on line: 371, column: 17 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-                if prototype_has `(`a) hashable then hashable `(`a) a : t
-                ^
-Error trace on line: 371, column: 54 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-                if prototype_has `(`a) hashable then hashable `(`a) a : t
-                                                     ^
 The body does not match the annotation.
-Got: i32
-Expected: u64
+Got: action
+Expected: dict (sa_list 32i32 message) {average_policy : sa 3i32 f32; current_policy : sa 3i32 f32; expected_values : sa 3i32 f32}

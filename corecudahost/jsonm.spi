@@ -13,55 +13,122 @@ inl empty forall t. : json t = $"`(json t) \v"
 
 let serialize forall t. (x : t) : json t =
     globals()
-    let rec f forall t'. (x : t') : json t' = real
-        open real_core
-        inl serialize_sa forall array el. =
-            inl ar = empty `(array el)
-            loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
-                inl x = f `el (index `array `el x i)
-                $"!ar.push_back(!x)" : ()
+    real
+    open real_core
+    inl rec f forall t'. ~(x : t') : json t' = 
+        join (
+            inl serialize_sa forall array el. =
+                inl ar = empty `(array el)
+                loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
+                    inl x = f `el (index `array `el x i)
+                    $"!ar.push_back(!x)" : ()
+                ar
+            typecase t' with
+            | () => empty `t'
+            | ~a * ~b => f_tuple `t' x 
+            | {} => 
+                inl l : json t' = $"`(json t') \v = nlohmann::json::object()"
+                record_type_iter (fun k => forall v. => 
+                    $"!l[!(symbol_to_string k)] = !(f `v (x k))" : ()
+                    ) `t'
+                l
+            | sa ~dim ~el => serialize_sa `(sa dim) `el
+            | da ~dim ~el => serialize_sa `(dam.sa dim) `el
+            | sa_list ~dim ~el => serialize_sa `(sa_list dim) `el
+            | da_list ~dim ~el => serialize_sa `(da_list dim) `el
+            | dict ~k ~v =>
+                inl ar = empty `(dict k v)
+                dictm.iter `k `v (fun k v =>
+                    inl k, v = f `k k, f `v v
+                    $"!ar.push_back(`(json (k * v))({!k, !v}))" : ()
+                    ) x
+                ar
+            | _ =>
+                if union_type_is `t' then 
+                    unbox x (fun (k,v) =>
+                        inl k = symbol_to_string k
+                        inl v = f `(`(v)) v
+                        $"`(json t) \v{!k, !v}" : json t'
+                        )
+                elif nominal_type_is `t' then 
+                    inl (exists t''. _) = nominal_type_apply `t'
+                    f `t'' (nominal_strip x)
+                else
+                    $"`(json t') \v = !x" : json t'
+        ) : json t'
+    and inl f_tuple forall orig. (x : orig) : json orig =
+        inl l = empty `orig
+        inl rec loop forall t'. (x : t') : () =
+            typecase t' with
+            | ~a * ~b => 
+                $"!l.push_back(!(f `a (fst x)))" : ()
+                loop `b (snd x)
+            | _ => 
+                $"!l.push_back(!(f `t' x))" : ()
+        loop `orig x
+        l
+    f `t x
+
+let deserialize forall t. (x : json t) : t =
+    globals()
+    real
+    open real_core
+    let rec f forall t'. (x : json t') : t' =
+        inl deserialize_sa forall array el. =
+            assert ($"!x.is_array()" : bool) "The json object must be an array."
+            inl len : int = $"!x.size()"
+            inl ar = create `array `el len
+            loop.for' `int {from=0; nearTo=len} fun i =>
+                set `array `el ar i (f `el ($"!x[!i]" : json el))
             ar
+
+        inl assert_sa_list_dim forall dim. =
+            inl dim = type_lit_to_lit `dim
+            inl len : int = $"!x.size()"
+            assert (dim >= len) "The length of the original object has to be greater than or equal to the static array dimension."
+
         typecase t' with
-        | () => empty `t'
-        | ~a * ~b => 
-            inl l = empty `t'
-            f_tuple `t' l x 
-            l
+        | () => assert ($"!x.is_null()" : bool) "Expected an unit type"
+        | ~a * ~b => f_tuple `t' x
         | {} => 
-            inl l : json t' = $"`(json t') \v = nlohmann::json::object()"
-            record_type_iter (fun k => forall v. => 
-                $"!l[!(symbol_to_string k)] = !(f `v (x k))" : ()
+            record_type_map (fun k => forall v. =>
+                typecase `k with ~k =>
+                f `v ($'!x["@k"]' : json v)
                 ) `t'
-            l
-        | sa ~dim ~el => serialize_sa `(sa dim) `el
-        | da ~dim ~el => serialize_sa `(dam.sa dim) `el
-        | sa_list ~dim ~el => serialize_sa `(sa_list dim) `el
-        | da_list ~dim ~el => serialize_sa `(da_list dim) `el
+        | sa ~dim ~el => deserialize_sa `(sa dim) `el
+        | da ~dim ~el => deserialize_sa `(da dim) `el
+        | sa_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(sa_list dim) `el
+        | da_list ~dim ~el => assert_sa_list_dim `dim . deserialize_sa `(da_list dim) `el
         | dict ~k ~v =>
-            inl ar = empty `(dict k v)
-            dictm.iter `k `v (fun k v =>
-                inl k, v = f `k k, f `v v
-                $"!ar.push_back(`(json (k * v))({!k, !v}))" : ()
-                ) x
-            ar
+            assert ($"!x.is_array()" : bool) "The json object must be an array."
+            inl len : int = $"!x.size()"
+            inl dict = dictm.create `k `v len
+            loop.for' `int {from=0; nearTo=len} fun i =>
+                inl kv = $"!x[!i]" : json (k * v)
+                assert ($"!kv.size() == 2" : bool) "The key/value pair of an unordered_map being deserilized has to have two elements in the array."
+                inl k,v = ($"!kv[0]" : json k), ($"!kv[1]" : json v)
+                dictm.set `k `v dict (f `k k) (f `v v)
+            dict
         | _ =>
             if union_type_is `t' then 
-                unbox x (fun (k,v) =>
-                    inl k = symbol_to_string k
-                    inl v = f `(`(v)) v
-                    $"`(json t) \v{!k, !(union_tag x), !v}" : json t'
-                    )
-            elif nominal_type_is `t' then
+                inl k = $"!x[0].get<std::string>()" : $"std::string"
+                union_to_record `t' forall r. =>
+                record_type_fold_back (fun key => forall value. next _ =>
+                    inl k' = $"std::string \v = !(symbol_to_string key)" : $"std::string"
+                    if $"!k == !k'" : bool then 
+                        inl v = $"!x[1]" : json value
+                        nominal_create `t' (key, f `value v)
+                    else next ()
+                    ) `r (fun _ => failwith `t' "Cannot convert the Python object into a Spiral union type.") ()
+            elif nominal_type_is `t' then // TODO: What are these existentials doing here?
                 inl (exists t''. _) = nominal_type_apply `t'
-                f `t'' (nominal_strip x)
+                nominal_create `t' (f `t'' x)
             else
-                $"`(json t') \v = !x" : json t'
-    and inl f_tuple forall t'. (l : json t') (x : t') : () = real
-        open real_core
-        typecase t' with
-        | ~a * ~b => 
-            $"!l.push_back(!(f `a (fst x)))" : ()
-            f_tuple `b l (snd x)
-        | _ => 
-            $"!l.push_back(!(f `t' x))" : ()
-    f x
+                $"!x.get<`t'>()" : t'
+    and inl f_tuple forall orig. (x : json orig) : orig =
+        inl rec loop forall t'. (i : int) : t' =
+            typecase t' with
+            | ~a * ~b => f `a ($"!x[!i]" : json a), loop `b (i+1)
+            | _ => f `t' ($"!x[!i]" : json t')
+        loop `orig 0
+    f `t x

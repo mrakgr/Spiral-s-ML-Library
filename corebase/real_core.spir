@@ -228,7 +228,7 @@ inl union_to_record forall t. on_succ = !!!!UnionToRecord(`t,on_succ)
 inl nominal_strip x = !!!!NominalStrip(x)
 
 // Applies the nominal type, stripping the wrapper from the body at the type level.
-// Returns the extracted value in an existential.
+// Returns the extracted type in an existential.
 inl nominal_type_apply forall t. = !!!!NominalTypeApply(`t)
 
 // Strips the existential wrapper from the value.
@@ -351,7 +351,6 @@ inl hash_template prim init_seed x =
         | {} & a => 
             record_fold_back (fun {state=(s,seed) key value} => 
                 inl a,b = f value, seed
-                print_static {s a b value key}
                 s + a * b, seed * init_seed
                 ) 
                 a 

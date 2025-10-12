@@ -47,9 +47,8 @@ inl test2() =
     add [PlayerGotCard(0, King); PlayerGotCard(1, Jack); PlayerAction(0, Raise)] def
     add [PlayerGotCard(0, King); PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise)] def
     add [PlayerGotCard(0, King); PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call)] def
-    inl t = serialize d
+    inl t = serialize d |> deserialize
     console.write_ln t
-
 
 inl main() =
     test2()

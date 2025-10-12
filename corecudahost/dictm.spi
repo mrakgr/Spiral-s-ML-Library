@@ -1,6 +1,7 @@
 // Provides an interface to the C++ `unordered_map`.
 open corebase
 
+
 inl globals() = global "#include <unordered_map>"
 
 inl create forall k v. (buckets : int) : dict k v =
@@ -26,3 +27,8 @@ inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
     loop.while' (fun () => $"!it !!= !d.end()") fun () =>
         f $"!it->first" $"!it->second"
         $"++!it"
+
+instance printable dict k v = fun {write write_ln} d =>
+    write_ln "{"
+    iter (fun k v => write "    " . write k . write " => " . write_ln v) d
+    write_ln "}"

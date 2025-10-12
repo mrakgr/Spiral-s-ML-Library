@@ -9,21 +9,42 @@ struct Tuple0;
 typedef unsigned long long (* Fun0)(static_array_list<Union0,32>);
 typedef bool (* Fun1)(static_array_list<Union0,32>, static_array_list<Union0,32>);
 struct Tuple1;
-nlohmann::json f_5();
-nlohmann::json f_4(Union1 v0);
-nlohmann::json f_7(int v0);
-nlohmann::json f_8(Union2 v0);
-nlohmann::json f_6(int v0, Union2 v1);
-nlohmann::json f_9(int v0, Union1 v1);
-nlohmann::json f_11(static_array<Union1,2> v0);
-nlohmann::json f_10(static_array<Union1,2> v0, int v1, int v2);
-nlohmann::json f_3(Union0 v0);
-nlohmann::json f_2(static_array_list<Union0,32> v0);
-nlohmann::json f_14(float v0);
-nlohmann::json f_13(static_array<float,3> v0);
-nlohmann::json f_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2);
-nlohmann::json f_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
+nlohmann::json method_5();
+nlohmann::json method_4(Union1 v0);
+nlohmann::json method_7(int v0);
+nlohmann::json method_8(Union2 v0);
+nlohmann::json method_6(int v0, Union2 v1);
+nlohmann::json method_9(int v0, Union1 v1);
+nlohmann::json method_11(static_array<Union1,2> v0);
+nlohmann::json method_10(static_array<Union1,2> v0, int v1, int v2);
+nlohmann::json method_3(Union0 v0);
+nlohmann::json method_2(static_array_list<Union0,32> v0);
+nlohmann::json method_14(float v0);
+nlohmann::json method_13(static_array<float,3> v0);
+nlohmann::json method_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2);
+nlohmann::json method_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
 nlohmann::json serialize_0(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
+void f_20(nlohmann::json v0);
+Union1 f_19(nlohmann::json v0);
+struct Tuple2;
+int f_22(nlohmann::json v0);
+Union2 f_23(nlohmann::json v0);
+Tuple2 f_21(nlohmann::json v0);
+struct Tuple3;
+Tuple3 f_24(nlohmann::json v0);
+struct Tuple4;
+static_array<Union1,2> f_26(nlohmann::json v0);
+Tuple4 f_25(nlohmann::json v0);
+Union0 f_18(nlohmann::json v0);
+static_array_list<Union0,32> f_17(nlohmann::json v0);
+float f_29(nlohmann::json v0);
+static_array<float,3> f_28(nlohmann::json v0);
+Tuple1 f_27(nlohmann::json v0);
+std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> f_16(nlohmann::json v0);
+std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> deserialize_15(nlohmann::json v0);
+void method_31(Union1 v0);
+void method_32(Union2 v0);
+void method_30(Union0 v0);
 struct Union1_0 { // Jack
 };
 struct Union1_1 { // King
@@ -260,6 +281,25 @@ struct Tuple1 {
     static_array<float,3> v2;
     __host__ __device__ Tuple1() = default;
     __host__ __device__ Tuple1(static_array<float,3> t0, static_array<float,3> t1, static_array<float,3> t2) : v0(t0), v1(t1), v2(t2) {}
+};
+struct Tuple2 {
+    Union2 v1;
+    int v0;
+    __host__ __device__ Tuple2() = default;
+    __host__ __device__ Tuple2(int t0, Union2 t1) : v0(t0), v1(t1) {}
+};
+struct Tuple3 {
+    Union1 v1;
+    int v0;
+    __host__ __device__ Tuple3() = default;
+    __host__ __device__ Tuple3(int t0, Union1 t1) : v0(t0), v1(t1) {}
+};
+struct Tuple4 {
+    static_array<Union1,2> v0;
+    int v1;
+    int v2;
+    __host__ __device__ Tuple4() = default;
+    __host__ __device__ Tuple4(static_array<Union1,2> t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
 };
 inline bool while_method_0(int v0, int v1){
     bool v2;
@@ -640,36 +680,36 @@ inline bool while_method_3(std::unordered_map<static_array_list<Union0,32>, Tupl
     v2 = v1 != v0.end();
     return v2;
 }
-nlohmann::json f_5(){
+nlohmann::json method_5(){
     nlohmann::json v0;
     return v0;
 }
-nlohmann::json f_4(Union1 v0){
+nlohmann::json method_4(Union1 v0){
     switch (v0.tag) {
         case 0: { // Jack
             nlohmann::json v1;
-            v1 = f_5();
+            v1 = method_5();
             const char * v2;
             v2 = "Jack";
-            nlohmann::json v3{v2, 0, v1};
+            nlohmann::json v3{v2, v1};
             return v3;
             break;
         }
         case 1: { // King
             nlohmann::json v4;
-            v4 = f_5();
+            v4 = method_5();
             const char * v5;
             v5 = "King";
-            nlohmann::json v6{v5, 1, v4};
+            nlohmann::json v6{v5, v4};
             return v6;
             break;
         }
         case 2: { // Queen
             nlohmann::json v7;
-            v7 = f_5();
+            v7 = method_5();
             const char * v8;
             v8 = "Queen";
-            nlohmann::json v9{v8, 2, v7};
+            nlohmann::json v9{v8, v7};
             return v9;
             break;
         }
@@ -679,36 +719,36 @@ nlohmann::json f_4(Union1 v0){
         }
     }
 }
-nlohmann::json f_7(int v0){
+nlohmann::json method_7(int v0){
     nlohmann::json v1 = v0;
     return v1;
 }
-nlohmann::json f_8(Union2 v0){
+nlohmann::json method_8(Union2 v0){
     switch (v0.tag) {
         case 0: { // Call
             nlohmann::json v1;
-            v1 = f_5();
+            v1 = method_5();
             const char * v2;
             v2 = "Call";
-            nlohmann::json v3{v2, 0, v1};
+            nlohmann::json v3{v2, v1};
             return v3;
             break;
         }
         case 1: { // Fold
             nlohmann::json v4;
-            v4 = f_5();
+            v4 = method_5();
             const char * v5;
             v5 = "Fold";
-            nlohmann::json v6{v5, 1, v4};
+            nlohmann::json v6{v5, v4};
             return v6;
             break;
         }
         case 2: { // Raise
             nlohmann::json v7;
-            v7 = f_5();
+            v7 = method_5();
             const char * v8;
             v8 = "Raise";
-            nlohmann::json v9{v8, 2, v7};
+            nlohmann::json v9{v8, v7};
             return v9;
             break;
         }
@@ -718,27 +758,27 @@ nlohmann::json f_8(Union2 v0){
         }
     }
 }
-nlohmann::json f_6(int v0, Union2 v1){
+nlohmann::json method_6(int v0, Union2 v1){
     nlohmann::json v2;
     nlohmann::json v3;
-    v3 = f_7(v0);
+    v3 = method_7(v0);
     v2.push_back(v3);
     nlohmann::json v4;
-    v4 = f_8(v1);
+    v4 = method_8(v1);
     v2.push_back(v4);
     return v2;
 }
-nlohmann::json f_9(int v0, Union1 v1){
+nlohmann::json method_9(int v0, Union1 v1){
     nlohmann::json v2;
     nlohmann::json v3;
-    v3 = f_7(v0);
+    v3 = method_7(v0);
     v2.push_back(v3);
     nlohmann::json v4;
-    v4 = f_4(v1);
+    v4 = method_4(v1);
     v2.push_back(v4);
     return v2;
 }
-nlohmann::json f_11(static_array<Union1,2> v0){
+nlohmann::json method_11(static_array<Union1,2> v0){
     nlohmann::json v1;
     int v2;
     v2 = 0;
@@ -746,70 +786,70 @@ nlohmann::json f_11(static_array<Union1,2> v0){
         Union1 v5;
         v5 = v0[v2];
         nlohmann::json v7;
-        v7 = f_4(v5);
+        v7 = method_4(v5);
         v1.push_back(v7);
         v2 += 1 ;
     }
     return v1;
 }
-nlohmann::json f_10(static_array<Union1,2> v0, int v1, int v2){
+nlohmann::json method_10(static_array<Union1,2> v0, int v1, int v2){
     nlohmann::json v3 = nlohmann::json::object();
     const char * v4;
     v4 = "cards_shown";
     nlohmann::json v5;
-    v5 = f_11(v0);
+    v5 = method_11(v0);
     v3[v4] = v5;
     const char * v6;
     v6 = "chips_won";
     nlohmann::json v7;
-    v7 = f_7(v1);
+    v7 = method_7(v1);
     v3[v6] = v7;
     const char * v8;
     v8 = "winner_id";
     nlohmann::json v9;
-    v9 = f_7(v2);
+    v9 = method_7(v2);
     v3[v8] = v9;
     return v3;
 }
-nlohmann::json f_3(Union0 v0){
+nlohmann::json method_3(Union0 v0){
     switch (v0.tag) {
         case 0: { // CommunityCardIs
             Union1 v1 = v0.case0.v0;
             nlohmann::json v2;
-            v2 = f_4(v1);
+            v2 = method_4(v1);
             const char * v3;
             v3 = "CommunityCardIs";
-            nlohmann::json v4{v3, 0, v2};
+            nlohmann::json v4{v3, v2};
             return v4;
             break;
         }
         case 1: { // PlayerAction
             int v5 = v0.case1.v0; Union2 v6 = v0.case1.v1;
             nlohmann::json v7;
-            v7 = f_6(v5, v6);
+            v7 = method_6(v5, v6);
             const char * v8;
             v8 = "PlayerAction";
-            nlohmann::json v9{v8, 1, v7};
+            nlohmann::json v9{v8, v7};
             return v9;
             break;
         }
         case 2: { // PlayerGotCard
             int v10 = v0.case2.v0; Union1 v11 = v0.case2.v1;
             nlohmann::json v12;
-            v12 = f_9(v10, v11);
+            v12 = method_9(v10, v11);
             const char * v13;
             v13 = "PlayerGotCard";
-            nlohmann::json v14{v13, 2, v12};
+            nlohmann::json v14{v13, v12};
             return v14;
             break;
         }
         case 3: { // Showdown
             static_array<Union1,2> v15 = v0.case3.v0; int v16 = v0.case3.v1; int v17 = v0.case3.v2;
             nlohmann::json v18;
-            v18 = f_10(v15, v16, v17);
+            v18 = method_10(v15, v16, v17);
             const char * v19;
             v19 = "Showdown";
-            nlohmann::json v20{v19, 3, v18};
+            nlohmann::json v20{v19, v18};
             return v20;
             break;
         }
@@ -819,7 +859,7 @@ nlohmann::json f_3(Union0 v0){
         }
     }
 }
-nlohmann::json f_2(static_array_list<Union0,32> v0){
+nlohmann::json method_2(static_array_list<Union0,32> v0){
     nlohmann::json v1;
     int v2;
     v2 = v0.length;
@@ -829,17 +869,17 @@ nlohmann::json f_2(static_array_list<Union0,32> v0){
         Union0 v6;
         v6 = v0[v3];
         nlohmann::json v8;
-        v8 = f_3(v6);
+        v8 = method_3(v6);
         v1.push_back(v8);
         v3 += 1 ;
     }
     return v1;
 }
-nlohmann::json f_14(float v0){
+nlohmann::json method_14(float v0){
     nlohmann::json v1 = v0;
     return v1;
 }
-nlohmann::json f_13(static_array<float,3> v0){
+nlohmann::json method_13(static_array<float,3> v0){
     nlohmann::json v1;
     int v2;
     v2 = 0;
@@ -847,32 +887,32 @@ nlohmann::json f_13(static_array<float,3> v0){
         float v5;
         v5 = v0[v2];
         nlohmann::json v7;
-        v7 = f_14(v5);
+        v7 = method_14(v5);
         v1.push_back(v7);
         v2 += 1 ;
     }
     return v1;
 }
-nlohmann::json f_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2){
+nlohmann::json method_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2){
     nlohmann::json v3 = nlohmann::json::object();
     const char * v4;
     v4 = "average_policy";
     nlohmann::json v5;
-    v5 = f_13(v0);
+    v5 = method_13(v0);
     v3[v4] = v5;
     const char * v6;
     v6 = "current_policy";
     nlohmann::json v7;
-    v7 = f_13(v1);
+    v7 = method_13(v1);
     v3[v6] = v7;
     const char * v8;
     v8 = "expected_values";
     nlohmann::json v9;
-    v9 = f_13(v2);
+    v9 = method_13(v2);
     v3[v8] = v9;
     return v3;
 }
-nlohmann::json f_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
+nlohmann::json method_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
     nlohmann::json v1;
     std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v2 = v0;
     auto v3 = v2.begin();
@@ -883,16 +923,491 @@ nlohmann::json f_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0
         Tuple1 tmp2 = v3->second;
         v6 = tmp2.v0; v7 = tmp2.v1; v8 = tmp2.v2;
         nlohmann::json v9;
-        v9 = f_2(v5);
+        v9 = method_2(v5);
         nlohmann::json v10;
-        v10 = f_12(v6, v7, v8);
+        v10 = method_12(v6, v7, v8);
         v1.push_back(nlohmann::json({v9, v10}));
         ++v3;
     }
     return v1;
 }
 nlohmann::json serialize_0(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
-    return f_1(v0);
+    return method_1(v0);
+}
+void f_20(nlohmann::json v0){
+    bool v1;
+    v1 = v0.is_null();
+    bool v2;
+    v2 = v1 == false;
+    if (v2){
+        assert("Expected an unit type" && v1);
+        return ;
+    } else {
+        return ;
+    }
+}
+Union1 f_19(nlohmann::json v0){
+    std::string v1;
+    v1 = v0[0].get<std::string>();
+    const char * v2;
+    v2 = "Jack";
+    std::string v3 = v2;
+    bool v4;
+    v4 = v1 == v3;
+    if (v4){
+        nlohmann::json v5;
+        v5 = v0[1];
+        f_20(v5);
+        return Union1{Union1_0{}};
+    } else {
+        const char * v7;
+        v7 = "King";
+        std::string v8 = v7;
+        bool v9;
+        v9 = v1 == v8;
+        if (v9){
+            nlohmann::json v10;
+            v10 = v0[1];
+            f_20(v10);
+            return Union1{Union1_1{}};
+        } else {
+            const char * v12;
+            v12 = "Queen";
+            std::string v13 = v12;
+            bool v14;
+            v14 = v1 == v13;
+            if (v14){
+                nlohmann::json v15;
+                v15 = v0[1];
+                f_20(v15);
+                return Union1{Union1_2{}};
+            } else {
+                printf("%s\n", "Cannot convert the Python object into a Spiral union type.");
+                exit(-1);
+            }
+        }
+    }
+}
+int f_22(nlohmann::json v0){
+    int v1;
+    v1 = v0.get<int>();
+    return v1;
+}
+Union2 f_23(nlohmann::json v0){
+    std::string v1;
+    v1 = v0[0].get<std::string>();
+    const char * v2;
+    v2 = "Call";
+    std::string v3 = v2;
+    bool v4;
+    v4 = v1 == v3;
+    if (v4){
+        nlohmann::json v5;
+        v5 = v0[1];
+        f_20(v5);
+        return Union2{Union2_0{}};
+    } else {
+        const char * v7;
+        v7 = "Fold";
+        std::string v8 = v7;
+        bool v9;
+        v9 = v1 == v8;
+        if (v9){
+            nlohmann::json v10;
+            v10 = v0[1];
+            f_20(v10);
+            return Union2{Union2_1{}};
+        } else {
+            const char * v12;
+            v12 = "Raise";
+            std::string v13 = v12;
+            bool v14;
+            v14 = v1 == v13;
+            if (v14){
+                nlohmann::json v15;
+                v15 = v0[1];
+                f_20(v15);
+                return Union2{Union2_2{}};
+            } else {
+                printf("%s\n", "Cannot convert the Python object into a Spiral union type.");
+                exit(-1);
+            }
+        }
+    }
+}
+Tuple2 f_21(nlohmann::json v0){
+    nlohmann::json v1;
+    v1 = v0[0];
+    int v2;
+    v2 = f_22(v1);
+    nlohmann::json v3;
+    v3 = v0[1];
+    Union2 v4;
+    v4 = f_23(v3);
+    return Tuple2{v2, v4};
+}
+Tuple3 f_24(nlohmann::json v0){
+    nlohmann::json v1;
+    v1 = v0[0];
+    int v2;
+    v2 = f_22(v1);
+    nlohmann::json v3;
+    v3 = v0[1];
+    Union1 v4;
+    v4 = f_19(v3);
+    return Tuple3{v2, v4};
+}
+static_array<Union1,2> f_26(nlohmann::json v0){
+    bool v1;
+    v1 = v0.is_array();
+    bool v2;
+    v2 = v1 == false;
+    if (v2){
+        assert("The json object must be an array." && v1);
+    } else {
+    }
+    int v4;
+    v4 = v0.size();
+    bool v5;
+    v5 = 2 == v4;
+    bool v6;
+    v6 = v5 == false;
+    if (v6){
+        assert("The type level dimension has to equal the value passed at runtime into create." && v5);
+    } else {
+    }
+    static_array<Union1,2> v9;
+    int v11;
+    v11 = 0;
+    while (while_method_0(v4, v11)){
+        nlohmann::json v13;
+        v13 = v0[v11];
+        Union1 v14;
+        v14 = f_19(v13);
+        v9[v11] = v14;
+        v11 += 1 ;
+    }
+    return v9;
+}
+Tuple4 f_25(nlohmann::json v0){
+    nlohmann::json v1;
+    v1 = v0["cards_shown"];
+    static_array<Union1,2> v2;
+    v2 = f_26(v1);
+    nlohmann::json v3;
+    v3 = v0["chips_won"];
+    int v4;
+    v4 = f_22(v3);
+    nlohmann::json v5;
+    v5 = v0["winner_id"];
+    int v6;
+    v6 = f_22(v5);
+    return Tuple4{v2, v4, v6};
+}
+Union0 f_18(nlohmann::json v0){
+    std::string v1;
+    v1 = v0[0].get<std::string>();
+    const char * v2;
+    v2 = "CommunityCardIs";
+    std::string v3 = v2;
+    bool v4;
+    v4 = v1 == v3;
+    if (v4){
+        nlohmann::json v5;
+        v5 = v0[1];
+        Union1 v6;
+        v6 = f_19(v5);
+        return Union0{Union0_0{v6}};
+    } else {
+        const char * v8;
+        v8 = "PlayerAction";
+        std::string v9 = v8;
+        bool v10;
+        v10 = v1 == v9;
+        if (v10){
+            nlohmann::json v11;
+            v11 = v0[1];
+            int v12; Union2 v13;
+            Tuple2 tmp3 = f_21(v11);
+            v12 = tmp3.v0; v13 = tmp3.v1;
+            return Union0{Union0_1{v12, v13}};
+        } else {
+            const char * v15;
+            v15 = "PlayerGotCard";
+            std::string v16 = v15;
+            bool v17;
+            v17 = v1 == v16;
+            if (v17){
+                nlohmann::json v18;
+                v18 = v0[1];
+                int v19; Union1 v20;
+                Tuple3 tmp4 = f_24(v18);
+                v19 = tmp4.v0; v20 = tmp4.v1;
+                return Union0{Union0_2{v19, v20}};
+            } else {
+                const char * v22;
+                v22 = "Showdown";
+                std::string v23 = v22;
+                bool v24;
+                v24 = v1 == v23;
+                if (v24){
+                    nlohmann::json v25;
+                    v25 = v0[1];
+                    static_array<Union1,2> v26; int v27; int v28;
+                    Tuple4 tmp5 = f_25(v25);
+                    v26 = tmp5.v0; v27 = tmp5.v1; v28 = tmp5.v2;
+                    return Union0{Union0_3{v26, v27, v28}};
+                } else {
+                    printf("%s\n", "Cannot convert the Python object into a Spiral union type.");
+                    exit(-1);
+                }
+            }
+        }
+    }
+}
+static_array_list<Union0,32> f_17(nlohmann::json v0){
+    int v1;
+    v1 = v0.size();
+    bool v2;
+    v2 = 32 >= v1;
+    bool v3;
+    v3 = v2 == false;
+    if (v3){
+        assert("The length of the original object has to be greater than or equal to the static array dimension." && v2);
+    } else {
+    }
+    bool v5;
+    v5 = v0.is_array();
+    bool v6;
+    v6 = v5 == false;
+    if (v6){
+        assert("The json object must be an array." && v5);
+    } else {
+    }
+    int v8;
+    v8 = v0.size();
+    bool v9;
+    v9 = 32 >= v8;
+    bool v10;
+    v10 = v9 == false;
+    if (v10){
+        assert("The type level dimension has to equal the value passed at runtime into create." && v9);
+    } else {
+    }
+    static_array_list<Union0,32> v13;
+    v13 = static_array_list<Union0,32>{};
+    v13.unsafe_set_length(v8);
+    int v15;
+    v15 = 0;
+    while (while_method_0(v8, v15)){
+        nlohmann::json v17;
+        v17 = v0[v15];
+        Union0 v18;
+        v18 = f_18(v17);
+        v13[v15] = v18;
+        v15 += 1 ;
+    }
+    return v13;
+}
+float f_29(nlohmann::json v0){
+    float v1;
+    v1 = v0.get<float>();
+    return v1;
+}
+static_array<float,3> f_28(nlohmann::json v0){
+    bool v1;
+    v1 = v0.is_array();
+    bool v2;
+    v2 = v1 == false;
+    if (v2){
+        assert("The json object must be an array." && v1);
+    } else {
+    }
+    int v4;
+    v4 = v0.size();
+    bool v5;
+    v5 = 3 == v4;
+    bool v6;
+    v6 = v5 == false;
+    if (v6){
+        assert("The type level dimension has to equal the value passed at runtime into create." && v5);
+    } else {
+    }
+    static_array<float,3> v9;
+    int v11;
+    v11 = 0;
+    while (while_method_0(v4, v11)){
+        nlohmann::json v13;
+        v13 = v0[v11];
+        float v14;
+        v14 = f_29(v13);
+        v9[v11] = v14;
+        v11 += 1 ;
+    }
+    return v9;
+}
+Tuple1 f_27(nlohmann::json v0){
+    nlohmann::json v1;
+    v1 = v0["average_policy"];
+    static_array<float,3> v2;
+    v2 = f_28(v1);
+    nlohmann::json v3;
+    v3 = v0["current_policy"];
+    static_array<float,3> v4;
+    v4 = f_28(v3);
+    nlohmann::json v5;
+    v5 = v0["expected_values"];
+    static_array<float,3> v6;
+    v6 = f_28(v5);
+    return Tuple1{v2, v4, v6};
+}
+std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> f_16(nlohmann::json v0){
+    bool v1;
+    v1 = v0.is_array();
+    bool v2;
+    v2 = v1 == false;
+    if (v2){
+        assert("The json object must be an array." && v1);
+    } else {
+    }
+    int v4;
+    v4 = v0.size();
+    Fun0 v5 = FunPointerMethod0;
+    Fun1 v6 = FunPointerMethod1;
+    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v7(v4, v5, v6);
+    int v8;
+    v8 = 0;
+    while (while_method_0(v4, v8)){
+        nlohmann::json v10;
+        v10 = v0[v8];
+        bool v11;
+        v11 = v10.size() == 2;
+        bool v12;
+        v12 = v11 == false;
+        if (v12){
+            assert("The key/value pair of an unordered_map being deserilized has to have two elements in the array." && v11);
+        } else {
+        }
+        nlohmann::json v14;
+        v14 = v10[0];
+        nlohmann::json v15;
+        v15 = v10[1];
+        static_array_list<Union0,32> v16;
+        v16 = f_17(v14);
+        static_array<float,3> v17; static_array<float,3> v18; static_array<float,3> v19;
+        Tuple1 tmp6 = f_27(v15);
+        v17 = tmp6.v0; v18 = tmp6.v1; v19 = tmp6.v2;
+        v7[v16] = Tuple1{v17, v18, v19};
+        v8 += 1 ;
+    }
+    return v7;
+}
+std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> deserialize_15(nlohmann::json v0){
+    return f_16(v0);
+}
+void method_31(Union1 v0){
+    switch (v0.tag) {
+        case 0: { // Jack
+            printf("%s","Jack");
+            return ;
+            break;
+        }
+        case 1: { // King
+            printf("%s","King");
+            return ;
+            break;
+        }
+        case 2: { // Queen
+            printf("%s","Queen");
+            return ;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+            exit(-1);
+        }
+    }
+}
+void method_32(Union2 v0){
+    switch (v0.tag) {
+        case 0: { // Call
+            printf("%s","Call");
+            return ;
+            break;
+        }
+        case 1: { // Fold
+            printf("%s","Fold");
+            return ;
+            break;
+        }
+        case 2: { // Raise
+            printf("%s","Raise");
+            return ;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+            exit(-1);
+        }
+    }
+}
+void method_30(Union0 v0){
+    switch (v0.tag) {
+        case 0: { // CommunityCardIs
+            Union1 v1 = v0.case0.v0;
+            printf("%s(","CommunityCardIs");
+            method_31(v1);
+            printf(")");
+            return ;
+            break;
+        }
+        case 1: { // PlayerAction
+            int v2 = v0.case1.v0; Union2 v3 = v0.case1.v1;
+            printf("%s(%d, ","PlayerAction", v2);
+            method_32(v3);
+            printf(")");
+            return ;
+            break;
+        }
+        case 2: { // PlayerGotCard
+            int v4 = v0.case2.v0; Union1 v5 = v0.case2.v1;
+            printf("%s(%d, ","PlayerGotCard", v4);
+            method_31(v5);
+            printf(")");
+            return ;
+            break;
+        }
+        case 3: { // Showdown
+            static_array<Union1,2> v6 = v0.case3.v0; int v7 = v0.case3.v1; int v8 = v0.case3.v2;
+            printf("%s({%s = %s","Showdown", "cards_shown", "[");
+            int v9;
+            v9 = 0;
+            while (while_method_1(v9)){
+                Union1 v12;
+                v12 = v6[v9];
+                printf("");
+                method_31(v12);
+                printf("");
+                int v14;
+                v14 = v9 + 1;
+                bool v15;
+                v15 = v14 < 2;
+                if (v15){
+                    printf("%s","; ");
+                } else {
+                }
+                v9 += 1 ;
+            }
+            printf("%s","]");
+            printf("; %s = %d; %s = %d})","chips_won", v7, "winner_id", v8);
+            return ;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+            exit(-1);
+        }
+    }
 }
 int main() {
     Fun0 v0 = FunPointerMethod0;
@@ -990,15 +1505,118 @@ int main() {
     v2[v39] = Tuple1{v4, v9, v14};
     nlohmann::json v51;
     v51 = serialize_0(v2);
-    bool v57;
-    v57 = true;
-    if (v57){
-        auto v58 = v51.dump(4);
-        const char * v59;
-        v59 = v58.c_str();
-        printf("%s",v59);
-    } else {
+    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v52;
+    v52 = deserialize_15(v51);
+    printf("%s\n","{");
+    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v96 = v52;
+    auto v97 = v96.begin();
+    while (while_method_3(v96, v97)){
+        static_array_list<Union0,32> v99;
+        v99 = v97->first;
+        static_array<float,3> v100; static_array<float,3> v101; static_array<float,3> v102;
+        Tuple1 tmp7 = v97->second;
+        v100 = tmp7.v0; v101 = tmp7.v1; v102 = tmp7.v2;
+        printf("%s","    ");
+        printf("%s","[");
+        int v103;
+        v103 = v99.length;
+        bool v104;
+        v104 = 100 < v103;
+        int v105;
+        if (v104){
+            v105 = 100;
+        } else {
+            v105 = v103;
+        }
+        int v106;
+        v106 = 0;
+        while (while_method_0(v105, v106)){
+            Union0 v109;
+            v109 = v99[v106];
+            printf("");
+            method_30(v109);
+            printf("");
+            int v111;
+            v111 = v106 + 1;
+            int v112;
+            v112 = v99.length;
+            bool v113;
+            v113 = v111 < v112;
+            if (v113){
+                printf("%s","; ");
+            } else {
+            }
+            v106 += 1 ;
+        }
+        int v114;
+        v114 = v99.length;
+        bool v115;
+        v115 = v114 > 100;
+        if (v115){
+            printf("%s","; ...");
+        } else {
+        }
+        printf("%s","]");
+        printf("");
+        printf("%s"," => ");
+        printf("{%s = %s","average_policy", "[");
+        int v116;
+        v116 = 0;
+        while (while_method_2(v116)){
+            float v119;
+            v119 = v100[v116];
+            printf("%f",v119);
+            int v121;
+            v121 = v116 + 1;
+            bool v122;
+            v122 = v121 < 3;
+            if (v122){
+                printf("%s","; ");
+            } else {
+            }
+            v116 += 1 ;
+        }
+        printf("%s","]");
+        printf("; %s = %s","current_policy", "[");
+        int v123;
+        v123 = 0;
+        while (while_method_2(v123)){
+            float v126;
+            v126 = v101[v123];
+            printf("%f",v126);
+            int v128;
+            v128 = v123 + 1;
+            bool v129;
+            v129 = v128 < 3;
+            if (v129){
+                printf("%s","; ");
+            } else {
+            }
+            v123 += 1 ;
+        }
+        printf("%s","]");
+        printf("; %s = %s","expected_values", "[");
+        int v130;
+        v130 = 0;
+        while (while_method_2(v130)){
+            float v133;
+            v133 = v102[v130];
+            printf("%f",v133);
+            int v135;
+            v135 = v130 + 1;
+            bool v136;
+            v136 = v135 < 3;
+            if (v136){
+                printf("%s","; ");
+            } else {
+            }
+            v130 += 1 ;
+        }
+        printf("%s","]");
+        printf("}\n");
+        ++v97;
     }
+    printf("%s\n","}");
     printf("\n");
     return 0;
 }
