@@ -1,17 +1,7 @@
 open corebase
-open corecuda
+open corecudahost
 open coreext
 open game
-
-type state_train =
-    {
-        deck : deck
-    }
-
-inl state_init() : state_train =
-    {
-        deck = deckm.create()
-    }
 
 union training_nodes =
     | T_game_round : table * action
@@ -19,69 +9,147 @@ union training_nodes =
     | T_game_chance_init : card * card
     | T_none
 
-type reward_for_pl1 = float
+// Clamps all the elements below 0 to 0.
+let relu (l : sa _ float) = arraym.map (max 0) l
+// Normalizes the array so all of its elements sum up to 1.
+// The inputs should always be >= 0.
+let normalize (l : sa _ float) =
+    inl s = arraym.sum l
+    arraym.map (fun x => if s <> 0 then x / s else 1 / conv (length l)) l
+// Passes the array through a relu and normalizes its sum to 1.
+let regret_match (l : sa _ float) = normalize (relu l)
 
-// let train_loop () : reward_for_pl1 =
-//     inl state_outer = stack_refs {messages = sa_create : messages}
-//     inl push_message = sa_listm.push state_outer.messages
-//     let rec body (state : state_train) node =
-//         inl reward = stack_mut 0
-//         inl set_rewards winner_id (chips_won : int) =
-//             inl chips_won = conv chips_won
-//             reward <- if winner_id = 0 then chips_won else -chips_won
-//         match node with
-//         | TerminalFold table =>
-//             inl msg = 
-//                 inl chips_won = index table.pot table.player_turn
-//                 set_rewards table.player_turn -chips_won
-//                 Showdown{cards_shown=table.pl_card; chips_won winner_id=toggle table.player_turn}
-//             push_message msg
-//             T_none
-//         | TerminalCall table =>
-//             inl msg =
-//                 inl chips_won, winner_id =
-//                     inl chips_won = index table.pot table.player_turn
-//                     match compare_hands table with
-//                     | Gt => chips_won, 0
-//                     | Eq => 0, -1
-//                     | Lt => chips_won, 1
-//                 set_rewards (abs winner_id) chips_won
-//                 Showdown{cards_shown=table.pl_card; chips_won winner_id}
-//             push_message msg
-//             T_none
-//         | Round table => 
-//             inl action =
-//                 inl data = table, state.messages
-//                 if is_train then
-//                     ml.cfr_models.trace_and_train (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
-//                 else
-//                     ml.cfr_models.trace_and_play (refm.from_local state.rng) cfr_model ({player_id=table.player_turn}, data) 
-//                 |> model_cfr.action_conv table
+let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; current_policy : sa 3 float})) : () =
+    inl state_outer = stack_refs {
+        messages = sa_create : messages
+        deck = deckm.create()
+        log_path_probs = sam.init (const (log 1)) : sa 2 float
+        }
+    inl using_message msg f =
+        sa_listm.push state_outer.messages msg
+        inl x = f()
+        sa_listm.pop state_outer.messages |> ignore
+        x
+    inl using_deck f =
+        loop.for {from=0; nearTo=6} (fun i s => // Note: don't try to factor out state_outer.deck into a variable because the CSE optimizer will break the semantics of the code.
+            if deckm.index state_outer.deck i then
+                state_outer.deck <- deckm.toggle state_outer.deck i
+                inl r = f (int_to_card i) : float
+                state_outer.deck <- deckm.toggle state_outer.deck i
+                fst s + r, snd s + 1
+            else 
+                s
+            ) (0, 0)
+        |> fun r, c => if c <> 0 then r / c else 0
+    inl using_path_prob (i : int) (path_prob : float) f =
+        inl old_log_prob = index state_outer.log_path_probs i
+        set state_outer.log_path_probs i (old_log_prob + log path_prob)
+        inl x = f()
+        set state_outer.log_path_probs i old_log_prob
+        x
+    inl get_path_prob (player_turn : int) = index state_outer.log_path_probs player_turn |> exp
+    let rec body node =
+        inl reward = stack_mut 0
+        inl set_rewards winner_id (chips_won : float) =
+            inl chips_won = conv chips_won
+            reward <- if winner_id = 0 then chips_won else -chips_won // Aligns the reward for the first player.
+        let rec loop = function // This is so game_round only gets generated once instead of 3 times in the compiled code.
+            | T_none => *reward // Returns the reward for the first player.
+            | T_game_chance_community_card(a,b) => body (game_chance_community_card a b)
+            | T_game_chance_init(a,b) => body (game_chance_init (a, b))
+            | T_game_round(a,b) => body (game_round a b)
+        match node with
+        | TerminalFold table =>
+            inl msg = 
+                inl chips_won = index table.pot table.player_turn
+                set_rewards table.player_turn (conv -chips_won)
+                Showdown{cards_shown=table.pl_card; chips_won winner_id=toggle table.player_turn}
+            using_message msg fun () =>
+            loop T_none
+        | TerminalCall table =>
+            inl msg =
+                inl chips_won, winner_id =
+                    inl chips_won = index table.pot table.player_turn
+                    match compare_hands table with
+                    | Gt => chips_won, 0
+                    | Eq => 0, -1
+                    | Lt => chips_won, 1
+                set_rewards (abs winner_id) (conv chips_won)
+                Showdown{cards_shown=table.pl_card; chips_won winner_id}
+            using_message msg fun () =>
+            loop T_none
+        | Round table => 
+            inl expected_value =
+                inl average_policy_decay = 1 - 2 ** -8
+                inl key = 
+                    state_outer.messages
+                    |> arraym.filter (function
+                        | PlayerGotCard(i,_) => i = table.player_turn
+                        | _ => true
+                        )
+                inl {average_policy current_policy} = 
+                    match dictm.get *dict key with
+                    | Some x => x
+                    | None => {
+                        average_policy = sam.init (const 0)
+                        current_policy = sam.init (const 0)
+                    }
+                inl current_policy_probs = regret_match current_policy
+                inl expected_value_per_action : sa 3 float = 
+                    [
+                        Some Call
+                        if index table.pot 0 <> index table.pot 1 then Some Fold else None
+                        if table.raises_left > 0 then Some Raise else None
+                    ]
+                    |> listm.mapi (fun i x =>
+                        match x with
+                        | Some action =>
+                            inl reward_for_pl0 = 
+                                using_path_prob table.player_turn (index current_policy_probs i) fun () =>
+                                using_message PlayerAction(table.player_turn, action) fun () => 
+                                loop (T_game_round (table, action))
+                            // Inverts the rewards if the player isn't 0.
+                            if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+                        | None => 0
+                    )
+                    |> arraym.fromList
+                inl expected_value = arraym.map2 (*) expected_value_per_action current_policy_probs |> arraym.sum
+                dictm.set *dict key {
+                    average_policy =
+                        inl path_prob_self = get_path_prob table.player_turn
+                        arraym.map2 (fun average_policy current_policy_probs => // Not sure why the path_prob_self is necessary in the enumerative version of CFR.
+                            average_policy_decay * average_policy + path_prob_self * current_policy_probs
+                            ) average_policy current_policy_probs
+                    current_policy =
+                        inl path_prob_opponent = get_path_prob (toggle table.player_turn)
+                        arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
+                            max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
+                            ) current_policy expected_value_per_action
+                    }
+                expected_value
 
-//             inl msg = PlayerAction(table.player_turn, action)
-//             push_message msg
-//             T_game_round (table, action)
-//         | RoundWithAction(table,action) =>
-//             inl msg = PlayerAction(table.player_turn, action)
-//             push_message msg
-//             T_game_round (table, action)
-//         | ChanceCommunityCard table =>
-//             inl card = pop_deck()
-//             inl msg = CommunityCardIs card
-//             push_message msg
-//             T_game_chance_community_card (table, card)
-//         | ChanceInit () => 
-//             inl c0,c1 = pop_deck(), pop_deck()
-//             push_message PlayerGotCard(0, c0)
-//             push_message PlayerGotCard(1, c1)
-//             T_game_chance_init (c0, c1)
-//         |> function // This is so game_round only gets generated once instead of 3 times in the compiled code.
-//         | T_none => None
-//         | T_game_chance_community_card(a,b) => Some(game_chance_community_card a b)
-//         | T_game_chance_init(a,b) => Some(game_chance_init (a, b))
-//         | T_game_round(a,b) => Some(game_round a b)
-//     body game_start()
+            set_rewards table.player_turn expected_value
+            loop T_none
+        | RoundWithAction(table,action) =>
+            inl msg = PlayerAction(table.player_turn, action)
+            using_message msg fun () =>
+            loop (T_game_round (table, action))
+        | ChanceCommunityCard table =>
+            using_deck fun card =>
+            inl msg = CommunityCardIs card
+            using_message msg fun () =>
+            loop (T_game_chance_community_card (table, card))
+        | ChanceInit () => 
+            using_deck fun c0 =>
+            using_deck fun c1 =>
+            using_message PlayerGotCard(0, c0) fun () =>
+            using_message PlayerGotCard(1, c1) fun () =>
+            loop (T_game_chance_init (c0, c1))
 
-    
-//     loop.while (function Some => true | None => false) (optionm.bind body) (Some node) |> ignore
+    body game_start() |> ignore
 
+inl main() =
+    inl dict = stack_refs (dictm.create 512)
+    train_loop dict
+    console.write_ln *dict
+    0i32

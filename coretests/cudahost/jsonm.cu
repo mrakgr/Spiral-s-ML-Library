@@ -9,20 +9,20 @@ struct Tuple0;
 typedef unsigned long long (* Fun0)(static_array_list<Union0,32>);
 typedef bool (* Fun1)(static_array_list<Union0,32>, static_array_list<Union0,32>);
 struct Tuple1;
-nlohmann::json method_5();
-nlohmann::json method_4(Union1 v0);
-nlohmann::json method_7(int v0);
-nlohmann::json method_8(Union2 v0);
-nlohmann::json method_6(int v0, Union2 v1);
-nlohmann::json method_9(int v0, Union1 v1);
-nlohmann::json method_11(static_array<Union1,2> v0);
-nlohmann::json method_10(static_array<Union1,2> v0, int v1, int v2);
-nlohmann::json method_3(Union0 v0);
-nlohmann::json method_2(static_array_list<Union0,32> v0);
-nlohmann::json method_14(float v0);
-nlohmann::json method_13(static_array<float,3> v0);
-nlohmann::json method_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2);
-nlohmann::json method_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
+nlohmann::json f_5();
+nlohmann::json f_4(Union1 v0);
+nlohmann::json f_7(int v0);
+nlohmann::json f_8(Union2 v0);
+nlohmann::json f_6(int v0, Union2 v1);
+nlohmann::json f_9(int v0, Union1 v1);
+nlohmann::json f_11(static_array<Union1,2> v0);
+nlohmann::json f_10(static_array<Union1,2> v0, int v1, int v2);
+nlohmann::json f_3(Union0 v0);
+nlohmann::json f_2(static_array_list<Union0,32> v0);
+nlohmann::json f_14(float v0);
+nlohmann::json f_13(static_array<float,3> v0);
+nlohmann::json f_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2);
+nlohmann::json f_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
 nlohmann::json serialize_0(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0);
 void f_20(nlohmann::json v0);
 Union1 f_19(nlohmann::json v0);
@@ -680,15 +680,15 @@ inline bool while_method_3(std::unordered_map<static_array_list<Union0,32>, Tupl
     v2 = v1 != v0.end();
     return v2;
 }
-nlohmann::json method_5(){
+nlohmann::json f_5(){
     nlohmann::json v0;
     return v0;
 }
-nlohmann::json method_4(Union1 v0){
+nlohmann::json f_4(Union1 v0){
     switch (v0.tag) {
         case 0: { // Jack
             nlohmann::json v1;
-            v1 = method_5();
+            v1 = f_5();
             const char * v2;
             v2 = "Jack";
             nlohmann::json v3{v2, v1};
@@ -697,7 +697,7 @@ nlohmann::json method_4(Union1 v0){
         }
         case 1: { // King
             nlohmann::json v4;
-            v4 = method_5();
+            v4 = f_5();
             const char * v5;
             v5 = "King";
             nlohmann::json v6{v5, v4};
@@ -706,7 +706,7 @@ nlohmann::json method_4(Union1 v0){
         }
         case 2: { // Queen
             nlohmann::json v7;
-            v7 = method_5();
+            v7 = f_5();
             const char * v8;
             v8 = "Queen";
             nlohmann::json v9{v8, v7};
@@ -719,15 +719,15 @@ nlohmann::json method_4(Union1 v0){
         }
     }
 }
-nlohmann::json method_7(int v0){
+nlohmann::json f_7(int v0){
     nlohmann::json v1 = v0;
     return v1;
 }
-nlohmann::json method_8(Union2 v0){
+nlohmann::json f_8(Union2 v0){
     switch (v0.tag) {
         case 0: { // Call
             nlohmann::json v1;
-            v1 = method_5();
+            v1 = f_5();
             const char * v2;
             v2 = "Call";
             nlohmann::json v3{v2, v1};
@@ -736,7 +736,7 @@ nlohmann::json method_8(Union2 v0){
         }
         case 1: { // Fold
             nlohmann::json v4;
-            v4 = method_5();
+            v4 = f_5();
             const char * v5;
             v5 = "Fold";
             nlohmann::json v6{v5, v4};
@@ -745,7 +745,7 @@ nlohmann::json method_8(Union2 v0){
         }
         case 2: { // Raise
             nlohmann::json v7;
-            v7 = method_5();
+            v7 = f_5();
             const char * v8;
             v8 = "Raise";
             nlohmann::json v9{v8, v7};
@@ -758,27 +758,27 @@ nlohmann::json method_8(Union2 v0){
         }
     }
 }
-nlohmann::json method_6(int v0, Union2 v1){
+nlohmann::json f_6(int v0, Union2 v1){
     nlohmann::json v2;
     nlohmann::json v3;
-    v3 = method_7(v0);
+    v3 = f_7(v0);
     v2.push_back(v3);
     nlohmann::json v4;
-    v4 = method_8(v1);
+    v4 = f_8(v1);
     v2.push_back(v4);
     return v2;
 }
-nlohmann::json method_9(int v0, Union1 v1){
+nlohmann::json f_9(int v0, Union1 v1){
     nlohmann::json v2;
     nlohmann::json v3;
-    v3 = method_7(v0);
+    v3 = f_7(v0);
     v2.push_back(v3);
     nlohmann::json v4;
-    v4 = method_4(v1);
+    v4 = f_4(v1);
     v2.push_back(v4);
     return v2;
 }
-nlohmann::json method_11(static_array<Union1,2> v0){
+nlohmann::json f_11(static_array<Union1,2> v0){
     nlohmann::json v1;
     int v2;
     v2 = 0;
@@ -786,37 +786,37 @@ nlohmann::json method_11(static_array<Union1,2> v0){
         Union1 v5;
         v5 = v0[v2];
         nlohmann::json v7;
-        v7 = method_4(v5);
+        v7 = f_4(v5);
         v1.push_back(v7);
         v2 += 1 ;
     }
     return v1;
 }
-nlohmann::json method_10(static_array<Union1,2> v0, int v1, int v2){
+nlohmann::json f_10(static_array<Union1,2> v0, int v1, int v2){
     nlohmann::json v3 = nlohmann::json::object();
     const char * v4;
     v4 = "cards_shown";
     nlohmann::json v5;
-    v5 = method_11(v0);
+    v5 = f_11(v0);
     v3[v4] = v5;
     const char * v6;
     v6 = "chips_won";
     nlohmann::json v7;
-    v7 = method_7(v1);
+    v7 = f_7(v1);
     v3[v6] = v7;
     const char * v8;
     v8 = "winner_id";
     nlohmann::json v9;
-    v9 = method_7(v2);
+    v9 = f_7(v2);
     v3[v8] = v9;
     return v3;
 }
-nlohmann::json method_3(Union0 v0){
+nlohmann::json f_3(Union0 v0){
     switch (v0.tag) {
         case 0: { // CommunityCardIs
             Union1 v1 = v0.case0.v0;
             nlohmann::json v2;
-            v2 = method_4(v1);
+            v2 = f_4(v1);
             const char * v3;
             v3 = "CommunityCardIs";
             nlohmann::json v4{v3, v2};
@@ -826,7 +826,7 @@ nlohmann::json method_3(Union0 v0){
         case 1: { // PlayerAction
             int v5 = v0.case1.v0; Union2 v6 = v0.case1.v1;
             nlohmann::json v7;
-            v7 = method_6(v5, v6);
+            v7 = f_6(v5, v6);
             const char * v8;
             v8 = "PlayerAction";
             nlohmann::json v9{v8, v7};
@@ -836,7 +836,7 @@ nlohmann::json method_3(Union0 v0){
         case 2: { // PlayerGotCard
             int v10 = v0.case2.v0; Union1 v11 = v0.case2.v1;
             nlohmann::json v12;
-            v12 = method_9(v10, v11);
+            v12 = f_9(v10, v11);
             const char * v13;
             v13 = "PlayerGotCard";
             nlohmann::json v14{v13, v12};
@@ -846,7 +846,7 @@ nlohmann::json method_3(Union0 v0){
         case 3: { // Showdown
             static_array<Union1,2> v15 = v0.case3.v0; int v16 = v0.case3.v1; int v17 = v0.case3.v2;
             nlohmann::json v18;
-            v18 = method_10(v15, v16, v17);
+            v18 = f_10(v15, v16, v17);
             const char * v19;
             v19 = "Showdown";
             nlohmann::json v20{v19, v18};
@@ -859,7 +859,7 @@ nlohmann::json method_3(Union0 v0){
         }
     }
 }
-nlohmann::json method_2(static_array_list<Union0,32> v0){
+nlohmann::json f_2(static_array_list<Union0,32> v0){
     nlohmann::json v1;
     int v2;
     v2 = v0.length;
@@ -869,17 +869,17 @@ nlohmann::json method_2(static_array_list<Union0,32> v0){
         Union0 v6;
         v6 = v0[v3];
         nlohmann::json v8;
-        v8 = method_3(v6);
+        v8 = f_3(v6);
         v1.push_back(v8);
         v3 += 1 ;
     }
     return v1;
 }
-nlohmann::json method_14(float v0){
+nlohmann::json f_14(float v0){
     nlohmann::json v1 = v0;
     return v1;
 }
-nlohmann::json method_13(static_array<float,3> v0){
+nlohmann::json f_13(static_array<float,3> v0){
     nlohmann::json v1;
     int v2;
     v2 = 0;
@@ -887,32 +887,32 @@ nlohmann::json method_13(static_array<float,3> v0){
         float v5;
         v5 = v0[v2];
         nlohmann::json v7;
-        v7 = method_14(v5);
+        v7 = f_14(v5);
         v1.push_back(v7);
         v2 += 1 ;
     }
     return v1;
 }
-nlohmann::json method_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2){
+nlohmann::json f_12(static_array<float,3> v0, static_array<float,3> v1, static_array<float,3> v2){
     nlohmann::json v3 = nlohmann::json::object();
     const char * v4;
     v4 = "average_policy";
     nlohmann::json v5;
-    v5 = method_13(v0);
+    v5 = f_13(v0);
     v3[v4] = v5;
     const char * v6;
     v6 = "current_policy";
     nlohmann::json v7;
-    v7 = method_13(v1);
+    v7 = f_13(v1);
     v3[v6] = v7;
     const char * v8;
     v8 = "expected_values";
     nlohmann::json v9;
-    v9 = method_13(v2);
+    v9 = f_13(v2);
     v3[v8] = v9;
     return v3;
 }
-nlohmann::json method_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
+nlohmann::json f_1(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
     nlohmann::json v1;
     std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v2 = v0;
     auto v3 = v2.begin();
@@ -923,16 +923,16 @@ nlohmann::json method_1(std::unordered_map<static_array_list<Union0,32>, Tuple1,
         Tuple1 tmp2 = v3->second;
         v6 = tmp2.v0; v7 = tmp2.v1; v8 = tmp2.v2;
         nlohmann::json v9;
-        v9 = method_2(v5);
+        v9 = f_2(v5);
         nlohmann::json v10;
-        v10 = method_12(v6, v7, v8);
+        v10 = f_12(v6, v7, v8);
         v1.push_back(nlohmann::json({v9, v10}));
         ++v3;
     }
     return v1;
 }
 nlohmann::json serialize_0(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v0){
-    return method_1(v0);
+    return f_1(v0);
 }
 void f_20(nlohmann::json v0){
     bool v1;

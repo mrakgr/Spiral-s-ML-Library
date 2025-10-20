@@ -15,47 +15,45 @@ let serialize forall t. (x : t) : json t =
     globals()
     real
     open real_core
-    inl rec f forall t'. ~(x : t') : json t' = 
-        join (
-            inl serialize_sa forall array el. =
-                inl ar = empty `(array el)
-                loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
-                    inl x = f `el (index `array `el x i)
-                    $"!ar.push_back(!x)" : ()
-                ar
-            typecase t' with
-            | () => empty `t'
-            | ~a * ~b => f_tuple `t' x 
-            | {} => 
-                inl l : json t' = $"`(json t') \v = nlohmann::json::object()"
-                record_type_iter (fun k => forall v. => 
-                    $"!l[!(symbol_to_string k)] = !(f `v (x k))" : ()
-                    ) `t'
-                l
-            | sa ~dim ~el => serialize_sa `(sa dim) `el
-            | da ~dim ~el => serialize_sa `(dam.sa dim) `el
-            | sa_list ~dim ~el => serialize_sa `(sa_list dim) `el
-            | da_list ~dim ~el => serialize_sa `(da_list dim) `el
-            | dict ~k ~v =>
-                inl ar = empty `(dict k v)
-                dictm.iter `k `v (fun k v =>
-                    inl k, v = f `k k, f `v v
-                    $"!ar.push_back(`(json (k * v))({!k, !v}))" : ()
-                    ) x
-                ar
-            | _ =>
-                if union_type_is `t' then 
-                    unbox x (fun (k,v) =>
-                        inl k = symbol_to_string k
-                        inl v = f `(`(v)) v
-                        $"`(json t) \v{!k, !v}" : json t'
-                        )
-                elif nominal_type_is `t' then 
-                    inl (exists t''. _) = nominal_type_apply `t'
-                    f `t'' (nominal_strip x)
-                else
-                    $"`(json t') \v = !x" : json t'
-        ) : json t'
+    let rec f forall t'. ~(x : t') : json t' = 
+        inl serialize_sa forall array el. =
+            inl ar = empty `(array el)
+            loop.for' `int {from=0; nearTo=length `array `el x} fun i =>
+                inl x = f `el (index `array `el x i)
+                $"!ar.push_back(!x)" : ()
+            ar
+        typecase t' with
+        | () => empty `t'
+        | ~a * ~b => f_tuple `t' x 
+        | {} => 
+            inl l : json t' = $"`(json t') \v = nlohmann::json::object()"
+            record_type_iter (fun k => forall v. => 
+                $"!l[!(symbol_to_string k)] = !(f `v (x k))" : ()
+                ) `t'
+            l
+        | sa ~dim ~el => serialize_sa `(sa dim) `el
+        | da ~dim ~el => serialize_sa `(dam.sa dim) `el
+        | sa_list ~dim ~el => serialize_sa `(sa_list dim) `el
+        | da_list ~dim ~el => serialize_sa `(da_list dim) `el
+        | dict ~k ~v =>
+            inl ar = empty `(dict k v)
+            dictm.iter `k `v (fun k v =>
+                inl k, v = f `k k, f `v v
+                $"!ar.push_back(`(json (k * v))({!k, !v}))" : ()
+                ) x
+            ar
+        | _ =>
+            if union_type_is `t' then 
+                unbox x (fun (k,v) =>
+                    inl k = symbol_to_string k
+                    inl v = f `(`(v)) v
+                    $"`(json t) \v{!k, !v}" : json t'
+                    )
+            elif nominal_type_is `t' then 
+                inl (exists t''. _) = nominal_type_apply `t'
+                f `t'' (nominal_strip x)
+            else
+                $"`(json t') \v = !x" : json t'
     and inl f_tuple forall orig. (x : orig) : json orig =
         inl l = empty `orig
         inl rec loop forall t'. (x : t') : () =

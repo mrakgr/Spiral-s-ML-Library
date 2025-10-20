@@ -13,8 +13,7 @@ union message =
     | Showdown : {winner_id : int; chips_won : int; cards_shown : sa 2 card}
 type messages = sa_list 32 message
 
-inl u32_to_card (i : u32) =
-    match i with
+inl int_to_card = function
     | 0 | 1 => King
     | 2 | 3 => Queen
     | 4 | 5 => Jack
@@ -25,7 +24,7 @@ let draw_card rng deck : card * deck =
     inl (deck d) = deck
     inl base = random.u32_ubound conv(popc_u32 d) rng
     inl i = sample_masked_bit_u32 d (conv base)
-    u32_to_card i, deckm.toggle deck (conv i)
+    int_to_card i, deckm.toggle deck (conv i)
 
 // Draws an array of cards from a deck.
 let draw_cards forall dim. rng deck : sa dim card * deck =

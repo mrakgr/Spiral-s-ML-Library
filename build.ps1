@@ -52,6 +52,6 @@ if (-not (Test-Path $path_output) -or
 if ($? -and (-not $BuildOnly)){ # Runs the executable if the compilation was successful or if it is already up to date.
     Set-Location $path_bin
     Write-Host "Running: $path_output"
-    & $path_output
+    & $path_output 2>&1 | Tee-Object -FilePath "$path_output.log"
     if (-not $?) { throw "The program execution failed." }
 }

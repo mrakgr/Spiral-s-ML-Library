@@ -29,6 +29,8 @@ inl init forall (ar : * -> *) {create; set} el. nearTo f : ar el =
 // Applies a function to each element of the array, threading an accumulator argument through the computation. 
 // If the input function is f and the elements are i0...iN then computes f (... (f s i0)...) iN
 inl fold forall (ar : * -> *) {index; length} el s. f (s : s) (ar : ar el) = for {from=0; nearTo=length ar} (fun i s => f s (index ar i)) s
+// Sums all the elements in the array starting from 0.
+inl sum forall (ar : * -> *) {index; length} el{number}. (ar : ar el) : el = fold (+) 0 ar
 // Applies a function to each element of the two arrays, threading an accumulator argument through the computation.
 inl fold2 forall (ar : * -> *) {index; length} el s. f (s : s) (ar1 : ar el) (ar2 : ar el) = 
     for {from=0; nearTo=assert_len ar1 ar2} (fun i s => f s (index ar1 i) (index ar2 i)) s
@@ -47,7 +49,7 @@ inl mapi forall (ar : * -> *) {length; create; set; index} a b. f (ar : ar a) : 
 inl iter forall (ar : * -> *) {length; index} el. f (ar : ar el) : () = for' {from=0; nearTo=length ar} (index ar >> f)
 // Iterates over an array. Provides the index as the first argument.
 inl iteri f ar = for' {from=0; nearTo=length ar} (fun i => f i (index ar i))
-// Filters the elements of an array using the function.
+// Returns the elements of the array for which the filtering function returns true.
 inl filter forall (ar : * -> *) {create; set; index; length} el. f (ar : ar el) : ar el =
     inl nearTo = length ar
     inl ar' : ar _ = create nearTo

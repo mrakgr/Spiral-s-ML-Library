@@ -1,18 +1,16 @@
-Error trace on line: 129, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-        inl rec loop forall t'. (i : int) : t =
-                                 ^
-Error trace on line: 130, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-            typecase t' with
+Error trace on line: 58, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            inl printable_funs =
             ^
-Error trace on line: 131, column: 53 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-            | ~a * ~b => f `a ($"!x[!i]" : json a), loop `b (i+1)
-                                                    ^
-Error trace on line: 129, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-        inl rec loop forall t'. (i : int) : t =
-                                 ^
-Error trace on line: 130, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecudahost/jsonm.spi.
-            typecase t' with
+Error trace on line: 63, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            if union_is x then
             ^
-The body does not match the annotation.
-Got: action
-Expected: dict (sa_list 32i32 message) {average_policy : sa 3i32 f32; current_policy : sa 3i32 f32; expected_values : sa 3i32 f32}
+Error trace on line: 80, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) printable_funs x
+            ^
+Error trace on line: 83, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+                !!!!PrintStatic(`(`x))
+                    ^
+Error trace on line: 84, column: 17 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+                error_type "Unsupported type. Check the terminal for more info"
+                ^
+Unsupported type. Check the terminal for more info

@@ -50,6 +50,11 @@ inl test2() =
     inl t = serialize d |> deserialize
     console.write_ln t
 
+inl test3() =
+    inl x : list i32 = [1;2;3]
+    inl t = serialize x |> deserialize
+    console.write_ln t
+
 inl main() =
     test2()
     0i32

@@ -79,7 +79,9 @@ inl rec write_ forall t. (console_config {h key_fmt key_value} as config : conso
                             )
             elif nominal_is x && prototype_has `(`x) printable then printable `(`x) printable_funs x
             // elif layout_is x then write *x // TODO: Deal with all the layout type cases.
-            else error_type "Unsupported type."
+            else 
+                !!!!PrintStatic(`(`x))
+                error_type "Unsupported type. Check the terminal for more info"
             
     real write x
     flush is_newline
