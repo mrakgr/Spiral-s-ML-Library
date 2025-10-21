@@ -132,9 +132,12 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
                 inl expected_value = arraym.map2 (*) expected_value_per_action current_policy_probs |> arraym.sum
                 dictm.set *dict key {
                     average_policy =
-                        inl path_prob_self = get_path_prob table.player_turn
+                        // inl path_prob_self = get_path_prob table.player_turn
                         arraym.map2 (fun average_policy current_policy_probs => // Not sure why the path_prob_self is necessary in the enumerative version of CFR.
-                            average_policy_decay * average_policy + path_prob_self * current_policy_probs
+                            // It's been verified that the full versio of the average policy update which has a multiplication by the path_prob_self isn't needed.
+                            // I expected this to be the case because MC-CFR algorithms don't have this aspect to them. Their own update is similar to the uncommented version.
+                            // average_policy_decay * average_policy + path_prob_self * current_policy_probs
+                            average_policy_decay * average_policy + current_policy_probs
                             ) average_policy current_policy_probs
                     current_policy =
                         inl path_prob_opponent = get_path_prob (toggle table.player_turn)
