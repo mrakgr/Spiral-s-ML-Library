@@ -35,6 +35,7 @@ if (-not (Test-Path $path_output) -or
         "-g" # Generates the debug info on host
         "-G" # Generates the debug info on device
         "-dopt", "on" # Turns on the device optimizations
+        "-Xcompiler", "-O3" # Turns on the host optimizations
         "-restrict" # Turns on the restricted pointer optimizations
         "-expt-relaxed-constexpr" # Allows relaxed constant expressions
         "-D__CUDA_NO_HALF_CONVERSIONS__" # Hack to compile Cutlass with half float types

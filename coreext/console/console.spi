@@ -17,13 +17,13 @@ inl printable_funs () : printable_funs =
         backend_switch_all {
             Python = fun () => console_python.write_ln x
             CudaDevice = fun () => console_cuda.write_ln x
-            CudaHost = fun () => console_cuda.write_ln x
+            CudaHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
         }
     inl write x =
         backend_switch_all {
             Python = fun () => console_python.write x
             CudaDevice = fun () => console_cuda.write x
-            CudaHost = fun () => console_cuda.write_ln x
+            CudaHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
         }
     {
         write = `$write
@@ -36,7 +36,7 @@ inl write_ln x =
     backend_switch_all {
         Python = fun () => console_python.write_ln x
         CudaDevice = fun () => console_cuda.single_threaded console_cuda.write_ln x
-        CudaHost = fun () => console_cuda.write_ln x
+        CudaHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
     }
 
 // Writes the argument to the console. On the Cuda side it uses a global lock to make sure the printing is thread safe and consistent.
@@ -44,7 +44,7 @@ inl write x =
     backend_switch_all {
         Python = fun () => console_python.write x
         CudaDevice = fun () => console_cuda.single_threaded console_cuda.write x
-        CudaHost = fun () => console_cuda.write x
+        CudaHost = fun () => console_cuda.write x . $"fflush(stdout)"
     }
 
 inl main() =

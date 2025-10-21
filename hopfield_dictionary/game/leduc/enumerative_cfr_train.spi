@@ -11,13 +11,27 @@ union training_nodes =
 
 // Clamps all the elements below 0 to 0.
 let relu (l : sa _ float) = arraym.map (max 0) l
+// Maps the masked out parts of the array to 0.
+inl mask forall dim. (l : sa dim float) (mask : sa dim bool) = arraym.map2 (fun a b => if b then a else 0) l mask
+// Normalizes the array so all of its elements sum up to 1 given the mask.
+// The inputs should always be >= 0.
+let masking_normalize forall dim. (l : sa dim float) (mask' : sa dim bool) =
+    inl inv_len = 1 / arraym.fold (fun s x => s + if x then 1 else 0) 0 mask'
+    inl l = mask l mask'
+    inl s = arraym.sum l
+    arraym.map2 (fun x m => 
+        if m = false then 0
+        elif s <> 0 then x / s
+        else inv_len
+        ) l mask'
 // Normalizes the array so all of its elements sum up to 1.
 // The inputs should always be >= 0.
 let normalize (l : sa _ float) =
+    inl inv_len = 1 / conv (length l)
     inl s = arraym.sum l
-    arraym.map (fun x => if s <> 0 then x / s else 1 / conv (length l)) l
+    arraym.map (fun x => if s <> 0 then x / s else inv_len) l
 // Passes the array through a relu and normalizes its sum to 1.
-let regret_match (l : sa _ float) = normalize (relu l)
+let regret_match forall dim. (l : sa dim float) (mask : sa dim bool) = masking_normalize (relu l) mask
 
 let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; current_policy : sa 3 float})) : () =
     inl state_outer = stack_refs {
@@ -94,13 +108,15 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
                         average_policy = sam.init (const 0)
                         current_policy = sam.init (const 0)
                     }
-                inl current_policy_probs = regret_match current_policy
-                inl expected_value_per_action : sa 3 float = 
+                inl actions =
                     [
                         Some Call
                         if index table.pot 0 <> index table.pot 1 then Some Fold else None
                         if table.raises_left > 0 then Some Raise else None
                     ]
+                inl current_policy_probs = regret_match current_policy (listm.map (function Some => true | None => false) actions |> arraym.fromList)
+                inl expected_value_per_action : sa 3 float = 
+                    actions
                     |> listm.mapi (fun i x =>
                         match x with
                         | Some action =>
@@ -150,6 +166,15 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
 
 inl main() =
     inl dict = stack_refs (dictm.create 512)
-    train_loop dict
-    console.write_ln *dict
+    inl nearTo : int = 1000
+    loop.for' {from=0; nearTo} (fun (i : int) =>
+        if i % 10 = 0 then
+            console.write_ln {i nearTo}
+        train_loop dict
+        )
+    inl dict' = dictm.create 512
+    *dict |> dictm.iter (fun k v =>
+        dictm.set dict' k (normalize v.average_policy)
+        )
+    console.write_ln dict'
     0i32

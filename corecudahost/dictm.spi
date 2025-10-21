@@ -30,5 +30,5 @@ inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
 
 instance printable dict k v = fun {write write_ln} d =>
     write_ln "{"
-    iter (fun k v => write "    " . write k . write " => " . write_ln v) d
+    iter (fun k v => write k . write " => " . write_ln v) d
     write_ln "}"
