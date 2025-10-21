@@ -33,35 +33,42 @@ let normalize (l : sa _ float) =
 // Passes the array through a relu and normalizes its sum to 1.
 let regret_match forall dim. (l : sa dim float) (mask : sa dim bool) = masking_normalize (relu l) mask
 
-let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; current_policy : sa 3 float})) : () =
+type path_prob = {policy : float; sampling : float}
+
+let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; current_policy : sa 3 float; expected_values : sa 3 {value : float; weight : float}})) : () =
+    inl rng = xoshiro.create()
+    inl sample sampling_probs = xoshiro.sample_discrete' sampling_probs rng
     inl state_outer = stack_refs {
         messages = sa_create : messages
         deck = deckm.create()
-        log_path_probs = sam.init (const (log 1)) : sa 2 float
-        }
+        log_path_probs = sam.init (const {policy = log 1; sampling = log 1}) : sa 2 path_prob
+    }
     inl using_message msg f =
         sa_listm.push state_outer.messages msg
         inl x = f()
         sa_listm.pop state_outer.messages |> ignore
         x
     inl using_deck f =
-        loop.for {from=0; nearTo=6} (fun i s => // Note: don't try to factor out state_outer.deck into a variable because the CSE optimizer will break the semantics of the code.
-            if deckm.index state_outer.deck i then
-                state_outer.deck <- deckm.toggle state_outer.deck i
-                inl r = f (int_to_card i) : float
-                state_outer.deck <- deckm.toggle state_outer.deck i
-                fst s + r, snd s + 1
-            else 
-                s
-            ) (0, 0)
-        |> fun r, c => if c <> 0 then r / c else 0
-    inl using_path_prob (i : int) (path_prob : float) f =
+        inl old_deck = loop._dup state_outer.deck // We're using loop._dup in order to convert the C++ reference into a value type. We need this for the backup to work.
+        inl card,deck = draw_card rng old_deck
+        state_outer.deck <- deck
+        inl r = f card
+        state_outer.deck <- old_deck
+        r
+    inl using_path_prob (i : int) (path_prob : path_prob) f =
         inl old_log_prob = index state_outer.log_path_probs i
-        set state_outer.log_path_probs i (old_log_prob + log path_prob)
+        set state_outer.log_path_probs i {old_log_prob with policy #= (+)(log path_prob.policy); sampling #= (+)(log path_prob.sampling)}
         inl x = f()
         set state_outer.log_path_probs i old_log_prob
         x
-    inl get_path_prob (player_turn : int) = index state_outer.log_path_probs player_turn |> exp
+    // Gets the path probability of all but the selected player.
+    inl get_path_prob_for_others (player_turn : int) = 
+        state_outer.log_path_probs
+        |> arraym.foldi (fun i s (log_path_prob : path_prob) =>
+                inl policy = if i = player_turn then log 1 else log_path_prob.policy
+                s + policy - log_path_prob.sampling
+            ) (log 1)
+        |> exp
     let rec body node =
         inl reward = stack_mut 0
         inl set_rewards winner_id (chips_won : float) =
@@ -94,56 +101,67 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
             loop T_none
         | Round table => 
             inl expected_value =
-                inl average_policy_decay = 1 - 2 ** -8
+                inl average_policy_decay = 1 - 2 ** -10
+                inl noise_factor = 2 ** -2 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
                 inl key = 
                     state_outer.messages
                     |> arraym.filter (function
                         | PlayerGotCard(i,_) => i = table.player_turn
                         | _ => true
                         )
-                inl {average_policy current_policy} = 
+                inl {average_policy current_policy expected_values} = 
                     match dictm.get *dict key with
                     | Some x => x
                     | None => {
                         average_policy = sam.init (const 0)
                         current_policy = sam.init (const 0)
+                        expected_values = sam.init (const {value = 0; weight = 0})
                     }
+                inl get_expected_value i =
+                    inl {value weight} = index expected_values i
+                    if weight <> 0 then value / weight else 0
                 inl actions =
                     [
                         Some Call
                         if index table.pot 0 <> index table.pot 1 then Some Fold else None
                         if table.raises_left > 0 then Some Raise else None
                     ]
-                inl current_policy_probs = regret_match current_policy (listm.map (function Some => true | None => false) actions |> arraym.fromList)
+                inl mask = listm.map (function Some => true | None => false) actions |> arraym.fromList
+                inl current_policy_probs = regret_match current_policy mask
+                inl noise_probs = masking_normalize (sam.init (const 0)) mask
+                inl sampling_probs = arraym.map2 (fun a b => (1 - noise_factor) * a + noise_factor * b) current_policy_probs noise_probs
+                inl action_index = sample sampling_probs
+                inl reward = stack_mut 0
                 inl expected_value_per_action : sa 3 float = 
                     actions
                     |> listm.mapi (fun i x =>
                         match x with
-                        | Some action =>
+                        | Some action when i = action_index =>
+                            inl action_prob = {policy = index current_policy_probs i; sampling = index sampling_probs i}
                             inl reward_for_pl0 = 
-                                using_path_prob table.player_turn (index current_policy_probs i) fun () =>
+                                using_path_prob table.player_turn action_prob fun () =>
                                 using_message PlayerAction(table.player_turn, action) fun () => 
                                 loop (T_game_round (table, action))
                             // Inverts the rewards if the player isn't 0.
-                            if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
-                        | None => 0
+                            reward <- if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+                            inl ev = get_expected_value i
+                            (*reward - ev) / action_prob.sampling + ev
+                        | _ => get_expected_value i
                     )
                     |> arraym.fromList
                 inl expected_value = arraym.map2 (*) expected_value_per_action current_policy_probs |> arraym.sum
                 dictm.set *dict key {
                     average_policy =
-                        // inl path_prob_self = get_path_prob table.player_turn
                         arraym.map2 (fun average_policy current_policy_probs =>
-                            // It's been verified that the full versio of the average policy update which has a multiplication by the path_prob_self isn't needed.
-                            // I expected this to be the case because MC-CFR algorithms don't have this aspect to them. Their own update is similar to the uncommented version.
-                            // average_policy_decay * average_policy + path_prob_self * current_policy_probs
                             average_policy_decay * average_policy + current_policy_probs
                             ) average_policy current_policy_probs
                     current_policy =
-                        inl path_prob_opponent = get_path_prob (toggle table.player_turn)
+                        inl path_prob_opponent = get_path_prob_for_others table.player_turn
                         arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
                             max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
                             ) current_policy expected_value_per_action
+                    expected_values =
+                        expected_values |> arraym.update action_index (fun x => {x with value#=(+) *reward; weight#=(+) 1})
                     }
                 expected_value
 
@@ -169,9 +187,9 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
 
 inl main() =
     inl dict = stack_refs (dictm.create 512)
-    inl nearTo : int = 1000
+    inl nearTo : int = 1_000_000
     loop.for' {from=0; nearTo} (fun (i : int) =>
-        if i % 10 = 0 then
+        if i % 1000 = 0 then
             console.write_ln {i nearTo}
         train_loop dict
         )

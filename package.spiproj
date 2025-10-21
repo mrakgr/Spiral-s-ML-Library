@@ -107,6 +107,7 @@ modules:
                 game
                 random_players
                 enumerative_cfr_train
+                mc_cfr_train
                 
 
     ml/

@@ -9,7 +9,27 @@ inl globals() = global "#include <xoshiro.h>"
 
 nominal xoshiro_rng = $"xso::rng"
 instance u32 xoshiro_rng = fun s => $"!s()"
+instance uniform xoshiro_rng = fun s => 
+    inl dist : $"std::uniform_real_distribution<`float>" = $"std::uniform_real_distribution<`float> \v(0.0, 1.0)"
+    $"!dist(!s)"
 
 inl create() : ref xoshiro_rng =
     globals()
     $"`xoshiro_rng \v"
+
+// Picks the index at a particular random value.
+let pick_discrete' forall dim. (dist : sa dim float) r =
+    inl dist = sam.scan_inclusive (+) dist
+    inl sum = arraym.last dist
+    inl r = r * sum
+    let rec loop i =
+        if i < length dist then // Note: Xoshiro generates uniform values in the [0,1) range unlike Cuda.
+            if r < index dist i then i
+            else loop (i + 1)
+        else length dist - 1
+    loop 0
+
+// Randomly samples an index of an action with replacement.
+// Takes in a unnormalized probability distribution as the first argument.
+// Returns the index of a randomly selected item inside it.
+let sample_discrete' forall dim. (dist : sa dim float) rng = pick_discrete' dist (uniform rng)
