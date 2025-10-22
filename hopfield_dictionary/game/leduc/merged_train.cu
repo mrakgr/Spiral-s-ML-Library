@@ -3523,65 +3523,47 @@ int main() {
         Tuple3 tmp2 = Tuple3{0, 0.0f};
         v28 = tmp2.v0; v29 = tmp2.v1;
         while (while_method_3(v28)){
-            int v31;
-            v31 = v28 % 40000;
-            bool v32;
-            v32 = v31 == 0;
-            if (v32){
-                printf("{%s = %d; %s = %d}\n","i", v28, "nearTo", 1000000);
-                fflush(stdout);
-            } else {
-            }
-            Union4 v38;
-            v38 = Union4{Union4_1{}};
-            float v39;
-            v39 = body_0(v15, v7, v5, v16, v21, v17, v27, v38);
-            v29 = v39;
+            Union4 v31;
+            v31 = Union4{Union4_1{}};
+            float v32;
+            v32 = body_0(v15, v7, v5, v16, v21, v17, v27, v31);
+            v29 = v32;
             v28 += 1 ;
         }
-        static_array<Union3,2> v41;
-        Union3 v44;
-        v44 = Union3{Union3_1{}};
-        v41[0] = v44;
-        Union3 v47;
-        v47 = Union3{Union3_0{}};
-        v41[1] = v47;
-        bool v49;
-        v49 = false;
-        xso::rng v50;
-        StackMut0 v51{63u};
-        static_array_list<Union0,32> v53;
-        v53 = static_array_list<Union0,32>{};
-        StackRefs1 v55{v53};
-        static_array<Tuple2,2> v57;
-        int v59;
-        v59 = 0;
-        while (while_method_2(v59)){
-            v57[v59] = Tuple2{0.0f, 0.0f};
-            v59 += 1 ;
+        static_array<Union3,2> v34;
+        Union3 v37;
+        v37 = Union3{Union3_1{}};
+        v34[0] = v37;
+        Union3 v40;
+        v40 = Union3{Union3_0{}};
+        v34[1] = v40;
+        bool v42;
+        v42 = false;
+        xso::rng v43;
+        StackMut0 v44{63u};
+        static_array_list<Union0,32> v46;
+        v46 = static_array_list<Union0,32>{};
+        StackRefs1 v48{v46};
+        static_array<Tuple2,2> v50;
+        int v52;
+        v52 = 0;
+        while (while_method_2(v52)){
+            v50[v52] = Tuple2{0.0f, 0.0f};
+            v52 += 1 ;
         }
-        StackRefs2 v61{v57};
-        int v62; float v63;
+        StackRefs2 v54{v50};
+        int v55; float v56;
         Tuple3 tmp39 = Tuple3{0, 0.0f};
-        v62 = tmp39.v0; v63 = tmp39.v1;
-        while (while_method_9(v62)){
-            int v65;
-            v65 = v62 % 4;
-            bool v66;
-            v66 = v65 == 0;
-            if (v66){
-                printf("{%s = %d; %s = %d}\n","i", v62, "nearTo", 100);
-                fflush(stdout);
-            } else {
-            }
-            Union4 v72;
-            v72 = Union4{Union4_1{}};
-            float v73;
-            v73 = body_0(v49, v41, v5, v50, v55, v51, v61, v72);
-            v63 = v73;
-            v62 += 1 ;
+        v55 = tmp39.v0; v56 = tmp39.v1;
+        while (while_method_9(v55)){
+            Union4 v58;
+            v58 = Union4{Union4_1{}};
+            float v59;
+            v59 = body_0(v42, v34, v5, v43, v48, v44, v54, v58);
+            v56 = v59;
+            v55 += 1 ;
         }
-        printf("{%s = %f}\n","reward_for_pl0", v63);
+        printf("{%s = %f}\n","reward_for_pl0", v56);
         fflush(stdout);
         v0 += 1 ;
     }

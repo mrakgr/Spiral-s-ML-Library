@@ -275,8 +275,8 @@ inl main() =
         inl loop (config : config) (nearTo : int) =
             inl train_loop = train_loop config dict
             loop.for {from=0; nearTo} (fun (i : int) _ =>
-                if i % (max 1 (nearTo / 25)) = 0 then
-                    console.write_ln {i nearTo}
+                // if i % (max 1 (nearTo / 25)) = 0 then
+                //     console.write_ln {i nearTo}
                 train_loop ()
                 ) 0
         inl _ =
