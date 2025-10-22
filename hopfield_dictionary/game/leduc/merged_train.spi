@@ -281,9 +281,9 @@ inl main() =
     //     } 1_000
     inl _ = 
         loop {
-            is_chance_node_sampling = true
+            is_chance_node_sampling = false
             player_modes = [TrainSampling; TrainSampling] |> arraym.fromList
-        } 1_000_000
+        } 50_000
     inl reward_for_pl0 = 
         loop {
             is_chance_node_sampling = false
