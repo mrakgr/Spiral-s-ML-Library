@@ -20,27 +20,29 @@ struct Union5;
 struct Union4;
 struct StackMut1;
 struct Tuple4;
+unsigned int loop_2(unsigned int v0, xso::rng & v1);
+struct StackMut2;
+struct StackMut3;
+unsigned int find_nth_set_bit_3(int v0, unsigned int v1, unsigned int v2);
+Tuple4 draw_card_1(xso::rng & v0, unsigned int v1);
 struct Union6;
 struct Tuple5;
-float loop_1(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRefs1 & v3, StackMut0 & v4, StackRefs2 & v5, StackMut1 & v6, Union6 v7);
+float loop_4(bool v0, static_array<Union3,2> v1, StackRefs0 & v2, xso::rng & v3, StackRefs1 & v4, StackMut0 & v5, StackRefs2 & v6, StackMut1 & v7, Union6 v8);
+struct Tuple6;
 struct Union7;
 struct Union8;
-static_array<float,3> masking_normalize_2(static_array<float,3> v0, static_array<bool,3> v1);
-static_array<float,3> relu_4(static_array<float,3> v0);
-static_array<float,3> regret_match_3(static_array<float,3> v0, static_array<bool,3> v1);
-int loop_7(static_array<float,3> v0, float v1, int v2);
-int pick_discrete__6(static_array<float,3> v0, float v1);
-int sample_discrete__5(static_array<float,3> v0, xso::rng & v1);
+static_array<float,3> masking_normalize_5(static_array<float,3> v0, static_array<bool,3> v1);
+static_array<float,3> relu_7(static_array<float,3> v0);
+static_array<float,3> regret_match_6(static_array<float,3> v0, static_array<bool,3> v1);
+int loop_10(static_array<float,3> v0, float v1, int v2);
+int pick_discrete__9(static_array<float,3> v0, float v1);
+int sample_discrete__8(static_array<float,3> v0, xso::rng & v1);
 struct Union9;
-int tag_9(Union1 v0);
-bool is_pair_10(int v0, int v1);
-Tuple5 order_11(int v0, int v1);
-Union9 compare_hands_8(Union5 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
-float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRefs1 & v3, StackMut0 & v4, StackRefs2 & v5, Union4 v6);
-static_array<float,3> normalize_12(static_array<float,3> v0);
-void method_14(Union1 v0);
-void method_15(Union2 v0);
-void method_13(Union0 v0);
+int tag_12(Union1 v0);
+bool is_pair_13(int v0, int v1);
+Tuple5 order_14(int v0, int v1);
+Union9 compare_hands_11(Union5 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
+float body_0(bool v0, static_array<Union3,2> v1, StackRefs0 & v2, xso::rng & v3, StackRefs1 & v4, StackMut0 & v5, StackRefs2 & v6, Union4 v7);
 struct Union1_0 { // Jack
 };
 struct Union1_1 { // King
@@ -576,11 +578,20 @@ struct StackMut1 {
     __host__ __device__ StackMut1(float t0) : v0(t0) {}
 };
 struct Tuple4 {
-    int v0;
-    float v1;
-    float v2;
+    Union1 v0;
+    unsigned int v1;
     __host__ __device__ Tuple4() = default;
-    __host__ __device__ Tuple4(int t0, float t1, float t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ Tuple4(Union1 t0, unsigned int t1) : v0(t0), v1(t1) {}
+};
+struct StackMut2 {
+    int v0;
+    __host__ __device__ StackMut2() = default;
+    __host__ __device__ StackMut2(int t0) : v0(t0) {}
+};
+struct StackMut3 {
+    unsigned int v0;
+    __host__ __device__ StackMut3() = default;
+    __host__ __device__ StackMut3(unsigned int t0) : v0(t0) {}
 };
 struct Union6_0 { // T_game_chance_community_card
     Union5 v0;
@@ -684,6 +695,13 @@ struct Tuple5 {
     int v1;
     __host__ __device__ Tuple5() = default;
     __host__ __device__ Tuple5(int t0, int t1) : v0(t0), v1(t1) {}
+};
+struct Tuple6 {
+    int v0;
+    float v1;
+    float v2;
+    __host__ __device__ Tuple6() = default;
+    __host__ __device__ Tuple6(int t0, float t1, float t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union7_0 { // None
 };
@@ -873,12 +891,17 @@ struct Union9 {
         this->tag = 255;
     }
 };
-inline bool while_method_0(int v0, int v1){
+inline bool while_method_0(int v0){
+    bool v1;
+    v1 = v0 < 30;
+    return v1;
+}
+inline bool while_method_1(int v0, int v1){
     bool v2;
     v2 = v1 < v0;
     return v2;
 }
-inline bool while_method_1(int v0){
+inline bool while_method_2(int v0){
     bool v1;
     v1 = v0 < 2;
     return v1;
@@ -890,7 +913,7 @@ unsigned long long FunPointerMethod0(static_array_list<Union0,32> tup0){
     int v2; unsigned long long v3; unsigned long long v4;
     Tuple0 tmp0 = Tuple0{0, 0ull, 1ull};
     v2 = tmp0.v0; v3 = tmp0.v1; v4 = tmp0.v2;
-    while (while_method_0(v1, v2)){
+    while (while_method_1(v1, v2)){
         Union0 v7;
         v7 = v0[v2];
         unsigned long long v52;
@@ -1008,7 +1031,7 @@ unsigned long long FunPointerMethod0(static_array_list<Union0,32> tup0){
                 int v38; unsigned long long v39; unsigned long long v40;
                 Tuple0 tmp1 = Tuple0{0, 0ull, 1ull};
                 v38 = tmp1.v0; v39 = tmp1.v1; v40 = tmp1.v2;
-                while (while_method_1(v38)){
+                while (while_method_2(v38)){
                     Union1 v43;
                     v43 = v31[v38];
                     unsigned long long v45;
@@ -1081,7 +1104,7 @@ bool FunPointerMethod1(static_array_list<Union0,32> tup0, static_array_list<Unio
         v6 = v1.length;
         int v7;
         v7 = 0;
-        while (while_method_0(v6, v7)){
+        while (while_method_1(v6, v7)){
             Union0 v10;
             v10 = v0[v7];
             Union0 v13;
@@ -1173,7 +1196,7 @@ bool FunPointerMethod1(static_array_list<Union0,32> tup0, static_array_list<Unio
                     v38 = true;
                     int v39;
                     v39 = 0;
-                    while (while_method_1(v39)){
+                    while (while_method_2(v39)){
                         Union1 v42;
                         v42 = v32[v39];
                         Union1 v45;
@@ -1242,150 +1265,291 @@ bool FunPointerMethod1(static_array_list<Union0,32> tup0, static_array_list<Unio
         return false;
     }
 }
-inline bool while_method_2(int v0){
-    bool v1;
-    v1 = v0 < 100000;
-    return v1;
-}
 inline bool while_method_3(int v0){
     bool v1;
-    v1 = v0 < 6;
+    v1 = v0 < 1000000;
     return v1;
 }
-float loop_1(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRefs1 & v3, StackMut0 & v4, StackRefs2 & v5, StackMut1 & v6, Union6 v7){
-    switch (v7.tag) {
-        case 0: { // T_game_chance_community_card
-            Union5 v9 = v7.case0.v0; bool v10 = v7.case0.v1; static_array<Union1,2> v11 = v7.case0.v2; int v12 = v7.case0.v3; static_array<int,2> v13 = v7.case0.v4; int v14 = v7.case0.v5; Union1 v15 = v7.case0.v6;
-            int v16;
-            v16 = 2;
-            int v17; int v18;
-            Tuple5 tmp4 = Tuple5{0, 0};
-            v17 = tmp4.v0; v18 = tmp4.v1;
-            while (while_method_1(v17)){
-                int v21;
-                v21 = v13[v17];
-                bool v23;
-                v23 = v18 >= v21;
-                int v24;
-                if (v23){
-                    v24 = v18;
+unsigned int loop_2(unsigned int v0, xso::rng & v1){
+    unsigned int v2;
+    v2 = v1();
+    unsigned int v3;
+    v3 = v2 % v0;
+    unsigned int v4;
+    v4 = v2 - v3;
+    unsigned int v5;
+    v5 = 0u - v0;
+    bool v6;
+    v6 = v4 <= v5;
+    if (v6){
+        return v3;
+    } else {
+        return loop_2(v0, v1);
+    }
+}
+inline bool while_method_4(unsigned int v0, unsigned int v1){
+    bool v2;
+    v2 = v1 < v0;
+    return v2;
+}
+unsigned int find_nth_set_bit_3(int v0, unsigned int v1, unsigned int v2){
+    int v4;
+    v4 = (int)v1;
+    unsigned int v5;
+    v5 = v2 >> v4;
+    StackMut2 v6{0};
+    StackMut3 v7{4294967295u};
+    unsigned int v8;
+    v8 = 32u - v1;
+    unsigned int v9;
+    v9 = 0u;
+    while (while_method_4(v8, v9)){
+        int v11;
+        v11 = (int)v9;
+        unsigned int v12;
+        v12 = v5 >> v11;
+        unsigned int v13;
+        v13 = v12 & 1u;
+        bool v14;
+        v14 = v13 == 0u;
+        bool v15;
+        v15 = v14 != true;
+        if (v15){
+            int v16 = v6.v0;
+            int v17;
+            v17 = v16 + 1;
+            v6.v0 = v17;
+            bool v18;
+            v18 = v17 == v0;
+            if (v18){
+                unsigned int v19;
+                v19 = v1 + v9;
+                v7.v0 = v19;
+                break;
+            } else {
+            }
+        } else {
+        }
+        v9 += 1u ;
+    }
+    unsigned int v20 = v7.v0;
+    return v20;
+}
+Tuple4 draw_card_1(xso::rng & v0, unsigned int v1){
+    int v3;
+    v3 = __builtin_popcount(v1);
+    unsigned int v4;
+    v4 = (unsigned int)v3;
+    bool v5;
+    v5 = 0u < v4;
+    bool v6;
+    v6 = v5 == false;
+    if (v6){
+        assert("The range has to be greater than 0." && v5);
+    } else {
+    }
+    unsigned int v8;
+    v8 = loop_2(v4, v0);
+    int v9;
+    v9 = (int)v8;
+    int v11;
+    v11 = __builtin_popcount(v1);
+    bool v12;
+    v12 = v9 < v11;
+    unsigned int v18;
+    if (v12){
+        int v13;
+        v13 = v9 + 1;
+        unsigned int v14;
+        v14 = 0u;
+        v18 = find_nth_set_bit_3(v13, v14, v1);
+    } else {
+        int v16;
+        v16 = v9 - v11;
+        printf("%s\n", "Cannot find the n-th set bit.");
+        exit(-1);
+    }
+    bool v19;
+    v19 = 0u == v18;
+    Union1 v37;
+    if (v19){
+        v37 = Union1{Union1_1{}};
+    } else {
+        bool v21;
+        v21 = 1u == v18;
+        if (v21){
+            v37 = Union1{Union1_1{}};
+        } else {
+            bool v23;
+            v23 = 2u == v18;
+            if (v23){
+                v37 = Union1{Union1_2{}};
+            } else {
+                bool v25;
+                v25 = 3u == v18;
+                if (v25){
+                    v37 = Union1{Union1_2{}};
                 } else {
-                    v24 = v21;
+                    bool v27;
+                    v27 = 4u == v18;
+                    if (v27){
+                        v37 = Union1{Union1_0{}};
+                    } else {
+                        bool v29;
+                        v29 = 5u == v18;
+                        if (v29){
+                            v37 = Union1{Union1_0{}};
+                        } else {
+                            printf("%s\n", "Invalid int in int_to_card.");
+                            exit(-1);
+                        }
+                    }
                 }
-                v18 = v24;
-                v17 += 1 ;
             }
-            static_array<int,2> v26;
-            int v28;
-            v28 = 0;
-            while (while_method_1(v28)){
-                v26[v28] = v18;
-                v28 += 1 ;
+        }
+    }
+    int v38;
+    v38 = (int)v18;
+    unsigned int v39;
+    v39 = 1u << v38;
+    unsigned int v40;
+    v40 = v1 ^ v39;
+    return Tuple4{v37, v40};
+}
+float loop_4(bool v0, static_array<Union3,2> v1, StackRefs0 & v2, xso::rng & v3, StackRefs1 & v4, StackMut0 & v5, StackRefs2 & v6, StackMut1 & v7, Union6 v8){
+    switch (v8.tag) {
+        case 0: { // T_game_chance_community_card
+            Union5 v10 = v8.case0.v0; bool v11 = v8.case0.v1; static_array<Union1,2> v12 = v8.case0.v2; int v13 = v8.case0.v3; static_array<int,2> v14 = v8.case0.v4; int v15 = v8.case0.v5; Union1 v16 = v8.case0.v6;
+            int v17;
+            v17 = 2;
+            int v18; int v19;
+            Tuple5 tmp4 = Tuple5{0, 0};
+            v18 = tmp4.v0; v19 = tmp4.v1;
+            while (while_method_2(v18)){
+                int v22;
+                v22 = v14[v18];
+                bool v24;
+                v24 = v19 >= v22;
+                int v25;
+                if (v24){
+                    v25 = v19;
+                } else {
+                    v25 = v22;
+                }
+                v19 = v25;
+                v18 += 1 ;
             }
-            Union5 v30;
-            v30 = Union5{Union5_1{v15}};
-            bool v31;
-            v31 = true;
-            int v32;
-            v32 = 0;
-            Union4 v33;
-            v33 = Union4{Union4_2{v30, v31, v11, v32, v26, v16}};
-            return body_0(v0, v1, v2, v3, v4, v5, v33);
+            static_array<int,2> v27;
+            int v29;
+            v29 = 0;
+            while (while_method_2(v29)){
+                v27[v29] = v19;
+                v29 += 1 ;
+            }
+            Union5 v31;
+            v31 = Union5{Union5_1{v16}};
+            bool v32;
+            v32 = true;
+            int v33;
+            v33 = 0;
+            Union4 v34;
+            v34 = Union4{Union4_2{v31, v32, v12, v33, v27, v17}};
+            return body_0(v0, v1, v2, v3, v4, v5, v6, v34);
             break;
         }
         case 1: { // T_game_chance_init
-            Union1 v35 = v7.case1.v0; Union1 v36 = v7.case1.v1;
-            int v37;
-            v37 = 2;
-            static_array<int,2> v39;
-            v39[0] = 1;
-            v39[1] = 1;
-            static_array<Union1,2> v42;
-            v42[0] = v35;
-            v42[1] = v36;
-            Union5 v44;
-            v44 = Union5{Union5_0{}};
-            bool v45;
-            v45 = true;
-            int v46;
-            v46 = 0;
-            Union4 v47;
-            v47 = Union4{Union4_2{v44, v45, v42, v46, v39, v37}};
-            return body_0(v0, v1, v2, v3, v4, v5, v47);
+            Union1 v36 = v8.case1.v0; Union1 v37 = v8.case1.v1;
+            int v38;
+            v38 = 2;
+            static_array<int,2> v40;
+            v40[0] = 1;
+            v40[1] = 1;
+            static_array<Union1,2> v43;
+            v43[0] = v36;
+            v43[1] = v37;
+            Union5 v45;
+            v45 = Union5{Union5_0{}};
+            bool v46;
+            v46 = true;
+            int v47;
+            v47 = 0;
+            Union4 v48;
+            v48 = Union4{Union4_2{v45, v46, v43, v47, v40, v38}};
+            return body_0(v0, v1, v2, v3, v4, v5, v6, v48);
             break;
         }
         case 2: { // T_game_round
-            Union5 v49 = v7.case2.v0; bool v50 = v7.case2.v1; static_array<Union1,2> v51 = v7.case2.v2; int v52 = v7.case2.v3; static_array<int,2> v53 = v7.case2.v4; int v54 = v7.case2.v5; Union2 v55 = v7.case2.v6;
-            Union4 v147;
-            switch (v49.tag) {
+            Union5 v50 = v8.case2.v0; bool v51 = v8.case2.v1; static_array<Union1,2> v52 = v8.case2.v2; int v53 = v8.case2.v3; static_array<int,2> v54 = v8.case2.v4; int v55 = v8.case2.v5; Union2 v56 = v8.case2.v6;
+            Union4 v148;
+            switch (v50.tag) {
                 case 0: { // None
-                    switch (v55.tag) {
+                    switch (v56.tag) {
                         case 0: { // Call
-                            if (v50){
-                                int v109;
-                                v109 = v52 ^ 1;
-                                v147 = Union4{Union4_2{v49, false, v51, v109, v53, v54}};
+                            if (v51){
+                                int v110;
+                                v110 = v53 ^ 1;
+                                v148 = Union4{Union4_2{v50, false, v52, v110, v54, v55}};
                             } else {
-                                v147 = Union4{Union4_0{v49, v50, v51, v52, v53, v54}};
+                                v148 = Union4{Union4_0{v50, v51, v52, v53, v54, v55}};
                             }
                             break;
                         }
                         case 1: { // Fold
-                            v147 = Union4{Union4_5{v49, v50, v51, v52, v53, v54}};
+                            v148 = Union4{Union4_5{v50, v51, v52, v53, v54, v55}};
                             break;
                         }
                         case 2: { // Raise
-                            bool v113;
-                            v113 = v54 > 0;
-                            if (v113){
-                                int v114;
-                                v114 = v52 ^ 1;
+                            bool v114;
+                            v114 = v55 > 0;
+                            if (v114){
                                 int v115;
-                                v115 = -1 + v54;
-                                int v116; int v117;
+                                v115 = v53 ^ 1;
+                                int v116;
+                                v116 = -1 + v55;
+                                int v117; int v118;
                                 Tuple5 tmp5 = Tuple5{0, 0};
-                                v116 = tmp5.v0; v117 = tmp5.v1;
-                                while (while_method_1(v116)){
-                                    int v120;
-                                    v120 = v53[v116];
-                                    bool v122;
-                                    v122 = v117 >= v120;
-                                    int v123;
-                                    if (v122){
-                                        v123 = v117;
+                                v117 = tmp5.v0; v118 = tmp5.v1;
+                                while (while_method_2(v117)){
+                                    int v121;
+                                    v121 = v54[v117];
+                                    bool v123;
+                                    v123 = v118 >= v121;
+                                    int v124;
+                                    if (v123){
+                                        v124 = v118;
                                     } else {
-                                        v123 = v120;
+                                        v124 = v121;
                                     }
-                                    v117 = v123;
-                                    v116 += 1 ;
+                                    v118 = v124;
+                                    v117 += 1 ;
                                 }
-                                static_array<int,2> v125;
-                                int v127;
-                                v127 = 0;
-                                while (while_method_1(v127)){
-                                    v125[v127] = v117;
-                                    v127 += 1 ;
+                                static_array<int,2> v126;
+                                int v128;
+                                v128 = 0;
+                                while (while_method_2(v128)){
+                                    v126[v128] = v118;
+                                    v128 += 1 ;
                                 }
-                                static_array<int,2> v130;
-                                int v132;
-                                v132 = 0;
-                                while (while_method_1(v132)){
-                                    int v135;
-                                    v135 = v125[v132];
-                                    bool v137;
-                                    v137 = v132 == v52;
-                                    int v139;
-                                    if (v137){
-                                        int v138;
-                                        v138 = v135 + 2;
-                                        v139 = v138;
+                                static_array<int,2> v131;
+                                int v133;
+                                v133 = 0;
+                                while (while_method_2(v133)){
+                                    int v136;
+                                    v136 = v126[v133];
+                                    bool v138;
+                                    v138 = v133 == v53;
+                                    int v140;
+                                    if (v138){
+                                        int v139;
+                                        v139 = v136 + 2;
+                                        v140 = v139;
                                     } else {
-                                        v139 = v135;
+                                        v140 = v136;
                                     }
-                                    v130[v132] = v139;
-                                    v132 += 1 ;
+                                    v131[v133] = v140;
+                                    v133 += 1 ;
                                 }
-                                v147 = Union4{Union4_2{v49, false, v51, v114, v130, v115}};
+                                v148 = Union4{Union4_2{v50, false, v52, v115, v131, v116}};
                             } else {
                                 printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                 exit(-1);
@@ -1400,98 +1564,98 @@ float loop_1(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                     break;
                 }
                 case 1: { // Some
-                    Union1 v56 = v49.case1.v0;
-                    switch (v55.tag) {
+                    Union1 v57 = v50.case1.v0;
+                    switch (v56.tag) {
                         case 0: { // Call
-                            if (v50){
-                                int v58;
-                                v58 = v52 ^ 1;
-                                v147 = Union4{Union4_2{v49, false, v51, v58, v53, v54}};
+                            if (v51){
+                                int v59;
+                                v59 = v53 ^ 1;
+                                v148 = Union4{Union4_2{v50, false, v52, v59, v54, v55}};
                             } else {
-                                int v60; int v61;
+                                int v61; int v62;
                                 Tuple5 tmp6 = Tuple5{0, 0};
-                                v60 = tmp6.v0; v61 = tmp6.v1;
-                                while (while_method_1(v60)){
-                                    int v64;
-                                    v64 = v53[v60];
-                                    bool v66;
-                                    v66 = v61 >= v64;
-                                    int v67;
-                                    if (v66){
-                                        v67 = v61;
+                                v61 = tmp6.v0; v62 = tmp6.v1;
+                                while (while_method_2(v61)){
+                                    int v65;
+                                    v65 = v54[v61];
+                                    bool v67;
+                                    v67 = v62 >= v65;
+                                    int v68;
+                                    if (v67){
+                                        v68 = v62;
                                     } else {
-                                        v67 = v64;
+                                        v68 = v65;
                                     }
-                                    v61 = v67;
-                                    v60 += 1 ;
+                                    v62 = v68;
+                                    v61 += 1 ;
                                 }
-                                static_array<int,2> v69;
-                                int v71;
-                                v71 = 0;
-                                while (while_method_1(v71)){
-                                    v69[v71] = v61;
-                                    v71 += 1 ;
+                                static_array<int,2> v70;
+                                int v72;
+                                v72 = 0;
+                                while (while_method_2(v72)){
+                                    v70[v72] = v62;
+                                    v72 += 1 ;
                                 }
-                                v147 = Union4{Union4_4{v49, v50, v51, v52, v69, v54}};
+                                v148 = Union4{Union4_4{v50, v51, v52, v53, v70, v55}};
                             }
                             break;
                         }
                         case 1: { // Fold
-                            v147 = Union4{Union4_5{v49, v50, v51, v52, v53, v54}};
+                            v148 = Union4{Union4_5{v50, v51, v52, v53, v54, v55}};
                             break;
                         }
                         case 2: { // Raise
-                            bool v75;
-                            v75 = v54 > 0;
-                            if (v75){
-                                int v76;
-                                v76 = v52 ^ 1;
+                            bool v76;
+                            v76 = v55 > 0;
+                            if (v76){
                                 int v77;
-                                v77 = -1 + v54;
-                                int v78; int v79;
+                                v77 = v53 ^ 1;
+                                int v78;
+                                v78 = -1 + v55;
+                                int v79; int v80;
                                 Tuple5 tmp7 = Tuple5{0, 0};
-                                v78 = tmp7.v0; v79 = tmp7.v1;
-                                while (while_method_1(v78)){
-                                    int v82;
-                                    v82 = v53[v78];
-                                    bool v84;
-                                    v84 = v79 >= v82;
-                                    int v85;
-                                    if (v84){
-                                        v85 = v79;
+                                v79 = tmp7.v0; v80 = tmp7.v1;
+                                while (while_method_2(v79)){
+                                    int v83;
+                                    v83 = v54[v79];
+                                    bool v85;
+                                    v85 = v80 >= v83;
+                                    int v86;
+                                    if (v85){
+                                        v86 = v80;
                                     } else {
-                                        v85 = v82;
+                                        v86 = v83;
                                     }
-                                    v79 = v85;
-                                    v78 += 1 ;
+                                    v80 = v86;
+                                    v79 += 1 ;
                                 }
-                                static_array<int,2> v87;
-                                int v89;
-                                v89 = 0;
-                                while (while_method_1(v89)){
-                                    v87[v89] = v79;
-                                    v89 += 1 ;
+                                static_array<int,2> v88;
+                                int v90;
+                                v90 = 0;
+                                while (while_method_2(v90)){
+                                    v88[v90] = v80;
+                                    v90 += 1 ;
                                 }
-                                static_array<int,2> v92;
-                                int v94;
-                                v94 = 0;
-                                while (while_method_1(v94)){
-                                    int v97;
-                                    v97 = v87[v94];
-                                    bool v99;
-                                    v99 = v94 == v52;
-                                    int v101;
-                                    if (v99){
-                                        int v100;
-                                        v100 = v97 + 4;
-                                        v101 = v100;
+                                static_array<int,2> v93;
+                                int v95;
+                                v95 = 0;
+                                while (while_method_2(v95)){
+                                    int v98;
+                                    v98 = v88[v95];
+                                    bool v100;
+                                    v100 = v95 == v53;
+                                    int v102;
+                                    if (v100){
+                                        int v101;
+                                        v101 = v98 + 4;
+                                        v102 = v101;
                                     } else {
-                                        v101 = v97;
+                                        v102 = v98;
                                     }
-                                    v92[v94] = v101;
-                                    v94 += 1 ;
+                                    v93[v95] = v102;
+                                    v95 += 1 ;
                                 }
-                                v147 = Union4{Union4_2{v49, false, v51, v76, v92, v77}};
+                                v148 = Union4{Union4_2{v50, false, v52, v77, v93, v78}};
                             } else {
                                 printf("%s\n", "Invalid action. The number of raises left is not positive.");
                                 exit(-1);
@@ -1510,12 +1674,12 @@ float loop_1(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                     exit(-1);
                 }
             }
-            return body_0(v0, v1, v2, v3, v4, v5, v147);
+            return body_0(v0, v1, v2, v3, v4, v5, v6, v148);
             break;
         }
         case 3: { // T_none
-            float v8 = v6.v0;
-            return v8;
+            float v9 = v7.v0;
+            return v9;
             break;
         }
         default: {
@@ -1524,16 +1688,21 @@ float loop_1(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
         }
     }
 }
-inline bool while_method_4(int v0){
+inline bool while_method_5(int v0){
+    bool v1;
+    v1 = v0 < 6;
+    return v1;
+}
+inline bool while_method_6(int v0){
     bool v1;
     v1 = v0 < 3;
     return v1;
 }
-static_array<float,3> masking_normalize_2(static_array<float,3> v0, static_array<bool,3> v1){
+static_array<float,3> masking_normalize_5(static_array<float,3> v0, static_array<bool,3> v1){
     int v2; float v3;
-    Tuple3 tmp12 = Tuple3{0, 0.0f};
-    v2 = tmp12.v0; v3 = tmp12.v1;
-    while (while_method_4(v2)){
+    Tuple3 tmp15 = Tuple3{0, 0.0f};
+    v2 = tmp15.v0; v3 = tmp15.v1;
+    while (while_method_6(v2)){
         bool v6;
         v6 = v1[v2];
         float v8;
@@ -1552,7 +1721,7 @@ static_array<float,3> masking_normalize_2(static_array<float,3> v0, static_array
     static_array<float,3> v12;
     int v14;
     v14 = 0;
-    while (while_method_4(v14)){
+    while (while_method_6(v14)){
         float v17;
         v17 = v0[v14];
         bool v20;
@@ -1567,9 +1736,9 @@ static_array<float,3> masking_normalize_2(static_array<float,3> v0, static_array
         v14 += 1 ;
     }
     int v23; float v24;
-    Tuple3 tmp13 = Tuple3{0, 0.0f};
-    v23 = tmp13.v0; v24 = tmp13.v1;
-    while (while_method_4(v23)){
+    Tuple3 tmp16 = Tuple3{0, 0.0f};
+    v23 = tmp16.v0; v24 = tmp16.v1;
+    while (while_method_6(v23)){
         float v27;
         v27 = v12[v23];
         float v29;
@@ -1580,7 +1749,7 @@ static_array<float,3> masking_normalize_2(static_array<float,3> v0, static_array
     static_array<float,3> v31;
     int v33;
     v33 = 0;
-    while (while_method_4(v33)){
+    while (while_method_6(v33)){
         float v36;
         v36 = v12[v33];
         bool v39;
@@ -1608,11 +1777,11 @@ static_array<float,3> masking_normalize_2(static_array<float,3> v0, static_array
     }
     return v31;
 }
-static_array<float,3> relu_4(static_array<float,3> v0){
+static_array<float,3> relu_7(static_array<float,3> v0){
     static_array<float,3> v2;
     int v4;
     v4 = 0;
-    while (while_method_4(v4)){
+    while (while_method_6(v4)){
         float v7;
         v7 = v0[v4];
         bool v9;
@@ -1628,22 +1797,22 @@ static_array<float,3> relu_4(static_array<float,3> v0){
     }
     return v2;
 }
-static_array<float,3> regret_match_3(static_array<float,3> v0, static_array<bool,3> v1){
+static_array<float,3> regret_match_6(static_array<float,3> v0, static_array<bool,3> v1){
     static_array<float,3> v2;
-    v2 = relu_4(v0);
-    return masking_normalize_2(v2, v1);
+    v2 = relu_7(v0);
+    return masking_normalize_5(v2, v1);
 }
-inline bool while_method_5(static_array<float,3> v0, int v1){
+inline bool while_method_7(static_array<float,3> v0, int v1){
     bool v2;
     v2 = v1 < 3;
     return v2;
 }
-inline bool while_method_6(int v0, int v1){
+inline bool while_method_8(int v0, int v1){
     bool v2;
     v2 = v1 > v0;
     return v2;
 }
-int loop_7(static_array<float,3> v0, float v1, int v2){
+int loop_10(static_array<float,3> v0, float v1, int v2){
     bool v3;
     v3 = v2 < 3;
     if (v3){
@@ -1656,17 +1825,17 @@ int loop_7(static_array<float,3> v0, float v1, int v2){
         } else {
             int v8;
             v8 = v2 + 1;
-            return loop_7(v0, v1, v8);
+            return loop_10(v0, v1, v8);
         }
     } else {
         return 2;
     }
 }
-int pick_discrete__6(static_array<float,3> v0, float v1){
+int pick_discrete__9(static_array<float,3> v0, float v1){
     static_array<float,3> v3;
     int v5;
     v5 = 0;
-    while (while_method_4(v5)){
+    while (while_method_6(v5)){
         float v8;
         v8 = v0[v5];
         v3[v5] = v8;
@@ -1674,10 +1843,10 @@ int pick_discrete__6(static_array<float,3> v0, float v1){
     }
     int v10;
     v10 = 1;
-    while (while_method_5(v3, v10)){
+    while (while_method_7(v3, v10)){
         int v12;
         v12 = 3;
-        while (while_method_6(v10, v12)){
+        while (while_method_8(v10, v12)){
             v12 -= 1 ;
             int v14;
             v14 = v12 - v10;
@@ -1699,15 +1868,15 @@ int pick_discrete__6(static_array<float,3> v0, float v1){
     v26 = v1 * v24;
     int v27;
     v27 = 0;
-    return loop_7(v3, v26, v27);
+    return loop_10(v3, v26, v27);
 }
-int sample_discrete__5(static_array<float,3> v0, xso::rng & v1){
+int sample_discrete__8(static_array<float,3> v0, xso::rng & v1){
     std::uniform_real_distribution<float> v2(0.0, 1.0);
     float v3;
     v3 = v2(v1);
-    return pick_discrete__6(v0, v3);
+    return pick_discrete__9(v0, v3);
 }
-int tag_9(Union1 v0){
+int tag_12(Union1 v0){
     switch (v0.tag) {
         case 0: { // Jack
             return 0;
@@ -1727,12 +1896,12 @@ int tag_9(Union1 v0){
         }
     }
 }
-bool is_pair_10(int v0, int v1){
+bool is_pair_13(int v0, int v1){
     bool v2;
     v2 = v1 == v0;
     return v2;
 }
-Tuple5 order_11(int v0, int v1){
+Tuple5 order_14(int v0, int v1){
     bool v2;
     v2 = v1 > v0;
     if (v2){
@@ -1741,7 +1910,7 @@ Tuple5 order_11(int v0, int v1){
         return Tuple5{v0, v1};
     }
 }
-Union9 compare_hands_8(Union5 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5){
+Union9 compare_hands_11(Union5 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5){
     switch (v0.tag) {
         case 0: { // None
             printf("%s\n", "Expected the community card to be present in the table.");
@@ -1751,19 +1920,19 @@ Union9 compare_hands_8(Union5 v0, bool v1, static_array<Union1,2> v2, int v3, st
         case 1: { // Some
             Union1 v7 = v0.case1.v0;
             int v8;
-            v8 = tag_9(v7);
+            v8 = tag_12(v7);
             Union1 v10;
             v10 = v2[0];
             int v12;
-            v12 = tag_9(v10);
+            v12 = tag_12(v10);
             Union1 v14;
             v14 = v2[1];
             int v16;
-            v16 = tag_9(v14);
+            v16 = tag_12(v14);
             bool v17;
-            v17 = is_pair_10(v8, v12);
+            v17 = is_pair_13(v8, v12);
             bool v18;
-            v18 = is_pair_10(v8, v16);
+            v18 = is_pair_13(v8, v16);
             if (v17){
                 if (v18){
                     bool v19;
@@ -1787,11 +1956,11 @@ Union9 compare_hands_8(Union5 v0, bool v1, static_array<Union1,2> v2, int v3, st
                     return Union9{Union9_2{}};
                 } else {
                     int v29; int v30;
-                    Tuple5 tmp39 = order_11(v8, v12);
-                    v29 = tmp39.v0; v30 = tmp39.v1;
+                    Tuple5 tmp37 = order_14(v8, v12);
+                    v29 = tmp37.v0; v30 = tmp37.v1;
                     int v31; int v32;
-                    Tuple5 tmp40 = order_11(v8, v16);
-                    v31 = tmp40.v0; v32 = tmp40.v1;
+                    Tuple5 tmp38 = order_14(v8, v16);
+                    v31 = tmp38.v0; v32 = tmp38.v1;
                     bool v33;
                     v33 = v29 < v31;
                     Union9 v39;
@@ -1843,410 +2012,465 @@ Union9 compare_hands_8(Union5 v0, bool v1, static_array<Union1,2> v2, int v3, st
         }
     }
 }
-float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRefs1 & v3, StackMut0 & v4, StackRefs2 & v5, Union4 v6){
-    StackMut1 v7{0.0f};
-    switch (v6.tag) {
+float body_0(bool v0, static_array<Union3,2> v1, StackRefs0 & v2, xso::rng & v3, StackRefs1 & v4, StackMut0 & v5, StackRefs2 & v6, Union4 v7){
+    StackMut1 v8{0.0f};
+    switch (v7.tag) {
         case 0: { // ChanceCommunityCard
-            Union5 v718 = v6.case0.v0; bool v719 = v6.case0.v1; static_array<Union1,2> v720 = v6.case0.v2; int v721 = v6.case0.v3; static_array<int,2> v722 = v6.case0.v4; int v723 = v6.case0.v5;
-            int v724; float v725; float v726;
-            Tuple4 tmp3 = Tuple4{0, 0.0f, 0.0f};
-            v724 = tmp3.v0; v725 = tmp3.v1; v726 = tmp3.v2;
-            while (while_method_3(v724)){
-                unsigned int v728 = v4.v0;
-                unsigned int v729;
-                v729 = 1u << v724;
-                unsigned int v730;
-                v730 = v728 & v729;
-                bool v731;
-                v731 = v730 == 0u;
-                bool v732;
-                v732 = v731 != true;
-                float v764; float v765;
-                if (v732){
-                    unsigned int v733 = v4.v0;
-                    unsigned int v734;
-                    v734 = v733 ^ v729;
-                    v4.v0 = v734;
-                    bool v735;
-                    v735 = 0 == v724;
-                    Union1 v753;
-                    if (v735){
-                        v753 = Union1{Union1_1{}};
-                    } else {
-                        bool v737;
-                        v737 = 1 == v724;
-                        if (v737){
-                            v753 = Union1{Union1_1{}};
-                        } else {
-                            bool v739;
-                            v739 = 2 == v724;
-                            if (v739){
-                                v753 = Union1{Union1_2{}};
-                            } else {
-                                bool v741;
-                                v741 = 3 == v724;
-                                if (v741){
-                                    v753 = Union1{Union1_2{}};
-                                } else {
-                                    bool v743;
-                                    v743 = 4 == v724;
-                                    if (v743){
-                                        v753 = Union1{Union1_0{}};
-                                    } else {
-                                        bool v745;
-                                        v745 = 5 == v724;
-                                        if (v745){
-                                            v753 = Union1{Union1_0{}};
-                                        } else {
-                                            printf("%s\n", "Invalid int in int_to_card.");
-                                            exit(-1);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    static_array_list<Union0,32> & v754 = v3.v0;
-                    Union0 v755;
-                    v755 = Union0{Union0_0{v753}};
-                    v754.push(v755);
-                    Union6 v756;
-                    v756 = Union6{Union6_0{v718, v719, v720, v721, v722, v723, v753}};
-                    float v757;
-                    v757 = loop_1(v0, v1, v2, v3, v4, v5, v7, v756);
-                    static_array_list<Union0,32> & v758 = v3.v0;
-                    Union0 v759;
-                    v759 = v758.pop();
-                    unsigned int v760 = v4.v0;
-                    unsigned int v761;
-                    v761 = v760 ^ v729;
-                    v4.v0 = v761;
-                    float v762;
-                    v762 = v725 + v757;
-                    float v763;
-                    v763 = v726 + 1.0f;
-                    v764 = v762; v765 = v763;
-                } else {
-                    v764 = v725; v765 = v726;
-                }
-                v725 = v764;
-                v726 = v765;
-                v724 += 1 ;
-            }
-            bool v766;
-            v766 = v726 == 0.0f;
-            bool v767;
-            v767 = v766 != true;
-            if (v767){
-                float v768;
-                v768 = v725 / v726;
-                return v768;
+            Union5 v669 = v7.case0.v0; bool v670 = v7.case0.v1; static_array<Union1,2> v671 = v7.case0.v2; int v672 = v7.case0.v3; static_array<int,2> v673 = v7.case0.v4; int v674 = v7.case0.v5;
+            if (v0){
+                unsigned int v675 = v5.v0;
+                Union1 v676; unsigned int v677;
+                Tuple4 tmp3 = draw_card_1(v3, v675);
+                v676 = tmp3.v0; v677 = tmp3.v1;
+                v5.v0 = v677;
+                static_array_list<Union0,32> & v678 = v4.v0;
+                Union0 v679;
+                v679 = Union0{Union0_0{v676}};
+                v678.push(v679);
+                Union6 v680;
+                v680 = Union6{Union6_0{v669, v670, v671, v672, v673, v674, v676}};
+                float v681;
+                v681 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v680);
+                static_array_list<Union0,32> & v682 = v4.v0;
+                Union0 v683;
+                v683 = v682.pop();
+                v5.v0 = v675;
+                return v681;
             } else {
-                return 0.0f;
-            }
-            break;
-        }
-        case 1: { // ChanceInit
-            int v770; float v771; float v772;
-            Tuple4 tmp8 = Tuple4{0, 0.0f, 0.0f};
-            v770 = tmp8.v0; v771 = tmp8.v1; v772 = tmp8.v2;
-            while (while_method_3(v770)){
-                unsigned int v774 = v4.v0;
-                unsigned int v775;
-                v775 = 1u << v770;
-                unsigned int v776;
-                v776 = v774 & v775;
-                bool v777;
-                v777 = v776 == 0u;
-                bool v778;
-                v778 = v777 != true;
-                float v854; float v855;
-                if (v778){
-                    unsigned int v779 = v4.v0;
-                    unsigned int v780;
-                    v780 = v779 ^ v775;
-                    v4.v0 = v780;
-                    bool v781;
-                    v781 = 0 == v770;
-                    Union1 v799;
-                    if (v781){
-                        v799 = Union1{Union1_1{}};
-                    } else {
-                        bool v783;
-                        v783 = 1 == v770;
-                        if (v783){
-                            v799 = Union1{Union1_1{}};
+                int v684; float v685; float v686;
+                Tuple6 tmp8 = Tuple6{0, 0.0f, 0.0f};
+                v684 = tmp8.v0; v685 = tmp8.v1; v686 = tmp8.v2;
+                while (while_method_5(v684)){
+                    unsigned int v688 = v5.v0;
+                    unsigned int v689;
+                    v689 = 1u << v684;
+                    unsigned int v690;
+                    v690 = v688 & v689;
+                    bool v691;
+                    v691 = v690 == 0u;
+                    bool v692;
+                    v692 = v691 != true;
+                    float v724; float v725;
+                    if (v692){
+                        unsigned int v693 = v5.v0;
+                        unsigned int v694;
+                        v694 = v693 ^ v689;
+                        v5.v0 = v694;
+                        bool v695;
+                        v695 = 0 == v684;
+                        Union1 v713;
+                        if (v695){
+                            v713 = Union1{Union1_1{}};
                         } else {
-                            bool v785;
-                            v785 = 2 == v770;
-                            if (v785){
-                                v799 = Union1{Union1_2{}};
+                            bool v697;
+                            v697 = 1 == v684;
+                            if (v697){
+                                v713 = Union1{Union1_1{}};
                             } else {
-                                bool v787;
-                                v787 = 3 == v770;
-                                if (v787){
-                                    v799 = Union1{Union1_2{}};
+                                bool v699;
+                                v699 = 2 == v684;
+                                if (v699){
+                                    v713 = Union1{Union1_2{}};
                                 } else {
-                                    bool v789;
-                                    v789 = 4 == v770;
-                                    if (v789){
-                                        v799 = Union1{Union1_0{}};
+                                    bool v701;
+                                    v701 = 3 == v684;
+                                    if (v701){
+                                        v713 = Union1{Union1_2{}};
                                     } else {
-                                        bool v791;
-                                        v791 = 5 == v770;
-                                        if (v791){
-                                            v799 = Union1{Union1_0{}};
+                                        bool v703;
+                                        v703 = 4 == v684;
+                                        if (v703){
+                                            v713 = Union1{Union1_0{}};
                                         } else {
-                                            printf("%s\n", "Invalid int in int_to_card.");
-                                            exit(-1);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    int v800; float v801; float v802;
-                    Tuple4 tmp9 = Tuple4{0, 0.0f, 0.0f};
-                    v800 = tmp9.v0; v801 = tmp9.v1; v802 = tmp9.v2;
-                    while (while_method_3(v800)){
-                        unsigned int v804 = v4.v0;
-                        unsigned int v805;
-                        v805 = 1u << v800;
-                        unsigned int v806;
-                        v806 = v804 & v805;
-                        bool v807;
-                        v807 = v806 == 0u;
-                        bool v808;
-                        v808 = v807 != true;
-                        float v844; float v845;
-                        if (v808){
-                            unsigned int v809 = v4.v0;
-                            unsigned int v810;
-                            v810 = v809 ^ v805;
-                            v4.v0 = v810;
-                            bool v811;
-                            v811 = 0 == v800;
-                            Union1 v829;
-                            if (v811){
-                                v829 = Union1{Union1_1{}};
-                            } else {
-                                bool v813;
-                                v813 = 1 == v800;
-                                if (v813){
-                                    v829 = Union1{Union1_1{}};
-                                } else {
-                                    bool v815;
-                                    v815 = 2 == v800;
-                                    if (v815){
-                                        v829 = Union1{Union1_2{}};
-                                    } else {
-                                        bool v817;
-                                        v817 = 3 == v800;
-                                        if (v817){
-                                            v829 = Union1{Union1_2{}};
-                                        } else {
-                                            bool v819;
-                                            v819 = 4 == v800;
-                                            if (v819){
-                                                v829 = Union1{Union1_0{}};
+                                            bool v705;
+                                            v705 = 5 == v684;
+                                            if (v705){
+                                                v713 = Union1{Union1_0{}};
                                             } else {
-                                                bool v821;
-                                                v821 = 5 == v800;
-                                                if (v821){
-                                                    v829 = Union1{Union1_0{}};
-                                                } else {
-                                                    printf("%s\n", "Invalid int in int_to_card.");
-                                                    exit(-1);
-                                                }
+                                                printf("%s\n", "Invalid int in int_to_card.");
+                                                exit(-1);
                                             }
                                         }
                                     }
                                 }
                             }
-                            static_array_list<Union0,32> & v830 = v3.v0;
-                            Union0 v831;
-                            v831 = Union0{Union0_2{0, v799}};
-                            v830.push(v831);
-                            static_array_list<Union0,32> & v832 = v3.v0;
-                            Union0 v833;
-                            v833 = Union0{Union0_2{1, v829}};
-                            v832.push(v833);
-                            Union6 v834;
-                            v834 = Union6{Union6_1{v799, v829}};
-                            float v835;
-                            v835 = loop_1(v0, v1, v2, v3, v4, v5, v7, v834);
-                            static_array_list<Union0,32> & v836 = v3.v0;
-                            Union0 v837;
-                            v837 = v836.pop();
-                            static_array_list<Union0,32> & v838 = v3.v0;
-                            Union0 v839;
-                            v839 = v838.pop();
-                            unsigned int v840 = v4.v0;
-                            unsigned int v841;
-                            v841 = v840 ^ v805;
-                            v4.v0 = v841;
-                            float v842;
-                            v842 = v801 + v835;
-                            float v843;
-                            v843 = v802 + 1.0f;
-                            v844 = v842; v845 = v843;
-                        } else {
-                            v844 = v801; v845 = v802;
                         }
-                        v801 = v844;
-                        v802 = v845;
-                        v800 += 1 ;
-                    }
-                    bool v846;
-                    v846 = v802 == 0.0f;
-                    bool v847;
-                    v847 = v846 != true;
-                    float v849;
-                    if (v847){
-                        float v848;
-                        v848 = v801 / v802;
-                        v849 = v848;
+                        static_array_list<Union0,32> & v714 = v4.v0;
+                        Union0 v715;
+                        v715 = Union0{Union0_0{v713}};
+                        v714.push(v715);
+                        Union6 v716;
+                        v716 = Union6{Union6_0{v669, v670, v671, v672, v673, v674, v713}};
+                        float v717;
+                        v717 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v716);
+                        static_array_list<Union0,32> & v718 = v4.v0;
+                        Union0 v719;
+                        v719 = v718.pop();
+                        unsigned int v720 = v5.v0;
+                        unsigned int v721;
+                        v721 = v720 ^ v689;
+                        v5.v0 = v721;
+                        float v722;
+                        v722 = v685 + v717;
+                        float v723;
+                        v723 = v686 + 1.0f;
+                        v724 = v722; v725 = v723;
                     } else {
-                        v849 = 0.0f;
+                        v724 = v685; v725 = v686;
                     }
-                    unsigned int v850 = v4.v0;
-                    unsigned int v851;
-                    v851 = v850 ^ v775;
-                    v4.v0 = v851;
-                    float v852;
-                    v852 = v771 + v849;
-                    float v853;
-                    v853 = v772 + 1.0f;
-                    v854 = v852; v855 = v853;
-                } else {
-                    v854 = v771; v855 = v772;
+                    v685 = v724;
+                    v686 = v725;
+                    v684 += 1 ;
                 }
-                v771 = v854;
-                v772 = v855;
-                v770 += 1 ;
+                bool v726;
+                v726 = v686 == 0.0f;
+                bool v727;
+                v727 = v726 != true;
+                if (v727){
+                    float v728;
+                    v728 = v685 / v686;
+                    return v728;
+                } else {
+                    return 0.0f;
+                }
             }
-            bool v856;
-            v856 = v772 == 0.0f;
-            bool v857;
-            v857 = v856 != true;
-            if (v857){
-                float v858;
-                v858 = v771 / v772;
-                return v858;
+            break;
+        }
+        case 1: { // ChanceInit
+            if (v0){
+                unsigned int v731 = v5.v0;
+                Union1 v732; unsigned int v733;
+                Tuple4 tmp9 = draw_card_1(v3, v731);
+                v732 = tmp9.v0; v733 = tmp9.v1;
+                v5.v0 = v733;
+                unsigned int v734 = v5.v0;
+                Union1 v735; unsigned int v736;
+                Tuple4 tmp10 = draw_card_1(v3, v734);
+                v735 = tmp10.v0; v736 = tmp10.v1;
+                v5.v0 = v736;
+                static_array_list<Union0,32> & v737 = v4.v0;
+                Union0 v738;
+                v738 = Union0{Union0_2{0, v732}};
+                v737.push(v738);
+                static_array_list<Union0,32> & v739 = v4.v0;
+                Union0 v740;
+                v740 = Union0{Union0_2{1, v735}};
+                v739.push(v740);
+                Union6 v741;
+                v741 = Union6{Union6_1{v732, v735}};
+                float v742;
+                v742 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v741);
+                static_array_list<Union0,32> & v743 = v4.v0;
+                Union0 v744;
+                v744 = v743.pop();
+                static_array_list<Union0,32> & v745 = v4.v0;
+                Union0 v746;
+                v746 = v745.pop();
+                v5.v0 = v734;
+                v5.v0 = v731;
+                return v742;
             } else {
-                return 0.0f;
+                int v747; float v748; float v749;
+                Tuple6 tmp11 = Tuple6{0, 0.0f, 0.0f};
+                v747 = tmp11.v0; v748 = tmp11.v1; v749 = tmp11.v2;
+                while (while_method_5(v747)){
+                    unsigned int v751 = v5.v0;
+                    unsigned int v752;
+                    v752 = 1u << v747;
+                    unsigned int v753;
+                    v753 = v751 & v752;
+                    bool v754;
+                    v754 = v753 == 0u;
+                    bool v755;
+                    v755 = v754 != true;
+                    float v831; float v832;
+                    if (v755){
+                        unsigned int v756 = v5.v0;
+                        unsigned int v757;
+                        v757 = v756 ^ v752;
+                        v5.v0 = v757;
+                        bool v758;
+                        v758 = 0 == v747;
+                        Union1 v776;
+                        if (v758){
+                            v776 = Union1{Union1_1{}};
+                        } else {
+                            bool v760;
+                            v760 = 1 == v747;
+                            if (v760){
+                                v776 = Union1{Union1_1{}};
+                            } else {
+                                bool v762;
+                                v762 = 2 == v747;
+                                if (v762){
+                                    v776 = Union1{Union1_2{}};
+                                } else {
+                                    bool v764;
+                                    v764 = 3 == v747;
+                                    if (v764){
+                                        v776 = Union1{Union1_2{}};
+                                    } else {
+                                        bool v766;
+                                        v766 = 4 == v747;
+                                        if (v766){
+                                            v776 = Union1{Union1_0{}};
+                                        } else {
+                                            bool v768;
+                                            v768 = 5 == v747;
+                                            if (v768){
+                                                v776 = Union1{Union1_0{}};
+                                            } else {
+                                                printf("%s\n", "Invalid int in int_to_card.");
+                                                exit(-1);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        int v777; float v778; float v779;
+                        Tuple6 tmp12 = Tuple6{0, 0.0f, 0.0f};
+                        v777 = tmp12.v0; v778 = tmp12.v1; v779 = tmp12.v2;
+                        while (while_method_5(v777)){
+                            unsigned int v781 = v5.v0;
+                            unsigned int v782;
+                            v782 = 1u << v777;
+                            unsigned int v783;
+                            v783 = v781 & v782;
+                            bool v784;
+                            v784 = v783 == 0u;
+                            bool v785;
+                            v785 = v784 != true;
+                            float v821; float v822;
+                            if (v785){
+                                unsigned int v786 = v5.v0;
+                                unsigned int v787;
+                                v787 = v786 ^ v782;
+                                v5.v0 = v787;
+                                bool v788;
+                                v788 = 0 == v777;
+                                Union1 v806;
+                                if (v788){
+                                    v806 = Union1{Union1_1{}};
+                                } else {
+                                    bool v790;
+                                    v790 = 1 == v777;
+                                    if (v790){
+                                        v806 = Union1{Union1_1{}};
+                                    } else {
+                                        bool v792;
+                                        v792 = 2 == v777;
+                                        if (v792){
+                                            v806 = Union1{Union1_2{}};
+                                        } else {
+                                            bool v794;
+                                            v794 = 3 == v777;
+                                            if (v794){
+                                                v806 = Union1{Union1_2{}};
+                                            } else {
+                                                bool v796;
+                                                v796 = 4 == v777;
+                                                if (v796){
+                                                    v806 = Union1{Union1_0{}};
+                                                } else {
+                                                    bool v798;
+                                                    v798 = 5 == v777;
+                                                    if (v798){
+                                                        v806 = Union1{Union1_0{}};
+                                                    } else {
+                                                        printf("%s\n", "Invalid int in int_to_card.");
+                                                        exit(-1);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                static_array_list<Union0,32> & v807 = v4.v0;
+                                Union0 v808;
+                                v808 = Union0{Union0_2{0, v776}};
+                                v807.push(v808);
+                                static_array_list<Union0,32> & v809 = v4.v0;
+                                Union0 v810;
+                                v810 = Union0{Union0_2{1, v806}};
+                                v809.push(v810);
+                                Union6 v811;
+                                v811 = Union6{Union6_1{v776, v806}};
+                                float v812;
+                                v812 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v811);
+                                static_array_list<Union0,32> & v813 = v4.v0;
+                                Union0 v814;
+                                v814 = v813.pop();
+                                static_array_list<Union0,32> & v815 = v4.v0;
+                                Union0 v816;
+                                v816 = v815.pop();
+                                unsigned int v817 = v5.v0;
+                                unsigned int v818;
+                                v818 = v817 ^ v782;
+                                v5.v0 = v818;
+                                float v819;
+                                v819 = v778 + v812;
+                                float v820;
+                                v820 = v779 + 1.0f;
+                                v821 = v819; v822 = v820;
+                            } else {
+                                v821 = v778; v822 = v779;
+                            }
+                            v778 = v821;
+                            v779 = v822;
+                            v777 += 1 ;
+                        }
+                        bool v823;
+                        v823 = v779 == 0.0f;
+                        bool v824;
+                        v824 = v823 != true;
+                        float v826;
+                        if (v824){
+                            float v825;
+                            v825 = v778 / v779;
+                            v826 = v825;
+                        } else {
+                            v826 = 0.0f;
+                        }
+                        unsigned int v827 = v5.v0;
+                        unsigned int v828;
+                        v828 = v827 ^ v752;
+                        v5.v0 = v828;
+                        float v829;
+                        v829 = v748 + v826;
+                        float v830;
+                        v830 = v749 + 1.0f;
+                        v831 = v829; v832 = v830;
+                    } else {
+                        v831 = v748; v832 = v749;
+                    }
+                    v748 = v831;
+                    v749 = v832;
+                    v747 += 1 ;
+                }
+                bool v833;
+                v833 = v749 == 0.0f;
+                bool v834;
+                v834 = v833 != true;
+                if (v834){
+                    float v835;
+                    v835 = v748 / v749;
+                    return v835;
+                } else {
+                    return 0.0f;
+                }
             }
             break;
         }
         case 2: { // Round
-            Union5 v58 = v6.case2.v0; bool v59 = v6.case2.v1; static_array<Union1,2> v60 = v6.case2.v2; int v61 = v6.case2.v3; static_array<int,2> v62 = v6.case2.v4; int v63 = v6.case2.v5;
-            static_array_list<Union0,32> & v64 = v3.v0;
-            int v65;
-            v65 = v64.length;
-            bool v66;
-            v66 = 32 >= v65;
+            Union5 v59 = v7.case2.v0; bool v60 = v7.case2.v1; static_array<Union1,2> v61 = v7.case2.v2; int v62 = v7.case2.v3; static_array<int,2> v63 = v7.case2.v4; int v64 = v7.case2.v5;
+            static_array_list<Union0,32> & v65 = v4.v0;
+            int v66;
+            v66 = v65.length;
             bool v67;
-            v67 = v66 == false;
-            if (v67){
-                assert("The type level dimension has to equal the value passed at runtime into create." && v66);
+            v67 = 32 >= v66;
+            bool v68;
+            v68 = v67 == false;
+            if (v68){
+                assert("The type level dimension has to equal the value passed at runtime into create." && v67);
             } else {
             }
-            static_array_list<Union0,32> v70;
-            v70 = static_array_list<Union0,32>{};
-            v70.unsafe_set_length(v65);
-            int v72; int v73;
-            Tuple5 tmp10 = Tuple5{0, 0};
-            v72 = tmp10.v0; v73 = tmp10.v1;
-            while (while_method_0(v65, v72)){
-                Union0 v76;
-                v76 = v64[v72];
-                bool v81;
-                switch (v76.tag) {
+            static_array_list<Union0,32> v71;
+            v71 = static_array_list<Union0,32>{};
+            v71.unsafe_set_length(v66);
+            int v73; int v74;
+            Tuple5 tmp13 = Tuple5{0, 0};
+            v73 = tmp13.v0; v74 = tmp13.v1;
+            while (while_method_1(v66, v73)){
+                Union0 v77;
+                v77 = v65[v73];
+                bool v82;
+                switch (v77.tag) {
                     case 2: { // PlayerGotCard
-                        int v78 = v76.case2.v0; Union1 v79 = v76.case2.v1;
-                        bool v80;
-                        v80 = v78 == v61;
-                        v81 = v80;
+                        int v79 = v77.case2.v0; Union1 v80 = v77.case2.v1;
+                        bool v81;
+                        v81 = v79 == v62;
+                        v82 = v81;
                         break;
                     }
                     default: {
-                        v81 = true;
+                        v82 = true;
                     }
                 }
-                int v83;
-                if (v81){
-                    v70[v73] = v76;
-                    int v82;
-                    v82 = v73 + 1;
-                    v83 = v82;
+                int v84;
+                if (v82){
+                    v71[v74] = v77;
+                    int v83;
+                    v83 = v74 + 1;
+                    v84 = v83;
                 } else {
-                    v83 = v73;
+                    v84 = v74;
                 }
-                v73 = v83;
-                v72 += 1 ;
+                v74 = v84;
+                v73 += 1 ;
             }
-            bool v84;
-            v84 = 32 >= v73;
             bool v85;
-            v85 = v84 == false;
-            if (v85){
-                assert("The type level dimension has to equal the value passed at runtime into create." && v84);
+            v85 = 32 >= v74;
+            bool v86;
+            v86 = v85 == false;
+            if (v86){
+                assert("The type level dimension has to equal the value passed at runtime into create." && v85);
             } else {
             }
-            static_array_list<Union0,32> v88;
-            v88 = static_array_list<Union0,32>{};
-            v88.unsafe_set_length(v73);
-            int v90;
-            v90 = 0;
-            while (while_method_0(v73, v90)){
-                Union0 v93;
-                v93 = v70[v90];
-                v88[v90] = v93;
-                v90 += 1 ;
+            static_array_list<Union0,32> v89;
+            v89 = static_array_list<Union0,32>{};
+            v89.unsafe_set_length(v74);
+            int v91;
+            v91 = 0;
+            while (while_method_1(v74, v91)){
+                Union0 v94;
+                v94 = v71[v91];
+                v89[v91] = v94;
+                v91 += 1 ;
             }
-            std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v95 = v1.v0;
-            auto v96 = v95.find(v88);
-            bool v97;
-            v97 = v96 != v95.end();
-            Union7 v103;
-            if (v97){
-                static_array<float,3> v98; static_array<float,3> v99; static_array<Tuple2,3> v100;
-                Tuple1 tmp11 = v96->second;
-                v98 = tmp11.v0; v99 = tmp11.v1; v100 = tmp11.v2;
-                v103 = Union7{Union7_1{v98, v99, v100}};
+            std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v96 = v2.v0;
+            auto v97 = v96.find(v89);
+            bool v98;
+            v98 = v97 != v96.end();
+            Union7 v104;
+            if (v98){
+                static_array<float,3> v99; static_array<float,3> v100; static_array<Tuple2,3> v101;
+                Tuple1 tmp14 = v97->second;
+                v99 = tmp14.v0; v100 = tmp14.v1; v101 = tmp14.v2;
+                v104 = Union7{Union7_1{v99, v100, v101}};
             } else {
-                v103 = Union7{Union7_0{}};
+                v104 = Union7{Union7_0{}};
             }
-            static_array<float,3> v125; static_array<float,3> v126; static_array<Tuple2,3> v127;
-            switch (v103.tag) {
+            static_array<float,3> v126; static_array<float,3> v127; static_array<Tuple2,3> v128;
+            switch (v104.tag) {
                 case 0: { // None
-                    static_array<float,3> v108;
-                    int v110;
-                    v110 = 0;
-                    while (while_method_4(v110)){
-                        v108[v110] = 0.0f;
-                        v110 += 1 ;
+                    static_array<float,3> v109;
+                    int v111;
+                    v111 = 0;
+                    while (while_method_6(v111)){
+                        v109[v111] = 0.0f;
+                        v111 += 1 ;
                     }
-                    static_array<float,3> v113;
-                    int v115;
-                    v115 = 0;
-                    while (while_method_4(v115)){
-                        v113[v115] = 0.0f;
-                        v115 += 1 ;
+                    static_array<float,3> v114;
+                    int v116;
+                    v116 = 0;
+                    while (while_method_6(v116)){
+                        v114[v116] = 0.0f;
+                        v116 += 1 ;
                     }
-                    static_array<Tuple2,3> v118;
-                    int v120;
-                    v120 = 0;
-                    while (while_method_4(v120)){
-                        v118[v120] = Tuple2{0.0f, 0.0f};
-                        v120 += 1 ;
+                    static_array<Tuple2,3> v119;
+                    int v121;
+                    v121 = 0;
+                    while (while_method_6(v121)){
+                        v119[v121] = Tuple2{0.0f, 0.0f};
+                        v121 += 1 ;
                     }
-                    v125 = v108; v126 = v113; v127 = v118;
+                    v126 = v109; v127 = v114; v128 = v119;
                     break;
                 }
                 case 1: { // Some
-                    static_array<float,3> v104 = v103.case1.v0; static_array<float,3> v105 = v103.case1.v1; static_array<Tuple2,3> v106 = v103.case1.v2;
-                    v125 = v104; v126 = v105; v127 = v106;
+                    static_array<float,3> v105 = v104.case1.v0; static_array<float,3> v106 = v104.case1.v1; static_array<Tuple2,3> v107 = v104.case1.v2;
+                    v126 = v105; v127 = v106; v128 = v107;
                     break;
                 }
                 default: {
@@ -2254,41 +2478,41 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                     exit(-1);
                 }
             }
-            int v129;
-            v129 = v62[0];
-            int v132;
-            v132 = v62[1];
-            bool v134;
-            v134 = v129 == v132;
+            int v130;
+            v130 = v63[0];
+            int v133;
+            v133 = v63[1];
             bool v135;
-            v135 = v134 != true;
-            Union8 v139;
-            if (v135){
-                Union2 v136;
-                v136 = Union2{Union2_1{}};
-                v139 = Union8{Union8_1{v136}};
+            v135 = v130 == v133;
+            bool v136;
+            v136 = v135 != true;
+            Union8 v140;
+            if (v136){
+                Union2 v137;
+                v137 = Union2{Union2_1{}};
+                v140 = Union8{Union8_1{v137}};
             } else {
-                v139 = Union8{Union8_0{}};
+                v140 = Union8{Union8_0{}};
             }
-            bool v140;
-            v140 = v63 > 0;
-            Union8 v144;
-            if (v140){
-                Union2 v141;
-                v141 = Union2{Union2_2{}};
-                v144 = Union8{Union8_1{v141}};
+            bool v141;
+            v141 = v64 > 0;
+            Union8 v145;
+            if (v141){
+                Union2 v142;
+                v142 = Union2{Union2_2{}};
+                v145 = Union8{Union8_1{v142}};
             } else {
-                v144 = Union8{Union8_0{}};
+                v145 = Union8{Union8_0{}};
             }
-            bool v147;
-            switch (v144.tag) {
+            bool v148;
+            switch (v145.tag) {
                 case 0: { // None
-                    v147 = false;
+                    v148 = false;
                     break;
                 }
                 case 1: { // Some
-                    Union2 v145 = v144.case1.v0;
-                    v147 = true;
+                    Union2 v146 = v145.case1.v0;
+                    v148 = true;
                     break;
                 }
                 default: {
@@ -2296,15 +2520,15 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                     exit(-1);
                 }
             }
-            bool v150;
-            switch (v139.tag) {
+            bool v151;
+            switch (v140.tag) {
                 case 0: { // None
-                    v150 = false;
+                    v151 = false;
                     break;
                 }
                 case 1: { // Some
-                    Union2 v148 = v139.case1.v0;
-                    v150 = true;
+                    Union2 v149 = v140.case1.v0;
+                    v151 = true;
                     break;
                 }
                 default: {
@@ -2312,58 +2536,58 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                     exit(-1);
                 }
             }
-            static_array<bool,3> v152;
-            v152[0] = true;
-            v152[1] = v150;
-            v152[2] = v147;
-            Union3 v155;
-            v155 = v0[v61];
-            float v699;
-            switch (v155.tag) {
+            static_array<bool,3> v153;
+            v153[0] = true;
+            v153[1] = v151;
+            v153[2] = v148;
+            Union3 v156;
+            v156 = v1[v62];
+            float v650;
+            switch (v156.tag) {
                 case 0: { // Frozen
-                    static_array<float,3> v597;
-                    v597 = masking_normalize_2(v125, v152);
-                    float v623;
-                    switch (v144.tag) {
+                    static_array<float,3> v548;
+                    v548 = masking_normalize_5(v126, v153);
+                    float v574;
+                    switch (v145.tag) {
                         case 0: { // None
-                            v623 = 0.0f;
+                            v574 = 0.0f;
                             break;
                         }
                         case 1: { // Some
-                            Union2 v598 = v144.case1.v0;
-                            float v600;
-                            v600 = v597[2];
-                            static_array<Tuple2,2> & v602 = v5.v0;
-                            float v605; float v606;
-                            Tuple2 tmp14 = v602[v61];
-                            v605 = tmp14.v0; v606 = tmp14.v1;
-                            static_array<Tuple2,2> & v609 = v5.v0;
-                            float v610;
-                            v610 = log(v600);
-                            float v611;
-                            v611 = v610 + v605;
-                            v609[v61] = Tuple2{v611, v606};
-                            static_array_list<Union0,32> & v612 = v3.v0;
-                            Union0 v613;
-                            v613 = Union0{Union0_1{v61, v598}};
-                            v612.push(v613);
-                            Union6 v614;
-                            v614 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v598}};
-                            float v615;
-                            v615 = loop_1(v0, v1, v2, v3, v4, v5, v7, v614);
-                            static_array_list<Union0,32> & v616 = v3.v0;
-                            Union0 v617;
-                            v617 = v616.pop();
-                            static_array<Tuple2,2> & v618 = v5.v0;
-                            v618[v61] = Tuple2{v605, v606};
-                            bool v619;
-                            v619 = v61 == 0;
-                            if (v619){
-                                v623 = v615;
+                            Union2 v549 = v145.case1.v0;
+                            float v551;
+                            v551 = v548[2];
+                            static_array<Tuple2,2> & v553 = v6.v0;
+                            float v556; float v557;
+                            Tuple2 tmp17 = v553[v62];
+                            v556 = tmp17.v0; v557 = tmp17.v1;
+                            static_array<Tuple2,2> & v560 = v6.v0;
+                            float v561;
+                            v561 = log(v551);
+                            float v562;
+                            v562 = v561 + v556;
+                            v560[v62] = Tuple2{v562, v557};
+                            static_array_list<Union0,32> & v563 = v4.v0;
+                            Union0 v564;
+                            v564 = Union0{Union0_1{v62, v549}};
+                            v563.push(v564);
+                            Union6 v565;
+                            v565 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v549}};
+                            float v566;
+                            v566 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v565);
+                            static_array_list<Union0,32> & v567 = v4.v0;
+                            Union0 v568;
+                            v568 = v567.pop();
+                            static_array<Tuple2,2> & v569 = v6.v0;
+                            v569[v62] = Tuple2{v556, v557};
+                            bool v570;
+                            v570 = v62 == 0;
+                            if (v570){
+                                v574 = v566;
                             } else {
-                                float v620;
-                                v620 = -v615;
-                                v623 = v620;
+                                float v571;
+                                v571 = -v566;
+                                v574 = v571;
                             }
                             break;
                         }
@@ -2372,47 +2596,47 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                             exit(-1);
                         }
                     }
-                    float v649;
-                    switch (v139.tag) {
+                    float v600;
+                    switch (v140.tag) {
                         case 0: { // None
-                            v649 = 0.0f;
+                            v600 = 0.0f;
                             break;
                         }
                         case 1: { // Some
-                            Union2 v624 = v139.case1.v0;
-                            float v626;
-                            v626 = v597[1];
-                            static_array<Tuple2,2> & v628 = v5.v0;
-                            float v631; float v632;
-                            Tuple2 tmp15 = v628[v61];
-                            v631 = tmp15.v0; v632 = tmp15.v1;
-                            static_array<Tuple2,2> & v635 = v5.v0;
-                            float v636;
-                            v636 = log(v626);
-                            float v637;
-                            v637 = v636 + v631;
-                            v635[v61] = Tuple2{v637, v632};
-                            static_array_list<Union0,32> & v638 = v3.v0;
-                            Union0 v639;
-                            v639 = Union0{Union0_1{v61, v624}};
-                            v638.push(v639);
-                            Union6 v640;
-                            v640 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v624}};
-                            float v641;
-                            v641 = loop_1(v0, v1, v2, v3, v4, v5, v7, v640);
-                            static_array_list<Union0,32> & v642 = v3.v0;
-                            Union0 v643;
-                            v643 = v642.pop();
-                            static_array<Tuple2,2> & v644 = v5.v0;
-                            v644[v61] = Tuple2{v631, v632};
-                            bool v645;
-                            v645 = v61 == 0;
-                            if (v645){
-                                v649 = v641;
+                            Union2 v575 = v140.case1.v0;
+                            float v577;
+                            v577 = v548[1];
+                            static_array<Tuple2,2> & v579 = v6.v0;
+                            float v582; float v583;
+                            Tuple2 tmp18 = v579[v62];
+                            v582 = tmp18.v0; v583 = tmp18.v1;
+                            static_array<Tuple2,2> & v586 = v6.v0;
+                            float v587;
+                            v587 = log(v577);
+                            float v588;
+                            v588 = v587 + v582;
+                            v586[v62] = Tuple2{v588, v583};
+                            static_array_list<Union0,32> & v589 = v4.v0;
+                            Union0 v590;
+                            v590 = Union0{Union0_1{v62, v575}};
+                            v589.push(v590);
+                            Union6 v591;
+                            v591 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v575}};
+                            float v592;
+                            v592 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v591);
+                            static_array_list<Union0,32> & v593 = v4.v0;
+                            Union0 v594;
+                            v594 = v593.pop();
+                            static_array<Tuple2,2> & v595 = v6.v0;
+                            v595[v62] = Tuple2{v582, v583};
+                            bool v596;
+                            v596 = v62 == 0;
+                            if (v596){
+                                v600 = v592;
                             } else {
-                                float v646;
-                                v646 = -v641;
-                                v649 = v646;
+                                float v597;
+                                v597 = -v592;
+                                v600 = v597;
                             }
                             break;
                         }
@@ -2421,120 +2645,120 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                             exit(-1);
                         }
                     }
-                    float v651;
-                    v651 = v597[0];
-                    static_array<Tuple2,2> & v653 = v5.v0;
-                    float v656; float v657;
-                    Tuple2 tmp16 = v653[v61];
-                    v656 = tmp16.v0; v657 = tmp16.v1;
-                    static_array<Tuple2,2> & v660 = v5.v0;
-                    float v661;
-                    v661 = log(v651);
-                    float v662;
-                    v662 = v661 + v656;
-                    v660[v61] = Tuple2{v662, v657};
-                    static_array_list<Union0,32> & v663 = v3.v0;
-                    Union2 v664;
-                    v664 = Union2{Union2_0{}};
-                    Union0 v665;
-                    v665 = Union0{Union0_1{v61, v664}};
-                    v663.push(v665);
-                    Union2 v666;
-                    v666 = Union2{Union2_0{}};
-                    Union6 v667;
-                    v667 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v666}};
-                    float v668;
-                    v668 = loop_1(v0, v1, v2, v3, v4, v5, v7, v667);
-                    static_array_list<Union0,32> & v669 = v3.v0;
-                    Union0 v670;
-                    v670 = v669.pop();
-                    static_array<Tuple2,2> & v671 = v5.v0;
-                    v671[v61] = Tuple2{v656, v657};
-                    bool v672;
-                    v672 = v61 == 0;
-                    float v674;
-                    if (v672){
-                        v674 = v668;
+                    float v602;
+                    v602 = v548[0];
+                    static_array<Tuple2,2> & v604 = v6.v0;
+                    float v607; float v608;
+                    Tuple2 tmp19 = v604[v62];
+                    v607 = tmp19.v0; v608 = tmp19.v1;
+                    static_array<Tuple2,2> & v611 = v6.v0;
+                    float v612;
+                    v612 = log(v602);
+                    float v613;
+                    v613 = v612 + v607;
+                    v611[v62] = Tuple2{v613, v608};
+                    static_array_list<Union0,32> & v614 = v4.v0;
+                    Union2 v615;
+                    v615 = Union2{Union2_0{}};
+                    Union0 v616;
+                    v616 = Union0{Union0_1{v62, v615}};
+                    v614.push(v616);
+                    Union2 v617;
+                    v617 = Union2{Union2_0{}};
+                    Union6 v618;
+                    v618 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v617}};
+                    float v619;
+                    v619 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v618);
+                    static_array_list<Union0,32> & v620 = v4.v0;
+                    Union0 v621;
+                    v621 = v620.pop();
+                    static_array<Tuple2,2> & v622 = v6.v0;
+                    v622[v62] = Tuple2{v607, v608};
+                    bool v623;
+                    v623 = v62 == 0;
+                    float v625;
+                    if (v623){
+                        v625 = v619;
                     } else {
-                        float v673;
-                        v673 = -v668;
-                        v674 = v673;
+                        float v624;
+                        v624 = -v619;
+                        v625 = v624;
                     }
-                    static_array<float,3> v676;
-                    v676[0] = v674;
-                    v676[1] = v649;
-                    v676[2] = v623;
-                    static_array<float,3> v679;
-                    int v681;
-                    v681 = 0;
-                    while (while_method_4(v681)){
-                        float v684;
-                        v684 = v676[v681];
-                        float v687;
-                        v687 = v597[v681];
-                        float v689;
-                        v689 = v684 * v687;
-                        v679[v681] = v689;
-                        v681 += 1 ;
+                    static_array<float,3> v627;
+                    v627[0] = v625;
+                    v627[1] = v600;
+                    v627[2] = v574;
+                    static_array<float,3> v630;
+                    int v632;
+                    v632 = 0;
+                    while (while_method_6(v632)){
+                        float v635;
+                        v635 = v627[v632];
+                        float v638;
+                        v638 = v548[v632];
+                        float v640;
+                        v640 = v635 * v638;
+                        v630[v632] = v640;
+                        v632 += 1 ;
                     }
-                    int v690; float v691;
-                    Tuple3 tmp17 = Tuple3{0, 0.0f};
-                    v690 = tmp17.v0; v691 = tmp17.v1;
-                    while (while_method_4(v690)){
-                        float v694;
-                        v694 = v679[v690];
-                        float v696;
-                        v696 = v691 + v694;
-                        v691 = v696;
-                        v690 += 1 ;
+                    int v641; float v642;
+                    Tuple3 tmp20 = Tuple3{0, 0.0f};
+                    v641 = tmp20.v0; v642 = tmp20.v1;
+                    while (while_method_6(v641)){
+                        float v645;
+                        v645 = v630[v641];
+                        float v647;
+                        v647 = v642 + v645;
+                        v642 = v647;
+                        v641 += 1 ;
                     }
-                    v699 = v691;
+                    v650 = v642;
                     break;
                 }
                 case 1: { // TrainEnumerative
-                    static_array<float,3> v157;
-                    v157 = regret_match_3(v126, v152);
-                    float v183;
-                    switch (v144.tag) {
+                    static_array<float,3> v158;
+                    v158 = regret_match_6(v127, v153);
+                    float v184;
+                    switch (v145.tag) {
                         case 0: { // None
-                            v183 = 0.0f;
+                            v184 = 0.0f;
                             break;
                         }
                         case 1: { // Some
-                            Union2 v158 = v144.case1.v0;
-                            float v160;
-                            v160 = v157[2];
-                            static_array<Tuple2,2> & v162 = v5.v0;
-                            float v165; float v166;
-                            Tuple2 tmp18 = v162[v61];
-                            v165 = tmp18.v0; v166 = tmp18.v1;
-                            static_array<Tuple2,2> & v169 = v5.v0;
-                            float v170;
-                            v170 = log(v160);
+                            Union2 v159 = v145.case1.v0;
+                            float v161;
+                            v161 = v158[2];
+                            static_array<Tuple2,2> & v163 = v6.v0;
+                            float v166; float v167;
+                            Tuple2 tmp21 = v163[v62];
+                            v166 = tmp21.v0; v167 = tmp21.v1;
+                            static_array<Tuple2,2> & v170 = v6.v0;
                             float v171;
-                            v171 = v170 + v165;
-                            v169[v61] = Tuple2{v171, v166};
-                            static_array_list<Union0,32> & v172 = v3.v0;
-                            Union0 v173;
-                            v173 = Union0{Union0_1{v61, v158}};
-                            v172.push(v173);
-                            Union6 v174;
-                            v174 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v158}};
-                            float v175;
-                            v175 = loop_1(v0, v1, v2, v3, v4, v5, v7, v174);
-                            static_array_list<Union0,32> & v176 = v3.v0;
-                            Union0 v177;
-                            v177 = v176.pop();
-                            static_array<Tuple2,2> & v178 = v5.v0;
-                            v178[v61] = Tuple2{v165, v166};
-                            bool v179;
-                            v179 = v61 == 0;
-                            if (v179){
-                                v183 = v175;
+                            v171 = log(v161);
+                            float v172;
+                            v172 = v171 + v166;
+                            v170[v62] = Tuple2{v172, v167};
+                            static_array_list<Union0,32> & v173 = v4.v0;
+                            Union0 v174;
+                            v174 = Union0{Union0_1{v62, v159}};
+                            v173.push(v174);
+                            Union6 v175;
+                            v175 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v159}};
+                            float v176;
+                            v176 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v175);
+                            static_array_list<Union0,32> & v177 = v4.v0;
+                            Union0 v178;
+                            v178 = v177.pop();
+                            static_array<Tuple2,2> & v179 = v6.v0;
+                            v179[v62] = Tuple2{v166, v167};
+                            bool v180;
+                            v180 = v62 == 0;
+                            if (v180){
+                                v184 = v176;
                             } else {
-                                float v180;
-                                v180 = -v175;
-                                v183 = v180;
+                                float v181;
+                                v181 = -v176;
+                                v184 = v181;
                             }
                             break;
                         }
@@ -2543,47 +2767,47 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                             exit(-1);
                         }
                     }
-                    float v209;
-                    switch (v139.tag) {
+                    float v210;
+                    switch (v140.tag) {
                         case 0: { // None
-                            v209 = 0.0f;
+                            v210 = 0.0f;
                             break;
                         }
                         case 1: { // Some
-                            Union2 v184 = v139.case1.v0;
-                            float v186;
-                            v186 = v157[1];
-                            static_array<Tuple2,2> & v188 = v5.v0;
-                            float v191; float v192;
-                            Tuple2 tmp19 = v188[v61];
-                            v191 = tmp19.v0; v192 = tmp19.v1;
-                            static_array<Tuple2,2> & v195 = v5.v0;
-                            float v196;
-                            v196 = log(v186);
+                            Union2 v185 = v140.case1.v0;
+                            float v187;
+                            v187 = v158[1];
+                            static_array<Tuple2,2> & v189 = v6.v0;
+                            float v192; float v193;
+                            Tuple2 tmp22 = v189[v62];
+                            v192 = tmp22.v0; v193 = tmp22.v1;
+                            static_array<Tuple2,2> & v196 = v6.v0;
                             float v197;
-                            v197 = v196 + v191;
-                            v195[v61] = Tuple2{v197, v192};
-                            static_array_list<Union0,32> & v198 = v3.v0;
-                            Union0 v199;
-                            v199 = Union0{Union0_1{v61, v184}};
-                            v198.push(v199);
-                            Union6 v200;
-                            v200 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v184}};
-                            float v201;
-                            v201 = loop_1(v0, v1, v2, v3, v4, v5, v7, v200);
-                            static_array_list<Union0,32> & v202 = v3.v0;
-                            Union0 v203;
-                            v203 = v202.pop();
-                            static_array<Tuple2,2> & v204 = v5.v0;
-                            v204[v61] = Tuple2{v191, v192};
-                            bool v205;
-                            v205 = v61 == 0;
-                            if (v205){
-                                v209 = v201;
+                            v197 = log(v187);
+                            float v198;
+                            v198 = v197 + v192;
+                            v196[v62] = Tuple2{v198, v193};
+                            static_array_list<Union0,32> & v199 = v4.v0;
+                            Union0 v200;
+                            v200 = Union0{Union0_1{v62, v185}};
+                            v199.push(v200);
+                            Union6 v201;
+                            v201 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v185}};
+                            float v202;
+                            v202 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v201);
+                            static_array_list<Union0,32> & v203 = v4.v0;
+                            Union0 v204;
+                            v204 = v203.pop();
+                            static_array<Tuple2,2> & v205 = v6.v0;
+                            v205[v62] = Tuple2{v192, v193};
+                            bool v206;
+                            v206 = v62 == 0;
+                            if (v206){
+                                v210 = v202;
                             } else {
-                                float v206;
-                                v206 = -v201;
-                                v209 = v206;
+                                float v207;
+                                v207 = -v202;
+                                v210 = v207;
                             }
                             break;
                         }
@@ -2592,597 +2816,532 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                             exit(-1);
                         }
                     }
-                    float v211;
-                    v211 = v157[0];
-                    static_array<Tuple2,2> & v213 = v5.v0;
-                    float v216; float v217;
-                    Tuple2 tmp20 = v213[v61];
-                    v216 = tmp20.v0; v217 = tmp20.v1;
-                    static_array<Tuple2,2> & v220 = v5.v0;
-                    float v221;
-                    v221 = log(v211);
+                    float v212;
+                    v212 = v158[0];
+                    static_array<Tuple2,2> & v214 = v6.v0;
+                    float v217; float v218;
+                    Tuple2 tmp23 = v214[v62];
+                    v217 = tmp23.v0; v218 = tmp23.v1;
+                    static_array<Tuple2,2> & v221 = v6.v0;
                     float v222;
-                    v222 = v221 + v216;
-                    v220[v61] = Tuple2{v222, v217};
-                    static_array_list<Union0,32> & v223 = v3.v0;
-                    Union2 v224;
-                    v224 = Union2{Union2_0{}};
-                    Union0 v225;
-                    v225 = Union0{Union0_1{v61, v224}};
-                    v223.push(v225);
-                    Union2 v226;
-                    v226 = Union2{Union2_0{}};
-                    Union6 v227;
-                    v227 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v226}};
-                    float v228;
-                    v228 = loop_1(v0, v1, v2, v3, v4, v5, v7, v227);
-                    static_array_list<Union0,32> & v229 = v3.v0;
-                    Union0 v230;
-                    v230 = v229.pop();
-                    static_array<Tuple2,2> & v231 = v5.v0;
-                    v231[v61] = Tuple2{v216, v217};
-                    bool v232;
-                    v232 = v61 == 0;
-                    float v234;
-                    if (v232){
-                        v234 = v228;
+                    v222 = log(v212);
+                    float v223;
+                    v223 = v222 + v217;
+                    v221[v62] = Tuple2{v223, v218};
+                    static_array_list<Union0,32> & v224 = v4.v0;
+                    Union2 v225;
+                    v225 = Union2{Union2_0{}};
+                    Union0 v226;
+                    v226 = Union0{Union0_1{v62, v225}};
+                    v224.push(v226);
+                    Union2 v227;
+                    v227 = Union2{Union2_0{}};
+                    Union6 v228;
+                    v228 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v227}};
+                    float v229;
+                    v229 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v228);
+                    static_array_list<Union0,32> & v230 = v4.v0;
+                    Union0 v231;
+                    v231 = v230.pop();
+                    static_array<Tuple2,2> & v232 = v6.v0;
+                    v232[v62] = Tuple2{v217, v218};
+                    bool v233;
+                    v233 = v62 == 0;
+                    float v235;
+                    if (v233){
+                        v235 = v229;
                     } else {
-                        float v233;
-                        v233 = -v228;
-                        v234 = v233;
+                        float v234;
+                        v234 = -v229;
+                        v235 = v234;
                     }
-                    static_array<float,3> v236;
-                    v236[0] = v234;
-                    v236[1] = v209;
-                    v236[2] = v183;
-                    static_array<float,3> v239;
-                    int v241;
-                    v241 = 0;
-                    while (while_method_4(v241)){
-                        float v244;
-                        v244 = v236[v241];
-                        float v247;
-                        v247 = v157[v241];
-                        float v249;
-                        v249 = v244 * v247;
-                        v239[v241] = v249;
-                        v241 += 1 ;
+                    static_array<float,3> v237;
+                    v237[0] = v235;
+                    v237[1] = v210;
+                    v237[2] = v184;
+                    static_array<float,3> v240;
+                    int v242;
+                    v242 = 0;
+                    while (while_method_6(v242)){
+                        float v245;
+                        v245 = v237[v242];
+                        float v248;
+                        v248 = v158[v242];
+                        float v250;
+                        v250 = v245 * v248;
+                        v240[v242] = v250;
+                        v242 += 1 ;
                     }
-                    int v250; float v251;
-                    Tuple3 tmp21 = Tuple3{0, 0.0f};
-                    v250 = tmp21.v0; v251 = tmp21.v1;
-                    while (while_method_4(v250)){
-                        float v254;
-                        v254 = v239[v250];
-                        float v256;
-                        v256 = v251 + v254;
-                        v251 = v256;
-                        v250 += 1 ;
+                    int v251; float v252;
+                    Tuple3 tmp24 = Tuple3{0, 0.0f};
+                    v251 = tmp24.v0; v252 = tmp24.v1;
+                    while (while_method_6(v251)){
+                        float v255;
+                        v255 = v240[v251];
+                        float v257;
+                        v257 = v252 + v255;
+                        v252 = v257;
+                        v251 += 1 ;
                     }
-                    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v257 = v1.v0;
-                    static_array<float,3> v259;
-                    int v261;
-                    v261 = 0;
-                    while (while_method_4(v261)){
-                        float v264;
-                        v264 = v125[v261];
-                        float v267;
-                        v267 = v157[v261];
-                        float v269;
-                        v269 = 0.99609375f * v264;
+                    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v258 = v2.v0;
+                    static_array<float,3> v260;
+                    int v262;
+                    v262 = 0;
+                    while (while_method_6(v262)){
+                        float v265;
+                        v265 = v126[v262];
+                        float v268;
+                        v268 = v158[v262];
                         float v270;
-                        v270 = v269 + v267;
-                        v259[v261] = v270;
-                        v261 += 1 ;
+                        v270 = 0.99609375f * v265;
+                        float v271;
+                        v271 = v270 + v268;
+                        v260[v262] = v271;
+                        v262 += 1 ;
                     }
-                    static_array<Tuple2,2> & v271 = v5.v0;
-                    int v272; float v273;
-                    Tuple3 tmp22 = Tuple3{0, 0.0f};
-                    v272 = tmp22.v0; v273 = tmp22.v1;
-                    while (while_method_1(v272)){
-                        float v277; float v278;
-                        Tuple2 tmp23 = v271[v272];
-                        v277 = tmp23.v0; v278 = tmp23.v1;
-                        bool v281;
-                        v281 = v272 == v61;
-                        float v282;
-                        if (v281){
-                            v282 = 0.0f;
-                        } else {
-                            v282 = v277;
-                        }
+                    static_array<Tuple2,2> & v272 = v6.v0;
+                    int v273; float v274;
+                    Tuple3 tmp25 = Tuple3{0, 0.0f};
+                    v273 = tmp25.v0; v274 = tmp25.v1;
+                    while (while_method_2(v273)){
+                        float v278; float v279;
+                        Tuple2 tmp26 = v272[v273];
+                        v278 = tmp26.v0; v279 = tmp26.v1;
+                        bool v282;
+                        v282 = v273 == v62;
                         float v283;
-                        v283 = v273 + v282;
-                        float v284;
-                        v284 = v283 - v278;
-                        v273 = v284;
-                        v272 += 1 ;
-                    }
-                    float v285;
-                    v285 = exp(v273);
-                    static_array<float,3> v287;
-                    int v289;
-                    v289 = 0;
-                    while (while_method_4(v289)){
-                        float v292;
-                        v292 = v126[v289];
-                        float v295;
-                        v295 = v236[v289];
-                        float v297;
-                        v297 = v295 - v251;
-                        float v298;
-                        v298 = v285 * v297;
-                        float v299;
-                        v299 = v292 + v298;
-                        bool v300;
-                        v300 = 0.0f >= v299;
-                        float v301;
-                        if (v300){
-                            v301 = 0.0f;
+                        if (v282){
+                            v283 = 0.0f;
                         } else {
-                            v301 = v299;
+                            v283 = v278;
                         }
-                        v287[v289] = v301;
-                        v289 += 1 ;
+                        float v284;
+                        v284 = v274 + v283;
+                        float v285;
+                        v285 = v284 - v279;
+                        v274 = v285;
+                        v273 += 1 ;
                     }
-                    v257[v88] = Tuple1{v259, v287, v127};
-                    v699 = v251;
+                    float v286;
+                    v286 = exp(v274);
+                    static_array<float,3> v288;
+                    int v290;
+                    v290 = 0;
+                    while (while_method_6(v290)){
+                        float v293;
+                        v293 = v127[v290];
+                        float v296;
+                        v296 = v237[v290];
+                        float v298;
+                        v298 = v296 - v252;
+                        float v299;
+                        v299 = v286 * v298;
+                        float v300;
+                        v300 = v293 + v299;
+                        bool v301;
+                        v301 = 0.0f >= v300;
+                        float v302;
+                        if (v301){
+                            v302 = 0.0f;
+                        } else {
+                            v302 = v300;
+                        }
+                        v288[v290] = v302;
+                        v290 += 1 ;
+                    }
+                    v258[v89] = Tuple1{v260, v288, v128};
+                    v650 = v252;
                     break;
                 }
                 case 2: { // TrainSampling
-                    static_array<float,3> v302;
-                    v302 = regret_match_3(v126, v152);
                     static_array<float,3> v303;
-                    v303 = masking_normalize_2(v125, v152);
-                    static_array<float,3> v305;
-                    int v307;
-                    v307 = 0;
-                    while (while_method_4(v307)){
-                        v305[v307] = 0.0f;
-                        v307 += 1 ;
+                    v303 = regret_match_6(v127, v153);
+                    static_array<float,3> v304;
+                    v304 = masking_normalize_5(v126, v153);
+                    static_array<float,3> v306;
+                    int v308;
+                    v308 = 0;
+                    while (while_method_6(v308)){
+                        v306[v308] = 0.0f;
+                        v308 += 1 ;
                     }
-                    static_array<float,3> v309;
-                    v309 = masking_normalize_2(v305, v152);
-                    static_array<float,3> v311;
-                    int v313;
-                    v313 = 0;
-                    while (while_method_4(v313)){
-                        float v316;
-                        v316 = v303[v313];
-                        float v319;
-                        v319 = v309[v313];
-                        float v321;
-                        v321 = 0.875f * v316;
+                    static_array<float,3> v310;
+                    v310 = masking_normalize_5(v306, v153);
+                    static_array<float,3> v312;
+                    int v314;
+                    v314 = 0;
+                    while (while_method_6(v314)){
+                        float v317;
+                        v317 = v304[v314];
+                        float v320;
+                        v320 = v310[v314];
                         float v322;
-                        v322 = 0.125f * v319;
+                        v322 = 0.875f * v317;
                         float v323;
-                        v323 = v321 + v322;
-                        v311[v313] = v323;
-                        v313 += 1 ;
+                        v323 = 0.125f * v320;
+                        float v324;
+                        v324 = v322 + v323;
+                        v312[v314] = v324;
+                        v314 += 1 ;
                     }
-                    int v324;
-                    v324 = sample_discrete__5(v311, v2);
-                    StackMut1 v325{0.0f};
-                    float v391;
-                    switch (v144.tag) {
-                        case 1: { // Some
-                            Union2 v326 = v144.case1.v0;
-                            bool v327;
-                            v327 = 2 == v324;
-                            if (v327){
-                                float v329;
-                                v329 = v302[2];
-                                float v332;
-                                v332 = v311[2];
-                                static_array<Tuple2,2> & v334 = v5.v0;
-                                float v337; float v338;
-                                Tuple2 tmp24 = v334[v61];
-                                v337 = tmp24.v0; v338 = tmp24.v1;
-                                static_array<Tuple2,2> & v341 = v5.v0;
-                                float v342;
-                                v342 = log(v329);
-                                float v343;
-                                v343 = v342 + v337;
-                                float v344;
-                                v344 = log(v332);
-                                float v345;
-                                v345 = v344 + v338;
-                                v341[v61] = Tuple2{v343, v345};
-                                static_array_list<Union0,32> & v346 = v3.v0;
-                                Union0 v347;
-                                v347 = Union0{Union0_1{v61, v326}};
-                                v346.push(v347);
-                                Union6 v348;
-                                v348 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v326}};
-                                float v349;
-                                v349 = loop_1(v0, v1, v2, v3, v4, v5, v7, v348);
-                                static_array_list<Union0,32> & v350 = v3.v0;
-                                Union0 v351;
-                                v351 = v350.pop();
-                                static_array<Tuple2,2> & v352 = v5.v0;
-                                v352[v61] = Tuple2{v337, v338};
-                                bool v353;
-                                v353 = v61 == 0;
-                                float v355;
-                                if (v353){
-                                    v355 = v349;
-                                } else {
-                                    float v354;
-                                    v354 = -v349;
-                                    v355 = v354;
-                                }
-                                v325.v0 = v355;
-                                float v358; float v359;
-                                Tuple2 tmp25 = v127[2];
-                                v358 = tmp25.v0; v359 = tmp25.v1;
-                                bool v362;
-                                v362 = v359 == 0.0f;
-                                bool v363;
-                                v363 = v362 != true;
-                                float v365;
-                                if (v363){
-                                    float v364;
-                                    v364 = v358 / v359;
-                                    v365 = v364;
-                                } else {
-                                    v365 = 0.0f;
-                                }
-                                float v366 = v325.v0;
-                                float v367;
-                                v367 = v366 - v365;
-                                float v368;
-                                v368 = v367 / v332;
-                                float v369;
-                                v369 = v368 + v365;
-                                v391 = v369;
-                            } else {
-                                float v372; float v373;
-                                Tuple2 tmp26 = v127[2];
-                                v372 = tmp26.v0; v373 = tmp26.v1;
-                                bool v376;
-                                v376 = v373 == 0.0f;
-                                bool v377;
-                                v377 = v376 != true;
-                                if (v377){
-                                    float v378;
-                                    v378 = v372 / v373;
-                                    v391 = v378;
-                                } else {
-                                    v391 = 0.0f;
-                                }
-                            }
-                            break;
-                        }
-                        default: {
-                            float v383; float v384;
-                            Tuple2 tmp27 = v127[2];
-                            v383 = tmp27.v0; v384 = tmp27.v1;
-                            bool v387;
-                            v387 = v384 == 0.0f;
-                            bool v388;
-                            v388 = v387 != true;
-                            if (v388){
-                                float v389;
-                                v389 = v383 / v384;
-                                v391 = v389;
-                            } else {
-                                v391 = 0.0f;
-                            }
-                        }
-                    }
-                    float v457;
-                    switch (v139.tag) {
-                        case 1: { // Some
-                            Union2 v392 = v139.case1.v0;
-                            bool v393;
-                            v393 = 1 == v324;
-                            if (v393){
-                                float v395;
-                                v395 = v302[1];
-                                float v398;
-                                v398 = v311[1];
-                                static_array<Tuple2,2> & v400 = v5.v0;
-                                float v403; float v404;
-                                Tuple2 tmp28 = v400[v61];
-                                v403 = tmp28.v0; v404 = tmp28.v1;
-                                static_array<Tuple2,2> & v407 = v5.v0;
-                                float v408;
-                                v408 = log(v395);
-                                float v409;
-                                v409 = v408 + v403;
-                                float v410;
-                                v410 = log(v398);
-                                float v411;
-                                v411 = v410 + v404;
-                                v407[v61] = Tuple2{v409, v411};
-                                static_array_list<Union0,32> & v412 = v3.v0;
-                                Union0 v413;
-                                v413 = Union0{Union0_1{v61, v392}};
-                                v412.push(v413);
-                                Union6 v414;
-                                v414 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v392}};
-                                float v415;
-                                v415 = loop_1(v0, v1, v2, v3, v4, v5, v7, v414);
-                                static_array_list<Union0,32> & v416 = v3.v0;
-                                Union0 v417;
-                                v417 = v416.pop();
-                                static_array<Tuple2,2> & v418 = v5.v0;
-                                v418[v61] = Tuple2{v403, v404};
-                                bool v419;
-                                v419 = v61 == 0;
-                                float v421;
-                                if (v419){
-                                    v421 = v415;
-                                } else {
-                                    float v420;
-                                    v420 = -v415;
-                                    v421 = v420;
-                                }
-                                v325.v0 = v421;
-                                float v424; float v425;
-                                Tuple2 tmp29 = v127[1];
-                                v424 = tmp29.v0; v425 = tmp29.v1;
-                                bool v428;
-                                v428 = v425 == 0.0f;
-                                bool v429;
-                                v429 = v428 != true;
-                                float v431;
-                                if (v429){
-                                    float v430;
-                                    v430 = v424 / v425;
-                                    v431 = v430;
-                                } else {
-                                    v431 = 0.0f;
-                                }
-                                float v432 = v325.v0;
-                                float v433;
-                                v433 = v432 - v431;
-                                float v434;
-                                v434 = v433 / v398;
-                                float v435;
-                                v435 = v434 + v431;
-                                v457 = v435;
-                            } else {
-                                float v438; float v439;
-                                Tuple2 tmp30 = v127[1];
-                                v438 = tmp30.v0; v439 = tmp30.v1;
-                                bool v442;
-                                v442 = v439 == 0.0f;
-                                bool v443;
-                                v443 = v442 != true;
-                                if (v443){
-                                    float v444;
-                                    v444 = v438 / v439;
-                                    v457 = v444;
-                                } else {
-                                    v457 = 0.0f;
-                                }
-                            }
-                            break;
-                        }
-                        default: {
-                            float v449; float v450;
-                            Tuple2 tmp31 = v127[1];
-                            v449 = tmp31.v0; v450 = tmp31.v1;
-                            bool v453;
-                            v453 = v450 == 0.0f;
-                            bool v454;
-                            v454 = v453 != true;
-                            if (v454){
-                                float v455;
-                                v455 = v449 / v450;
-                                v457 = v455;
-                            } else {
-                                v457 = 0.0f;
-                            }
-                        }
-                    }
-                    bool v458;
-                    v458 = 0 == v324;
-                    float v513;
-                    if (v458){
-                        float v460;
-                        v460 = v302[0];
-                        float v463;
-                        v463 = v311[0];
-                        static_array<Tuple2,2> & v465 = v5.v0;
-                        float v468; float v469;
-                        Tuple2 tmp32 = v465[v61];
-                        v468 = tmp32.v0; v469 = tmp32.v1;
-                        static_array<Tuple2,2> & v472 = v5.v0;
-                        float v473;
-                        v473 = log(v460);
-                        float v474;
-                        v474 = v473 + v468;
-                        float v475;
-                        v475 = log(v463);
-                        float v476;
-                        v476 = v475 + v469;
-                        v472[v61] = Tuple2{v474, v476};
-                        static_array_list<Union0,32> & v477 = v3.v0;
-                        Union2 v478;
-                        v478 = Union2{Union2_0{}};
-                        Union0 v479;
-                        v479 = Union0{Union0_1{v61, v478}};
-                        v477.push(v479);
-                        Union2 v480;
-                        v480 = Union2{Union2_0{}};
-                        Union6 v481;
-                        v481 = Union6{Union6_2{v58, v59, v60, v61, v62, v63, v480}};
-                        float v482;
-                        v482 = loop_1(v0, v1, v2, v3, v4, v5, v7, v481);
-                        static_array_list<Union0,32> & v483 = v3.v0;
-                        Union0 v484;
-                        v484 = v483.pop();
-                        static_array<Tuple2,2> & v485 = v5.v0;
-                        v485[v61] = Tuple2{v468, v469};
-                        bool v486;
-                        v486 = v61 == 0;
-                        float v488;
-                        if (v486){
-                            v488 = v482;
-                        } else {
-                            float v487;
-                            v487 = -v482;
-                            v488 = v487;
-                        }
-                        v325.v0 = v488;
-                        float v491; float v492;
-                        Tuple2 tmp33 = v127[0];
-                        v491 = tmp33.v0; v492 = tmp33.v1;
-                        bool v495;
-                        v495 = v492 == 0.0f;
-                        bool v496;
-                        v496 = v495 != true;
-                        float v498;
-                        if (v496){
-                            float v497;
-                            v497 = v491 / v492;
-                            v498 = v497;
-                        } else {
-                            v498 = 0.0f;
-                        }
-                        float v499 = v325.v0;
-                        float v500;
-                        v500 = v499 - v498;
-                        float v501;
-                        v501 = v500 / v463;
-                        float v502;
-                        v502 = v501 + v498;
-                        v513 = v502;
+                    int v325;
+                    v325 = sample_discrete__8(v312, v3);
+                    StackMut1 v326{0.0f};
+                    float v329; float v330;
+                    Tuple2 tmp27 = v128[2];
+                    v329 = tmp27.v0; v330 = tmp27.v1;
+                    bool v333;
+                    v333 = v330 == 0.0f;
+                    bool v334;
+                    v334 = v333 != true;
+                    float v336;
+                    if (v334){
+                        float v335;
+                        v335 = v329 / v330;
+                        v336 = v335;
                     } else {
-                        float v505; float v506;
-                        Tuple2 tmp34 = v127[0];
-                        v505 = tmp34.v0; v506 = tmp34.v1;
-                        bool v509;
-                        v509 = v506 == 0.0f;
+                        v336 = 0.0f;
+                    }
+                    float v372;
+                    switch (v145.tag) {
+                        case 1: { // Some
+                            Union2 v337 = v145.case1.v0;
+                            bool v338;
+                            v338 = 2 == v325;
+                            if (v338){
+                                float v340;
+                                v340 = v303[2];
+                                float v343;
+                                v343 = v312[2];
+                                static_array<Tuple2,2> & v345 = v6.v0;
+                                float v348; float v349;
+                                Tuple2 tmp28 = v345[v62];
+                                v348 = tmp28.v0; v349 = tmp28.v1;
+                                static_array<Tuple2,2> & v352 = v6.v0;
+                                float v353;
+                                v353 = log(v340);
+                                float v354;
+                                v354 = v353 + v348;
+                                float v355;
+                                v355 = log(v343);
+                                float v356;
+                                v356 = v355 + v349;
+                                v352[v62] = Tuple2{v354, v356};
+                                static_array_list<Union0,32> & v357 = v4.v0;
+                                Union0 v358;
+                                v358 = Union0{Union0_1{v62, v337}};
+                                v357.push(v358);
+                                Union6 v359;
+                                v359 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v337}};
+                                float v360;
+                                v360 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v359);
+                                static_array_list<Union0,32> & v361 = v4.v0;
+                                Union0 v362;
+                                v362 = v361.pop();
+                                static_array<Tuple2,2> & v363 = v6.v0;
+                                v363[v62] = Tuple2{v348, v349};
+                                bool v364;
+                                v364 = v62 == 0;
+                                float v366;
+                                if (v364){
+                                    v366 = v360;
+                                } else {
+                                    float v365;
+                                    v365 = -v360;
+                                    v366 = v365;
+                                }
+                                v326.v0 = v366;
+                                float v367 = v326.v0;
+                                float v368;
+                                v368 = v367 - v336;
+                                float v369;
+                                v369 = v368 / v343;
+                                float v370;
+                                v370 = v369 + v336;
+                                v372 = v370;
+                            } else {
+                                v372 = v336;
+                            }
+                            break;
+                        }
+                        default: {
+                            v372 = v336;
+                        }
+                    }
+                    float v375; float v376;
+                    Tuple2 tmp29 = v128[1];
+                    v375 = tmp29.v0; v376 = tmp29.v1;
+                    bool v379;
+                    v379 = v376 == 0.0f;
+                    bool v380;
+                    v380 = v379 != true;
+                    float v382;
+                    if (v380){
+                        float v381;
+                        v381 = v375 / v376;
+                        v382 = v381;
+                    } else {
+                        v382 = 0.0f;
+                    }
+                    float v418;
+                    switch (v140.tag) {
+                        case 1: { // Some
+                            Union2 v383 = v140.case1.v0;
+                            bool v384;
+                            v384 = 1 == v325;
+                            if (v384){
+                                float v386;
+                                v386 = v303[1];
+                                float v389;
+                                v389 = v312[1];
+                                static_array<Tuple2,2> & v391 = v6.v0;
+                                float v394; float v395;
+                                Tuple2 tmp30 = v391[v62];
+                                v394 = tmp30.v0; v395 = tmp30.v1;
+                                static_array<Tuple2,2> & v398 = v6.v0;
+                                float v399;
+                                v399 = log(v386);
+                                float v400;
+                                v400 = v399 + v394;
+                                float v401;
+                                v401 = log(v389);
+                                float v402;
+                                v402 = v401 + v395;
+                                v398[v62] = Tuple2{v400, v402};
+                                static_array_list<Union0,32> & v403 = v4.v0;
+                                Union0 v404;
+                                v404 = Union0{Union0_1{v62, v383}};
+                                v403.push(v404);
+                                Union6 v405;
+                                v405 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v383}};
+                                float v406;
+                                v406 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v405);
+                                static_array_list<Union0,32> & v407 = v4.v0;
+                                Union0 v408;
+                                v408 = v407.pop();
+                                static_array<Tuple2,2> & v409 = v6.v0;
+                                v409[v62] = Tuple2{v394, v395};
+                                bool v410;
+                                v410 = v62 == 0;
+                                float v412;
+                                if (v410){
+                                    v412 = v406;
+                                } else {
+                                    float v411;
+                                    v411 = -v406;
+                                    v412 = v411;
+                                }
+                                v326.v0 = v412;
+                                float v413 = v326.v0;
+                                float v414;
+                                v414 = v413 - v382;
+                                float v415;
+                                v415 = v414 / v389;
+                                float v416;
+                                v416 = v415 + v382;
+                                v418 = v416;
+                            } else {
+                                v418 = v382;
+                            }
+                            break;
+                        }
+                        default: {
+                            v418 = v382;
+                        }
+                    }
+                    float v421; float v422;
+                    Tuple2 tmp31 = v128[0];
+                    v421 = tmp31.v0; v422 = tmp31.v1;
+                    bool v425;
+                    v425 = v422 == 0.0f;
+                    bool v426;
+                    v426 = v425 != true;
+                    float v428;
+                    if (v426){
+                        float v427;
+                        v427 = v421 / v422;
+                        v428 = v427;
+                    } else {
+                        v428 = 0.0f;
+                    }
+                    bool v429;
+                    v429 = 0 == v325;
+                    float v464;
+                    if (v429){
+                        float v431;
+                        v431 = v303[0];
+                        float v434;
+                        v434 = v312[0];
+                        static_array<Tuple2,2> & v436 = v6.v0;
+                        float v439; float v440;
+                        Tuple2 tmp32 = v436[v62];
+                        v439 = tmp32.v0; v440 = tmp32.v1;
+                        static_array<Tuple2,2> & v443 = v6.v0;
+                        float v444;
+                        v444 = log(v431);
+                        float v445;
+                        v445 = v444 + v439;
+                        float v446;
+                        v446 = log(v434);
+                        float v447;
+                        v447 = v446 + v440;
+                        v443[v62] = Tuple2{v445, v447};
+                        static_array_list<Union0,32> & v448 = v4.v0;
+                        Union2 v449;
+                        v449 = Union2{Union2_0{}};
+                        Union0 v450;
+                        v450 = Union0{Union0_1{v62, v449}};
+                        v448.push(v450);
+                        Union2 v451;
+                        v451 = Union2{Union2_0{}};
+                        Union6 v452;
+                        v452 = Union6{Union6_2{v59, v60, v61, v62, v63, v64, v451}};
+                        float v453;
+                        v453 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v452);
+                        static_array_list<Union0,32> & v454 = v4.v0;
+                        Union0 v455;
+                        v455 = v454.pop();
+                        static_array<Tuple2,2> & v456 = v6.v0;
+                        v456[v62] = Tuple2{v439, v440};
+                        bool v457;
+                        v457 = v62 == 0;
+                        float v459;
+                        if (v457){
+                            v459 = v453;
+                        } else {
+                            float v458;
+                            v458 = -v453;
+                            v459 = v458;
+                        }
+                        v326.v0 = v459;
+                        float v460 = v326.v0;
+                        float v461;
+                        v461 = v460 - v428;
+                        float v462;
+                        v462 = v461 / v434;
+                        float v463;
+                        v463 = v462 + v428;
+                        v464 = v463;
+                    } else {
+                        v464 = v428;
+                    }
+                    static_array<float,3> v466;
+                    v466[0] = v464;
+                    v466[1] = v418;
+                    v466[2] = v372;
+                    static_array<float,3> v469;
+                    int v471;
+                    v471 = 0;
+                    while (while_method_6(v471)){
+                        float v474;
+                        v474 = v466[v471];
+                        float v477;
+                        v477 = v303[v471];
+                        float v479;
+                        v479 = v474 * v477;
+                        v469[v471] = v479;
+                        v471 += 1 ;
+                    }
+                    int v480; float v481;
+                    Tuple3 tmp33 = Tuple3{0, 0.0f};
+                    v480 = tmp33.v0; v481 = tmp33.v1;
+                    while (while_method_6(v480)){
+                        float v484;
+                        v484 = v469[v480];
+                        float v486;
+                        v486 = v481 + v484;
+                        v481 = v486;
+                        v480 += 1 ;
+                    }
+                    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v487 = v2.v0;
+                    static_array<float,3> v489;
+                    int v491;
+                    v491 = 0;
+                    while (while_method_6(v491)){
+                        float v494;
+                        v494 = v126[v491];
+                        float v497;
+                        v497 = v303[v491];
+                        float v499;
+                        v499 = v494 + v497;
+                        v489[v491] = v499;
+                        v491 += 1 ;
+                    }
+                    static_array<Tuple2,2> & v500 = v6.v0;
+                    int v501; float v502;
+                    Tuple3 tmp34 = Tuple3{0, 0.0f};
+                    v501 = tmp34.v0; v502 = tmp34.v1;
+                    while (while_method_2(v501)){
+                        float v506; float v507;
+                        Tuple2 tmp35 = v500[v501];
+                        v506 = tmp35.v0; v507 = tmp35.v1;
                         bool v510;
-                        v510 = v509 != true;
+                        v510 = v501 == v62;
+                        float v511;
                         if (v510){
-                            float v511;
-                            v511 = v505 / v506;
-                            v513 = v511;
+                            v511 = 0.0f;
                         } else {
-                            v513 = 0.0f;
+                            v511 = v506;
                         }
+                        float v512;
+                        v512 = v502 + v511;
+                        float v513;
+                        v513 = v512 - v507;
+                        v502 = v513;
+                        v501 += 1 ;
                     }
-                    static_array<float,3> v515;
-                    v515[0] = v513;
-                    v515[1] = v457;
-                    v515[2] = v391;
-                    static_array<float,3> v518;
-                    int v520;
-                    v520 = 0;
-                    while (while_method_4(v520)){
-                        float v523;
-                        v523 = v515[v520];
+                    float v514;
+                    v514 = exp(v502);
+                    static_array<float,3> v516;
+                    int v518;
+                    v518 = 0;
+                    while (while_method_6(v518)){
+                        float v521;
+                        v521 = v127[v518];
+                        float v524;
+                        v524 = v466[v518];
                         float v526;
-                        v526 = v302[v520];
+                        v526 = v524 - v481;
+                        float v527;
+                        v527 = v514 * v526;
                         float v528;
-                        v528 = v523 * v526;
-                        v518[v520] = v528;
-                        v520 += 1 ;
-                    }
-                    int v529; float v530;
-                    Tuple3 tmp35 = Tuple3{0, 0.0f};
-                    v529 = tmp35.v0; v530 = tmp35.v1;
-                    while (while_method_4(v529)){
-                        float v533;
-                        v533 = v518[v529];
-                        float v535;
-                        v535 = v530 + v533;
-                        v530 = v535;
-                        v529 += 1 ;
-                    }
-                    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v536 = v1.v0;
-                    static_array<float,3> v538;
-                    int v540;
-                    v540 = 0;
-                    while (while_method_4(v540)){
-                        float v543;
-                        v543 = v125[v540];
-                        float v546;
-                        v546 = v302[v540];
-                        float v548;
-                        v548 = v543 + v546;
-                        v538[v540] = v548;
-                        v540 += 1 ;
-                    }
-                    static_array<Tuple2,2> & v549 = v5.v0;
-                    int v550; float v551;
-                    Tuple3 tmp36 = Tuple3{0, 0.0f};
-                    v550 = tmp36.v0; v551 = tmp36.v1;
-                    while (while_method_1(v550)){
-                        float v555; float v556;
-                        Tuple2 tmp37 = v549[v550];
-                        v555 = tmp37.v0; v556 = tmp37.v1;
-                        bool v559;
-                        v559 = v550 == v61;
-                        float v560;
-                        if (v559){
-                            v560 = 0.0f;
+                        v528 = v521 + v527;
+                        bool v529;
+                        v529 = 0.0f >= v528;
+                        float v530;
+                        if (v529){
+                            v530 = 0.0f;
                         } else {
-                            v560 = v555;
+                            v530 = v528;
                         }
-                        float v561;
-                        v561 = v551 + v560;
-                        float v562;
-                        v562 = v561 - v556;
-                        v551 = v562;
-                        v550 += 1 ;
+                        v516[v518] = v530;
+                        v518 += 1 ;
                     }
-                    float v563;
-                    v563 = exp(v551);
-                    static_array<float,3> v565;
-                    int v567;
-                    v567 = 0;
-                    while (while_method_4(v567)){
-                        float v570;
-                        v570 = v126[v567];
-                        float v573;
-                        v573 = v515[v567];
-                        float v575;
-                        v575 = v573 - v530;
-                        float v576;
-                        v576 = v563 * v575;
-                        float v577;
-                        v577 = v570 + v576;
-                        bool v578;
-                        v578 = 0.0f >= v577;
-                        float v579;
-                        if (v578){
-                            v579 = 0.0f;
+                    static_array<Tuple2,3> v532;
+                    int v534;
+                    v534 = 0;
+                    while (while_method_6(v534)){
+                        float v538; float v539;
+                        Tuple2 tmp36 = v128[v534];
+                        v538 = tmp36.v0; v539 = tmp36.v1;
+                        bool v542;
+                        v542 = v325 == v534;
+                        float v546; float v547;
+                        if (v542){
+                            float v543 = v326.v0;
+                            float v544;
+                            v544 = v538 + v543;
+                            float v545;
+                            v545 = v539 + 1.0f;
+                            v546 = v544; v547 = v545;
                         } else {
-                            v579 = v577;
+                            v546 = v538; v547 = v539;
                         }
-                        v565[v567] = v579;
-                        v567 += 1 ;
+                        v532[v534] = Tuple2{v546, v547};
+                        v534 += 1 ;
                     }
-                    static_array<Tuple2,3> v581;
-                    int v583;
-                    v583 = 0;
-                    while (while_method_4(v583)){
-                        float v587; float v588;
-                        Tuple2 tmp38 = v127[v583];
-                        v587 = tmp38.v0; v588 = tmp38.v1;
-                        bool v591;
-                        v591 = v324 == v583;
-                        float v595; float v596;
-                        if (v591){
-                            float v592 = v325.v0;
-                            float v593;
-                            v593 = v587 + v592;
-                            float v594;
-                            v594 = v588 + 1.0f;
-                            v595 = v593; v596 = v594;
-                        } else {
-                            v595 = v587; v596 = v588;
-                        }
-                        v581[v583] = Tuple2{v595, v596};
-                        v583 += 1 ;
-                    }
-                    v536[v88] = Tuple1{v538, v565, v581};
-                    v699 = v530;
+                    v487[v89] = Tuple1{v489, v516, v532};
+                    v650 = v481;
                     break;
                 }
                 default: {
@@ -3190,56 +3349,56 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                     exit(-1);
                 }
             }
-            bool v700;
-            v700 = v61 == 0;
-            float v702;
-            if (v700){
-                v702 = v699;
+            bool v651;
+            v651 = v62 == 0;
+            float v653;
+            if (v651){
+                v653 = v650;
             } else {
-                float v701;
-                v701 = -v699;
-                v702 = v701;
+                float v652;
+                v652 = -v650;
+                v653 = v652;
             }
-            v7.v0 = v702;
-            Union6 v703;
-            v703 = Union6{Union6_3{}};
-            return loop_1(v0, v1, v2, v3, v4, v5, v7, v703);
+            v8.v0 = v653;
+            Union6 v654;
+            v654 = Union6{Union6_3{}};
+            return loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v654);
             break;
         }
         case 3: { // RoundWithAction
-            Union5 v705 = v6.case3.v0; bool v706 = v6.case3.v1; static_array<Union1,2> v707 = v6.case3.v2; int v708 = v6.case3.v3; static_array<int,2> v709 = v6.case3.v4; int v710 = v6.case3.v5; Union2 v711 = v6.case3.v6;
-            static_array_list<Union0,32> & v712 = v3.v0;
-            Union0 v713;
-            v713 = Union0{Union0_1{v708, v711}};
-            v712.push(v713);
-            Union6 v714;
-            v714 = Union6{Union6_2{v705, v706, v707, v708, v709, v710, v711}};
-            float v715;
-            v715 = loop_1(v0, v1, v2, v3, v4, v5, v7, v714);
-            static_array_list<Union0,32> & v716 = v3.v0;
-            Union0 v717;
-            v717 = v716.pop();
-            return v715;
+            Union5 v656 = v7.case3.v0; bool v657 = v7.case3.v1; static_array<Union1,2> v658 = v7.case3.v2; int v659 = v7.case3.v3; static_array<int,2> v660 = v7.case3.v4; int v661 = v7.case3.v5; Union2 v662 = v7.case3.v6;
+            static_array_list<Union0,32> & v663 = v4.v0;
+            Union0 v664;
+            v664 = Union0{Union0_1{v659, v662}};
+            v663.push(v664);
+            Union6 v665;
+            v665 = Union6{Union6_2{v656, v657, v658, v659, v660, v661, v662}};
+            float v666;
+            v666 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v665);
+            static_array_list<Union0,32> & v667 = v4.v0;
+            Union0 v668;
+            v668 = v667.pop();
+            return v666;
             break;
         }
         case 4: { // TerminalCall
-            Union5 v29 = v6.case4.v0; bool v30 = v6.case4.v1; static_array<Union1,2> v31 = v6.case4.v2; int v32 = v6.case4.v3; static_array<int,2> v33 = v6.case4.v4; int v34 = v6.case4.v5;
-            int v36;
-            v36 = v33[v32];
-            Union9 v38;
-            v38 = compare_hands_8(v29, v30, v31, v32, v33, v34);
-            int v43; int v44;
-            switch (v38.tag) {
+            Union5 v30 = v7.case4.v0; bool v31 = v7.case4.v1; static_array<Union1,2> v32 = v7.case4.v2; int v33 = v7.case4.v3; static_array<int,2> v34 = v7.case4.v4; int v35 = v7.case4.v5;
+            int v37;
+            v37 = v34[v33];
+            Union9 v39;
+            v39 = compare_hands_11(v30, v31, v32, v33, v34, v35);
+            int v44; int v45;
+            switch (v39.tag) {
                 case 0: { // Eq
-                    v43 = 0; v44 = -1;
+                    v44 = 0; v45 = -1;
                     break;
                 }
                 case 1: { // Gt
-                    v43 = v36; v44 = 0;
+                    v44 = v37; v45 = 0;
                     break;
                 }
                 case 2: { // Lt
-                    v43 = v36; v44 = 1;
+                    v44 = v37; v45 = 1;
                     break;
                 }
                 default: {
@@ -3247,76 +3406,76 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
                     exit(-1);
                 }
             }
-            int v45;
-            v45 = -v44;
-            bool v46;
-            v46 = v44 >= v45;
-            int v47;
-            if (v46){
-                v47 = v44;
+            int v46;
+            v46 = -v45;
+            bool v47;
+            v47 = v45 >= v46;
+            int v48;
+            if (v47){
+                v48 = v45;
             } else {
-                v47 = v45;
+                v48 = v46;
             }
-            float v48;
-            v48 = (float)v43;
-            bool v49;
-            v49 = v47 == 0;
-            float v51;
-            if (v49){
-                v51 = v48;
+            float v49;
+            v49 = (float)v44;
+            bool v50;
+            v50 = v48 == 0;
+            float v52;
+            if (v50){
+                v52 = v49;
             } else {
-                float v50;
-                v50 = -v48;
-                v51 = v50;
+                float v51;
+                v51 = -v49;
+                v52 = v51;
             }
-            v7.v0 = v51;
-            static_array_list<Union0,32> & v52 = v3.v0;
-            Union0 v53;
-            v53 = Union0{Union0_3{v31, v43, v44}};
-            v52.push(v53);
-            Union6 v54;
-            v54 = Union6{Union6_3{}};
-            float v55;
-            v55 = loop_1(v0, v1, v2, v3, v4, v5, v7, v54);
-            static_array_list<Union0,32> & v56 = v3.v0;
-            Union0 v57;
-            v57 = v56.pop();
-            return v55;
+            v8.v0 = v52;
+            static_array_list<Union0,32> & v53 = v4.v0;
+            Union0 v54;
+            v54 = Union0{Union0_3{v32, v44, v45}};
+            v53.push(v54);
+            Union6 v55;
+            v55 = Union6{Union6_3{}};
+            float v56;
+            v56 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v55);
+            static_array_list<Union0,32> & v57 = v4.v0;
+            Union0 v58;
+            v58 = v57.pop();
+            return v56;
             break;
         }
         case 5: { // TerminalFold
-            Union5 v8 = v6.case5.v0; bool v9 = v6.case5.v1; static_array<Union1,2> v10 = v6.case5.v2; int v11 = v6.case5.v3; static_array<int,2> v12 = v6.case5.v4; int v13 = v6.case5.v5;
-            int v15;
-            v15 = v12[v11];
-            int v17;
-            v17 = -v15;
-            float v18;
-            v18 = (float)v17;
-            bool v19;
-            v19 = v11 == 0;
-            float v21;
-            if (v19){
-                v21 = v18;
+            Union5 v9 = v7.case5.v0; bool v10 = v7.case5.v1; static_array<Union1,2> v11 = v7.case5.v2; int v12 = v7.case5.v3; static_array<int,2> v13 = v7.case5.v4; int v14 = v7.case5.v5;
+            int v16;
+            v16 = v13[v12];
+            int v18;
+            v18 = -v16;
+            float v19;
+            v19 = (float)v18;
+            bool v20;
+            v20 = v12 == 0;
+            float v22;
+            if (v20){
+                v22 = v19;
             } else {
-                float v20;
-                v20 = -v18;
-                v21 = v20;
+                float v21;
+                v21 = -v19;
+                v22 = v21;
             }
-            v7.v0 = v21;
-            int v22;
-            v22 = v11 ^ 1;
-            static_array_list<Union0,32> & v23 = v3.v0;
-            Union0 v24;
-            v24 = Union0{Union0_3{v10, v15, v22}};
-            v23.push(v24);
-            Union6 v25;
-            v25 = Union6{Union6_3{}};
-            float v26;
-            v26 = loop_1(v0, v1, v2, v3, v4, v5, v7, v25);
-            static_array_list<Union0,32> & v27 = v3.v0;
-            Union0 v28;
-            v28 = v27.pop();
-            return v26;
+            v8.v0 = v22;
+            int v23;
+            v23 = v12 ^ 1;
+            static_array_list<Union0,32> & v24 = v4.v0;
+            Union0 v25;
+            v25 = Union0{Union0_3{v11, v16, v23}};
+            v24.push(v25);
+            Union6 v26;
+            v26 = Union6{Union6_3{}};
+            float v27;
+            v27 = loop_4(v0, v1, v2, v3, v4, v5, v6, v8, v26);
+            static_array_list<Union0,32> & v28 = v4.v0;
+            Union0 v29;
+            v29 = v28.pop();
+            return v27;
             break;
         }
         default: {
@@ -3325,448 +3484,106 @@ float body_0(static_array<Union3,2> v0, StackRefs0 & v1, xso::rng & v2, StackRef
         }
     }
 }
-inline bool while_method_7(int v0){
+inline bool while_method_9(int v0){
     bool v1;
     v1 = v0 < 100;
     return v1;
 }
-inline bool while_method_8(std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v0, std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1>::iterator & v1){
-    bool v2;
-    v2 = v1 != v0.end();
-    return v2;
-}
-static_array<float,3> normalize_12(static_array<float,3> v0){
-    int v1; float v2;
-    Tuple3 tmp43 = Tuple3{0, 0.0f};
-    v1 = tmp43.v0; v2 = tmp43.v1;
-    while (while_method_4(v1)){
-        float v5;
-        v5 = v0[v1];
-        float v7;
-        v7 = v2 + v5;
-        v2 = v7;
-        v1 += 1 ;
-    }
-    static_array<float,3> v9;
-    int v11;
-    v11 = 0;
-    while (while_method_4(v11)){
-        float v14;
-        v14 = v0[v11];
-        bool v16;
-        v16 = v2 == 0.0f;
-        bool v17;
-        v17 = v16 != true;
-        float v19;
-        if (v17){
-            float v18;
-            v18 = v14 / v2;
-            v19 = v18;
-        } else {
-            v19 = 0.33333334f;
-        }
-        v9[v11] = v19;
-        v11 += 1 ;
-    }
-    return v9;
-}
-inline bool while_method_9(std::unordered_map<static_array_list<Union0,32>, static_array<float,3>, Fun0, Fun1> & v0, std::unordered_map<static_array_list<Union0,32>, static_array<float,3>, Fun0, Fun1>::iterator & v1){
-    bool v2;
-    v2 = v1 != v0.end();
-    return v2;
-}
-void method_14(Union1 v0){
-    switch (v0.tag) {
-        case 0: { // Jack
-            printf("%s","Jack");
-            return ;
-            break;
-        }
-        case 1: { // King
-            printf("%s","King");
-            return ;
-            break;
-        }
-        case 2: { // Queen
-            printf("%s","Queen");
-            return ;
-            break;
-        }
-        default: {
-            assert("Invalid tag." && false);
-            exit(-1);
-        }
-    }
-}
-void method_15(Union2 v0){
-    switch (v0.tag) {
-        case 0: { // Call
-            printf("%s","Call");
-            return ;
-            break;
-        }
-        case 1: { // Fold
-            printf("%s","Fold");
-            return ;
-            break;
-        }
-        case 2: { // Raise
-            printf("%s","Raise");
-            return ;
-            break;
-        }
-        default: {
-            assert("Invalid tag." && false);
-            exit(-1);
-        }
-    }
-}
-void method_13(Union0 v0){
-    switch (v0.tag) {
-        case 0: { // CommunityCardIs
-            Union1 v1 = v0.case0.v0;
-            printf("%s(","CommunityCardIs");
-            method_14(v1);
-            printf(")");
-            return ;
-            break;
-        }
-        case 1: { // PlayerAction
-            int v2 = v0.case1.v0; Union2 v3 = v0.case1.v1;
-            printf("%s(%d, ","PlayerAction", v2);
-            method_15(v3);
-            printf(")");
-            return ;
-            break;
-        }
-        case 2: { // PlayerGotCard
-            int v4 = v0.case2.v0; Union1 v5 = v0.case2.v1;
-            printf("%s(%d, ","PlayerGotCard", v4);
-            method_14(v5);
-            printf(")");
-            return ;
-            break;
-        }
-        case 3: { // Showdown
-            static_array<Union1,2> v6 = v0.case3.v0; int v7 = v0.case3.v1; int v8 = v0.case3.v2;
-            printf("%s({%s = %s","Showdown", "cards_shown", "[");
-            int v9;
-            v9 = 0;
-            while (while_method_1(v9)){
-                Union1 v12;
-                v12 = v6[v9];
-                printf("");
-                method_14(v12);
-                printf("");
-                int v14;
-                v14 = v9 + 1;
-                bool v15;
-                v15 = v14 < 2;
-                if (v15){
-                    printf("%s","; ");
-                } else {
-                }
-                v9 += 1 ;
-            }
-            printf("%s","]");
-            printf("; %s = %d; %s = %d})","chips_won", v7, "winner_id", v8);
-            return ;
-            break;
-        }
-        default: {
-            assert("Invalid tag." && false);
-            exit(-1);
-        }
-    }
-}
 int main() {
-    Fun0 v0 = FunPointerMethod0;
-    Fun1 v1 = FunPointerMethod1;
-    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v2(512, v0, v1);
-    StackRefs0 v3{v2};
-    static_array<Union3,2> v5;
-    Union3 v8;
-    v8 = Union3{Union3_2{}};
-    v5[0] = v8;
-    Union3 v11;
-    v11 = Union3{Union3_2{}};
-    v5[1] = v11;
-    xso::rng v13;
-    StackMut0 v14{63u};
-    static_array_list<Union0,32> v16;
-    v16 = static_array_list<Union0,32>{};
-    StackRefs1 v18{v16};
-    static_array<Tuple2,2> v20;
-    int v22;
-    v22 = 0;
-    while (while_method_1(v22)){
-        v20[v22] = Tuple2{0.0f, 0.0f};
-        v22 += 1 ;
-    }
-    StackRefs2 v24{v20};
-    int v25; float v26;
-    Tuple3 tmp2 = Tuple3{0, 0.0f};
-    v25 = tmp2.v0; v26 = tmp2.v1;
-    while (while_method_2(v25)){
-        int v28;
-        v28 = v25 % 4000;
-        bool v29;
-        v29 = v28 == 0;
-        if (v29){
-            printf("{%s = %d; %s = %d}\n","i", v25, "nearTo", 100000);
-            fflush(stdout);
-        } else {
+    int v0;
+    v0 = 0;
+    while (while_method_0(v0)){
+        Fun0 v2 = FunPointerMethod0;
+        Fun1 v3 = FunPointerMethod1;
+        std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> v4(512, v2, v3);
+        StackRefs0 v5{v4};
+        static_array<Union3,2> v7;
+        Union3 v10;
+        v10 = Union3{Union3_2{}};
+        v7[0] = v10;
+        Union3 v13;
+        v13 = Union3{Union3_2{}};
+        v7[1] = v13;
+        bool v15;
+        v15 = true;
+        xso::rng v16;
+        StackMut0 v17{63u};
+        static_array_list<Union0,32> v19;
+        v19 = static_array_list<Union0,32>{};
+        StackRefs1 v21{v19};
+        static_array<Tuple2,2> v23;
+        int v25;
+        v25 = 0;
+        while (while_method_2(v25)){
+            v23[v25] = Tuple2{0.0f, 0.0f};
+            v25 += 1 ;
         }
-        Union4 v35;
-        v35 = Union4{Union4_1{}};
-        float v36;
-        v36 = body_0(v5, v3, v13, v18, v14, v24, v35);
-        v26 = v36;
-        v25 += 1 ;
-    }
-    static_array<Union3,2> v38;
-    Union3 v41;
-    v41 = Union3{Union3_1{}};
-    v38[0] = v41;
-    Union3 v44;
-    v44 = Union3{Union3_0{}};
-    v38[1] = v44;
-    xso::rng v46;
-    StackMut0 v47{63u};
-    static_array_list<Union0,32> v49;
-    v49 = static_array_list<Union0,32>{};
-    StackRefs1 v51{v49};
-    static_array<Tuple2,2> v53;
-    int v55;
-    v55 = 0;
-    while (while_method_1(v55)){
-        v53[v55] = Tuple2{0.0f, 0.0f};
-        v55 += 1 ;
-    }
-    StackRefs2 v57{v53};
-    int v58; float v59;
-    Tuple3 tmp41 = Tuple3{0, 0.0f};
-    v58 = tmp41.v0; v59 = tmp41.v1;
-    while (while_method_7(v58)){
-        int v61;
-        v61 = v58 % 4;
-        bool v62;
-        v62 = v61 == 0;
-        if (v62){
-            printf("{%s = %d; %s = %d}\n","i", v58, "nearTo", 100);
-            fflush(stdout);
-        } else {
-        }
-        Union4 v68;
-        v68 = Union4{Union4_1{}};
-        float v69;
-        v69 = body_0(v38, v3, v46, v51, v47, v57, v68);
-        v59 = v69;
-        v58 += 1 ;
-    }
-    printf("{%s = %f}\n","reward_for_pl0", v59);
-    fflush(stdout);
-    printf("%s\n","Average policies:");
-    fflush(stdout);
-    std::unordered_map<static_array_list<Union0,32>, static_array<float,3>, Fun0, Fun1> v78(512, v0, v1);
-    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v79 = v3.v0;
-    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v80 = v79;
-    auto v81 = v80.begin();
-    while (while_method_8(v80, v81)){
-        static_array_list<Union0,32> v83;
-        v83 = v81->first;
-        static_array<float,3> v84; static_array<float,3> v85; static_array<Tuple2,3> v86;
-        Tuple1 tmp42 = v81->second;
-        v84 = tmp42.v0; v85 = tmp42.v1; v86 = tmp42.v2;
-        static_array<float,3> v87;
-        v87 = normalize_12(v84);
-        v78[v83] = v87;
-        ++v81;
-    }
-    printf("%s\n","{");
-    std::unordered_map<static_array_list<Union0,32>, static_array<float,3>, Fun0, Fun1> & v115 = v78;
-    auto v116 = v115.begin();
-    while (while_method_9(v115, v116)){
-        static_array_list<Union0,32> v118;
-        v118 = v116->first;
-        static_array<float,3> v119;
-        v119 = v116->second;
-        printf("%s","[");
-        int v120;
-        v120 = v118.length;
-        bool v121;
-        v121 = 100 < v120;
-        int v122;
-        if (v121){
-            v122 = 100;
-        } else {
-            v122 = v120;
-        }
-        int v123;
-        v123 = 0;
-        while (while_method_0(v122, v123)){
-            Union0 v126;
-            v126 = v118[v123];
-            printf("");
-            method_13(v126);
-            printf("");
-            int v128;
-            v128 = v123 + 1;
-            int v129;
-            v129 = v118.length;
-            bool v130;
-            v130 = v128 < v129;
-            if (v130){
-                printf("%s","; ");
+        StackRefs2 v27{v23};
+        int v28; float v29;
+        Tuple3 tmp2 = Tuple3{0, 0.0f};
+        v28 = tmp2.v0; v29 = tmp2.v1;
+        while (while_method_3(v28)){
+            int v31;
+            v31 = v28 % 40000;
+            bool v32;
+            v32 = v31 == 0;
+            if (v32){
+                printf("{%s = %d; %s = %d}\n","i", v28, "nearTo", 1000000);
+                fflush(stdout);
             } else {
             }
-            v123 += 1 ;
+            Union4 v38;
+            v38 = Union4{Union4_1{}};
+            float v39;
+            v39 = body_0(v15, v7, v5, v16, v21, v17, v27, v38);
+            v29 = v39;
+            v28 += 1 ;
         }
-        int v131;
-        v131 = v118.length;
-        bool v132;
-        v132 = v131 > 100;
-        if (v132){
-            printf("%s","; ...");
-        } else {
+        static_array<Union3,2> v41;
+        Union3 v44;
+        v44 = Union3{Union3_1{}};
+        v41[0] = v44;
+        Union3 v47;
+        v47 = Union3{Union3_0{}};
+        v41[1] = v47;
+        bool v49;
+        v49 = false;
+        xso::rng v50;
+        StackMut0 v51{63u};
+        static_array_list<Union0,32> v53;
+        v53 = static_array_list<Union0,32>{};
+        StackRefs1 v55{v53};
+        static_array<Tuple2,2> v57;
+        int v59;
+        v59 = 0;
+        while (while_method_2(v59)){
+            v57[v59] = Tuple2{0.0f, 0.0f};
+            v59 += 1 ;
         }
-        printf("%s","]");
-        printf("");
-        printf("%s"," => ");
-        printf("%s","[");
-        int v133;
-        v133 = 0;
-        while (while_method_4(v133)){
-            float v136;
-            v136 = v119[v133];
-            printf("%f",v136);
-            int v138;
-            v138 = v133 + 1;
-            bool v139;
-            v139 = v138 < 3;
-            if (v139){
-                printf("%s","; ");
+        StackRefs2 v61{v57};
+        int v62; float v63;
+        Tuple3 tmp39 = Tuple3{0, 0.0f};
+        v62 = tmp39.v0; v63 = tmp39.v1;
+        while (while_method_9(v62)){
+            int v65;
+            v65 = v62 % 4;
+            bool v66;
+            v66 = v65 == 0;
+            if (v66){
+                printf("{%s = %d; %s = %d}\n","i", v62, "nearTo", 100);
+                fflush(stdout);
             } else {
             }
-            v133 += 1 ;
+            Union4 v72;
+            v72 = Union4{Union4_1{}};
+            float v73;
+            v73 = body_0(v49, v41, v5, v50, v55, v51, v61, v72);
+            v63 = v73;
+            v62 += 1 ;
         }
-        printf("%s","]");
-        printf("\n");
-        ++v116;
+        printf("{%s = %f}\n","reward_for_pl0", v63);
+        fflush(stdout);
+        v0 += 1 ;
     }
-    printf("%s\n","}");
-    printf("\n");
-    fflush(stdout);
-    printf("%s\n","Expected values:");
-    fflush(stdout);
-    std::unordered_map<static_array_list<Union0,32>, static_array<float,3>, Fun0, Fun1> v184(512, v0, v1);
-    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v185 = v3.v0;
-    std::unordered_map<static_array_list<Union0,32>, Tuple1, Fun0, Fun1> & v186 = v185;
-    auto v187 = v186.begin();
-    while (while_method_8(v186, v187)){
-        static_array_list<Union0,32> v189;
-        v189 = v187->first;
-        static_array<float,3> v190; static_array<float,3> v191; static_array<Tuple2,3> v192;
-        Tuple1 tmp44 = v187->second;
-        v190 = tmp44.v0; v191 = tmp44.v1; v192 = tmp44.v2;
-        static_array<float,3> v194;
-        int v196;
-        v196 = 0;
-        while (while_method_4(v196)){
-            float v200; float v201;
-            Tuple2 tmp45 = v192[v196];
-            v200 = tmp45.v0; v201 = tmp45.v1;
-            bool v204;
-            v204 = v201 == 0.0f;
-            bool v205;
-            v205 = v204 != true;
-            float v207;
-            if (v205){
-                float v206;
-                v206 = v200 / v201;
-                v207 = v206;
-            } else {
-                v207 = 0.0f;
-            }
-            v194[v196] = v207;
-            v196 += 1 ;
-        }
-        v184[v189] = v194;
-        ++v187;
-    }
-    printf("%s\n","{");
-    std::unordered_map<static_array_list<Union0,32>, static_array<float,3>, Fun0, Fun1> & v235 = v184;
-    auto v236 = v235.begin();
-    while (while_method_9(v235, v236)){
-        static_array_list<Union0,32> v238;
-        v238 = v236->first;
-        static_array<float,3> v239;
-        v239 = v236->second;
-        printf("%s","[");
-        int v240;
-        v240 = v238.length;
-        bool v241;
-        v241 = 100 < v240;
-        int v242;
-        if (v241){
-            v242 = 100;
-        } else {
-            v242 = v240;
-        }
-        int v243;
-        v243 = 0;
-        while (while_method_0(v242, v243)){
-            Union0 v246;
-            v246 = v238[v243];
-            printf("");
-            method_13(v246);
-            printf("");
-            int v248;
-            v248 = v243 + 1;
-            int v249;
-            v249 = v238.length;
-            bool v250;
-            v250 = v248 < v249;
-            if (v250){
-                printf("%s","; ");
-            } else {
-            }
-            v243 += 1 ;
-        }
-        int v251;
-        v251 = v238.length;
-        bool v252;
-        v252 = v251 > 100;
-        if (v252){
-            printf("%s","; ...");
-        } else {
-        }
-        printf("%s","]");
-        printf("");
-        printf("%s"," => ");
-        printf("%s","[");
-        int v253;
-        v253 = 0;
-        while (while_method_4(v253)){
-            float v256;
-            v256 = v239[v253];
-            printf("%f",v256);
-            int v258;
-            v258 = v253 + 1;
-            bool v259;
-            v259 = v258 < 3;
-            if (v259){
-                printf("%s","; ");
-            } else {
-            }
-            v253 += 1 ;
-        }
-        printf("%s","]");
-        printf("\n");
-        ++v236;
-    }
-    printf("%s\n","}");
-    printf("\n");
-    fflush(stdout);
     return 0;
 }
