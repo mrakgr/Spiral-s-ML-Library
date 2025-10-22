@@ -267,7 +267,6 @@ inl train_loop (config : config) (dict : stack_refs game_dict) =
 
 inl main() =
     inl dict = stack_refs (dictm.create 512)
-    // inl nearTo : int = 1 <<< 16
     inl loop (config : config) (nearTo : int) =
         inl train_loop = train_loop config dict
         loop.for {from=0; nearTo} (fun (i : int) _ =>
@@ -275,16 +274,21 @@ inl main() =
                 console.write_ln {i nearTo}
             train_loop ()
             ) 0
+    // inl _ = 
+    //     loop {
+    //         is_chance_node_sampling = false
+    //         player_modes = [TrainEnumerative; TrainEnumerative] |> arraym.fromList
+    //     } 1_000
     inl _ = 
         loop {
-            is_chance_node_sampling = false
-            player_modes = [TrainEnumerative; TrainEnumerative] |> arraym.fromList
-        } 50
+            is_chance_node_sampling = true
+            player_modes = [TrainSampling; TrainSampling] |> arraym.fromList
+        } 1_000_000
     inl reward_for_pl0 = 
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainEnumerative; Frozen] |> arraym.fromList
-        } 20
+        } 100
     console.write_ln {reward_for_pl0}
     inl dict' = dictm.create 512
     *dict |> dictm.iter (fun k v =>
