@@ -34,8 +34,9 @@ let normalize (l : sa _ float) =
 let regret_match forall dim. (l : sa dim float) (mask : sa dim bool) = masking_normalize (relu l) mask
 
 type path_prob = {policy : float; sampling : float}
+type game_dict = dict messages {average_policy : sa 3 float; current_policy : sa 3 float; expected_values : sa 3 {value : float; weight : float}}
 
-let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; current_policy : sa 3 float; expected_values : sa 3 {value : float; weight : float}})) : () =
+inl train_loop (dict : stack_refs game_dict) =
     inl rng = xoshiro.create()
     inl sample sampling_probs = xoshiro.sample_discrete' sampling_probs rng
     inl state_outer = stack_refs {
@@ -101,8 +102,9 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
             loop T_none
         | Round table => 
             inl expected_value =
-                inl average_policy_decay = 1 - 2 ** -10
-                inl noise_factor = 2 ** -2 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
+                inl average_policy_decay : float = 1 - 2 ** -10
+                inl ev_decay : float = 1 - 2 ** -1
+                inl noise_factor : float = 2 ** 0 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
                 inl key = 
                     state_outer.messages
                     |> arraym.filter (function
@@ -161,7 +163,10 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
                             max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
                             ) current_policy expected_value_per_action
                     expected_values =
-                        expected_values |> arraym.update action_index (fun x => {x with value#=(+) *reward; weight#=(+) 1})
+                        expected_values |> arraym.update action_index (fun x => {x with 
+                            value#=fun value => value * ev_decay + *reward
+                            weight#=fun weight => weight * ev_decay + 1
+                            })
                     }
                 expected_value
 
@@ -183,15 +188,17 @@ let train_loop (dict : stack_refs (dict messages {average_policy : sa 3 float; c
             using_message PlayerGotCard(1, c1) fun () =>
             loop (T_game_chance_init (c0, c1))
 
-    body game_start() |> ignore
+    fun () => 
+        body game_start() |> ignore
 
 inl main() =
     inl dict = stack_refs (dictm.create 512)
     inl nearTo : int = 1_000_000
+    inl train_loop = train_loop dict
     loop.for' {from=0; nearTo} (fun (i : int) =>
         if i % 1000 = 0 then
             console.write_ln {i nearTo}
-        train_loop dict
+        train_loop ()
         )
     inl dict' = dictm.create 512
     *dict |> dictm.iter (fun k v =>
