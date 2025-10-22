@@ -46,6 +46,8 @@ type config =
         player_modes : sa 2 player_mode
     }
 
+inl normalize_expected_value {value weight} = if weight <> 0 then value / weight else 0
+
 inl train_loop (config : config) (dict : stack_refs game_dict) =
     inl rng = xoshiro.create()
     inl sample sampling_probs = xoshiro.sample_discrete' sampling_probs rng
@@ -115,9 +117,7 @@ inl train_loop (config : config) (dict : stack_refs game_dict) =
                     current_policy = sam.init (const 0)
                     expected_values = sam.init (const {value = 0; weight = 0})
                 }
-            inl get_expected_value i =
-                inl {value weight} = index expected_values i
-                if weight <> 0 then value / weight else 0
+            inl get_expected_value i = normalize_expected_value (index expected_values i)
             inl actions =
                 [
                     Some Call
@@ -126,12 +126,15 @@ inl train_loop (config : config) (dict : stack_refs game_dict) =
                 ]
             inl mask = listm.map (function Some => true | None => false) actions |> arraym.fromList
             inl cfr_mc () = // Does Monte Carlo campling.
-                inl average_policy_decay : float = 1 - 2 ** -10
-                inl ev_decay : float = 1 - 2 ** -1
-                inl noise_factor : float = 2 ** 0 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
+                // inl average_policy_decay : float = 1 - 2 ** -10
+                // inl ev_decay : float = 1 - 2 ** -1
+                inl average_policy_decay : float = 1
+                inl ev_decay : float = 1
+                inl noise_factor : float = 2 ** -3 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
                 inl current_policy_probs = regret_match current_policy mask
+                inl average_policy_probs = masking_normalize average_policy mask
                 inl noise_probs = masking_normalize (sam.init (const 0)) mask
-                inl sampling_probs = arraym.map2 (fun a b => (1 - noise_factor) * a + noise_factor * b) current_policy_probs noise_probs
+                inl sampling_probs = arraym.map2 (fun a b => (1 - noise_factor) * a + noise_factor * b) average_policy_probs noise_probs
                 inl action_index = sample sampling_probs
                 inl reward = stack_mut 0
                 inl expected_value_per_action : sa 3 float = 
@@ -148,7 +151,8 @@ inl train_loop (config : config) (dict : stack_refs game_dict) =
                             reward <- if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
                             inl ev = get_expected_value i
                             (*reward - ev) / action_prob.sampling + ev
-                        | _ => get_expected_value i
+                        | _ => 
+                            get_expected_value i
                     )
                     |> arraym.fromList
                 inl expected_value = arraym.map2 (*) expected_value_per_action current_policy_probs |> arraym.sum
@@ -160,6 +164,7 @@ inl train_loop (config : config) (dict : stack_refs game_dict) =
                     current_policy =
                         inl path_prob_opponent = get_path_prob_for_others table.player_turn
                         arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
+                            // Too bad the CFR+ update is so much better than the regular one as we'll be using the regular ones with Hopfield dicts.
                             max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
                             ) current_policy expected_value_per_action
                     expected_values =
@@ -283,16 +288,23 @@ inl main() =
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainSampling; TrainSampling] |> arraym.fromList
-        } 50_000
+        } 100_000
     inl reward_for_pl0 = 
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainEnumerative; Frozen] |> arraym.fromList
         } 100
     console.write_ln {reward_for_pl0}
+    console.write_ln "Average policies:"
     inl dict' = dictm.create 512
     *dict |> dictm.iter (fun k v =>
         dictm.set dict' k (normalize v.average_policy)
+        )
+    console.write_ln dict'
+    console.write_ln "Expected values:"
+    inl dict' = dictm.create 512
+    *dict |> dictm.iter (fun k v =>
+        dictm.set dict' k (arraym.map normalize_expected_value v.expected_values)
         )
     console.write_ln dict'
     0i32
