@@ -47,6 +47,8 @@ type config =
     }
 
 inl normalize_expected_value {value weight} = if weight <> 0 then value / weight else 0
+inl dot_product forall dim. (expected_value_per_action : sa dim float) (current_policy_probs : sa dim float) =
+    arraym.fold2 (fun s a b => s + a * b) 0 expected_value_per_action current_policy_probs
 
 inl train_loop ~(config : config) (dict : stack_refs game_dict) =
     inl rng = xoshiro.create()
@@ -155,7 +157,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
                             ev
                     )
                     |> arraym.fromList
-                inl expected_value = arraym.map2 (*) expected_value_per_action current_policy_probs |> arraym.sum
+                inl expected_value = dot_product expected_value_per_action current_policy_probs
                 dictm.set *dict key {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
@@ -190,7 +192,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
                         | None => 0
                     )
                     |> arraym.fromList
-                inl expected_value = arraym.map2 (*) expected_value_per_action current_policy_probs |> arraym.sum
+                inl expected_value = dot_product expected_value_per_action current_policy_probs
                 dictm.set *dict key {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
@@ -220,7 +222,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
                         | None => 0
                     )
                     |> arraym.fromList
-                inl expected_value = arraym.map2 (*) expected_value_per_action current_policy_probs |> arraym.sum
+                inl expected_value = dot_product expected_value_per_action current_policy_probs
                 expected_value
             match index config.player_modes table.player_turn with
             | TrainEnumerative => cfr_enum ()
