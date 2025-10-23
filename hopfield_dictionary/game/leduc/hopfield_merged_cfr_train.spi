@@ -1,3 +1,17 @@
+// Note for tomorrow: I've figured out something very important.
+// When multiplying two binary vectors a and b the maximum value they can take is the: min (popc a) (popc b)
+// That means when calculating the maximum coefficient in a softmax for numerical stability, instead of having to
+// do a whole matmul just to get this constant I can instead take the population count of the input vectors!
+// In addition to that, we don't even have to calculate the denominator for the softmax, as the hopfield dictionary
+// values can all be normalized or have inbuilt denominators.
+// In the worst case, instead of calculating the denominator explicitly, we can just add a constant 1 field
+// and use that to divide the rest.
+// This will lead to huge computational savings.
+// In particular, because we won't be dividing by the denominator it becomes easy to actually predict the update inside the cfr function
+// without having to insert it into the dictionary and then do an evaluation to get the probabilities back.
+// This will make it very easy to implement predictive baselines even with a Hopfield dictionary!
+
+
 open corebase
 open corecudahost
 open coreext
