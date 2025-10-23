@@ -1,4 +1,4 @@
-#include "merged_train.auto.cu"
+#include "merged_train_learned_infoset.auto.cu"
 #include <thrust/device_vector.h>
 #include <unordered_map>
 #include <xoshiro.h>
