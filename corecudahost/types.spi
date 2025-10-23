@@ -1,3 +1,9 @@
 open corebase
 
+nominal hash_node t = 
+    {
+        hash : u64
+        node : t
+    }
 nominal dict k v = $"std::unordered_map<`k, `v, `(fptr (arg k) u64), `(fptr (arg k * arg k) bool)>"
+nominal cached_dict k v = dict (hash_node k) v

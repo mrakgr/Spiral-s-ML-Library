@@ -1,0 +1,18 @@
+// Cached dictionaries cache the hash keys of all the node in a thin wrapper.
+open corebase
+open dictm
+
+// Creates the dictionary with a specified amount of buckets.
+inl create forall k v. (buckets : int) : cached_dict k v = cached_dict (create buckets)
+// Gets an item from the dictionary.
+inl get forall k v. (cached_dict d : cached_dict k v) (k : k) : option v = get d (hash_nodem.create k)
+// Sets the item to the dictionary at the specified key.
+inl set forall k v. (cached_dict d : cached_dict k v) (k : k) (v : v) : () = set d (hash_nodem.create k) v
+// Checks whether the key exists in the dictionary.
+inl contains forall k v. (cached_dict d : cached_dict k v) (k : k) : bool = contains d (hash_nodem.create k)
+// Clears the dictionary of keys.
+inl clear forall k v. (cached_dict d : cached_dict k v) : () = clear d
+// Removes the key from the dictionary and returns boolean whether the operation was successful.
+inl erase forall k v. (cached_dict d : cached_dict k v) (k : k) : bool = erase d (hash_nodem.create k)
+// Iterates over the dictionary with the iterator function.
+inl iter forall k v. (f : k -> v -> ()) (cached_dict d : cached_dict k v) : () = d |> iter (fun k v => f k.node v)

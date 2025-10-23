@@ -1,9 +1,9 @@
 // Provides an interface to the C++ `unordered_map`.
 open corebase
 
-
 inl globals() = global "#include <unordered_map>"
 
+// Creates the dictionary with a specified amount of buckets.
 inl create forall k v. (buckets : int) : dict k v =
     globals()
     $"`(dict k v) \v(!buckets, !(to_fptr hash : fptr (arg k) u64), !(to_fptr (fun a,b => a = b) : fptr (arg k * arg k) bool))"

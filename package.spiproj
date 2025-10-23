@@ -73,7 +73,9 @@ modules:
 
     corecudahost/
         types-
+        hash_nodem
         dictm
+        cached_dictm
         jsonm
         
     coreext/

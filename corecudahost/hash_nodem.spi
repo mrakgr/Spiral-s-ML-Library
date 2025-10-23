@@ -1,0 +1,8 @@
+open corebase
+
+inl create forall t. (node : t) : hash_node t = hash_node { hash = hash node; node }
+
+instance hashable hash_node t = fun x => x.hash
+instance equable hash_node t = fun a b => a.hash = b.hash && a.node = b.node
+instance comparable hash_node t = fun a b => comp a.node b.node
+instance printable hash_node t = fun {write write_ln} x => write x.node
