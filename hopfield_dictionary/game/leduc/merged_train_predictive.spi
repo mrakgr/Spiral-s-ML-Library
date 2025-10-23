@@ -34,7 +34,11 @@ let normalize (l : sa _ float) =
 let regret_match forall dim. (l : sa dim float) (mask : sa dim bool) = masking_normalize (relu l) mask
 
 type path_prob = {policy : float; sampling : float}
-type game_dict = dict messages {average_policy : sa 3 float; current_policy : sa 3 float; expected_values : sa 3 {value : float; weight : float}}
+type game_dicts = 
+    {
+        policy : cached_dict messages {average_policy : sa 3 float; current_policy : sa 3 float}
+        expected_values : cached_dict messages (sa 3 {value : float; weight : float})
+    }
 
 union player_mode =
     | Frozen
@@ -50,7 +54,7 @@ inl normalize_expected_value {value weight} = if weight <> 0 then value / weight
 inl dot_product forall dim. (expected_value_per_action : sa dim float) (current_policy_probs : sa dim float) =
     arraym.fold2 (fun s a b => s + a * b) 0 expected_value_per_action current_policy_probs
 
-inl train_loop ~(config : config) (dict : stack_refs game_dict) =
+inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
     inl rng = xoshiro.create()
     inl sample sampling_probs = xoshiro.sample_discrete' sampling_probs rng
     inl deck = stack_mut deckm.create()
@@ -105,21 +109,20 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
             | T_game_chance_init(a,b) => body (game_chance_init (a, b))
             | T_game_round(a,b) => body (game_round a b)
         inl cfr (table : table) =
-            inl key = 
+            inl key_ev = *messages
+            inl key_policy = 
                 *messages
                 |> arraym.filter (function
                     | PlayerGotCard(i,_) => i = table.player_turn
                     | _ => true
                     )
-            inl {average_policy current_policy expected_values} = 
-                match dictm.get *dict key with
+            inl {average_policy current_policy} = 
+                match cached_dictm.get dict.policy key_policy with
                 | Some x => x
                 | None => {
                     average_policy = sam.init (const 0)
                     current_policy = sam.init (const 0)
-                    expected_values = sam.init (const {value = 0; weight = 0})
                 }
-            inl get_expected_value i = normalize_expected_value (index expected_values i)
             inl actions =
                 [
                     Some Call
@@ -127,7 +130,12 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
                     if table.raises_left > 0 then Some Raise else None
                 ]
             inl mask = listm.map (function Some => true | None => false) actions |> arraym.fromList
-            inl cfr_mc () = // Does Monte Carlo campling. Uses the learned infoset baseline.
+            inl cfr_mc () = // Does Monte Carlo campling. An experimental attempt at a predictive baseline that doesn't walk up the tree again.
+                inl expected_values = 
+                    match cached_dictm.get dict.expected_values key_ev with
+                    | Some x => x
+                    | None => sam.init (const {value = 0; weight = 0})
+                inl get_expected_value i = normalize_expected_value (index expected_values i)
                 // inl average_policy_decay : float = 1 - 2 ** -10
                 // inl ev_decay : float = 1 - 2 ** -1
                 inl average_policy_decay : float = 1
@@ -158,23 +166,25 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                dictm.set *dict key {
+                inl current_policy =
+                    inl path_prob_opponent = get_path_prob_for_others table.player_turn
+                    arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
+                        max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
+                        ) current_policy expected_value_per_action
+                cached_dictm.set dict.policy key_policy {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
                             average_policy_decay * average_policy + current_policy_probs
                             ) average_policy current_policy_probs
-                    current_policy =
-                        inl path_prob_opponent = get_path_prob_for_others table.player_turn
-                        arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
-                            max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
-                            ) current_policy expected_value_per_action
-                    expected_values =
-                        expected_values |> arraym.update action_index (fun x => {x with 
-                            value#=fun value => value * ev_decay + *reward
-                            weight#=fun weight => weight * ev_decay + 1
-                            })
+                    current_policy
                     }
-                expected_value
+                cached_dictm.set dict.expected_values key_ev (
+                    expected_values |> arraym.update action_index (fun x => {x with 
+                        value#=fun value => value * ev_decay + *reward
+                        weight#=fun weight => weight * ev_decay + 1
+                        })
+                )
+                dot_product expected_value_per_action (regret_match current_policy mask)
             inl cfr_enum () = // Does enumeration.
                 inl average_policy_decay = 1 - 2 ** -8
                 inl current_policy_probs = regret_match current_policy mask
@@ -193,7 +203,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                dictm.set *dict key {
+                cached_dictm.set dict.policy key_policy {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
                             average_policy_decay * average_policy + current_policy_probs
@@ -203,7 +213,6 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
                         arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
                             max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
                             ) current_policy expected_value_per_action
-                    expected_values
                     }
                 expected_value
             inl cfr_frozen () = // Doesn't do any training. Is for testing purposes.
@@ -273,7 +282,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dict) =
 
 inl main() =
     loop.for' {from=0; nearTo=30} fun (_ : int) =>
-        inl dict = stack_refs (dictm.create 512)
+        inl dict = stack_refs ({policy = cached_dictm.create 512; expected_values = cached_dictm.create 512})
         inl loop (config : config) (nearTo : int) =
             inl train_loop = train_loop config dict
             loop.for {from=0; nearTo} (fun (i : int) _ =>
@@ -285,7 +294,7 @@ inl main() =
             loop {
                 is_chance_node_sampling = true
                 player_modes = [TrainSampling; TrainSampling] |> arraym.fromList
-            } 3_000_000
+            } 1_000_000
         inl reward_for_pl0 =
             loop {
                 is_chance_node_sampling = false
