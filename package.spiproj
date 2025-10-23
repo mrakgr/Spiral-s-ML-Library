@@ -110,7 +110,7 @@ modules:
                 random_players
                 enumerative_cfr_train
                 mc_cfr_train
-                merged_train
+                merged_train_learned_infoset
                 merged_train_learned_history
                 merged_train_predictive
 
