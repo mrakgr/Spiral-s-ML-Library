@@ -130,7 +130,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                     if table.raises_left > 0 then Some Raise else None
                 ]
             inl mask = listm.map (function Some => true | None => false) actions |> arraym.fromList
-            inl cfr_mc () = // Does Monte Carlo campling. Uses the learned history baseline.
+            inl cfr_mc () = // Does Monte Carlo campling. An experimental attempt at a predictive baseline that doesn't walk up the tree again.
                 inl expected_values = 
                     match cached_dictm.get dict.expected_values key_ev with
                     | Some x => x
@@ -166,16 +166,17 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
+                inl current_policy =
+                    inl path_prob_opponent = get_path_prob_for_others table.player_turn
+                    arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
+                        max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
+                        ) current_policy expected_value_per_action
                 cached_dictm.set dict.policy key_policy {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
                             average_policy_decay * average_policy + current_policy_probs
                             ) average_policy current_policy_probs
-                    current_policy =
-                        inl path_prob_opponent = get_path_prob_for_others table.player_turn
-                        arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
-                            max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
-                            ) current_policy expected_value_per_action
+                    current_policy
                     }
                 cached_dictm.set dict.expected_values key_ev (
                     expected_values |> arraym.update action_index (fun x => {x with 
@@ -183,7 +184,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                         weight#=fun weight => weight * ev_decay + 1
                         })
                 )
-                expected_value
+                dot_product expected_value_per_action (regret_match current_policy mask)
             inl cfr_enum () = // Does enumeration.
                 inl average_policy_decay = 1 - 2 ** -8
                 inl current_policy_probs = regret_match current_policy mask
@@ -293,7 +294,7 @@ inl main() =
             loop {
                 is_chance_node_sampling = true
                 player_modes = [TrainSampling; TrainSampling] |> arraym.fromList
-            } 1_500_000
+            } 1_000_000
         inl reward_for_pl0 =
             loop {
                 is_chance_node_sampling = false

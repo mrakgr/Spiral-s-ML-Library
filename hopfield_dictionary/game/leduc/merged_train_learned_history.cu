@@ -1161,7 +1161,7 @@ bool FunPointerMethod1(Tuple0 tup0, Tuple0 tup1){
 }
 inline bool while_method_3(int v0){
     bool v1;
-    v1 = v0 < 2000000;
+    v1 = v0 < 1500000;
     return v1;
 }
 unsigned int loop_2(unsigned int v0, xso::rng & v1){

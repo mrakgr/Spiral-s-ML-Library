@@ -26,6 +26,7 @@ if (-not (Test-Path $path_output) -or
             # "Crow/include"
             "cpp-httplib"
             "json/include"
+            "eigen"
         ) | ForEach-Object { "-Icpp_libs/$_" }
     $nvcc_args = @(
         $cpp_libs_includes

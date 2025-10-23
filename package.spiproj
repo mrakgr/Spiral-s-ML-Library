@@ -114,6 +114,9 @@ modules:
                 merged_train_learned_history
                 merged_train_predictive
 
+                hopfield_merged_cfr_train
+                
+
     ml/
         helpers-
         primitives

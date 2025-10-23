@@ -10,7 +10,8 @@
                 // "${workspaceFolder}/cpp_libs/cutlass/include/",
                 "${workspaceFolder}/cpp_libs/cpp-httplib",
                 "${workspaceFolder}/cpp_libs/xoshiro/include",
-                "${workspaceFolder}/cpp_libs/json/include"
+                "${workspaceFolder}/cpp_libs/json/include",
+                "${workspaceFolder}/cpp_libs/eigen"
             ],
             "defines": [
                 "__NVCC__",
