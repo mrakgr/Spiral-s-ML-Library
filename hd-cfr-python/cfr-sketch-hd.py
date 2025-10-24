@@ -1,10 +1,7 @@
 import numpy as np
 
-def softmax(x):
-    e_x = np.exp(x - np.max(x))  # subtract max for numerical stability
-    return e_x / e_x.sum(axis=0)
 def hopfield_dict(input : np.ndarray, keys : np.ndarray, values : np.ndarray, temperature = 0.0001):
-    return np.matmul(softmax(np.matmul(keys, input) / temperature), values)
+    return np.matmul(np.exp((np.matmul(keys, input) - np.max(input)) / temperature), values)
 
 keys = np.array([
     [1,0,0],
@@ -34,8 +31,6 @@ expected_values_den = np.array([
 
 def expected_values(key : np.ndarray):
     a,b = hopfield_dict(key,keys, expected_values_nom), hopfield_dict(key,keys, expected_values_den)
-    # print(f"a: {a}")
-    # print(f"b: {b}")
     return np.divide(a, np.maximum(2 ** -30, b))
 
 def relu(x):
@@ -48,9 +43,6 @@ def get_prob_distr(x : np.ndarray) -> np.ndarray:
 
 def calculate_expected_values(expected_values : np.ndarray, sampling_prob : float, action_index : int, action_reward : float):
     e = np.zeros_like(expected_values)
-    # print(f"sampling_prob: {sampling_prob}")
-    # print(f"action_index: {action_index}")
-    # print(f"action_reward: {action_reward}")
     for i in range(len(e)):
         ev = expected_values[i]
         if i == action_index:
@@ -79,9 +71,9 @@ def cfr_update(key : np.ndarray, action_index : int, action_reward : float, path
     # print(f"current_policy_update: {current_policy_update}")
 
     average_policy_update = current_policy_probs
-    print(f"c: {c}")
-    print(f"current_policy_update: {current_policy_update}")
-    print(f"average_policy_update: {average_policy_update}")
+    # print(f"c: {c}")
+    # print(f"current_policy_update: {current_policy_update}")
+    # print(f"average_policy_update: {average_policy_update}")
     e_update_nom = np.zeros_like(e)
     e_update_den = np.zeros_like(e)
     e_update_nom[action_index] = action_reward

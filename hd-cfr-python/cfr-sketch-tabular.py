@@ -70,12 +70,12 @@ def cfr_update(key : str, action_index : int, action_reward : float, path_prob_s
     current_policy_update = (new_expected_values - mean_of_ev) * path_prob_opponent / path_probability_sampling
     # print(f"current_policy_update: {current_policy_update}")
 
-    updated_current_policy = (1 - alpha) * c + alpha * current_policy_update
+    updated_current_policy = c + current_policy_update
     average_policy_update = current_policy_probs
-    print(f"c: {c}")
-    print(f"current_policy_update: {current_policy_update}")
-    print(f"updated_current_policy: {updated_current_policy}")
-    print(f"average_policy_update: {average_policy_update}")
+    # print(f"c: {c}")
+    # print(f"current_policy_update: {current_policy_update}")
+    # print(f"updated_current_policy: {updated_current_policy}")
+    # print(f"average_policy_update: {average_policy_update}")
     e_update_nom = np.zeros_like(e)
     e_update_den = np.zeros_like(e)
     e_update_nom[action_index] = action_reward
@@ -83,9 +83,9 @@ def cfr_update(key : str, action_index : int, action_reward : float, path_prob_s
 
     # Mutable updates
     current_policy[key] = updated_current_policy
-    average_policy[key] = (1 - alpha) * a + alpha * average_policy_update
-    expected_values_nom[key] = (1 - alpha) * expected_values_nom[key] + alpha * e_update_nom
-    expected_values_den[key] = (1 - alpha) * expected_values_den[key] + alpha * e_update_den
+    average_policy[key] = a + average_policy_update
+    expected_values_nom[key] = expected_values_nom[key] + e_update_nom
+    expected_values_den[key] = expected_values_den[key] + e_update_den
     count = count + 1.
 
 print(current_policy.get("state_a"))
