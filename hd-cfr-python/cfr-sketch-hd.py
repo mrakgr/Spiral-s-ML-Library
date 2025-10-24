@@ -4,19 +4,22 @@ def hopfield_dict(input : np.ndarray, keys : np.ndarray, values : np.ndarray, te
     return np.matmul(np.exp((np.matmul(keys, input) - np.max(input)) / temperature), values)
 
 keys = np.array([
-    [1,0,0],
-    [0,1,0],
-    [0,0,1],
+    [1,0,0], # 1
+    [1,0,0], # 1
+    [0,1,0], # 0
+    [0,0,1], # 0
 ],dtype=float)
+# np.matmul(keys,np.array([1,0,0]))
 average_policy = np.array([
     [0,0,0],
     [0,0,0],
     [0,0,0],
 ],dtype=float)
 current_policy = np.array([
-    [300,300,-10],
-    [300,300,-10],
-    [300,300,-10],
+    [300,300,-10], # * 1
+    [300,300,-10], # * 1
+    [300,300,-10], # * 0
+    [300,300,-10], # * 0
 ],dtype=float)
 expected_values_nom = np.array([
     [0,0,0],
@@ -70,7 +73,8 @@ def cfr_update(key : np.ndarray, action_index : int, action_reward : float, path
     current_policy_update = (new_expected_values - mean_of_ev) * path_prob_opponent / path_probability_sampling
     # print(f"current_policy_update: {current_policy_update}")
 
-    average_policy_update = current_policy_probs
+    updated_current_policy = c + current_policy_update
+    average_policy_update = get_prob_distr(updated_current_policy)
     # print(f"c: {c}")
     # print(f"current_policy_update: {current_policy_update}")
     # print(f"average_policy_update: {average_policy_update}")

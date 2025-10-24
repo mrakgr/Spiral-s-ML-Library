@@ -71,7 +71,7 @@ def cfr_update(key : str, action_index : int, action_reward : float, path_prob_s
     # print(f"current_policy_update: {current_policy_update}")
 
     updated_current_policy = c + current_policy_update
-    average_policy_update = current_policy_probs
+    average_policy_update = get_prob_distr(updated_current_policy)
     # print(f"c: {c}")
     # print(f"current_policy_update: {current_policy_update}")
     # print(f"updated_current_policy: {updated_current_policy}")
