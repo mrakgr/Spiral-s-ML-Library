@@ -113,6 +113,8 @@ modules:
                 merged_train_learned_infoset
                 merged_train_learned_history
                 merged_train_predictive
+                merged_train_predictive_alt
+                merged_train_predictive_alt_avg_policy_decay
 
                 hopfield_merged_cfr_train
                 

@@ -1,0 +1,305 @@
+open corebase
+open corecudahost
+open coreext
+open game
+
+union training_nodes =
+    | T_game_round : table * action
+    | T_game_chance_community_card : table * card
+    | T_game_chance_init : card * card
+    | T_none
+
+// Clamps all the elements below 0 to 0.
+let relu (l : sa _ float) = arraym.map (max 0) l
+// Maps the masked out parts of the array to 0.
+inl mask forall dim. (l : sa dim float) (mask : sa dim bool) = arraym.map2 (fun a b => if b then a else 0) l mask
+// Normalizes the array so all of its elements sum up to 1 given the mask.
+// The inputs should always be >= 0.
+let masking_normalize forall dim. (l : sa dim float) (mask' : sa dim bool) =
+    inl inv_len = 1 / arraym.fold (fun s x => s + if x then 1 else 0) 0 mask'
+    inl l = mask l mask'
+    inl s = arraym.sum l
+    arraym.map2 (fun x m => 
+        if m = false then 0
+        elif s <> 0 then x / s
+        else inv_len
+        ) l mask'
+// Normalizes the array so all of its elements sum up to 1.
+// The inputs should always be >= 0.
+let normalize (l : sa _ float) =
+    inl inv_len = 1 / conv (length l)
+    inl s = arraym.sum l
+    arraym.map (fun x => if s <> 0 then x / s else inv_len) l
+// Passes the array through a relu and normalizes its sum to 1.
+let regret_match forall dim. (l : sa dim float) (mask : sa dim bool) = masking_normalize (relu l) mask
+
+type path_prob = {policy : float; sampling : float}
+type game_dicts = 
+    {
+        policy : cached_dict messages {average_policy : sa 3 float; current_policy : sa 3 float}
+        expected_values : cached_dict messages (sa 3 {value : float; weight : float})
+    }
+
+union player_mode =
+    | Frozen
+    | TrainSampling
+    | TrainEnumerative
+type config = 
+    {
+        is_chance_node_sampling : bool
+        player_modes : sa 2 player_mode
+    }
+
+inl normalize_expected_value {value weight} = if weight <> 0 then value / weight else 0
+inl dot_product forall dim. (expected_value_per_action : sa dim float) (current_policy_probs : sa dim float) =
+    arraym.fold2 (fun s a b => s + a * b) 0 expected_value_per_action current_policy_probs
+
+inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
+    inl rng = xoshiro.create()
+    inl sample sampling_probs = xoshiro.sample_discrete' sampling_probs rng
+    inl deck = stack_mut deckm.create()
+    inl messages = stack_refs (sa_create : messages)
+    inl log_path_probs = stack_refs (sam.init (const {policy = log 1; sampling = log 1}) : sa 2 path_prob)
+    inl using_message msg f =
+        sa_listm.push *messages msg
+        inl x = f()
+        sa_listm.pop *messages |> ignore
+        x
+    inl using_deck_sampling f =
+        inl old_deck = *deck
+        inl card,new_deck = draw_card rng old_deck
+        deck <- new_deck
+        inl r = f card
+        deck <- old_deck
+        r
+    inl using_deck_enumerative f =
+        loop.for {from=0; nearTo=6} (fun i s =>
+            if deckm.index *deck i then
+                deck <- deckm.toggle *deck i
+                inl r = f (int_to_card i) : float
+                deck <- deckm.toggle *deck i
+                fst s + r, snd s + 1
+            else 
+                s
+            ) (0, 0)
+        |> fun r, c => if c <> 0 then r / c else 0
+    inl using_deck f = if config.is_chance_node_sampling then using_deck_sampling f else using_deck_enumerative f
+    inl using_path_prob (i : int) (path_prob : path_prob) f =
+        inl old_log_prob = index *log_path_probs i
+        set *log_path_probs i {old_log_prob with policy #= (+)(log path_prob.policy); sampling #= (+)(log path_prob.sampling)}
+        inl x = f()
+        set *log_path_probs i old_log_prob
+        x
+    // Gets the path probability of all but the selected player.
+    inl get_path_prob_for_others (player_turn : int) = 
+        *log_path_probs
+        |> arraym.foldi (fun i s (log_path_prob : path_prob) =>
+                inl policy = if i = player_turn then log 1 else log_path_prob.policy
+                s + policy - log_path_prob.sampling
+            ) (log 1)
+        |> exp
+    let rec body node =
+        inl reward = stack_mut 0
+        inl set_rewards winner_id (chips_won : float) =
+            inl chips_won = conv chips_won
+            reward <- if winner_id = 0 then chips_won else -chips_won // Aligns the reward for the first player.
+        let rec loop = function // This is so game_round only gets generated once instead of 3 times in the compiled code.
+            | T_none => *reward // Returns the reward for the first player.
+            | T_game_chance_community_card(a,b) => body (game_chance_community_card a b)
+            | T_game_chance_init(a,b) => body (game_chance_init (a, b))
+            | T_game_round(a,b) => body (game_round a b)
+        inl cfr (table : table) =
+            inl key_ev = *messages
+            inl key_policy = 
+                *messages
+                |> arraym.filter (function
+                    | PlayerGotCard(i,_) => i = table.player_turn
+                    | _ => true
+                    )
+            inl {average_policy current_policy} = 
+                match cached_dictm.get dict.policy key_policy with
+                | Some x => x
+                | None => {
+                    average_policy = sam.init (const 0)
+                    current_policy = sam.init (const 0)
+                }
+            inl actions =
+                [
+                    Some Call
+                    if index table.pot 0 <> index table.pot 1 then Some Fold else None
+                    if table.raises_left > 0 then Some Raise else None
+                ]
+            inl mask = listm.map (function Some => true | None => false) actions |> arraym.fromList
+            inl cfr_mc () = // Does Monte Carlo campling. An experimental attempt at a predictive baseline that doesn't walk up the tree again.
+                inl expected_values = 
+                    match cached_dictm.get dict.expected_values key_ev with
+                    | Some x => x
+                    | None => sam.init (const {value = 0; weight = 0})
+                inl get_expected_value i = normalize_expected_value (index expected_values i)
+                // inl average_policy_decay : float = 1 - 2 ** -10
+                // inl ev_decay : float = 1 - 2 ** -1
+                inl average_policy_decay : float = 1
+                inl ev_decay : float = 1
+                inl noise_factor : float = 2 ** -3 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
+                inl current_policy_probs = regret_match current_policy mask
+                inl average_policy_probs = masking_normalize average_policy mask
+                inl noise_probs = masking_normalize (sam.init (const 0)) mask
+                inl sampling_probs = arraym.map2 (fun a b => (1 - noise_factor) * a + noise_factor * b) average_policy_probs noise_probs
+                inl action_index = sample sampling_probs
+                inl reward = stack_mut 0
+                inl expected_value_per_action : sa 3 float = 
+                    actions
+                    |> listm.mapi (fun i x =>
+                        inl ev = get_expected_value i
+                        match x with
+                        | Some action when i = action_index =>
+                            inl action_prob = {policy = index current_policy_probs i; sampling = index sampling_probs i}
+                            inl reward_for_pl0 = 
+                                using_path_prob table.player_turn action_prob fun () =>
+                                using_message PlayerAction(table.player_turn, action) fun () => 
+                                loop (T_game_round (table, action))
+                            // Inverts the rewards if the player isn't 0.
+                            reward <- if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+                            (*reward - ev) / action_prob.sampling + ev
+                        | _ => 
+                            ev
+                    )
+                    |> arraym.fromList
+                inl expected_value = dot_product expected_value_per_action current_policy_probs
+                inl current_policy = // Updated current policy.
+                    inl path_prob_opponent = get_path_prob_for_others table.player_turn
+                    arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
+                        max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
+                        ) current_policy expected_value_per_action
+                inl current_policy_probs = regret_match current_policy mask // Updated probabilities.
+                cached_dictm.set dict.policy key_policy {
+                    average_policy =
+                        arraym.map2 (fun average_policy current_policy_probs =>
+                            average_policy_decay * average_policy + current_policy_probs
+                            ) average_policy current_policy_probs
+                    current_policy
+                    }
+                cached_dictm.set dict.expected_values key_ev (
+                    expected_values |> arraym.update action_index (fun x => {x with 
+                        value#=fun value => value * ev_decay + *reward
+                        weight#=fun weight => weight * ev_decay + 1
+                        })
+                )
+                dot_product expected_value_per_action current_policy_probs
+            inl cfr_enum () = // Does enumeration.
+                inl average_policy_decay = 1 - 2 ** -8
+                inl current_policy_probs = regret_match current_policy mask
+                inl expected_value_per_action : sa 3 float = 
+                    actions
+                    |> listm.mapi (fun i x =>
+                        match x with
+                        | Some action =>
+                            inl reward_for_pl0 = 
+                                using_path_prob table.player_turn {policy=index current_policy_probs i; sampling=1} fun () =>
+                                using_message PlayerAction(table.player_turn, action) fun () => 
+                                loop (T_game_round (table, action))
+                            // Inverts the rewards if the player isn't 0.
+                            if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+                        | None => 0
+                    )
+                    |> arraym.fromList
+                inl expected_value = dot_product expected_value_per_action current_policy_probs
+                cached_dictm.set dict.policy key_policy {
+                    average_policy =
+                        arraym.map2 (fun average_policy current_policy_probs =>
+                            average_policy_decay * average_policy + current_policy_probs
+                            ) average_policy current_policy_probs
+                    current_policy =
+                        inl path_prob_opponent = get_path_prob_for_others table.player_turn
+                        arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
+                            max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
+                            ) current_policy expected_value_per_action
+                    }
+                expected_value
+            inl cfr_frozen () = // Doesn't do any training. Is for testing purposes.
+                inl current_policy_probs = masking_normalize average_policy mask // Uses the average policy.
+                inl expected_value_per_action : sa 3 float = 
+                    actions
+                    |> listm.mapi (fun i x =>
+                        match x with
+                        | Some action =>
+                            inl reward_for_pl0 = 
+                                using_path_prob table.player_turn {policy=index current_policy_probs i; sampling=1} fun () =>
+                                using_message PlayerAction(table.player_turn, action) fun () => 
+                                loop (T_game_round (table, action))
+                            // Inverts the rewards if the player isn't 0.
+                            if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+                        | None => 0
+                    )
+                    |> arraym.fromList
+                inl expected_value = dot_product expected_value_per_action current_policy_probs
+                expected_value
+            match index config.player_modes table.player_turn with
+            | TrainEnumerative => cfr_enum ()
+            | TrainSampling => cfr_mc ()
+            | Frozen => cfr_frozen ()
+        match node with
+        | TerminalFold table =>
+            inl msg = 
+                inl chips_won = index table.pot table.player_turn
+                set_rewards table.player_turn (conv -chips_won)
+                Showdown{cards_shown=table.pl_card; chips_won winner_id=toggle table.player_turn}
+            using_message msg fun () =>
+            loop T_none
+        | TerminalCall table =>
+            inl msg =
+                inl chips_won, winner_id =
+                    inl chips_won = index table.pot table.player_turn
+                    match compare_hands table with
+                    | Gt => chips_won, 0
+                    | Eq => 0, -1
+                    | Lt => chips_won, 1
+                set_rewards (abs winner_id) (conv chips_won)
+                Showdown{cards_shown=table.pl_card; chips_won winner_id}
+            using_message msg fun () =>
+            loop T_none
+        | Round table => 
+            inl expected_value = cfr table
+            set_rewards table.player_turn expected_value
+            loop T_none
+        | RoundWithAction(table,action) =>
+            inl msg = PlayerAction(table.player_turn, action)
+            using_message msg fun () =>
+            loop (T_game_round (table, action))
+        | ChanceCommunityCard table =>
+            using_deck fun card =>
+            inl msg = CommunityCardIs card
+            using_message msg fun () =>
+            loop (T_game_chance_community_card (table, card))
+        | ChanceInit () => 
+            using_deck fun c0 =>
+            using_deck fun c1 =>
+            using_message PlayerGotCard(0, c0) fun () =>
+            using_message PlayerGotCard(1, c1) fun () =>
+            loop (T_game_chance_init (c0, c1))
+
+    fun () => 
+        body game_start()
+
+inl main() =
+    loop.for' {from=0; nearTo=30} fun (_ : int) =>
+        inl dict = stack_refs ({policy = cached_dictm.create 512; expected_values = cached_dictm.create 512})
+        inl loop (config : config) (nearTo : int) =
+            inl train_loop = train_loop config dict
+            loop.for {from=0; nearTo} (fun (i : int) _ =>
+                // if i % (max 1 (nearTo / 25)) = 0 then
+                //     console.write_ln {i nearTo}
+                train_loop ()
+                ) 0
+        inl _ =
+            loop {
+                is_chance_node_sampling = true
+                player_modes = [TrainSampling; TrainSampling] |> arraym.fromList
+            } 1_000_000
+        inl reward_for_pl0 =
+            loop {
+                is_chance_node_sampling = false
+                player_modes = [TrainEnumerative; Frozen] |> arraym.fromList
+            } 100
+        console.write_ln {reward_for_pl0}
+    0i32
