@@ -1,4 +1,4 @@
-#include <Eigen/Dense>
+#include <hopfield_dict.hpp>
 #include <iostream>
 
 int main() {
@@ -15,11 +15,7 @@ int main() {
     input << 1, 1, 0, 0,
              0, 1, 1, 1;
     
-    Eigen::MatrixXd out;
-    out.setZero();
-    
-    Eigen::MatrixXd & out_ref = out;
-    // matmul(((matmul(keys, input.T) - input.sum) / temperature).T, values)
-    out_ref = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
+    Eigen::MatrixXd out(2,4);
+    hopfield_dictionary_get(input, keys, values, out);
     std::cout << out << "\n\n";
 }

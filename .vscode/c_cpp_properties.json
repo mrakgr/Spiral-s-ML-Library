@@ -11,7 +11,8 @@
                 "${workspaceFolder}/cpp_libs/cpp-httplib",
                 "${workspaceFolder}/cpp_libs/xoshiro/include",
                 "${workspaceFolder}/cpp_libs/json/include",
-                "${workspaceFolder}/cpp_libs/eigen"
+                "${workspaceFolder}/cpp_libs/eigen",
+                "${workspaceFolder}/hopfield_dictionary/host_cpp_lib"
             ],
             "defines": [
                 "__NVCC__",

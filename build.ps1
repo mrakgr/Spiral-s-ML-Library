@@ -22,12 +22,17 @@ if (-not (Test-Path $path_output) -or
 
     $cpp_libs_includes = 
         @(
-            "xoshiro/include"
             # "Crow/include"
-            "cpp-httplib"
-            "json/include"
-            "eigen"
-        ) | ForEach-Object { "-Icpp_libs/$_" }
+            "cpp_libs/xoshiro/include"
+            "cpp_libs/cpp-httplib"
+            "cpp_libs/json/include"
+            "cpp_libs/eigen"
+            "hopfield_dictionary/host_cpp_lib"
+        ) | ForEach-Object { "-I$_" }
+    $extra_cpp_files =
+        @(
+            "hopfield_dictionary/host_cpp_lib/hopfield_dict.cpp" # For performance the host side Hopfield dictionary implementation has been factored into its own library.
+        )
     $nvcc_args = @(
         $cpp_libs_includes
         # "-D", "NDEBUG" # Turns off the asserts
@@ -43,7 +48,7 @@ if (-not (Test-Path $path_output) -or
         "-diag-suppress", "550,20012,68,39,177" # Suppresses various warnings
         "-std", "c++20" # Compiles with the selected C++ standard
         "-o", $path_output # The output path
-        $Path # Input file
+        "-x", "cu", $Path, $extra_cpp_files # Input file and the extra host side files .cpp files that need to be passed to the compiler.
     )
 
     nvcc $nvcc_args 
