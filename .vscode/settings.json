@@ -33,7 +33,8 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "ostream": "cpp",
-        "*.impl": "cpp"
+        "*.impl": "cpp",
+        "*.inc": "cpp"
     },
     "C_Cpp.default.cppStandard": "c++20",
     "cmake.ignoreCMakeListsMissing": true
