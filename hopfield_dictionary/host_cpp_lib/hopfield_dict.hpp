@@ -2,4 +2,4 @@
 
 #include <Eigen/Dense>
 
-void hopfield_dictionary_get(Eigen::MatrixXd & input, Eigen::MatrixXd & keys, Eigen::MatrixXd & values, Eigen::MatrixXd & out, double temperature = 0.001);
+void hopfield_dictionary_get(Eigen::MatrixXf & input, Eigen::MatrixXf & keys, Eigen::MatrixXf & values, Eigen::MatrixXf & out, float temperature);

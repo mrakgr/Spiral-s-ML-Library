@@ -1,0 +1,5 @@
+open corebase
+
+inl main() =
+    inl x : array f32 = create 10
+    0i32
