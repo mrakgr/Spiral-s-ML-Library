@@ -1,5 +1,57 @@
 // Pickler combinators for converting regular Spiral types to binary vectors of floating point values.
 
+open corebase
+
+prototype pickler_index array : array -> int -> bool
+prototype pickler_set array : array -> int -> bool -> ()
+
+instance pickler_index array t{number} = fun x i => 
+    if index x i = 1 then true
+    elif index x i = 0 then false
+    else failwith "Pickler index expected to get 1 or 0."
+instance pickler_set array t{number} = fun x i v => set x i (if v then 1 else 0)
+
+nominal binary_array = array u32
+
+instance pickler_index binary_array = fun (binary_array (x : array u32)) i => 
+    index x (i / 32) &&& (1 <<< (i % 32)) <> 0
+instance pickler_set binary_array = fun (binary_array (x : array u32)) i v =>
+    inl a = index x (i / 32)
+    inl b = 1 <<< (i % 32)
+    set x (i / 32) (if v then a ||| b else a &&& ~~~b)
+
+union rec pickler t =
+    | Unit :: pickler ()
+    | Bool :: pickler bool
+    | Int :: int -> pickler int
+    | Uint :: int -> pickler uint
+    | Sa_list :: forall dim t. pickler t -> pickler (sa_list dim t)
+    | Sa :: forall dim t. pickler t -> pickler (sa dim t)
+    | Pair :: forall a b. pickler a * pickler b -> pickler (a * b)
+    | Wrap :: forall a. (exists b. (a -> b) * (b -> a) * pickler b) -> pickler a
+    | Alt :: forall t. list (exists k v. k * pickler v) -> pickler t
+
+inl size' forall t. (p : pickler t) : compile_time.hashmap * int =
+    inl h = compile_time.hashmapm.create()
+    inl rec loop forall t'. : pickler t' -> int =
+        compile_time.hashmapm.memoize h function
+            | Unit => 0
+            | Bool => 2
+            | Int l => l
+            | Uint l => l
+            | Sa_list p => 
+                inl dim = real typecase t' with sa_list ~dim _ => real_core.type_lit_to_lit `dim : int
+                dim + (loop p + 1) * dim
+            | Sa p =>
+                inl dim = real typecase t' with sa_list ~dim _ => real_core.type_lit_to_lit `dim : int
+                loop p * dim
+            | Pair(a,b) => loop a + loop b
+            | Wrap (exists b. a, b, p) => loop p
+            | Alt l => l |> listm.fold (fun s (exists k v. (k, v) : exists k v. k * pickler v) => s + loop v) 0
+    h, loop p
+
+// -----------------------------------------------------------------------------------------------
+
 type state = int * array float
 nominal pu a = {
     pickle : a -> state -> ()

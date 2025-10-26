@@ -34,3 +34,9 @@ inl get_with_default forall key value. (hashmap (exists. h) : hashmap key value)
 // Makes the hash map immutable, allowing it to be passed through join points.
 // After it's set to immutable, trying to add or remove from it will result in a type error.
 inl set_immutable forall key value. (hashmap (exists. h) : hashmap key value) : () = !!!!HashMapSetImmutable(h)
+
+// Memoizes the result of calling the function for a given key using the hashmap.
+inl memoize forall key value. (h : hashmap key value) f k =
+    match try_get h k with
+    | Some v => v
+    | None => inl v = f k in add h k v . v

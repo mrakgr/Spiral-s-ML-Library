@@ -1,5 +1,7 @@
 #include "test0.auto.cu"
+#include <iostream>
 int main() {
-    float v0[10];
+    bool x = false;
+    std::cout << static_cast<float>(x) << std::endl;
     return 0;
 }

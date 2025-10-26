@@ -64,10 +64,7 @@ nominal model t =
         data : graph_data
     }
 
-inl memoize (h : compile_time.hashmap) f k =
-    match compile_time.hashmapm.try_get h k with
-    | Some v => v
-    | None => inl v = f k in compile_time.hashmapm.add h k v . v
+inl memoize (h : compile_time.hashmap) = compile_time.hashmapm.memoize h
 
 // Returns the top level dimension for an arbitrary graph type. Takes in a hashmap for memoization purposes.
 // Results in a type errors error on the KeyScalar node.
