@@ -31,29 +31,28 @@ union rec pickler t =
     | Wrap :: forall a. (exists b. (a -> b) * (b -> a) * pickler b) -> pickler a
     | Alt :: forall t. list (exists k v. k * pickler v) -> pickler t
 
-inl qwe (l : list {x : int}) : int =
-    l |> listm.fold (fun a b => b.x) 0
+inl qwe() =
+    inl fold s f l = listm.fold f s l
+    [{x=1}] |> fold 0i32 (fun a b => b.x) 
 
-// : exists k v. k * pickler v
-// Returns the size of the pickler.
+// Returns the number of entries in the pickler.
 inl size' forall t. (h : compile_time.hashmap) (p : pickler t) : int =
+    inl get_max_length forall (array : * -> * -> *) dim el. (x : pickler (array dim el)) : int = real real_core.type_lit_to_lit `dim : int
     inl rec loop forall t'. : pickler t' -> int =
         compile_time.hashmapm.memoize h function
             | Unit => 0
             | Bool => 2
             | Int l => l
             | Uint l => l 
-            | Sa_list p => 
-                inl dim = real typecase t' with _ ~dim _ => real_core.type_lit_to_lit `dim : int
-                dim + (loop p + 1) * dim
-            | Sa p =>
-                inl dim = real typecase t' with _ ~dim _ => real_core.type_lit_to_lit `dim : int
-                loop p * dim // : exists k v. k * pickler v
+            | Sa_list p as x => 
+                inl len = get_max_length x
+                len + (loop p + 1) * len
+            | Sa p as x =>
+                inl len = get_max_length x
+                loop p * len
             | Pair(a,b) => loop a + loop b 
             | Wrap (exists b. a, b, p) => loop p 
-            | Alt l => 
-                // (0i32, l) ||> listm.fold (fun s (exists k v. k, v) => s + loop v)
-                l |> listm.fold (fun s (exists k v. k, v) => s + loop v) 0
+            | Alt l => (0i32, l) ||> listm.fold (fun s (exists k v. k, v) => s + loop v)
     loop p
 
 // Returns the size of the pickler. The first unit argument of this returns the function with the compile time hashmap primed.
