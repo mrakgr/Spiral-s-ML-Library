@@ -110,7 +110,7 @@ let deserialize forall t. (x : json t) : t =
         | _ =>
             if union_type_is `t' then 
                 inl k = $"!x[0].get<std::string>()" : $"std::string"
-                union_to_record `t' forall r. =>
+                union_type_to_record `t' forall r. =>
                 record_type_fold_back (fun key => forall value. next _ =>
                     inl k' = $"std::string \v = !(symbol_to_string key)" : $"std::string"
                     if $"!k == !k'" : bool then 

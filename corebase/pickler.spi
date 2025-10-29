@@ -177,7 +177,7 @@ inl alt forall t r. (l : r) : pu t =
     inl one = 1 : int
     inl _ = real // Typechecking.
         open real_core
-        union_to_record `t forall r'. =>
+        union_type_to_record `t forall r'. =>
         assert (record_type_length `r' = record_type_length `r) "The number of keys in the record should be the same as in the union type."
         record_type_iter (fun k => forall v. =>
             record_type_try_find `r' k

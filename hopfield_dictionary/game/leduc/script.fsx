@@ -1,1 +1,1 @@
-[{|x = 1|}] |> List.fold (fun a b -> b.x) 0
+let t = Error 123

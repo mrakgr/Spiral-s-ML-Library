@@ -172,8 +172,8 @@ inl record_filter f a = !!!!RecordFilter(f,a)
 inl record_fold f s a = !!!!RecordFold(f,s,a)
 // Folds over a record right to left.
 inl record_fold_back f a s = !!!!RecordFoldBack(f,s,a)
-// Returns the record's length as i32.
-inl record_length m = !!!!RecordLength(m)
+// Returns the record's length as an int.
+inl record_length m = conv `int !!!!RecordLength(m)
 
 // Maps over a type record.
 inl record_type_map f = forall a. => !!!!RecordTypeMap(f, `a)
@@ -183,8 +183,8 @@ inl record_type_iter f = forall a. => !!!!RecordTypeIter(f, `a)
 inl record_type_fold f s = forall a. => !!!!RecordTypeFold(f,s, `a)
 // Folds over a type record right to left.
 inl record_type_fold_back f = forall a. s => !!!!RecordTypeFoldBack(f,s, `a)
-// Returns the type record's length as i32.
-inl record_type_length forall m. = !!!!RecordTypeLength(`m)
+// Returns the type record's length as an int.
+inl record_type_length forall m. = conv `int !!!!RecordTypeLength(`m)
 // Tries indexing into a type record at the specified key. Passes the value into the success branch if it finds it.
 inl record_type_try_find forall a. k on_succ on_fail = !!!!RecordTypeTryFind(`a,k,on_succ,on_fail)
 
@@ -214,15 +214,17 @@ inl free_vars x = !!!!FreeVars(x)
 // Sets the free vars of the first term to the second. Both the number and the types of the free vars have to be the same.
 inl free_vars_replace a b = !!!!FreeVarsReplace(a,b)
 
+// Converts an union type to a type record.
+inl union_type_to_record forall t. on_succ = !!!!UnionToRecord(`t,on_succ)
+// Returns the number of cases in an union type an int.
+inl union_type_length forall x. = union_type_to_record `x record_type_length
 // Returns the i32 tag of an union.
 inl union_tag x = !!!!UnionTag(x)
-
+// Returns the number of cases in an union as an int.
+inl union_length x = union_type_length `(`(x))
 // Takes in a tag and an union type and passes the key/value pair of the union at that tag into the success case.
 // When the tag is a runtime variable it iterates through all the cases in turn.
 inl union_untag forall t. x on_succ on_fail = !!!!UnionUntag(`t,x,on_succ,on_fail)
-
-// Converts an union type to a type record.
-inl union_to_record forall t. on_succ = !!!!UnionToRecord(`t,on_succ)
 
 // Strips the nominal wrapper from the value.
 inl nominal_strip x = !!!!NominalStrip(x)

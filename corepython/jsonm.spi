@@ -38,7 +38,7 @@ let deserialize forall t. (json x : json t) : t =
         | _ =>
             if union_type_is `t' then 
                 inl k,v = ($"!x[0] ## type: ignore" : string), ($"!x[1] ## type: ignore" : obj)
-                union_to_record `t' forall r. =>
+                union_type_to_record `t' forall r. =>
                 record_type_fold_back (fun key => forall value. next _ =>
                     if symbol_to_string key = k then nominal_create `t' (key, f `value v)
                     else next ()
