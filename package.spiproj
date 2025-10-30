@@ -122,6 +122,8 @@ modules:
                 hopfield_merged_cfr_train
 
                 test0
+                test1
+                
                 
 
     ml/

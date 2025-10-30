@@ -78,10 +78,11 @@ inl size' (h : compile_time.hashmap) : forall t. pickler t -> int =
                 | Wrap (exists b. a, b, p) => loop p 
                 | Alt l => real
                     open real_core
+                    inl l = nominal_strip l
                     record_fold (fun {state key value} => 
                         typecase `value with pickler ~t => 
                         state + loop `t value
-                        ) (record_length l) (nominal_strip l)
+                        ) (record_length l) l
         loop p
     `$body
 
@@ -102,13 +103,14 @@ inl pickle forall array{pickler_enable} tt. (ar : array) (p : pickler tt) ~(x : 
         | Bool => push (if x then 1 else 0) 2
         | Int l => 
             assert (l > 0) "The argument to Int must be greater than 0."
-            assert (0 <= x) "The input to the pickler must be 0 or positive."
-            assert (x < 0) "The input to the pickler must be less than the specified length."
+            assert (x < l) "The input to the pickler must be 0 or positive."
+            assert (0 <= x) "The input to the pickler must be less than the specified length."
             push x l
         | Uint l =>
+            inl x = conv x
             assert (l > 0) "The argument to Uint must be greater than 0."
-            assert (x < 0) "The input to the pickler must be less than the specified length."
-            push (conv x) l
+            assert (x < l) "The input to the pickler must be 0 or positive."
+            push x l
         | Sa_list l => 
             inl max_len = get_max_length p
             inl len = length x
@@ -187,17 +189,17 @@ inl unpickle forall array{pickler_index} tt. (ar : array) (p : pickler tt) : tt 
                 open real_core
                 inl tag = scan (union_type_length `t)
                 record_fold (fun {state=i key value} => 
-                    typecase `value with pickler ~t => 
+                    typecase `value with pickler ~t_case => 
                     if i = tag then
                         match *result with 
                         | None => 
                             union_untag `t (conv `i32 i)
-                                (fun k => forall v. => nominal_create `t (k, loop `v))
+                                (fun k => forall v. => nominal_create `t (k, loop' `v value))
                                 (fun _ => error_type "Invalid tag.")
                             |> fun x => result <- Some `t x
-                        | Some => failwith `t "Duplicate union type instances in the unpickle Alt case."
+                        | Some => assert (dyn false) "Duplicate union type instances in the unpickle Alt case."
                     else
-                        ensure false (size `t value)
+                        ensure false (size `t_case value)
                     i + 1
                     ) 0 (nominal_strip l) |> ignore
             match *result with

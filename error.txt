@@ -1,16 +1,18 @@
-Error trace on line: 58, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
-            inl printable_funs =
-            ^
-Error trace on line: 63, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
-            if union_is x then
-            ^
-Error trace on line: 80, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
-            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) printable_funs x
-            ^
-Error trace on line: 83, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
-                !!!!PrintStatic(`(`x))
+Error trace on line: 190, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
+                record_fold (fun {state=i key value} => 
+                                 ^
+Error trace on line: 191, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
+                    typecase `value with pickler ~t_case => 
                     ^
-Error trace on line: 84, column: 17 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
-                error_type "Unsupported type. Check the terminal for more info"
-                ^
-Unsupported type. Check the terminal for more info
+Error trace on line: 192, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
+                    if i = tag then
+                    ^
+Error trace on line: 193, column: 25 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
+                        match *result with 
+                        ^
+Error trace on line: 194, column: 27 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
+                        | None => 
+                          ^
+The types of two branches of an union unbox do not match.
+Got: ()
+And: card
