@@ -23,16 +23,6 @@ instance pickler_set binary_array = fun (binary_array (x : array u32)) i v =>
     inl b = 1 <<< (i % 32)
     set x (i / 32) (if v then a ||| b else a &&& ~~~b)
 
-// Converts the union type to a record, and then maps all the elements of it with the given function.
-nominal union_map (f : * -> *) t =
-    `(
-        open real_core
-        union_type_to_record `t forall r. =>
-        record_type_fold (fun s k => forall v. =>
-            {s with $k = ``(f v)}
-            ) {} `r
-    )
-
 union rec pickler t =
     | Unit :: pickler ()
     | Bool :: pickler bool

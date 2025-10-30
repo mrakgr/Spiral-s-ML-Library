@@ -5,17 +5,17 @@ __device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
 struct Union0;
 struct Union1;
 struct StackMut0;
-__device__ void method_1(unsigned char * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
+__device__ void method_1(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
 struct Tuple0;
 struct Tuple1;
-__device__ int method_3(unsigned char * v0, StackMut0 & v1, int v2);
+__device__ int method_3(unsigned int * v0, StackMut0 & v1, int v2);
 struct Union2;
 struct StackMut1;
-__device__ void method_4(unsigned char * v0, StackMut0 & v1, int v2);
+__device__ void method_4(unsigned int * v0, StackMut0 & v1, int v2);
 struct Union3;
 struct StackMut2;
-__device__ void method_5(unsigned char * v0, StackMut0 & v1, int v2);
-__device__ Tuple0 method_2(unsigned char * v0);
+__device__ void method_5(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ Tuple0 method_2(unsigned int * v0);
 __device__ void method_6(Union0 v0);
 __device__ void method_7(Union1 v0);
 void run_cuda_host_0();
@@ -326,7 +326,7 @@ __device__ inline bool while_method_3(int v0){
     v1 = v0 < 3;
     return v1;
 }
-__device__ void method_1(unsigned char * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
+__device__ void method_1(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
     StackMut0 v7{0};
     int v8;
     v8 = (int)v6;
@@ -341,76 +341,116 @@ __device__ void method_1(unsigned char * v0, static_array_list<Union0,5> v1, Uni
     int v12 = v7.v0;
     int v13;
     v13 = v12 + v8;
-    v0[v13] = 1u;
-    int v14 = v7.v0;
-    int v15;
-    v15 = v14 + 10;
-    v7.v0 = v15;
-    bool v16;
-    v16 = v5 < 10;
-    bool v17;
-    v17 = v16 == false;
-    if (v17){
-        assert("The input to the pickler must be 0 or positive." && v16);
+    int v14;
+    v14 = v13 / 32;
+    unsigned int v15;
+    v15 = v0[v14];
+    int v16;
+    v16 = v13 % 32;
+    unsigned int v17;
+    v17 = 1u << v16;
+    unsigned int v18;
+    v18 = v15 | v17;
+    v0[v14] = v18;
+    int v19 = v7.v0;
+    int v20;
+    v20 = v19 + 10;
+    v7.v0 = v20;
+    bool v21;
+    v21 = v5 < 10;
+    bool v22;
+    v22 = v21 == false;
+    if (v22){
+        assert("The input to the pickler must be 0 or positive." && v21);
     } else {
     }
-    bool v19;
-    v19 = 0 <= v5;
-    bool v20;
-    v20 = v19 == false;
-    if (v20){
-        assert("The input to the pickler must be less than the specified length." && v19);
+    bool v24;
+    v24 = 0 <= v5;
+    bool v25;
+    v25 = v24 == false;
+    if (v25){
+        assert("The input to the pickler must be less than the specified length." && v24);
     } else {
-    }
-    int v22 = v7.v0;
-    int v23;
-    v23 = v22 + v5;
-    v0[v23] = 1u;
-    int v24 = v7.v0;
-    int v25;
-    v25 = v24 + 10;
-    v7.v0 = v25;
-    int v26;
-    if (v3){
-        v26 = 1;
-    } else {
-        v26 = 0;
     }
     int v27 = v7.v0;
     int v28;
-    v28 = v27 + v26;
-    v0[v28] = 1u;
-    int v29 = v7.v0;
-    int v30;
-    v30 = v29 + 2;
-    v7.v0 = v30;
-    int v31 = v7.v0;
-    int v32;
-    v32 = v31 + 3;
-    int v33;
-    v33 = v2.tag;
+    v28 = v27 + v5;
+    int v29;
+    v29 = v28 / 32;
+    unsigned int v30;
+    v30 = v0[v29];
+    int v31;
+    v31 = v28 % 32;
+    unsigned int v32;
+    v32 = 1u << v31;
+    unsigned int v33;
+    v33 = v30 | v32;
+    v0[v29] = v33;
     int v34 = v7.v0;
     int v35;
-    v35 = v34 + v33;
-    v0[v35] = 1u;
-    int v36 = v7.v0;
-    int v37;
-    v37 = v36 + 3;
-    v7.v0 = v37;
+    v35 = v34 + 10;
+    v7.v0 = v35;
+    int v36;
+    if (v3){
+        v36 = 1;
+    } else {
+        v36 = 0;
+    }
+    int v37 = v7.v0;
+    int v38;
+    v38 = v37 + v36;
+    int v39;
+    v39 = v38 / 32;
+    unsigned int v40;
+    v40 = v0[v39];
+    int v41;
+    v41 = v38 % 32;
+    unsigned int v42;
+    v42 = 1u << v41;
+    unsigned int v43;
+    v43 = v40 | v42;
+    v0[v39] = v43;
+    int v44 = v7.v0;
+    int v45;
+    v45 = v44 + 2;
+    v7.v0 = v45;
+    int v46 = v7.v0;
+    int v47;
+    v47 = v46 + 3;
+    int v48;
+    v48 = v2.tag;
+    int v49 = v7.v0;
+    int v50;
+    v50 = v49 + v48;
+    int v51;
+    v51 = v50 / 32;
+    unsigned int v52;
+    v52 = v0[v51];
+    int v53;
+    v53 = v50 % 32;
+    unsigned int v54;
+    v54 = 1u << v53;
+    unsigned int v55;
+    v55 = v52 | v54;
+    v0[v51] = v55;
+    int v56 = v7.v0;
+    int v57;
+    v57 = v56 + 3;
+    v7.v0 = v57;
     switch (v2.tag) {
         case 0: { // Jack
-            int v38 = v7.v0;
-            v7.v0 = v38;
+            int v58 = v7.v0;
+            v7.v0 = v58;
             break;
         }
         case 1: { // King
-            int v39 = v7.v0;
-            v7.v0 = v39;
+            int v59 = v7.v0;
+            v7.v0 = v59;
             break;
         }
         case 2: { // Queen
-            int v40 = v7.v0;
-            v7.v0 = v40;
+            int v60 = v7.v0;
+            v7.v0 = v60;
             break;
         }
         default: {
@@ -418,76 +458,106 @@ __device__ void method_1(unsigned char * v0, static_array_list<Union0,5> v1, Uni
             __trap();
         }
     }
-    v7.v0 = v32;
-    int v41;
-    v41 = v1.length;
-    int v42 = v7.v0;
-    int v43;
-    v43 = v42 + v41;
-    v0[v43] = 1u;
-    int v44 = v7.v0;
-    int v45;
-    v45 = v44 + 5;
-    v7.v0 = v45;
-    int v46;
-    v46 = v1.length;
-    int v47;
-    v47 = 0;
-    while (while_method_1(v46, v47)){
-        Union0 v49;
-        v49 = v1[v47];
-        int v52 = v7.v0;
-        int v53;
-        v53 = v52 + 13;
-        int v54;
-        v54 = v49.tag;
-        int v55 = v7.v0;
-        int v56;
-        v56 = v55 + v54;
-        v0[v56] = 1u;
-        int v57 = v7.v0;
-        int v58;
-        v58 = v57 + 3;
-        v7.v0 = v58;
-        switch (v49.tag) {
+    v7.v0 = v47;
+    int v61;
+    v61 = v1.length;
+    int v62 = v7.v0;
+    int v63;
+    v63 = v62 + v61;
+    int v64;
+    v64 = v63 / 32;
+    unsigned int v65;
+    v65 = v0[v64];
+    int v66;
+    v66 = v63 % 32;
+    unsigned int v67;
+    v67 = 1u << v66;
+    unsigned int v68;
+    v68 = v65 | v67;
+    v0[v64] = v68;
+    int v69 = v7.v0;
+    int v70;
+    v70 = v69 + 5;
+    v7.v0 = v70;
+    int v71;
+    v71 = v1.length;
+    int v72;
+    v72 = 0;
+    while (while_method_1(v71, v72)){
+        Union0 v74;
+        v74 = v1[v72];
+        int v77 = v7.v0;
+        int v78;
+        v78 = v77 + 13;
+        int v79;
+        v79 = v74.tag;
+        int v80 = v7.v0;
+        int v81;
+        v81 = v80 + v79;
+        int v82;
+        v82 = v81 / 32;
+        unsigned int v83;
+        v83 = v0[v82];
+        int v84;
+        v84 = v81 % 32;
+        unsigned int v85;
+        v85 = 1u << v84;
+        unsigned int v86;
+        v86 = v83 | v85;
+        v0[v82] = v86;
+        int v87 = v7.v0;
+        int v88;
+        v88 = v87 + 3;
+        v7.v0 = v88;
+        switch (v74.tag) {
             case 0: { // Call
-                int v59 = v7.v0;
-                v7.v0 = v59;
+                int v89 = v7.v0;
+                v7.v0 = v89;
                 break;
             }
             case 1: { // Fold
-                int v60 = v7.v0;
-                v7.v0 = v60;
+                int v90 = v7.v0;
+                v7.v0 = v90;
                 break;
             }
             case 2: { // Raise
-                int v61 = v49.case2.v0;
-                int v62 = v7.v0;
-                v7.v0 = v62;
-                bool v63;
-                v63 = v61 < 10;
-                bool v64;
-                v64 = v63 == false;
-                if (v64){
-                    assert("The input to the pickler must be 0 or positive." && v63);
+                int v91 = v74.case2.v0;
+                int v92 = v7.v0;
+                v7.v0 = v92;
+                bool v93;
+                v93 = v91 < 10;
+                bool v94;
+                v94 = v93 == false;
+                if (v94){
+                    assert("The input to the pickler must be 0 or positive." && v93);
                 } else {
                 }
-                bool v66;
-                v66 = 0 <= v61;
-                bool v67;
-                v67 = v66 == false;
-                if (v67){
-                    assert("The input to the pickler must be less than the specified length." && v66);
+                bool v96;
+                v96 = 0 <= v91;
+                bool v97;
+                v97 = v96 == false;
+                if (v97){
+                    assert("The input to the pickler must be less than the specified length." && v96);
                 } else {
                 }
-                int v69 = v7.v0;
-                int v70;
-                v70 = v69 + v61;
-                v0[v70] = 1u;
-                int v71 = v7.v0;
-                int v72;
-                v72 = v71 + 10;
-                v7.v0 = v72;
+                int v99 = v7.v0;
+                int v100;
+                v100 = v99 + v91;
+                int v101;
+                v101 = v100 / 32;
+                unsigned int v102;
+                v102 = v0[v101];
+                int v103;
+                v103 = v100 % 32;
+                unsigned int v104;
+                v104 = 1u << v103;
+                unsigned int v105;
+                v105 = v102 | v104;
+                v0[v101] = v105;
+                int v106 = v7.v0;
+                int v107;
+                v107 = v106 + 10;
+                v7.v0 = v107;
                 break;
             }
             default: {
@@ -495,86 +565,101 @@ __device__ void method_1(unsigned char * v0, static_array_list<Union0,5> v1, Uni
                 __trap();
             }
         }
-        v7.v0 = v53;
-        int v73 = v7.v0;
-        int v74;
-        v74 = v73 + 1;
-        v7.v0 = v74;
-        v47 += 1 ;
-    }
-    int v75;
-    v75 = v41;
-    while (while_method_2(v75)){
-        int v77 = v7.v0;
-        int v78;
-        v78 = v77 + 13;
         v7.v0 = v78;
-        int v79 = v7.v0;
-        v0[v79] = 1u;
-        int v80 = v7.v0;
-        int v81;
-        v81 = v80 + 1;
-        v7.v0 = v81;
-        v75 += 1 ;
+        int v108 = v7.v0;
+        int v109;
+        v109 = v108 + 1;
+        v7.v0 = v109;
+        v72 += 1 ;
     }
-    int v82;
-    v82 = 0;
-    while (while_method_3(v82)){
-        int v84;
-        v84 = v4[v82];
-        bool v87;
-        v87 = v84 < 5;
-        bool v88;
-        v88 = v87 == false;
-        if (v88){
-            assert("The input to the pickler must be 0 or positive." && v87);
+    int v110;
+    v110 = v61;
+    while (while_method_2(v110)){
+        int v112 = v7.v0;
+        int v113;
+        v113 = v112 + 13;
+        v7.v0 = v113;
+        int v114 = v7.v0;
+        int v115;
+        v115 = v114 / 32;
+        unsigned int v116;
+        v116 = v0[v115];
+        int v117;
+        v117 = v114 % 32;
+        unsigned int v118;
+        v118 = 1u << v117;
+        unsigned int v119;
+        v119 = v116 | v118;
+        v0[v115] = v119;
+        int v120 = v7.v0;
+        int v121;
+        v121 = v120 + 1;
+        v7.v0 = v121;
+        v110 += 1 ;
+    }
+    int v122;
+    v122 = 0;
+    while (while_method_3(v122)){
+        int v124;
+        v124 = v4[v122];
+        bool v127;
+        v127 = v124 < 5;
+        bool v128;
+        v128 = v127 == false;
+        if (v128){
+            assert("The input to the pickler must be 0 or positive." && v127);
         } else {
         }
-        bool v90;
-        v90 = 0 <= v84;
-        bool v91;
-        v91 = v90 == false;
-        if (v91){
-            assert("The input to the pickler must be less than the specified length." && v90);
+        bool v130;
+        v130 = 0 <= v124;
+        bool v131;
+        v131 = v130 == false;
+        if (v131){
+            assert("The input to the pickler must be less than the specified length." && v130);
         } else {
         }
-        int v93 = v7.v0;
-        int v94;
-        v94 = v93 + v84;
-        v0[v94] = 1u;
-        int v95 = v7.v0;
-        int v96;
-        v96 = v95 + 5;
-        v7.v0 = v96;
-        v82 += 1 ;
+        int v133 = v7.v0;
+        int v134;
+        v134 = v133 + v124;
+        int v135;
+        v135 = v134 / 32;
+        unsigned int v136;
+        v136 = v0[v135];
+        int v137;
+        v137 = v134 % 32;
+        unsigned int v138;
+        v138 = 1u << v137;
+        unsigned int v139;
+        v139 = v136 | v138;
+        v0[v135] = v139;
+        int v140 = v7.v0;
+        int v141;
+        v141 = v140 + 5;
+        v7.v0 = v141;
+        v122 += 1 ;
     }
     return ;
 }
-__device__ int method_3(unsigned char * v0, StackMut0 & v1, int v2){
+__device__ int method_3(unsigned int * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
     Tuple1 tmp0 = Tuple1{0, 0, 0};
     v3 = tmp0.v0; v4 = tmp0.v1; v5 = tmp0.v2;
     while (while_method_1(v2, v3)){
         int v7 = v1.v0;
-        unsigned char v8;
-        v8 = v0[v7];
-        bool v9;
-        v9 = v8 == 1u;
+        int v8;
+        v8 = v7 / 32;
+        unsigned int v9;
+        v9 = v0[v8];
+        int v10;
+        v10 = v7 % 32;
+        unsigned int v11;
+        v11 = 1u << v10;
+        unsigned int v12;
+        v12 = v9 & v11;
+        bool v13;
+        v13 = v12 == 0u;
         bool v14;
-        if (v9){
-            v14 = true;
-        } else {
-            unsigned char v10;
-            v10 = v0[v7];
-            bool v11;
-            v11 = v10 == 0u;
-            if (v11){
-                v14 = false;
-            } else {
-                printf("%s\n", "Pickler index expected to get 1 or 0.");
-                __trap();
-            }
-        }
+        v14 = v13 != true;
         int v15 = v1.v0;
         int v16;
         v16 = v15 + 1;
@@ -601,31 +686,26 @@ __device__ int method_3(unsigned char * v0, StackMut0 & v1, int v2){
     }
     return v4;
 }
-__device__ void method_4(unsigned char * v0, StackMut0 & v1, int v2){
+__device__ void method_4(unsigned int * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
     Tuple1 tmp1 = Tuple1{0, 0, 0};
     v3 = tmp1.v0; v4 = tmp1.v1; v5 = tmp1.v2;
     while (while_method_1(v2, v3)){
         int v7 = v1.v0;
-        unsigned char v8;
-        v8 = v0[v7];
-        bool v9;
-        v9 = v8 == 1u;
+        int v8;
+        v8 = v7 / 32;
+        unsigned int v9;
+        v9 = v0[v8];
+        int v10;
+        v10 = v7 % 32;
+        unsigned int v11;
+        v11 = 1u << v10;
+        unsigned int v12;
+        v12 = v9 & v11;
+        bool v13;
+        v13 = v12 == 0u;
         bool v14;
-        if (v9){
-            v14 = true;
-        } else {
-            unsigned char v10;
-            v10 = v0[v7];
-            bool v11;
-            v11 = v10 == 0u;
-            if (v11){
-                v14 = false;
-            } else {
-                printf("%s\n", "Pickler index expected to get 1 or 0.");
-                __trap();
-            }
-        }
+        v14 = v13 != true;
         int v15 = v1.v0;
         int v16;
         v16 = v15 + 1;
@@ -653,31 +733,26 @@ __device__ void method_4(unsigned char * v0, StackMut0 & v1, int v2){
         return ;
     }
 }
-__device__ void method_5(unsigned char * v0, StackMut0 & v1, int v2){
+__device__ void method_5(unsigned int * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
     Tuple1 tmp2 = Tuple1{0, 0, 0};
     v3 = tmp2.v0; v4 = tmp2.v1; v5 = tmp2.v2;
     while (while_method_1(v2, v3)){
         int v7 = v1.v0;
-        unsigned char v8;
-        v8 = v0[v7];
-        bool v9;
-        v9 = v8 == 1u;
+        int v8;
+        v8 = v7 / 32;
+        unsigned int v9;
+        v9 = v0[v8];
+        int v10;
+        v10 = v7 % 32;
+        unsigned int v11;
+        v11 = 1u << v10;
+        unsigned int v12;
+        v12 = v9 & v11;
+        bool v13;
+        v13 = v12 == 0u;
         bool v14;
-        if (v9){
-            v14 = true;
-        } else {
-            unsigned char v10;
-            v10 = v0[v7];
-            bool v11;
-            v11 = v10 == 0u;
-            if (v11){
-                v14 = false;
-            } else {
-                printf("%s\n", "Pickler index expected to get 1 or 0.");
-                __trap();
-            }
-        }
+        v14 = v13 != true;
         int v15 = v1.v0;
         int v16;
         v16 = v15 + 1;
@@ -705,7 +780,7 @@ __device__ void method_5(unsigned char * v0, StackMut0 & v1, int v2){
         return ;
     }
 }
-__device__ Tuple0 method_2(unsigned char * v0){
+__device__ Tuple0 method_2(unsigned int * v0){
     StackMut0 v1{0};
     int v2;
     v2 = 10;
@@ -1104,101 +1179,113 @@ extern "C" __global__ void __cluster_dims__(12,1,1) global_entry0() {
         v20[0] = 1;
         v20[1] = 2;
         v20[2] = 3;
-        unsigned char v23[115];
+        unsigned int v23[4];
         int v24;
         v24 = 0;
         while (while_method_0(v24)){
-            v23[v24] = 0u;
+            int v26;
+            v26 = v24 / 32;
+            unsigned int v27;
+            v27 = v23[v26];
+            int v28;
+            v28 = v24 % 32;
+            unsigned int v29;
+            v29 = 1u << v28;
+            unsigned int v30;
+            v30 = ~v29;
+            unsigned int v31;
+            v31 = v27 & v30;
+            v23[v26] = v31;
             v24 += 1 ;
         }
-        Union1 v26;
-        v26 = Union1{Union1_1{}};
-        bool v27;
-        v27 = false;
-        int v28;
-        v28 = 8;
-        unsigned int v29;
-        v29 = 5u;
-        method_1(v23, v5, v26, v27, v20, v28, v29);
-        static_array_list<Union0,5> v30; Union1 v31; bool v32; static_array<int,3> v33; int v34; unsigned int v35;
+        Union1 v32;
+        v32 = Union1{Union1_1{}};
+        bool v33;
+        v33 = false;
+        int v34;
+        v34 = 8;
+        unsigned int v35;
+        v35 = 5u;
+        method_1(v23, v5, v32, v33, v20, v34, v35);
+        static_array_list<Union0,5> v36; Union1 v37; bool v38; static_array<int,3> v39; int v40; unsigned int v41;
         Tuple0 tmp3 = method_2(v23);
-        v30 = tmp3.v0; v31 = tmp3.v1; v32 = tmp3.v2; v33 = tmp3.v3; v34 = tmp3.v4; v35 = tmp3.v5;
-        cuda::counting_semaphore<cuda::thread_scope_system, 1> & v36 = console_lock;
-        auto v37 = cooperative_groups::coalesced_threads();
-        v36.acquire();
+        v36 = tmp3.v0; v37 = tmp3.v1; v38 = tmp3.v2; v39 = tmp3.v3; v40 = tmp3.v4; v41 = tmp3.v5;
+        cuda::counting_semaphore<cuda::thread_scope_system, 1> & v42 = console_lock;
+        auto v43 = cooperative_groups::coalesced_threads();
+        v42.acquire();
         printf("{%s = %s","action_history", "[");
-        int v38;
-        v38 = v30.length;
-        bool v39;
-        v39 = 100 < v38;
-        int v40;
-        if (v39){
-            v40 = 100;
+        int v44;
+        v44 = v36.length;
+        bool v45;
+        v45 = 100 < v44;
+        int v46;
+        if (v45){
+            v46 = 100;
         } else {
-            v40 = v38;
+            v46 = v44;
         }
-        int v41;
-        v41 = 0;
-        while (while_method_1(v40, v41)){
-            Union0 v43;
-            v43 = v30[v41];
+        int v47;
+        v47 = 0;
+        while (while_method_1(v46, v47)){
+            Union0 v49;
+            v49 = v36[v47];
             printf("");
-            method_6(v43);
+            method_6(v49);
             printf("");
-            int v46;
-            v46 = v41 + 1;
-            int v47;
-            v47 = v30.length;
-            bool v48;
-            v48 = v46 < v47;
-            if (v48){
+            int v52;
+            v52 = v47 + 1;
+            int v53;
+            v53 = v36.length;
+            bool v54;
+            v54 = v52 < v53;
+            if (v54){
                 printf("%s","; ");
             } else {
             }
-            v41 += 1 ;
+            v47 += 1 ;
         }
-        int v49;
-        v49 = v30.length;
-        bool v50;
-        v50 = v49 > 100;
-        if (v50){
+        int v55;
+        v55 = v36.length;
+        bool v56;
+        v56 = v55 > 100;
+        if (v56){
             printf("%s","; ...");
         } else {
         }
         printf("%s","]");
         printf("; %s = ","card");
-        method_7(v31);
-        const char * v53;
-        if (v32){
-            const char * v51;
-            v51 = "true";
-            v53 = v51;
+        method_7(v37);
+        const char * v59;
+        if (v38){
+            const char * v57;
+            v57 = "true";
+            v59 = v57;
         } else {
-            const char * v52;
-            v52 = "false";
-            v53 = v52;
+            const char * v58;
+            v58 = "false";
+            v59 = v58;
         }
-        printf("; %s = %s; %s = %s","is_first", v53, "l", "[");
-        int v54;
-        v54 = 0;
-        while (while_method_3(v54)){
-            int v56;
-            v56 = v33[v54];
-            printf("%d",v56);
-            int v59;
-            v59 = v54 + 1;
-            bool v60;
-            v60 = v59 < 3;
-            if (v60){
+        printf("; %s = %s; %s = %s","is_first", v59, "l", "[");
+        int v60;
+        v60 = 0;
+        while (while_method_3(v60)){
+            int v62;
+            v62 = v39[v60];
+            printf("%d",v62);
+            int v65;
+            v65 = v60 + 1;
+            bool v66;
+            v66 = v65 < 3;
+            if (v66){
                 printf("%s","; ");
             } else {
             }
-            v54 += 1 ;
+            v60 += 1 ;
         }
         printf("%s","]");
-        printf("; %s = %d; %s = %u}\n","pot", v34, "stack", v35);
-        v36.release();
-        v37.sync() ;
+        printf("; %s = %d; %s = %u}\n","pot", v40, "stack", v41);
+        v42.release();
+        v43.sync() ;
     } else {
     }
     return ;

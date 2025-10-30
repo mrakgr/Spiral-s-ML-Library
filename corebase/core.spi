@@ -135,6 +135,16 @@ inl tlit forall q. (x : q) : exists t. t = real
 inl tint (x : int) = tlit x
 
 open real_core
+
+// Converts the union type to a record, and then maps all the elements of it with the given function.
+nominal union_map (f : * -> *) t =
+    `(
+        union_type_to_record `t forall r. =>
+        record_type_fold (fun s k => forall v. =>
+            {s with $k = ``(f v)}
+            ) {} `r
+    )
+
 // Structural polymorphic equality for every type in the language (apart from functions.)
 inl (=) forall t. (a : t) (b : t) : bool = real a = b
 // Structural polymorphic inequality for every type in the language (apart from functions.)
@@ -173,3 +183,4 @@ inl backend_switch_cuda forall t. (x : {CudaDevice : () -> t; CudaHost : () -> t
 inl backend_switch_python forall t. (x : {CudaDevice : () -> t; Python : () -> t}) : t = real backend_switch_real x
 // Backend switch for Python/CudaHost.
 inl backend_switch_host forall t. (x : {Python : () -> t; CudaHost : () -> t}) : t = real backend_switch_real x
+
