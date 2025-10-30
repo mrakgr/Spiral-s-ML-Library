@@ -1,0 +1,70 @@
+// Provides an interface to the C++ `unordered_map`.
+open corebase
+
+prototype key_to_array k : k -> array f32
+prototype array_to_value v : array f32 -> v
+
+
+nominal eigen_matrix t = $"Eigen::Matrix<`t,Eigen::Dynamic,Eigen::Dynamic>"
+nominal static_eigen_matrix t rows cols = $"Eigen::Matrix<`t,@rows,@cols>"
+
+type serializers t k v = { key_to_array : k -> array t; array_to_value : array t -> v }
+nominal dict k v =
+    exists t. {
+        data : exists rows cols_keys cols_values. 
+            stack_refs {
+                keys : static_eigen_matrix t rows cols_keys
+                values : static_eigen_matrix t rows cols_values
+                i : int
+            }
+        serializers : serializers t k v
+    }
+
+inl globals() = global "#include <hopfield_dict.hpp>"
+
+// Creates the dictionary with a specified types `k` for the keys and `v` for values. `t` represents the matrix datatype.
+// Takes in serializers to convert raw array data of type `t` to Spiral usable formats.
+// The rows and the columns need to be compile time literals.
+// Does not initialize the matrices to 0.
+inl create forall t k v. (serializers : serializers t k v) ({rows cols_keys cols_values} : {rows : int; cols_keys : int; cols_values : int}) : dict k v =
+    globals()
+    assert (lit_is rows) "The rows of the matrix have to be known at compile time."
+    assert (lit_is cols_keys) "The number of columns in the keys matrix have to be known at compile time."
+    assert (lit_is cols_values) "The number of columns in the values matrix have to be known at compile time."
+    dict exists {
+        serializers
+        data = 
+            inl (exists rows. rows), (exists cols_keys. cols_keys), (exists cols_values. cols_values) =
+                tint rows, tint cols_keys, tint cols_values
+            exists [rows; cols_keys; cols_values]
+                stack_refs {
+                    keys = $"`(static_eigen_matrix t rows cols_keys) \v"
+                    values = $"`(static_eigen_matrix t rows cols_values) \v"
+                    i = 0
+                }
+    }
+
+// Clears the dictionary of keys by setting both the keys and the values all to 0.
+inl clear forall k v. ((dict (exists t. {data = exists rows cols_keys cols_values. refs})) : dict k v) : () =
+    $"!(refs.keys).setZero()" . $"!(refs.values).setZero()" . refs.i <- 0
+
+// Gets an item from the dictionary.
+inl get forall k v. ((dict (exists t. {serializers data = exists rows cols_keys cols_values. refs})) : dict k v) (k : k) : v =
+    inl input = serializers.key_to_array k
+    inl out : array t = corebase.create (failwith "todo")
+    // hopfield_dictionary_get(input, keys, values, out, 0.001);
+    failwith ""
+// Sets the item to the dictionary at the specified key.
+inl set forall k v. (d : dict k v) (k : k) (v : v) : () = $"!d[!k] = !v"
+// Iterates over the dictionary with the iterator function.
+inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
+    inl d = corecuda.refm.from_local d
+    inl it : $"`(dict k v)::iterator &" = $"auto \v = !d.begin()"
+    loop.while' (fun () => $"!it !!= !d.end()") fun () =>
+        f $"!it->first" $"!it->second"
+        $"++!it"
+
+instance printable dict k v = fun {write write_ln} d =>
+    write_ln "{"
+    iter (fun k v => write k . write " => " . write_ln v) d
+    write_ln "}"

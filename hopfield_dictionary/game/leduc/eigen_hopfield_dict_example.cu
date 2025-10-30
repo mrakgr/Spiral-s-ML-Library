@@ -16,6 +16,6 @@ int main() {
              0, 1, 1, 1;
     
     Eigen::MatrixXf out(2,4);
-    hopfield_dictionary_get(input, keys, values, out, 0.001);
+    hopfield_dictionary_get(input, keys, values, out, 0.001); 
     std::cout << out << "\n\n";
 }

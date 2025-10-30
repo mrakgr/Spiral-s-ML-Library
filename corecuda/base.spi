@@ -172,12 +172,6 @@ inl run_cuda_host f = join
     assert (max_potential_cluster_size() >= blocks_per_cluster) "Max potential cluster size must be greater than or equal to the given cluster size."
     
     real
-        inl vars = 
-            struct.map (fun x => 
-                typecase `x with
-                | array_base ~t => $"`t * \v = !x.data().get()" : $"`t *"
-                | _ => x
-                ) vars
         match vars with
         | () => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel))" : ()
         | _ => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel, #vars))" : ()

@@ -7,6 +7,9 @@
 // matmul(((matmul(keys, input.T) - input.sum) / temperature).T, values)
 
 // Returns a value (into the output matrix) given the input key from the hopfield dictionary.
+
+void qwerasdf(){}
+
 void hopfield_dictionary_get(Eigen::MatrixXf & input, Eigen::MatrixXf & keys, Eigen::MatrixXf & values, Eigen::MatrixXf & out, float temperature){
     out = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
 }
