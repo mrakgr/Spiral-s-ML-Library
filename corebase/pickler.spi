@@ -1,4 +1,5 @@
 // Pickler combinators for converting regular Spiral types to binary vectors of floating point values.
+// Preferably use the picklers in the hd_pickler module instead.
 
 type state = int * array float
 nominal pu a = {

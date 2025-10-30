@@ -5,17 +5,17 @@ __device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
 struct Union0;
 struct Union1;
 struct StackMut0;
-__device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
+__device__ void method_1(unsigned char * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
 struct Tuple0;
 struct Tuple1;
-__device__ int method_3(float * v0, StackMut0 & v1, int v2);
+__device__ int method_3(unsigned char * v0, StackMut0 & v1, int v2);
 struct Union2;
 struct StackMut1;
-__device__ void method_4(float * v0, StackMut0 & v1, int v2);
+__device__ void method_4(unsigned char * v0, StackMut0 & v1, int v2);
 struct Union3;
 struct StackMut2;
-__device__ void method_5(float * v0, StackMut0 & v1, int v2);
-__device__ Tuple0 method_2(float * v0);
+__device__ void method_5(unsigned char * v0, StackMut0 & v1, int v2);
+__device__ Tuple0 method_2(unsigned char * v0);
 __device__ void method_6(Union0 v0);
 __device__ void method_7(Union1 v0);
 void run_cuda_host_0();
@@ -326,7 +326,7 @@ __device__ inline bool while_method_3(int v0){
     v1 = v0 < 3;
     return v1;
 }
-__device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
+__device__ void method_1(unsigned char * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
     StackMut0 v7{0};
     int v8;
     v8 = (int)v6;
@@ -341,7 +341,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
     int v12 = v7.v0;
     int v13;
     v13 = v12 + v8;
-    v0[v13] = 1.0f;
+    v0[v13] = 1u;
     int v14 = v7.v0;
     int v15;
     v15 = v14 + 10;
@@ -365,7 +365,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
     int v22 = v7.v0;
     int v23;
     v23 = v22 + v5;
-    v0[v23] = 1.0f;
+    v0[v23] = 1u;
     int v24 = v7.v0;
     int v25;
     v25 = v24 + 10;
@@ -379,7 +379,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
     int v27 = v7.v0;
     int v28;
     v28 = v27 + v26;
-    v0[v28] = 1.0f;
+    v0[v28] = 1u;
     int v29 = v7.v0;
     int v30;
     v30 = v29 + 2;
@@ -392,7 +392,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
     int v34 = v7.v0;
     int v35;
     v35 = v34 + v33;
-    v0[v35] = 1.0f;
+    v0[v35] = 1u;
     int v36 = v7.v0;
     int v37;
     v37 = v36 + 3;
@@ -424,7 +424,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
     int v42 = v7.v0;
     int v43;
     v43 = v42 + v41;
-    v0[v43] = 1.0f;
+    v0[v43] = 1u;
     int v44 = v7.v0;
     int v45;
     v45 = v44 + 5;
@@ -444,7 +444,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
         int v55 = v7.v0;
         int v56;
         v56 = v55 + v54;
-        v0[v56] = 1.0f;
+        v0[v56] = 1u;
         int v57 = v7.v0;
         int v58;
         v58 = v57 + 3;
@@ -483,7 +483,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
                 int v69 = v7.v0;
                 int v70;
                 v70 = v69 + v61;
-                v0[v70] = 1.0f;
+                v0[v70] = 1u;
                 int v71 = v7.v0;
                 int v72;
                 v72 = v71 + 10;
@@ -510,7 +510,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
         v78 = v77 + 13;
         v7.v0 = v78;
         int v79 = v7.v0;
-        v0[v79] = 1.0f;
+        v0[v79] = 1u;
         int v80 = v7.v0;
         int v81;
         v81 = v80 + 1;
@@ -541,7 +541,7 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
         int v93 = v7.v0;
         int v94;
         v94 = v93 + v84;
-        v0[v94] = 1.0f;
+        v0[v94] = 1u;
         int v95 = v7.v0;
         int v96;
         v96 = v95 + 5;
@@ -550,24 +550,24 @@ __device__ void method_1(float * v0, static_array_list<Union0,5> v1, Union1 v2, 
     }
     return ;
 }
-__device__ int method_3(float * v0, StackMut0 & v1, int v2){
+__device__ int method_3(unsigned char * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
     Tuple1 tmp0 = Tuple1{0, 0, 0};
     v3 = tmp0.v0; v4 = tmp0.v1; v5 = tmp0.v2;
     while (while_method_1(v2, v3)){
         int v7 = v1.v0;
-        float v8;
+        unsigned char v8;
         v8 = v0[v7];
         bool v9;
-        v9 = v8 == 1.0f;
+        v9 = v8 == 1u;
         bool v14;
         if (v9){
             v14 = true;
         } else {
-            float v10;
+            unsigned char v10;
             v10 = v0[v7];
             bool v11;
-            v11 = v10 == 0.0f;
+            v11 = v10 == 0u;
             if (v11){
                 v14 = false;
             } else {
@@ -601,24 +601,24 @@ __device__ int method_3(float * v0, StackMut0 & v1, int v2){
     }
     return v4;
 }
-__device__ void method_4(float * v0, StackMut0 & v1, int v2){
+__device__ void method_4(unsigned char * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
     Tuple1 tmp1 = Tuple1{0, 0, 0};
     v3 = tmp1.v0; v4 = tmp1.v1; v5 = tmp1.v2;
     while (while_method_1(v2, v3)){
         int v7 = v1.v0;
-        float v8;
+        unsigned char v8;
         v8 = v0[v7];
         bool v9;
-        v9 = v8 == 1.0f;
+        v9 = v8 == 1u;
         bool v14;
         if (v9){
             v14 = true;
         } else {
-            float v10;
+            unsigned char v10;
             v10 = v0[v7];
             bool v11;
-            v11 = v10 == 0.0f;
+            v11 = v10 == 0u;
             if (v11){
                 v14 = false;
             } else {
@@ -653,24 +653,24 @@ __device__ void method_4(float * v0, StackMut0 & v1, int v2){
         return ;
     }
 }
-__device__ void method_5(float * v0, StackMut0 & v1, int v2){
+__device__ void method_5(unsigned char * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
     Tuple1 tmp2 = Tuple1{0, 0, 0};
     v3 = tmp2.v0; v4 = tmp2.v1; v5 = tmp2.v2;
     while (while_method_1(v2, v3)){
         int v7 = v1.v0;
-        float v8;
+        unsigned char v8;
         v8 = v0[v7];
         bool v9;
-        v9 = v8 == 1.0f;
+        v9 = v8 == 1u;
         bool v14;
         if (v9){
             v14 = true;
         } else {
-            float v10;
+            unsigned char v10;
             v10 = v0[v7];
             bool v11;
-            v11 = v10 == 0.0f;
+            v11 = v10 == 0u;
             if (v11){
                 v14 = false;
             } else {
@@ -705,7 +705,7 @@ __device__ void method_5(float * v0, StackMut0 & v1, int v2){
         return ;
     }
 }
-__device__ Tuple0 method_2(float * v0){
+__device__ Tuple0 method_2(unsigned char * v0){
     StackMut0 v1{0};
     int v2;
     v2 = 10;
@@ -1104,11 +1104,11 @@ extern "C" __global__ void __cluster_dims__(12,1,1) global_entry0() {
         v20[0] = 1;
         v20[1] = 2;
         v20[2] = 3;
-        float v23[115];
+        unsigned char v23[115];
         int v24;
         v24 = 0;
         while (while_method_0(v24)){
-            v23[v24] = 0.0f;
+            v23[v24] = 0u;
             v24 += 1 ;
         }
         Union1 v26;

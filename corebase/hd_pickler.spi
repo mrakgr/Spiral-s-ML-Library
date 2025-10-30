@@ -1,24 +1,27 @@
 // Pickler combinators for converting regular Spiral types to binary vectors of floating point values.
-open corebase
+// The preferred pickler for Hopfield dictionaries. I'd also recomment it for regular NNs as well.
 
 // Returns boolean whether the array is 1 at a given index.
 prototype pickler_index array : array -> int -> bool
 // Sets the array to 1 at the given index.
-prototype pickler_enable array : array -> int -> ()
+prototype pickler_set array : array -> int -> bool -> ()
+prototype pickler_create array : int -> array
 
+instance pickler_create array t = create
 instance pickler_index array t{number} = fun x i => 
     if index x i = 1 then true
     elif index x i = 0 then false
     else failwith "Pickler index expected to get 1 or 0."
-instance pickler_enable array t{number} = fun x i => set x i 1
+instance pickler_set array t{number} = fun x i v => set x i (if v then 1 else 0)
 nominal binary_array = array u32
 
+instance pickler_create binary_array = fun len => binary_array (create (divup len 32))
 instance pickler_index binary_array = fun (binary_array (x : array u32)) i => 
     index x (i / 32) &&& (1 <<< (i % 32)) <> 0
-instance pickler_enable binary_array = fun (binary_array (x : array u32)) i =>
+instance pickler_set binary_array = fun (binary_array (x : array u32)) i v =>
     inl a = index x (i / 32)
     inl b = 1 <<< (i % 32)
-    set x (i / 32) (a ||| b)
+    set x (i / 32) (if v then a ||| b else a &&& ~~~b)
 
 // Converts the union type to a record, and then maps all the elements of it with the given function.
 nominal union_map (f : * -> *) t =
@@ -90,10 +93,10 @@ inl size' (h : compile_time.hashmap) : forall t. pickler t -> int =
 inl size () : forall t. pickler t -> int = size' (compile_time.hashmapm.create())
 
 // Serializes the argument to a binary vector. The vector elements should all be set to 0 prior to being passed into this function.
-inl pickle forall array{pickler_enable} tt. (ar : array) (p : pickler tt) ~(x : tt) : () = join
+inl pickle forall array{pickler_set} tt. (ar : array) (p : pickler tt) ~(x : tt) : () = join
     inl size : forall w. pickler w -> int = size()
     inl i = stack_mut (0 : int)
-    inl enable i' = pickler_enable ar (*i + i')
+    inl enable i' = pickler_set ar (*i + i') true
     inl advance i' = i <- *i + i'
     inl push a b = enable a . advance b
     inl set i' = i <- i'
@@ -212,17 +215,19 @@ inl result forall a b. (a : pickler a) (b : pickler b) : pickler (result a b) = 
 inl (++) forall a b. (a : pickler a) (b : pickler b) : pickler (choice2 a b) = alt { C1of2 = a; C2of2 = b }
 inl (**) forall a b. (a : pickler a) (b : pickler b) : pickler (a * b) = pair a b
 
-nominal binary_array t = array float
-inl serialize forall t. (p : pickler t) (x : t) : binary_array t =
+nominal pickled_array t = binary_array
+// nominal pickled_array t = array u8
+inl serialize forall t. (p : pickler t) (x : t) : pickled_array t =
     inl size = size()
     inl len = size p
-    inl ar : array float = create len
-    loop.for' {from=0; nearTo=len} (fun i => set ar i 0)
+    inl ar : binary_array = pickler_create len
+    // inl ar : array u8 = pickler_create len
+    loop.for' {from=0; nearTo=len} (fun i => pickler_set ar i false)
     pickle ar p x
-    binary_array ar
+    pickled_array ar
 
-inl deserialize forall t. (p : pickler t) (binary_array x : binary_array t) : t =
+inl deserialize forall t. (p : pickler t) (pickled_array x : pickled_array t) : t =
     open tensorm
     unpickle x p
 
-instance printable binary_array t = fun ({write write_ln} : printable_funs) (binary_array x) => write_ln x
+instance printable pickled_array t = fun ({write write_ln} : printable_funs) (pickled_array x) => write_ln x
