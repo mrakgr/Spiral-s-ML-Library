@@ -29,7 +29,7 @@ if (-not (Test-Path $path_output) -or
             "cpp_libs/eigen"
             "hopfield_dictionary/host_cpp_lib"
         ) | ForEach-Object { "-I$_" }
-    $extra_cpp_files =
+    $cpp_host_files =
         @(
             "hopfield_dictionary/host_cpp_lib/hopfield_dict.cpp" # For performance the host side Hopfield dictionary implementation has been factored into its own library.
         )
@@ -47,10 +47,12 @@ if (-not (Test-Path $path_output) -or
         "-D__CUDA_NO_HALF_CONVERSIONS__" # Hack to compile Cutlass with half float types
         "-diag-suppress", "550,20012,68,39,177" # Suppresses various warnings
         "-std", "c++20" # Compiles with the selected C++ standard
+        $Path, "cpu_math.o"
         "-o", $path_output # The output path
-        "-x", "cu", $Path, $extra_cpp_files # Input file and the extra host side files .cpp files that need to be passed to the compiler.
     )
 
+    g++ -O3 -std=c++20 $cpp_libs_includes -c $cpp_host_files -o cpu_math.o
+    if (-not $?) { throw "g++ compilation failed" }
     nvcc $nvcc_args 
 } else {
     # Write-Host "The '$path_output' is up to date."

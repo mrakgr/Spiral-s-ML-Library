@@ -11,6 +11,14 @@ using default_uint = unsigned int;
 #include <stdio.h>
 #endif
 
+#ifndef __host__
+#define __host__
+#endif
+
+#ifndef __device__
+#define __device__
+#endif
+
 // For error checking on the host.
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 template <typename T> inline __host__ __device__ void destroy(T& obj) { obj.~T(); }

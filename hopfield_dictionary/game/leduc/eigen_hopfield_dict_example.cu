@@ -2,20 +2,23 @@
 #include <iostream>
 
 int main() {
-    const double temperature = 0.001;
-    Eigen::MatrixXf keys(3, 4);
-    keys << 1, 1, 0, 0,
-            1, 0, 1, 0,
-            0, 1, 1, 1;
-    Eigen::MatrixXf values(3, 4);
-    values << 1.0/2.0, 0, 1.0/2.0, 0,
-              0, 3.0/4.0, 1.0/4.0, 0,
-              2.0/3.0, 0, 1.0/3.0, 0;
-    Eigen::MatrixXf input(2, 4);
-    input << 1, 1, 0, 0,
-             0, 1, 1, 1;
+    // Eigen::Matrix<float,3,4> keys;
+    // keys << 1, 1, 0, 0,
+    //         1, 0, 1, 0,
+    //         0, 1, 1, 1;
+    // Eigen::Matrix<float,3,4> values;
+    // values << 1.0/2.0, 0, 1.0/2.0, 0,
+    //           0, 3.0/4.0, 1.0/4.0, 0,
+    //           2.0/3.0, 0, 1.0/3.0, 0;
+    // Eigen::Matrix<float,2,4> input;
+    // input << 1, 1, 0, 0,
+    //          0, 1, 1, 1;
     
-    Eigen::MatrixXf out(2,4);
-    hopfield_dictionary_get(input, keys, values, out, 0.001); 
-    std::cout << out << "\n\n";
+    // Eigen::Matrix<float,2,4,0,2,4> out;
+    // hopfield_dictionary_get<float,3,4,4,2>(input, keys, values, out, 0.001f); 
+    // foo<float,2,4>(input); 
+    // std::cout << out << "\n\n";
+    Foo x;
+    x.i = 10;
+    bar(x);
 }
