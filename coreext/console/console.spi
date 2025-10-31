@@ -6,6 +6,7 @@ open corecuda
 inl single_threaded write x =
     backend_switch_all {
         Python = fun () => write x
+        CppHost = fun () => write x
         CudaHost = fun () => write x
         CudaDevice = fun () => console_cuda.single_threaded write x
     }
@@ -17,12 +18,14 @@ inl printable_funs () : printable_funs =
         backend_switch_all {
             Python = fun () => console_python.write_ln x
             CudaDevice = fun () => console_cuda.write_ln x
+            CppHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
             CudaHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
         }
     inl write x =
         backend_switch_all {
             Python = fun () => console_python.write x
             CudaDevice = fun () => console_cuda.write x
+            CppHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
             CudaHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
         }
     {
@@ -36,6 +39,7 @@ inl write_ln x =
     backend_switch_all {
         Python = fun () => console_python.write_ln x
         CudaDevice = fun () => console_cuda.single_threaded console_cuda.write_ln x
+        CppHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
         CudaHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
     }
 
@@ -44,6 +48,7 @@ inl write x =
     backend_switch_all {
         Python = fun () => console_python.write x
         CudaDevice = fun () => console_cuda.single_threaded console_cuda.write x
+        CppHost = fun () => console_cuda.write x . $"fflush(stdout)"
         CudaHost = fun () => console_cuda.write x . $"fflush(stdout)"
     }
 

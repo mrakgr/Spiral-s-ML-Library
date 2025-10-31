@@ -16,26 +16,25 @@ type game_state = {
     }
 
 inl main() =
-    run fun _ =>
-        if rangem.threads_in_grid().from = 0 then
-            inl p_card = alt {
-                King = unit()
-                Queen = unit()
-                Jack = unit()
-            }
-            inl p_action = alt {
-                Raise = Int 10
-                Fold = unit()
-                Call = unit()
-            }
-            inl p : pickler game_state = 
-                uint 10 ** int 10 ** bool() ** p_card ** sa_list p_action ** sa (int 5)
-                |> wrap 
-                    (fun {stack pot is_first card action_history l} => stack, pot, is_first, card, action_history, l)
-                    (fun stack, pot, is_first, card, action_history, l => {stack pot is_first card action_history l})
-            serialize p {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
-            // |> fun x => write_ln x . x
-            |> deserialize p
-            |> console.write_ln
-    device_sync()
+    // run fun _ =>
+    //     if rangem.threads_in_grid().from = 0 then
+    inl p_card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl p_action = alt {
+        Raise = Int 10
+        Fold = unit()
+        Call = unit()
+    }
+    inl p : pickler game_state = 
+        uint 10 ** int 10 ** bool() ** p_card ** sa_list p_action ** sa (int 5)
+        |> wrap 
+            (fun {stack pot is_first card action_history l} => stack, pot, is_first, card, action_history, l)
+            (fun stack, pot, is_first, card, action_history, l => {stack pot is_first card action_history l})
+    serialize p {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
+    |> deserialize p
+    |> console.write_ln
+    // device_sync()
     0i32

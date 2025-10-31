@@ -57,6 +57,7 @@ inl device_sync() : () =
     backend_switch_host {
         Python = fun () => $"cp.cuda.get_current_stream().synchronize()"
         CudaHost = fun () => $"gpuErrchk(cudaDeviceSynchronize())"
+        CppHost = fun () => failwith "Cannot do device sync on the host Cpp backend."
     }
 
 union compiler =

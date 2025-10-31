@@ -1,18 +1,10 @@
-Error trace on line: 190, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
-                record_fold (fun {state=i key value} => 
-                                 ^
-Error trace on line: 191, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
-                    typecase `value with pickler ~t_case => 
-                    ^
-Error trace on line: 192, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
-                    if i = tag then
-                    ^
-Error trace on line: 193, column: 25 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
-                        match *result with 
-                        ^
-Error trace on line: 194, column: 27 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_pickler.spi.
-                        | None => 
-                          ^
-The types of two branches of an union unbox do not match.
-Got: ()
-And: card
+Error trace on line: 18, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/test1.spi.
+inl main() =
+        ^
+Error trace on line: 19, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/test1.spi.
+    run fun _ =>
+    ^
+Error trace on line: 189, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecuda/base.spi.
+inl run f = run' f
+            ^
+Cannot find the backend CppHost in the backend switch op.

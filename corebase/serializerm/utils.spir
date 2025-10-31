@@ -68,6 +68,7 @@ inl calculate_offsets forall el. =
 
 inl ptr_at_offset (ptr : ptr) (exists t. offset) =
     backend_switch_real {
+        CppHost = fun () => $"(`t *)(!ptr+!offset)" : array t
         CudaHost = fun () => $"(`t *)(!ptr+!offset)" : array t
         CudaDevice = fun () => $"(`t *)(!ptr+!offset)" : array t
         Python = fun () => $"!ptr[!offset:].view(`(cupy_type t))" : array t
