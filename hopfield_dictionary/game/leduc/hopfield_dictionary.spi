@@ -5,28 +5,40 @@ prototype key_to_array k : k -> array f32
 prototype array_to_value v : array f32 -> v
 
 
-nominal eigen_matrix t = $"Eigen::Matrix<`t,Eigen::Dynamic,Eigen::Dynamic>"
-nominal static_eigen_matrix t rows cols = $"Eigen::Matrix<`t,@rows,@cols>"
+nominal matrix t = $"Eigen::Matrix<`t,Eigen::Dynamic,Eigen::Dynamic>"
+nominal static_matrix t rows cols = $"Eigen::Matrix<`t,@rows,@cols>"
+nominal map t = $"Eigen::Map<`t>"
+
+// out = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
+inl hopfield_dictionary_get forall t_keys t_values rows_hd rows_input cols_keys cols_values. 
+        (keys : static_matrix t_keys rows_hd cols_keys)
+        (values : static_matrix t_values rows_hd cols_values)
+        (input : map (static_matrix t_keys rows_input cols_keys)) 
+        (out : map (static_matrix t_values rows_input cols_values))
+        (temperature : t_values)
+        : () = join
+    $"!out = ((!keys * !input.transpose() - !input.rowwise().sum().transpose().replicate(!keys.rows(),1)).array() / !temperature).exp().matrix().transpose() * !values"
+
 
 type serializers t k v = { key_to_array : k -> array t; array_to_value : array t -> v }
 nominal dict k v =
-    exists t. {
+    exists t{number}. {
         data : exists rows cols_keys cols_values. 
             stack_refs {
-                keys : static_eigen_matrix t rows cols_keys
-                values : static_eigen_matrix t rows cols_values
+                keys : static_matrix t rows cols_keys
+                values : static_matrix t rows cols_values
                 i : int
             }
         serializers : serializers t k v
     }
 
-inl globals() = global "#include <hopfield_dict.hpp>"
+inl globals() = global "#include <Eigen/Dense>"
 
 // Creates the dictionary with a specified types `k` for the keys and `v` for values. `t` represents the matrix datatype.
 // Takes in serializers to convert raw array data of type `t` to Spiral usable formats.
 // The rows and the columns need to be compile time literals.
 // Does not initialize the matrices to 0.
-inl create forall t k v. (serializers : serializers t k v) ({rows cols_keys cols_values} : {rows : int; cols_keys : int; cols_values : int}) : dict k v =
+inl create forall t{number} k v. (serializers : serializers t k v) ({rows cols_keys cols_values} : {rows : int; cols_keys : int; cols_values : int}) : dict k v =
     globals()
     assert (lit_is rows) "The rows of the matrix have to be known at compile time."
     assert (lit_is cols_keys) "The number of columns in the keys matrix have to be known at compile time."
@@ -38,8 +50,8 @@ inl create forall t k v. (serializers : serializers t k v) ({rows cols_keys cols
                 tint rows, tint cols_keys, tint cols_values
             exists [rows; cols_keys; cols_values]
                 stack_refs {
-                    keys = $"`(static_eigen_matrix t rows cols_keys) \v"
-                    values = $"`(static_eigen_matrix t rows cols_values) \v"
+                    keys = $"`(static_matrix t rows cols_keys) \v"
+                    values = $"`(static_matrix t rows cols_values) \v"
                     i = 0
                 }
     }
@@ -51,20 +63,23 @@ inl clear forall k v. ((dict (exists t. {data = exists rows cols_keys cols_value
 // Gets an item from the dictionary.
 inl get forall k v. ((dict (exists t. {serializers data = exists rows cols_keys cols_values. refs})) : dict k v) (k : k) : v =
     inl input = serializers.key_to_array k
+    inl q : map (static_matrix t 1 cols_keys) = static_map_from_array input
     inl out : array t = corebase.create (failwith "todo")
-    // hopfield_dictionary_get(input, keys, values, out, 0.001);
-    failwith ""
-// Sets the item to the dictionary at the specified key.
-inl set forall k v. (d : dict k v) (k : k) (v : v) : () = $"!d[!k] = !v"
-// Iterates over the dictionary with the iterator function.
-inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
-    inl d = corecuda.refm.from_local d
-    inl it : $"`(dict k v)::iterator &" = $"auto \v = !d.begin()"
-    loop.while' (fun () => $"!it !!= !d.end()") fun () =>
-        f $"!it->first" $"!it->second"
-        $"++!it"
+    inl w : map (static_matrix t 1 cols_values) = static_map_from_array out
+    hopfield_dictionary_get refs.keys refs.values q w 0.001
+    serializers.array_to_value out
 
-instance printable dict k v = fun {write write_ln} d =>
-    write_ln "{"
-    iter (fun k v => write k . write " => " . write_ln v) d
-    write_ln "}"
+// // Sets the item to the dictionary at the specified key.
+// inl set forall k v. (d : dict k v) (k : k) (v : v) : () = $"!d[!k] = !v"
+// // Iterates over the dictionary with the iterator function.
+// inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
+//     inl d = corecuda.refm.from_local d
+//     inl it : $"`(dict k v)::iterator &" = $"auto \v = !d.begin()"
+//     loop.while' (fun () => $"!it !!= !d.end()") fun () =>
+//         f $"!it->first" $"!it->second"
+//         $"++!it"
+
+// instance printable dict k v = fun {write write_ln} d =>
+//     write_ln "{"
+//     iter (fun k v => write k . write " => " . write_ln v) d
+//     write_ln "}"
