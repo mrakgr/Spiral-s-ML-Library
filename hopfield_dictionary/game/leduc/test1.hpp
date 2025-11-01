@@ -1,21 +1,27 @@
 #pragma once
 #include "test1.corelib.hpp"
+void cuda_host_entry0();
 struct Union0;
 struct Union1;
 struct StackMut0;
-void method_0(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
 struct Tuple0;
 struct Tuple1;
-int method_2(unsigned int * v0, StackMut0 & v1, int v2);
 struct Union2;
 struct StackMut1;
-void method_3(unsigned int * v0, StackMut0 & v1, int v2);
 struct Union3;
 struct StackMut2;
-void method_4(unsigned int * v0, StackMut0 & v1, int v2);
-Tuple0 method_1(unsigned int * v0);
-void method_5(Union0 v0);
-void method_6(Union1 v0);
+void run_cuda_device_from_cuda_host_1();
+void run_cuda_host_from_cpp_host_0();
+#ifdef __CUDACC__
+extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0();
+__device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
+__device__ int method_4(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ void method_5(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ void method_6(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ Tuple0 method_3(unsigned int * v0);
+__device__ void method_7(Union0 v0);
+__device__ void method_8(Union1 v0);
+#endif
 struct Union0_0 { // Call
 };
 struct Union0_1 { // Fold

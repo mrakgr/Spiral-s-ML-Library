@@ -79,7 +79,7 @@ inl call_backend f =
 
 inl assert_blocks_per_cluster_divides_blocks_per_grid() = assert (blocks_per_grid() % blocks_per_cluster() = 0) "The number of blocks per grid has to be divisible by blocks per cluster."
 
-inl run_python f = join
+inl run_cuda_device_from_python f = join
     inl blocks_per_grid, threads_per_block = blocks_per_grid(), threads_per_block()
     assert_blocks_per_cluster_divides_blocks_per_grid()
     inl vars = call_backend f
@@ -125,7 +125,7 @@ inl run_python f = join
         | _ => $'!entry((!blocks_per_grid,),(!threads_per_block,),(!vars,),shared_mem=!shared_mem)' : ()
     ()
 
-inl run_cuda_host f = join
+inl run_cuda_device_from_cuda_host f = join
     inl blocks_per_grid, threads_per_block, blocks_per_cluster = blocks_per_grid(), threads_per_block(), blocks_per_cluster()
     assert_blocks_per_cluster_divides_blocks_per_grid()
     inl shared_mem = dynamic_shared_memory_used()
@@ -177,16 +177,20 @@ inl run_cuda_host f = join
         | () => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel))" : ()
         | _ => $"gpuErrchk(cudaLaunchKernelEx(&!config, kernel, #vars))" : ()
     ()
+
+inl run_cuda_host_from_cpp_host f = join
+    inl vars = join_backend CudaHost
+        f()
+    $"kernel(#vars)"
+    ()
     
 // Executes the lambda on the GPU device.
-inl run' (f : () -> ()) : () =
+inl run (f : () -> ()) : () =
     !!!!UnsafeBackendSwitch({
-        Python = fun () => run_python f : ()
-        CudaHost = fun () => run_cuda_host f : ()
+        Python = fun () => run_cuda_device_from_python f : ()
+        CppHost = fun () => run_cuda_host_from_cpp_host (fun () => run_cuda_device_from_cuda_host f) : ()
+        CudaHost = fun () => run_cuda_device_from_cuda_host f : ()
     })
-
-// Executes the lambda on the GPU device.
-inl run f = run' f
 
 // Synchronizes all the threads in a block using barrier 0.
 // Requires all the threads to execute the same instruction which can cause trouble given that the Cuda compiler does inlining.

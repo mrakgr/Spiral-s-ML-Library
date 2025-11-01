@@ -13,8 +13,9 @@ using default_uint = unsigned int;
 #include <stdio.h>
 #endif
 
-#include <utility>
-#include <stdlib.h>
+#include <utility> // For std::move
+#include <stdlib.h> // For exit
+#include <cuda_runtime.h> // So we can link with Cuda libs.
 
 // The defines are so the .hpp library is compatible between the backends.
 #ifndef __host__
@@ -22,9 +23,6 @@ using default_uint = unsigned int;
 #endif
 #ifndef __device__
 #define __device__
-#endif
-#ifndef __global__
-#define __global__
 #endif
 
 #ifdef __CUDACC__

@@ -4,7 +4,13 @@ inl main() =
 Error trace on line: 19, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/test1.spi.
     run fun _ =>
     ^
-Error trace on line: 189, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecuda/base.spi.
+Error trace on line: 201, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/corecuda/base.spi.
 inl run f = run' f
             ^
-Cannot find the backend CppHost in the backend switch op.
+Error trace on line: 196, column: 23 in module: /home/mrakgr/Spiral-s-ML-Library/corecuda/base.spi.
+        CppHost = fun () => run_cpp_host f : ()
+                      ^
+Error trace on line: 196, column: 29 in module: /home/mrakgr/Spiral-s-ML-Library/corecuda/base.spi.
+        CppHost = fun () => run_cpp_host f : ()
+                            ^
+Cannot apply a forall with a term.
