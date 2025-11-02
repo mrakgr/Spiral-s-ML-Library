@@ -34,8 +34,10 @@ inl main() =
                     |> wrap 
                         (fun {stack pot is_first card action_history l} => stack, pot, is_first, card, action_history, l)
                         (fun stack, pot, is_first, card, action_history, l => {stack pot is_first card action_history l})
-                serialize p {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
-                |> deserialize p
-                |> console.write_ln // should print out the original input
+
+                ()
+                // serialize p {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
+                // |> deserialize p
+                // |> console.write_ln // should print out the original input
         device_sync()
     0i32

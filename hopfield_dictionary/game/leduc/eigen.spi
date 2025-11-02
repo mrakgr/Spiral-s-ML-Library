@@ -1,0 +1,9 @@
+open corebase
+nominal map t = $"Eigen::Map<`t>"
+nominal matrix t = $"Eigen::Matrix<`t,Eigen::Dynamic,Eigen::Dynamic>"
+nominal static_matrix t rows cols = $"Eigen::Matrix<`t,@rows,@cols>"
+type static_vector t cols = static_matrix t 1 cols
+
+inl globals() = global "#include <Eigen/Dense>"
+inl create_static forall t{number} rows cols. : static_matrix t rows cols = globals() . $"`(static_matrix t rows cols) \v"
+inl create forall t{number}. ({rows cols} : {rows : int; cols : int}) : matrix t = globals() . $"`(matrix t) \v(!rows, !cols)"

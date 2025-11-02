@@ -117,13 +117,15 @@ modules:
                 merged_train_predictive_alt
                 merged_train_predictive_alt_avg_policy_decay
 
-                hopfield_dictionary
+                eigen
+                hd
                 
-
                 hopfield_merged_cfr_train
 
                 test0
                 test1
+                test2
+
 
                 
 

@@ -12,14 +12,15 @@ if ((Split-Path $Path -Extension) -ne ".cpp") {
     throw "Expected a .cpp file as the build target."
 }
 
-$path_bin = Join-Path (Split-Path $Path -Parent) "bin"
-$path_output_bin = Join-Path (New-Item $path_bin -ItemType Directory -Force) (Split-Path $Path -LeafBase)
-$path_output_obj = "$path_output_bin.o"
+$path_cu_file = "$([System.IO.Path]::ChangeExtension($Path, 'cu'))"
+$path_bin_dir = Join-Path (Split-Path $Path -Parent) "bin"
+$path_output_bin_file = Join-Path (New-Item $path_bin_dir -ItemType Directory -Force) (Split-Path $Path -LeafBase)
+$path_output_obj_file = "$path_output_bin_file.o"
 
-if (-not (Test-Path $path_output_bin) -or 
-    ($(Get-Item $Path).LastWriteTime -ge $(Get-Item $path_output_bin).LastWriteTime) -or 
-    ($(Get-Item $PSCommandPath).LastWriteTime -ge $(Get-Item $path_output_bin).LastWriteTime)) {
-    Write-Host "Compiling '$Path' into '$path_output_bin'"
+if (-not (Test-Path $path_output_bin_file) -or 
+    ($(Get-Item $Path).LastWriteTime -ge $(Get-Item $path_output_bin_file).LastWriteTime) -or 
+    ($(Get-Item $PSCommandPath).LastWriteTime -ge $(Get-Item $path_output_bin_file).LastWriteTime)) {
+    Write-Host "Compiling '$Path' into '$path_output_bin_file'"
 
     $cpp_libs_includes = 
         @(
@@ -43,32 +44,36 @@ if (-not (Test-Path $path_output_bin) -or
         "-D__CUDA_NO_HALF_CONVERSIONS__" # Hack to compile Cutlass with half float types
         "-diag-suppress", "550,20012,68,39,177" # Suppresses various warnings
         "-std=c++20" # Compiles with the selected C++ standard
-        "-c", "$([System.IO.Path]::ChangeExtension($Path, 'cu'))" # Input file
-        "-o", $path_output_obj # The output object path
+        "-c", $path_cu_file # Input file
+        "-o", $path_output_obj_file # The output object path
         )
     $gpp_args = @(
         $cpp_libs_includes
-        "-I/usr/local/cuda/include"
         "-O3" # Turns on the host optimizations
         "-std=c++20" # Compiles with the selected C++ standard
         "-Wno-format-zero-length" # Suppresses print("") statement warnings
         "-Wno-attributes" # Suppresses Cuda attribute warnings.
-        $Path, $path_output_obj # The input files
-        "-L/usr/local/cuda/lib64", "-lcudart" # Cuda runtime library links
-        "-o", $path_output_bin # The output binary path.
+        $(if (Test-Path $path_cu_file) { @( # Cuda specific compilation options. It's structured like this so we can compile arbitrary .cpp files even without an accompanying .cu one.
+            "-I/usr/local/cuda/include" # Cuda include
+            $path_output_obj_file # The Cuda object file from the previous compilation step
+            "-L/usr/local/cuda/lib64", "-lcudart" # Cuda runtime library links
+        )}) 
+        $Path # The Cpp host input file
+        "-o", $path_output_bin_file # The output binary path.
     )
-
     
-    if (Test-Path $path_output_bin) { Remove-Item $path_output_bin }
-    echo "Compiling with nvcc..." && nvcc $nvcc_args && echo "Compiling with g++..." && g++ $gpp_args
-    if (Test-Path $path_output_obj) { Remove-Item $path_output_obj }
+    if (Test-Path $path_output_bin_file) { Remove-Item $path_output_bin_file }
+    if (Test-Path $path_output_obj_file) { Remove-Item $path_output_obj_file }
+    if (Test-Path $path_cu_file) { Write-Output "Compiling with nvcc..."; nvcc $nvcc_args } 
+    if ($?) { Write-Output "Compiling with g++..."; g++ $gpp_args }
+    if (Test-Path $path_output_obj_file) { Remove-Item $path_output_obj_file }
 } else {
-    # Write-Host "The '$path_output_bin' is up to date."
+    # Write-Host "The '$path_output_bin_file' is up to date."
 }
 
-if ((Test-Path $path_output_bin) -and (-not $BuildOnly)){ # Runs the executable if the compilation was successful or if it is already up to date.
-    Set-Location $path_bin
-    Write-Host "Running: $path_output_bin"
-    & $path_output_bin 2>&1 | Tee-Object -FilePath "$path_output_bin.log"
+if ((Test-Path $path_output_bin_file) -and (-not $BuildOnly)){ # Runs the executable if the compilation was successful or if it is already up to date.
+    Set-Location $path_bin_dir
+    Write-Host "Running: $path_output_bin_file"
+    & $path_output_bin_file 2>&1 | Tee-Object -FilePath "$path_output_bin_file.log"
     if (-not $?) { throw "The program execution failed." }
 }
