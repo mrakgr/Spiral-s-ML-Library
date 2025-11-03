@@ -60,7 +60,7 @@ inl size' (h : compile_time.hashmap) : forall t. pickler t -> int =
                 | Unit => 0
                 | Bool => 2
                 | Int l => l
-                | Uint l => l 
+                | Uint l => l
                 | Sa_list p as x => 
                     inl max_len = get_max_length x
                     max_len + (loop p + 1) * max_len

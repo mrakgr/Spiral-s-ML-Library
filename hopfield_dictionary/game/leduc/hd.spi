@@ -3,26 +3,26 @@ open corebase
 open eigen
 
 // out = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
-inl hopfield_dictionary_get forall t_keys t_values rows_hd rows_input cols_keys cols_values. 
-        (keys : static_matrix t_keys rows_hd cols_keys)
-        (values : static_matrix t_values rows_hd cols_values)
-        (input : static_matrix t_keys rows_input cols_keys)
-        (out : static_matrix t_values rows_input cols_values)
+inl hopfield_dictionary_get forall rows_hd rows_input cols_keys cols_values t_keys t_values.
+        (keys : static_matrix rows_hd cols_keys t_keys)
+        (values : static_matrix rows_hd cols_values t_values)
+        (input : static_matrix rows_input cols_keys t_keys)
+        (out : static_matrix rows_input cols_values t_values)
         (temperature : t_values)
         : () = join
     $"!out = ((!keys * !input.transpose() - !input.rowwise().sum().transpose().replicate(!keys.rows(),1)).array() / !temperature).exp().matrix().transpose() * !values"
 
-type serializers k v = exists t{number} cols_keys cols_values. { key_to_array : k -> static_vector t cols_keys; array_to_value : static_vector t cols_values -> v }
+type serializers k v = exists cols_keys cols_values t{number}. { key_to_array : k -> static_vector cols_keys t; array_to_value : static_vector cols_values t -> v }
 nominal dict k v =
-    exists t{number} rows cols_keys cols_values. {
+    exists rows cols_keys cols_values t{number}. {
         data : stack_refs {
-            keys : static_matrix t rows cols_keys
-            values : static_matrix t rows cols_values
+            keys : static_matrix rows cols_keys t
+            values : static_matrix rows cols_values t
             i : int
         }
         serializers : { 
-            key_to_array : k -> static_vector t cols_keys
-            array_to_value : static_vector t cols_values -> v 
+            key_to_array : k -> static_vector cols_keys t
+            array_to_value : static_vector cols_values t -> v 
         }
     }
 
@@ -30,10 +30,10 @@ nominal dict k v =
 // Takes in serializers to convert raw array data of type `t` to Spiral usable formats.
 // The rows and the columns need to be compile time literals.
 // Does not initialize the matrices to 0.
-inl create forall k v. (exists t cols_keys cols_values. { key_to_array array_to_value } : serializers k v) ({rows} : {rows : int}) : dict k v =
+inl create forall k v. (exists cols_keys cols_values t. { key_to_array array_to_value } : serializers k v) ({rows} : {rows : int}) : dict k v =
     assert (lit_is rows) "The rows of the matrix have to be known at compile time."
     inl (exists rows. rows) = tint rows
-    dict exists [t; rows; cols_keys; cols_values] {
+    dict exists [rows; cols_keys; cols_values; t] {
         serializers = { key_to_array  array_to_value }
         data = stack_refs {
             keys = create_static
@@ -43,8 +43,8 @@ inl create forall k v. (exists t cols_keys cols_values. { key_to_array array_to_
     }
 
 // Clears the dictionary of keys by setting both the keys and the values all to 0.
-inl clear forall k v. ((dict (exists t rows cols_keys cols_values. {data = refs})) : dict k v) : () =
-    $"!(refs.keys).setZero()" . $"!(refs.values).setZero()" . refs.i <- 0
+inl clear forall k v. ((dict (exists rows cols_keys cols_values t. {data = refs})) : dict k v) : () =
+    matrix_clear refs.keys . matrix_clear refs.values . refs.i <- 0
 
 // Gets an item from the dictionary.
 inl get forall k v. ((dict (exists t rows cols_keys cols_values. {serializers data = refs})) : dict k v) (k : k) : v =
