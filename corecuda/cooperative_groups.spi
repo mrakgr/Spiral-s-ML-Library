@@ -9,12 +9,12 @@ inl grid_group_thread_rank() : int = $"cooperative_groups::grid_group::thread_ra
 inl thread_block_num_threads() : int = $"cooperative_groups::thread_block::num_threads()"
 inl thread_block_thread_rank() : int = $"cooperative_groups::thread_block::thread_rank()"
 
-nominal grid_group = $"cooperative_groups::grid_group"
-nominal cluster_group = $"cooperative_groups::cluster_group"
-nominal thread_block = $"cooperative_groups::thread_block"
-nominal thread_block_tile parent size = $"cooperative_groups::thread_block_tile<@size, `parent>"
-nominal thread = $"cooperative_groups::thread_block_tile<1>"
-nominal coalesced_group = $"cooperative_groups::coalesced_group"
+nominal grid_group = $"cooperative_groups::grid_group \@ \#include <cooperative_groups.h>"
+nominal cluster_group = $"cooperative_groups::cluster_group \@ \#include <cooperative_groups.h>"
+nominal thread_block = $"cooperative_groups::thread_block \@ \#include <cooperative_groups.h>"
+nominal thread_block_tile parent size = $"cooperative_groups::thread_block_tile<@size, `parent> \@ \#include <cooperative_groups.h>"
+nominal thread = $"cooperative_groups::thread_block_tile<1> \@ \#include <cooperative_groups.h>"
+nominal coalesced_group = $"cooperative_groups::coalesced_group \@ \#include <cooperative_groups.h>"
 
 prototype groupable t : t -> ()
 instance groupable thread = fun _ => ()
@@ -36,18 +36,12 @@ instance tileable coalesced_group = fun _ => ()
 inl meta_group_size forall group {tileable}. (cg : ref group) : int = $"!cg.meta_group_size()"
 inl meta_group_rank forall group {tileable}. (cg : ref group) : int = $"!cg.meta_group_rank()"
 
-inl create_grid() : ref grid_group = 
-    global "#include <cooperative_groups.h>"
-    $"auto \v = cooperative_groups::this_grid()"
-inl create_cluster() : ref cluster_group = 
-    global "#include <cooperative_groups.h>"
-    $"auto \v = cooperative_groups::this_cluster()"
-inl create_block() : ref thread_block = 
-    global "#include <cooperative_groups.h>"
-    $"auto \v = cooperative_groups::this_thread_block()"
-inl create_thread() : ref thread = 
-    global "#include <cooperative_groups.h>"
-    $"auto \v = cooperative_groups::this_thread()"
+inl globals() = global "#include <cooperative_groups.h>"
+
+inl create_grid() : ref grid_group = globals() . $"auto \v = cooperative_groups::this_grid()"
+inl create_cluster() : ref cluster_group = globals() . $"auto \v = cooperative_groups::this_cluster()"
+inl create_block() : ref thread_block = globals() . $"auto \v = cooperative_groups::this_thread_block()"
+inl create_thread() : ref thread = globals() . $"auto \v = cooperative_groups::this_thread()"
 
 // These can only be created from tiles of size 32 or less.
 inl create_labeled_partition forall parent {tileable}. (x : ref parent) (i : int) : ref coalesced_group = $"auto \v = cooperative_groups::labeled_partition(!x,!i)"

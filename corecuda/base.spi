@@ -263,6 +263,3 @@ inl undefined forall t. : t = index (create 1 : array t) 0
 inl nanosleep (ns : u32) : () = 
     assert (ns <= 1_000_000) "The maximum sleep duration is approximately 1 millisecond."
     $"__nanosleep(!ns)"
-
-// Base reference type
-nominal ref t = $"`t &"

@@ -4,10 +4,10 @@ open eigen
 
 // out = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
 inl hopfield_dictionary_get forall rows_hd rows_input cols_keys cols_values t_keys t_values.
-        (keys : static_matrix rows_hd cols_keys t_keys)
-        (values : static_matrix rows_hd cols_values t_values)
-        (input : static_matrix rows_input cols_keys t_keys)
-        (out : static_matrix rows_input cols_values t_values)
+        (keys : ref (static_matrix rows_hd cols_keys t_keys))
+        (values : ref (static_matrix rows_hd cols_values t_values))
+        (input : ref (static_matrix rows_input cols_keys t_keys))
+        (out : ref (static_matrix rows_input cols_values t_values))
         (temperature : t_values)
         : () = join
     $"!out = ((!keys * !input.transpose() - !input.rowwise().sum().transpose().replicate(!keys.rows(),1)).array() / !temperature).exp().matrix().transpose() * !values"
@@ -50,7 +50,8 @@ inl clear forall k v. ((dict (exists rows cols_keys cols_values t. {data = refs}
 inl get forall k v. ((dict (exists t rows cols_keys cols_values. {serializers data = refs})) : dict k v) (k : k) : v =
     inl input = serializers.key_to_array k
     inl out = eigen.create_static
-    hopfield_dictionary_get refs.keys refs.values input out 0.001
+    open corecuda.refm
+    hopfield_dictionary_get (from_local refs.keys) (from_local refs.values) (from_local input) (from_local out) 0.001
     serializers.array_to_value out
 
 // // Sets the item to the dictionary at the specified key.

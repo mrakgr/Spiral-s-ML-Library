@@ -3,7 +3,7 @@ open refm
 open tensorm
 open thread_scope
 
-nominal counting_semaphore count scope = $'cuda::counting_semaphore<`scope, @count>'
+nominal counting_semaphore count scope = $'cuda::counting_semaphore<`scope, @count> \@ \#include <cuda/semaphore>'
 type binary_semaphore scope = counting_semaphore 1 scope
 
 inl globals() = global "#include <cuda/semaphore>"

@@ -1,29 +1,26 @@
 #include "test1.hpp"
-#include <cooperative_groups.h>
-#include <cuda/semaphore>
-__device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
-__device__ inline bool while_method_0(int v0){
+__device__ inline bool while_method_6(int v0){
     bool v1;
     v1 = v0 < 115;
     return v1;
 }
-__device__ inline bool while_method_1(int v0, int v1){
+__device__ inline bool while_method_10(int v0, int v1){
     bool v2;
     v2 = v1 < v0;
     return v2;
 }
-__device__ inline bool while_method_2(int v0){
+__device__ inline bool while_method_11(int v0){
     bool v1;
     v1 = v0 < 5;
     return v1;
 }
-__device__ inline bool while_method_3(int v0){
+__device__ inline bool while_method_12(int v0){
     bool v1;
     v1 = v0 < 3;
     return v1;
 }
-__device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
-    StackMut0 v7{0};
+__device__ void method_8(unsigned int * v0, static_array_list<Union5,5> v1, Union7 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
+    StackMut9 v7{0};
     int v8;
     v8 = (int)v6;
     bool v9;
@@ -179,8 +176,8 @@ __device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Unio
     v71 = v1.length;
     int v72;
     v72 = 0;
-    while (while_method_1(v71, v72)){
-        Union0 v75;
+    while (while_method_10(v71, v72)){
+        Union5 v75;
         v75 = v1[v72];
         int v78 = v7.v0;
         int v79;
@@ -270,7 +267,7 @@ __device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Unio
     }
     int v111;
     v111 = v61;
-    while (while_method_2(v111)){
+    while (while_method_11(v111)){
         int v113 = v7.v0;
         int v114;
         v114 = v113 + 13;
@@ -295,7 +292,7 @@ __device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Unio
     }
     int v123;
     v123 = 0;
-    while (while_method_3(v123)){
+    while (while_method_12(v123)){
         int v126;
         v126 = v4[v123];
         bool v129;
@@ -336,11 +333,11 @@ __device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Unio
     }
     return ;
 }
-__device__ int method_4(unsigned int * v0, StackMut0 & v1, int v2){
+__device__ int method_15(unsigned int * v0, StackMut9 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple1 tmp0 = Tuple1{0, 0, 0};
+    Tuple16 tmp0 = Tuple16{0, 0, 0};
     v3 = tmp0.v0; v4 = tmp0.v1; v5 = tmp0.v2;
-    while (while_method_1(v2, v3)){
+    while (while_method_10(v2, v3)){
         int v7 = v1.v0;
         int v8;
         v8 = v7 / 32;
@@ -382,11 +379,11 @@ __device__ int method_4(unsigned int * v0, StackMut0 & v1, int v2){
     }
     return v4;
 }
-__device__ void method_5(unsigned int * v0, StackMut0 & v1, int v2){
+__device__ void method_19(unsigned int * v0, StackMut9 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple1 tmp1 = Tuple1{0, 0, 0};
+    Tuple16 tmp1 = Tuple16{0, 0, 0};
     v3 = tmp1.v0; v4 = tmp1.v1; v5 = tmp1.v2;
-    while (while_method_1(v2, v3)){
+    while (while_method_10(v2, v3)){
         int v7 = v1.v0;
         int v8;
         v8 = v7 / 32;
@@ -429,11 +426,11 @@ __device__ void method_5(unsigned int * v0, StackMut0 & v1, int v2){
         return ;
     }
 }
-__device__ void method_6(unsigned int * v0, StackMut0 & v1, int v2){
+__device__ void method_22(unsigned int * v0, StackMut9 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple1 tmp2 = Tuple1{0, 0, 0};
+    Tuple16 tmp2 = Tuple16{0, 0, 0};
     v3 = tmp2.v0; v4 = tmp2.v1; v5 = tmp2.v2;
-    while (while_method_1(v2, v3)){
+    while (while_method_10(v2, v3)){
         int v7 = v1.v0;
         int v8;
         v8 = v7 / 32;
@@ -476,46 +473,46 @@ __device__ void method_6(unsigned int * v0, StackMut0 & v1, int v2){
         return ;
     }
 }
-__device__ Tuple0 method_3(unsigned int * v0){
-    StackMut0 v1{0};
+__device__ Tuple14 method_13(unsigned int * v0){
+    StackMut9 v1{0};
     int v2;
     v2 = 10;
     int v3;
-    v3 = method_4(v0, v1, v2);
+    v3 = method_15(v0, v1, v2);
     unsigned int v4;
     v4 = (unsigned int)v3;
     int v5;
     v5 = 10;
     int v6;
-    v6 = method_4(v0, v1, v5);
+    v6 = method_15(v0, v1, v5);
     int v7;
     v7 = 2;
     int v8;
-    v8 = method_4(v0, v1, v7);
+    v8 = method_15(v0, v1, v7);
     bool v9;
     v9 = v8 == 1;
-    Union2 v10;
-    v10 = Union2{Union2_0{}};
-    StackMut1 v11{v10};
+    Union17 v10;
+    v10 = Union17{Union17_0{}};
+    StackMut18 v11{v10};
     int v12;
     v12 = 3;
     int v13;
-    v13 = method_4(v0, v1, v12);
+    v13 = method_15(v0, v1, v12);
     bool v14;
     v14 = 0 == v13;
     if (v14){
-        Union2 v15 = v11.v0;
+        Union17 v15 = v11.v0;
         switch (v15.tag) {
             case 0: { // None
-                Union1 v16;
-                v16 = Union1{Union1_0{}};
-                Union2 v17;
-                v17 = Union2{Union2_1{v16}};
+                Union7 v16;
+                v16 = Union7{Union7_0{}};
+                Union17 v17;
+                v17 = Union17{Union17_1{v16}};
                 v11.v0 = v17;
                 break;
             }
             case 1: { // Some
-                Union1 v18 = v15.case1.v0;
+                Union7 v18 = v15.case1.v0;
                 bool v19;
                 v19 = false;
                 bool v20;
@@ -534,23 +531,23 @@ __device__ Tuple0 method_3(unsigned int * v0){
     } else {
         int v22;
         v22 = 0;
-        method_5(v0, v1, v22);
+        method_19(v0, v1, v22);
     }
     bool v23;
     v23 = 1 == v13;
     if (v23){
-        Union2 v24 = v11.v0;
+        Union17 v24 = v11.v0;
         switch (v24.tag) {
             case 0: { // None
-                Union1 v25;
-                v25 = Union1{Union1_1{}};
-                Union2 v26;
-                v26 = Union2{Union2_1{v25}};
+                Union7 v25;
+                v25 = Union7{Union7_1{}};
+                Union17 v26;
+                v26 = Union17{Union17_1{v25}};
                 v11.v0 = v26;
                 break;
             }
             case 1: { // Some
-                Union1 v27 = v24.case1.v0;
+                Union7 v27 = v24.case1.v0;
                 bool v28;
                 v28 = false;
                 bool v29;
@@ -569,23 +566,23 @@ __device__ Tuple0 method_3(unsigned int * v0){
     } else {
         int v31;
         v31 = 0;
-        method_5(v0, v1, v31);
+        method_19(v0, v1, v31);
     }
     bool v32;
     v32 = 2 == v13;
     if (v32){
-        Union2 v33 = v11.v0;
+        Union17 v33 = v11.v0;
         switch (v33.tag) {
             case 0: { // None
-                Union1 v34;
-                v34 = Union1{Union1_2{}};
-                Union2 v35;
-                v35 = Union2{Union2_1{v34}};
+                Union7 v34;
+                v34 = Union7{Union7_2{}};
+                Union17 v35;
+                v35 = Union17{Union17_1{v34}};
                 v11.v0 = v35;
                 break;
             }
             case 1: { // Some
-                Union1 v36 = v33.case1.v0;
+                Union7 v36 = v33.case1.v0;
                 bool v37;
                 v37 = false;
                 bool v38;
@@ -604,10 +601,10 @@ __device__ Tuple0 method_3(unsigned int * v0){
     } else {
         int v40;
         v40 = 0;
-        method_5(v0, v1, v40);
+        method_19(v0, v1, v40);
     }
-    Union2 v41 = v11.v0;
-    Union1 v45;
+    Union17 v41 = v11.v0;
+    Union7 v45;
     switch (v41.tag) {
         case 0: { // None
             printf("%s\n", "Could not parse the union type in unpickle's Alt case.");
@@ -615,7 +612,7 @@ __device__ Tuple0 method_3(unsigned int * v0){
             break;
         }
         case 1: { // Some
-            Union1 v42 = v41.case1.v0;
+            Union7 v42 = v41.case1.v0;
             v45 = v42;
             break;
         }
@@ -627,34 +624,34 @@ __device__ Tuple0 method_3(unsigned int * v0){
     int v46;
     v46 = 5;
     int v47;
-    v47 = method_4(v0, v1, v46);
-    static_array_list<Union0,5> v49;
-    v49 = static_array_list<Union0,5>{};
+    v47 = method_15(v0, v1, v46);
+    static_array_list<Union5,5> v49;
+    v49 = static_array_list<Union5,5>{};
     int v52;
     v52 = 0;
-    while (while_method_1(v47, v52)){
-        Union3 v54;
-        v54 = Union3{Union3_0{}};
-        StackMut2 v55{v54};
+    while (while_method_10(v47, v52)){
+        Union20 v54;
+        v54 = Union20{Union20_0{}};
+        StackMut21 v55{v54};
         int v56;
         v56 = 3;
         int v57;
-        v57 = method_4(v0, v1, v56);
+        v57 = method_15(v0, v1, v56);
         bool v58;
         v58 = 0 == v57;
         if (v58){
-            Union3 v59 = v55.v0;
+            Union20 v59 = v55.v0;
             switch (v59.tag) {
                 case 0: { // None
-                    Union0 v60;
-                    v60 = Union0{Union0_0{}};
-                    Union3 v61;
-                    v61 = Union3{Union3_1{v60}};
+                    Union5 v60;
+                    v60 = Union5{Union5_0{}};
+                    Union20 v61;
+                    v61 = Union20{Union20_1{v60}};
                     v55.v0 = v61;
                     break;
                 }
                 case 1: { // Some
-                    Union0 v62 = v59.case1.v0;
+                    Union5 v62 = v59.case1.v0;
                     bool v63;
                     v63 = false;
                     bool v64;
@@ -673,23 +670,23 @@ __device__ Tuple0 method_3(unsigned int * v0){
         } else {
             int v66;
             v66 = 0;
-            method_5(v0, v1, v66);
+            method_19(v0, v1, v66);
         }
         bool v67;
         v67 = 1 == v57;
         if (v67){
-            Union3 v68 = v55.v0;
+            Union20 v68 = v55.v0;
             switch (v68.tag) {
                 case 0: { // None
-                    Union0 v69;
-                    v69 = Union0{Union0_1{}};
-                    Union3 v70;
-                    v70 = Union3{Union3_1{v69}};
+                    Union5 v69;
+                    v69 = Union5{Union5_1{}};
+                    Union20 v70;
+                    v70 = Union20{Union20_1{v69}};
                     v55.v0 = v70;
                     break;
                 }
                 case 1: { // Some
-                    Union0 v71 = v68.case1.v0;
+                    Union5 v71 = v68.case1.v0;
                     bool v72;
                     v72 = false;
                     bool v73;
@@ -708,27 +705,27 @@ __device__ Tuple0 method_3(unsigned int * v0){
         } else {
             int v75;
             v75 = 0;
-            method_5(v0, v1, v75);
+            method_19(v0, v1, v75);
         }
         bool v76;
         v76 = 2 == v57;
         if (v76){
-            Union3 v77 = v55.v0;
+            Union20 v77 = v55.v0;
             switch (v77.tag) {
                 case 0: { // None
                     int v78;
                     v78 = 10;
                     int v79;
-                    v79 = method_4(v0, v1, v78);
-                    Union0 v80;
-                    v80 = Union0{Union0_2{v79}};
-                    Union3 v81;
-                    v81 = Union3{Union3_1{v80}};
+                    v79 = method_15(v0, v1, v78);
+                    Union5 v80;
+                    v80 = Union5{Union5_2{v79}};
+                    Union20 v81;
+                    v81 = Union20{Union20_1{v80}};
                     v55.v0 = v81;
                     break;
                 }
                 case 1: { // Some
-                    Union0 v82 = v77.case1.v0;
+                    Union5 v82 = v77.case1.v0;
                     bool v83;
                     v83 = false;
                     bool v84;
@@ -747,10 +744,10 @@ __device__ Tuple0 method_3(unsigned int * v0){
         } else {
             int v86;
             v86 = 10;
-            method_5(v0, v1, v86);
+            method_19(v0, v1, v86);
         }
-        Union3 v87 = v55.v0;
-        Union0 v91;
+        Union20 v87 = v55.v0;
+        Union5 v91;
         switch (v87.tag) {
             case 0: { // None
                 printf("%s\n", "Could not parse the union type in unpickle's Alt case.");
@@ -758,7 +755,7 @@ __device__ Tuple0 method_3(unsigned int * v0){
                 break;
             }
             case 1: { // Some
-                Union0 v88 = v87.case1.v0;
+                Union5 v88 = v87.case1.v0;
                 v91 = v88;
                 break;
             }
@@ -770,34 +767,34 @@ __device__ Tuple0 method_3(unsigned int * v0){
         v49.push(v91);
         int v92;
         v92 = 1;
-        method_5(v0, v1, v92);
+        method_19(v0, v1, v92);
         v52 += 1 ;
     }
     int v93;
     v93 = v47;
-    while (while_method_2(v93)){
+    while (while_method_11(v93)){
         int v95;
         v95 = 13;
-        method_5(v0, v1, v95);
+        method_19(v0, v1, v95);
         int v96;
         v96 = 1;
-        method_6(v0, v1, v96);
+        method_22(v0, v1, v96);
         v93 += 1 ;
     }
     static_array<int,3> v98;
     int v101;
     v101 = 0;
-    while (while_method_3(v101)){
+    while (while_method_12(v101)){
         int v103;
         v103 = 5;
         int v104;
-        v104 = method_4(v0, v1, v103);
+        v104 = method_15(v0, v1, v103);
         v98[v101] = v104;
         v101 += 1 ;
     }
-    return Tuple0{v49, v45, v9, v98, v6, v4};
+    return Tuple14{v49, v45, v9, v98, v6, v4};
 }
-__device__ void method_7(Union0 v0){
+__device__ void method_26(Union5 v0){
     switch (v0.tag) {
         case 0: { // Call
             printf("%s","Call");
@@ -821,7 +818,7 @@ __device__ void method_7(Union0 v0){
         }
     }
 }
-__device__ void method_8(Union1 v0){
+__device__ void method_27(Union7 v0){
     switch (v0.tag) {
         case 0: { // Jack
             printf("%s","Jack");
@@ -856,20 +853,20 @@ extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0() {
     bool v4;
     v4 = v3 == 0;
     if (v4){
-        static_array_list<Union0,5> v6;
-        v6 = static_array_list<Union0,5>{};
+        static_array_list<Union5,5> v6;
+        v6 = static_array_list<Union5,5>{};
         v6.unsafe_set_length(4);
-        Union0 v10;
-        v10 = Union0{Union0_2{3}};
+        Union5 v10;
+        v10 = Union5{Union5_2{3}};
         v6[0] = v10;
-        Union0 v14;
-        v14 = Union0{Union0_2{4}};
+        Union5 v14;
+        v14 = Union5{Union5_2{4}};
         v6[1] = v14;
-        Union0 v18;
-        v18 = Union0{Union0_0{}};
+        Union5 v18;
+        v18 = Union5{Union5_0{}};
         v6[2] = v18;
-        Union0 v22;
-        v22 = Union0{Union0_1{}};
+        Union5 v22;
+        v22 = Union5{Union5_1{}};
         v6[3] = v22;
         static_array<int,3> v26;
         v26[0] = 1;
@@ -878,7 +875,7 @@ extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0() {
         unsigned int v29[4];
         int v30;
         v30 = 0;
-        while (while_method_0(v30)){
+        while (while_method_6(v30)){
             int v32;
             v32 = v30 / 32;
             unsigned int v33;
@@ -894,17 +891,17 @@ extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0() {
             v29[v32] = v37;
             v30 += 1 ;
         }
-        Union1 v38;
-        v38 = Union1{Union1_1{}};
+        Union7 v38;
+        v38 = Union7{Union7_1{}};
         bool v39;
         v39 = false;
         int v40;
         v40 = 8;
         unsigned int v41;
         v41 = 5u;
-        method_2(v29, v6, v38, v39, v26, v40, v41);
-        static_array_list<Union0,5> v42; Union1 v43; bool v44; static_array<int,3> v45; int v46; unsigned int v47;
-        Tuple0 tmp3 = method_3(v29);
+        method_8(v29, v6, v38, v39, v26, v40, v41);
+        static_array_list<Union5,5> v42; Union7 v43; bool v44; static_array<int,3> v45; int v46; unsigned int v47;
+        Tuple14 tmp3 = method_13(v29);
         v42 = tmp3.v0; v43 = tmp3.v1; v44 = tmp3.v2; v45 = tmp3.v3; v46 = tmp3.v4; v47 = tmp3.v5;
         cuda::counting_semaphore<cuda::thread_scope_system, 1> & v73 = console_lock;
         auto v74 = cooperative_groups::coalesced_threads();
@@ -922,11 +919,11 @@ extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0() {
         }
         int v78;
         v78 = 0;
-        while (while_method_1(v77, v78)){
-            Union0 v81;
+        while (while_method_10(v77, v78)){
+            Union5 v81;
             v81 = v42[v78];
             printf("");
-            method_7(v81);
+            method_26(v81);
             printf("");
             int v84;
             v84 = v78 + 1;
@@ -950,7 +947,7 @@ extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0() {
         }
         printf("%s","]");
         printf("; %s = ","card");
-        method_8(v43);
+        method_27(v43);
         const char * v91;
         if (v44){
             const char * v89;
@@ -964,7 +961,7 @@ extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0() {
         printf("; %s = %s; %s = %s","is_first", v91, "l", "[");
         int v92;
         v92 = 0;
-        while (while_method_3(v92)){
+        while (while_method_12(v92)){
             int v95;
             v95 = v45[v92];
             printf("%d",v95);
@@ -986,7 +983,7 @@ extern "C" __global__ void __cluster_dims__(12,1,1) cuda_device_entry0() {
     }
     return ;
 }
-void run_cuda_device_from_cuda_host_1(){
+void run_cuda_device_from_cuda_host_3(){
     auto kernel = cuda_device_entry0;
     gpuErrchk(cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, 98304));
     gpuErrchk(cudaFuncSetAttribute(kernel, cudaFuncAttributeNonPortableClusterSizeAllowed, 12));
@@ -1015,7 +1012,7 @@ void run_cuda_device_from_cuda_host_1(){
     return ;
 }
 void cuda_host_entry0() {
-    run_cuda_device_from_cuda_host_1();
+    run_cuda_device_from_cuda_host_3();
     gpuErrchk(cudaDeviceSynchronize());
     return ;
 }

@@ -112,3 +112,6 @@ type ptr = array u8
 type size = u64
 
 type range dim = {from : int; nearTo : dim; by : int}
+
+// Base reference type. Cpp only.
+nominal ref t = $"`t &"

@@ -50,7 +50,7 @@ inl main() =
     inl serializers : hd.serializers game_state game_dicts = 
         inl (exists cols_keys. _) = tint (size p)
         inl (exists cols_values. _) = tint (num_actions * 4)
-        exists [cols_keys; cols_values; float] 
+        exists [cols_keys; cols_values; float]
             {
                 key_to_array = fun x =>
                     inl m : eigen.static_vector cols_keys float = eigen.create_static
@@ -59,7 +59,8 @@ inl main() =
                     hd_pickler.pickle ar p x  
                     m
                 array_to_value = fun x => 
-                    inl init offset = sam.init (fun i => eigen.matrix_index x (0, i + offset))
+                    inl init offset = 
+                        sam.init (fun i => eigen.matrix_index x (0, i + offset))
                     {
                         average_policy = init (num_actions * 0)
                         current_policy = init (num_actions * 1)
@@ -69,6 +70,7 @@ inl main() =
             }
             
     inl d : hd.dict game_state game_dicts = hd.create serializers {rows=1 <<< 0}
+    hd.clear d
     inl k : game_state = {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
     inl v : game_dicts = hd.get d k
     console.write_ln v
