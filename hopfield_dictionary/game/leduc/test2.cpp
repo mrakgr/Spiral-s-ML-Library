@@ -247,6 +247,30 @@ inline bool while_method_11(int v0){
     v1 = v0 < 12;
     return v1;
 }
+void method_12(Union3 v0){
+    switch (v0.tag) {
+        case 0: { // Call
+            printf("%s","Call");
+            return ;
+            break;
+        }
+        case 1: { // Fold
+            printf("%s","Fold");
+            return ;
+            break;
+        }
+        case 2: { // Raise
+            int v1 = v0.case2.v0;
+            printf("%s(%d)","Raise", v1);
+            return ;
+            break;
+        }
+        default: {
+            assert("Invalid tag." && false);
+            exit(-1);
+        }
+    }
+}
 int main() {
     Eigen::Matrix<float,1,115> v0;
     Eigen::Matrix<float,1,48> v1;
@@ -340,76 +364,136 @@ int main() {
         v68[v70] = v73;
         v70 += 1 ;
     }
-    printf("{%s = %s","average_policy", "[");
-    int v140;
-    v140 = 0;
-    while (while_method_11(v140)){
-        float v144;
-        v144 = v45[v140];
-        printf("%f",v144);
-        int v146;
-        v146 = v140 + 1;
-        bool v147;
-        v147 = v146 < 12;
-        if (v147){
+    printf("{%s = %s","action_history", "[");
+    int v120;
+    v120 = v8.length;
+    bool v121;
+    v121 = 100 < v120;
+    int v122;
+    if (v121){
+        v122 = 100;
+    } else {
+        v122 = v120;
+    }
+    int v123;
+    v123 = 0;
+    while (while_method_7(v122, v123)){
+        Union3 v127;
+        v127 = v8[v123];
+        printf("");
+        method_12(v127);
+        printf("");
+        int v129;
+        v129 = v123 + 1;
+        int v130;
+        v130 = v8.length;
+        bool v131;
+        v131 = v129 < v130;
+        if (v131){
             printf("%s","; ");
         } else {
         }
-        v140 += 1 ;
+        v123 += 1 ;
+    }
+    int v132;
+    v132 = v8.length;
+    bool v133;
+    v133 = v132 > 100;
+    if (v133){
+        printf("%s","; ...");
+    } else {
+    }
+    printf("%s","]");
+    printf("; %s = %s; %s = %s; %s = %s","card", "King", "is_first", "false", "l", "[");
+    int v134;
+    v134 = 0;
+    while (while_method_9(v134)){
+        int v138;
+        v138 = v28[v134];
+        printf("%d",v138);
+        int v140;
+        v140 = v134 + 1;
+        bool v141;
+        v141 = v140 < 3;
+        if (v141){
+            printf("%s","; ");
+        } else {
+        }
+        v134 += 1 ;
+    }
+    printf("%s","]");
+    printf("; %s = %d; %s = %u}\n","pot", 8, "stack", 5u);
+    fflush(stdout);
+    printf("{%s = %s","average_policy", "[");
+    int v250;
+    v250 = 0;
+    while (while_method_11(v250)){
+        float v254;
+        v254 = v45[v250];
+        printf("%f",v254);
+        int v256;
+        v256 = v250 + 1;
+        bool v257;
+        v257 = v256 < 12;
+        if (v257){
+            printf("%s","; ");
+        } else {
+        }
+        v250 += 1 ;
     }
     printf("%s","]");
     printf("; %s = %s","current_policy", "[");
-    int v148;
-    v148 = 0;
-    while (while_method_11(v148)){
-        float v152;
-        v152 = v52[v148];
-        printf("%f",v152);
-        int v154;
-        v154 = v148 + 1;
-        bool v155;
-        v155 = v154 < 12;
-        if (v155){
+    int v258;
+    v258 = 0;
+    while (while_method_11(v258)){
+        float v262;
+        v262 = v52[v258];
+        printf("%f",v262);
+        int v264;
+        v264 = v258 + 1;
+        bool v265;
+        v265 = v264 < 12;
+        if (v265){
             printf("%s","; ");
         } else {
         }
-        v148 += 1 ;
+        v258 += 1 ;
     }
     printf("%s","]");
     printf("; %s = %s","ev_values", "[");
-    int v156;
-    v156 = 0;
-    while (while_method_11(v156)){
-        float v160;
-        v160 = v60[v156];
-        printf("%f",v160);
-        int v162;
-        v162 = v156 + 1;
-        bool v163;
-        v163 = v162 < 12;
-        if (v163){
+    int v266;
+    v266 = 0;
+    while (while_method_11(v266)){
+        float v270;
+        v270 = v60[v266];
+        printf("%f",v270);
+        int v272;
+        v272 = v266 + 1;
+        bool v273;
+        v273 = v272 < 12;
+        if (v273){
             printf("%s","; ");
         } else {
         }
-        v156 += 1 ;
+        v266 += 1 ;
     }
     printf("%s","]");
     printf("; %s = %s","ev_weights", "[");
-    int v164;
-    v164 = 0;
-    while (while_method_11(v164)){
-        float v168;
-        v168 = v68[v164];
-        printf("%f",v168);
-        int v170;
-        v170 = v164 + 1;
-        bool v171;
-        v171 = v170 < 12;
-        if (v171){
+    int v274;
+    v274 = 0;
+    while (while_method_11(v274)){
+        float v278;
+        v278 = v68[v274];
+        printf("%f",v278);
+        int v280;
+        v280 = v274 + 1;
+        bool v281;
+        v281 = v280 < 12;
+        if (v281){
             printf("%s","; ");
         } else {
         }
-        v164 += 1 ;
+        v274 += 1 ;
     }
     printf("%s","]");
     printf("}\n");

@@ -12,7 +12,13 @@ inl hopfield_dictionary_get forall rows_hd rows_input cols_keys cols_values t_ke
         : () = join
     $"!out = ((!keys * !input.transpose() - !input.rowwise().sum().transpose().replicate(!keys.rows(),1)).array() / !temperature).exp().matrix().transpose() * !values"
 
-type serializers k v = exists cols_keys cols_values t{number}. { key_to_array : k -> static_vector cols_keys t; array_to_value : static_vector cols_values t -> v }
+type serializers k v = exists cols_keys cols_values t{number}. 
+    { 
+        key_to_array : k -> static_vector cols_keys t
+        array_to_value : static_vector cols_values t -> v 
+        value_to_array : v -> static_vector cols_values t
+        array_to_key : static_vector cols_keys t -> option k
+    }
 nominal dict k v =
     exists rows cols_keys cols_values t{number}. {
         data : stack_refs {
@@ -22,7 +28,9 @@ nominal dict k v =
         }
         serializers : { 
             key_to_array : k -> static_vector cols_keys t
+            value_to_array : v -> static_vector cols_values t
             array_to_value : static_vector cols_values t -> v 
+            array_to_key : static_vector cols_keys t -> option k
         }
     }
 
@@ -30,41 +38,54 @@ nominal dict k v =
 // Takes in serializers to convert raw array data of type `t` to Spiral usable formats.
 // The rows and the columns need to be compile time literals.
 // Does not initialize the matrices to 0.
-inl create forall k v. (exists cols_keys cols_values t. { key_to_array array_to_value } : serializers k v) ({rows} : {rows : int}) : dict k v =
+inl create forall k v. (exists cols_keys cols_values t. { key_to_array array_to_value value_to_array array_to_key } : serializers k v) ({rows} : {rows : int}) : dict k v =
     assert (lit_is rows) "The rows of the matrix have to be known at compile time."
     inl (exists rows. rows) = tint rows
-    dict exists [rows; cols_keys; cols_values; t] {
-        serializers = { key_to_array  array_to_value }
+    dict (exists [rows; cols_keys; cols_values; t] {
+        serializers = { key_to_array array_to_value value_to_array array_to_key }
         data = stack_refs {
             keys = create_static
             values = create_static
             i = 0
         }
-    }
+    })
 
 // Clears the dictionary of keys by setting both the keys and the values all to 0.
 inl clear forall k v. ((dict (exists rows cols_keys cols_values t. {data = refs})) : dict k v) : () =
     matrix_clear refs.keys . matrix_clear refs.values . refs.i <- 0
 
 // Gets an item from the dictionary.
-inl get forall k v. ((dict (exists t rows cols_keys cols_values. {serializers data = refs})) : dict k v) (k : k) : v =
+inl get forall k v. ((dict (exists rows cols_keys cols_values t. {serializers data = refs})) : dict k v) (k : k) : v =
     inl input = serializers.key_to_array k
     inl out = eigen.create_static
     open corecuda.refm
     hopfield_dictionary_get (from_local refs.keys) (from_local refs.values) (from_local input) (from_local out) 0.001
     serializers.array_to_value out
 
-// // Sets the item to the dictionary at the specified key.
-// inl set forall k v. (d : dict k v) (k : k) (v : v) : () = $"!d[!k] = !v"
-// // Iterates over the dictionary with the iterator function.
-// inl iter forall k v. (f : k -> v -> ()) (d : dict k v) : () =
-//     inl d = corecuda.refm.from_local d
-//     inl it : $"`(dict k v)::iterator &" = $"auto \v = !d.begin()"
-//     loop.while' (fun () => $"!it !!= !d.end()") fun () =>
-//         f $"!it->first" $"!it->second"
-//         $"++!it"
+// Returns the number of rows in a dictionary
+inl num_rows forall k v. ((dict (exists rows cols_keys cols_values t. {serializers data = refs})) : dict k v) : int =
+    real open real_core in type_lit_to_lit `rows : int
 
-// instance printable dict k v = fun {write write_ln} d =>
-//     write_ln "{"
-//     iter (fun k v => write k . write " => " . write_ln v) d
-//     write_ln "}"
+// Added the key value pair to the dictionary and increments the dictionary pointer by one.
+inl set forall k v. ((dict (exists rows cols_keys cols_values t. {serializers data = refs})) & d : dict k v) (k : k) (v : v) : () =
+    inl num_rows : int = num_rows d
+    inl keys, values = refs.keys, refs.values
+    $"!keys.row(!(refs.i)) = !(serializers.key_to_array k)"
+    $"!values.row(!(refs.i)) = !(serializers.value_to_array v)"
+    refs.i <- (*refs.i + 1) % num_rows
+
+// Iterates over the dictionary with the iterator function.
+inl iter forall k v. (f : k -> v -> ()) ((dict (exists rows cols_keys cols_values t. {serializers data = refs})) & d : dict k v) : () =
+    inl num_rows : int = num_rows d
+    inl keys, values = refs.keys, refs.values
+    loop.for' {from = 0; nearTo = num_rows} fun i =>
+        inl k = ($"auto \v = !keys.row(!i)" : static_vector cols_keys t) |> serializers.array_to_key
+        inl v = ($"auto \v = !values.row(!i)" : static_vector cols_values t) |> serializers.array_to_value
+        match k with
+        | Some k => f k v
+        | None => ()
+
+instance printable dict k v = fun {write write_ln} d =>
+    write_ln "{"
+    iter (fun k v => write k . write " => " . write_ln v) d
+    write_ln "}"

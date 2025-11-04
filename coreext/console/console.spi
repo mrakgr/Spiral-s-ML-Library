@@ -36,11 +36,12 @@ inl printable_funs () : printable_funs =
 // Writes the argument to the console. On the Cuda side it uses a global lock to make sure the printing is thread safe and consistent.
 // Puts a newline at the end.
 inl write_ln x =
+    print_static {write_ln = x}
     backend_switch_all {
         Python = fun () => console_python.write_ln x
-        CudaDevice = fun () => console_cuda.single_threaded console_cuda.write_ln x
         CppHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
         CudaHost = fun () => console_cuda.write_ln x . $"fflush(stdout)"
+        CudaDevice = fun () => console_cuda.single_threaded console_cuda.write_ln x
     }
 
 // Writes the argument to the console. On the Cuda side it uses a global lock to make sure the printing is thread safe and consistent.

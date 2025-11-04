@@ -21,6 +21,7 @@ struct StackMut6;
 // The Cpp host methods forward declarations
 void method_5(float * v0, static_array_list<Union3,5> v1, Union4 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
 void method_10(Eigen::Matrix<float,1,115> & v0, Eigen::Matrix<float,1,48> & v1, Eigen::Matrix<float,1,115> & v2, Eigen::Matrix<float,1,48> & v3);
+void method_12(Union3 v0);
 // The Cuda host main defs forward declarations
 #endif
 // The Cuda type definitions
