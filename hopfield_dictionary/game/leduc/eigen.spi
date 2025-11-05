@@ -3,8 +3,11 @@ nominal map t = $"Eigen::Map<`t> \@ \#include <Eigen/Dense>"
 nominal matrix t = $"Eigen::Matrix<`t,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> \@ \#include <Eigen/Dense>"
 nominal static_matrix rows cols t = $"Eigen::Matrix<`t,@rows,@cols,Eigen::RowMajor> \@ \#include <Eigen/Dense>"
 type static_vector cols t = static_matrix 1 cols t
+type vector t = matrix t
 
 prototype matrix_index m t : m t -> (int * int) -> t
+prototype matrix_rows m t : m t -> int
+prototype matrix_cols m t : m t -> int
 prototype matrix_set m t : m t -> (int * int) -> t -> ()
 prototype matrix_clear m t : m t -> ()
 
@@ -12,9 +15,13 @@ inl globals() = global "#include <Eigen/Dense>"
 inl create_static forall rows cols t{number}. : static_matrix rows cols t = $"`(static_matrix rows cols t) \v"
 inl create forall t{number}. ({rows cols} : {rows : int; cols : int}) : matrix t = $"`(matrix t) \v(!rows, !cols)"
 
-instance matrix_set matrix = fun m (r,c) v => $"!m(!r,!c) = !v"
-instance matrix_set static_matrix rows cols = fun m (r,c) v => $"!m(!r,!c) = !v"
 instance matrix_index matrix = fun m (r,c) => $"!m(!r,!c)"
 instance matrix_index static_matrix rows cols = fun m (r,c) => $"!m(!r,!c)"
+instance matrix_rows matrix = fun m => $"!m.rows()"
+instance matrix_rows static_matrix rows cols = fun m => real open real_core in type_lit_to_lit `rows : int
+instance matrix_cols matrix = fun m => $"!m.cols()"
+instance matrix_cols static_matrix rows cols = fun m => real open real_core in type_lit_to_lit `cols : int
+instance matrix_set matrix = fun m (r,c) v => $"!m(!r,!c) = !v"
+instance matrix_set static_matrix rows cols = fun m (r,c) v => $"!m(!r,!c) = !v"
 instance matrix_clear matrix = fun m => $"!m.setZero()"
 instance matrix_clear static_matrix rows cols = fun m => $"!m.setZero()"

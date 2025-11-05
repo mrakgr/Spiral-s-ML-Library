@@ -243,14 +243,9 @@ void method_6(float * v0, static_array_list<Union3,5> v1, Union5 v2, bool v3, st
     }
     return ;
 }
-inline bool while_method_11(int v0){
-    bool v1;
-    v1 = v0 < 8;
-    return v1;
-}
-int method_15(float * v0, StackMut7 & v1, int v2){
+int method_14(float * v0, StackMut7 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple16 tmp0 = Tuple16{0, 0, 0};
+    Tuple15 tmp0 = Tuple15{0, 0, 0};
     v3 = tmp0.v0; v4 = tmp0.v1; v5 = tmp0.v2;
     while (while_method_8(v2, v3)){
         int v7 = v1.v0;
@@ -299,9 +294,9 @@ int method_15(float * v0, StackMut7 & v1, int v2){
     }
     return v4;
 }
-void method_19(float * v0, StackMut7 & v1, int v2){
+void method_18(float * v0, StackMut7 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple16 tmp1 = Tuple16{0, 0, 0};
+    Tuple15 tmp1 = Tuple15{0, 0, 0};
     v3 = tmp1.v0; v4 = tmp1.v1; v5 = tmp1.v2;
     while (while_method_8(v2, v3)){
         int v7 = v1.v0;
@@ -351,9 +346,9 @@ void method_19(float * v0, StackMut7 & v1, int v2){
         return ;
     }
 }
-void method_22(float * v0, StackMut7 & v1, int v2){
+void method_21(float * v0, StackMut7 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple16 tmp2 = Tuple16{0, 0, 0};
+    Tuple15 tmp2 = Tuple15{0, 0, 0};
     v3 = tmp2.v0; v4 = tmp2.v1; v5 = tmp2.v2;
     while (while_method_8(v2, v3)){
         int v7 = v1.v0;
@@ -403,41 +398,41 @@ void method_22(float * v0, StackMut7 & v1, int v2){
         return ;
     }
 }
-Tuple14 method_13(float * v0){
+Tuple13 method_12(float * v0){
     StackMut7 v1{0};
     int v2;
     v2 = 10;
     int v3;
-    v3 = method_15(v0, v1, v2);
+    v3 = method_14(v0, v1, v2);
     unsigned int v4;
     v4 = (unsigned int)v3;
     int v5;
     v5 = 10;
     int v6;
-    v6 = method_15(v0, v1, v5);
+    v6 = method_14(v0, v1, v5);
     int v7;
     v7 = 2;
     int v8;
-    v8 = method_15(v0, v1, v7);
+    v8 = method_14(v0, v1, v7);
     bool v9;
     v9 = v8 == 1;
-    Union17 v10;
-    v10 = Union17{Union17_0{}};
-    StackMut18 v11{v10};
+    Union16 v10;
+    v10 = Union16{Union16_0{}};
+    StackMut17 v11{v10};
     int v12;
     v12 = 3;
     int v13;
-    v13 = method_15(v0, v1, v12);
+    v13 = method_14(v0, v1, v12);
     bool v14;
     v14 = 0 == v13;
     if (v14){
-        Union17 v15 = v11.v0;
+        Union16 v15 = v11.v0;
         switch (v15.tag) {
             case 0: { // None
                 Union5 v16;
                 v16 = Union5{Union5_0{}};
-                Union17 v17;
-                v17 = Union17{Union17_1{v16}};
+                Union16 v17;
+                v17 = Union16{Union16_1{v16}};
                 v11.v0 = v17;
                 break;
             }
@@ -461,18 +456,18 @@ Tuple14 method_13(float * v0){
     } else {
         int v22;
         v22 = 0;
-        method_19(v0, v1, v22);
+        method_18(v0, v1, v22);
     }
     bool v23;
     v23 = 1 == v13;
     if (v23){
-        Union17 v24 = v11.v0;
+        Union16 v24 = v11.v0;
         switch (v24.tag) {
             case 0: { // None
                 Union5 v25;
                 v25 = Union5{Union5_1{}};
-                Union17 v26;
-                v26 = Union17{Union17_1{v25}};
+                Union16 v26;
+                v26 = Union16{Union16_1{v25}};
                 v11.v0 = v26;
                 break;
             }
@@ -496,18 +491,18 @@ Tuple14 method_13(float * v0){
     } else {
         int v31;
         v31 = 0;
-        method_19(v0, v1, v31);
+        method_18(v0, v1, v31);
     }
     bool v32;
     v32 = 2 == v13;
     if (v32){
-        Union17 v33 = v11.v0;
+        Union16 v33 = v11.v0;
         switch (v33.tag) {
             case 0: { // None
                 Union5 v34;
                 v34 = Union5{Union5_2{}};
-                Union17 v35;
-                v35 = Union17{Union17_1{v34}};
+                Union16 v35;
+                v35 = Union16{Union16_1{v34}};
                 v11.v0 = v35;
                 break;
             }
@@ -531,9 +526,9 @@ Tuple14 method_13(float * v0){
     } else {
         int v40;
         v40 = 0;
-        method_19(v0, v1, v40);
+        method_18(v0, v1, v40);
     }
-    Union17 v41 = v11.v0;
+    Union16 v41 = v11.v0;
     Union5 v45;
     switch (v41.tag) {
         case 0: { // None
@@ -554,29 +549,29 @@ Tuple14 method_13(float * v0){
     int v46;
     v46 = 5;
     int v47;
-    v47 = method_15(v0, v1, v46);
+    v47 = method_14(v0, v1, v46);
     static_array_list<Union3,5> v50;
     v50 = static_array_list<Union3,5>{};
     int v52;
     v52 = 0;
     while (while_method_8(v47, v52)){
-        Union20 v54;
-        v54 = Union20{Union20_0{}};
-        StackMut21 v55{v54};
+        Union19 v54;
+        v54 = Union19{Union19_0{}};
+        StackMut20 v55{v54};
         int v56;
         v56 = 3;
         int v57;
-        v57 = method_15(v0, v1, v56);
+        v57 = method_14(v0, v1, v56);
         bool v58;
         v58 = 0 == v57;
         if (v58){
-            Union20 v59 = v55.v0;
+            Union19 v59 = v55.v0;
             switch (v59.tag) {
                 case 0: { // None
                     Union3 v60;
                     v60 = Union3{Union3_0{}};
-                    Union20 v61;
-                    v61 = Union20{Union20_1{v60}};
+                    Union19 v61;
+                    v61 = Union19{Union19_1{v60}};
                     v55.v0 = v61;
                     break;
                 }
@@ -600,18 +595,18 @@ Tuple14 method_13(float * v0){
         } else {
             int v66;
             v66 = 0;
-            method_19(v0, v1, v66);
+            method_18(v0, v1, v66);
         }
         bool v67;
         v67 = 1 == v57;
         if (v67){
-            Union20 v68 = v55.v0;
+            Union19 v68 = v55.v0;
             switch (v68.tag) {
                 case 0: { // None
                     Union3 v69;
                     v69 = Union3{Union3_1{}};
-                    Union20 v70;
-                    v70 = Union20{Union20_1{v69}};
+                    Union19 v70;
+                    v70 = Union19{Union19_1{v69}};
                     v55.v0 = v70;
                     break;
                 }
@@ -635,22 +630,22 @@ Tuple14 method_13(float * v0){
         } else {
             int v75;
             v75 = 0;
-            method_19(v0, v1, v75);
+            method_18(v0, v1, v75);
         }
         bool v76;
         v76 = 2 == v57;
         if (v76){
-            Union20 v77 = v55.v0;
+            Union19 v77 = v55.v0;
             switch (v77.tag) {
                 case 0: { // None
                     int v78;
                     v78 = 10;
                     int v79;
-                    v79 = method_15(v0, v1, v78);
+                    v79 = method_14(v0, v1, v78);
                     Union3 v80;
                     v80 = Union3{Union3_2{v79}};
-                    Union20 v81;
-                    v81 = Union20{Union20_1{v80}};
+                    Union19 v81;
+                    v81 = Union19{Union19_1{v80}};
                     v55.v0 = v81;
                     break;
                 }
@@ -674,9 +669,9 @@ Tuple14 method_13(float * v0){
         } else {
             int v86;
             v86 = 10;
-            method_19(v0, v1, v86);
+            method_18(v0, v1, v86);
         }
-        Union20 v87 = v55.v0;
+        Union19 v87 = v55.v0;
         Union3 v91;
         switch (v87.tag) {
             case 0: { // None
@@ -697,7 +692,7 @@ Tuple14 method_13(float * v0){
         v50.push(v91);
         int v92;
         v92 = 1;
-        method_19(v0, v1, v92);
+        method_18(v0, v1, v92);
         v52 += 1 ;
     }
     int v93;
@@ -705,10 +700,10 @@ Tuple14 method_13(float * v0){
     while (while_method_9(v93)){
         int v95;
         v95 = 13;
-        method_19(v0, v1, v95);
+        method_18(v0, v1, v95);
         int v96;
         v96 = 1;
-        method_22(v0, v1, v96);
+        method_21(v0, v1, v96);
         v93 += 1 ;
     }
     static_array<int,3> v99;
@@ -718,13 +713,13 @@ Tuple14 method_13(float * v0){
         int v103;
         v103 = 5;
         int v104;
-        v104 = method_15(v0, v1, v103);
+        v104 = method_14(v0, v1, v103);
         v99[v101] = v104;
         v101 += 1 ;
     }
-    return Tuple14{v50, v45, v9, v99, v6, v4};
+    return Tuple13{v50, v45, v9, v99, v6, v4};
 }
-void method_23(Union3 v0){
+void method_22(Union3 v0){
     switch (v0.tag) {
         case 0: { // Call
             printf("%s","Call");
@@ -748,7 +743,7 @@ void method_23(Union3 v0){
         }
     }
 }
-void method_24(Union5 v0){
+void method_23(Union5 v0){
     switch (v0.tag) {
         case 0: { // Jack
             printf("%s","Jack");
@@ -771,15 +766,19 @@ void method_24(Union5 v0){
         }
     }
 }
+void method_24(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v3){
+    v3 = ((v0 * v2.transpose() - v2.rowwise().sum().transpose().replicate(v0.rows(),1)).array() / 0.001f).exp().matrix().transpose() * v1;
+    return ;
+}
 int main() {
-    Eigen::Matrix<float,8,115,Eigen::RowMajor> v0;
-    Eigen::Matrix<float,8,48,Eigen::RowMajor> v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v0(16384, 115);
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v1(16384, 48);
     int v2;
     v2 = 0;
     StackRefs2 v3{v2, v0, v1};
-    Eigen::Matrix<float,8,115,Eigen::RowMajor> & v4 = v3.v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v4 = v3.v1;
     v4.setZero();
-    Eigen::Matrix<float,8,48,Eigen::RowMajor> & v5 = v3.v2;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v5 = v3.v2;
     v5.setZero();
     v3.v0 = 0;
     static_array_list<Union3,5> v8;
@@ -829,465 +828,477 @@ int main() {
         v50[v52] = 1.0f;
         v52 += 1 ;
     }
-    Eigen::Matrix<float,8,115,Eigen::RowMajor> & v54 = v3.v1;
-    Eigen::Matrix<float,8,48,Eigen::RowMajor> & v55 = v3.v2;
-    int & v56 = v3.v0;
-    Eigen::Matrix<float,1,115,Eigen::RowMajor> v57;
-    v57.setZero();
-    float * v58;
-    v58 = &v57(0,0);
-    Union5 v59;
-    v59 = Union5{Union5_1{}};
-    bool v60;
-    v60 = false;
-    int v61;
-    v61 = 8;
-    unsigned int v62;
-    v62 = 5u;
-    method_6(v58, v8, v59, v60, v28, v61, v62);
-    v54.row(v56) = v57;
-    int & v63 = v3.v0;
-    Eigen::Matrix<float,1,48,Eigen::RowMajor> v64;
-    int v65;
-    v65 = 0;
-    while (while_method_4(v65)){
-        float v69;
-        v69 = v32[v65];
-        v64(0,v65) = v69;
-        v65 += 1 ;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v54 = v3.v1;
+    int v55;
+    v55 = v54.rows();
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v56 = v3.v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v57 = v3.v2;
+    int & v58 = v3.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v59(1, 115);
+    v59.setZero();
+    float * v60;
+    v60 = &v59(0,0);
+    Union5 v61;
+    v61 = Union5{Union5_1{}};
+    bool v62;
+    v62 = false;
+    int v63;
+    v63 = 8;
+    unsigned int v64;
+    v64 = 5u;
+    method_6(v60, v8, v61, v62, v28, v63, v64);
+    v56.row(v58) = v59;
+    int & v65 = v3.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v66(1, 48);
+    int v67;
+    v67 = 0;
+    while (while_method_4(v67)){
+        float v71;
+        v71 = v32[v67];
+        v66(0,v67) = v71;
+        v67 += 1 ;
     }
-    int v71;
-    v71 = 0;
-    while (while_method_4(v71)){
-        int v73;
-        v73 = v71 + 12;
-        float v76;
-        v76 = v38[v71];
-        v64(0,v73) = v76;
-        v71 += 1 ;
+    int v73;
+    v73 = 0;
+    while (while_method_4(v73)){
+        int v75;
+        v75 = v73 + 12;
+        float v78;
+        v78 = v38[v73];
+        v66(0,v75) = v78;
+        v73 += 1 ;
     }
-    int v78;
-    v78 = 0;
-    while (while_method_4(v78)){
-        int v80;
-        v80 = v78 + 24;
-        float v83;
-        v83 = v44[v78];
-        v64(0,v80) = v83;
-        v78 += 1 ;
+    int v80;
+    v80 = 0;
+    while (while_method_4(v80)){
+        int v82;
+        v82 = v80 + 24;
+        float v85;
+        v85 = v44[v80];
+        v66(0,v82) = v85;
+        v80 += 1 ;
     }
-    int v85;
-    v85 = 0;
-    while (while_method_4(v85)){
-        int v87;
-        v87 = v85 + 36;
-        float v90;
-        v90 = v50[v85];
-        v64(0,v87) = v90;
-        v85 += 1 ;
+    int v87;
+    v87 = 0;
+    while (while_method_4(v87)){
+        int v89;
+        v89 = v87 + 36;
+        float v92;
+        v92 = v50[v87];
+        v66(0,v89) = v92;
+        v87 += 1 ;
     }
-    v55.row(v63) = v64;
-    int & v92 = v3.v0; Eigen::Matrix<float,8,115,Eigen::RowMajor> & v93 = v3.v1; Eigen::Matrix<float,8,48,Eigen::RowMajor> & v94 = v3.v2;
-    int v95;
-    v95 = v92 + 1;
-    int v96;
-    v96 = v95 % 8;
-    v3.v0 = v96;
-    static_array<float,12> v99;
-    int v101;
-    v101 = 0;
-    while (while_method_4(v101)){
-        v99[v101] = 2.0f;
-        v101 += 1 ;
+    v57.row(v65) = v66;
+    int & v94 = v3.v0; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v95 = v3.v1; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v96 = v3.v2;
+    int v97;
+    v97 = v94 + 1;
+    int v98;
+    v98 = v97 % v55;
+    v3.v0 = v98;
+    static_array<float,12> v101;
+    int v103;
+    v103 = 0;
+    while (while_method_4(v103)){
+        v101[v103] = 2.0f;
+        v103 += 1 ;
     }
-    static_array<float,12> v105;
-    int v107;
-    v107 = 0;
-    while (while_method_4(v107)){
-        v105[v107] = 2.0f;
-        v107 += 1 ;
+    static_array<float,12> v107;
+    int v109;
+    v109 = 0;
+    while (while_method_4(v109)){
+        v107[v109] = 2.0f;
+        v109 += 1 ;
     }
-    static_array<float,12> v111;
-    int v113;
-    v113 = 0;
-    while (while_method_4(v113)){
-        v111[v113] = 2.0f;
-        v113 += 1 ;
+    static_array<float,12> v113;
+    int v115;
+    v115 = 0;
+    while (while_method_4(v115)){
+        v113[v115] = 2.0f;
+        v115 += 1 ;
     }
-    static_array<float,12> v117;
-    int v119;
-    v119 = 0;
-    while (while_method_4(v119)){
-        v117[v119] = 2.0f;
-        v119 += 1 ;
+    static_array<float,12> v119;
+    int v121;
+    v121 = 0;
+    while (while_method_4(v121)){
+        v119[v121] = 2.0f;
+        v121 += 1 ;
     }
-    Eigen::Matrix<float,8,115,Eigen::RowMajor> & v121 = v3.v1;
-    Eigen::Matrix<float,8,48,Eigen::RowMajor> & v122 = v3.v2;
-    int & v123 = v3.v0;
-    Eigen::Matrix<float,1,115,Eigen::RowMajor> v124;
-    v124.setZero();
-    float * v125;
-    v125 = &v124(0,0);
-    Union5 v126;
-    v126 = Union5{Union5_2{}};
-    bool v127;
-    v127 = false;
-    int v128;
-    v128 = 8;
-    unsigned int v129;
-    v129 = 5u;
-    method_6(v125, v8, v126, v127, v28, v128, v129);
-    v121.row(v123) = v124;
-    int & v130 = v3.v0;
-    Eigen::Matrix<float,1,48,Eigen::RowMajor> v131;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v123 = v3.v1;
+    int v124;
+    v124 = v123.rows();
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v125 = v3.v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v126 = v3.v2;
+    int & v127 = v3.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v128(1, 115);
+    v128.setZero();
+    float * v129;
+    v129 = &v128(0,0);
+    Union5 v130;
+    v130 = Union5{Union5_2{}};
+    bool v131;
+    v131 = false;
     int v132;
-    v132 = 0;
-    while (while_method_4(v132)){
-        float v136;
-        v136 = v99[v132];
-        v131(0,v132) = v136;
-        v132 += 1 ;
+    v132 = 8;
+    unsigned int v133;
+    v133 = 5u;
+    method_6(v129, v8, v130, v131, v28, v132, v133);
+    v125.row(v127) = v128;
+    int & v134 = v3.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v135(1, 48);
+    int v136;
+    v136 = 0;
+    while (while_method_4(v136)){
+        float v140;
+        v140 = v101[v136];
+        v135(0,v136) = v140;
+        v136 += 1 ;
     }
-    int v138;
-    v138 = 0;
-    while (while_method_4(v138)){
-        int v140;
-        v140 = v138 + 12;
-        float v143;
-        v143 = v105[v138];
-        v131(0,v140) = v143;
-        v138 += 1 ;
+    int v142;
+    v142 = 0;
+    while (while_method_4(v142)){
+        int v144;
+        v144 = v142 + 12;
+        float v147;
+        v147 = v107[v142];
+        v135(0,v144) = v147;
+        v142 += 1 ;
     }
-    int v145;
-    v145 = 0;
-    while (while_method_4(v145)){
-        int v147;
-        v147 = v145 + 24;
-        float v150;
-        v150 = v111[v145];
-        v131(0,v147) = v150;
-        v145 += 1 ;
+    int v149;
+    v149 = 0;
+    while (while_method_4(v149)){
+        int v151;
+        v151 = v149 + 24;
+        float v154;
+        v154 = v113[v149];
+        v135(0,v151) = v154;
+        v149 += 1 ;
     }
-    int v152;
-    v152 = 0;
-    while (while_method_4(v152)){
-        int v154;
-        v154 = v152 + 36;
-        float v157;
-        v157 = v117[v152];
-        v131(0,v154) = v157;
-        v152 += 1 ;
+    int v156;
+    v156 = 0;
+    while (while_method_4(v156)){
+        int v158;
+        v158 = v156 + 36;
+        float v161;
+        v161 = v119[v156];
+        v135(0,v158) = v161;
+        v156 += 1 ;
     }
-    v122.row(v130) = v131;
-    int & v159 = v3.v0; Eigen::Matrix<float,8,115,Eigen::RowMajor> & v160 = v3.v1; Eigen::Matrix<float,8,48,Eigen::RowMajor> & v161 = v3.v2;
-    int v162;
-    v162 = v159 + 1;
-    int v163;
-    v163 = v162 % 8;
-    v3.v0 = v163;
-    static_array<float,12> v166;
-    int v168;
-    v168 = 0;
-    while (while_method_4(v168)){
-        v166[v168] = 3.0f;
-        v168 += 1 ;
+    v126.row(v134) = v135;
+    int & v163 = v3.v0; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v164 = v3.v1; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v165 = v3.v2;
+    int v166;
+    v166 = v163 + 1;
+    int v167;
+    v167 = v166 % v124;
+    v3.v0 = v167;
+    static_array<float,12> v170;
+    int v172;
+    v172 = 0;
+    while (while_method_4(v172)){
+        v170[v172] = 3.0f;
+        v172 += 1 ;
     }
-    static_array<float,12> v172;
-    int v174;
-    v174 = 0;
-    while (while_method_4(v174)){
-        v172[v174] = 3.0f;
-        v174 += 1 ;
+    static_array<float,12> v176;
+    int v178;
+    v178 = 0;
+    while (while_method_4(v178)){
+        v176[v178] = 3.0f;
+        v178 += 1 ;
     }
-    static_array<float,12> v178;
-    int v180;
-    v180 = 0;
-    while (while_method_4(v180)){
-        v178[v180] = 3.0f;
-        v180 += 1 ;
+    static_array<float,12> v182;
+    int v184;
+    v184 = 0;
+    while (while_method_4(v184)){
+        v182[v184] = 3.0f;
+        v184 += 1 ;
     }
-    static_array<float,12> v184;
-    int v186;
-    v186 = 0;
-    while (while_method_4(v186)){
-        v184[v186] = 3.0f;
-        v186 += 1 ;
+    static_array<float,12> v188;
+    int v190;
+    v190 = 0;
+    while (while_method_4(v190)){
+        v188[v190] = 3.0f;
+        v190 += 1 ;
     }
-    Eigen::Matrix<float,8,115,Eigen::RowMajor> & v188 = v3.v1;
-    Eigen::Matrix<float,8,48,Eigen::RowMajor> & v189 = v3.v2;
-    int & v190 = v3.v0;
-    Eigen::Matrix<float,1,115,Eigen::RowMajor> v191;
-    v191.setZero();
-    float * v192;
-    v192 = &v191(0,0);
-    Union5 v193;
-    v193 = Union5{Union5_0{}};
-    bool v194;
-    v194 = true;
-    int v195;
-    v195 = 3;
-    unsigned int v196;
-    v196 = 5u;
-    method_6(v192, v8, v193, v194, v28, v195, v196);
-    v188.row(v190) = v191;
-    int & v197 = v3.v0;
-    Eigen::Matrix<float,1,48,Eigen::RowMajor> v198;
-    int v199;
-    v199 = 0;
-    while (while_method_4(v199)){
-        float v203;
-        v203 = v166[v199];
-        v198(0,v199) = v203;
-        v199 += 1 ;
-    }
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v192 = v3.v1;
+    int v193;
+    v193 = v192.rows();
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v194 = v3.v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v195 = v3.v2;
+    int & v196 = v3.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v197(1, 115);
+    v197.setZero();
+    float * v198;
+    v198 = &v197(0,0);
+    Union5 v199;
+    v199 = Union5{Union5_0{}};
+    bool v200;
+    v200 = true;
+    int v201;
+    v201 = 3;
+    unsigned int v202;
+    v202 = 5u;
+    method_6(v198, v8, v199, v200, v28, v201, v202);
+    v194.row(v196) = v197;
+    int & v203 = v3.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v204(1, 48);
     int v205;
     v205 = 0;
     while (while_method_4(v205)){
-        int v207;
-        v207 = v205 + 12;
-        float v210;
-        v210 = v172[v205];
-        v198(0,v207) = v210;
+        float v209;
+        v209 = v170[v205];
+        v204(0,v205) = v209;
         v205 += 1 ;
     }
-    int v212;
-    v212 = 0;
-    while (while_method_4(v212)){
-        int v214;
-        v214 = v212 + 24;
-        float v217;
-        v217 = v178[v212];
-        v198(0,v214) = v217;
-        v212 += 1 ;
+    int v211;
+    v211 = 0;
+    while (while_method_4(v211)){
+        int v213;
+        v213 = v211 + 12;
+        float v216;
+        v216 = v176[v211];
+        v204(0,v213) = v216;
+        v211 += 1 ;
     }
-    int v219;
-    v219 = 0;
-    while (while_method_4(v219)){
-        int v221;
-        v221 = v219 + 36;
-        float v224;
-        v224 = v184[v219];
-        v198(0,v221) = v224;
-        v219 += 1 ;
+    int v218;
+    v218 = 0;
+    while (while_method_4(v218)){
+        int v220;
+        v220 = v218 + 24;
+        float v223;
+        v223 = v182[v218];
+        v204(0,v220) = v223;
+        v218 += 1 ;
     }
-    v189.row(v197) = v198;
-    int & v226 = v3.v0; Eigen::Matrix<float,8,115,Eigen::RowMajor> & v227 = v3.v1; Eigen::Matrix<float,8,48,Eigen::RowMajor> & v228 = v3.v2;
-    int v229;
-    v229 = v226 + 1;
-    int v230;
-    v230 = v229 % 8;
-    v3.v0 = v230;
+    int v225;
+    v225 = 0;
+    while (while_method_4(v225)){
+        int v227;
+        v227 = v225 + 36;
+        float v230;
+        v230 = v188[v225];
+        v204(0,v227) = v230;
+        v225 += 1 ;
+    }
+    v195.row(v203) = v204;
+    int & v232 = v3.v0; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v233 = v3.v1; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v234 = v3.v2;
+    int v235;
+    v235 = v232 + 1;
+    int v236;
+    v236 = v235 % v193;
+    v3.v0 = v236;
     printf("%s\n","{");
-    Eigen::Matrix<float,8,115,Eigen::RowMajor> & v455 = v3.v1;
-    Eigen::Matrix<float,8,48,Eigen::RowMajor> & v456 = v3.v2;
-    int v457;
-    v457 = 0;
-    while (while_method_11(v457)){
-        auto v459 = v455.row(v457);
-        bool v460;
-        v460 = (v459.array() == 0).all();
-        Union12 v470;
-        if (v460){
-            v470 = Union12{Union12_0{}};
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v465 = v3.v1;
+    int v466;
+    v466 = v465.rows();
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v467 = v3.v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v468 = v3.v2;
+    int v469;
+    v469 = 0;
+    while (while_method_8(v466, v469)){
+        auto v471 = v467.row(v469);
+        bool v472;
+        v472 = (v471.array() == 0).all();
+        Union11 v482;
+        if (v472){
+            v482 = Union11{Union11_0{}};
         } else {
-            float * v462;
-            v462 = &v459(0,0);
-            static_array_list<Union3,5> v463; Union5 v464; bool v465; static_array<int,3> v466; int v467; unsigned int v468;
-            Tuple14 tmp3 = method_13(v462);
-            v463 = tmp3.v0; v464 = tmp3.v1; v465 = tmp3.v2; v466 = tmp3.v3; v467 = tmp3.v4; v468 = tmp3.v5;
-            v470 = Union12{Union12_1{v463, v464, v465, v466, v467, v468}};
+            float * v474;
+            v474 = &v471(0,0);
+            static_array_list<Union3,5> v475; Union5 v476; bool v477; static_array<int,3> v478; int v479; unsigned int v480;
+            Tuple13 tmp3 = method_12(v474);
+            v475 = tmp3.v0; v476 = tmp3.v1; v477 = tmp3.v2; v478 = tmp3.v3; v479 = tmp3.v4; v480 = tmp3.v5;
+            v482 = Union11{Union11_1{v475, v476, v477, v478, v479, v480}};
         }
-        auto v471 = v456.row(v457);
-        static_array<float,12> v474;
-        int v476;
-        v476 = 0;
-        while (while_method_4(v476)){
-            float v478;
-            v478 = v471(0,v476);
-            v474[v476] = v478;
-            v476 += 1 ;
+        auto v483 = v468.row(v469);
+        static_array<float,12> v486;
+        int v488;
+        v488 = 0;
+        while (while_method_4(v488)){
+            float v490;
+            v490 = v483(0,v488);
+            v486[v488] = v490;
+            v488 += 1 ;
         }
-        static_array<float,12> v481;
-        int v483;
-        v483 = 0;
-        while (while_method_4(v483)){
-            int v485;
-            v485 = v483 + 12;
-            float v486;
-            v486 = v471(0,v485);
-            v481[v483] = v486;
-            v483 += 1 ;
+        static_array<float,12> v493;
+        int v495;
+        v495 = 0;
+        while (while_method_4(v495)){
+            int v497;
+            v497 = v495 + 12;
+            float v498;
+            v498 = v483(0,v497);
+            v493[v495] = v498;
+            v495 += 1 ;
         }
-        static_array<float,12> v489;
-        int v491;
-        v491 = 0;
-        while (while_method_4(v491)){
-            int v493;
-            v493 = v491 + 24;
-            float v494;
-            v494 = v471(0,v493);
-            v489[v491] = v494;
-            v491 += 1 ;
+        static_array<float,12> v501;
+        int v503;
+        v503 = 0;
+        while (while_method_4(v503)){
+            int v505;
+            v505 = v503 + 24;
+            float v506;
+            v506 = v483(0,v505);
+            v501[v503] = v506;
+            v503 += 1 ;
         }
-        static_array<float,12> v497;
-        int v499;
-        v499 = 0;
-        while (while_method_4(v499)){
-            int v501;
-            v501 = v499 + 36;
-            float v502;
-            v502 = v471(0,v501);
-            v497[v499] = v502;
-            v499 += 1 ;
+        static_array<float,12> v509;
+        int v511;
+        v511 = 0;
+        while (while_method_4(v511)){
+            int v513;
+            v513 = v511 + 36;
+            float v514;
+            v514 = v483(0,v513);
+            v509[v511] = v514;
+            v511 += 1 ;
         }
-        switch (v470.tag) {
+        switch (v482.tag) {
             case 0: { // None
                 break;
             }
             case 1: { // Some
-                static_array_list<Union3,5> v503 = v470.case1.v0; Union5 v504 = v470.case1.v1; bool v505 = v470.case1.v2; static_array<int,3> v506 = v470.case1.v3; int v507 = v470.case1.v4; unsigned int v508 = v470.case1.v5;
+                static_array_list<Union3,5> v515 = v482.case1.v0; Union5 v516 = v482.case1.v1; bool v517 = v482.case1.v2; static_array<int,3> v518 = v482.case1.v3; int v519 = v482.case1.v4; unsigned int v520 = v482.case1.v5;
                 printf("{%s = %s","action_history", "[");
-                int v509;
-                v509 = v503.length;
-                bool v510;
-                v510 = 100 < v509;
-                int v511;
-                if (v510){
-                    v511 = 100;
+                int v521;
+                v521 = v515.length;
+                bool v522;
+                v522 = 100 < v521;
+                int v523;
+                if (v522){
+                    v523 = 100;
                 } else {
-                    v511 = v509;
+                    v523 = v521;
                 }
-                int v512;
-                v512 = 0;
-                while (while_method_8(v511, v512)){
-                    Union3 v516;
-                    v516 = v503[v512];
+                int v524;
+                v524 = 0;
+                while (while_method_8(v523, v524)){
+                    Union3 v528;
+                    v528 = v515[v524];
                     printf("");
-                    method_23(v516);
+                    method_22(v528);
                     printf("");
-                    int v518;
-                    v518 = v512 + 1;
-                    int v519;
-                    v519 = v503.length;
-                    bool v520;
-                    v520 = v518 < v519;
-                    if (v520){
+                    int v530;
+                    v530 = v524 + 1;
+                    int v531;
+                    v531 = v515.length;
+                    bool v532;
+                    v532 = v530 < v531;
+                    if (v532){
                         printf("%s","; ");
                     } else {
                     }
-                    v512 += 1 ;
+                    v524 += 1 ;
                 }
-                int v521;
-                v521 = v503.length;
-                bool v522;
-                v522 = v521 > 100;
-                if (v522){
+                int v533;
+                v533 = v515.length;
+                bool v534;
+                v534 = v533 > 100;
+                if (v534){
                     printf("%s","; ...");
                 } else {
                 }
                 printf("%s","]");
                 printf("; %s = ","card");
-                method_24(v504);
-                const char * v525;
-                if (v505){
-                    const char * v523;
-                    v523 = "true";
-                    v525 = v523;
+                method_23(v516);
+                const char * v537;
+                if (v517){
+                    const char * v535;
+                    v535 = "true";
+                    v537 = v535;
                 } else {
-                    const char * v524;
-                    v524 = "false";
-                    v525 = v524;
+                    const char * v536;
+                    v536 = "false";
+                    v537 = v536;
                 }
-                printf("; %s = %s; %s = %s","is_first", v525, "l", "[");
-                int v526;
-                v526 = 0;
-                while (while_method_10(v526)){
-                    int v530;
-                    v530 = v506[v526];
-                    printf("%d",v530);
-                    int v532;
-                    v532 = v526 + 1;
-                    bool v533;
-                    v533 = v532 < 3;
-                    if (v533){
+                printf("; %s = %s; %s = %s","is_first", v537, "l", "[");
+                int v538;
+                v538 = 0;
+                while (while_method_10(v538)){
+                    int v542;
+                    v542 = v518[v538];
+                    printf("%d",v542);
+                    int v544;
+                    v544 = v538 + 1;
+                    bool v545;
+                    v545 = v544 < 3;
+                    if (v545){
                         printf("%s","; ");
                     } else {
                     }
-                    v526 += 1 ;
+                    v538 += 1 ;
                 }
                 printf("%s","]");
-                printf("; %s = %d; %s = %u}","pot", v507, "stack", v508);
+                printf("; %s = %d; %s = %u}","pot", v519, "stack", v520);
                 printf("%s"," => ");
                 printf("{%s = %s","average_policy", "[");
-                int v534;
-                v534 = 0;
-                while (while_method_4(v534)){
-                    float v538;
-                    v538 = v474[v534];
-                    printf("%f",v538);
-                    int v540;
-                    v540 = v534 + 1;
-                    bool v541;
-                    v541 = v540 < 12;
-                    if (v541){
+                int v546;
+                v546 = 0;
+                while (while_method_4(v546)){
+                    float v550;
+                    v550 = v486[v546];
+                    printf("%f",v550);
+                    int v552;
+                    v552 = v546 + 1;
+                    bool v553;
+                    v553 = v552 < 12;
+                    if (v553){
                         printf("%s","; ");
                     } else {
                     }
-                    v534 += 1 ;
+                    v546 += 1 ;
                 }
                 printf("%s","]");
                 printf("; %s = %s","current_policy", "[");
-                int v542;
-                v542 = 0;
-                while (while_method_4(v542)){
-                    float v546;
-                    v546 = v481[v542];
-                    printf("%f",v546);
-                    int v548;
-                    v548 = v542 + 1;
-                    bool v549;
-                    v549 = v548 < 12;
-                    if (v549){
+                int v554;
+                v554 = 0;
+                while (while_method_4(v554)){
+                    float v558;
+                    v558 = v493[v554];
+                    printf("%f",v558);
+                    int v560;
+                    v560 = v554 + 1;
+                    bool v561;
+                    v561 = v560 < 12;
+                    if (v561){
                         printf("%s","; ");
                     } else {
                     }
-                    v542 += 1 ;
+                    v554 += 1 ;
                 }
                 printf("%s","]");
                 printf("; %s = %s","ev_values", "[");
-                int v550;
-                v550 = 0;
-                while (while_method_4(v550)){
-                    float v554;
-                    v554 = v489[v550];
-                    printf("%f",v554);
-                    int v556;
-                    v556 = v550 + 1;
-                    bool v557;
-                    v557 = v556 < 12;
-                    if (v557){
+                int v562;
+                v562 = 0;
+                while (while_method_4(v562)){
+                    float v566;
+                    v566 = v501[v562];
+                    printf("%f",v566);
+                    int v568;
+                    v568 = v562 + 1;
+                    bool v569;
+                    v569 = v568 < 12;
+                    if (v569){
                         printf("%s","; ");
                     } else {
                     }
-                    v550 += 1 ;
+                    v562 += 1 ;
                 }
                 printf("%s","]");
                 printf("; %s = %s","ev_weights", "[");
-                int v558;
-                v558 = 0;
-                while (while_method_4(v558)){
-                    float v562;
-                    v562 = v497[v558];
-                    printf("%f",v562);
-                    int v564;
-                    v564 = v558 + 1;
-                    bool v565;
-                    v565 = v564 < 12;
-                    if (v565){
+                int v570;
+                v570 = 0;
+                while (while_method_4(v570)){
+                    float v574;
+                    v574 = v509[v570];
+                    printf("%f",v574);
+                    int v576;
+                    v576 = v570 + 1;
+                    bool v577;
+                    v577 = v576 < 12;
+                    if (v577){
                         printf("%s","; ");
                     } else {
                     }
-                    v558 += 1 ;
+                    v570 += 1 ;
                 }
                 printf("%s","]");
                 printf("}\n");
@@ -1298,10 +1309,150 @@ int main() {
                 exit(-1);
             }
         }
-        v457 += 1 ;
+        v469 += 1 ;
     }
     printf("%s\n","}");
     printf("\n");
+    fflush(stdout);
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v729(1, 115);
+    v729.setZero();
+    float * v730;
+    v730 = &v729(0,0);
+    Union5 v731;
+    v731 = Union5{Union5_1{}};
+    bool v732;
+    v732 = false;
+    int v733;
+    v733 = 8;
+    unsigned int v734;
+    v734 = 5u;
+    method_6(v730, v8, v731, v732, v28, v733, v734);
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v735 = v3.v2;
+    int v736;
+    v736 = v735.cols();
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v737(1, v736);
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v738 = v3.v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v739 = v738;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v740 = v3.v2;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v741 = v740;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v742 = v729;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v743 = v737;
+    method_24(v739, v741, v742, v743);
+    static_array<float,12> v746;
+    int v748;
+    v748 = 0;
+    while (while_method_4(v748)){
+        float v750;
+        v750 = v737(0,v748);
+        v746[v748] = v750;
+        v748 += 1 ;
+    }
+    static_array<float,12> v753;
+    int v755;
+    v755 = 0;
+    while (while_method_4(v755)){
+        int v757;
+        v757 = v755 + 12;
+        float v758;
+        v758 = v737(0,v757);
+        v753[v755] = v758;
+        v755 += 1 ;
+    }
+    static_array<float,12> v761;
+    int v763;
+    v763 = 0;
+    while (while_method_4(v763)){
+        int v765;
+        v765 = v763 + 24;
+        float v766;
+        v766 = v737(0,v765);
+        v761[v763] = v766;
+        v763 += 1 ;
+    }
+    static_array<float,12> v769;
+    int v771;
+    v771 = 0;
+    while (while_method_4(v771)){
+        int v773;
+        v773 = v771 + 36;
+        float v774;
+        v774 = v737(0,v773);
+        v769[v771] = v774;
+        v771 += 1 ;
+    }
+    printf("{%s = %s","average_policy", "[");
+    int v841;
+    v841 = 0;
+    while (while_method_4(v841)){
+        float v845;
+        v845 = v746[v841];
+        printf("%f",v845);
+        int v847;
+        v847 = v841 + 1;
+        bool v848;
+        v848 = v847 < 12;
+        if (v848){
+            printf("%s","; ");
+        } else {
+        }
+        v841 += 1 ;
+    }
+    printf("%s","]");
+    printf("; %s = %s","current_policy", "[");
+    int v849;
+    v849 = 0;
+    while (while_method_4(v849)){
+        float v853;
+        v853 = v753[v849];
+        printf("%f",v853);
+        int v855;
+        v855 = v849 + 1;
+        bool v856;
+        v856 = v855 < 12;
+        if (v856){
+            printf("%s","; ");
+        } else {
+        }
+        v849 += 1 ;
+    }
+    printf("%s","]");
+    printf("; %s = %s","ev_values", "[");
+    int v857;
+    v857 = 0;
+    while (while_method_4(v857)){
+        float v861;
+        v861 = v761[v857];
+        printf("%f",v861);
+        int v863;
+        v863 = v857 + 1;
+        bool v864;
+        v864 = v863 < 12;
+        if (v864){
+            printf("%s","; ");
+        } else {
+        }
+        v857 += 1 ;
+    }
+    printf("%s","]");
+    printf("; %s = %s","ev_weights", "[");
+    int v865;
+    v865 = 0;
+    while (while_method_4(v865)){
+        float v869;
+        v869 = v769[v865];
+        printf("%f",v869);
+        int v871;
+        v871 = v865 + 1;
+        bool v872;
+        v872 = v871 < 12;
+        if (v872){
+            printf("%s","; ");
+        } else {
+        }
+        v865 += 1 ;
+    }
+    printf("%s","]");
+    printf("}\n");
     fflush(stdout);
     return 0;
 }

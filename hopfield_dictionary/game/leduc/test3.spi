@@ -55,19 +55,19 @@ inl main() =
             ev_weights = sam.init (const c)
         }
 
+    inl cols_keys = size p
+    inl cols_values = num_actions * 4
     inl serializers : hd.serializers game_state game_dicts = 
-        inl (exists cols_keys. _) = tint (size p)
-        inl (exists cols_values. _) = tint (num_actions * 4)
-        exists [cols_keys; cols_values; float]
+        exists [float]
             {
                 key_to_array = fun x =>
-                    inl m : eigen.static_vector cols_keys float = eigen.create_static
+                    inl m : eigen.vector float = eigen.create {rows = 1; cols = cols_keys}
                     eigen.matrix_clear m
                     inl ar : array float = $"&!m(0,0)"
                     hd_pickler.pickle ar p x  
                     m
                 value_to_array = fun x =>
-                    inl m : eigen.static_vector cols_values float = eigen.create_static
+                    inl m : eigen.vector float = eigen.create {rows = 1; cols = cols_values}
                     inl f offset l = loop.for' {from=0; nearTo=num_actions} fun i => eigen.matrix_set m (0,i + offset) (index l i)
                     f (num_actions * 0) x.average_policy . f (num_actions * 1) x.current_policy . f (num_actions * 2) x.ev_values . f (num_actions * 3) x.ev_weights
                     m
@@ -87,13 +87,13 @@ inl main() =
                         Some (hd_pickler.unpickle ar p)
             }
             
-    inl d : hd.dict game_state game_dicts = hd.create serializers {rows=8}
+    inl d : hd.dict game_state game_dicts = hd.create serializers {rows=1 <<< 14; cols_keys cols_values}
     hd.clear d
     inl k : game_state = {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
     hd.set d k (create_policy 1)
     hd.set d {k with card = Queen} (create_policy 2)
     hd.set d {k with card = Jack; pot = 3; is_first = true} (create_policy 3)
     console.write_ln d
-    // inl v : game_dicts = hd.get d k
-    // console.write_ln v
+    inl v : game_dicts = hd.get d k
+    console.write_ln v
     0i32
