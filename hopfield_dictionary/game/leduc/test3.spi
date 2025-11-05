@@ -81,18 +81,19 @@ inl main() =
                     }
                 array_to_key = fun m => 
                     if $"(!m.array() == 0).all()" then
+                        None
+                    else
                         inl ar : array float = $"&!m(0,0)"
                         Some (hd_pickler.unpickle ar p)
-                    else
-                        None
             }
             
-    inl d : hd.dict game_state game_dicts = hd.create serializers {rows=3}
+    inl d : hd.dict game_state game_dicts = hd.create serializers {rows=8}
     hd.clear d
     inl k : game_state = {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
     hd.set d k (create_policy 1)
     hd.set d {k with card = Queen} (create_policy 2)
     hd.set d {k with card = Jack; pot = 3; is_first = true} (create_policy 3)
-    // inl v : game_dicts = hd.get d k
     console.write_ln d
+    // inl v : game_dicts = hd.get d k
+    // console.write_ln v
     0i32

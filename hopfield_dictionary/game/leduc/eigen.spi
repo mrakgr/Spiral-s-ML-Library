@@ -1,7 +1,7 @@
 open corebase
 nominal map t = $"Eigen::Map<`t> \@ \#include <Eigen/Dense>"
-nominal matrix t = $"Eigen::Matrix<`t,Eigen::Dynamic,Eigen::Dynamic> \@ \#include <Eigen/Dense>"
-nominal static_matrix rows cols t = $"Eigen::Matrix<`t,@rows,@cols> \@ \#include <Eigen/Dense>"
+nominal matrix t = $"Eigen::Matrix<`t,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> \@ \#include <Eigen/Dense>"
+nominal static_matrix rows cols t = $"Eigen::Matrix<`t,@rows,@cols,Eigen::RowMajor> \@ \#include <Eigen/Dense>"
 type static_vector cols t = static_matrix 1 cols t
 
 prototype matrix_index m t : m t -> (int * int) -> t

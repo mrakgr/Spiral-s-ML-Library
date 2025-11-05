@@ -19,7 +19,7 @@ type serializers k v = exists cols_keys cols_values t{number}.
         value_to_array : v -> static_vector cols_values t
         array_to_key : static_vector cols_keys t -> option k
     }
-nominal dict k v = // TODO: The premise behind the bug is incorrect. While I fixed the bug in v2.18.3, `k` and `v` were used in the body. So why didn't the pass work?
+nominal dict k v =
     exists rows cols_keys cols_values t{number}. {
         data : stack_refs {
             keys : static_matrix rows cols_keys t
