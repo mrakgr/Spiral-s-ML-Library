@@ -1,13 +1,16 @@
-Error trace on line: 38, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/test1.spi.
-inl main() =
-        ^
-Error trace on line: 39, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/test1.spi.
-    inl python () = 
+Error trace on line: 25, column: 16 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/base.spi.
+    inl base = random.u32_ubound conv(popc_u32 d) rng
+               ^
+Error trace on line: 25, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/base.spi.
+    inl base = random.u32_ubound conv(popc_u32 d) rng
+                                 ^
+Error trace on line: 25, column: 39 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/base.spi.
+    inl base = random.u32_ubound conv(popc_u32 d) rng
+                                      ^
+Error trace on line: 28, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/sampling.spi.
+    backend_switch_cuda {
     ^
-Error trace on line: 44, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/test1.spi.
-    inl cpp () =
-    ^
-Error trace on line: 50, column: 10 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/test1.spi.
-    real real_core.backend_switch_unsafe { Python = python; CppHost = cpp }
-         ^
-Cannot find the backend CudaHost in the backend switch op.
+Error trace on line: 181, column: 95 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
+inl backend_switch_cuda forall t. (x : {CudaDevice : () -> t; CudaHost : () -> t}) : t = real backend_switch_real x
+                                                                                              ^
+Cannot find the backend CppHost in the backend switch op.

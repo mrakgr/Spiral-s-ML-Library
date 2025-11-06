@@ -135,9 +135,11 @@ inl pick_discrete forall t. (r : float) (l : list (t * float)) =
     loop l
 
 instance index list = fun l i =>
-    inl rec body i = function 
+    assert (0 <= i) "The index must be 0 or positive."
+    inl rec body (i : int) (x : list el) =
+        match x with 
         | Cons(x,x') => if i = 0 then x else loop (i-1) x'
-        | Nil => failwith "Index not found in list."
+        | Nil => failwith "The index is not less than the length of the list."
     and inl loop s l =
         if var_is l then inl ~s = s in join body s l
         else body s l 

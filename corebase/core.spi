@@ -179,6 +179,8 @@ inl nominal_recreate forall a b. (x : a): b = real nominal_recreate `b x
 inl backend_switch_all forall t. (x : {CudaDevice : () -> t; CppHost : () -> t; CudaHost : () -> t; Python : () -> t}) : t = real backend_switch_real x
 // Backend switch for CudaHost/CudaDevice.
 inl backend_switch_cuda forall t. (x : {CudaDevice : () -> t; CudaHost : () -> t}) : t = real backend_switch_real x
+// Backend switch for Host/Device.
+inl backend_switch_host_device forall t. (x : {Device : () -> t; Host : () -> t}) : t = real backend_switch_real {CudaDevice=x.Device; CudaHost=x.Host; CppHost=x.Host}
 // Backend switch for Python/CudaDevice.
 inl backend_switch_python forall t. (x : {CudaDevice : () -> t; Python : () -> t}) : t = real backend_switch_real x
 // Backend switch for Python/CppHost.

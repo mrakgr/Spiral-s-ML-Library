@@ -6,8 +6,8 @@ open corebase
 // Finds the position of the nth set bit in a mask shifted right by base. The target bit is given by the last argument that is the offset.
 // Link: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#integer-arithmetic-instructions-fns
 let find_nth_set_bit ({mask base offset} : {mask : u32; base : u32; offset : i32}) : u32 =
-    backend_switch_cuda {
-        CudaHost = fun () =>
+    backend_switch_host_device {
+        Host = fun () =>
             inl masked_bits = mask >>> conv base
             inl count = stack_mut 0i32
             inl solution = stack_mut limit.max
@@ -19,15 +19,15 @@ let find_nth_set_bit ({mask base offset} : {mask : u32; base : u32; offset : i32
                         solution <- base + i
                         $"break"
             *solution
-        CudaDevice = fun () =>
+        Device = fun () =>
             corecuda.intrinsic.fns mask base offset
     }
 
 // Gets the population count of the set bits.
 inl popc_u32 (x : u32) =
-    backend_switch_cuda {
-        CudaHost = fun () => $"__builtin_popcount(!x)"
-        CudaDevice = fun () => corecuda.intrinsic.popc_u32 x
+    backend_switch_host_device {
+        Host = fun () => $"__builtin_popcount(!x)"
+        Device = fun () => corecuda.intrinsic.popc_u32 x
     }
 
 // Gets the position of the i-th (starting at 0) set bit in a list of u32 masks.

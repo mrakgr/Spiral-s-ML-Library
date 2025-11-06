@@ -34,27 +34,30 @@ let normalize (l : sa _ float) =
 let regret_match forall dim. (l : sa dim float) (mask : sa dim bool) = masking_normalize (relu l) mask
 
 type path_prob = {policy : float; sampling : float}
+type dict_policy = cached_dict messages {average_policy : sa 3 float; current_policy : sa 3 float}
+type dict_ev = cached_dict messages (sa 3 {value : float; weight : float})
 type game_dicts = 
     {
-        policy : cached_dict messages {average_policy : sa 3 float; current_policy : sa 3 float}
-        expected_values : cached_dict messages (sa 3 {value : float; weight : float})
+        policy : dict_policy
+        expected_values : dict_ev
     }
 
 union player_mode =
-    | Frozen
-    | TrainSampling
-    | TrainEnumerative
+    | Frozen : { policy : stack_refs dict_policy }
+    | TrainEnumerative : { policy : stack_refs dict_policy }
+    | TrainSampling : { policy : stack_refs dict_policy; expected_values : stack_refs dict_ev }
+
 type config = 
     {
         is_chance_node_sampling : bool
-        player_modes : sa 2 player_mode
+        player_modes : list player_mode
     }
 
 inl normalize_expected_value {value weight} = if weight <> 0 then value / weight else 0
 inl dot_product forall dim. (expected_value_per_action : sa dim float) (current_policy_probs : sa dim float) =
     arraym.fold2 (fun s a b => s + a * b) 0 expected_value_per_action current_policy_probs
 
-inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
+inl train_loop (config : config) =
     inl rng = xoshiro.create()
     inl sample sampling_probs = xoshiro.sample_discrete' sampling_probs rng
     inl deck = stack_mut deckm.create()
@@ -94,21 +97,15 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
     inl get_path_prob_for_others (player_turn : int) = 
         *log_path_probs
         |> arraym.foldi (fun i s (log_path_prob : path_prob) =>
-                inl policy = if i = player_turn then log 1 else log_path_prob.policy
-                s + policy - log_path_prob.sampling
+            inl policy = if i = player_turn then log 1 else log_path_prob.policy
+            s + policy - log_path_prob.sampling
             ) (log 1)
         |> exp
-    let rec body node =
-        inl reward = stack_mut 0
-        inl set_rewards winner_id (chips_won : float) =
-            inl chips_won = conv chips_won
-            reward <- if winner_id = 0 then chips_won else -chips_won // Aligns the reward for the first player.
-        let rec loop = function // This is so game_round only gets generated once instead of 3 times in the compiled code.
-            | T_none => *reward // Returns the reward for the first player.
-            | T_game_chance_community_card(a,b) => body (game_chance_community_card a b)
-            | T_game_chance_init(a,b) => body (game_chance_init (a, b))
-            | T_game_round(a,b) => body (game_round a b)
-        inl cfr (table : table) =
+
+    inl cfr' (table : table) (loop : training_nodes -> f32) mode =
+        match mode with
+        | TrainEnumerative {policy} | TrainSampling {policy} | Frozen {policy} =>
+            inl dict_policy = *policy
             inl key_ev = *messages
             inl key_policy = 
                 *messages
@@ -117,7 +114,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                     | _ => true
                     )
             inl {average_policy current_policy} = 
-                match cached_dictm.get dict.policy key_policy with
+                match cached_dictm.get dict_policy key_policy with
                 | Some x => x
                 | None => {
                     average_policy = sam.init (const 0)
@@ -130,9 +127,12 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                     if table.raises_left > 0 then Some Raise else None
                 ]
             inl mask = listm.map (function Some => true | None => false) actions |> arraym.fromList
-            inl cfr_mc () = // Does Monte Carlo campling. An experimental attempt at a predictive baseline that doesn't walk up the tree again.
+            match mode with
+            | TrainSampling {expected_values} =>
+                // Does Monte Carlo campling. An experimental attempt at a predictive baseline that doesn't walk up the tree again.
+                inl dict_expected_values = *expected_values
                 inl expected_values = 
-                    match cached_dictm.get dict.expected_values key_ev with
+                    match cached_dictm.get dict_expected_values key_ev with
                     | Some x => x
                     | None => sam.init (const {value = 0; weight = 0})
                 inl get_expected_value i = normalize_expected_value (index expected_values i)
@@ -166,26 +166,28 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                inl current_policy =
+                inl current_policy = // Updated current policy.
                     inl path_prob_opponent = get_path_prob_for_others table.player_turn
                     arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
                         max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
                         ) current_policy expected_value_per_action
-                cached_dictm.set dict.policy key_policy {
+                inl current_policy_probs = regret_match current_policy mask // Updated probabilities.
+                cached_dictm.set dict_policy key_policy {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
                             average_policy_decay * average_policy + current_policy_probs
                             ) average_policy current_policy_probs
                     current_policy
                     }
-                cached_dictm.set dict.expected_values key_ev (
+                cached_dictm.set dict_expected_values key_ev (
                     expected_values |> arraym.update action_index (fun x => {x with 
                         value#=fun value => value * ev_decay + *reward
                         weight#=fun weight => weight * ev_decay + 1
                         })
                 )
-                dot_product expected_value_per_action (regret_match current_policy mask)
-            inl cfr_enum () = // Does enumeration.
+                dot_product expected_value_per_action current_policy_probs
+            | TrainEnumerative =>
+                // Does enumeration.
                 inl average_policy_decay = 1 - 2 ** -8
                 inl current_policy_probs = regret_match current_policy mask
                 inl expected_value_per_action : sa 3 float = 
@@ -203,7 +205,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                cached_dictm.set dict.policy key_policy {
+                cached_dictm.set dict_policy key_policy {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
                             average_policy_decay * average_policy + current_policy_probs
@@ -215,7 +217,8 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                             ) current_policy expected_value_per_action
                     }
                 expected_value
-            inl cfr_frozen () = // Doesn't do any training. Is for testing purposes.
+            | Frozen =>
+                // Doesn't do any training. Is for testing purposes.
                 inl current_policy_probs = masking_normalize average_policy mask // Uses the average policy.
                 inl expected_value_per_action : sa 3 float = 
                     actions
@@ -233,10 +236,26 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
                 expected_value
-            match index config.player_modes table.player_turn with
-            | TrainEnumerative => cfr_enum ()
-            | TrainSampling => cfr_mc ()
-            | Frozen => cfr_frozen ()
+            
+    inl cfr (table : table) (loop : training_nodes -> f32) =
+        listm.foldBack (fun i next () =>
+            if table.player_turn = i then
+                inl mode = index config.player_modes i
+                join cfr' table loop mode
+            else
+                next()
+            ) [0; 1] (fun () => failwith "Mode index is out of bounds.") ()
+
+    let rec body node =
+        inl reward = stack_mut 0
+        inl set_rewards winner_id (chips_won : float) =
+            inl chips_won = conv chips_won
+            reward <- if winner_id = 0 then chips_won else -chips_won // Aligns the reward for the first player.
+        let rec loop = function // This is so game_round only gets generated once instead of 3 times in the compiled code.
+            | T_none => *reward // Returns the reward for the first player.
+            | T_game_chance_community_card(a,b) => body (game_chance_community_card a b)
+            | T_game_chance_init(a,b) => body (game_chance_init (a, b))
+            | T_game_round(a,b) => body (game_round a b)
         match node with
         | TerminalFold table =>
             inl msg = 
@@ -258,7 +277,7 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
             using_message msg fun () =>
             loop T_none
         | Round table => 
-            inl expected_value = cfr table
+            inl expected_value = cfr table loop
             set_rewards table.player_turn expected_value
             loop T_none
         | RoundWithAction(table,action) =>
@@ -282,9 +301,10 @@ inl train_loop ~(config : config) (dict : stack_refs game_dicts) =
 
 inl main() =
     loop.for' {from=0; nearTo=30} fun (_ : int) =>
-        inl dict = stack_refs ({policy = cached_dictm.create 512; expected_values = cached_dictm.create 512})
+        inl policy = stack_refs (cached_dictm.create 512)
+        inl expected_values = stack_refs (cached_dictm.create 512)
         inl loop (config : config) (nearTo : int) =
-            inl train_loop = train_loop config dict
+            inl train_loop = train_loop config
             loop.for {from=0; nearTo} (fun (i : int) _ =>
                 // if i % (max 1 (nearTo / 25)) = 0 then
                 //     console.write_ln {i nearTo}
@@ -293,12 +313,12 @@ inl main() =
         inl _ =
             loop {
                 is_chance_node_sampling = true
-                player_modes = [TrainSampling; TrainSampling] |> arraym.fromList
+                player_modes = [TrainSampling {policy expected_values}; TrainSampling {policy expected_values}]
             } 1_000_000
         inl reward_for_pl0 =
             loop {
                 is_chance_node_sampling = false
-                player_modes = [TrainEnumerative; Frozen] |> arraym.fromList
+                player_modes = [TrainEnumerative {policy}; Frozen {policy}]
             } 100
         console.write_ln {reward_for_pl0}
     0i32
