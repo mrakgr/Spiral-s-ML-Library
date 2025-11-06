@@ -1,16 +1,18 @@
-Error trace on line: 25, column: 16 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/base.spi.
-    inl base = random.u32_ubound conv(popc_u32 d) rng
-               ^
-Error trace on line: 25, column: 34 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/base.spi.
-    inl base = random.u32_ubound conv(popc_u32 d) rng
-                                 ^
-Error trace on line: 25, column: 39 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/base.spi.
-    inl base = random.u32_ubound conv(popc_u32 d) rng
-                                      ^
-Error trace on line: 28, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/sampling.spi.
-    backend_switch_cuda {
+Error trace on line: 315, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_cfr_train.spi.
+    inl p_showdown : pickler showdown = record {
     ^
-Error trace on line: 181, column: 95 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
-inl backend_switch_cuda forall t. (x : {CudaDevice : () -> t; CudaHost : () -> t}) : t = real backend_switch_real x
-                                                                                              ^
-Cannot find the backend CppHost in the backend switch op.
+Error trace on line: 320, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_cfr_train.spi.
+    inl p_message : pickler message = alt {
+    ^
+Error trace on line: 320, column: 39 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_cfr_train.spi.
+    inl p_message : pickler message = alt {
+                                      ^
+Error trace on line: 48, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/hd_pickler.spi.
+    Alt(real union_map `pickler `union_ picklers)
+    ^
+Error trace on line: 48, column: 14 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/hd_pickler.spi.
+    Alt(real union_map `pickler `union_ picklers)
+             ^
+Type error in nominal constructor.
+Got:      {CommunityCardIs : pickler card; Hidden : pickler (); PlayerAction : pickler (i32 * card); PlayerGotCard : pickler (i32 * card); Showdown : pickler {cards_shown : sa 2i32 card; chips_won : i32; winner_id : i32}}
+Expected: {CommunityCardIs : pickler card; Hidden : pickler (); PlayerAction : pickler (i32 * action); PlayerGotCard : pickler (i32 * card); Showdown : pickler {cards_shown : sa 2i32 card; chips_won : i32; winner_id : i32}}

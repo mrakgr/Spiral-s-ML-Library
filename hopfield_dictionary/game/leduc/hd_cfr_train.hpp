@@ -9,6 +9,7 @@
 #else
 // Cpp host backend
 #include <unordered_map>
+#include <Eigen/Dense>
 #include <xoshiro.h>
 struct Union1;
 struct Union2;
@@ -20,9 +21,10 @@ struct Tuple1;
 struct StackRefs0;
 struct Tuple2;
 struct StackRefs1;
-struct StackMut0;
 struct StackRefs2;
+struct StackMut0;
 struct StackRefs3;
+struct StackRefs4;
 struct Tuple3;
 struct Union4;
 struct Union3;
@@ -41,23 +43,23 @@ struct Tuple7;
 unsigned int loop_2(unsigned int v0, xso::rng & v1);
 unsigned int find_nth_set_bit_3(int v0, unsigned int v1, unsigned int v2);
 Tuple4 draw_card_1(xso::rng & v0, unsigned int v1);
-float loop_4(StackRefs2 & v0, StackRefs1 & v1, StackRefs0 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, StackMut1 & v6, Union5 v7);
+float loop_4(StackRefs3 & v0, StackRefs1 & v1, StackRefs0 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
 static_array<float,3> relu_7(static_array<float,3> v0);
 static_array<float,3> masking_normalize_8(static_array<float,3> v0, static_array<bool,3> v1);
 static_array<float,3> regret_match_6(static_array<float,3> v0, static_array<bool,3> v1);
 int loop_11(static_array<float,3> v0, float v1, int v2);
 int pick_discrete__10(static_array<float,3> v0, float v1);
 int sample_discrete__9(static_array<float,3> v0, xso::rng & v1);
-float method_5(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs1 & v9, StackRefs0 & v10, StackMut0 & v11, StackMut1 & v12);
+float method_5(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs1 & v9, StackRefs0 & v10, StackMut0 & v11, StackMut1 & v12);
 int tag_13(Union1 v0);
 bool is_pair_14(int v0, int v1);
 Tuple5 order_15(int v0, int v1);
 Union9 compare_hands_12(Union4 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
-float body_0(StackRefs2 & v0, StackRefs1 & v1, StackRefs0 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, Union3 v6);
-float loop_17(StackRefs2 & v0, StackRefs0 & v1, xso::rng & v2, StackMut0 & v3, StackRefs3 & v4, StackMut1 & v5, Union5 v6);
-float method_18(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackMut0 & v10, StackMut1 & v11);
-float method_19(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackMut0 & v10, StackMut1 & v11);
-float body_16(StackRefs2 & v0, StackRefs0 & v1, xso::rng & v2, StackMut0 & v3, StackRefs3 & v4, Union3 v5);
+float body_0(StackRefs3 & v0, StackRefs1 & v1, StackRefs0 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
+float loop_17(StackRefs3 & v0, StackRefs0 & v1, xso::rng & v2, StackMut0 & v3, StackRefs4 & v4, StackMut1 & v5, Union5 v6);
+float method_18(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackMut0 & v10, StackMut1 & v11);
+float method_19(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackMut0 & v10, StackMut1 & v11);
+float body_16(StackRefs3 & v0, StackRefs0 & v1, xso::rng & v2, StackMut0 & v3, StackRefs4 & v4, Union3 v5);
 int main();
 struct Union1_0 { // Jack
 };
@@ -196,61 +198,68 @@ struct Union0_0 { // CommunityCardIs
     __host__ __device__ Union0_0(Union1 t0) : v0(t0) {}
     __host__ __device__ Union0_0() = delete;
 };
-struct Union0_1 { // PlayerAction
+struct Union0_1 { // Hidden
+};
+struct Union0_2 { // PlayerAction
     Union2 v1;
     int v0;
-    __host__ __device__ Union0_1(int t0, Union2 t1) : v0(t0), v1(t1) {}
-    __host__ __device__ Union0_1() = delete;
-};
-struct Union0_2 { // PlayerGotCard
-    Union1 v1;
-    int v0;
-    __host__ __device__ Union0_2(int t0, Union1 t1) : v0(t0), v1(t1) {}
+    __host__ __device__ Union0_2(int t0, Union2 t1) : v0(t0), v1(t1) {}
     __host__ __device__ Union0_2() = delete;
 };
-struct Union0_3 { // Showdown
+struct Union0_3 { // PlayerGotCard
+    Union1 v1;
+    int v0;
+    __host__ __device__ Union0_3(int t0, Union1 t1) : v0(t0), v1(t1) {}
+    __host__ __device__ Union0_3() = delete;
+};
+struct Union0_4 { // Showdown
     static_array<Union1,2> v0;
     int v1;
     int v2;
-    __host__ __device__ Union0_3(static_array<Union1,2> t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
-    __host__ __device__ Union0_3() = delete;
+    __host__ __device__ Union0_4(static_array<Union1,2> t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ Union0_4() = delete;
 };
 struct Union0 {
     union {
         Union0_0 case0; // CommunityCardIs
-        Union0_1 case1; // PlayerAction
-        Union0_2 case2; // PlayerGotCard
-        Union0_3 case3; // Showdown
+        Union0_1 case1; // Hidden
+        Union0_2 case2; // PlayerAction
+        Union0_3 case3; // PlayerGotCard
+        Union0_4 case4; // Showdown
     };
     unsigned char tag{255};
     __host__ __device__ Union0() {}
     __host__ __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // CommunityCardIs
-    __host__ __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // PlayerAction
-    __host__ __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // PlayerGotCard
-    __host__ __device__ Union0(Union0_3 t) : tag(3), case3(t) {} // Showdown
+    __host__ __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // Hidden
+    __host__ __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // PlayerAction
+    __host__ __device__ Union0(Union0_3 t) : tag(3), case3(t) {} // PlayerGotCard
+    __host__ __device__ Union0(Union0_4 t) : tag(4), case4(t) {} // Showdown
     __host__ __device__ Union0(const Union0 & x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union0_0(x.case0); break; // CommunityCardIs
-            case 1: new (&this->case1) Union0_1(x.case1); break; // PlayerAction
-            case 2: new (&this->case2) Union0_2(x.case2); break; // PlayerGotCard
-            case 3: new (&this->case3) Union0_3(x.case3); break; // Showdown
+            case 1: new (&this->case1) Union0_1(x.case1); break; // Hidden
+            case 2: new (&this->case2) Union0_2(x.case2); break; // PlayerAction
+            case 3: new (&this->case3) Union0_3(x.case3); break; // PlayerGotCard
+            case 4: new (&this->case4) Union0_4(x.case4); break; // Showdown
         }
     }
     __host__ __device__ Union0(const Union0 && x) : tag(x.tag) {
         switch(x.tag){
             case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // CommunityCardIs
-            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // PlayerAction
-            case 2: new (&this->case2) Union0_2(std::move(x.case2)); break; // PlayerGotCard
-            case 3: new (&this->case3) Union0_3(std::move(x.case3)); break; // Showdown
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // Hidden
+            case 2: new (&this->case2) Union0_2(std::move(x.case2)); break; // PlayerAction
+            case 3: new (&this->case3) Union0_3(std::move(x.case3)); break; // PlayerGotCard
+            case 4: new (&this->case4) Union0_4(std::move(x.case4)); break; // Showdown
         }
     }
     __host__ __device__ Union0 & operator=(const Union0 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
                 case 0: this->case0 = x.case0; break; // CommunityCardIs
-                case 1: this->case1 = x.case1; break; // PlayerAction
-                case 2: this->case2 = x.case2; break; // PlayerGotCard
-                case 3: this->case3 = x.case3; break; // Showdown
+                case 1: this->case1 = x.case1; break; // Hidden
+                case 2: this->case2 = x.case2; break; // PlayerAction
+                case 3: this->case3 = x.case3; break; // PlayerGotCard
+                case 4: this->case4 = x.case4; break; // Showdown
             }
         } else {
             this->~Union0();
@@ -262,9 +271,10 @@ struct Union0 {
         if (this->tag == x.tag) {
             switch(x.tag){
                 case 0: this->case0 = std::move(x.case0); break; // CommunityCardIs
-                case 1: this->case1 = std::move(x.case1); break; // PlayerAction
-                case 2: this->case2 = std::move(x.case2); break; // PlayerGotCard
-                case 3: this->case3 = std::move(x.case3); break; // Showdown
+                case 1: this->case1 = std::move(x.case1); break; // Hidden
+                case 2: this->case2 = std::move(x.case2); break; // PlayerAction
+                case 3: this->case3 = std::move(x.case3); break; // PlayerGotCard
+                case 4: this->case4 = std::move(x.case4); break; // Showdown
             }
         } else {
             this->~Union0();
@@ -275,9 +285,10 @@ struct Union0 {
     __host__ __device__ ~Union0() {
         switch(this->tag){
             case 0: this->case0.~Union0_0(); break; // CommunityCardIs
-            case 1: this->case1.~Union0_1(); break; // PlayerAction
-            case 2: this->case2.~Union0_2(); break; // PlayerGotCard
-            case 3: this->case3.~Union0_3(); break; // Showdown
+            case 1: this->case1.~Union0_1(); break; // Hidden
+            case 2: this->case2.~Union0_2(); break; // PlayerAction
+            case 3: this->case3.~Union0_3(); break; // PlayerGotCard
+            case 4: this->case4.~Union0_4(); break; // Showdown
         }
         this->tag = 255;
     }
@@ -310,20 +321,27 @@ struct StackRefs1 {
     __host__ __device__ StackRefs1() = default;
     __host__ __device__ StackRefs1(std::unordered_map<Tuple0, static_array<Tuple2,3>, Fun0, Fun1> & t0) : v0(t0) {}
 };
+struct StackRefs2 {
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2;
+    int & v0;
+    __host__ __device__ StackRefs2() = default;
+    __host__ __device__ StackRefs2(int & t0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t2) : v0(t0), v1(t1), v2(t2) {}
+};
 struct StackMut0 {
     unsigned int v0;
     __host__ __device__ StackMut0() = default;
     __host__ __device__ StackMut0(unsigned int t0) : v0(t0) {}
 };
-struct StackRefs2 {
-    static_array_list<Union0,32> & v0;
-    __host__ __device__ StackRefs2() = default;
-    __host__ __device__ StackRefs2(static_array_list<Union0,32> & t0) : v0(t0) {}
-};
 struct StackRefs3 {
-    static_array<Tuple2,2> & v0;
+    static_array_list<Union0,32> & v0;
     __host__ __device__ StackRefs3() = default;
-    __host__ __device__ StackRefs3(static_array<Tuple2,2> & t0) : v0(t0) {}
+    __host__ __device__ StackRefs3(static_array_list<Union0,32> & t0) : v0(t0) {}
+};
+struct StackRefs4 {
+    static_array<Tuple2,2> & v0;
+    __host__ __device__ StackRefs4() = default;
+    __host__ __device__ StackRefs4(static_array<Tuple2,2> & t0) : v0(t0) {}
 };
 struct Tuple3 {
     int v0;

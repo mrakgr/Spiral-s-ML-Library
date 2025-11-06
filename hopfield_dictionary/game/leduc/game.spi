@@ -12,12 +12,13 @@ type table = // The complete game state.
         player_turn : int
     }
 
+type showdown = {winner_id : int; chips_won : int; cards_shown : sa 2 card}
 union message =
     | Hidden
     | PlayerGotCard : int * card
     | CommunityCardIs : card
     | PlayerAction : int * action
-    | Showdown : {winner_id : int; chips_won : int; cards_shown : sa 2 card}
+    | Showdown : showdown
 
 type messages = sa_list 32 message
 
