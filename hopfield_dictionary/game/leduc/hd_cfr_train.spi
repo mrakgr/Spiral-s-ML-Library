@@ -300,7 +300,7 @@ inl train_loop (config : config) =
         body game_start()
 
 inl main() =
-    loop.for' {from=0; nearTo=30} fun (_ : int) =>
+    loop.for' {from=0; nearTo=1} fun (_ : int) =>
         inl policy = stack_refs (cached_dictm.create 512)
         inl expected_values = stack_refs (cached_dictm.create 512)
         inl loop (config : config) (nearTo : int) =
