@@ -1,213 +1,11 @@
-kernel = r"""
-#include <new>
-#include <assert.h>
-#include <stdio.h>
-using default_int = int;
-using default_uint = unsigned int;
-template <typename el>
-struct sptr // Shared pointer for the Spiral datatypes. They have to have the refc field inside them to work.
-{
-    el* base;
-
-    __device__ sptr() : base(nullptr) {}
-    __device__ sptr(el* ptr) : base(ptr) { this->base->refc++; }
-
-    __device__ ~sptr()
-    {
-        if (this->base != nullptr && --this->base->refc == 0)
-        {
-            delete this->base;
-            this->base = nullptr;
-        }
-    }
-
-    __device__ sptr(sptr& x)
-    {
-        this->base = x.base;
-        this->base->refc++;
-    }
-
-    __device__ sptr(sptr&& x)
-    {
-        this->base = x.base;
-        x.base = nullptr;
-    }
-
-    __device__ sptr& operator=(sptr& x)
-    {
-        if (this->base != x.base)
-        {
-            delete this->base;
-            this->base = x.base;
-            this->base->refc++;
-        }
-        return *this;
-    }
-
-    __device__ sptr& operator=(sptr&& x)
-    {
-        if (this->base != x.base)
-        {
-            delete this->base;
-            this->base = x.base;
-            x.base = nullptr;
-        }
-        return *this;
-    }
-};
-
-template <typename el>
-struct csptr : public sptr<el>
-{ // Shared pointer for closures specifically.
-    using sptr<el>::sptr;
-    template <typename... Args>
-    __device__ auto operator()(Args... args) -> decltype(this->base->operator()(args...))
-    {
-        return this->base->operator()(args...);
-    }
-};
-
-template <typename el, default_int max_length>
-struct static_array
-{
-    el ptr[max_length];
-    __device__ el& operator[](default_int i) {
-        assert("The index has to be in range." && 0 <= i && i < max_length);
-        return this->ptr[i];
-    }
-};
-
-template <typename el, default_int max_length>
-struct static_array_list
-{
-    default_int length{ 0 };
-    el ptr[max_length];
-
-    __device__ el& operator[](default_int i) {
-        assert("The index has to be in range." && 0 <= i && i < this->length);
-        return this->ptr[i];
-    }
-    __device__ void push(el& x) {
-        ptr[this->length++] = x;
-        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
-    }
-    __device__ void push(el&& x) {
-        ptr[this->length++] = std::move(x);
-        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
-    }
-    __device__ el pop() {
-        assert("The array before popping should be greater than 0." && 0 < this->length);
-        auto x = ptr[--this->length];
-        ptr[this->length].~el();
-        new (&ptr[this->length]) el();
-        return x;
-    }
-    // Should be used only during initialization.
-    __device__ void unsafe_set_length(default_int i) {
-        assert("The new length should be in range." && 0 <= i && i <= max_length);
-        this->length = i;
-    }
-};
-
-template <typename el, default_int max_length>
-struct dynamic_array_base
-{
-    int refc{ 0 };
-    el* ptr;
-
-    __device__ dynamic_array_base() : ptr(new el[max_length]) {}
-    __device__ ~dynamic_array_base() { delete[] this->ptr; }
-
-    __device__ el& operator[](default_int i) {
-        assert("The index has to be in range." && 0 <= i && i < this->length);
-        return this->ptr[i];
-    }
-};
-
-template <typename el, default_int max_length>
-struct dynamic_array
-{
-    sptr<dynamic_array_base<el, max_length>> ptr;
-
-    __device__ dynamic_array() = default;
-    __device__ dynamic_array(bool t) : ptr(new dynamic_array_base<el, max_length>()) {}
-    __device__ el& operator[](default_int i) {
-        return this->ptr.base->operator[](i);
-    }
-};
-
-template <typename el, default_int max_length>
-struct dynamic_array_list_base
-{
-    int refc{ 0 };
-    default_int length{ 0 };
-    el* ptr;
-
-    __device__ dynamic_array_list_base() : ptr(new el[max_length]) {}
-    __device__ dynamic_array_list_base(default_int l) : ptr(new el[max_length]) { this->unsafe_set_length(l); }
-    __device__ ~dynamic_array_list_base() { delete[] this->ptr; }
-
-    __device__ el& operator[](default_int i) {
-        assert("The index has to be in range." && 0 <= i && i < this->length);
-        return this->ptr[i];
-    }
-    __device__ void push(el& x) {
-        ptr[this->length++] = x;
-        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
-    }
-    __device__ void push(el&& x) {
-        ptr[this->length++] = std::move(x);
-        assert("The array after pushing should not be greater than max length." && this->length <= max_length);
-    }
-    __device__ el pop() {
-        assert("The array before popping should be greater than 0." && 0 < this->length);
-        auto x = ptr[--this->length];
-        ptr[this->length].~el();
-        new (&ptr[this->length]) el();
-        return x;
-    }
-    // Should be used only during initialization.
-    __device__ void unsafe_set_length(default_int i) {
-        assert("The new length should be in range." && 0 <= i && i <= max_length);
-        this->length = i;
-    }
-};
-
-template <typename el, default_int max_length>
-struct dynamic_array_list
-{
-    sptr<dynamic_array_list_base<el, max_length>> ptr;
-
-    __device__ dynamic_array_list() = default;
-    __device__ dynamic_array_list(default_int l) : ptr(new dynamic_array_list_base<el, max_length>(l)) {}
-
-    __device__ el& operator[](default_int i) {
-        return this->ptr.base->operator[](i);
-    }
-    __device__ void push(el& x) {
-        this->ptr.base->push(x);
-    }
-    __device__ void push(el&& x) {
-        this->ptr.base->push(std::move(x));
-    }
-    __device__ el pop() {
-        return this->ptr.base->pop();
-    }
-    // Should be used only during initialization.
-    __device__ void unsafe_set_length(default_int i) {
-        this->ptr.base->unsafe_set_length(i);
-    }
-    __device__ default_int length_() {
-        return this->ptr.base->length;
-    }
-};
-
-__device__ inline bool while_method_0(int v0){
+kernels_main = r"""
+extern "C" __global__ void entry0(float * v0, float * v1);
+__device__ inline bool while_method_1(int v0){
     bool v1;
     v1 = v0 < 67108864;
     return v1;
 }
-__device__ inline bool while_method_1(int v0){
+__device__ inline bool while_method_2(int v0){
     bool v1;
     v1 = v0 < 4;
     return v1;
@@ -223,7 +21,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
     v5 = v2 + v4;
     int v6;
     v6 = v5;
-    while (while_method_0(v6)){
+    while (while_method_1(v6)){
         bool v8;
         v8 = 0 <= v6;
         bool v9;
@@ -256,7 +54,7 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         int v19;
         v19 = 0;
         #pragma unroll
-        while (while_method_1(v19)){
+        while (while_method_2(v19)){
             assert("Tensor range check" && 0 <= v19 && v19 < 4);
             float v21;
             v21 = v15[v19];
@@ -273,58 +71,13 @@ extern "C" __global__ void entry0(float * v0, float * v1) {
         v24 = reinterpret_cast<int4*>(v1 + v14);
         assert("Pointer alignment check" && reinterpret_cast<unsigned long long>(v23) % 16 == 0 && reinterpret_cast<unsigned long long>(v24) % 16 == 0);
         *v24 = *v23;
-        v6 += 33792 ;
+        v6 += 6144 ;
     }
     return ;
 }
 """
-class static_array():
-    def __init__(self, length):
-        self.ptr = []
-        for _ in range(length):
-            self.ptr.append(None)
-
-    def __getitem__(self, index):
-        assert 0 <= index < len(self.ptr), "The get index needs to be in range."
-        return self.ptr[index]
-    
-    def __setitem__(self, index, value):
-        assert 0 <= index < len(self.ptr), "The set index needs to be in range."
-        self.ptr[index] = value
-
-class static_array_list(static_array):
-    def __init__(self, length):
-        super().__init__(length)
-        self.length = 0
-
-    def __getitem__(self, index):
-        assert 0 <= index < self.length, "The get index needs to be in range."
-        return self.ptr[index]
-    
-    def __setitem__(self, index, value):
-        assert 0 <= index < self.length, "The set index needs to be in range."
-        self.ptr[index] = value
-
-    def push(self,value):
-        assert (self.length < len(self.ptr)), "The length before pushing has to be less than the maximum length of the array."
-        self.ptr[self.length] = value
-        self.length += 1
-
-    def pop(self):
-        assert (0 < self.length), "The length before popping has to be greater than 0."
-        self.length -= 1
-        return self.ptr[self.length]
-
-    def unsafe_set_length(self,i):
-        assert 0 <= i <= len(self.ptr), "The new length has to be in range."
-        self.length = i
-
-class dynamic_array(static_array): 
-    pass
-
-class dynamic_array_list(static_array_list):
-    def length_(self): return self.length
-
+from test0_auto import *
+kernels = kernels_aux + kernels_main
 import cupy as cp
 from dataclasses import dataclass
 from typing import NamedTuple, Union, Callable, Tuple
@@ -335,84 +88,86 @@ options.append('--define-macro=NDEBUG')
 options.append('--dopt=on')
 options.append('--diag-suppress=550,20012,68,39,177')
 options.append('--restrict')
+import os
+home = os.getenv('HOME')
+options.append(f'-I={home}/ThunderKittens/include')
 options.append('--maxrregcount=255')
 options.append('--std=c++20')
+options.append('--expt-relaxed-constexpr')
 options.append('-D__CUDA_NO_HALF_CONVERSIONS__')
-raw_module = cp.RawModule(code=kernel, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
-def method0(v0 : i32) -> bool:
+raw_module = cp.RawModule(code=kernels, backend='nvcc', enable_cooperative_groups=True, options=tuple(options))
+def method0(v0 : cp.ndarray, v1 : cp.ndarray) -> None:
+    kernel = "entry0"
+    v2 = cp.cuda.Device().attributes['MultiProcessorCount']
+    v3 = v2 >= 24
+    del v2
+    v4 = v3 == False
+    if v4:
+        v5 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
+        assert v3, v5
+        del v5
+    else:
+        pass
+    del v3, v4
+    v6 = raw_module.get_function(kernel)
+    v6.max_dynamic_shared_size_bytes = 98304 
+    print(f'Threads per block, blocks per grid: {256}, {24}')
+    v6((24,),(256,),(v0, v1),shared_mem=98304)
+    del v0, v1, v6
+    return 
+def method1(v0 : i32) -> bool:
     v1 = v0 < 16
     del v0
     return v1
-def main_body():
+def main():
     v2 = "{}\n"
     v3 = "Running test 0. How long does the memory transfer take?"
     print(v2.format(v3),end="")
     del v2, v3
     v4 = cp.ones(268435456,dtype=cp.float32) # type: ignore
     v5 = cp.empty(268435456,dtype=cp.float32)
-    v6 = cp.cuda.Device().attributes['MultiProcessorCount']
-    v7 = v6 == 132
-    del v6
-    v8 = v7 == False
-    if v8:
-        v9 = "The number of SMs per GPU at runtime must much that what is declared atop of corecuda.base. Make sure to use the correct constant so it can be propagated at compile time."
-        assert v7, v9
-        del v9
-    else:
-        pass
-    del v7, v8
-    v10 = 0
-    v11 = raw_module.get_function(f"entry{v10}")
-    del v10
-    v11.max_dynamic_shared_size_bytes = 229376 
-    print(f'Threads per block, blocks per grid: {256}, {132}')
-    v11((132,),(256,),(v4, v5),shared_mem=229376)
-    del v4, v11
-    v23 = 0
-    v24 = "{}"
-    print(v24.format('['),end="")
-    v25 = 0
-    while method0(v25):
-        v27 = v23
-        v28 = v27 >= 100
-        del v27
-        if v28:
-            v29 = " ..."
-            print(v24.format(v29),end="")
-            del v29
+    method0(v4, v5)
+    del v4
+    v35 = 0
+    v36 = "{}"
+    print(v36.format('['),end="")
+    v37 = 0
+    while method1(v37):
+        v39 = v35
+        v40 = v39 >= 100
+        del v39
+        if v40:
+            v41 = " ..."
+            print(v36.format(v41),end="")
+            del v41
             break
         else:
             pass
-        del v28
-        v30 = v25 == 0
-        v31 = v30 != True
-        del v30
-        if v31:
-            v32 = "; "
-            print(v24.format(v32),end="")
-            del v32
+        del v40
+        v42 = v37 == 0
+        v43 = v42 != True
+        del v42
+        if v43:
+            v44 = "; "
+            print(v36.format(v44),end="")
+            del v44
         else:
             pass
-        del v31
-        v33 = v23 + 1
-        v23 = v33
-        del v33
-        v34 = v5[v25].item()
-        v35 = "{:.6f}"
-        print(v35.format(v34),end="")
-        del v34, v35
-        v25 += 1 
-    del v5, v23, v25
-    print(v24.format(']'),end="")
-    del v24
-    v36 = "\n"
-    print(v36.format(),end="")
+        del v43
+        v45 = v35 + 1
+        v35 = v45
+        del v45
+        v46 = v5[v37].item()
+        v47 = "{:.6f}"
+        print(v47.format(v46),end="")
+        del v46, v47
+        v37 += 1 
+    del v5, v35, v37
+    print(v36.format(']'),end="")
     del v36
+    v48 = "\n"
+    print(v48.format(),end="")
+    del v48
     return 
-
-def main():
-    r = main_body()
-    cp.cuda.get_current_stream().synchronize() # This line is here so the `__trap()` calls on the kernel aren't missed.
-    return r
 
 if __name__ == '__main__': print(main())

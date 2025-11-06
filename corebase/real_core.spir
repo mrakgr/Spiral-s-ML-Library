@@ -271,6 +271,10 @@ inl failwith forall t. msg = !!!!FailWith(`t,msg)
 // The term returned by the selected backend is dyned.
 inl backend_switch_real x = !!!!BackendSwitch(x)
 
+// The unsafe version of the backend switch. It doesn't test that all the branches return the same type, so could cause soundness issues when abused.
+// The code using this shouldn't use compile time dictionaries from outside the branch scope nor return different types from them.
+inl backend_switch_unsafe x = !!!!UnsafeBackendSwitch(x)
+
 // Asserts an term. If the conditional and the message are literals it raises a type error instead.
 inl assert c msg = 
     if c = false then 
@@ -380,11 +384,11 @@ inl hash_template prim init_seed x =
 
 inl hash x : u64 = 
     inl hash_cpp () = hash_template (fun x => typecase `x with ~x => $"std::hash<`x>()(!x)" : u64) 9973u64 x
-    !!!!UnsafeBackendSwitch({
+    backend_switch_unsafe {
         Fsharp = fun () => hash_template (fun x => $"uint64 (hash !x)" : u64) 9973u64 x
         Python = fun () => hash_template (fun x => $"hash(!x)" : u64) 9973u64 x
         CudaDevice = hash_cpp
         CppHost = hash_cpp
         CudaHost = hash_cpp
-    }) 
+    }
     

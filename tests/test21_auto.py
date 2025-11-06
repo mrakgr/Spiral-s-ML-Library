@@ -1,3 +1,4 @@
+kernels_aux = r"""
 #pragma once
 
 // The types of these two will be replaced during compilation by the Spiral code generator. 
@@ -18,8 +19,8 @@ using default_uint = unsigned int;
 #include <cuda_runtime.h> // So we can link with Cuda libs.
 
 // The defines are so the .hpp library is compatible between the backends.
-#ifndef __host__
-#define __host__
+#ifndef __device__
+#define __device__
 #endif
 #ifndef __device__
 #define __device__
@@ -28,7 +29,7 @@ using default_uint = unsigned int;
 #ifdef __CUDACC__
 // For error checking on the host.
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-template <typename T> inline __host__ __device__ void destroy(T& obj) { obj.~T(); }
+template <typename T> inline __device__ __device__ void destroy(T& obj) { obj.~T(); }
 inline void gpuAssert(cudaError error, const char *file, int line, bool abort=true) {
     if (error != cudaSuccess) {
         fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(error), file, line);
@@ -42,10 +43,10 @@ struct sptr // Shared pointer for the Spiral datatypes. They have to have the re
 {
     el* base;
 
-    __host__ __device__ sptr() : base(nullptr) {}
-    __host__ __device__ sptr(el* ptr) : base(ptr) { this->base->refc++; }
+    __device__ __device__ sptr() : base(nullptr) {}
+    __device__ __device__ sptr(el* ptr) : base(ptr) { this->base->refc++; }
 
-    __host__ __device__ ~sptr()
+    __device__ __device__ ~sptr()
     {
         if (this->base != nullptr && --this->base->refc == 0)
         {
@@ -54,19 +55,19 @@ struct sptr // Shared pointer for the Spiral datatypes. They have to have the re
         }
     }
 
-    __host__ __device__ sptr(const sptr& x)
+    __device__ __device__ sptr(const sptr& x)
     {
         this->base = x.base;
         this->base->refc++;
     }
 
-    __host__ __device__ sptr(sptr&& x)
+    __device__ __device__ sptr(sptr&& x)
     {
         this->base = x.base;
         x.base = nullptr;
     }
 
-    __host__ __device__ sptr& operator=(const sptr& x)
+    __device__ __device__ sptr& operator=(const sptr& x)
     {
         if (this->base != x.base)
         {
@@ -77,7 +78,7 @@ struct sptr // Shared pointer for the Spiral datatypes. They have to have the re
         return *this;
     }
     
-    __host__ __device__ sptr& operator=(sptr&& x)
+    __device__ __device__ sptr& operator=(sptr&& x)
     {
         if (this->base != x.base)
         {
@@ -94,7 +95,7 @@ struct csptr : public sptr<el>
 { // Shared pointer for closures specifically.
     using sptr<el>::sptr;
     template <typename... Args>
-    __host__ __device__ auto operator()(Args... args) -> decltype(this->base->operator()(args...))
+    __device__ __device__ auto operator()(Args... args) -> decltype(this->base->operator()(args...))
     {
         return this->base->operator()(args...);
     }
@@ -104,7 +105,7 @@ template <typename el, default_int max_length>
 struct static_array
 {
     el ptr[max_length];
-    __host__ __device__ el& operator[](default_int i) {
+    __device__ __device__ el& operator[](default_int i) {
         assert("The index has to be in range." && 0 <= i && i < max_length);
         return this->ptr[i];
     }
@@ -116,19 +117,19 @@ struct static_array_list
     default_int length{ 0 };
     el ptr[max_length];
 
-    __host__ __device__ el& operator[](default_int i) {
+    __device__ __device__ el& operator[](default_int i) {
         assert("The index has to be in range." && 0 <= i && i < this->length);
         return this->ptr[i];
     }
-    __host__ __device__ void push(const el& x) {
+    __device__ __device__ void push(const el& x) {
         ptr[this->length++] = x;
         assert("The array after pushing should not be greater than max length." && this->length <= max_length);
     }
-    __host__ __device__ void push(const el&& x) {
+    __device__ __device__ void push(const el&& x) {
         ptr[this->length++] = std::move(x);
         assert("The array after pushing should not be greater than max length." && this->length <= max_length);
     }
-    __host__ __device__ el pop() {
+    __device__ __device__ el pop() {
         assert("The array before popping should be greater than 0." && 0 < this->length);
         auto x = ptr[--this->length];
         ptr[this->length].~el();
@@ -136,7 +137,7 @@ struct static_array_list
         return x;
     }
     // Should be used only during initialization.
-    __host__ __device__ void unsafe_set_length(default_int i) {
+    __device__ __device__ void unsafe_set_length(default_int i) {
         assert("The new length should be in range." && 0 <= i && i <= max_length);
         this->length = i;
     }
@@ -148,10 +149,10 @@ struct dynamic_array_base
     int refc{ 0 };
     el* ptr;
 
-    __host__ __device__ dynamic_array_base() : ptr(new el[max_length]) {}
-    __host__ __device__ ~dynamic_array_base() { delete[] this->ptr; }
+    __device__ __device__ dynamic_array_base() : ptr(new el[max_length]) {}
+    __device__ __device__ ~dynamic_array_base() { delete[] this->ptr; }
 
-    __host__ __device__ el& operator[](default_int i) {
+    __device__ __device__ el& operator[](default_int i) {
         assert("The index has to be in range." && 0 <= i && i < this->length);
         return this->ptr[i];
     }
@@ -162,9 +163,9 @@ struct dynamic_array
 {
     sptr<dynamic_array_base<el, max_length>> ptr;
 
-    __host__ __device__ dynamic_array() = default;
-    __host__ __device__ dynamic_array(bool t) : ptr(new dynamic_array_base<el, max_length>()) {}
-    __host__ __device__ el& operator[](default_int i) {
+    __device__ __device__ dynamic_array() = default;
+    __device__ __device__ dynamic_array(bool t) : ptr(new dynamic_array_base<el, max_length>()) {}
+    __device__ __device__ el& operator[](default_int i) {
         return this->ptr.base->operator[](i);
     }
 };
@@ -176,23 +177,23 @@ struct dynamic_array_list_base
     default_int length{ 0 };
     el* ptr;
 
-    __host__ __device__ dynamic_array_list_base() : ptr(new el[max_length]) {}
-    __host__ __device__ dynamic_array_list_base(default_int l) : ptr(new el[max_length]) { this->unsafe_set_length(l); }
-    __host__ __device__ ~dynamic_array_list_base() { delete[] this->ptr; }
+    __device__ __device__ dynamic_array_list_base() : ptr(new el[max_length]) {}
+    __device__ __device__ dynamic_array_list_base(default_int l) : ptr(new el[max_length]) { this->unsafe_set_length(l); }
+    __device__ __device__ ~dynamic_array_list_base() { delete[] this->ptr; }
 
-    __host__ __device__ el& operator[](default_int i) {
+    __device__ __device__ el& operator[](default_int i) {
         assert("The index has to be in range." && 0 <= i && i < this->length);
         return this->ptr[i];
     }
-    __host__ __device__ void push(const el& x) {
+    __device__ __device__ void push(const el& x) {
         ptr[this->length++] = x;
         assert("The array after pushing should not be greater than max length." && this->length <= max_length);
     }
-    __host__ __device__ void push(const el&& x) {
+    __device__ __device__ void push(const el&& x) {
         ptr[this->length++] = std::move(x);
         assert("The array after pushing should not be greater than max length." && this->length <= max_length);
     }
-    __host__ __device__ el pop() {
+    __device__ __device__ el pop() {
         assert("The array before popping should be greater than 0." && 0 < this->length);
         auto x = ptr[--this->length];
         ptr[this->length].~el();
@@ -200,7 +201,7 @@ struct dynamic_array_list_base
         return x;
     }
     // Should be used only during initialization.
-    __host__ __device__ void unsafe_set_length(default_int i) {
+    __device__ __device__ void unsafe_set_length(default_int i) {
         assert("The new length should be in range." && 0 <= i && i <= max_length);
         this->length = i;
     }
@@ -211,26 +212,74 @@ struct dynamic_array_list
 {
     sptr<dynamic_array_list_base<el, max_length>> ptr;
 
-    __host__ __device__ dynamic_array_list() = default;
-    __host__ __device__ dynamic_array_list(default_int l) : ptr(new dynamic_array_list_base<el, max_length>(l)) {}
+    __device__ __device__ dynamic_array_list() = default;
+    __device__ __device__ dynamic_array_list(default_int l) : ptr(new dynamic_array_list_base<el, max_length>(l)) {}
 
-    __host__ __device__ el& operator[](default_int i) {
+    __device__ __device__ el& operator[](default_int i) {
         return this->ptr.base->operator[](i);
     }
-    __host__ __device__ void push(const el& x) {
+    __device__ __device__ void push(const el& x) {
         this->ptr.base->push(x);
     }
-    __host__ __device__ void push(const el&& x) {
+    __device__ __device__ void push(const el&& x) {
         this->ptr.base->push(std::move(x));
     }
-    __host__ __device__ el pop() {
+    __device__ __device__ el pop() {
         return this->ptr.base->pop();
     }
     // Should be used only during initialization.
-    __host__ __device__ void unsafe_set_length(default_int i) {
+    __device__ __device__ void unsafe_set_length(default_int i) {
         this->ptr.base->unsafe_set_length(i);
     }
-    __host__ __device__ default_int length_() {
+    __device__ __device__ default_int length_() {
         return this->ptr.base->length;
     }
 };
+"""
+class static_array():
+    def __init__(self, length):
+        self.ptr = []
+        for _ in range(length):
+            self.ptr.append(None)
+
+    def __getitem__(self, index):
+        assert 0 <= index < len(self.ptr), "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < len(self.ptr), "The set index needs to be in range."
+        self.ptr[index] = value
+
+class static_array_list(static_array):
+    def __init__(self, length):
+        super().__init__(length)
+        self.length = 0
+
+    def __getitem__(self, index):
+        assert 0 <= index < self.length, "The get index needs to be in range."
+        return self.ptr[index]
+    
+    def __setitem__(self, index, value):
+        assert 0 <= index < self.length, "The set index needs to be in range."
+        self.ptr[index] = value
+
+    def push(self,value):
+        assert (self.length < len(self.ptr)), "The length before pushing has to be less than the maximum length of the array."
+        self.ptr[self.length] = value
+        self.length += 1
+
+    def pop(self):
+        assert (0 < self.length), "The length before popping has to be greater than 0."
+        self.length -= 1
+        return self.ptr[self.length]
+
+    def unsafe_set_length(self,i):
+        assert 0 <= i <= len(self.ptr), "The new length has to be in range."
+        self.length = i
+
+class dynamic_array(static_array): 
+    pass
+
+class dynamic_array_list(static_array_list):
+    def length_(self): return self.length
+
