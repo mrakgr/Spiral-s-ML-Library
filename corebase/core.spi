@@ -145,6 +145,14 @@ nominal union_map (f : * -> *) t =
             ) {} `r
     )
 
+// Maps all the elements of the record type with the given function.
+nominal record_map (f : * -> *) r =
+    `(
+        record_type_fold (fun s k => forall v. =>
+            {s with $k = ``(f v)}
+            ) {} `r
+    )
+
 // Structural polymorphic equality for every type in the language (apart from functions.)
 inl (=) forall t. (a : t) (b : t) : bool = real a = b
 // Structural polymorphic inequality for every type in the language (apart from functions.)

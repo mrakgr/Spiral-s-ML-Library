@@ -1,92 +1,296 @@
 #pragma once
 #include "test2.corelib.hpp"
-// Cuda globals
 #ifdef __CUDACC__
-#endif
-// Cpp globals
-#include <Eigen/Dense>
-// The Cuda type forward declarations
-#ifdef __CUDACC__
-#endif
-// The Cpp type forward declarations
-struct StackRefs2;
-struct Union3;
-struct Union5;
-struct StackMut7;
-struct Union11;
-struct Tuple13;
-struct Tuple15;
-struct Union16;
-struct StackMut17;
-struct Union19;
-struct StackMut20;
-#ifdef __CUDACC__
-// The Cuda device methods forward declarations
-// The Cuda host methods forward declarations
-// The Cuda device main defs forward declarations
+#ifdef __CUDA_ARCH__
+// Cuda device backend
 #else
-// The Cpp host methods forward declarations
-void method_6(float * v0, static_array_list<Union3,5> v1, Union5 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
-int method_14(float * v0, StackMut7 & v1, int v2);
-void method_18(float * v0, StackMut7 & v1, int v2);
-void method_21(float * v0, StackMut7 & v1, int v2);
-Tuple13 method_12(float * v0);
-void method_22(Union3 v0);
-void method_23(Union5 v0);
-void method_24(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v3);
-// The Cuda host main defs forward declarations
+// Cuda host backend
 #endif
-// The Cuda type definitions
-#ifdef __CUDACC__
-#endif
-// The Cpp type definitions
-struct StackRefs2 {
+#else
+// Cpp host backend
+#include <Eigen/Dense>
+struct StackRefs0;
+struct Union0;
+struct Union1;
+struct StackMut0;
+struct Union2;
+struct Tuple0;
+struct Tuple1;
+struct Union3;
+struct StackMut1;
+struct Union4;
+struct StackMut2;
+void method_0(float * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
+int method_2(float * v0, StackMut0 & v1, int v2);
+void method_3(float * v0, StackMut0 & v1, int v2);
+void method_4(float * v0, StackMut0 & v1, int v2);
+Tuple0 method_1(float * v0);
+void method_5(Union0 v0);
+void method_6(Union1 v0);
+void method_7(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v3);
+int main();
+struct StackRefs0 {
     Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1;
     Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2;
     int & v0;
-    __host__ __device__ StackRefs2() = default;
-    __host__ __device__ StackRefs2(int & t0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ StackRefs0() = default;
+    __host__ __device__ StackRefs0(int & t0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t2) : v0(t0), v1(t1), v2(t2) {}
 };
-struct Union3_0 { // Call
+struct Union0_0 { // Call
 };
-struct Union3_1 { // Fold
+struct Union0_1 { // Fold
 };
-struct Union3_2 { // Raise
+struct Union0_2 { // Raise
     int v0;
-    __host__ __device__ Union3_2(int t0) : v0(t0) {}
-    __host__ __device__ Union3_2() = delete;
+    __host__ __device__ Union0_2(int t0) : v0(t0) {}
+    __host__ __device__ Union0_2() = delete;
 };
-struct Union3 {
+struct Union0 {
     union {
-        Union3_0 case0; // Call
-        Union3_1 case1; // Fold
-        Union3_2 case2; // Raise
+        Union0_0 case0; // Call
+        Union0_1 case1; // Fold
+        Union0_2 case2; // Raise
     };
     unsigned char tag{255};
-    __host__ __device__ Union3() {}
-    __host__ __device__ Union3(Union3_0 t) : tag(0), case0(t) {} // Call
-    __host__ __device__ Union3(Union3_1 t) : tag(1), case1(t) {} // Fold
-    __host__ __device__ Union3(Union3_2 t) : tag(2), case2(t) {} // Raise
-    __host__ __device__ Union3(const Union3 & x) : tag(x.tag) {
+    __host__ __device__ Union0() {}
+    __host__ __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // Call
+    __host__ __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // Fold
+    __host__ __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // Raise
+    __host__ __device__ Union0(const Union0 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union3_0(x.case0); break; // Call
-            case 1: new (&this->case1) Union3_1(x.case1); break; // Fold
-            case 2: new (&this->case2) Union3_2(x.case2); break; // Raise
+            case 0: new (&this->case0) Union0_0(x.case0); break; // Call
+            case 1: new (&this->case1) Union0_1(x.case1); break; // Fold
+            case 2: new (&this->case2) Union0_2(x.case2); break; // Raise
         }
     }
-    __host__ __device__ Union3(const Union3 && x) : tag(x.tag) {
+    __host__ __device__ Union0(const Union0 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union3_0(std::move(x.case0)); break; // Call
-            case 1: new (&this->case1) Union3_1(std::move(x.case1)); break; // Fold
-            case 2: new (&this->case2) Union3_2(std::move(x.case2)); break; // Raise
+            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // Call
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // Fold
+            case 2: new (&this->case2) Union0_2(std::move(x.case2)); break; // Raise
         }
     }
-    __host__ __device__ Union3 & operator=(const Union3 & x) {
+    __host__ __device__ Union0 & operator=(const Union0 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
                 case 0: this->case0 = x.case0; break; // Call
                 case 1: this->case1 = x.case1; break; // Fold
                 case 2: this->case2 = x.case2; break; // Raise
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
+        }
+        return *this;
+    }
+    __host__ __device__ Union0 & operator=(const Union0 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Call
+                case 1: this->case1 = std::move(x.case1); break; // Fold
+                case 2: this->case2 = std::move(x.case2); break; // Raise
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
+        }
+        return *this;
+    }
+    __host__ __device__ ~Union0() {
+        switch(this->tag){
+            case 0: this->case0.~Union0_0(); break; // Call
+            case 1: this->case1.~Union0_1(); break; // Fold
+            case 2: this->case2.~Union0_2(); break; // Raise
+        }
+        this->tag = 255;
+    }
+};
+struct Union1_0 { // Jack
+};
+struct Union1_1 { // King
+};
+struct Union1_2 { // Queen
+};
+struct Union1 {
+    union {
+        Union1_0 case0; // Jack
+        Union1_1 case1; // King
+        Union1_2 case2; // Queen
+    };
+    unsigned char tag{255};
+    __host__ __device__ Union1() {}
+    __host__ __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Jack
+    __host__ __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // King
+    __host__ __device__ Union1(Union1_2 t) : tag(2), case2(t) {} // Queen
+    __host__ __device__ Union1(const Union1 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(x.case0); break; // Jack
+            case 1: new (&this->case1) Union1_1(x.case1); break; // King
+            case 2: new (&this->case2) Union1_2(x.case2); break; // Queen
+        }
+    }
+    __host__ __device__ Union1(const Union1 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Jack
+            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // King
+            case 2: new (&this->case2) Union1_2(std::move(x.case2)); break; // Queen
+        }
+    }
+    __host__ __device__ Union1 & operator=(const Union1 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Jack
+                case 1: this->case1 = x.case1; break; // King
+                case 2: this->case2 = x.case2; break; // Queen
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{x};
+        }
+        return *this;
+    }
+    __host__ __device__ Union1 & operator=(const Union1 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Jack
+                case 1: this->case1 = std::move(x.case1); break; // King
+                case 2: this->case2 = std::move(x.case2); break; // Queen
+            }
+        } else {
+            this->~Union1();
+            new (this) Union1{std::move(x)};
+        }
+        return *this;
+    }
+    __host__ __device__ ~Union1() {
+        switch(this->tag){
+            case 0: this->case0.~Union1_0(); break; // Jack
+            case 1: this->case1.~Union1_1(); break; // King
+            case 2: this->case2.~Union1_2(); break; // Queen
+        }
+        this->tag = 255;
+    }
+};
+struct StackMut0 {
+    int v0;
+    __host__ __device__ StackMut0() = default;
+    __host__ __device__ StackMut0(int t0) : v0(t0) {}
+};
+struct Union2_0 { // None
+};
+struct Union2_1 { // Some
+    static_array_list<Union0,5> v0;
+    Union1 v1;
+    static_array<int,3> v3;
+    int v4;
+    unsigned int v5;
+    bool v2;
+    __host__ __device__ Union2_1(static_array_list<Union0,5> t0, Union1 t1, bool t2, static_array<int,3> t3, int t4, unsigned int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
+    __host__ __device__ Union2_1() = delete;
+};
+struct Union2 {
+    union {
+        Union2_0 case0; // None
+        Union2_1 case1; // Some
+    };
+    unsigned char tag{255};
+    __host__ __device__ Union2() {}
+    __host__ __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // None
+    __host__ __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Some
+    __host__ __device__ Union2(const Union2 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(x.case0); break; // None
+            case 1: new (&this->case1) Union2_1(x.case1); break; // Some
+        }
+    }
+    __host__ __device__ Union2(const Union2 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union2_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __host__ __device__ Union2 & operator=(const Union2 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{x};
+        }
+        return *this;
+    }
+    __host__ __device__ Union2 & operator=(const Union2 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{std::move(x)};
+        }
+        return *this;
+    }
+    __host__ __device__ ~Union2() {
+        switch(this->tag){
+            case 0: this->case0.~Union2_0(); break; // None
+            case 1: this->case1.~Union2_1(); break; // Some
+        }
+        this->tag = 255;
+    }
+};
+struct Tuple0 {
+    static_array_list<Union0,5> v0;
+    Union1 v1;
+    static_array<int,3> v3;
+    int v4;
+    unsigned int v5;
+    bool v2;
+    __host__ __device__ Tuple0() = default;
+    __host__ __device__ Tuple0(static_array_list<Union0,5> t0, Union1 t1, bool t2, static_array<int,3> t3, int t4, unsigned int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
+};
+struct Tuple1 {
+    int v0;
+    int v1;
+    int v2;
+    __host__ __device__ Tuple1() = default;
+    __host__ __device__ Tuple1(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+};
+struct Union3_0 { // None
+};
+struct Union3_1 { // Some
+    Union0 v0;
+    __host__ __device__ Union3_1(Union0 t0) : v0(t0) {}
+    __host__ __device__ Union3_1() = delete;
+};
+struct Union3 {
+    union {
+        Union3_0 case0; // None
+        Union3_1 case1; // Some
+    };
+    unsigned char tag{255};
+    __host__ __device__ Union3() {}
+    __host__ __device__ Union3(Union3_0 t) : tag(0), case0(t) {} // None
+    __host__ __device__ Union3(Union3_1 t) : tag(1), case1(t) {} // Some
+    __host__ __device__ Union3(const Union3 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union3_0(x.case0); break; // None
+            case 1: new (&this->case1) Union3_1(x.case1); break; // Some
+        }
+    }
+    __host__ __device__ Union3(const Union3 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union3_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union3_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __host__ __device__ Union3 & operator=(const Union3 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
             }
         } else {
             this->~Union3();
@@ -97,9 +301,8 @@ struct Union3 {
     __host__ __device__ Union3 & operator=(const Union3 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Call
-                case 1: this->case1 = std::move(x.case1); break; // Fold
-                case 2: this->case2 = std::move(x.case2); break; // Raise
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
             }
         } else {
             this->~Union3();
@@ -109,293 +312,80 @@ struct Union3 {
     }
     __host__ __device__ ~Union3() {
         switch(this->tag){
-            case 0: this->case0.~Union3_0(); break; // Call
-            case 1: this->case1.~Union3_1(); break; // Fold
-            case 2: this->case2.~Union3_2(); break; // Raise
+            case 0: this->case0.~Union3_0(); break; // None
+            case 1: this->case1.~Union3_1(); break; // Some
         }
         this->tag = 255;
     }
 };
-struct Union5_0 { // Jack
-};
-struct Union5_1 { // King
-};
-struct Union5_2 { // Queen
-};
-struct Union5 {
-    union {
-        Union5_0 case0; // Jack
-        Union5_1 case1; // King
-        Union5_2 case2; // Queen
-    };
-    unsigned char tag{255};
-    __host__ __device__ Union5() {}
-    __host__ __device__ Union5(Union5_0 t) : tag(0), case0(t) {} // Jack
-    __host__ __device__ Union5(Union5_1 t) : tag(1), case1(t) {} // King
-    __host__ __device__ Union5(Union5_2 t) : tag(2), case2(t) {} // Queen
-    __host__ __device__ Union5(const Union5 & x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union5_0(x.case0); break; // Jack
-            case 1: new (&this->case1) Union5_1(x.case1); break; // King
-            case 2: new (&this->case2) Union5_2(x.case2); break; // Queen
-        }
-    }
-    __host__ __device__ Union5(const Union5 && x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union5_0(std::move(x.case0)); break; // Jack
-            case 1: new (&this->case1) Union5_1(std::move(x.case1)); break; // King
-            case 2: new (&this->case2) Union5_2(std::move(x.case2)); break; // Queen
-        }
-    }
-    __host__ __device__ Union5 & operator=(const Union5 & x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = x.case0; break; // Jack
-                case 1: this->case1 = x.case1; break; // King
-                case 2: this->case2 = x.case2; break; // Queen
-            }
-        } else {
-            this->~Union5();
-            new (this) Union5{x};
-        }
-        return *this;
-    }
-    __host__ __device__ Union5 & operator=(const Union5 && x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Jack
-                case 1: this->case1 = std::move(x.case1); break; // King
-                case 2: this->case2 = std::move(x.case2); break; // Queen
-            }
-        } else {
-            this->~Union5();
-            new (this) Union5{std::move(x)};
-        }
-        return *this;
-    }
-    __host__ __device__ ~Union5() {
-        switch(this->tag){
-            case 0: this->case0.~Union5_0(); break; // Jack
-            case 1: this->case1.~Union5_1(); break; // King
-            case 2: this->case2.~Union5_2(); break; // Queen
-        }
-        this->tag = 255;
-    }
-};
-struct StackMut7 {
-    int v0;
-    __host__ __device__ StackMut7() = default;
-    __host__ __device__ StackMut7(int t0) : v0(t0) {}
-};
-struct Union11_0 { // None
-};
-struct Union11_1 { // Some
-    static_array_list<Union3,5> v0;
-    Union5 v1;
-    static_array<int,3> v3;
-    int v4;
-    unsigned int v5;
-    bool v2;
-    __host__ __device__ Union11_1(static_array_list<Union3,5> t0, Union5 t1, bool t2, static_array<int,3> t3, int t4, unsigned int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
-    __host__ __device__ Union11_1() = delete;
-};
-struct Union11 {
-    union {
-        Union11_0 case0; // None
-        Union11_1 case1; // Some
-    };
-    unsigned char tag{255};
-    __host__ __device__ Union11() {}
-    __host__ __device__ Union11(Union11_0 t) : tag(0), case0(t) {} // None
-    __host__ __device__ Union11(Union11_1 t) : tag(1), case1(t) {} // Some
-    __host__ __device__ Union11(const Union11 & x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union11_0(x.case0); break; // None
-            case 1: new (&this->case1) Union11_1(x.case1); break; // Some
-        }
-    }
-    __host__ __device__ Union11(const Union11 && x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union11_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union11_1(std::move(x.case1)); break; // Some
-        }
-    }
-    __host__ __device__ Union11 & operator=(const Union11 & x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = x.case0; break; // None
-                case 1: this->case1 = x.case1; break; // Some
-            }
-        } else {
-            this->~Union11();
-            new (this) Union11{x};
-        }
-        return *this;
-    }
-    __host__ __device__ Union11 & operator=(const Union11 && x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // None
-                case 1: this->case1 = std::move(x.case1); break; // Some
-            }
-        } else {
-            this->~Union11();
-            new (this) Union11{std::move(x)};
-        }
-        return *this;
-    }
-    __host__ __device__ ~Union11() {
-        switch(this->tag){
-            case 0: this->case0.~Union11_0(); break; // None
-            case 1: this->case1.~Union11_1(); break; // Some
-        }
-        this->tag = 255;
-    }
-};
-struct Tuple13 {
-    static_array_list<Union3,5> v0;
-    Union5 v1;
-    static_array<int,3> v3;
-    int v4;
-    unsigned int v5;
-    bool v2;
-    __host__ __device__ Tuple13() = default;
-    __host__ __device__ Tuple13(static_array_list<Union3,5> t0, Union5 t1, bool t2, static_array<int,3> t3, int t4, unsigned int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
-};
-struct Tuple15 {
-    int v0;
-    int v1;
-    int v2;
-    __host__ __device__ Tuple15() = default;
-    __host__ __device__ Tuple15(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
-};
-struct Union16_0 { // None
-};
-struct Union16_1 { // Some
-    Union5 v0;
-    __host__ __device__ Union16_1(Union5 t0) : v0(t0) {}
-    __host__ __device__ Union16_1() = delete;
-};
-struct Union16 {
-    union {
-        Union16_0 case0; // None
-        Union16_1 case1; // Some
-    };
-    unsigned char tag{255};
-    __host__ __device__ Union16() {}
-    __host__ __device__ Union16(Union16_0 t) : tag(0), case0(t) {} // None
-    __host__ __device__ Union16(Union16_1 t) : tag(1), case1(t) {} // Some
-    __host__ __device__ Union16(const Union16 & x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union16_0(x.case0); break; // None
-            case 1: new (&this->case1) Union16_1(x.case1); break; // Some
-        }
-    }
-    __host__ __device__ Union16(const Union16 && x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union16_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union16_1(std::move(x.case1)); break; // Some
-        }
-    }
-    __host__ __device__ Union16 & operator=(const Union16 & x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = x.case0; break; // None
-                case 1: this->case1 = x.case1; break; // Some
-            }
-        } else {
-            this->~Union16();
-            new (this) Union16{x};
-        }
-        return *this;
-    }
-    __host__ __device__ Union16 & operator=(const Union16 && x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // None
-                case 1: this->case1 = std::move(x.case1); break; // Some
-            }
-        } else {
-            this->~Union16();
-            new (this) Union16{std::move(x)};
-        }
-        return *this;
-    }
-    __host__ __device__ ~Union16() {
-        switch(this->tag){
-            case 0: this->case0.~Union16_0(); break; // None
-            case 1: this->case1.~Union16_1(); break; // Some
-        }
-        this->tag = 255;
-    }
-};
-struct StackMut17 {
-    Union16 v0;
-    __host__ __device__ StackMut17() = default;
-    __host__ __device__ StackMut17(Union16 t0) : v0(t0) {}
-};
-struct Union19_0 { // None
-};
-struct Union19_1 { // Some
+struct StackMut1 {
     Union3 v0;
-    __host__ __device__ Union19_1(Union3 t0) : v0(t0) {}
-    __host__ __device__ Union19_1() = delete;
+    __host__ __device__ StackMut1() = default;
+    __host__ __device__ StackMut1(Union3 t0) : v0(t0) {}
 };
-struct Union19 {
+struct Union4_0 { // None
+};
+struct Union4_1 { // Some
+    Union1 v0;
+    __host__ __device__ Union4_1(Union1 t0) : v0(t0) {}
+    __host__ __device__ Union4_1() = delete;
+};
+struct Union4 {
     union {
-        Union19_0 case0; // None
-        Union19_1 case1; // Some
+        Union4_0 case0; // None
+        Union4_1 case1; // Some
     };
     unsigned char tag{255};
-    __host__ __device__ Union19() {}
-    __host__ __device__ Union19(Union19_0 t) : tag(0), case0(t) {} // None
-    __host__ __device__ Union19(Union19_1 t) : tag(1), case1(t) {} // Some
-    __host__ __device__ Union19(const Union19 & x) : tag(x.tag) {
+    __host__ __device__ Union4() {}
+    __host__ __device__ Union4(Union4_0 t) : tag(0), case0(t) {} // None
+    __host__ __device__ Union4(Union4_1 t) : tag(1), case1(t) {} // Some
+    __host__ __device__ Union4(const Union4 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union19_0(x.case0); break; // None
-            case 1: new (&this->case1) Union19_1(x.case1); break; // Some
+            case 0: new (&this->case0) Union4_0(x.case0); break; // None
+            case 1: new (&this->case1) Union4_1(x.case1); break; // Some
         }
     }
-    __host__ __device__ Union19(const Union19 && x) : tag(x.tag) {
+    __host__ __device__ Union4(const Union4 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union19_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union19_1(std::move(x.case1)); break; // Some
+            case 0: new (&this->case0) Union4_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union4_1(std::move(x.case1)); break; // Some
         }
     }
-    __host__ __device__ Union19 & operator=(const Union19 & x) {
+    __host__ __device__ Union4 & operator=(const Union4 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
                 case 0: this->case0 = x.case0; break; // None
                 case 1: this->case1 = x.case1; break; // Some
             }
         } else {
-            this->~Union19();
-            new (this) Union19{x};
+            this->~Union4();
+            new (this) Union4{x};
         }
         return *this;
     }
-    __host__ __device__ Union19 & operator=(const Union19 && x) {
+    __host__ __device__ Union4 & operator=(const Union4 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
                 case 0: this->case0 = std::move(x.case0); break; // None
                 case 1: this->case1 = std::move(x.case1); break; // Some
             }
         } else {
-            this->~Union19();
-            new (this) Union19{std::move(x)};
+            this->~Union4();
+            new (this) Union4{std::move(x)};
         }
         return *this;
     }
-    __host__ __device__ ~Union19() {
+    __host__ __device__ ~Union4() {
         switch(this->tag){
-            case 0: this->case0.~Union19_0(); break; // None
-            case 1: this->case1.~Union19_1(); break; // Some
+            case 0: this->case0.~Union4_0(); break; // None
+            case 1: this->case1.~Union4_1(); break; // Some
         }
         this->tag = 255;
     }
 };
-struct StackMut20 {
-    Union19 v0;
-    __host__ __device__ StackMut20() = default;
-    __host__ __device__ StackMut20(Union19 t0) : v0(t0) {}
+struct StackMut2 {
+    Union4 v0;
+    __host__ __device__ StackMut2() = default;
+    __host__ __device__ StackMut2(Union4 t0) : v0(t0) {}
 };
+#endif

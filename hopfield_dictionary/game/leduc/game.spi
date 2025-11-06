@@ -13,6 +13,7 @@ type table = // The complete game state.
     }
 
 union message =
+    | Hidden
     | PlayerGotCard : int * card
     | CommunityCardIs : card
     | PlayerAction : int * action

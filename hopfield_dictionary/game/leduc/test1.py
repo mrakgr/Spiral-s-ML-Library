@@ -2,63 +2,129 @@ kernels_main = r"""
 #include <cooperative_groups.h>
 #include <cuda/semaphore>
 __device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
+struct Union0;
 struct Union1;
+struct StackMut0;
+struct Tuple0;
+struct Tuple1;
+struct Union2;
+struct StackMut1;
 struct Union3;
-struct StackMut5;
-struct Tuple10;
-struct Tuple12;
-struct Union13;
-struct StackMut14;
-struct Union16;
-struct StackMut17;
-__device__ void method_4(unsigned int * v0, static_array_list<Union1,5> v1, Union3 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
-__device__ int method_11(unsigned int * v0, StackMut5 & v1, int v2);
-__device__ void method_15(unsigned int * v0, StackMut5 & v1, int v2);
-__device__ void method_18(unsigned int * v0, StackMut5 & v1, int v2);
-__device__ Tuple10 method_9(unsigned int * v0);
-__device__ void method_22(Union1 v0);
-__device__ void method_23(Union3 v0);
+struct StackMut2;
+__device__ void method_0(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
+__device__ int method_2(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ void method_3(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ void method_4(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ Tuple0 method_1(unsigned int * v0);
+__device__ void method_5(Union0 v0);
+__device__ void method_6(Union1 v0);
 extern "C" __global__ void entry0();
-struct Union1_0 { // Call
+struct Union0_0 { // Call
 };
-struct Union1_1 { // Fold
+struct Union0_1 { // Fold
 };
-struct Union1_2 { // Raise
+struct Union0_2 { // Raise
     int v0;
-    __device__ Union1_2(int t0) : v0(t0) {}
-    __device__ Union1_2() = delete;
+    __device__ Union0_2(int t0) : v0(t0) {}
+    __device__ Union0_2() = delete;
 };
-struct Union1 {
+struct Union0 {
     union {
-        Union1_0 case0; // Call
-        Union1_1 case1; // Fold
-        Union1_2 case2; // Raise
+        Union0_0 case0; // Call
+        Union0_1 case1; // Fold
+        Union0_2 case2; // Raise
     };
     unsigned char tag{255};
-    __device__ Union1() {}
-    __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Call
-    __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // Fold
-    __device__ Union1(Union1_2 t) : tag(2), case2(t) {} // Raise
-    __device__ Union1(const Union1 & x) : tag(x.tag) {
+    __device__ Union0() {}
+    __device__ Union0(Union0_0 t) : tag(0), case0(t) {} // Call
+    __device__ Union0(Union0_1 t) : tag(1), case1(t) {} // Fold
+    __device__ Union0(Union0_2 t) : tag(2), case2(t) {} // Raise
+    __device__ Union0(const Union0 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union1_0(x.case0); break; // Call
-            case 1: new (&this->case1) Union1_1(x.case1); break; // Fold
-            case 2: new (&this->case2) Union1_2(x.case2); break; // Raise
+            case 0: new (&this->case0) Union0_0(x.case0); break; // Call
+            case 1: new (&this->case1) Union0_1(x.case1); break; // Fold
+            case 2: new (&this->case2) Union0_2(x.case2); break; // Raise
         }
     }
-    __device__ Union1(const Union1 && x) : tag(x.tag) {
+    __device__ Union0(const Union0 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Call
-            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // Fold
-            case 2: new (&this->case2) Union1_2(std::move(x.case2)); break; // Raise
+            case 0: new (&this->case0) Union0_0(std::move(x.case0)); break; // Call
+            case 1: new (&this->case1) Union0_1(std::move(x.case1)); break; // Fold
+            case 2: new (&this->case2) Union0_2(std::move(x.case2)); break; // Raise
         }
     }
-    __device__ Union1 & operator=(const Union1 & x) {
+    __device__ Union0 & operator=(const Union0 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
                 case 0: this->case0 = x.case0; break; // Call
                 case 1: this->case1 = x.case1; break; // Fold
                 case 2: this->case2 = x.case2; break; // Raise
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{x};
+        }
+        return *this;
+    }
+    __device__ Union0 & operator=(const Union0 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // Call
+                case 1: this->case1 = std::move(x.case1); break; // Fold
+                case 2: this->case2 = std::move(x.case2); break; // Raise
+            }
+        } else {
+            this->~Union0();
+            new (this) Union0{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union0() {
+        switch(this->tag){
+            case 0: this->case0.~Union0_0(); break; // Call
+            case 1: this->case1.~Union0_1(); break; // Fold
+            case 2: this->case2.~Union0_2(); break; // Raise
+        }
+        this->tag = 255;
+    }
+};
+struct Union1_0 { // Jack
+};
+struct Union1_1 { // King
+};
+struct Union1_2 { // Queen
+};
+struct Union1 {
+    union {
+        Union1_0 case0; // Jack
+        Union1_1 case1; // King
+        Union1_2 case2; // Queen
+    };
+    unsigned char tag{255};
+    __device__ Union1() {}
+    __device__ Union1(Union1_0 t) : tag(0), case0(t) {} // Jack
+    __device__ Union1(Union1_1 t) : tag(1), case1(t) {} // King
+    __device__ Union1(Union1_2 t) : tag(2), case2(t) {} // Queen
+    __device__ Union1(const Union1 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(x.case0); break; // Jack
+            case 1: new (&this->case1) Union1_1(x.case1); break; // King
+            case 2: new (&this->case2) Union1_2(x.case2); break; // Queen
+        }
+    }
+    __device__ Union1(const Union1 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union1_0(std::move(x.case0)); break; // Jack
+            case 1: new (&this->case1) Union1_1(std::move(x.case1)); break; // King
+            case 2: new (&this->case2) Union1_2(std::move(x.case2)); break; // Queen
+        }
+    }
+    __device__ Union1 & operator=(const Union1 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // Jack
+                case 1: this->case1 = x.case1; break; // King
+                case 2: this->case2 = x.case2; break; // Queen
             }
         } else {
             this->~Union1();
@@ -69,9 +135,9 @@ struct Union1 {
     __device__ Union1 & operator=(const Union1 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Call
-                case 1: this->case1 = std::move(x.case1); break; // Fold
-                case 2: this->case2 = std::move(x.case2); break; // Raise
+                case 0: this->case0 = std::move(x.case0); break; // Jack
+                case 1: this->case1 = std::move(x.case1); break; // King
+                case 2: this->case2 = std::move(x.case2); break; // Queen
             }
         } else {
             this->~Union1();
@@ -81,50 +147,133 @@ struct Union1 {
     }
     __device__ ~Union1() {
         switch(this->tag){
-            case 0: this->case0.~Union1_0(); break; // Call
-            case 1: this->case1.~Union1_1(); break; // Fold
-            case 2: this->case2.~Union1_2(); break; // Raise
+            case 0: this->case0.~Union1_0(); break; // Jack
+            case 1: this->case1.~Union1_1(); break; // King
+            case 2: this->case2.~Union1_2(); break; // Queen
         }
         this->tag = 255;
     }
 };
-struct Union3_0 { // Jack
+struct StackMut0 {
+    int v0;
+    __device__ StackMut0() = default;
+    __device__ StackMut0(int t0) : v0(t0) {}
 };
-struct Union3_1 { // King
+struct Tuple0 {
+    static_array_list<Union0,5> v0;
+    Union1 v1;
+    static_array<int,3> v3;
+    int v4;
+    unsigned int v5;
+    bool v2;
+    __device__ Tuple0() = default;
+    __device__ Tuple0(static_array_list<Union0,5> t0, Union1 t1, bool t2, static_array<int,3> t3, int t4, unsigned int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
 };
-struct Union3_2 { // Queen
+struct Tuple1 {
+    int v0;
+    int v1;
+    int v2;
+    __device__ Tuple1() = default;
+    __device__ Tuple1(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+};
+struct Union2_0 { // None
+};
+struct Union2_1 { // Some
+    Union1 v0;
+    __device__ Union2_1(Union1 t0) : v0(t0) {}
+    __device__ Union2_1() = delete;
+};
+struct Union2 {
+    union {
+        Union2_0 case0; // None
+        Union2_1 case1; // Some
+    };
+    unsigned char tag{255};
+    __device__ Union2() {}
+    __device__ Union2(Union2_0 t) : tag(0), case0(t) {} // None
+    __device__ Union2(Union2_1 t) : tag(1), case1(t) {} // Some
+    __device__ Union2(const Union2 & x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(x.case0); break; // None
+            case 1: new (&this->case1) Union2_1(x.case1); break; // Some
+        }
+    }
+    __device__ Union2(const Union2 && x) : tag(x.tag) {
+        switch(x.tag){
+            case 0: new (&this->case0) Union2_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union2_1(std::move(x.case1)); break; // Some
+        }
+    }
+    __device__ Union2 & operator=(const Union2 & x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{x};
+        }
+        return *this;
+    }
+    __device__ Union2 & operator=(const Union2 && x) {
+        if (this->tag == x.tag) {
+            switch(x.tag){
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
+            }
+        } else {
+            this->~Union2();
+            new (this) Union2{std::move(x)};
+        }
+        return *this;
+    }
+    __device__ ~Union2() {
+        switch(this->tag){
+            case 0: this->case0.~Union2_0(); break; // None
+            case 1: this->case1.~Union2_1(); break; // Some
+        }
+        this->tag = 255;
+    }
+};
+struct StackMut1 {
+    Union2 v0;
+    __device__ StackMut1() = default;
+    __device__ StackMut1(Union2 t0) : v0(t0) {}
+};
+struct Union3_0 { // None
+};
+struct Union3_1 { // Some
+    Union0 v0;
+    __device__ Union3_1(Union0 t0) : v0(t0) {}
+    __device__ Union3_1() = delete;
 };
 struct Union3 {
     union {
-        Union3_0 case0; // Jack
-        Union3_1 case1; // King
-        Union3_2 case2; // Queen
+        Union3_0 case0; // None
+        Union3_1 case1; // Some
     };
     unsigned char tag{255};
     __device__ Union3() {}
-    __device__ Union3(Union3_0 t) : tag(0), case0(t) {} // Jack
-    __device__ Union3(Union3_1 t) : tag(1), case1(t) {} // King
-    __device__ Union3(Union3_2 t) : tag(2), case2(t) {} // Queen
+    __device__ Union3(Union3_0 t) : tag(0), case0(t) {} // None
+    __device__ Union3(Union3_1 t) : tag(1), case1(t) {} // Some
     __device__ Union3(const Union3 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union3_0(x.case0); break; // Jack
-            case 1: new (&this->case1) Union3_1(x.case1); break; // King
-            case 2: new (&this->case2) Union3_2(x.case2); break; // Queen
+            case 0: new (&this->case0) Union3_0(x.case0); break; // None
+            case 1: new (&this->case1) Union3_1(x.case1); break; // Some
         }
     }
     __device__ Union3(const Union3 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union3_0(std::move(x.case0)); break; // Jack
-            case 1: new (&this->case1) Union3_1(std::move(x.case1)); break; // King
-            case 2: new (&this->case2) Union3_2(std::move(x.case2)); break; // Queen
+            case 0: new (&this->case0) Union3_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union3_1(std::move(x.case1)); break; // Some
         }
     }
     __device__ Union3 & operator=(const Union3 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = x.case0; break; // Jack
-                case 1: this->case1 = x.case1; break; // King
-                case 2: this->case2 = x.case2; break; // Queen
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
             }
         } else {
             this->~Union3();
@@ -135,9 +284,8 @@ struct Union3 {
     __device__ Union3 & operator=(const Union3 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Jack
-                case 1: this->case1 = std::move(x.case1); break; // King
-                case 2: this->case2 = std::move(x.case2); break; // Queen
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
             }
         } else {
             this->~Union3();
@@ -147,187 +295,39 @@ struct Union3 {
     }
     __device__ ~Union3() {
         switch(this->tag){
-            case 0: this->case0.~Union3_0(); break; // Jack
-            case 1: this->case1.~Union3_1(); break; // King
-            case 2: this->case2.~Union3_2(); break; // Queen
+            case 0: this->case0.~Union3_0(); break; // None
+            case 1: this->case1.~Union3_1(); break; // Some
         }
         this->tag = 255;
     }
 };
-struct StackMut5 {
-    int v0;
-    __device__ StackMut5() = default;
-    __device__ StackMut5(int t0) : v0(t0) {}
-};
-struct Tuple10 {
-    static_array_list<Union1,5> v0;
-    Union3 v1;
-    static_array<int,3> v3;
-    int v4;
-    unsigned int v5;
-    bool v2;
-    __device__ Tuple10() = default;
-    __device__ Tuple10(static_array_list<Union1,5> t0, Union3 t1, bool t2, static_array<int,3> t3, int t4, unsigned int t5) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4), v5(t5) {}
-};
-struct Tuple12 {
-    int v0;
-    int v1;
-    int v2;
-    __device__ Tuple12() = default;
-    __device__ Tuple12(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
-};
-struct Union13_0 { // None
-};
-struct Union13_1 { // Some
+struct StackMut2 {
     Union3 v0;
-    __device__ Union13_1(Union3 t0) : v0(t0) {}
-    __device__ Union13_1() = delete;
+    __device__ StackMut2() = default;
+    __device__ StackMut2(Union3 t0) : v0(t0) {}
 };
-struct Union13 {
-    union {
-        Union13_0 case0; // None
-        Union13_1 case1; // Some
-    };
-    unsigned char tag{255};
-    __device__ Union13() {}
-    __device__ Union13(Union13_0 t) : tag(0), case0(t) {} // None
-    __device__ Union13(Union13_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union13(const Union13 & x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union13_0(x.case0); break; // None
-            case 1: new (&this->case1) Union13_1(x.case1); break; // Some
-        }
-    }
-    __device__ Union13(const Union13 && x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union13_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union13_1(std::move(x.case1)); break; // Some
-        }
-    }
-    __device__ Union13 & operator=(const Union13 & x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = x.case0; break; // None
-                case 1: this->case1 = x.case1; break; // Some
-            }
-        } else {
-            this->~Union13();
-            new (this) Union13{x};
-        }
-        return *this;
-    }
-    __device__ Union13 & operator=(const Union13 && x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // None
-                case 1: this->case1 = std::move(x.case1); break; // Some
-            }
-        } else {
-            this->~Union13();
-            new (this) Union13{std::move(x)};
-        }
-        return *this;
-    }
-    __device__ ~Union13() {
-        switch(this->tag){
-            case 0: this->case0.~Union13_0(); break; // None
-            case 1: this->case1.~Union13_1(); break; // Some
-        }
-        this->tag = 255;
-    }
-};
-struct StackMut14 {
-    Union13 v0;
-    __device__ StackMut14() = default;
-    __device__ StackMut14(Union13 t0) : v0(t0) {}
-};
-struct Union16_0 { // None
-};
-struct Union16_1 { // Some
-    Union1 v0;
-    __device__ Union16_1(Union1 t0) : v0(t0) {}
-    __device__ Union16_1() = delete;
-};
-struct Union16 {
-    union {
-        Union16_0 case0; // None
-        Union16_1 case1; // Some
-    };
-    unsigned char tag{255};
-    __device__ Union16() {}
-    __device__ Union16(Union16_0 t) : tag(0), case0(t) {} // None
-    __device__ Union16(Union16_1 t) : tag(1), case1(t) {} // Some
-    __device__ Union16(const Union16 & x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union16_0(x.case0); break; // None
-            case 1: new (&this->case1) Union16_1(x.case1); break; // Some
-        }
-    }
-    __device__ Union16(const Union16 && x) : tag(x.tag) {
-        switch(x.tag){
-            case 0: new (&this->case0) Union16_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union16_1(std::move(x.case1)); break; // Some
-        }
-    }
-    __device__ Union16 & operator=(const Union16 & x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = x.case0; break; // None
-                case 1: this->case1 = x.case1; break; // Some
-            }
-        } else {
-            this->~Union16();
-            new (this) Union16{x};
-        }
-        return *this;
-    }
-    __device__ Union16 & operator=(const Union16 && x) {
-        if (this->tag == x.tag) {
-            switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // None
-                case 1: this->case1 = std::move(x.case1); break; // Some
-            }
-        } else {
-            this->~Union16();
-            new (this) Union16{std::move(x)};
-        }
-        return *this;
-    }
-    __device__ ~Union16() {
-        switch(this->tag){
-            case 0: this->case0.~Union16_0(); break; // None
-            case 1: this->case1.~Union16_1(); break; // Some
-        }
-        this->tag = 255;
-    }
-};
-struct StackMut17 {
-    Union16 v0;
-    __device__ StackMut17() = default;
-    __device__ StackMut17(Union16 t0) : v0(t0) {}
-};
-__device__ inline bool while_method_2(int v0){
+__device__ inline bool while_method_0(int v0){
     bool v1;
     v1 = v0 < 115;
     return v1;
 }
-__device__ inline bool while_method_6(int v0, int v1){
+__device__ inline bool while_method_1(int v0, int v1){
     bool v2;
     v2 = v1 < v0;
     return v2;
 }
-__device__ inline bool while_method_7(int v0){
+__device__ inline bool while_method_2(int v0){
     bool v1;
     v1 = v0 < 5;
     return v1;
 }
-__device__ inline bool while_method_8(int v0){
+__device__ inline bool while_method_3(int v0){
     bool v1;
     v1 = v0 < 3;
     return v1;
 }
-__device__ void method_4(unsigned int * v0, static_array_list<Union1,5> v1, Union3 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
-    StackMut5 v7{0};
+__device__ void method_0(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6){
+    StackMut0 v7{0};
     int v8;
     v8 = (int)v6;
     bool v9;
@@ -483,8 +483,8 @@ __device__ void method_4(unsigned int * v0, static_array_list<Union1,5> v1, Unio
     v71 = v1.length;
     int v72;
     v72 = 0;
-    while (while_method_6(v71, v72)){
-        Union1 v75;
+    while (while_method_1(v71, v72)){
+        Union0 v75;
         v75 = v1[v72];
         int v78 = v7.v0;
         int v79;
@@ -574,7 +574,7 @@ __device__ void method_4(unsigned int * v0, static_array_list<Union1,5> v1, Unio
     }
     int v111;
     v111 = v61;
-    while (while_method_7(v111)){
+    while (while_method_2(v111)){
         int v113 = v7.v0;
         int v114;
         v114 = v113 + 13;
@@ -599,7 +599,7 @@ __device__ void method_4(unsigned int * v0, static_array_list<Union1,5> v1, Unio
     }
     int v123;
     v123 = 0;
-    while (while_method_8(v123)){
+    while (while_method_3(v123)){
         int v126;
         v126 = v4[v123];
         bool v129;
@@ -640,11 +640,11 @@ __device__ void method_4(unsigned int * v0, static_array_list<Union1,5> v1, Unio
     }
     return ;
 }
-__device__ int method_11(unsigned int * v0, StackMut5 & v1, int v2){
+__device__ int method_2(unsigned int * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple12 tmp0 = Tuple12{0, 0, 0};
+    Tuple1 tmp0 = Tuple1{0, 0, 0};
     v3 = tmp0.v0; v4 = tmp0.v1; v5 = tmp0.v2;
-    while (while_method_6(v2, v3)){
+    while (while_method_1(v2, v3)){
         int v7 = v1.v0;
         int v8;
         v8 = v7 / 32;
@@ -686,11 +686,11 @@ __device__ int method_11(unsigned int * v0, StackMut5 & v1, int v2){
     }
     return v4;
 }
-__device__ void method_15(unsigned int * v0, StackMut5 & v1, int v2){
+__device__ void method_3(unsigned int * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple12 tmp1 = Tuple12{0, 0, 0};
+    Tuple1 tmp1 = Tuple1{0, 0, 0};
     v3 = tmp1.v0; v4 = tmp1.v1; v5 = tmp1.v2;
-    while (while_method_6(v2, v3)){
+    while (while_method_1(v2, v3)){
         int v7 = v1.v0;
         int v8;
         v8 = v7 / 32;
@@ -733,11 +733,11 @@ __device__ void method_15(unsigned int * v0, StackMut5 & v1, int v2){
         return ;
     }
 }
-__device__ void method_18(unsigned int * v0, StackMut5 & v1, int v2){
+__device__ void method_4(unsigned int * v0, StackMut0 & v1, int v2){
     int v3; int v4; int v5;
-    Tuple12 tmp2 = Tuple12{0, 0, 0};
+    Tuple1 tmp2 = Tuple1{0, 0, 0};
     v3 = tmp2.v0; v4 = tmp2.v1; v5 = tmp2.v2;
-    while (while_method_6(v2, v3)){
+    while (while_method_1(v2, v3)){
         int v7 = v1.v0;
         int v8;
         v8 = v7 / 32;
@@ -780,46 +780,46 @@ __device__ void method_18(unsigned int * v0, StackMut5 & v1, int v2){
         return ;
     }
 }
-__device__ Tuple10 method_9(unsigned int * v0){
-    StackMut5 v1{0};
+__device__ Tuple0 method_1(unsigned int * v0){
+    StackMut0 v1{0};
     int v2;
     v2 = 10;
     int v3;
-    v3 = method_11(v0, v1, v2);
+    v3 = method_2(v0, v1, v2);
     unsigned int v4;
     v4 = (unsigned int)v3;
     int v5;
     v5 = 10;
     int v6;
-    v6 = method_11(v0, v1, v5);
+    v6 = method_2(v0, v1, v5);
     int v7;
     v7 = 2;
     int v8;
-    v8 = method_11(v0, v1, v7);
+    v8 = method_2(v0, v1, v7);
     bool v9;
     v9 = v8 == 1;
-    Union13 v10;
-    v10 = Union13{Union13_0{}};
-    StackMut14 v11{v10};
+    Union2 v10;
+    v10 = Union2{Union2_0{}};
+    StackMut1 v11{v10};
     int v12;
     v12 = 3;
     int v13;
-    v13 = method_11(v0, v1, v12);
+    v13 = method_2(v0, v1, v12);
     bool v14;
     v14 = 0 == v13;
     if (v14){
-        Union13 v15 = v11.v0;
+        Union2 v15 = v11.v0;
         switch (v15.tag) {
             case 0: { // None
-                Union3 v16;
-                v16 = Union3{Union3_0{}};
-                Union13 v17;
-                v17 = Union13{Union13_1{v16}};
+                Union1 v16;
+                v16 = Union1{Union1_0{}};
+                Union2 v17;
+                v17 = Union2{Union2_1{v16}};
                 v11.v0 = v17;
                 break;
             }
             case 1: { // Some
-                Union3 v18 = v15.case1.v0;
+                Union1 v18 = v15.case1.v0;
                 bool v19;
                 v19 = false;
                 bool v20;
@@ -838,23 +838,23 @@ __device__ Tuple10 method_9(unsigned int * v0){
     } else {
         int v22;
         v22 = 0;
-        method_15(v0, v1, v22);
+        method_3(v0, v1, v22);
     }
     bool v23;
     v23 = 1 == v13;
     if (v23){
-        Union13 v24 = v11.v0;
+        Union2 v24 = v11.v0;
         switch (v24.tag) {
             case 0: { // None
-                Union3 v25;
-                v25 = Union3{Union3_1{}};
-                Union13 v26;
-                v26 = Union13{Union13_1{v25}};
+                Union1 v25;
+                v25 = Union1{Union1_1{}};
+                Union2 v26;
+                v26 = Union2{Union2_1{v25}};
                 v11.v0 = v26;
                 break;
             }
             case 1: { // Some
-                Union3 v27 = v24.case1.v0;
+                Union1 v27 = v24.case1.v0;
                 bool v28;
                 v28 = false;
                 bool v29;
@@ -873,23 +873,23 @@ __device__ Tuple10 method_9(unsigned int * v0){
     } else {
         int v31;
         v31 = 0;
-        method_15(v0, v1, v31);
+        method_3(v0, v1, v31);
     }
     bool v32;
     v32 = 2 == v13;
     if (v32){
-        Union13 v33 = v11.v0;
+        Union2 v33 = v11.v0;
         switch (v33.tag) {
             case 0: { // None
-                Union3 v34;
-                v34 = Union3{Union3_2{}};
-                Union13 v35;
-                v35 = Union13{Union13_1{v34}};
+                Union1 v34;
+                v34 = Union1{Union1_2{}};
+                Union2 v35;
+                v35 = Union2{Union2_1{v34}};
                 v11.v0 = v35;
                 break;
             }
             case 1: { // Some
-                Union3 v36 = v33.case1.v0;
+                Union1 v36 = v33.case1.v0;
                 bool v37;
                 v37 = false;
                 bool v38;
@@ -908,10 +908,10 @@ __device__ Tuple10 method_9(unsigned int * v0){
     } else {
         int v40;
         v40 = 0;
-        method_15(v0, v1, v40);
+        method_3(v0, v1, v40);
     }
-    Union13 v41 = v11.v0;
-    Union3 v45;
+    Union2 v41 = v11.v0;
+    Union1 v45;
     switch (v41.tag) {
         case 0: { // None
             printf("%s\n", "Could not parse the union type in unpickle's Alt case.");
@@ -919,7 +919,7 @@ __device__ Tuple10 method_9(unsigned int * v0){
             break;
         }
         case 1: { // Some
-            Union3 v42 = v41.case1.v0;
+            Union1 v42 = v41.case1.v0;
             v45 = v42;
             break;
         }
@@ -931,34 +931,34 @@ __device__ Tuple10 method_9(unsigned int * v0){
     int v46;
     v46 = 5;
     int v47;
-    v47 = method_11(v0, v1, v46);
-    static_array_list<Union1,5> v49;
-    v49 = static_array_list<Union1,5>{};
+    v47 = method_2(v0, v1, v46);
+    static_array_list<Union0,5> v49;
+    v49 = static_array_list<Union0,5>{};
     int v52;
     v52 = 0;
-    while (while_method_6(v47, v52)){
-        Union16 v54;
-        v54 = Union16{Union16_0{}};
-        StackMut17 v55{v54};
+    while (while_method_1(v47, v52)){
+        Union3 v54;
+        v54 = Union3{Union3_0{}};
+        StackMut2 v55{v54};
         int v56;
         v56 = 3;
         int v57;
-        v57 = method_11(v0, v1, v56);
+        v57 = method_2(v0, v1, v56);
         bool v58;
         v58 = 0 == v57;
         if (v58){
-            Union16 v59 = v55.v0;
+            Union3 v59 = v55.v0;
             switch (v59.tag) {
                 case 0: { // None
-                    Union1 v60;
-                    v60 = Union1{Union1_0{}};
-                    Union16 v61;
-                    v61 = Union16{Union16_1{v60}};
+                    Union0 v60;
+                    v60 = Union0{Union0_0{}};
+                    Union3 v61;
+                    v61 = Union3{Union3_1{v60}};
                     v55.v0 = v61;
                     break;
                 }
                 case 1: { // Some
-                    Union1 v62 = v59.case1.v0;
+                    Union0 v62 = v59.case1.v0;
                     bool v63;
                     v63 = false;
                     bool v64;
@@ -977,23 +977,23 @@ __device__ Tuple10 method_9(unsigned int * v0){
         } else {
             int v66;
             v66 = 0;
-            method_15(v0, v1, v66);
+            method_3(v0, v1, v66);
         }
         bool v67;
         v67 = 1 == v57;
         if (v67){
-            Union16 v68 = v55.v0;
+            Union3 v68 = v55.v0;
             switch (v68.tag) {
                 case 0: { // None
-                    Union1 v69;
-                    v69 = Union1{Union1_1{}};
-                    Union16 v70;
-                    v70 = Union16{Union16_1{v69}};
+                    Union0 v69;
+                    v69 = Union0{Union0_1{}};
+                    Union3 v70;
+                    v70 = Union3{Union3_1{v69}};
                     v55.v0 = v70;
                     break;
                 }
                 case 1: { // Some
-                    Union1 v71 = v68.case1.v0;
+                    Union0 v71 = v68.case1.v0;
                     bool v72;
                     v72 = false;
                     bool v73;
@@ -1012,27 +1012,27 @@ __device__ Tuple10 method_9(unsigned int * v0){
         } else {
             int v75;
             v75 = 0;
-            method_15(v0, v1, v75);
+            method_3(v0, v1, v75);
         }
         bool v76;
         v76 = 2 == v57;
         if (v76){
-            Union16 v77 = v55.v0;
+            Union3 v77 = v55.v0;
             switch (v77.tag) {
                 case 0: { // None
                     int v78;
                     v78 = 10;
                     int v79;
-                    v79 = method_11(v0, v1, v78);
-                    Union1 v80;
-                    v80 = Union1{Union1_2{v79}};
-                    Union16 v81;
-                    v81 = Union16{Union16_1{v80}};
+                    v79 = method_2(v0, v1, v78);
+                    Union0 v80;
+                    v80 = Union0{Union0_2{v79}};
+                    Union3 v81;
+                    v81 = Union3{Union3_1{v80}};
                     v55.v0 = v81;
                     break;
                 }
                 case 1: { // Some
-                    Union1 v82 = v77.case1.v0;
+                    Union0 v82 = v77.case1.v0;
                     bool v83;
                     v83 = false;
                     bool v84;
@@ -1051,10 +1051,10 @@ __device__ Tuple10 method_9(unsigned int * v0){
         } else {
             int v86;
             v86 = 10;
-            method_15(v0, v1, v86);
+            method_3(v0, v1, v86);
         }
-        Union16 v87 = v55.v0;
-        Union1 v91;
+        Union3 v87 = v55.v0;
+        Union0 v91;
         switch (v87.tag) {
             case 0: { // None
                 printf("%s\n", "Could not parse the union type in unpickle's Alt case.");
@@ -1062,7 +1062,7 @@ __device__ Tuple10 method_9(unsigned int * v0){
                 break;
             }
             case 1: { // Some
-                Union1 v88 = v87.case1.v0;
+                Union0 v88 = v87.case1.v0;
                 v91 = v88;
                 break;
             }
@@ -1074,34 +1074,34 @@ __device__ Tuple10 method_9(unsigned int * v0){
         v49.push(v91);
         int v92;
         v92 = 1;
-        method_15(v0, v1, v92);
+        method_3(v0, v1, v92);
         v52 += 1 ;
     }
     int v93;
     v93 = v47;
-    while (while_method_7(v93)){
+    while (while_method_2(v93)){
         int v95;
         v95 = 13;
-        method_15(v0, v1, v95);
+        method_3(v0, v1, v95);
         int v96;
         v96 = 1;
-        method_18(v0, v1, v96);
+        method_4(v0, v1, v96);
         v93 += 1 ;
     }
     static_array<int,3> v98;
     int v101;
     v101 = 0;
-    while (while_method_8(v101)){
+    while (while_method_3(v101)){
         int v103;
         v103 = 5;
         int v104;
-        v104 = method_11(v0, v1, v103);
+        v104 = method_2(v0, v1, v103);
         v98[v101] = v104;
         v101 += 1 ;
     }
-    return Tuple10{v49, v45, v9, v98, v6, v4};
+    return Tuple0{v49, v45, v9, v98, v6, v4};
 }
-__device__ void method_22(Union1 v0){
+__device__ void method_5(Union0 v0){
     switch (v0.tag) {
         case 0: { // Call
             printf("%s","Call");
@@ -1125,7 +1125,7 @@ __device__ void method_22(Union1 v0){
         }
     }
 }
-__device__ void method_23(Union3 v0){
+__device__ void method_6(Union1 v0){
     switch (v0.tag) {
         case 0: { // Jack
             printf("%s","Jack");
@@ -1160,20 +1160,20 @@ extern "C" __global__ void entry0() {
     bool v4;
     v4 = v3 == 0;
     if (v4){
-        static_array_list<Union1,5> v6;
-        v6 = static_array_list<Union1,5>{};
+        static_array_list<Union0,5> v6;
+        v6 = static_array_list<Union0,5>{};
         v6.unsafe_set_length(4);
-        Union1 v10;
-        v10 = Union1{Union1_2{3}};
+        Union0 v10;
+        v10 = Union0{Union0_2{3}};
         v6[0] = v10;
-        Union1 v14;
-        v14 = Union1{Union1_2{4}};
+        Union0 v14;
+        v14 = Union0{Union0_2{4}};
         v6[1] = v14;
-        Union1 v18;
-        v18 = Union1{Union1_0{}};
+        Union0 v18;
+        v18 = Union0{Union0_0{}};
         v6[2] = v18;
-        Union1 v22;
-        v22 = Union1{Union1_1{}};
+        Union0 v22;
+        v22 = Union0{Union0_1{}};
         v6[3] = v22;
         static_array<int,3> v26;
         v26[0] = 1;
@@ -1182,7 +1182,7 @@ extern "C" __global__ void entry0() {
         unsigned int v29[4];
         int v30;
         v30 = 0;
-        while (while_method_2(v30)){
+        while (while_method_0(v30)){
             int v32;
             v32 = v30 / 32;
             unsigned int v33;
@@ -1198,17 +1198,17 @@ extern "C" __global__ void entry0() {
             v29[v32] = v37;
             v30 += 1 ;
         }
-        Union3 v38;
-        v38 = Union3{Union3_1{}};
+        Union1 v38;
+        v38 = Union1{Union1_1{}};
         bool v39;
         v39 = false;
         int v40;
         v40 = 8;
         unsigned int v41;
         v41 = 5u;
-        method_4(v29, v6, v38, v39, v26, v40, v41);
-        static_array_list<Union1,5> v42; Union3 v43; bool v44; static_array<int,3> v45; int v46; unsigned int v47;
-        Tuple10 tmp3 = method_9(v29);
+        method_0(v29, v6, v38, v39, v26, v40, v41);
+        static_array_list<Union0,5> v42; Union1 v43; bool v44; static_array<int,3> v45; int v46; unsigned int v47;
+        Tuple0 tmp3 = method_1(v29);
         v42 = tmp3.v0; v43 = tmp3.v1; v44 = tmp3.v2; v45 = tmp3.v3; v46 = tmp3.v4; v47 = tmp3.v5;
         cuda::counting_semaphore<cuda::thread_scope_system, 1> & v73 = console_lock;
         auto v74 = cooperative_groups::coalesced_threads();
@@ -1226,11 +1226,11 @@ extern "C" __global__ void entry0() {
         }
         int v78;
         v78 = 0;
-        while (while_method_6(v77, v78)){
-            Union1 v81;
+        while (while_method_1(v77, v78)){
+            Union0 v81;
             v81 = v42[v78];
             printf("");
-            method_22(v81);
+            method_5(v81);
             printf("");
             int v84;
             v84 = v78 + 1;
@@ -1254,7 +1254,7 @@ extern "C" __global__ void entry0() {
         }
         printf("%s","]");
         printf("; %s = ","card");
-        method_23(v43);
+        method_6(v43);
         const char * v91;
         if (v44){
             const char * v89;
@@ -1268,7 +1268,7 @@ extern "C" __global__ void entry0() {
         printf("; %s = %s; %s = %s","is_first", v91, "l", "[");
         int v92;
         v92 = 0;
-        while (while_method_8(v92)){
+        while (while_method_3(v92)){
             int v95;
             v95 = v45[v92];
             printf("%d",v95);

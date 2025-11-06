@@ -33,6 +33,7 @@ union rec pickler t =
     | Pair :: forall a b. pickler a * pickler b -> pickler (a * b)
     | Wrap :: forall a. (exists b. (a -> b) * (b -> a) * pickler b) -> pickler a
     | Alt :: forall t. union_map pickler t -> pickler t
+    | Record :: forall t. record_map pickler t -> pickler t
 
 inl unit() = Unit
 inl bool() = Bool
@@ -42,9 +43,12 @@ inl sa_list forall a b. (x : pickler a) : pickler (sa_list b a) = Sa_list x
 inl sa forall a b. (x : pickler a) : pickler (sa b a) = Sa x
 inl pair forall a b. (a : pickler a) (b : pickler b) : pickler (a * b) = Pair(a,b)
 
-// Takes in a record of picklers and produces an alt node.
+// Takes in a record of picklers and produces an Alt node.
 inl alt forall record_of_picklers union_. (picklers : record_of_picklers) : pickler union_ =
     Alt(real union_map `pickler `union_ picklers)
+// Takes in a record of picklers and produces an Record node.
+inl record forall record_of_picklers record. (picklers : record_of_picklers) : pickler record =
+    Record(real record_map `pickler `record picklers)
 
 // Creates a new pickler out of existing ones using the bijection functions.
 inl wrap forall a b. (in_ : a -> b) (out : b -> a) (p : pickler b) : pickler a = Wrap(exists in_, out, p)
@@ -76,6 +80,13 @@ inl size' (h : compile_time.hashmap) : forall t. pickler t -> int =
                         typecase `value with pickler ~t => 
                         state + loop `t value
                         ) (record_length l) l
+                | Record l => real
+                    open real_core
+                    inl l = nominal_strip l
+                    record_fold (fun {state key value} => 
+                        typecase `value with pickler ~t => 
+                        state + loop `t value
+                        ) 0 l
         loop p
     `$body
 
@@ -128,6 +139,10 @@ inl pickle forall array{pickler_set} tt. (ar : array) (p : pickler tt) ~(x : tt)
                     advance (offsets k)
                     loop' `(`(v)) (l k) v
             set end
+        | Record l =>
+            real
+                open real_core
+                record_iter (fun {key value} => loop' `(`(value)) (l key) value) x
     loop' p x
 
 // Deserializes the argument from a binary vector.
@@ -198,6 +213,13 @@ inl unpickle forall array{pickler_index} tt. (ar : array) (p : pickler tt) : tt 
             match *result with
             | Some x => x
             | None => failwith "Could not parse the union type in unpickle's Alt case."
+        | Record l =>
+            real
+                open real_core
+                record_map (fun {key value} => 
+                    typecase `value with pickler ~t_case => 
+                    loop' `t_case value
+                    ) (nominal_strip l)
     loop' p
 
 inl option forall t. (a : pickler t) : pickler (option t) = alt { Some = a; None = unit() }

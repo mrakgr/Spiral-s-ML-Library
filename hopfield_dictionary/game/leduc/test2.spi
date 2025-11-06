@@ -28,12 +28,12 @@ type game_dicts =
 
 inl main() =
     inl size = hd_pickler.size()
-    inl p_card = alt {
+    inl p_card : pickler card = alt {
         King = unit()
         Queen = unit()
         Jack = unit()
     }
-    inl p_action = alt {
+    inl p_action : pickler action = alt {
         Raise = Int 10
         Fold = unit()
         Call = unit()
@@ -41,11 +41,14 @@ inl main() =
     inl num_actions : int = actions() |> listm.length
     inl (exists num_actions'. _) = tint num_actions
     assert (if type num_actions = num_actions' then true else false) "The number of actions in the pickler have to be equal to the global specification."
-    inl p : pickler game_state = 
-        uint 10 ** int 10 ** bool() ** p_card ** sa_list p_action ** sa (int 5)
-        |> wrap 
-            (fun {stack pot is_first card action_history l} => stack, pot, is_first, card, action_history, l)
-            (fun stack, pot, is_first, card, action_history, l => {stack pot is_first card action_history l})
+    inl p : pickler game_state = record {
+        stack = uint 10
+        pot = int 10
+        is_first = bool()
+        card = p_card
+        action_history = sa_list p_action : pickler (sa_list 5 _)
+        l = sa (int 5) : pickler (sa 3 _)
+    }
 
     inl create_policy c =
         {
