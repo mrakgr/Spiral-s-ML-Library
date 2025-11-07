@@ -201,7 +201,7 @@ bool FunPointerMethod1(Tuple0 tup0, Tuple0 tup1){
 }
 inline bool while_method_2(int v0){
     bool v1;
-    v1 = v0 < 500;
+    v1 = v0 < 50;
     return v1;
 }
 inline bool while_method_3(int v0){
@@ -2005,85 +2005,100 @@ float method_6(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool 
         v183 = v194;
         v182 += 1 ;
     }
-    static_array<Tuple2,2> & v195 = v2.v0;
-    int v196; float v197;
-    Tuple3 tmp26 = Tuple3{0, 0.0f};
-    v196 = tmp26.v0; v197 = tmp26.v1;
-    while (while_method_1(v196)){
-        float v199; float v200;
-        Tuple2 tmp27 = v195[v196];
-        v199 = tmp27.v0; v200 = tmp27.v1;
-        bool v207;
-        v207 = v196 == v6;
-        float v208;
-        if (v207){
-            v208 = 0.0f;
-        } else {
-            v208 = v199;
-        }
+    static_array<float,3> v195;
+    int v199;
+    v199 = 0;
+    while (while_method_4(v199)){
+        float v201;
+        v201 = v76[v199];
+        float v205;
+        v205 = v91[v199];
         float v209;
-        v209 = v197 + v208;
-        float v210;
-        v210 = v209 - v200;
-        v197 = v210;
-        v196 += 1 ;
+        v209 = v201 + v205;
+        v195[v199] = v209;
+        v199 += 1 ;
     }
-    float v211;
-    v211 = exp(v197);
-    static_array<float,3> v212;
-    int v216;
-    v216 = 0;
-    while (while_method_4(v216)){
-        float v218;
-        v218 = v83[v216];
-        float v222;
-        v222 = v178[v216];
-        float v226;
-        v226 = v222 - v183;
-        float v227;
-        v227 = v211 * v226;
-        v212[v216] = v227;
-        v216 += 1 ;
+    static_array<Tuple2,2> & v210 = v2.v0;
+    int v211; float v212;
+    Tuple3 tmp26 = Tuple3{0, 0.0f};
+    v211 = tmp26.v0; v212 = tmp26.v1;
+    while (while_method_1(v211)){
+        float v214; float v215;
+        Tuple2 tmp27 = v210[v211];
+        v214 = tmp27.v0; v215 = tmp27.v1;
+        bool v222;
+        v222 = v211 == v6;
+        float v223;
+        if (v222){
+            v223 = 0.0f;
+        } else {
+            v223 = v214;
+        }
+        float v224;
+        v224 = v212 + v223;
+        float v225;
+        v225 = v224 - v215;
+        v212 = v225;
+        v211 += 1 ;
     }
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v228 = v10.v1;
-    int v229;
-    v229 = v228.rows();
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v230 = v10.v1;
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v231 = v10.v2;
-    int & v232 = v10.v0;
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v233(1, 1312);
-    v233.setZero();
-    float * v234;
-    v234 = &v233(0,0);
-    method_7(v234, v48);
-    v230.row(v232) = v233;
-    int & v235 = v10.v0;
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v236(1, 12);
-    int v237;
-    v237 = 0;
-    while (while_method_4(v237)){
-        float v239;
-        v239 = v91[v237];
-        v236(0,v237) = v239;
-        v237 += 1 ;
+    float v226;
+    v226 = exp(v212);
+    static_array<float,3> v227;
+    int v231;
+    v231 = 0;
+    while (while_method_4(v231)){
+        float v233;
+        v233 = v83[v231];
+        float v237;
+        v237 = v178[v231];
+        float v241;
+        v241 = v237 - v183;
+        float v242;
+        v242 = v226 * v241;
+        float v243;
+        v243 = v233 + v242;
+        v227[v231] = v243;
+        v231 += 1 ;
     }
-    int v243;
-    v243 = 0;
-    while (while_method_4(v243)){
-        int v245;
-        v245 = v243 + 3;
-        float v246;
-        v246 = v212[v243];
-        v236(0,v245) = v246;
-        v243 += 1 ;
-    }
-    v231.row(v235) = v236;
-    int & v250 = v10.v0; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v251 = v10.v1; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v252 = v10.v2;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v244 = v10.v1;
+    int v245;
+    v245 = v244.rows();
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v246 = v10.v1;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v247 = v10.v2;
+    int & v248 = v10.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v249(1, 1312);
+    v249.setZero();
+    float * v250;
+    v250 = &v249(0,0);
+    method_7(v250, v48);
+    v246.row(v248) = v249;
+    int & v251 = v10.v0;
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v252(1, 6);
     int v253;
-    v253 = v250 + 1;
-    int v254;
-    v254 = v253 % v229;
-    v10.v0 = v254;
+    v253 = 0;
+    while (while_method_4(v253)){
+        float v255;
+        v255 = v195[v253];
+        v252(0,v253) = v255;
+        v253 += 1 ;
+    }
+    int v259;
+    v259 = 0;
+    while (while_method_4(v259)){
+        int v261;
+        v261 = v259 + 3;
+        float v262;
+        v262 = v227[v259];
+        v252(0,v261) = v262;
+        v259 += 1 ;
+    }
+    v247.row(v251) = v252;
+    int & v266 = v10.v0; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v267 = v10.v1; Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v268 = v10.v2;
+    int v269;
+    v269 = v266 + 1;
+    int v270;
+    v270 = v269 % v245;
+    v10.v0 = v270;
     return v183;
 }
 int tag_10(Union1 v0){
@@ -2669,7 +2684,7 @@ float body_0(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, S
 }
 inline bool while_method_6(int v0){
     bool v1;
-    v1 = v0 < 100;
+    v1 = v0 < 10;
     return v1;
 }
 float loop_14(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7){
@@ -5500,7 +5515,7 @@ int main() {
     std::unordered_map<Tuple0, static_array<Tuple2,3>, Fun0, Fun1> v4(512, v0, v1);
     StackRefs1 v5{v4};
     Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v6(65536, 1312);
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v7(65536, 12);
+    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> v7(65536, 6);
     int v8;
     v8 = 0;
     StackRefs2 v9{v8, v6, v7};
@@ -5527,11 +5542,11 @@ int main() {
     v26 = tmp0.v0; v27 = tmp0.v1;
     while (while_method_2(v26)){
         int v29;
-        v29 = v26 % 20;
+        v29 = v26 % 2;
         bool v30;
         v30 = v29 == 0;
         if (v30){
-            printf("{%s = %d; %s = %d}\n","i", v26, "nearTo", 500);
+            printf("{%s = %d; %s = %d}\n","i", v26, "nearTo", 50);
             fflush(stdout);
         } else {
         }
@@ -5560,11 +5575,11 @@ int main() {
     v52 = tmp30.v0; v53 = tmp30.v1;
     while (while_method_6(v52)){
         int v55;
-        v55 = v52 % 4;
+        v55 = v52 % 1;
         bool v56;
         v56 = v55 == 0;
         if (v56){
-            printf("{%s = %d; %s = %d}\n","i", v52, "nearTo", 100);
+            printf("{%s = %d; %s = %d}\n","i", v52, "nearTo", 10);
             fflush(stdout);
         } else {
         }
