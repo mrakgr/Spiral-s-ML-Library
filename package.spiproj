@@ -120,7 +120,7 @@ modules:
                 eigen
                 hd
                 
-                hd_cfr_train
+                enumerative_hd_cfr_train
 
                 test0
                 test1

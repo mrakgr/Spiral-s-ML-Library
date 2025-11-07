@@ -1,5 +1,5 @@
 #pragma once
-#include "hd_cfr_train.corelib.hpp"
+#include "enumerative_hd_cfr_train.corelib.hpp"
 #ifdef __CUDACC__
 #ifdef __CUDA_ARCH__
 // Cuda device backend
@@ -30,50 +30,43 @@ struct Union4;
 struct Union3;
 struct StackMut1;
 struct Tuple4;
-struct StackMut2;
-struct StackMut3;
 struct Union5;
 struct Tuple5;
 struct Union6;
-struct Union7;
 struct Tuple6;
-struct Tuple7;
+struct Union7;
+struct StackMut2;
 struct Union8;
 struct Union9;
-struct Tuple8;
+struct Tuple7;
 struct Union10;
+struct StackMut3;
 struct StackMut4;
 struct StackMut5;
-struct StackMut6;
-unsigned int loop_2(unsigned int v0, xso::rng & v1);
-unsigned int find_nth_set_bit_3(int v0, unsigned int v1, unsigned int v2);
-Tuple4 draw_card_1(xso::rng & v0, unsigned int v1);
-float loop_4(StackRefs3 & v0, StackRefs2 & v1, xso::rng & v2, StackMut0 & v3, StackRefs4 & v4, StackMut1 & v5, Union5 v6);
-void method_6(float * v0, static_array_list<Union0,32> v1);
-void method_7(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v3);
-static_array<float,3> relu_9(static_array<float,3> v0);
-static_array<float,3> masking_normalize_10(static_array<float,3> v0, static_array<bool,3> v1);
-static_array<float,3> regret_match_8(static_array<float,3> v0, static_array<bool,3> v1);
-int loop_13(static_array<float,3> v0, float v1, int v2);
-int pick_discrete__12(static_array<float,3> v0, float v1);
-int sample_discrete__11(static_array<float,3> v0, xso::rng & v1);
-float method_5(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs2 & v9, StackMut0 & v10, StackMut1 & v11);
-int tag_15(Union1 v0);
-bool is_pair_16(int v0, int v1);
-Tuple5 order_17(int v0, int v1);
-Union7 compare_hands_14(Union4 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
-float body_0(StackRefs3 & v0, StackRefs2 & v1, xso::rng & v2, StackMut0 & v3, StackRefs4 & v4, Union3 v5);
-float loop_19(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
-float method_20(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-float method_21(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-float body_18(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
-int method_23(float * v0, StackMut2 & v1, int v2);
-void method_24(float * v0, StackMut2 & v1, int v2);
-void method_25(float * v0, StackMut2 & v1, int v2);
-static_array_list<Union0,32> method_22(float * v0);
-void method_27(Union1 v0);
-void method_28(Union2 v0);
-void method_26(Union0 v0);
+float loop_1(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
+static_array<float,3> relu_4(static_array<float,3> v0);
+static_array<float,3> masking_normalize_5(static_array<float,3> v0, static_array<bool,3> v1);
+static_array<float,3> regret_match_3(static_array<float,3> v0, static_array<bool,3> v1);
+float method_2(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
+void method_7(float * v0, static_array_list<Union0,32> v1);
+void method_8(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v3);
+float method_6(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
+int tag_10(Union1 v0);
+bool is_pair_11(int v0, int v1);
+Tuple5 order_12(int v0, int v1);
+Union8 compare_hands_9(Union4 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
+float body_0(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
+float loop_14(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
+float method_15(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
+float method_16(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
+float body_13(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
+int method_18(float * v0, StackMut2 & v1, int v2);
+void method_19(float * v0, StackMut2 & v1, int v2);
+void method_20(float * v0, StackMut2 & v1, int v2);
+static_array_list<Union0,32> method_17(float * v0);
+void method_22(Union1 v0);
+void method_23(Union2 v0);
+void method_21(Union0 v0);
 int main();
 struct Union1_0 { // Jack
 };
@@ -563,20 +556,11 @@ struct StackMut1 {
     __host__ __device__ StackMut1(float t0) : v0(t0) {}
 };
 struct Tuple4 {
-    Union1 v0;
-    unsigned int v1;
-    __host__ __device__ Tuple4() = default;
-    __host__ __device__ Tuple4(Union1 t0, unsigned int t1) : v0(t0), v1(t1) {}
-};
-struct StackMut2 {
     int v0;
-    __host__ __device__ StackMut2() = default;
-    __host__ __device__ StackMut2(int t0) : v0(t0) {}
-};
-struct StackMut3 {
-    unsigned int v0;
-    __host__ __device__ StackMut3() = default;
-    __host__ __device__ StackMut3(unsigned int t0) : v0(t0) {}
+    float v1;
+    float v2;
+    __host__ __device__ Tuple4() = default;
+    __host__ __device__ Tuple4(int t0, float t1, float t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union5_0 { // T_game_chance_community_card
     Union4 v0;
@@ -741,43 +725,47 @@ struct Union6 {
         this->tag = 255;
     }
 };
-struct Union7_0 { // Eq
+struct Tuple6 {
+    unsigned long long v1;
+    unsigned long long v2;
+    int v0;
+    __host__ __device__ Tuple6() = default;
+    __host__ __device__ Tuple6(int t0, unsigned long long t1, unsigned long long t2) : v0(t0), v1(t1), v2(t2) {}
 };
-struct Union7_1 { // Gt
+struct Union7_0 { // None
 };
-struct Union7_2 { // Lt
+struct Union7_1 { // Some
+    static_array<float,3> v0;
+    static_array<float,3> v1;
+    __host__ __device__ Union7_1(static_array<float,3> t0, static_array<float,3> t1) : v0(t0), v1(t1) {}
+    __host__ __device__ Union7_1() = delete;
 };
 struct Union7 {
     union {
-        Union7_0 case0; // Eq
-        Union7_1 case1; // Gt
-        Union7_2 case2; // Lt
+        Union7_0 case0; // None
+        Union7_1 case1; // Some
     };
     unsigned char tag{255};
     __host__ __device__ Union7() {}
-    __host__ __device__ Union7(Union7_0 t) : tag(0), case0(t) {} // Eq
-    __host__ __device__ Union7(Union7_1 t) : tag(1), case1(t) {} // Gt
-    __host__ __device__ Union7(Union7_2 t) : tag(2), case2(t) {} // Lt
+    __host__ __device__ Union7(Union7_0 t) : tag(0), case0(t) {} // None
+    __host__ __device__ Union7(Union7_1 t) : tag(1), case1(t) {} // Some
     __host__ __device__ Union7(const Union7 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union7_0(x.case0); break; // Eq
-            case 1: new (&this->case1) Union7_1(x.case1); break; // Gt
-            case 2: new (&this->case2) Union7_2(x.case2); break; // Lt
+            case 0: new (&this->case0) Union7_0(x.case0); break; // None
+            case 1: new (&this->case1) Union7_1(x.case1); break; // Some
         }
     }
     __host__ __device__ Union7(const Union7 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union7_0(std::move(x.case0)); break; // Eq
-            case 1: new (&this->case1) Union7_1(std::move(x.case1)); break; // Gt
-            case 2: new (&this->case2) Union7_2(std::move(x.case2)); break; // Lt
+            case 0: new (&this->case0) Union7_0(std::move(x.case0)); break; // None
+            case 1: new (&this->case1) Union7_1(std::move(x.case1)); break; // Some
         }
     }
     __host__ __device__ Union7 & operator=(const Union7 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = x.case0; break; // Eq
-                case 1: this->case1 = x.case1; break; // Gt
-                case 2: this->case2 = x.case2; break; // Lt
+                case 0: this->case0 = x.case0; break; // None
+                case 1: this->case1 = x.case1; break; // Some
             }
         } else {
             this->~Union7();
@@ -788,9 +776,8 @@ struct Union7 {
     __host__ __device__ Union7 & operator=(const Union7 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // Eq
-                case 1: this->case1 = std::move(x.case1); break; // Gt
-                case 2: this->case2 = std::move(x.case2); break; // Lt
+                case 0: this->case0 = std::move(x.case0); break; // None
+                case 1: this->case1 = std::move(x.case1); break; // Some
             }
         } else {
             this->~Union7();
@@ -800,61 +787,54 @@ struct Union7 {
     }
     __host__ __device__ ~Union7() {
         switch(this->tag){
-            case 0: this->case0.~Union7_0(); break; // Eq
-            case 1: this->case1.~Union7_1(); break; // Gt
-            case 2: this->case2.~Union7_2(); break; // Lt
+            case 0: this->case0.~Union7_0(); break; // None
+            case 1: this->case1.~Union7_1(); break; // Some
         }
         this->tag = 255;
     }
 };
-struct Tuple6 {
+struct StackMut2 {
     int v0;
-    float v1;
-    float v2;
-    __host__ __device__ Tuple6() = default;
-    __host__ __device__ Tuple6(int t0, float t1, float t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ StackMut2() = default;
+    __host__ __device__ StackMut2(int t0) : v0(t0) {}
 };
-struct Tuple7 {
-    unsigned long long v1;
-    unsigned long long v2;
-    int v0;
-    __host__ __device__ Tuple7() = default;
-    __host__ __device__ Tuple7(int t0, unsigned long long t1, unsigned long long t2) : v0(t0), v1(t1), v2(t2) {}
+struct Union8_0 { // Eq
 };
-struct Union8_0 { // None
+struct Union8_1 { // Gt
 };
-struct Union8_1 { // Some
-    static_array<float,3> v0;
-    static_array<float,3> v1;
-    __host__ __device__ Union8_1(static_array<float,3> t0, static_array<float,3> t1) : v0(t0), v1(t1) {}
-    __host__ __device__ Union8_1() = delete;
+struct Union8_2 { // Lt
 };
 struct Union8 {
     union {
-        Union8_0 case0; // None
-        Union8_1 case1; // Some
+        Union8_0 case0; // Eq
+        Union8_1 case1; // Gt
+        Union8_2 case2; // Lt
     };
     unsigned char tag{255};
     __host__ __device__ Union8() {}
-    __host__ __device__ Union8(Union8_0 t) : tag(0), case0(t) {} // None
-    __host__ __device__ Union8(Union8_1 t) : tag(1), case1(t) {} // Some
+    __host__ __device__ Union8(Union8_0 t) : tag(0), case0(t) {} // Eq
+    __host__ __device__ Union8(Union8_1 t) : tag(1), case1(t) {} // Gt
+    __host__ __device__ Union8(Union8_2 t) : tag(2), case2(t) {} // Lt
     __host__ __device__ Union8(const Union8 & x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union8_0(x.case0); break; // None
-            case 1: new (&this->case1) Union8_1(x.case1); break; // Some
+            case 0: new (&this->case0) Union8_0(x.case0); break; // Eq
+            case 1: new (&this->case1) Union8_1(x.case1); break; // Gt
+            case 2: new (&this->case2) Union8_2(x.case2); break; // Lt
         }
     }
     __host__ __device__ Union8(const Union8 && x) : tag(x.tag) {
         switch(x.tag){
-            case 0: new (&this->case0) Union8_0(std::move(x.case0)); break; // None
-            case 1: new (&this->case1) Union8_1(std::move(x.case1)); break; // Some
+            case 0: new (&this->case0) Union8_0(std::move(x.case0)); break; // Eq
+            case 1: new (&this->case1) Union8_1(std::move(x.case1)); break; // Gt
+            case 2: new (&this->case2) Union8_2(std::move(x.case2)); break; // Lt
         }
     }
     __host__ __device__ Union8 & operator=(const Union8 & x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = x.case0; break; // None
-                case 1: this->case1 = x.case1; break; // Some
+                case 0: this->case0 = x.case0; break; // Eq
+                case 1: this->case1 = x.case1; break; // Gt
+                case 2: this->case2 = x.case2; break; // Lt
             }
         } else {
             this->~Union8();
@@ -865,8 +845,9 @@ struct Union8 {
     __host__ __device__ Union8 & operator=(const Union8 && x) {
         if (this->tag == x.tag) {
             switch(x.tag){
-                case 0: this->case0 = std::move(x.case0); break; // None
-                case 1: this->case1 = std::move(x.case1); break; // Some
+                case 0: this->case0 = std::move(x.case0); break; // Eq
+                case 1: this->case1 = std::move(x.case1); break; // Gt
+                case 2: this->case2 = std::move(x.case2); break; // Lt
             }
         } else {
             this->~Union8();
@@ -876,8 +857,9 @@ struct Union8 {
     }
     __host__ __device__ ~Union8() {
         switch(this->tag){
-            case 0: this->case0.~Union8_0(); break; // None
-            case 1: this->case1.~Union8_1(); break; // Some
+            case 0: this->case0.~Union8_0(); break; // Eq
+            case 1: this->case1.~Union8_1(); break; // Gt
+            case 2: this->case2.~Union8_2(); break; // Lt
         }
         this->tag = 255;
     }
@@ -942,12 +924,12 @@ struct Union9 {
         this->tag = 255;
     }
 };
-struct Tuple8 {
+struct Tuple7 {
     int v0;
     int v1;
     int v2;
-    __host__ __device__ Tuple8() = default;
-    __host__ __device__ Tuple8(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ Tuple7() = default;
+    __host__ __device__ Tuple7(int t0, int t1, int t2) : v0(t0), v1(t1), v2(t2) {}
 };
 struct Union10_0 { // None
 };
@@ -1009,19 +991,19 @@ struct Union10 {
         this->tag = 255;
     }
 };
-struct StackMut4 {
+struct StackMut3 {
     Union10 v0;
+    __host__ __device__ StackMut3() = default;
+    __host__ __device__ StackMut3(Union10 t0) : v0(t0) {}
+};
+struct StackMut4 {
+    Union4 v0;
     __host__ __device__ StackMut4() = default;
-    __host__ __device__ StackMut4(Union10 t0) : v0(t0) {}
+    __host__ __device__ StackMut4(Union4 t0) : v0(t0) {}
 };
 struct StackMut5 {
-    Union4 v0;
-    __host__ __device__ StackMut5() = default;
-    __host__ __device__ StackMut5(Union4 t0) : v0(t0) {}
-};
-struct StackMut6 {
     Union6 v0;
-    __host__ __device__ StackMut6() = default;
-    __host__ __device__ StackMut6(Union6 t0) : v0(t0) {}
+    __host__ __device__ StackMut5() = default;
+    __host__ __device__ StackMut5(Union6 t0) : v0(t0) {}
 };
 #endif

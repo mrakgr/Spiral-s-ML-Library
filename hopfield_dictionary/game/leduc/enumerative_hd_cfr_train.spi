@@ -38,13 +38,15 @@ type dict_policy = cached_dict messages {average_policy : sa 3 float; current_po
 type dict_ev = cached_dict messages (sa 3 {value : float; weight : float})
 type game_dicts = { policy : dict_policy; expected_values : dict_ev }
 type hd_key = messages
-type hd_value = { average_policy : sa 3 float; current_policy : sa 3 float; ev_values : sa 3 float; ev_weights : sa 3 float }
+type hd_value = { average_policy : sa 3 float; current_policy : sa 3 float }
+// type hd_value = { average_policy : sa 3 float; current_policy : sa 3 float; ev_values : sa 3 float; ev_weights : sa 3 float }
 type hd_dict = hd.dict hd_key hd_value
 union player_mode =
     | TrainEnumerative : { policy : stack_refs dict_policy }
     | TrainSampling : { policy : stack_refs dict_policy; expected_values : stack_refs dict_ev }
     | Frozen : { policy : stack_refs dict_policy }
-    | TrainSamplingHopfield : hd_dict
+    | TrainEnumerativeHopfield : hd_dict
+    // | TrainSamplingHopfield : hd_dict
     | FrozenHopfield : hd_dict
 
 type config = 
@@ -237,7 +239,7 @@ inl train_loop (config : config) =
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
                 expected_value
-        | TrainSamplingHopfield dict | FrozenHopfield dict =>
+        | TrainEnumerativeHopfield dict | FrozenHopfield dict =>
             inl key_ev = *messages
             inl key_policy = 
                 *messages
@@ -248,53 +250,91 @@ inl train_loop (config : config) =
             inl {average_policy current_policy} = hd.get dict key_policy
 
             match mode with
-            | TrainSamplingHopfield =>
-                inl {ev_values ev_weights} = hd.get dict key_ev
-                inl get_expected_value i = normalize_expected_value {value = index ev_values i; weight = index ev_weights i}
-                inl noise_factor : float = 2 ** -3 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
+            | TrainEnumerativeHopfield dict =>
+                // Does enumeration.
                 inl current_policy_probs = regret_match current_policy mask
-                inl average_policy_probs = masking_normalize average_policy mask
-                inl noise_probs = masking_normalize (sam.init (const 0)) mask
-                inl sampling_probs = arraym.map2 (fun a b => (1 - noise_factor) * a + noise_factor * b) average_policy_probs noise_probs
-                inl action_index = sample sampling_probs
-                inl reward = stack_mut 0
                 inl expected_value_per_action : sa 3 float = 
                     actions
                     |> listm.mapi (fun i x =>
-                        inl ev = get_expected_value i
                         match x with
-                        | Some action when i = action_index =>
-                            inl action_prob = {policy = index current_policy_probs i; sampling = index sampling_probs i}
+                        | Some action =>
                             inl reward_for_pl0 = 
-                                using_path_prob table.player_turn action_prob fun () =>
+                                using_path_prob table.player_turn {policy=index current_policy_probs i; sampling=1} fun () =>
                                 using_message PlayerAction(table.player_turn, action) fun () => 
                                 loop (T_game_round (table, action))
                             // Inverts the rewards if the player isn't 0.
-                            reward <- if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
-                            (*reward - ev) / action_prob.sampling + ev
-                        | _ => 
-                            ev
+                            if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+                        | None => 0
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                inl current_policy_update = // Current policy update.
-                    inl path_prob_opponent = get_path_prob_for_others table.player_turn
-                    arraym.map (fun expected_value_per_action =>
-                        path_prob_opponent * (expected_value_per_action - expected_value)
-                        ) expected_value_per_action
-                inl current_policy = // Updated current policy.
-                    arraym.map2 (fun current_policy current_policy_update => // CFR update
-                        current_policy + current_policy_update
-                        ) current_policy current_policy_update
-                // The predictive baseline takes the policy probabilities after they've been updated.
-                inl current_policy_probs = regret_match current_policy mask // Updated probabilities.
-                hd.set dict key_ev {
-                    average_policy = current_policy_probs
-                    current_policy = current_policy_update
-                    ev_values = sam.init (fun i => if action_index = i then *reward else 0)
-                    ev_weights = sam.init (fun i => if action_index = i then 1 else 0)
-                }
-                dot_product expected_value_per_action current_policy_probs
+                hd.set dict key_policy {
+                    average_policy =
+                        arraym.map2 (fun average_policy current_policy_probs =>
+                            (average_policy + current_policy_probs) * exponent
+                            ) average_policy current_policy_probs
+                    current_policy =
+                        inl path_prob_opponent = get_path_prob_for_others table.player_turn
+                        arraym.map2 (fun current_policy expected_value_per_action => // CFR update
+                            (current_policy + path_prob_opponent * (expected_value_per_action - expected_value)) * exponent
+                            ) current_policy expected_value_per_action
+                    }
+                // hd.set dict key_policy {
+                //     average_policy = current_policy_probs
+                //     current_policy =
+                //         inl path_prob_opponent = get_path_prob_for_others table.player_turn
+                //         arraym.map2 (fun current_policy expected_value_per_action => // CFR update
+                //             path_prob_opponent * (expected_value_per_action - expected_value)
+                //             ) current_policy expected_value_per_action
+                //     }
+                expected_value
+            // | TrainSamplingHopfield =>
+            //     inl {ev_values ev_weights} = hd.get dict key_ev
+            //     inl get_expected_value i = normalize_expected_value {value = index ev_values i; weight = index ev_weights i}
+            //     inl noise_factor : float = 2 ** -3 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
+            //     inl current_policy_probs = regret_match current_policy mask
+            //     inl average_policy_probs = masking_normalize average_policy mask
+            //     inl noise_probs = masking_normalize (sam.init (const 0)) mask
+            //     inl sampling_probs = arraym.map2 (fun a b => (1 - noise_factor) * a + noise_factor * b) average_policy_probs noise_probs
+            //     inl action_index = sample sampling_probs
+            //     inl reward = stack_mut 0
+            //     inl expected_value_per_action : sa 3 float = 
+            //         actions
+            //         |> listm.mapi (fun i x =>
+            //             inl ev = get_expected_value i
+            //             match x with
+            //             | Some action when i = action_index =>
+            //                 inl action_prob = {policy = index current_policy_probs i; sampling = index sampling_probs i}
+            //                 inl reward_for_pl0 = 
+            //                     using_path_prob table.player_turn action_prob fun () =>
+            //                     using_message PlayerAction(table.player_turn, action) fun () => 
+            //                     loop (T_game_round (table, action))
+            //                 // Inverts the rewards if the player isn't 0.
+            //                 reward <- if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+            //                 (*reward - ev) / action_prob.sampling + ev
+            //             | _ => 
+            //                 ev
+            //         )
+            //         |> arraym.fromList
+            //     inl expected_value = dot_product expected_value_per_action current_policy_probs
+            //     inl current_policy_update = // Current policy update.
+            //         inl path_prob_opponent = get_path_prob_for_others table.player_turn
+            //         arraym.map (fun expected_value_per_action =>
+            //             path_prob_opponent * (expected_value_per_action - expected_value)
+            //             ) expected_value_per_action
+            //     inl current_policy = // Updated current policy.
+            //         arraym.map2 (fun current_policy current_policy_update => // CFR update
+            //             current_policy + current_policy_update
+            //             ) current_policy current_policy_update
+            //     // The predictive baseline takes the policy probabilities after they've been updated.
+            //     inl current_policy_probs = regret_match current_policy mask // Updated probabilities.
+            //     hd.set dict key_ev {
+            //         average_policy = current_policy_probs
+            //         current_policy = current_policy_update
+            //         ev_values = sam.init (fun i => if action_index = i then *reward else 0)
+            //         ev_weights = sam.init (fun i => if action_index = i then 1 else 0)
+            //     }
+            //     dot_product expected_value_per_action current_policy_probs
             | FrozenHopfield =>
                 // Doesn't do any training. Is for testing purposes.
                 inl current_policy_probs = masking_normalize average_policy mask // Uses the average policy.
@@ -416,7 +456,8 @@ inl create_hd (rows : int) =
         }
 
     inl cols_keys = size p
-    inl cols_values = num_actions * 4
+    inl cols_values = num_actions * 2
+    // inl cols_values = num_actions * 4
     inl serializers : hd.serializers hd_key hd_value = 
         exists [float]
             {
@@ -429,15 +470,16 @@ inl create_hd (rows : int) =
                 value_to_array = fun x =>
                     inl m : eigen.vector float = eigen.create {rows = 1; cols = cols_values}
                     inl f offset l = loop.for' {from=0; nearTo=num_actions} fun i => eigen.matrix_set m (0,i + offset) (index l i)
-                    f (num_actions * 0) x.average_policy . f (num_actions * 1) x.current_policy . f (num_actions * 2) x.ev_values . f (num_actions * 3) x.ev_weights
+                    // f (num_actions * 0) x.average_policy . f (num_actions * 1) x.current_policy . f (num_actions * 2) x.ev_values . f (num_actions * 3) x.ev_weights
+                    f (num_actions * 0) x.average_policy . f (num_actions * 1) x.current_policy
                     m
                 array_to_value = fun x => 
                     inl init offset = sam.init (fun i => eigen.matrix_index x (0, i + offset))
                     {
                         average_policy = init (num_actions * 0)
                         current_policy = init (num_actions * 1)
-                        ev_values = init (num_actions * 2)
-                        ev_weights = init (num_actions * 3)
+                        // ev_values = init (num_actions * 2)
+                        // ev_weights = init (num_actions * 3)
                     }
                 array_to_key = fun m => 
                     if $"(!m.array() == 0).all()" then
@@ -452,26 +494,27 @@ inl create_hd (rows : int) =
     d
 
 inl main() =
-    loop.for' {from=0; nearTo=1} fun (_ : int) =>
-        inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
-        inl expected_values : stack_refs dict_ev = stack_refs (cached_dictm.create 512)
-        inl hd = create_hd (1 <<< 14)
-        inl loop (config : config) (nearTo : int) =
-            inl train_loop = train_loop config
-            loop.for {from=0; nearTo} (fun (i : int) _ =>
-                if i % (max 1 (nearTo / 25)) = 0 then
-                    console.write_ln {i nearTo}
-                train_loop ()
-                ) 0
-        inl _ =
-            loop {
-                is_chance_node_sampling = true
-                player_modes = [TrainSamplingHopfield hd; TrainSamplingHopfield hd]
-            } 1_000_000
-        inl reward_for_pl0 =
-            loop {
-                is_chance_node_sampling = false
-                player_modes = [TrainEnumerative {policy}; FrozenHopfield hd]
-            } 100
-        console.write_ln {reward_for_pl0}
+    // loop.for' {from=0; nearTo=1} fun (_ : int) =>
+    inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
+    inl expected_values : stack_refs dict_ev = stack_refs (cached_dictm.create 512)
+    inl hd = create_hd (1 <<< 16)
+    inl loop (config : config) (nearTo : int) =
+        inl train_loop = train_loop config
+        loop.for {from=0; nearTo} (fun (i : int) _ =>
+            if i % (max 1 (nearTo / 25)) = 0 then
+                console.write_ln {i nearTo}
+            train_loop ()
+            ) 0
+    inl _ =
+        loop {
+            is_chance_node_sampling = false
+            player_modes = [TrainEnumerative {policy}; TrainEnumerativeHopfield hd]
+        } 500
+    inl reward_for_pl0 =
+        loop {
+            is_chance_node_sampling = false
+            player_modes = [TrainEnumerative {policy}; FrozenHopfield hd]
+        } 100
+    console.write_ln {reward_for_pl0}
+    console.write_ln hd
     0i32
