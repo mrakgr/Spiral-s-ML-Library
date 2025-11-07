@@ -171,6 +171,7 @@ inl train_loop (config : config) =
                     arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
                         max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
                         ) current_policy expected_value_per_action
+                // The predictive baseline takes the policy probabilities after they've been updated.
                 inl current_policy_probs = regret_match current_policy mask // Updated probabilities.
                 cached_dictm.set dict_policy key_policy {
                     average_policy =
@@ -237,7 +238,6 @@ inl train_loop (config : config) =
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
                 expected_value
         | TrainSamplingHopfield dict | FrozenHopfield dict =>
-            // inl dict_policy = *policy
             inl key_ev = *messages
             inl key_policy = 
                 *messages
@@ -251,10 +251,6 @@ inl train_loop (config : config) =
             | TrainSamplingHopfield =>
                 inl {ev_values ev_weights} = hd.get dict key_ev
                 inl get_expected_value i = normalize_expected_value {value = index ev_values i; weight = index ev_weights i}
-                // inl average_policy_decay : float = 1 - 2 ** -10
-                // inl ev_decay : float = 1 - 2 ** -1
-                inl average_policy_decay : float = 1
-                inl ev_decay : float = 1
                 inl noise_factor : float = 2 ** -3 // Controls the degree of exploration. 1 means the sampling policy is completely uniform and 0 means the sampling policy is equal to the current policy.
                 inl current_policy_probs = regret_match current_policy mask
                 inl average_policy_probs = masking_normalize average_policy mask
@@ -281,26 +277,43 @@ inl train_loop (config : config) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                inl current_policy = // Updated current policy.
+                inl current_policy_update = // Current policy update.
                     inl path_prob_opponent = get_path_prob_for_others table.player_turn
-                    arraym.map2 (fun current_policy expected_value_per_action => // CFR+ update
-                        max 0 (current_policy + path_prob_opponent * (expected_value_per_action - expected_value))
-                        ) current_policy expected_value_per_action
+                    arraym.map (fun expected_value_per_action =>
+                        path_prob_opponent * (expected_value_per_action - expected_value)
+                        ) expected_value_per_action
+                inl current_policy = // Updated current policy.
+                    arraym.map2 (fun current_policy current_policy_update => // CFR update
+                        current_policy + current_policy_update
+                        ) current_policy current_policy_update
+                // The predictive baseline takes the policy probabilities after they've been updated.
                 inl current_policy_probs = regret_match current_policy mask // Updated probabilities.
-                cached_dictm.set dict_policy key_policy {
-                    average_policy =
-                        arraym.map2 (fun average_policy current_policy_probs =>
-                            average_policy_decay * average_policy + current_policy_probs
-                            ) average_policy current_policy_probs
-                    current_policy
-                    }
-                cached_dictm.set dict_expected_values key_ev (
-                    expected_values |> arraym.update action_index (fun x => {x with 
-                        value#=fun value => value * ev_decay + *reward
-                        weight#=fun weight => weight * ev_decay + 1
-                        })
-                )
+                hd.set dict key_ev {
+                    average_policy = current_policy_probs
+                    current_policy = current_policy_update
+                    ev_values = sam.init (fun i => if action_index = i then *reward else 0)
+                    ev_weights = sam.init (fun i => if action_index = i then 1 else 0)
+                }
                 dot_product expected_value_per_action current_policy_probs
+            | FrozenHopfield =>
+                // Doesn't do any training. Is for testing purposes.
+                inl current_policy_probs = masking_normalize average_policy mask // Uses the average policy.
+                inl expected_value_per_action : sa 3 float = 
+                    actions
+                    |> listm.mapi (fun i x =>
+                        match x with
+                        | Some action =>
+                            inl reward_for_pl0 = 
+                                using_path_prob table.player_turn {policy=index current_policy_probs i; sampling=1} fun () =>
+                                using_message PlayerAction(table.player_turn, action) fun () => 
+                                loop (T_game_round (table, action))
+                            // Inverts the rewards if the player isn't 0.
+                            if table.player_turn = 0 then reward_for_pl0 else -reward_for_pl0
+                        | None => 0
+                    )
+                    |> arraym.fromList
+                inl expected_value = dot_product expected_value_per_action current_policy_probs
+                expected_value
 
     inl cfr (table : table) (loop : training_nodes -> f32) =
         listm.foldBack (fun i next () =>
@@ -440,8 +453,8 @@ inl create_hd (rows : int) =
 
 inl main() =
     loop.for' {from=0; nearTo=1} fun (_ : int) =>
-        inl policy = stack_refs (cached_dictm.create 512)
-        inl expected_values = stack_refs (cached_dictm.create 512)
+        inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
+        inl expected_values : stack_refs dict_ev = stack_refs (cached_dictm.create 512)
         inl hd = create_hd (1 <<< 14)
         inl loop (config : config) (nearTo : int) =
             inl train_loop = train_loop config
