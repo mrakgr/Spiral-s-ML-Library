@@ -271,12 +271,12 @@ inl train_loop (config : config) =
                 hd.set dict key_policy {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
-                            (average_policy + current_policy_probs) * exponent
+                            average_policy + current_policy_probs
                             ) average_policy current_policy_probs
                     current_policy =
                         inl path_prob_opponent = get_path_prob_for_others table.player_turn
                         arraym.map2 (fun current_policy expected_value_per_action => // CFR update
-                            (current_policy + path_prob_opponent * (expected_value_per_action - expected_value)) * exponent
+                            current_policy + path_prob_opponent * (expected_value_per_action - expected_value)
                             ) current_policy expected_value_per_action
                     }
                 // hd.set dict key_policy {
