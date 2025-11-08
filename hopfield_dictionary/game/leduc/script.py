@@ -10,7 +10,7 @@ import numpy as np
 
 def f(baseline_data):
     a = np.array(baseline_data)
-    print(a.mean(), a.std())
+    print(a.mean() - -0.083, a.std())
 
 f(learned_infoset_baseline_1000k)
 f(learned_infoset_baseline_3000k)

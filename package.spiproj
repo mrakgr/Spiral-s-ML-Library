@@ -121,6 +121,8 @@ modules:
                 hd
                 
                 enumerative_hd_cfr_train
+                
+                maxi
 
                 test0
                 test1

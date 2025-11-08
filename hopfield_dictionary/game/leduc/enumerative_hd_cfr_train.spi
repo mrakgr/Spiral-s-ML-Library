@@ -268,17 +268,6 @@ inl train_loop (config : config) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                // hd.set dict key_policy { // These style of mutable updates causes the algorithm to diverge. We end up seeing nans in the final output.
-                //     average_policy =
-                //         arraym.map2 (fun average_policy current_policy_probs =>
-                //             average_policy + current_policy_probs
-                //             ) average_policy current_policy_probs
-                //     current_policy =
-                //         inl path_prob_opponent = get_path_prob_for_others table.player_turn
-                //         arraym.map2 (fun current_policy expected_value_per_action => // CFR update
-                //             current_policy + path_prob_opponent * (expected_value_per_action - expected_value)
-                //             ) current_policy expected_value_per_action
-                //     }
                 hd.set dict key_policy {
                     average_policy = current_policy_probs
                     current_policy =
