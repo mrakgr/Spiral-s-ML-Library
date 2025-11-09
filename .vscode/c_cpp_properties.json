@@ -12,7 +12,7 @@
                 "${workspaceFolder}/cpp_libs/xoshiro/include",
                 "${workspaceFolder}/cpp_libs/json/include",
                 "${workspaceFolder}/cpp_libs/eigen",
-                "${workspaceFolder}/hopfield_dictionary/host_cpp_lib"
+                "${userHome}/ArrayFire-3.10.0-Linux/include"
             ],
             "defines": [
                 "__NVCC__",
