@@ -2,7 +2,8 @@
 open corebase
 open eigen
 
-inl max_dictionary_get forall t_keys t_values.
+// out = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
+inl hopfield_dictionary_get forall t_keys t_values.
         (keys : ref (matrix t_keys))
         (values : ref (matrix t_values))
         (input : ref (matrix t_keys))
@@ -56,7 +57,7 @@ inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k
     inl input = serializers.key_to_array k
     inl out = eigen.create {rows = 1; cols = matrix_cols refs.values}
     open corecuda.refm
-    max_dictionary_get (from_local refs.keys) (from_local refs.values) (from_local input) (from_local out) 0.001
+    hopfield_dictionary_get (from_local refs.keys) (from_local refs.values) (from_local input) (from_local out) 0.001
     serializers.array_to_value out
 
 // Returns the number of rows in a dictionary

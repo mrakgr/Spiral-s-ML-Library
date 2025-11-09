@@ -34,7 +34,7 @@ int main() {
             0.0f, 0.75f, 0.25f, 0.0f,
             2.0f/3.0f, 0.0f, 1.0f/3.0f, 0.0f
         };
-        af::array values = (af::array(4, 3, values_data));
+        af::array values = af::array(4, 3, values_data);
         af_print(values);
         
         // Initialize the input matrix
@@ -42,7 +42,7 @@ int main() {
             1, 1, 0, 0,
             0, 1, 1, 1
         };
-        af::array input = (af::array(4, 2, input_data));
+        af::array input = af::array(4, 2, input_data);
         af_print(input);
 
         // Compute the result

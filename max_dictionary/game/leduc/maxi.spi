@@ -1,89 +1,89 @@
-// // A maxi dictionary implementation using the Eigen library.
-// open corebase
-// open eigen
+// A Maximum dictionary implementation using the Arrayfire library.
+open corebase
+open af
 
-// // out = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
-// inl maxi_dictionary_get forall t_keys t_values.
-//         (keys : ref (matrix t_keys))
-//         (values : ref (matrix t_values))
-//         (input : ref (matrix t_keys))
-//         (out : ref (matrix t_values))
-//         (temperature : t_values)
-//         : () = join
-//     $"!out = ((!keys * !input.transpose() - !input.rowwise().sum().transpose().replicate(!keys.rows(),1)).array() / !temperature).exp().matrix().transpose() * !values"
+inl max_dictionary_get forall t.
+        (keys : af_array t)
+        (values : af_array t)
+        (input : af_array t)
+        : af_array t = 
+    real
+        inl temp : af_array t = $"af::matmul(af::transpose(!input), !keys)"
+        inl max_vals : af_array t = real $"af::array \v" : af_array t
+        inl max_indices : af_array u32 = real $"af::array \v" : af_array u32
+        $"af::max(!max_vals, !max_indices, !temp, 1)"
+        $"af::lookup(!values, !max_indices, 1)" : af_array t
 
-// type serializers k v = exists t{number}. 
-//     { 
-//         key_to_array : k -> vector t
-//         array_to_value : vector t -> v 
-//         value_to_array : v -> vector t
-//         array_to_key : vector t -> option k
-//     }
-// nominal dict k v =
-//     exists t{number}. {
-//         data : stack_refs {
-//             keys : matrix t
-//             values : matrix t
-//             i : int
-//         }
-//         serializers : { 
-//             key_to_array : k -> vector t
-//             value_to_array : v -> vector t
-//             array_to_value : vector t -> v 
-//             array_to_key : vector t -> option k
-//         }
-//     }
+type serializers k v = exists t{number}. 
+    { 
+        key_to_array : k -> af_array t
+        array_to_value : af_array t -> v 
+        value_to_array : v -> af_array t
+        array_to_key : af_array t -> option k
+    }
+nominal dict k v =
+    exists t{number}. {
+        data : stack_refs {
+            keys : af_array t
+            values : af_array t
+            i : int
+        }
+        serializers : { 
+            key_to_array : k -> af_array t
+            value_to_array : v -> af_array t
+            array_to_value : af_array t -> v 
+            array_to_key : af_array t -> option k
+        }
+    }
 
-// // Creates the dictionary with a specified types `k` for the keys and `v` for values. `t` represents the matrix datatype.
-// // Takes in serializers to convert raw array data of type `t` to Spiral usable formats.
-// // The rows and the columns need to be compile time literals.
-// // Does not initialize the matrices to 0.
-// inl create forall k v. (exists t. { key_to_array array_to_value value_to_array array_to_key } : serializers k v) ({rows cols_keys cols_values} : {rows : int; cols_keys : int; cols_values : int}) : dict k v =
-//     dict (exists [t] {
-//         serializers = { key_to_array array_to_value value_to_array array_to_key }
-//         data = stack_refs {
-//             keys = create {rows cols = cols_keys}
-//             values = create {rows cols = cols_values}
-//             i = 0
-//         }
-//     })
+// Creates the dictionary with a specified types `k` for the keys and `v` for values. `t` represents the matrix datatype.
+// Takes in serializers to convert raw array data of type `t` to Spiral usable formats.
+// The rows and the columns need to be compile time literals.
+// Does not initialize the matrices to 0.
+inl create forall k v. (exists t. { key_to_array array_to_value value_to_array array_to_key } : serializers k v) ({rows cols_keys cols_values} : {rows : int; cols_keys : int; cols_values : int}) : dict k v =
+    dict (exists [t] {
+        serializers = { key_to_array array_to_value value_to_array array_to_key }
+        data = stack_refs {
+            keys = create {rows cols = cols_keys}
+            values = create {rows cols = cols_values}
+            i = 0
+        }
+    })
 
-// // Clears the dictionary of keys by setting both the keys and the values all to 0.
-// inl clear forall k v. ((dict (exists t. {data = refs})) : dict k v) : () =
-//     matrix_clear refs.keys . matrix_clear refs.values . refs.i <- 0
+// Clears the dictionary of keys by setting both the keys and the values all to 0.
+inl clear forall k v. ((dict (exists t. {data = refs})) : dict k v) : () =
+    array_clear refs.keys . array_clear refs.values . refs.i <- 0
 
-// // Gets an item from the dictionary.
-// inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : v =
-//     inl input = serializers.key_to_array k
-//     inl out = eigen.create {rows = 1; cols = matrix_cols refs.values}
-//     open corecuda.refm
-//     hopfield_dictionary_get (from_local refs.keys) (from_local refs.values) (from_local input) (from_local out) 0.001
-//     serializers.array_to_value out
+// Gets an item from the dictionary.
+inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : v =
+    inl input = serializers.key_to_array k
+    inl out = max_dictionary_get refs.keys refs.values input
+    serializers.array_to_value out
 
-// // Returns the number of rows in a dictionary
-// inl num_rows forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) : int =
-//     matrix_rows refs.keys
+// Returns the number of rows in a dictionary
+inl num_rows forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) : int =
+    array_rows refs.keys
 
-// // Added the key value pair to the dictionary and increments the dictionary pointer by one.
-// inl set forall k v. ((dict (exists t. {serializers data = refs})) & d : dict k v) (k : k) (v : v) : () =
-//     inl num_rows : int = num_rows d
-//     inl keys, values = refs.keys, refs.values
-//     $"!keys.row(!(refs.i)) = !(serializers.key_to_array k)"
-//     $"!values.row(!(refs.i)) = !(serializers.value_to_array v)"
-//     refs.i <- (*refs.i + 1) % num_rows
+// Added the key value pair to the dictionary and increments the dictionary pointer by one.
+inl set forall k v. ((dict (exists t. {serializers data = refs})) & d : dict k v) (k : k) (v : v) : () =
+    inl num_rows : int = num_rows d
+    inl keys, values = refs.keys, refs.values
+    $"!keys(af::span, !(refs.i)) = !(serializers.key_to_array k)"
+    $"!values(af::span, !(refs.i)) = !(serializers.value_to_array v)"
+    refs.i <- (*refs.i + 1) % num_rows
 
-// // Iterates over the dictionary with the iterator function.
-// inl iter forall k v. (f : k -> v -> ()) ((dict (exists t. {serializers data = refs})) & d : dict k v) : () =
-//     inl num_rows : int = num_rows d
-//     inl keys, values = refs.keys, refs.values
-//     loop.for' {from = 0; nearTo = num_rows} fun i =>
-//         inl k = ($"auto \v = !keys.row(!i)" : vector t) |> serializers.array_to_key
-//         inl v = ($"auto \v = !values.row(!i)" : vector t) |> serializers.array_to_value
-//         match k with
-//         | Some k => f k v
-//         | None => ()
+// Iterates over the dictionary with the iterator function.
+inl iter forall k v. (f : k -> v -> ()) ((dict (exists t. {serializers data = refs})) & d : dict k v) : () =
+    inl num_rows : int = num_rows d
+    inl keys, values = refs.keys, refs.values
+    loop.for' {from = 0; nearTo = num_rows} fun i =>
+        inl k = ($"auto \v = !keys(af::span, !i)" : af_array t) |> serializers.array_to_key
+        inl v = ($"auto \v = !values(af::span, !i)" : af_array t) |> serializers.array_to_value
+        match k with
+        | Some k => f k v
+        | None => ()
 
-// instance printable dict k v = fun {write write_ln} d =>
-//     write_ln "{"
-//     iter (fun k v => write k . write " => " . write_ln v) d
-//     write_ln "}"
+instance printable dict k v = fun {write write_ln} d =>
+    write_ln "{"
+    iter (fun k v => write k . write " => " . write_ln v) d
+    write_ln "}"

@@ -1,0 +1,15 @@
+// Marko
+[PlayerGotCard(1, King); PlayerAction(0, Raise)] => [0.405682; 0.000000; 0.594318]
+[PlayerGotCard(1, Queen); PlayerAction(0, Raise)] => [0.607537; 0.006289; 0.386174]
+[PlayerGotCard(0, Queen)] => [0.283604; 0.000000; 0.716396]
+[PlayerGotCard(0, King)] => [0.251003; 0.000000; 0.748997]
+// Thomas enumerative Hopfield CFR
+[PlayerGotCard(1, King); PlayerAction(0, Raise)] => [0.405348; 3.33333e-05; 0.594619]
+[PlayerGotCard(1, Queen); PlayerAction(0, Raise)] => [0.501837; 0.0644212; 0.433742]
+[PlayerGotCard(0, Queen)] => [0.156661; 0; 0.843339]
+[PlayerGotCard(0, King)] => [0.223276; 0; 0.776724]
+// Thomas MC-CFR Hopfield
+[PlayerGotCard(1, King); PlayerAction(0, Raise)] => [0.999892; 9.92439e-05; 8.33875e-06]
+[PlayerGotCard(1, Queen); PlayerAction(0, Raise)] => [0.999777; 0.000125566; 9.7051e-05]
+[PlayerGotCard(0, Queen)] => [0.000732346; 0; 0.999268]
+[PlayerGotCard(0, King)] => [0.999967; 0; 3.30957e-05]

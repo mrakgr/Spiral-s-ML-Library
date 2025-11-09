@@ -122,11 +122,13 @@ modules:
                 
                 enumerative_hd_cfr_train
                 
+                af
                 maxi
 
                 test0
                 test1
                 test2
+                test_maxi
                 
     ml/
         helpers-
