@@ -54,13 +54,14 @@ if (-not (Test-Path $path_output_bin_file) -or
         "-Wno-format-zero-length" # Suppresses print("") statement warnings
         "-Wno-attributes" # Suppresses Cuda attribute warnings.
         $(if (Test-Path $path_cu_file) { @( # Cuda specific compilation options. It's structured like this so we can compile arbitrary .cpp files even without an accompanying .cu one.
-        $path_output_obj_file # The Cuda object file from the previous compilation step
-        "-I/usr/local/cuda/include" # Cuda include
-        "-L/usr/local/cuda/lib64", "-lcudart" # Cuda runtime library links
+            $path_output_obj_file # The Cuda object file from the previous compilation step
+            "-I/usr/local/cuda/include" # Cuda include
+            "-L/usr/local/cuda/lib64", "-lcudart" # Cuda runtime library links
         )}) 
         $Path # The Cpp host input file
-        "-I/home/mrakgr/ArrayFire-3.10.0-Linux/include" # Arrayfire include
-        "-L/home/mrakgr/ArrayFire-3.10.0-Linux/lib64", "-lafcpu" # Arrayfire library
+        "-I${HOME}/ArrayFire-3.10.0-Linux/include" # Arrayfire include
+        "-L${HOME}/ArrayFire-3.10.0-Linux/lib64", "-lafcuda" # Arrayfire library
+        "-Wl,-rpath,${HOME}/ArrayFire-3.10.0-Linux/lib64" # Arrayfire library path for the binary
         "-o", $path_output_bin_file # The output binary path.
     )
     
