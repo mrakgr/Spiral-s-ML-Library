@@ -100,7 +100,7 @@ modules:
             dictm
             jsonm
 
-    hopfield_dictionary/
+    max_dictionary/
         game/
             leduc/
                 types-
