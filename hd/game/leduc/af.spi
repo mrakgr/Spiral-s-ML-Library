@@ -19,5 +19,5 @@ instance length af_array = fun m => $"!m.elements()"
 inl from_array forall t{number}. (arr : array t) (len : int) : af_array t = $"`(af_array t) \v(!len, 1, !arr)"
 inl to_array forall t{number}. (m : af_array t) : array t = 
     inl arr : array t = corebase.create (length m)
-    $"!m.host<`t>(!arr);"
+    $"!m.host(!arr);"
     arr

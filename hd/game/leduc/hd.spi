@@ -2,7 +2,7 @@
 open corebase
 open af
 
-nominal af_index k = k * u32
+nominal af_index k = k * af_array u32
 inl max_dictionary_get forall t.
         (x : stack_refs {
             keys : af_array t
@@ -67,8 +67,7 @@ inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k
         out_values = values
         out_indices = indices
     })
-    inl i : u32 = $"!indices(0)"
-    serializers.array_to_value values, af_index (k, i)
+    serializers.array_to_value values, af_index (k, indices)
 
 // Returns the number of rows in a dictionary
 inl num_rows forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) : int =
