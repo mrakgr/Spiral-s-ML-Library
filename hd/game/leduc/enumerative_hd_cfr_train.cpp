@@ -201,7 +201,7 @@ bool FunPointerMethod1(Tuple0 tup0, Tuple0 tup1){
 }
 inline bool while_method_2(int v0){
     bool v1;
-    v1 = v0 < 50;
+    v1 = v0 < 500;
     return v1;
 }
 inline bool while_method_3(int v0){
@@ -2710,7 +2710,7 @@ float body_0(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, S
 }
 inline bool while_method_7(int v0){
     bool v1;
-    v1 = v0 < 10;
+    v1 = v0 < 100;
     return v1;
 }
 float loop_14(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7){
@@ -5568,11 +5568,11 @@ int main() {
     v25 = tmp0.v0; v26 = tmp0.v1;
     while (while_method_2(v25)){
         int v28;
-        v28 = v25 % 2;
+        v28 = v25 % 20;
         bool v29;
         v29 = v28 == 0;
         if (v29){
-            printf("{%s = %d; %s = %d}\n","i", v25, "nearTo", 50);
+            printf("{%s = %d; %s = %d}\n","i", v25, "nearTo", 500);
             fflush(stdout);
         } else {
         }
@@ -5601,11 +5601,11 @@ int main() {
     v51 = tmp30.v0; v52 = tmp30.v1;
     while (while_method_7(v51)){
         int v54;
-        v54 = v51 % 1;
+        v54 = v51 % 4;
         bool v55;
         v55 = v54 == 0;
         if (v55){
-            printf("{%s = %d; %s = %d}\n","i", v51, "nearTo", 10);
+            printf("{%s = %d; %s = %d}\n","i", v51, "nearTo", 100);
             fflush(stdout);
         } else {
         }

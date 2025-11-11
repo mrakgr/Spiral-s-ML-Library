@@ -501,12 +501,12 @@ inl main() =
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainEnumerative {policy}; TrainEnumerativeHebbian hd]
-        } 50
+        } 500
     inl reward_for_pl0 =
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainEnumerative {policy}; FrozenHebbian hd]
-        } 10
+        } 100
     console.write_ln {reward_for_pl0}
     console.write_ln hd
     0i32
