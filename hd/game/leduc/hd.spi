@@ -53,7 +53,7 @@ inl create forall k v. (exists t. { key_to_array array_to_value value_to_array a
 
 // Clears the dictionary of keys by setting both the keys and the values all to 0.
 inl clear forall k v. ((dict (exists t. {data = refs})) : dict k v) : () =
-    matrix_clear refs.keys . matrix_clear refs.values
+    matrix_set_all refs.keys 1 . matrix_clear refs.values
 
 // Gets an item from the dictionary.
 inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : v * af_index k =

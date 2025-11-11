@@ -9,7 +9,7 @@
 #else
 // Cpp host backend
 #include <unordered_map>
-#include <Eigen/Dense>
+#include <arrayfire.h>
 #include <xoshiro.h>
 struct Union1;
 struct Union2;
@@ -36,6 +36,7 @@ struct Union6;
 struct Tuple6;
 struct Union7;
 struct StackMut2;
+struct StackRefs5;
 struct Union8;
 struct Union9;
 struct Tuple7;
@@ -49,7 +50,7 @@ static_array<float,3> masking_normalize_5(static_array<float,3> v0, static_array
 static_array<float,3> regret_match_3(static_array<float,3> v0, static_array<bool,3> v1);
 float method_2(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
 void method_7(float * v0, static_array_list<Union0,32> v1);
-void method_8(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v3);
+void method_8(StackRefs5 & v0);
 float method_6(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
 int tag_10(Union1 v0);
 bool is_pair_11(int v0, int v1);
@@ -329,11 +330,10 @@ struct StackRefs1 {
     __host__ __device__ StackRefs1(std::unordered_map<Tuple0, static_array<Tuple2,3>, Fun0, Fun1> & t0) : v0(t0) {}
 };
 struct StackRefs2 {
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v1;
-    Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & v2;
-    int & v0;
+    af::array & v0;
+    af::array & v1;
     __host__ __device__ StackRefs2() = default;
-    __host__ __device__ StackRefs2(int & t0, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t1, Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ StackRefs2(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
 };
 struct StackMut0 {
     unsigned int v0;
@@ -797,6 +797,15 @@ struct StackMut2 {
     int v0;
     __host__ __device__ StackMut2() = default;
     __host__ __device__ StackMut2(int t0) : v0(t0) {}
+};
+struct StackRefs5 {
+    af::array & v0;
+    af::array & v1;
+    af::array & v2;
+    af::array & v3;
+    af::array & v4;
+    __host__ __device__ StackRefs5() = default;
+    __host__ __device__ StackRefs5(af::array & t0, af::array & t1, af::array & t2, af::array & t3, af::array & t4) : v0(t0), v1(t1), v2(t2), v3(t3), v4(t4) {}
 };
 struct Union8_0 { // Eq
 };

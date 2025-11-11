@@ -474,7 +474,7 @@ inl create_hd (rows : int) =
                         // ev_weights = init (num_actions * 3)
                     }
                 array_to_key = fun m =>
-                    if $"(!m.array() == 0).all()" then
+                    if $"af::allTrue<bool>(!m == 1)" then
                         None
                     else
                         inl ar : array float = af.to_array m
@@ -489,7 +489,7 @@ inl main() =
     // loop.for' {from=0; nearTo=1} fun (_ : int) =>
     inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
     inl expected_values : stack_refs dict_ev = stack_refs (cached_dictm.create 512)
-    inl hd = create_hd (1 <<< 16)
+    inl hd = create_hd (1 <<< 9)
     inl loop (config : config) (nearTo : int) =
         inl train_loop = train_loop config
         loop.for {from=0; nearTo} (fun (i : int) _ =>

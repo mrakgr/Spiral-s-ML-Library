@@ -3,5 +3,6 @@ nominal deck = u32
 prototype matrix_index m t : m t -> (int * int) -> t
 prototype matrix_rows m t : m t -> int
 prototype matrix_cols m t : m t -> int
-prototype matrix_set m t : m t -> (int * int) -> t -> ()
 prototype matrix_clear m t : m t -> ()
+prototype matrix_set m t : m t -> (int * int) -> t -> ()
+prototype matrix_set_all m t : m t -> t -> ()
