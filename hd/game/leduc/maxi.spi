@@ -9,8 +9,8 @@ inl max_dictionary_get forall t.
         : af_array t = 
     real
         inl temp : af_array t = $"af::matmul(af::transpose(!input), !keys)"
-        inl max_vals : af_array t = real $"af::array \v" : af_array t
-        inl max_indices : af_array u32 = real $"af::array \v" : af_array u32
+        inl max_vals : af_array t = $"af::array \v"
+        inl max_indices : af_array u32 = $"af::array \v"
         $"af::max(!max_vals, !max_indices, !temp, 1)"
         $"af::lookup(!values, !max_indices, 1)" : af_array t
 

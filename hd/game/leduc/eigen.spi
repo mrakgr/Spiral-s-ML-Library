@@ -5,12 +5,6 @@ nominal static_matrix rows cols t = $"Eigen::Matrix<`t,@rows,@cols,Eigen::RowMaj
 type static_vector cols t = static_matrix 1 cols t
 type vector t = matrix t
 
-prototype matrix_index m t : m t -> (int * int) -> t
-prototype matrix_rows m t : m t -> int
-prototype matrix_cols m t : m t -> int
-prototype matrix_set m t : m t -> (int * int) -> t -> ()
-prototype matrix_clear m t : m t -> ()
-
 inl globals() = global "#include <Eigen/Dense>"
 inl create_static forall rows cols t{number}. : static_matrix rows cols t = $"`(static_matrix rows cols t) \v"
 inl create forall t{number}. ({rows cols} : {rows : int; cols : int}) : matrix t = $"`(matrix t) \v(!rows, !cols)"

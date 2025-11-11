@@ -1,0 +1,15 @@
+open corebase
+nominal af_array t = $"af::array \@ \#include <arrayfire.h>"
+
+inl globals() = global "#include <arrayfire.h>"
+
+// Creates a new af::array with specified dimensions (column-major order)
+// Note: Arrayfire uses column-major order, so we specify (cols, rows) to the constructor
+inl create forall t{number}. ({rows cols} : {rows : int; cols : int}) : af_array t = 
+    $"`(af_array t) \v(!cols, !rows)"
+
+instance matrix_index af_array = fun m (r,c) => $"!m(!r,!c)"
+instance matrix_rows af_array = fun m => $"!m.dims(1)"
+instance matrix_cols af_array = fun m => $"!m.dims(0)"
+instance matrix_set af_array = fun m (r,c) v => $"!m(!r,!c) = !v"
+instance matrix_clear af_array = fun m => $"!m = af::constant(0, !m.dims(), !m.type())"

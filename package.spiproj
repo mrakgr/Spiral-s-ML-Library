@@ -100,7 +100,7 @@ modules:
             dictm
             jsonm
 
-    max_dictionary/
+    hd/
         game/
             leduc/
                 types-
@@ -118,12 +118,12 @@ modules:
                 merged_train_predictive_alt_avg_policy_decay
 
                 eigen
+                af
                 hd
+                maxi
                 
                 enumerative_hd_cfr_train
                 
-                af
-                maxi
 
                 test0
                 test1
