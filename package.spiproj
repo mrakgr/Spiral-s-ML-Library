@@ -120,8 +120,6 @@ modules:
                 eigen
                 af
                 hd
-                maxi
-                
                 enumerative_hd_cfr_train
                 
 

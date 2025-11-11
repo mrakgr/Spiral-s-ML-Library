@@ -1,36 +1,40 @@
-// A Hopfield dictionary implementation using the Eigen library.
+// A Winner-Take-All Hebbian dictionary implementation using the Arrayfire library.
 open corebase
-open eigen
+open af
 
-// out = ((keys * input.transpose() - input.rowwise().sum().transpose().replicate(keys.rows(),1)).array() / temperature).exp().matrix().transpose() * values;
-inl hopfield_dictionary_get forall t_keys t_values.
-        (keys : ref (matrix t_keys))
-        (values : ref (matrix t_values))
-        (input : ref (matrix t_keys))
-        (out : ref (matrix t_values))
-        (temperature : t_values)
-        : () = join
-    $"!out = ((!keys * !input.transpose() - !input.rowwise().sum().transpose().replicate(!keys.rows(),1)).array() / !temperature).exp().matrix().transpose() * !values"
+nominal af_index k = k * u32
+inl max_dictionary_get forall t.
+        (x : stack_refs {
+            keys : af_array t
+            values : af_array t
+            input : af_array t
+            out_values : af_array t
+            out_indices : af_array u32
+        }) : () = join
+    inl {keys values input out_values out_indices} = *x
+    inl temp : af_array t = $"af::matmul(af::transpose(!input), !keys)"
+    inl max_vals : af_array t = $"af::array \v"
+    $"af::max(!max_vals, !out_indices, !temp + af::randu(!temp.dims()), 1)"
+    $"!out_values = af::lookup(!values, !out_indices, 1)"
 
 type serializers k v = exists t{number}. 
     { 
-        key_to_array : k -> vector t
-        array_to_value : vector t -> v 
-        value_to_array : v -> vector t
-        array_to_key : vector t -> option k
+        key_to_array : k -> af_array t
+        array_to_value : af_array t -> v 
+        value_to_array : v -> af_array t
+        array_to_key : af_array t -> option k
     }
 nominal dict k v =
     exists t{number}. {
         data : stack_refs {
-            keys : matrix t
-            values : matrix t
-            i : int
+            keys : af_array t
+            values : af_array t
         }
         serializers : { 
-            key_to_array : k -> vector t
-            value_to_array : v -> vector t
-            array_to_value : vector t -> v 
-            array_to_key : vector t -> option k
+            key_to_array : k -> af_array t
+            value_to_array : v -> af_array t
+            array_to_value : af_array t -> v 
+            array_to_key : af_array t -> option k
         }
     }
 
@@ -44,43 +48,49 @@ inl create forall k v. (exists t. { key_to_array array_to_value value_to_array a
         data = stack_refs {
             keys = create {rows cols = cols_keys}
             values = create {rows cols = cols_values}
-            i = 0
         }
     })
 
 // Clears the dictionary of keys by setting both the keys and the values all to 0.
 inl clear forall k v. ((dict (exists t. {data = refs})) : dict k v) : () =
-    matrix_clear refs.keys . matrix_clear refs.values . refs.i <- 0
+    matrix_clear refs.keys . matrix_clear refs.values
 
 // Gets an item from the dictionary.
-inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : v =
+inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : v * af_index k =
     inl input = serializers.key_to_array k
-    inl out = eigen.create {rows = 1; cols = matrix_cols refs.values}
-    open corecuda.refm
-    hopfield_dictionary_get (from_local refs.keys) (from_local refs.values) (from_local input) (from_local out) 0.001
-    serializers.array_to_value out
+    inl values : af_array t = $"af::array \v"
+    inl indices : af_array u32 = $"af::array \v"
+    max_dictionary_get (stack_refs {
+        keys = refs.keys
+        values = refs.values
+        input = input
+        out_values = values
+        out_indices = indices
+    })
+    inl i : u32 = $"!indices(0)"
+    serializers.array_to_value values, af_index (k, i)
 
 // Returns the number of rows in a dictionary
 inl num_rows forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) : int =
     matrix_rows refs.keys
 
 // Added the key value pair to the dictionary and increments the dictionary pointer by one.
-inl set forall k v. ((dict (exists t. {serializers data = refs})) & d : dict k v) (k : k) (v : v) : () =
+inl set forall k v. ((dict (exists t. {serializers data = refs})) & d : dict k v) (af_index (k, k_i) : af_index k) (v : v) : () =
     inl num_rows : int = num_rows d
     inl keys, values = refs.keys, refs.values
-    $"!keys.row(!(refs.i)) = !(serializers.key_to_array k)"
-    $"!values.row(!(refs.i)) = !(serializers.value_to_array v)"
-    refs.i <- (*refs.i + 1) % num_rows
+    $"!keys(af::span, !k_i) = !(serializers.key_to_array k)"
+    $"!values(af::span, !k_i) = !(serializers.value_to_array v)"
 
 // Iterates over the dictionary with the iterator function.
 inl iter forall k v. (f : k -> v -> ()) ((dict (exists t. {serializers data = refs})) & d : dict k v) : () =
     inl num_rows : int = num_rows d
     inl keys, values = refs.keys, refs.values
     loop.for' {from = 0; nearTo = num_rows} fun i =>
-        inl k = ($"auto \v = !keys.row(!i)" : vector t) |> serializers.array_to_key
-        inl v = ($"auto \v = !values.row(!i)" : vector t) |> serializers.array_to_value
+        inl k = ($"auto \v = !keys(af::span, !i)" : af_array t) |> serializers.array_to_key
         match k with
-        | Some k => f k v
+        | Some k => 
+            inl v = ($"auto \v = !values(af::span, !i)" : af_array t) |> serializers.array_to_value
+            f k v
         | None => ()
 
 instance printable dict k v = fun {write write_ln} d =>

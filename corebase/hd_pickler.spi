@@ -1,5 +1,5 @@
 // Pickler combinators for converting regular Spiral types to binary vectors of floating point values.
-// The preferred pickler for Hopfield dictionaries. I'd also recomment it for regular NNs as well.
+// The preferred pickler for Hebbian dictionaries. I'd also recomment it for regular NNs as well.
 
 // Returns boolean whether the array is 1 at a given index.
 prototype pickler_index array : array -> int -> bool
