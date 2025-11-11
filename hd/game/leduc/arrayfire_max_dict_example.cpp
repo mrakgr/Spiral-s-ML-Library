@@ -9,7 +9,9 @@ af::array max_dictionary_get(
     
     // // Get max indices along dimension 0 (rows)
     af::array max_vals, max_indices;
-    af::max(max_vals, max_indices, temp + af::randu(temp.dims()), 1);
+    af::array noise = af::randu(temp.dims());
+    af_print(noise);
+    af::max(max_vals, max_indices, temp + noise, 1);
     af_print(max_indices(0, af::span));
     
     // // Use the indices to lookup values from the values array

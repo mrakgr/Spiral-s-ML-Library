@@ -1,18 +1,16 @@
-Error trace on line: 315, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_cfr_train.spi.
-    inl p_showdown : pickler showdown = record {
-    ^
-Error trace on line: 320, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_cfr_train.spi.
-    inl p_message : pickler message = alt {
-    ^
-Error trace on line: 320, column: 39 in module: /home/mrakgr/Spiral-s-ML-Library/hopfield_dictionary/game/leduc/hd_cfr_train.spi.
-    inl p_message : pickler message = alt {
-                                      ^
-Error trace on line: 48, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/hd_pickler.spi.
-    Alt(real union_map `pickler `union_ picklers)
-    ^
-Error trace on line: 48, column: 14 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/hd_pickler.spi.
-    Alt(real union_map `pickler `union_ picklers)
-             ^
-Type error in nominal constructor.
-Got:      {CommunityCardIs : pickler card; Hidden : pickler (); PlayerAction : pickler (i32 * card); PlayerGotCard : pickler (i32 * card); Showdown : pickler {cards_shown : sa 2i32 card; chips_won : i32; winner_id : i32}}
-Expected: {CommunityCardIs : pickler card; Hidden : pickler (); PlayerAction : pickler (i32 * action); PlayerGotCard : pickler (i32 * card); Showdown : pickler {cards_shown : sa 2i32 card; chips_won : i32; winner_id : i32}}
+Error trace on line: 58, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            inl printable_funs =
+            ^
+Error trace on line: 63, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            if union_is x then
+            ^
+Error trace on line: 80, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) printable_funs x
+            ^
+Error trace on line: 83, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+                !!!!PrintStatic(`(`x))
+                    ^
+Error trace on line: 84, column: 17 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+                error_type "Unsupported type. Check the terminal for more info"
+                ^
+Unsupported type. Check the terminal for more info

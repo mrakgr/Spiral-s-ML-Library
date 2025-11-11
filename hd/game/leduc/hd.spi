@@ -53,7 +53,9 @@ inl create forall k v. (exists t. { key_to_array array_to_value value_to_array a
 
 // Clears the dictionary of keys by setting both the keys and the values all to 0.
 inl clear forall k v. ((dict (exists t. {data = refs})) : dict k v) : () =
-    matrix_set_all refs.keys 1 . matrix_clear refs.values
+    inl rows, cols = matrix_rows refs.keys, matrix_cols refs.keys
+    $"!(refs.keys) = (af::randu(!cols, !rows) > 0.5).as(!(refs.keys).type())"
+    matrix_clear refs.values
 
 // Gets an item from the dictionary.
 inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : v * af_index k =
@@ -77,6 +79,18 @@ inl num_rows forall k v. ((dict (exists t. {serializers data = refs})) : dict k 
 inl set forall k v. ((dict (exists t. {serializers data = refs})) & d : dict k v) (af_index (k, k_i) : af_index k) (v : v) : () =
     inl num_rows : int = num_rows d
     inl keys, values = refs.keys, refs.values
+    // inl k'_array : af_array t = $"`(af_array t) \v = !keys(af::span, !k_i.scalar<`u32>())"
+    // inl k' : option k = serializers.array_to_key k'_array
+    // match k' with
+    // | None => ()
+    // | Some k' =>
+    //     if k' <> k then 
+    //         coreext.console.write_ln {k k'}
+    //         coreext.console.write_ln d
+    //         // inl k,k' = serializers.key_to_array k, serializers.key_to_array k'
+    //         // $"af_print(af::transpose(!k))"
+    //         // $"af_print(af::transpose(!k'))"
+    //         failwith "Key mismatch in dictionary set operation."
     $"!keys(af::span, !k_i) = !(serializers.key_to_array k)"
     $"!values(af::span, !k_i) = !(serializers.value_to_array v)"
 

@@ -1,0 +1,198 @@
+{i = 0; nearTo = 500}
+{i = 20; nearTo = 500}
+{i = 40; nearTo = 500}
+{i = 60; nearTo = 500}
+{i = 80; nearTo = 500}
+{i = 100; nearTo = 500}
+{i = 120; nearTo = 500}
+{i = 140; nearTo = 500}
+{i = 160; nearTo = 500}
+{i = 180; nearTo = 500}
+{i = 200; nearTo = 500}
+{i = 220; nearTo = 500}
+{i = 240; nearTo = 500}
+{i = 260; nearTo = 500}
+{i = 280; nearTo = 500}
+{i = 300; nearTo = 500}
+{i = 320; nearTo = 500}
+{i = 340; nearTo = 500}
+{i = 360; nearTo = 500}
+{i = 380; nearTo = 500}
+{i = 400; nearTo = 500}
+{i = 420; nearTo = 500}
+{i = 440; nearTo = 500}
+{i = 460; nearTo = 500}
+{i = 480; nearTo = 500}
+{i = 0; nearTo = 100}
+{i = 4; nearTo = 100}
+{i = 8; nearTo = 100}
+{i = 12; nearTo = 100}
+{i = 16; nearTo = 100}
+{i = 20; nearTo = 100}
+{i = 24; nearTo = 100}
+{i = 28; nearTo = 100}
+{i = 32; nearTo = 100}
+{i = 36; nearTo = 100}
+{i = 40; nearTo = 100}
+{i = 44; nearTo = 100}
+{i = 48; nearTo = 100}
+{i = 52; nearTo = 100}
+{i = 56; nearTo = 100}
+{i = 60; nearTo = 100}
+{i = 64; nearTo = 100}
+{i = 68; nearTo = 100}
+{i = 72; nearTo = 100}
+{i = 76; nearTo = 100}
+{i = 80; nearTo = 100}
+{i = 84; nearTo = 100}
+{i = 88; nearTo = 100}
+{i = 92; nearTo = 100}
+{i = 96; nearTo = 100}
+{reward_for_pl0 = 0.213502}
+{
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [181.018341; 0.000000; 74.981621]; current_policy = [26.333162; 2441.703613; 18.200268]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [138.224136; 67.918839; 49.857159]; current_policy = [21.945663; 10.669535; 29.567471]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [57.900333; 0.000000; 198.099579]; current_policy = [1.004019; 23.765263; 2.778346]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [237.994537; 0.000000; 18.005238]; current_policy = [2.713851; 0.022517; 0.401023]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [2.190520; 253.809494; 0.000000]; current_policy = [0.267703; 15.017249; 1181.961670]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [158.859070; 0.000000; 97.140892]; current_policy = [15.160019; 447.897430; 23.003607]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 0.500000]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.521352; 255.478683; 0.000000]; current_policy = [0.105982; 8.470498; 1292.321655]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [245.610672; 0.000000; 10.389378]; current_policy = [23.808256; 0.000000; 1.291802]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [252.028946; 0.000000; 3.971015]; current_policy = [24.692751; 1.320533; 0.000000]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [187.022766; 48.086636; 20.890425]; current_policy = [49.694065; 13.794719; 8.850420]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise)] => {average_policy = [224.708832; 1.985182; 29.305969]; current_policy = [49.931183; 1.091347; 0.362925]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 7.086575]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.014223; 226.468735; 29.517244]; current_policy = [0.000000; 3.205781; 0.382168]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [229.523407; 0.000000; 26.476669]; current_policy = [54.948013; 1349.962402; 4.127952]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [0.187500; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [202.123352; 53.876579; 0.000000]; current_policy = [10.429346; 3.359895; 806.514160]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [0.647195; 234.425873; 20.926985]; current_policy = [0.576012; 89.254715; 1.635560]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.000001; 0.000001; 255.998047]; current_policy = [0.000000; 0.000000; 3.313624]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [252.908615; 3.091331; 0.000000]; current_policy = [2.585093; 0.024190; 32.658928]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [83.808014; 172.192062; 0.000000]; current_policy = [9.496648; 21.221661; 2467.031494]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.000159; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 2.300979]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [188.862030; 63.850983; 3.286942]; current_policy = [18.824387; 81.585823; 0.005318]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [250.417801; 5.582188; 0.000000]; current_policy = [2.742287; 0.021973; 26.467945]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.502699; 255.497177; 0.000000]; current_policy = [0.000000; 2.360642; 50.720810]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [0.000001; 0.000001; 255.998047]; current_policy = [0.000000; 0.000000; 10.061213]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [43.680977; 0.000000; 212.319122]; current_policy = [0.580427; 0.342661; 2.528652]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [241.057755; 0.000000; 14.942228]; current_policy = [35.369331; 5081.592773; 5.370852]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [153.271500; 0.000000; 102.728401]; current_policy = [34.619957; 94.894737; 20.995047]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise)] => {average_policy = [240.987640; 2.086464; 12.925902]; current_policy = [47.193405; 1.769692; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [0.000003; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 1.733393]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [0.000001; 0.000001; 255.998047]; current_policy = [0.000000; 0.000000; 6.226750]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [0.208333; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.137357; 241.671448; 14.191280]; current_policy = [0.479697; 269.590546; 19.453314]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [186.237732; 69.762245; 0.000000]; current_policy = [15.749923; 17.158472; 2319.845459]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [5.533425; 250.466736; 0.000000]; current_policy = [0.196258; 10.372517; 2480.635742]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [3.037129; 252.963028; 0.000000]; current_policy = [0.017169; 8.195065; 2385.163818]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [133.575989; 121.002289; 1.421529]; current_policy = [5.354954; 5.299784; 0.020001]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [247.331070; 0.000000; 8.668952]; current_policy = [129.981567; 15673.014648; 8.621245]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 0.276524]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [203.850342; 51.703693; 0.445873]; current_policy = [14.692503; 3.627913; 0.000000]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [0.131104; 255.315155; 0.553681]; current_policy = [0.000000; 4.357485; 0.000000]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [5.035037; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.152117; 255.847839; 0.000000]; current_policy = [0.000000; 16.459318; 3043.391602]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [239.992111; 0.000000; 16.007832]; current_policy = [39.203117; 16085.921875; 0.434370]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [0.000001; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 0.477835]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [37.970589; 9.072107; 208.957184]; current_policy = [14.134206; 17.961617; 40.943420]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.182065; 239.968781; 15.849127]; current_policy = [0.000000; 29.698641; 7.289790]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [156.148224; 95.396255; 4.455434]; current_policy = [157.976318; 88.786316; 3.612688]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.271946; 253.778961; 1.949132]; current_policy = [0.000000; 113.937103; 0.000000]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [128.506088; 0.113717; 127.379944]; current_policy = [2.365660; 0.000000; 2.343625]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [255.263794; 0.000000; 0.736109]; current_policy = [22.122215; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [193.921295; 10.776223; 51.302494]; current_policy = [28.812496; 0.000000; 2.880116]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [0.643851; 251.001404; 4.354698]; current_policy = [0.080652; 36.389477; 0.496558]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 2.335184]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000001; 0.000000]; current_policy = [5.013646; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.252403; 243.468018; 12.279378]; current_policy = [0.040390; 6.826687; 0.315091]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [208.493622; 4.554963; 42.951313]; current_policy = [61.626945; 2.597817; 14.538580]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [211.878540; 0.000000; 44.121410]; current_policy = [66.098129; 1452.876343; 12.729061]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000001; 0.000000]; current_policy = [0.250000; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [6.632827; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [4.367488; 251.632477; 0.000000]; current_policy = [1.272102; 38.561539; 3864.221191]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [222.795273; 0.000000; 33.204769]; current_policy = [31.597919; 10921.606445; 4.702839]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [143.781418; 0.000000; 112.218460]; current_policy = [30.762684; 10.372426; 19.175516]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [220.761292; 6.006085; 29.232559]; current_policy = [55.473316; 0.000000; 19.034618]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [0.000001; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 0.173160]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [0.000001; 0.000001; 255.998047]; current_policy = [0.000000; 0.000000; 4.692611]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [205.284073; 14.605263; 36.110966]; current_policy = [46.965042; 10.421405; 5.057064]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [174.191452; 9.062393; 72.746063]; current_policy = [37.476513; 9.656081; 22.163094]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.042849; 255.957108; 0.000000]; current_policy = [0.000000; 2.084803; 52.203911]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [226.839432; 18.826870; 10.333809]; current_policy = [61.915771; 0.343990; 0.596219]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [238.789642; 17.210451; 0.000000]; current_policy = [10.057621; 2.155991; 238.079178]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [73.015648; 0.000000; 182.984436]; current_policy = [2.772956; 1.963595; 16.565090]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [143.025879; 58.021103; 54.952950]; current_policy = [11.278104; 4.483771; 4.387784]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [229.212433; 0.000000; 26.787445]; current_policy = [17.382618; 3331.046143; 2.190818]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [243.845535; 12.154436; 0.000000]; current_policy = [9.881804; 0.659118; 297.702820]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [0.000001; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 3.328654]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [208.311569; 43.869312; 3.819002]; current_policy = [24.957697; 6.579768; 0.474261]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [143.935684; 108.662491; 3.401678]; current_policy = [54.111439; 39.093513; 1.069736]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [0.000001; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 2.700923]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [1.711844; 244.764923; 9.523090]; current_policy = [0.042874; 6.158864; 0.331479]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [207.009903; 0.000000; 48.990269]; current_policy = [3.424828; 148.795166; 0.960821]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise)] => {average_policy = [238.362015; 1.095316; 16.542654]; current_policy = [47.119690; 0.000000; 5.801471]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [42.570202; 0.000000; 213.429733]; current_policy = [10.797815; 2.154553; 40.281139]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [238.824692; 17.175358; 0.000000]; current_policy = [13.462246; 2.504835; 383.272156]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [80.297974; 0.000000; 175.702347]; current_policy = [1.302179; 20.533306; 2.261111]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [1.750000; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [26.323399; 224.782745; 4.893971]; current_policy = [12.528139; 67.351959; 3.069329]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.000003; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 8.636736]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [254.696793; 1.303214; 0.000000]; current_policy = [12.632392; 0.000000; 157.348434]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.072258; 234.621735; 21.306036]; current_policy = [0.018920; 32.083344; 5.222461]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [0.000003; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 4.178560]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [1.444070; 254.547607; 0.000000]; current_policy = [0.000000; 2.487140; 394.186890]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [54.612392; 201.387634; 0.000000]; current_policy = [2.776900; 18.660789; 2166.629883]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [223.753952; 25.520609; 6.725313]; current_policy = [26.078854; 5.927988; 0.357453]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [245.004242; 0.000000; 10.995924]; current_policy = [17.937878; 0.000000; 0.900519]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 1.341642]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [229.149796; 0.000000; 26.850225]; current_policy = [36.083065; 5098.432617; 3.500365]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [238.946014; 17.054148; 0.000000]; current_policy = [9.271468; 0.005023; 220.359573]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [52.096455; 203.903519; 0.000000]; current_policy = [0.594155; 1.556932; 81.450836]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [0.208333; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.502014; 255.498001; 0.000000]; current_policy = [0.156983; 10.968856; 1364.293945]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [249.760681; 6.239310; 0.000000]; current_policy = [66.177238; 0.504393; 2969.707031]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [17.035416; 238.964569; 0.000000]; current_policy = [1.835172; 29.838926; 2890.454834]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [1.647204; 254.352814; 0.000000]; current_policy = [0.000000; 15.174880; 2923.315674]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [1.757086; 254.235626; 0.000000]; current_policy = [0.013149; 1.922703; 404.054688]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [158.113968; 18.748840; 79.137222]; current_policy = [30.625946; 17.711243; 12.599994]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.275245; 245.946152; 9.778465]; current_policy = [0.946974; 228.831985; 7.547185]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [148.635849; 99.400711; 7.963466]; current_policy = [79.976189; 39.716152; 1.530269]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000001; 0.000000]; current_policy = [0.768286; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.179059; 235.376526; 20.444548]; current_policy = [0.000000; 8.306847; 0.334295]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 4.224049]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [7.016126; 244.657547; 4.326234]; current_policy = [2.931547; 162.440491; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [248.092056; 7.907973; 0.000000]; current_policy = [14.064948; 0.159677; 271.185455]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [255.368469; 0.000000; 0.631521]; current_policy = [22.913572; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call)] => {average_policy = [238.082428; 1.383491; 16.534060]; current_policy = [45.453117; 0.000000; 12.935704]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [225.626770; 30.373238; 0.000000]; current_policy = [8.946163; 5.317279; 321.914307]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 4.219363]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 0.613506]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [232.055725; 23.944139; 0.000000]; current_policy = [13.619417; 0.014359; 346.035156]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.755085; 255.244904; 0.000000]; current_policy = [0.177156; 15.317045; 1248.727417]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [250.983459; 5.016594; 0.000000]; current_policy = [65.242996; 0.000000; 2572.152100]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.093249; 255.906723; 0.000000]; current_policy = [0.000000; 12.690908; 3141.442383]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call)] => {average_policy = [218.756851; 1.275042; 35.968208]; current_policy = [45.743843; 0.000000; 10.421423]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call)] => {average_policy = [0.000001; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 0.992286]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [0.169056; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 0.500000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [0.747461; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.715219; 255.284866; 0.000000]; current_policy = [0.049046; 10.085481; 3654.118652]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [255.998047; 0.000000; 0.000000]; current_policy = [0.097222; 0.000000; 0.000000]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [135.063156; 43.814045; 77.122635]; current_policy = [5.438503; 12.004812; 0.306821]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [218.770859; 0.000000; 37.229061]; current_policy = [27.952534; 7768.132324; 0.993575]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [158.638947; 0.000000; 97.360870]; current_policy = [16.288160; 473.754547; 12.799007]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [187.828827; 68.171188; 0.000000]; current_policy = [1.184104; 0.545611; 6.240787]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [149.399963; 38.118664; 68.481300]; current_policy = [31.602365; 1.159101; 2.986297]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Raise)] => {average_policy = [0.000001; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 3.768407]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.404299; 255.595734; 0.000000]; current_policy = [0.043642; 5.365752; 2826.029053]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Jack); PlayerAction(0, Call)] => {average_policy = [76.994698; 9.907413; 169.097763]; current_policy = [0.510658; 0.013665; 13.537453]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [28.375229; 224.921692; 2.702957]; current_policy = [4.987339; 30.691536; 1.238894]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [82.755081; 166.779846; 6.465201]; current_policy = [108.493607; 208.307190; 10.755648]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Raise)] => {average_policy = [194.612808; 17.853909; 43.533146]; current_policy = [54.007172; 0.000000; 43.822941]}
+[Hidden; PlayerGotCard(1, Jack); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(Queen); PlayerAction(0, Raise)] => {average_policy = [1.749986; 248.041656; 6.208216]; current_policy = [0.262843; 54.892548; 0.889580]}
+[Hidden; PlayerGotCard(1, King); PlayerAction(0, Raise); PlayerAction(1, Call); CommunityCardIs(King); PlayerAction(0, Call)] => {average_policy = [0.000000; 0.000000; 255.998047]; current_policy = [0.000000; 0.000000; 4.238324]}
+[Hidden; PlayerGotCard(1, Queen); PlayerAction(0, Raise); PlayerAction(1, Raise); PlayerAction(0, Call); CommunityCardIs(Jack); PlayerAction(0, Call); PlayerAction(1, Raise); PlayerAction(0, Raise)] => {average_policy = [0.902846; 255.090286; 0.000000]; current_policy = [0.000000; 1.913671; 410.002808]}
+}
+

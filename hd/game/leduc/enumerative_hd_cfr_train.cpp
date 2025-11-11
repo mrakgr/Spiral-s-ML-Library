@@ -5543,172 +5543,179 @@ int main() {
     StackRefs0 v3{v2};
     std::unordered_map<Tuple0, static_array<Tuple2,3>, Fun0, Fun1> v4(512, v0, v1);
     StackRefs1 v5{v4};
-    af::array v6(1312, 512);
-    af::array v7(6, 512);
+    af::array v6(1312, 144);
+    af::array v7(6, 144);
     StackRefs2 v8{v6, v7};
     af::array & v9 = v8.v0;
-    v9 = af::constant<float>(1.0f, v9.dims());
-    af::array & v10 = v8.v1;
-    v10 = af::constant<float>(0, v10.dims());
-    xso::rng v11;
-    StackMut0 v12{63u};
-    static_array_list<Union0,32> v13;
-    v13 = static_array_list<Union0,32>{};
-    StackRefs3 v17{v13};
-    static_array<Tuple2,2> v18;
-    int v22;
-    v22 = 0;
-    while (while_method_1(v22)){
-        v18[v22] = Tuple2{0.0f, 0.0f};
-        v22 += 1 ;
+    int v10;
+    v10 = v9.dims(1);
+    af::array & v11 = v8.v0;
+    int v12;
+    v12 = v11.dims(0);
+    af::array & v13 = v8.v0;
+    af::array & v14 = v8.v0;
+    v13 = (af::randu(v12, v10) > 0.5).as(v14.type());
+    af::array & v15 = v8.v1;
+    v15 = af::constant<float>(0, v15.dims());
+    xso::rng v16;
+    StackMut0 v17{63u};
+    static_array_list<Union0,32> v18;
+    v18 = static_array_list<Union0,32>{};
+    StackRefs3 v22{v18};
+    static_array<Tuple2,2> v23;
+    int v27;
+    v27 = 0;
+    while (while_method_1(v27)){
+        v23[v27] = Tuple2{0.0f, 0.0f};
+        v27 += 1 ;
     }
-    StackRefs4 v24{v18};
-    int v25; float v26;
+    StackRefs4 v29{v23};
+    int v30; float v31;
     Tuple3 tmp0 = Tuple3{0, 0.0f};
-    v25 = tmp0.v0; v26 = tmp0.v1;
-    while (while_method_2(v25)){
-        int v28;
-        v28 = v25 % 20;
-        bool v29;
-        v29 = v28 == 0;
-        if (v29){
-            printf("{%s = %d; %s = %d}\n","i", v25, "nearTo", 500);
+    v30 = tmp0.v0; v31 = tmp0.v1;
+    while (while_method_2(v30)){
+        int v33;
+        v33 = v30 % 20;
+        bool v34;
+        v34 = v33 == 0;
+        if (v34){
+            printf("{%s = %d; %s = %d}\n","i", v30, "nearTo", 500);
             fflush(stdout);
         } else {
         }
-        Union3 v35;
-        v35 = Union3{Union3_1{}};
-        float v36;
-        v36 = body_0(v17, v3, v8, v11, v12, v24, v35);
-        v26 = v36;
-        v25 += 1 ;
+        Union3 v40;
+        v40 = Union3{Union3_1{}};
+        float v41;
+        v41 = body_0(v22, v3, v8, v16, v17, v29, v40);
+        v31 = v41;
+        v30 += 1 ;
     }
-    xso::rng v37;
-    StackMut0 v38{63u};
-    static_array_list<Union0,32> v39;
-    v39 = static_array_list<Union0,32>{};
-    StackRefs3 v43{v39};
-    static_array<Tuple2,2> v44;
-    int v48;
-    v48 = 0;
-    while (while_method_1(v48)){
-        v44[v48] = Tuple2{0.0f, 0.0f};
-        v48 += 1 ;
+    xso::rng v42;
+    StackMut0 v43{63u};
+    static_array_list<Union0,32> v44;
+    v44 = static_array_list<Union0,32>{};
+    StackRefs3 v48{v44};
+    static_array<Tuple2,2> v49;
+    int v53;
+    v53 = 0;
+    while (while_method_1(v53)){
+        v49[v53] = Tuple2{0.0f, 0.0f};
+        v53 += 1 ;
     }
-    StackRefs4 v50{v44};
-    int v51; float v52;
+    StackRefs4 v55{v49};
+    int v56; float v57;
     Tuple3 tmp30 = Tuple3{0, 0.0f};
-    v51 = tmp30.v0; v52 = tmp30.v1;
-    while (while_method_7(v51)){
-        int v54;
-        v54 = v51 % 4;
-        bool v55;
-        v55 = v54 == 0;
-        if (v55){
-            printf("{%s = %d; %s = %d}\n","i", v51, "nearTo", 100);
+    v56 = tmp30.v0; v57 = tmp30.v1;
+    while (while_method_7(v56)){
+        int v59;
+        v59 = v56 % 4;
+        bool v60;
+        v60 = v59 == 0;
+        if (v60){
+            printf("{%s = %d; %s = %d}\n","i", v56, "nearTo", 100);
             fflush(stdout);
         } else {
         }
-        Union3 v61;
-        v61 = Union3{Union3_1{}};
-        float v62;
-        v62 = body_13(v43, v3, v8, v37, v38, v50, v61);
-        v52 = v62;
-        v51 += 1 ;
+        Union3 v66;
+        v66 = Union3{Union3_1{}};
+        float v67;
+        v67 = body_13(v48, v3, v8, v42, v43, v55, v66);
+        v57 = v67;
+        v56 += 1 ;
     }
-    printf("{%s = %f}\n","reward_for_pl0", v52);
+    printf("{%s = %f}\n","reward_for_pl0", v57);
     fflush(stdout);
     printf("%s\n","{");
-    af::array & v67 = v8.v0;
-    int v68;
-    v68 = v67.dims(1);
-    af::array & v69 = v8.v0;
-    af::array & v70 = v8.v1;
-    int v71;
-    v71 = 0;
-    while (while_method_0(v68, v71)){
-        auto v73 = v69(af::span, v71);
-        bool v74;
-        v74 = af::allTrue<bool>(v73 == 1);
-        Union9 v80;
-        if (v74){
-            v80 = Union9{Union9_0{}};
+    af::array & v72 = v8.v0;
+    int v73;
+    v73 = v72.dims(1);
+    af::array & v74 = v8.v0;
+    af::array & v75 = v8.v1;
+    int v76;
+    v76 = 0;
+    while (while_method_0(v73, v76)){
+        auto v78 = v74(af::span, v76);
+        bool v79;
+        v79 = af::allTrue<bool>(v78 == 1);
+        Union9 v85;
+        if (v79){
+            v85 = Union9{Union9_0{}};
         } else {
-            int v76;
-            v76 = v73.elements();
-            float v77[v76];
-            v73.host(v77);;
-            static_array_list<Union0,32> v78;
-            v78 = method_17(v77);
-            v80 = Union9{Union9_1{v78}};
+            int v81;
+            v81 = v78.elements();
+            float v82[v81];
+            v78.host(v82);;
+            static_array_list<Union0,32> v83;
+            v83 = method_17(v82);
+            v85 = Union9{Union9_1{v83}};
         }
-        switch (v80.tag) {
+        switch (v85.tag) {
             case 0: { // None
                 break;
             }
             case 1: { // Some
-                static_array_list<Union0,32> v81 = v80.case1.v0;
-                auto v82 = v70(af::span, v71);
-                int v83;
-                v83 = v82.elements();
-                float v84[v83];
-                v82.host(v84);;
-                static_array<float,3> v85;
-                int v89;
-                v89 = 0;
-                while (while_method_4(v89)){
-                    float v91;
-                    v91 = v84[v89];
-                    v85[v89] = v91;
-                    v89 += 1 ;
+                static_array_list<Union0,32> v86 = v85.case1.v0;
+                auto v87 = v75(af::span, v76);
+                int v88;
+                v88 = v87.elements();
+                float v89[v88];
+                v87.host(v89);;
+                static_array<float,3> v90;
+                int v94;
+                v94 = 0;
+                while (while_method_4(v94)){
+                    float v96;
+                    v96 = v89[v94];
+                    v90[v94] = v96;
+                    v94 += 1 ;
                 }
-                static_array<float,3> v92;
-                int v96;
-                v96 = 0;
-                while (while_method_4(v96)){
-                    int v98;
-                    v98 = v96 + 3;
-                    float v99;
-                    v99 = v84[v98];
-                    v92[v96] = v99;
-                    v96 += 1 ;
+                static_array<float,3> v97;
+                int v101;
+                v101 = 0;
+                while (while_method_4(v101)){
+                    int v103;
+                    v103 = v101 + 3;
+                    float v104;
+                    v104 = v89[v103];
+                    v97[v101] = v104;
+                    v101 += 1 ;
                 }
                 printf("%s","[");
-                int v100;
-                v100 = v81.length;
-                bool v101;
-                v101 = 100 < v100;
-                int v102;
-                if (v101){
-                    v102 = 100;
+                int v105;
+                v105 = v86.length;
+                bool v106;
+                v106 = 100 < v105;
+                int v107;
+                if (v106){
+                    v107 = 100;
                 } else {
-                    v102 = v100;
+                    v107 = v105;
                 }
-                int v103;
-                v103 = 0;
-                while (while_method_0(v102, v103)){
-                    Union0 v105;
-                    v105 = v81[v103];
+                int v108;
+                v108 = 0;
+                while (while_method_0(v107, v108)){
+                    Union0 v110;
+                    v110 = v86[v108];
                     printf("");
-                    method_21(v105);
+                    method_21(v110);
                     printf("");
-                    int v109;
-                    v109 = v103 + 1;
-                    int v110;
-                    v110 = v81.length;
-                    bool v111;
-                    v111 = v109 < v110;
-                    if (v111){
+                    int v114;
+                    v114 = v108 + 1;
+                    int v115;
+                    v115 = v86.length;
+                    bool v116;
+                    v116 = v114 < v115;
+                    if (v116){
                         printf("%s","; ");
                     } else {
                     }
-                    v103 += 1 ;
+                    v108 += 1 ;
                 }
-                int v112;
-                v112 = v81.length;
-                bool v113;
-                v113 = v112 > 100;
-                if (v113){
+                int v117;
+                v117 = v86.length;
+                bool v118;
+                v118 = v117 > 100;
+                if (v118){
                     printf("%s","; ...");
                 } else {
                 }
@@ -5716,39 +5723,39 @@ int main() {
                 printf("");
                 printf("%s"," => ");
                 printf("{%s = %s","average_policy", "[");
-                int v114;
-                v114 = 0;
-                while (while_method_4(v114)){
-                    float v116;
-                    v116 = v85[v114];
-                    printf("%f",v116);
-                    int v120;
-                    v120 = v114 + 1;
-                    bool v121;
-                    v121 = v120 < 3;
-                    if (v121){
+                int v119;
+                v119 = 0;
+                while (while_method_4(v119)){
+                    float v121;
+                    v121 = v90[v119];
+                    printf("%f",v121);
+                    int v125;
+                    v125 = v119 + 1;
+                    bool v126;
+                    v126 = v125 < 3;
+                    if (v126){
                         printf("%s","; ");
                     } else {
                     }
-                    v114 += 1 ;
+                    v119 += 1 ;
                 }
                 printf("%s","]");
                 printf("; %s = %s","current_policy", "[");
-                int v122;
-                v122 = 0;
-                while (while_method_4(v122)){
-                    float v124;
-                    v124 = v92[v122];
-                    printf("%f",v124);
-                    int v128;
-                    v128 = v122 + 1;
-                    bool v129;
-                    v129 = v128 < 3;
-                    if (v129){
+                int v127;
+                v127 = 0;
+                while (while_method_4(v127)){
+                    float v129;
+                    v129 = v97[v127];
+                    printf("%f",v129);
+                    int v133;
+                    v133 = v127 + 1;
+                    bool v134;
+                    v134 = v133 < 3;
+                    if (v134){
                         printf("%s","; ");
                     } else {
                     }
-                    v122 += 1 ;
+                    v127 += 1 ;
                 }
                 printf("%s","]");
                 printf("}\n");
@@ -5759,7 +5766,7 @@ int main() {
                 exit(-1);
             }
         }
-        v71 += 1 ;
+        v76 += 1 ;
     }
     printf("%s\n","}");
     printf("\n");

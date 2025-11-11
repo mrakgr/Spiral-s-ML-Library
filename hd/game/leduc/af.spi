@@ -21,3 +21,6 @@ inl to_array forall t{number}. (m : af_array t) : array t =
     inl arr : array t = corebase.create (length m)
     $"!m.host(!arr);"
     arr
+
+instance printable af_array t = fun s m =>
+    $"af_print(!m)"
