@@ -1,0 +1,195 @@
+// Pickler combinators for converting regular Spiral types to binary vectors of floating point values.
+// The preferred pickler for Spherical K-Means dictionaries. I'd also recomment it for regular NNs as well.
+
+open hd_pickler
+
+// Returns the number of entries in the pickler.
+inl size' (h : compile_time.hashmap) : forall t. pickler t -> int = 
+    inl body forall t. (p : pickler t) : int =
+        inl rec loop forall t'. : pickler t' -> int =
+            compile_time.hashmapm.memoize h function
+                | Unit => 1
+                | Bool => 2
+                | Int l => l
+                | Uint l => l
+                | Sa_list p as x => 
+                    inl max_len = get_max_length x
+                    loop p * max_len
+                | Sa p as x =>
+                    inl max_len = get_max_length x
+                    loop p * max_len
+                | Pair(a,b) => loop a + loop b 
+                | Wrap (exists b. a, b, p) => loop p 
+                | Alt l => real
+                    open real_core
+                    inl l = nominal_strip l
+                    record_fold (fun {state key value} => 
+                        typecase `value with pickler ~t => 
+                        state + loop `t value
+                        ) 0 l
+                | Record l => real
+                    open real_core
+                    inl l = nominal_strip l
+                    record_fold (fun {state key value} => 
+                        typecase `value with pickler ~t => 
+                        state + loop `t value
+                        ) 0 l
+        loop p
+    `$body
+
+// Returns the size of the pickler. Uses a compile time dictionary under the hood that gets created when the union arg is applied.
+inl size () : forall t. pickler t -> int = size' (compile_time.hashmapm.create())
+
+// Serializes the argument to a binary vector. The vector elements should all be set to 0 prior to being passed into this function.
+inl pickle forall array{pickler_set} tt. (ar : array) (p : pickler tt) ~(x : tt) : () = join
+    inl size : forall w. pickler w -> int = size()
+    inl i = stack_mut (0 : int)
+    inl enable i' = pickler_set ar (*i + i') true
+    inl advance i' = i <- *i + i'
+    inl push a b = enable a . advance b
+    inl set i' = i <- i'
+    inl rec loop' forall t. (p : pickler t) (x : t) : () = 
+        match p with
+        | Unit => push 0 1
+        | Bool => push (if x then 1 else 0) 2
+        | Int l => 
+            assert (l > 0) "The argument to Int must be greater than 0."
+            assert (x < l) "The input to the pickler must be 0 or positive."
+            assert (0 <= x) "The input to the pickler must be less than the specified length."
+            push x l
+        | Uint l =>
+            inl x = conv x
+            assert (l > 0) "The argument to Uint must be greater than 0."
+            assert (x < l) "The input to the pickler must be 0 or positive."
+            push x l
+        | Sa_list l => arraym.iter (loop' l) x
+        | Sa l => arraym.iter (loop' l) x
+        | Pair(a,b) => loop' a (fst x) . loop' b (snd x)
+        | Wrap (exists b. a, b, p) => loop' p (a x)
+        | Alt l =>
+            inl end = *i + size p
+            real
+                open real_core
+                inl offsets, _ =
+                    record_fold (fun {state=(m,s) key value} => 
+                        typecase `value with pickler ~t => 
+                        {m with $key=s}, s + size `t value
+                        ) ({},0) (nominal_strip l)
+                unbox x fun (k,v) =>
+                    advance (offsets k)
+                    loop' `(`(v)) (l k) v
+            set end
+        | Record l =>
+            real
+                open real_core
+                record_iter (fun {key value} => loop' `(`(value)) (l key) value) x
+    loop' p x
+
+// Deserializes the argument from a binary vector.
+inl unpickle forall array{pickler_index} tt. (ar : array) (p : pickler tt) : tt = join
+    inl size : forall w. pickler w -> int = size()
+    inl i = stack_mut (0 : int)
+    inl index (i' : int) : bool = pickler_index ar (*i + i')
+    inl advance i' = i <- *i + i'
+    inl parse () : bool =
+        inl x = index 0
+        advance 1
+        x
+    inl scan_template (len : int) =
+        loop.for {from = 0; nearTo = len} (fun i' (last_loc, count : int * int) =>
+            if parse() then i', count + 1
+            else last_loc, count
+            ) (0, 0)
+    inl scan ~(len : int) : int = join
+        inl last_loc, count = scan_template len
+        assert (count = 1) "The number of integers being scanned in unpickle needs to be exactly 1."
+        last_loc
+    inl has_nonzero ~(len : int) : bool = join
+        inl last_loc, count = scan_template len
+        advance -len
+        count > 0
+    inl ensure (c : bool) ~(len : int) : () = join
+        inl last_loc, count = scan_template len
+        if c then assert (count = len) "Expected that the elements of this particular element in the unpickler would all be 1. `ensure` check failed."
+        else assert (count = 0) "Expected that the elements of this particular element in the unpickler would all be 0. `ensure` check failed."
+    inl set i' = i <- i'
+    inl rec loop' forall t. (p : pickler t) : t =
+        match p with
+        | Unit => assert (scan 1 = 0) "Invalid unit value in unpickle."
+        | Bool => scan 2 = 1
+        | Int l => 
+            assert (l > 0) "The argument to Int must be greater than 0."
+            scan l
+        | Uint l => 
+            assert (l > 0) "The argument to Uint must be greater than 0."
+            conv (scan l)
+        | Sa_list l =>
+            inl max_len = get_max_length p
+            inl x = sa_create
+            inl is_done = stack_mut false
+            loop.for' {from = 0; nearTo = max_len} fun _ =>
+                if *is_done then
+                    ensure false (size l)
+                else 
+                    if has_nonzero (size l) then
+                        sa_listm.push x (loop' l)
+                    else
+                        is_done <- true
+            x
+        | Sa l => sam.init (fun _ => loop' l)
+        | Pair(a,b) => loop' a, loop' b
+        | Wrap (exists b. a, b, p) => b (loop' p)
+        | Alt l =>
+            inl result = stack_mut None
+            inl is_done = stack_mut false
+            real
+                open real_core
+                record_fold (fun {state=i key value} => 
+                    typecase `value with pickler ~t_case => 
+                    if *is_done then
+                        ensure false (size `t_case value)
+                    else
+                        if has_nonzero (size l) then
+                            match *result with 
+                            | None => 
+                                union_untag `t (conv `i32 i)
+                                    (fun k => forall v. => nominal_create `t (k, loop' `v value))
+                                    (fun _ => error_type "Invalid tag.")
+                                |> fun x => result <- Some `t x
+                            | Some => assert (dyn false) "Duplicate union type instances in the unpickle Alt case."
+                            is_done <- true
+                    i + 1
+                    ) 0 (nominal_strip l) |> ignore
+            match *result with
+            | Some x => x
+            | None => failwith "Could not parse the union type in unpickle's Alt case."
+        | Record l =>
+            real
+                open real_core
+                record_map (fun {key value} => 
+                    typecase `value with pickler ~t_case => 
+                    loop' `t_case value
+                    ) (nominal_strip l)
+    loop' p
+
+inl option forall t. (a : pickler t) : pickler (option t) = alt { Some = a; None = unit() }
+inl result forall a b. (a : pickler a) (b : pickler b) : pickler (result a b) = alt { Ok = a; Error = b }
+inl (++) forall a b. (a : pickler a) (b : pickler b) : pickler (choice2 a b) = alt { C1of2 = a; C2of2 = b }
+inl (**) forall a b. (a : pickler a) (b : pickler b) : pickler (a * b) = pair a b
+
+nominal pickled_array t = binary_array
+// nominal pickled_array t = array u8
+inl serialize forall t. (p : pickler t) (x : t) : pickled_array t =
+    inl size = size()
+    inl len = size p
+    inl ar : binary_array = pickler_create len
+    // inl ar : array u8 = pickler_create len
+    loop.for' {from=0; nearTo=len} (fun i => pickler_set ar i false)
+    pickle ar p x
+    pickled_array ar
+
+inl deserialize forall t. (p : pickler t) (pickled_array x : pickled_array t) : t =
+    open tensorm
+    unpickle x p
+
+instance printable pickled_array t = fun ({write write_ln} : printable_funs) (pickled_array x) => write_ln x
