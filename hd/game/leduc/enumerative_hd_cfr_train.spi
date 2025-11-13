@@ -410,6 +410,7 @@ inl train_loop (config : config) =
     fun () => 
         body game_start()
 
+open picklers
 inl create_hd (rows : int) =
     open hd_pickler
     inl size = size()

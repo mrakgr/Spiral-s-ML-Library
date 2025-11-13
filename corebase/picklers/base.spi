@@ -1,0 +1,34 @@
+// Returns boolean whether the array is 1 at a given index.
+prototype pickler_index array : array -> int -> bool
+// Sets the array to 1 at the given index.
+prototype pickler_set array : array -> int -> bool -> ()
+prototype pickler_create array : int -> array
+
+union rec pickler t =
+    | Unit :: pickler ()
+    | Bool :: pickler bool
+    | Int :: int -> pickler int
+    | Uint :: int -> pickler uint
+    | Sa_list :: forall dim t. pickler t -> pickler (sa_list dim t)
+    | Sa :: forall dim t. pickler t -> pickler (sa dim t)
+    | Pair :: forall a b. pickler a * pickler b -> pickler (a * b)
+    | Wrap :: forall a. (exists b. (a -> b) * (b -> a) * pickler b) -> pickler a
+    | Alt :: forall t. union_map pickler t -> pickler t
+    | Record :: forall t. record_map pickler t -> pickler t
+
+inl unit() = Unit
+inl bool() = Bool
+inl int x = Int x
+inl uint x = Uint x
+inl sa_list forall a b. (x : pickler a) : pickler (sa_list b a) = Sa_list x
+inl sa forall a b. (x : pickler a) : pickler (sa b a) = Sa x
+inl pair forall a b. (a : pickler a) (b : pickler b) : pickler (a * b) = Pair(a,b)
+
+// Takes in a record of picklers and produces an Alt node.
+inl alt forall record_of_picklers union_. (picklers : record_of_picklers) : pickler union_ =
+    Alt(real union_map `pickler `union_ picklers)
+// Takes in a record of picklers and produces an Record node.
+inl record forall record_of_picklers record. (picklers : record_of_picklers) : pickler record =
+    Record(real record_map `pickler `record picklers)
+// Creates a new pickler out of existing ones using the bijection functions.
+inl wrap forall a b. (in_ : a -> b) (out : b -> a) (p : pickler b) : pickler a = Wrap(exists in_, out, p)
