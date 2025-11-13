@@ -413,7 +413,6 @@ inl train_loop (config : config) =
 open picklers
 inl create_hd (rows : int) =
     open hd_pickler
-    inl size = size()
     inl actions = [Fold; Call; Raise]
     inl p_card : pickler card = alt {
         King = unit()

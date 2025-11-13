@@ -1,0 +1,178 @@
+// This particular pickler attempts to squeeze more complex datatypes into a single integer.
+
+open hd_pickler
+
+// Returns the number of entries in the pickler.
+inl size'() : forall t. pickler t -> int = 
+    inl h = compile_time.hashmapm.create()
+    inl (*) a b : int =
+        inl r = a * b
+        assert (a <> 0 && r / a <> b) "The multiplication when calculating the size in the int pickler overflew."
+        r
+    inl (**) (a : int) (b : int) : int =
+        inl rec loop s b =
+            if b > 0 then loop (s * a) (b - 1)
+            else s
+        loop 1 b
+    inl body forall t. (p : pickler t) : int =
+        inl rec loop forall t'. : pickler t' -> int =
+            compile_time.hashmapm.memoize h function
+                | Unit => 1
+                | Bool => 2
+                | Int l => assert (l > 0) "The Int length must be greater than 0." . l
+                | Uint l => assert (l > 0) "The Uint length must be greater than 0." . l
+                | Sa_list p as x => 
+                    inl max_len = get_max_length x
+                    loop p ** max_len
+                | Sa p as x =>
+                    inl max_len = get_max_length x
+                    (loop p ** max_len) * max_len // The max len at the end is the encoded array length.
+                | Pair(a,b) => loop a * loop b 
+                | Wrap (exists b. a, b, p) => loop p 
+                | Alt l => real
+                    open real_core
+                    inl l = nominal_strip l
+                    record_fold (fun {state key value} => 
+                        typecase `value with pickler ~t => 
+                        state + loop `t value
+                        ) 0 l
+                | Record l => real
+                    open real_core
+                    inl l = nominal_strip l
+                    record_fold (fun {state key value} => 
+                        typecase `value with pickler ~t => 
+                        state * loop `t value
+                        ) 1 l
+        loop p
+    `$body
+
+// Returns the size of the pickler. Uses a compile time dictionary under the hood that gets created when the union arg is applied.
+inl size forall t. (x : pickler t) : int = inl f = size'() in f x
+
+// Serializes the argument to a binary vector. The vector elements should all be set to 0 prior to being passed into this function.
+inl pickle forall tt. (p : pickler tt) ~(x : tt) : int = join
+    inl size : forall w. pickler w -> int = size'()
+    inl rec loop' forall t. (p : pickler t) (x : t) : int = 
+        match p with
+        | Unit => 0
+        | Bool => if x then 1 else 0
+        | Int l => 
+            assert (0 <= x) "The input to the pickler must be 0 or positive."
+            assert (x < l) "The input to the pickler must be less than the specified length."
+            x
+        | Uint l =>
+            inl x = conv x
+            assert (x < l) "The input to the pickler must be less than the specified length."
+            x
+        | Pair(a,b) => loop' a (fst x) * size b + loop' b (snd x)
+        | Sa l => 
+            arraym.fold (fun (denom, sum) x => 
+                inl denom = denom / size l
+                denom, sum + loop' l x * denom
+                ) (size p, 0) x |> snd
+        | Sa_list l =>
+            arraym.fold (fun (denom, sum) x => 
+                inl denom = denom / size l
+                denom, sum + loop' l x * denom
+                ) (size p, 0) x
+            |> fun _,r => 
+                inl max_len = get_max_length p
+                r * max_len + length x
+        | Wrap (exists b. a, b, p) => loop' p (a x)
+        | Alt l =>
+            real
+                open real_core
+                inl offsets, _ =
+                    record_fold (fun {state=(m,s) key value} => 
+                        typecase `value with pickler ~t => 
+                        {m with $key=s}, s + size `t value
+                        ) ({},0) (nominal_strip l)
+                unbox x fun (k,v) =>
+                    offsets k + loop' `(`(v)) (l k) v
+        | Record l =>
+            real
+                open real_core
+                record_fold_back (fun {state=(inv_denom, sum) key value} => 
+                    inv_denom * size `(`(value)) (l key), sum + loop' `(`(value)) (l key) value * inv_denom
+                    ) x (1, 0) |> snd
+    loop' p x
+
+// Deserializes the argument from a binary vector.
+inl unpickle forall tt. (ar : int) (p : pickler tt) : tt = join
+    inl size : forall w. pickler w -> int = size'()
+    assert (0 <= ar) "The input to unpickle must be >= 0."
+    inl x = stack_mut ar
+    inl read (size : int) =
+        inl r = *x % size
+        x <- *x / size
+        r
+    inl rec loop' forall t. (p : pickler t) : t =
+        match p with
+        | Unit => ()
+        | Bool => read 2 = 1
+        | Int l => read l
+        | Uint l => conv (read l)
+        | Pair(a,b) => 
+            inl b = loop' b
+            inl a = loop' a
+            a, b
+        | Sa l => 
+            inl max_len = get_max_length p
+            inl ar : sa _ _ = sa_create
+            loop.forDown' {nearFrom = max_len; to = 0} fun i =>
+                set ar i (loop' l)
+            ar
+        | Sa_list l =>
+            inl max_len = get_max_length p
+            inl len = read max_len
+            inl ar : sa_list _ _ = sa_create
+            sa_listm.unsafe_set_length ar len
+            loop.forDown' {nearFrom = max_len; to = 0} fun i =>
+                if i < len then set ar i (loop' l)
+                else x <- *x / size l
+            ar
+        | Wrap (exists b. a, b, p) => b (loop' p)
+        | Record l =>
+            real
+                open real_core
+                record_fold_back (fun {state key value} => 
+                    typecase `value with pickler ~t_case => 
+                    {state with $key = loop' `t_case value}
+                    ) (nominal_strip l) {}
+        | Alt l =>
+            inl old_x = *x
+            x <- old_x % size p
+            inl result = stack_mut None
+            real
+                open real_core
+                record_fold (fun {state=i key value} => 
+                    typecase `value with pickler ~t_case => 
+                    inl size = size `t_case value
+                    match *result with 
+                    | Some => ()
+                    | None => 
+                        if *x < size then
+                            union_untag `t (conv `i32 i)
+                                (fun k => forall v. => nominal_create `t (k, loop' `v value))
+                                (fun _ => error_type "Invalid tag.")
+                            |> fun x => result <- Some `t x
+                        else
+                            x <- *x - size
+                    i + 1
+                    ) 0 (nominal_strip l) |> ignore
+            x <- old_x / size p
+            match *result with
+            | Some x => x
+            | None => failwith "Could not parse the union type in unpickle's Alt case."
+
+    loop' p
+
+nominal int_pickled_array t = int
+// nominal int_pickled_array t = array u8
+inl serialize forall t. (p : pickler t) (x : t) : int_pickled_array t =
+    int_pickled_array (pickle p x)
+
+inl deserialize forall t. (p : pickler t) (int_pickled_array x : int_pickled_array t) : t =
+    unpickle x p
+
+instance printable int_pickled_array t = fun ({write write_ln} : printable_funs) (int_pickled_array x) => write_ln x

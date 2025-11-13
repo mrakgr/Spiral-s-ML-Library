@@ -32,3 +32,8 @@ inl record forall record_of_picklers record. (picklers : record_of_picklers) : p
     Record(real record_map `pickler `record picklers)
 // Creates a new pickler out of existing ones using the bijection functions.
 inl wrap forall a b. (in_ : a -> b) (out : b -> a) (p : pickler b) : pickler a = Wrap(exists in_, out, p)
+
+inl option forall t. (a : pickler t) : pickler (option t) = alt { Some = a; None = unit() }
+inl result forall a b. (a : pickler a) (b : pickler b) : pickler (result a b) = alt { Ok = a; Error = b }
+inl (++) forall a b. (a : pickler a) (b : pickler b) : pickler (choice2 a b) = alt { C1of2 = a; C2of2 = b }
+inl (**) forall a b. (a : pickler a) (b : pickler b) : pickler (a * b) = pair a b

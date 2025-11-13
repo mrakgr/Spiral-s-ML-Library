@@ -1,5 +1,5 @@
-// Pickler combinators for converting regular Spiral types to binary vectors of floating point values.
-// The preferred pickler for Hebbian dictionaries. I'd also recomment it for regular NNs as well.
+// Pickler combinators for converting regular Spiral types to binary vectors.
+// The preferred pickler for Hebbian dictionaries.
 
 instance pickler_create array t = create
 instance pickler_index array t{number} = fun x i => 
@@ -21,14 +21,16 @@ instance pickler_set binary_array = fun (binary_array (x : array u32)) i v =>
 inl get_max_length forall (array : * -> * -> *) dim el. (x : pickler (array dim el)) : int = real real_core.type_lit_to_lit `dim : int
 
 // Returns the number of entries in the pickler.
-inl size' (h : compile_time.hashmap) : forall t. pickler t -> int = 
+// Is intended for internal use only.
+inl size' () : forall t. pickler t -> int = 
+    inl h = compile_time.hashmapm.create()
     inl body forall t. (p : pickler t) : int =
         inl rec loop forall t'. : pickler t' -> int =
             compile_time.hashmapm.memoize h function
                 | Unit => 0
                 | Bool => 2
-                | Int l => l
-                | Uint l => l
+                | Int l => assert (l > 0) "The Int length must be greater than 0." . l
+                | Uint l => assert (l > 0) "The Uint length must be greater than 0." . l
                 | Sa_list p as x => 
                     inl max_len = get_max_length x
                     max_len + (loop p + 1) * max_len
@@ -55,11 +57,11 @@ inl size' (h : compile_time.hashmap) : forall t. pickler t -> int =
     `$body
 
 // Returns the size of the pickler. Uses a compile time dictionary under the hood that gets created when the union arg is applied.
-inl size () : forall t. pickler t -> int = size' (compile_time.hashmapm.create())
+inl size forall t. (x : pickler t) : int = inl f = size'() in f x
 
 // Serializes the argument to a binary vector. The vector elements should all be set to 0 prior to being passed into this function.
 inl pickle forall array{pickler_set} tt. (ar : array) (p : pickler tt) ~(x : tt) : () = join
-    inl size : forall w. pickler w -> int = size()
+    inl size : forall w. pickler w -> int = size'()
     inl i = stack_mut (0 : int)
     inl enable i' = pickler_set ar (*i + i') true
     inl advance i' = i <- *i + i'
@@ -70,14 +72,12 @@ inl pickle forall array{pickler_set} tt. (ar : array) (p : pickler tt) ~(x : tt)
         | Unit => ()
         | Bool => push (if x then 1 else 0) 2
         | Int l => 
-            assert (l > 0) "The argument to Int must be greater than 0."
-            assert (x < l) "The input to the pickler must be 0 or positive."
-            assert (0 <= x) "The input to the pickler must be less than the specified length."
+            assert (0 <= x) "The input to the pickler must be 0 or positive."
+            assert (x < l) "The input to the pickler must be less than the specified length."
             push x l
         | Uint l =>
             inl x = conv x
-            assert (l > 0) "The argument to Uint must be greater than 0."
-            assert (x < l) "The input to the pickler must be 0 or positive."
+            assert (x < l) "The input to the pickler must be less than the specified length."
             push x l
         | Sa_list l => 
             inl max_len = get_max_length p
@@ -111,7 +111,7 @@ inl pickle forall array{pickler_set} tt. (ar : array) (p : pickler tt) ~(x : tt)
 
 // Deserializes the argument from a binary vector.
 inl unpickle forall array{pickler_index} tt. (ar : array) (p : pickler tt) : tt = join
-    inl size : forall w. pickler w -> int = size()
+    inl size : forall w. pickler w -> int = size'()
     inl i = stack_mut (0 : int)
     inl index (i' : int) : bool = pickler_index ar (*i + i')
     inl advance i' = i <- *i + i'
@@ -137,12 +137,8 @@ inl unpickle forall array{pickler_index} tt. (ar : array) (p : pickler tt) : tt 
         match p with
         | Unit => ()
         | Bool => scan 2 = 1
-        | Int l => 
-            assert (l > 0) "The argument to Int must be greater than 0."
-            scan l
-        | Uint l => 
-            assert (l > 0) "The argument to Uint must be greater than 0."
-            conv (scan l)
+        | Int l => scan l
+        | Uint l => conv (scan l)
         | Sa_list l =>
             inl max_len = get_max_length p
             inl len = scan max_len
@@ -186,15 +182,9 @@ inl unpickle forall array{pickler_index} tt. (ar : array) (p : pickler tt) : tt 
                     ) (nominal_strip l)
     loop' p
 
-inl option forall t. (a : pickler t) : pickler (option t) = alt { Some = a; None = unit() }
-inl result forall a b. (a : pickler a) (b : pickler b) : pickler (result a b) = alt { Ok = a; Error = b }
-inl (++) forall a b. (a : pickler a) (b : pickler b) : pickler (choice2 a b) = alt { C1of2 = a; C2of2 = b }
-inl (**) forall a b. (a : pickler a) (b : pickler b) : pickler (a * b) = pair a b
-
 nominal pickled_array t = binary_array
 // nominal pickled_array t = array u8
 inl serialize forall t. (p : pickler t) (x : t) : pickled_array t =
-    inl size = size()
     inl len = size p
     inl ar : binary_array = pickler_create len
     // inl ar : array u8 = pickler_create len
@@ -203,7 +193,6 @@ inl serialize forall t. (p : pickler t) (x : t) : pickled_array t =
     pickled_array ar
 
 inl deserialize forall t. (p : pickler t) (pickled_array x : pickled_array t) : t =
-    open tensorm
     unpickle x p
 
 instance printable pickled_array t = fun ({write write_ln} : printable_funs) (pickled_array x) => write_ln x

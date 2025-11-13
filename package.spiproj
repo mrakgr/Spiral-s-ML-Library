@@ -49,6 +49,8 @@ modules:
             base-
             hd_pickler
             kms_pickler
+            int_pickler
+            
 
         types-
         

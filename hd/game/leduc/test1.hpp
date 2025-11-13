@@ -1,8 +1,6 @@
 #pragma once
 #include "test1.corelib.hpp"
 #ifdef __CUDACC__
-#ifdef __CUDA_ARCH__
-// Cuda device backend
 #include <cooperative_groups.h>
 #include <cuda/semaphore>
 __device__ cuda::binary_semaphore<cuda::thread_scope_system> console_lock(1);
@@ -13,16 +11,8 @@ struct Tuple0;
 struct Tuple1;
 struct Union2;
 struct StackMut1;
-struct StackMut2;
 struct Union3;
-struct StackMut3;
-__device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
-__device__ int method_4(unsigned int * v0, StackMut0 & v1, int v2);
-__device__ void method_5(unsigned int * v0, StackMut0 & v1, int v2);
-__device__ bool method_6(StackMut0 & v0, unsigned int * v1, int v2);
-__device__ Tuple0 method_3(unsigned int * v0);
-__device__ void method_7(Union0 v0);
-__device__ void method_8(Union1 v0);
+struct StackMut2;
 struct Union0_0 { // Call
 };
 struct Union0_1 { // Fold
@@ -245,11 +235,6 @@ struct StackMut1 {
     __host__ __device__ StackMut1() = default;
     __host__ __device__ StackMut1(Union2 t0) : v0(t0) {}
 };
-struct StackMut2 {
-    bool v0;
-    __host__ __device__ StackMut2() = default;
-    __host__ __device__ StackMut2(bool t0) : v0(t0) {}
-};
 struct Union3_0 { // None
 };
 struct Union3_1 { // Some
@@ -310,11 +295,20 @@ struct Union3 {
         this->tag = 255;
     }
 };
-struct StackMut3 {
+struct StackMut2 {
     Union3 v0;
-    __host__ __device__ StackMut3() = default;
-    __host__ __device__ StackMut3(Union3 t0) : v0(t0) {}
+    __host__ __device__ StackMut2() = default;
+    __host__ __device__ StackMut2(Union3 t0) : v0(t0) {}
 };
+#ifdef __CUDA_ARCH__
+// Cuda device backend
+__device__ void method_2(unsigned int * v0, static_array_list<Union0,5> v1, Union1 v2, bool v3, static_array<int,3> v4, int v5, unsigned int v6);
+__device__ int method_4(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ void method_5(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ void method_6(unsigned int * v0, StackMut0 & v1, int v2);
+__device__ Tuple0 method_3(unsigned int * v0);
+__device__ void method_7(Union0 v0);
+__device__ void method_8(Union1 v0);
 #else
 // Cuda host backend
 void run_cuda_device_from_cuda_host_1();
