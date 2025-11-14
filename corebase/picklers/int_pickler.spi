@@ -7,10 +7,10 @@ inl size'() : forall t. pickler t -> int =
     inl h = compile_time.hashmapm.create()
     inl (*) a b : int =
         inl r = a * b
-        assert (a <> 0 && r / a <> b) "The multiplication when calculating the size in the int pickler overflew."
+        assert (a <> 0 && r / a = b) "The multiplication when calculating the size in the int pickler overflew."
         r
     inl (**) (a : int) (b : int) : int =
-        inl rec loop s b =
+        inl rec loop forall t{number}. (s : int) (b : t) : int = // TODO: Investigate the compiler error
             if b > 0 then loop (s * a) (b - 1)
             else s
         loop 1 b
@@ -21,10 +21,10 @@ inl size'() : forall t. pickler t -> int =
                 | Bool => 2
                 | Int l => assert (l > 0) "The Int length must be greater than 0." . l
                 | Uint l => assert (l > 0) "The Uint length must be greater than 0." . l
-                | Sa_list p as x => 
+                | Sa p as x => 
                     inl max_len = get_max_length x
                     loop p ** max_len
-                | Sa p as x =>
+                | Sa_list p as x =>
                     inl max_len = get_max_length x
                     (loop p ** max_len) * max_len // The max len at the end is the encoded array length.
                 | Pair(a,b) => loop a * loop b 

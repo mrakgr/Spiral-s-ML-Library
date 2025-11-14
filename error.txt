@@ -1,16 +1,16 @@
-Error trace on line: 148, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/kms_pickler.spi.
-                    typecase `value with pickler ~t_case => 
-                    ^
-Error trace on line: 149, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/kms_pickler.spi.
-                    if *is_done then
-                    ^
-Error trace on line: 152, column: 25 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/kms_pickler.spi.
-                        if has_nonzero (size l) then
-                        ^
-Error trace on line: 152, column: 28 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/kms_pickler.spi.
-                        if has_nonzero (size l) then
-                           ^
-Error trace on line: 152, column: 41 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/kms_pickler.spi.
-                        if has_nonzero (size l) then
-                                        ^
-Cannot apply a forall with a term.
+Error trace on line: 10, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
+        assert (a <> 0 && r / a = b) "The multiplication when calculating the size in the int pickler overflew."
+        ^
+Error trace on line: 165, column: 50 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
+inl assert (c : bool) (msg : string) : () = real assert c msg
+                                                 ^
+Error trace on line: 280, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+    if c = false then 
+    ^
+Error trace on line: 281, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+        ^
+Error trace on line: 281, column: 40 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
+        if lit_is c && lit_is msg then error_type msg
+                                       ^
+The multiplication when calculating the size in the int pickler overflew.

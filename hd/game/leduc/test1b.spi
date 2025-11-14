@@ -1,0 +1,94 @@
+open corebase
+open corecuda
+open picklers
+open int_pickler
+open coreext
+
+union card = King | Queen | Jack
+union action = Raise : int | Fold | Call
+
+type game_state = {
+    stack : uint
+    pot : int
+    is_first : bool
+    card : card
+    action_history : sa_list 5 action
+    l : sa 3 int
+    }
+
+inl program() =
+    inl p_card : pickler card = alt {
+        King = unit()
+        Queen = unit()
+        Jack = unit()
+    }
+    inl p_action : pickler action = alt {
+        Raise = Int 3
+        Fold = unit()
+        Call = unit()
+    }
+    inl p_record = record {
+        action = p_action
+        pot_stack = uint 3 ** uint 3
+        card = p_card
+    }
+    inl p : pickler (sa_list 2 (sa 3 {action : action; pot_stack : uint * uint; card : card})) = 
+        sa_list (sa p_record)
+    console.write_ln {size = size p}
+    inl data = 
+        arraym.fromList [
+            arraym.fromList [
+                {
+                    action = Raise 1
+                    pot_stack = 2,0
+                    card = King
+                }
+                {
+                    action = Call
+                    pot_stack = 2,2
+                    card = Queen
+                }
+                {
+                    pot_stack = 1,1
+                    action = Fold
+                    card = Jack
+                }
+                ]
+            arraym.fromList [
+                {
+                    action = Raise 2
+                    pot_stack = 2,0
+                    card = King
+                }
+                {
+                    action = Raise 0
+                    pot_stack = 1,2
+                    card = Queen
+                }
+                {
+                    pot_stack = 1,1
+                    action = Call
+                    card = Jack
+                }
+                ]
+        ]
+    serialize p data
+    // serialize p {stack=5; pot=8; is_first = false; card=King; action_history=arraym.fromList [Raise 3; Raise 4; Call; Fold]; l = arraym.fromList [1;2;3]}
+    |> deserialize p
+    |> console.write_ln // should print out the original input
+
+inl main() =
+    inl python () = 
+        run_cuda_device_from_python fun _ =>
+            if rangem.threads_in_grid().from = 0 then
+                program()
+        device_sync()
+    // inl cpp () =
+    //     run_cuda_host_from_cpp_host fun _ =>
+    //         run_cuda_device_from_cuda_host fun _ =>
+    //             if rangem.threads_in_grid().from = 0 then
+    //                 program()
+    //         device_sync()
+    inl cpp () = program()
+    real real_core.backend_switch_unsafe { Python = python; CppHost = cpp }
+    0i32
