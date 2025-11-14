@@ -1,16 +1,17 @@
-Error trace on line: 10, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
-        assert (a <> 0 && r / a = b) "The multiplication when calculating the size in the int pickler overflew."
-        ^
-Error trace on line: 165, column: 50 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/core.spi.
-inl assert (c : bool) (msg : string) : () = real assert c msg
-                                                 ^
-Error trace on line: 280, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-    if c = false then 
-    ^
-Error trace on line: 281, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-        ^
-Error trace on line: 281, column: 40 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/real_core.spir.
-        if lit_is c && lit_is msg then error_type msg
-                                       ^
-The multiplication when calculating the size in the int pickler overflew.
+Error trace on line: 94, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
+                    record_fold (fun {state=(m,s) key value} => 
+                    ^
+Error trace on line: 94, column: 38 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
+                    record_fold (fun {state=(m,s) key value} => 
+                                     ^
+Error trace on line: 94, column: 46 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
+                    record_fold (fun {state=(m,s) key value} => 
+                                             ^
+Error trace on line: 95, column: 25 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
+                        typecase `value with pickler ~t => 
+                        ^
+Error trace on line: 96, column: 42 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
+                        {m with $key=s}, s + size `t value
+                                         ^
+The two literals must be both numeric and equal in type.
+Got: 0i32 and 1u32

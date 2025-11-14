@@ -3,30 +3,34 @@
 open hd_pickler
 
 // Returns the number of entries in the pickler.
-inl size'() : forall t. pickler t -> int = 
+inl size'() : forall t. pickler t -> uint = 
     inl h = compile_time.hashmapm.create()
-    inl (*) a b : int =
+    inl (+) a b : uint =
+        assert (a <= limit.max - b) "The addition when calculating the size in the int pickler overflew."
+        inl r = a + b
+        r
+    inl (*) a b : uint =
         inl r = a * b
         assert (a <> 0 && r / a = b) "The multiplication when calculating the size in the int pickler overflew."
         r
-    inl (**) (a : int) (b : int) : int =
-        inl rec loop forall t{number}. (s : int) (b : t) : int = // TODO: Investigate the compiler error
-            if b > 0 then loop (s * a) (b - 1)
-            else s
+    inl (**) (a : uint) (b : uint) : uint =
+        inl rec loop forall t{number}. (s : uint) (b : t) : uint = // TODO: Investigate the compiler error
+            if b > 0 then loop (s * a) (b - 1) else s
         loop 1 b
-    inl body forall t. (p : pickler t) : int =
-        inl rec loop forall t'. : pickler t' -> int =
+    inl body forall t. (p : pickler t) : uint =
+        inl rec loop forall t'. : pickler t' -> uint =
             compile_time.hashmapm.memoize h function
                 | Unit => 1
                 | Bool => 2
-                | Int l => assert (l > 0) "The Int length must be greater than 0." . l
-                | Uint l => assert (l > 0) "The Uint length must be greater than 0." . l
+                | Int l => assert (l > 0) "The Int length must be greater than 0." . conv l
+                | Uint l => assert (l > 0) "The Uint length must be greater than 0." . conv l
                 | Sa p as x => 
-                    inl max_len = get_max_length x
+                    inl max_len = conv (get_max_length x)
                     loop p ** max_len
                 | Sa_list p as x =>
-                    inl max_len = get_max_length x
-                    (loop p ** max_len) * max_len // The max len at the end is the encoded array length.
+                    inl max_len = conv (get_max_length x)
+                    inl rec f (i : uint) = if i <= max_len then loop p ** i + f (i+1) else 0
+                    f 0
                 | Pair(a,b) => loop a * loop b 
                 | Wrap (exists b. a, b, p) => loop p 
                 | Alt l => real
@@ -35,49 +39,53 @@ inl size'() : forall t. pickler t -> int =
                     record_fold (fun {state key value} => 
                         typecase `value with pickler ~t => 
                         state + loop `t value
-                        ) 0 l
+                        ) (conv `uint 0) l
                 | Record l => real
                     open real_core
                     inl l = nominal_strip l
                     record_fold (fun {state key value} => 
                         typecase `value with pickler ~t => 
                         state * loop `t value
-                        ) 1 l
+                        ) (conv `uint 1) l
         loop p
     `$body
 
 // Returns the size of the pickler. Uses a compile time dictionary under the hood that gets created when the union arg is applied.
-inl size forall t. (x : pickler t) : int = inl f = size'() in f x
+inl size forall t. (x : pickler t) : uint = inl f = size'() in f x
+
+let int_pow (a : uint) (b : uint) =
+    let rec f (s : uint) (i : uint) = if i > 0 then f (s * a) (i - 1) else s
+    f 1 b
+
+let sum_pow (a : uint) (b : uint) = 
+    let rec f (s : uint) (i : uint) (t : uint) = if i > 0 then f (s + t) (i - 1) (t * a) else s
+    f 0 b 1
 
 // Serializes the argument to a binary vector. The vector elements should all be set to 0 prior to being passed into this function.
-inl pickle forall tt. (p : pickler tt) ~(x : tt) : int = join
-    inl size : forall w. pickler w -> int = size'()
-    inl rec loop' forall t. (p : pickler t) (x : t) : int = 
+inl pickle forall tt. (p : pickler tt) ~(x : tt) : uint = join
+    inl size : forall w. pickler w -> uint = size'()
+    inl rec loop' forall t. (p : pickler t) (x : t) : uint = 
         match p with
         | Unit => 0
         | Bool => if x then 1 else 0
         | Int l => 
             assert (0 <= x) "The input to the pickler must be 0 or positive."
             assert (x < l) "The input to the pickler must be less than the specified length."
-            x
+            conv x
         | Uint l =>
-            inl x = conv x
-            assert (x < l) "The input to the pickler must be less than the specified length."
+            assert (conv x < l) "The input to the pickler must be less than the specified length."
             x
         | Pair(a,b) => loop' a (fst x) * size b + loop' b (snd x)
         | Sa l => 
-            arraym.fold (fun (denom, sum) x => 
-                inl denom = denom / size l
-                denom, sum + loop' l x * denom
-                ) (size p, 0) x |> snd
+            arraym.foldBack (fun x (denom, sum) => 
+                denom * size l, sum + loop' l x * denom
+                ) x (1, 0) |> snd
         | Sa_list l =>
-            arraym.fold (fun (denom, sum) x => 
-                inl denom = denom / size l
-                denom, sum + loop' l x * denom
-                ) (size p, 0) x
-            |> fun _,r => 
-                inl max_len = get_max_length p
-                r * max_len + length x
+            inl max_len = get_max_length p
+            arraym.foldBack (fun x (denom, sum) => 
+                denom * size l, sum + loop' l x * denom
+                ) x (1, 0) |> snd
+            |> fun r => sum_pow (size l) conv(length x) + r
         | Wrap (exists b. a, b, p) => loop' p (a x)
         | Alt l =>
             real
@@ -86,7 +94,7 @@ inl pickle forall tt. (p : pickler tt) ~(x : tt) : int = join
                     record_fold (fun {state=(m,s) key value} => 
                         typecase `value with pickler ~t => 
                         {m with $key=s}, s + size `t value
-                        ) ({},0) (nominal_strip l)
+                        ) ({},conv `uint 0) (nominal_strip l)
                 unbox x fun (k,v) =>
                     offsets k + loop' `(`(v)) (l k) v
         | Record l =>
@@ -94,24 +102,24 @@ inl pickle forall tt. (p : pickler tt) ~(x : tt) : int = join
                 open real_core
                 record_fold_back (fun {state=(inv_denom, sum) key value} => 
                     inv_denom * size `(`(value)) (l key), sum + loop' `(`(value)) (l key) value * inv_denom
-                    ) x (1, 0) |> snd
+                    ) x (conv `uint 1, conv `uint 0) |> snd
     loop' p x
 
 // Deserializes the argument from a binary vector.
-inl unpickle forall tt. (ar : int) (p : pickler tt) : tt = join
-    inl size : forall w. pickler w -> int = size'()
+inl unpickle forall tt. (ar : uint) (p : pickler tt) : tt = join
+    inl size : forall w. pickler w -> uint = size'()
     assert (0 <= ar) "The input to unpickle must be >= 0."
     inl x = stack_mut ar
-    inl read (size : int) =
+    inl read_prod (size : uint) =
         inl r = *x % size
         x <- *x / size
         r
     inl rec loop' forall t. (p : pickler t) : t =
         match p with
         | Unit => ()
-        | Bool => read 2 = 1
-        | Int l => read l
-        | Uint l => conv (read l)
+        | Bool => read_prod 2 = 1
+        | Int l => conv (read_prod (conv l))
+        | Uint l => read_prod (conv l)
         | Pair(a,b) => 
             inl b = loop' b
             inl a = loop' a
@@ -124,12 +132,18 @@ inl unpickle forall tt. (ar : int) (p : pickler tt) : tt = join
             ar
         | Sa_list l =>
             inl max_len = get_max_length p
-            inl len = read max_len
+            inl old_x = *x
+            x <- old_x % size p
             inl ar : sa_list _ _ = sa_create
-            sa_listm.unsafe_set_length ar len
-            loop.forDown' {nearFrom = max_len; to = 0} fun i =>
-                if i < len then set ar i (loop' l)
-                else x <- *x / size l
+            loop.forDown' {nearFrom = max_len + 1; to = 0} fun ii =>
+                inl offset = sum_pow (size l) (conv ii)
+                if offset <= *x then
+                    x <- *x - offset
+                    sa_listm.unsafe_set_length ar ii
+                    loop.forDown' {nearFrom = ii; to = 0} fun i =>
+                        set ar i (loop' l)
+                    loop.break()
+            x <- old_x / size p
             ar
         | Wrap (exists b. a, b, p) => b (loop' p)
         | Record l =>
@@ -167,7 +181,7 @@ inl unpickle forall tt. (ar : int) (p : pickler tt) : tt = join
 
     loop' p
 
-nominal int_pickled_array t = int
+nominal int_pickled_array t = uint
 // nominal int_pickled_array t = array u8
 inl serialize forall t. (p : pickler t) (x : t) : int_pickled_array t =
     int_pickled_array (pickle p x)

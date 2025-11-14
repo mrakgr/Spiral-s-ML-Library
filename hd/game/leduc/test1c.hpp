@@ -1,5 +1,5 @@
 #pragma once
-#include "test1b.corelib.hpp"
+#include "test1c.corelib.hpp"
 #ifdef __CUDACC__
 #ifdef __CUDA_ARCH__
 // Cuda device backend
@@ -17,12 +17,11 @@ struct Union2;
 struct StackMut1;
 struct Union3;
 struct StackMut2;
+struct Tuple2;
 unsigned int f_2(unsigned int v0, unsigned int v1, unsigned int v2, unsigned int v3);
 unsigned int sum_pow_1(unsigned int v0, unsigned int v1);
-unsigned int method_0(static_array_list<Tuple0,5> v0);
-static_array_list<Tuple0,5> method_3(unsigned int v0);
-void method_4(Union0 v0);
-void method_5(Union1 v0);
+Tuple1 method_0(unsigned int v0);
+unsigned int method_3(static_array_list<Tuple0,5> v0, static_array<int,2> v1);
 int main();
 struct Union0_0 { // Call
 };
@@ -166,11 +165,10 @@ struct Tuple0 {
     __host__ __device__ Tuple0(Union0 t0, Union1 t1) : v0(t0), v1(t1) {}
 };
 struct Tuple1 {
-    int v0;
-    unsigned int v1;
-    unsigned int v2;
+    static_array_list<Tuple0,5> v0;
+    static_array<int,2> v1;
     __host__ __device__ Tuple1() = default;
-    __host__ __device__ Tuple1(int t0, unsigned int t1, unsigned int t2) : v0(t0), v1(t1), v2(t2) {}
+    __host__ __device__ Tuple1(static_array_list<Tuple0,5> t0, static_array<int,2> t1) : v0(t0), v1(t1) {}
 };
 struct StackMut0 {
     unsigned int v0;
@@ -306,5 +304,12 @@ struct StackMut2 {
     Union3 v0;
     __host__ __device__ StackMut2() = default;
     __host__ __device__ StackMut2(Union3 t0) : v0(t0) {}
+};
+struct Tuple2 {
+    int v0;
+    unsigned int v1;
+    unsigned int v2;
+    __host__ __device__ Tuple2() = default;
+    __host__ __device__ Tuple2(int t0, unsigned int t1, unsigned int t2) : v0(t0), v1(t1), v2(t2) {}
 };
 #endif

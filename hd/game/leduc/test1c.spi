@@ -31,30 +31,13 @@ inl program() =
         action = p_action
         card = p_card
     }
-    inl p : pickler (sa_list 5 ({action : action; card : card})) = 
-        sa_list (p_record)
+    inl p : pickler (sa_list 5 ({action : action; card : card}) * sa 2 int) = 
+        sa_list p_record ** sa (int 5)
     console.write_ln {size = size p}
-    inl data = 
-        arraym.fromList [
-            {
-                action = Raise 1
-                card = King
-            }
-            {
-                action = Call
-                card = Queen
-            }
-            {
-                action = Fold
-                card = Jack
-            }
-            ]
-    serialize p data
-    |> deserialize p
-    |> console.write_ln // should print out the original input
-
-    // loop.for' {from = 0; nearTo = min 1000 (size p)} fun i =>
-    //     console.write_ln (deserialize p (int_pickled_array i))
+    loop.for' {from = 0; nearTo = size p} fun i =>
+        inl i = int_pickled_array i
+        assert (serialize p (deserialize p i) = i) "The round trip has to be equal to the original."
+    console.write_ln "The test passes."
 
 inl main() =
     inl python () = 
