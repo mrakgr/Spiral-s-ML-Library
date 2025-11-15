@@ -2,7 +2,7 @@
 open corebase
 open af
 
-inl learning_rate () = 0.1
+inl learning_rate () = 1
 
 nominal af_index k = k * af_array u32
 inl spherical_kms_dictionary_get forall t.
@@ -103,10 +103,10 @@ inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k
     spherical_kms_dictionary_get 
         (stack_refs { keys = refs.keys; values = refs.values; input })
         (stack_refs { indexed_values max_indices })
-    // spherical_kms_dictionary_key_update
-    //     learning_rate()
-    //     (stack_refs { input max_indices })
-    //     (stack_refs { keys = refs.keys })
+    spherical_kms_dictionary_key_update
+        learning_rate()
+        (stack_refs { input max_indices })
+        (stack_refs { keys = refs.keys })
     serializers.array_to_value indexed_values, af_index (k, max_indices)
 
 // Returns the number of rows in a dictionary
