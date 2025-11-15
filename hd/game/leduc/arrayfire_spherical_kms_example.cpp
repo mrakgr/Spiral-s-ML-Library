@@ -1,7 +1,7 @@
 #include <arrayfire.h>
 #include <iostream>
 
-af::array max_dictionary_get(
+af::array spherical_kms_dictionary_get(
     const af::array& input,
     const af::array& keys,
     const af::array& values) {
@@ -9,10 +9,9 @@ af::array max_dictionary_get(
     
     // // Get max indices along dimension 0 (rows)
     af::array max_vals, max_indices;
-    af::array noise = af::randu(temp.dims());
-    af_print(noise);
-    af::max(max_vals, max_indices, temp + noise, 1);
-    af_print(max_indices(0, af::span));
+    // af_print(noise);
+    af::max(max_vals, max_indices, temp, 1);
+    // af_print(max_indices(0, af::span));
     
     // // Use the indices to lookup values from the values array
     // // Each row in max_indices will be used to select a row from values
@@ -48,7 +47,7 @@ int main() {
         af_print(input);
 
         // Compute the result
-        af::array result = max_dictionary_get(input, keys, values);
+        af::array result = spherical_kms_dictionary_get(input, keys, values);
         
         // Print the result
         af_print(result);
