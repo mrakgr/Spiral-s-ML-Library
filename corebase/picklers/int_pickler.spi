@@ -14,7 +14,7 @@ inl size'() : forall t. pickler t -> uint =
         assert (a <> 0 && r / a = b) "The multiplication when calculating the size in the int pickler overflew."
         r
     inl (**) (a : uint) (b : uint) : uint =
-        inl rec loop forall t{number}. (s : uint) (b : t) : uint = // TODO: Investigate the compiler error
+        inl rec loop s b =
             if b > 0 then loop (s * a) (b - 1) else s
         loop 1 b
     inl body forall t. (p : pickler t) : uint =

@@ -1,17 +1,16 @@
-Error trace on line: 94, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
-                    record_fold (fun {state=(m,s) key value} => 
-                    ^
-Error trace on line: 94, column: 38 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
-                    record_fold (fun {state=(m,s) key value} => 
-                                     ^
-Error trace on line: 94, column: 46 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
-                    record_fold (fun {state=(m,s) key value} => 
-                                             ^
-Error trace on line: 95, column: 25 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
-                        typecase `value with pickler ~t => 
-                        ^
-Error trace on line: 96, column: 42 in module: /home/mrakgr/Spiral-s-ML-Library/corebase/picklers/int_pickler.spi.
-                        {m with $key=s}, s + size `t value
-                                         ^
-The two literals must be both numeric and equal in type.
-Got: 0i32 and 1u32
+Error trace on line: 9, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
+    inl y = 1 ** 2
+    ^
+Error trace on line: 9, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
+    inl y = 1 ** 2
+            ^
+Error trace on line: 6, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
+    f a 1 b
+    ^
+Error trace on line: 5, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
+        if b > 0 then f a (s * a) (b - 1) else s
+        ^
+Error trace on line: 5, column: 23 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
+        if b > 0 then f a (s * a) (b - 1) else s
+                      ^
+Cannot apply a forall with a term.
