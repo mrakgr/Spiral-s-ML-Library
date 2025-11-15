@@ -483,7 +483,7 @@ inl main() =
     // loop.for' {from=0; nearTo=1} fun (_ : int) =>
     inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
     inl expected_values : stack_refs dict_ev = stack_refs (cached_dictm.create 512)
-    inl hd = create_hd 144
+    inl hd = create_hd (1 <<< 14)
     inl loop (config : config) (nearTo : int) =
         inl train_loop = train_loop config
         loop.for {from=0; nearTo} (fun (i : int) _ =>

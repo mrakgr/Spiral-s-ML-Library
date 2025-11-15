@@ -91,7 +91,8 @@ inl create forall k v. (exists t. { key_to_array array_to_value value_to_array }
 // Clears the dictionary of keys by setting both the keys and the values all to 0.
 inl clear forall k v. ((dict (exists t. {data = refs})) : dict k v) : () =
     inl rows, cols = matrix_rows refs.keys, matrix_cols refs.keys
-    $"!(refs.keys) = af::randu(!cols, !rows)"
+    inl keys : af_array t = normalize_l2 $"af::randu(!cols, !rows)"
+    $"!(refs.keys) = !keys"
     matrix_clear refs.values
 
 // Gets an item from the dictionary.
@@ -102,10 +103,10 @@ inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k
     spherical_kms_dictionary_get 
         (stack_refs { keys = refs.keys; values = refs.values; input })
         (stack_refs { indexed_values max_indices })
-    spherical_kms_dictionary_key_update
-        learning_rate()
-        (stack_refs { input max_indices })
-        (stack_refs { keys = refs.keys })
+    // spherical_kms_dictionary_key_update
+    //     learning_rate()
+    //     (stack_refs { input max_indices })
+    //     (stack_refs { keys = refs.keys })
     serializers.array_to_value indexed_values, af_index (k, max_indices)
 
 // Returns the number of rows in a dictionary

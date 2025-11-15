@@ -40,8 +40,6 @@ struct StackRefs5;
 struct StackRefs6;
 struct StackRefs7;
 struct StackRefs8;
-struct StackRefs9;
-struct StackRefs10;
 struct Union8;
 float loop_1(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
 static_array<float,3> relu_4(static_array<float,3> v0);
@@ -51,17 +49,16 @@ float method_2(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool 
 void method_7(float * v0, static_array_list<Union0,32> v1);
 void method_8(StackRefs5 & v0, StackRefs6 & v1);
 void method_9(StackRefs7 & v0, StackRefs8 & v1);
-void method_10(StackRefs9 & v0, StackRefs10 & v1);
 float method_6(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-int tag_12(Union1 v0);
-bool is_pair_13(int v0, int v1);
-Tuple5 order_14(int v0, int v1);
-Union8 compare_hands_11(Union4 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
+int tag_11(Union1 v0);
+bool is_pair_12(int v0, int v1);
+Tuple5 order_13(int v0, int v1);
+Union8 compare_hands_10(Union4 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
 float body_0(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
-float loop_16(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
+float loop_15(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
+float method_16(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
 float method_17(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-float method_18(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-float body_15(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
+float body_14(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
 int main();
 struct Union1_0 { // Jack
 };
@@ -815,17 +812,6 @@ struct StackRefs8 {
     af::array & v0;
     __host__ __device__ StackRefs8() = default;
     __host__ __device__ StackRefs8(af::array & t0) : v0(t0) {}
-};
-struct StackRefs9 {
-    af::array & v0;
-    af::array & v1;
-    __host__ __device__ StackRefs9() = default;
-    __host__ __device__ StackRefs9(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
-};
-struct StackRefs10 {
-    af::array & v0;
-    __host__ __device__ StackRefs10() = default;
-    __host__ __device__ StackRefs10(af::array & t0) : v0(t0) {}
 };
 struct Union8_0 { // Eq
 };
