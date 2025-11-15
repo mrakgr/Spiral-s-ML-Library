@@ -412,7 +412,6 @@ inl train_loop (config : config) =
 
 open picklers
 inl create_hd (rows : int) =
-    open hd_pickler
     inl actions = [Fold; Call; Raise]
     inl p_card : pickler card = alt {
         King = unit()
@@ -448,7 +447,7 @@ inl create_hd (rows : int) =
             ev_weights = sam.init (const c)
         }
 
-    inl cols_keys = size p
+    inl cols_keys = kms_pickler.size p
     inl cols_values = num_actions * 2
     // inl cols_values = num_actions * 4
     inl serializers : kms.serializers hd_key hd_value = 
