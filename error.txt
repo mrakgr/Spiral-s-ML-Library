@@ -1,16 +1,16 @@
-Error trace on line: 9, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
-    inl y = 1 ** 2
-    ^
-Error trace on line: 9, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
-    inl y = 1 ** 2
+Error trace on line: 58, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            inl printable_funs =
             ^
-Error trace on line: 6, column: 5 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
-    f a 1 b
-    ^
-Error trace on line: 5, column: 9 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
-        if b > 0 then f a (s * a) (b - 1) else s
-        ^
-Error trace on line: 5, column: 23 in module: /home/mrakgr/Spiral-s-ML-Library/hd/game/leduc/test120.spi.
-        if b > 0 then f a (s * a) (b - 1) else s
-                      ^
-Cannot apply a forall with a term.
+Error trace on line: 63, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            if union_is x then
+            ^
+Error trace on line: 80, column: 13 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+            elif nominal_is x && prototype_has `(`x) printable then printable `(`x) printable_funs x
+            ^
+Error trace on line: 83, column: 21 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+                !!!!PrintStatic(`(`x))
+                    ^
+Error trace on line: 84, column: 17 in module: /home/mrakgr/Spiral-s-ML-Library/coreext/console/console_cuda.spi.
+                error_type "Unsupported type. Check the terminal for more info"
+                ^
+Unsupported type. Check the terminal for more info

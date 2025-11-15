@@ -125,8 +125,8 @@ modules:
 
                 eigen
                 af
-                hd
-                enumerative_hd_cfr_train
+                kms
+                enumerative_kms_cfr_train
                 
 
                 test0

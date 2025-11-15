@@ -40,7 +40,7 @@ type game_dicts = { policy : dict_policy; expected_values : dict_ev }
 type hd_key = messages
 type hd_value = { average_policy : sa 3 float; current_policy : sa 3 float }
 // type hd_value = { average_policy : sa 3 float; current_policy : sa 3 float; ev_values : sa 3 float; ev_weights : sa 3 float }
-type hd_dict = hd.dict hd_key hd_value
+type hd_dict = kms.dict hd_key hd_value
 union player_mode =
     | TrainEnumerative : { policy : stack_refs dict_policy }
     | TrainSampling : { policy : stack_refs dict_policy; expected_values : stack_refs dict_ev }
@@ -247,7 +247,7 @@ inl train_loop (config : config) =
                     | PlayerGotCard(i,_) when i <> table.player_turn => Hidden
                     | x => x
                     )
-            inl {average_policy current_policy}, key_policy_i = hd.get dict key_policy
+            inl {average_policy current_policy}, key_policy_i = kms.get dict key_policy
 
             match mode with
             | TrainEnumerativeHebbian dict =>
@@ -269,7 +269,7 @@ inl train_loop (config : config) =
                     )
                     |> arraym.fromList
                 inl expected_value = dot_product expected_value_per_action current_policy_probs
-                hd.set dict key_policy_i {
+                kms.set dict key_policy_i {
                     average_policy =
                         arraym.map2 (fun average_policy current_policy_probs =>
                             average_policy_decay * average_policy + current_policy_probs
@@ -451,12 +451,12 @@ inl create_hd (rows : int) =
     inl cols_keys = size p
     inl cols_values = num_actions * 2
     // inl cols_values = num_actions * 4
-    inl serializers : hd.serializers hd_key hd_value = 
+    inl serializers : kms.serializers hd_key hd_value = 
         exists [float]
             {
                 key_to_array = fun x =>
                     inl ar : array float = arraym.init cols_keys (const 0)
-                    hd_pickler.pickle ar p x 
+                    kms_pickler.pickle ar p x 
                     af.from_array ar cols_keys
                 value_to_array = fun x =>
                     inl ar : array float = arraym.init cols_values (const 0)
@@ -473,16 +473,10 @@ inl create_hd (rows : int) =
                         // ev_values = init (num_actions * 2)
                         // ev_weights = init (num_actions * 3)
                     }
-                array_to_key = fun m =>
-                    if $"af::allTrue<bool>(!m == 1)" then
-                        None
-                    else
-                        inl ar : array float = af.to_array m
-                        Some (hd_pickler.unpickle ar p)
             }
             
-    inl d : hd.dict hd_key hd_value = hd.create serializers {rows cols_keys cols_values}
-    hd.clear d
+    inl d : kms.dict hd_key hd_value = kms.create serializers {rows cols_keys cols_values}
+    kms.clear d
     d
 
 inl main() =
@@ -508,5 +502,4 @@ inl main() =
             player_modes = [TrainEnumerative {policy}; FrozenHebbian hd]
         } 100
     console.write_ln {reward_for_pl0}
-    console.write_ln hd
     0i32
