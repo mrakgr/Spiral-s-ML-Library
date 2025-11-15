@@ -1,6 +1,5 @@
 #include <arrayfire.h>
 #include <iostream>
-#include <assert.h>
 
 af::array spherical_kms_dictionary_get(
     const af::array& input,
@@ -34,7 +33,6 @@ void spherical_kms_dictionary_key_update(
     af_print(input);
     auto dim_inner = input.dims(0);
     auto dim_keys = keys.dims(1);
-    assert (input.dims(1) == 1);
     af::array temp = af::matmul(af::transpose(input), keys);
     
     // Get max indices along dimension 0 (rows)
@@ -45,7 +43,23 @@ void spherical_kms_dictionary_key_update(
     af_print(indexed_keys);
     auto indexed_keys_update = input - af::tile(af::sum(input * indexed_keys, 0), dim_inner) * indexed_keys;
     af_print(indexed_keys_update);
-    keys(af::span, max_indices) = normalize_l2(indexed_keys + lr * indexed_keys_update);
+    
+    // Create one-hot encoding from max_indices using identity matrix lookup
+    // This creates a matrix where each column has a 1 at the position of the matched key
+    af::array identity = af::identity(dim_keys, dim_inner);
+    af_print(identity);
+    af::array one_hot = af::lookup(identity, max_indices, 1);
+    af_print(one_hot);
+    
+    // Accumulate inputs for each key: keys_update = input * one_hot^T
+    // This sums all inputs that belong to each key
+    af::array sum_inputs = af::matmul(indexed_keys_update, af::transpose(one_hot));
+    af::array sum_counts = af::max(1, af::matmul(af::constant(1,indexed_keys_update.dims()), af::transpose(one_hot)));
+    af_print(sum_inputs);
+    af_print(sum_counts);
+    
+    // Add accumulated inputs to keys
+    keys = normalize_l2(keys + lr * sum_inputs / sum_counts);
     af_print(keys);
 }
 
@@ -74,8 +88,10 @@ int main() {
         // Initialize the input matrix
         float input_data[] = {
             1, 0.5, 0, 0,
+            0.8, 0.5, 0, 0,
+            0, 1, 1, 0.5
         };
-        af::array input = af::array(4, 1, input_data);
+        af::array input = af::array(4, 3, input_data);
         af_print(input);
 
         spherical_kms_dictionary_key_update(input, keys);
