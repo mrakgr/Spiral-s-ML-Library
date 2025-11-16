@@ -521,7 +521,7 @@ inl debug() =
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainEnumerative {policy}; TrainEnumerative {policy = policy_2}]
-        } 10
+        } 30
     inl _ =
         loop {
             is_chance_node_sampling = false

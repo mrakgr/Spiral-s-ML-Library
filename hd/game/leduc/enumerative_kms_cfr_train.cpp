@@ -201,7 +201,7 @@ bool FunPointerMethod1(Tuple0 tup0, Tuple0 tup1){
 }
 inline bool while_method_2(int v0){
     bool v1;
-    v1 = v0 < 10;
+    v1 = v0 < 30;
     return v1;
 }
 inline bool while_method_3(int v0){
@@ -4135,16 +4135,19 @@ void method_17(StackRefs6 & v0, StackRefs7 & v1){
     int v9;
     v9 = v6.dims(1);
     af::array v10;
-    v10 = af::exp(v5 / af::tile(v4,1,v5.dims(1)) * 7 - 7);
     af::array v11;
-    v11 = af::tile(v7,1,v9);
+    af::min(v10, v11, v5, 1);
     af::array v12;
-    v12 = v11 - af::tile(af::sum(v11 * v6, 0), v8) * v6;
+    v12 = af::exp((v5 - af::tile(v10,1,v5.dims(1))) / af::tile(v4-v10,1,v5.dims(1)) * 7 - 7);
     af::array v13;
-    v13 = v6 + 0.001f * af::tile(v10,v6.dims(0)) * v12;
+    v13 = af::tile(v7,1,v9);
     af::array v14;
-    v14 = v13 / af::tile(af::sqrt(af::sum(v13 * v13, 0)), v13.dims(0));
-    v6 = v14;
+    v14 = v13 - af::tile(af::sum(v13 * v6, 0), v8) * v6;
+    af::array v15;
+    v15 = v6 + 0.1f * af::tile(v12,v6.dims(0)) * v14;
+    af::array v16;
+    v16 = v15 / af::tile(af::sqrt(af::sum(v15 * v15, 0)), v15.dims(0));
+    v6 = v16;
     return ;
 }
 void method_18(StackRefs8 & v0, StackRefs9 & v1){
@@ -5170,7 +5173,7 @@ int main() {
         bool v35;
         v35 = v34 == 0;
         if (v35){
-            printf("{%s = %d; %s = %d}\n","i", v31, "nearTo", 10);
+            printf("{%s = %d; %s = %d}\n","i", v31, "nearTo", 30);
             fflush(stdout);
         } else {
         }

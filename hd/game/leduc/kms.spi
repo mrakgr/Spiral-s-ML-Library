@@ -2,7 +2,7 @@
 open corebase
 open af
 
-inl learning_rate () = 0.001
+inl learning_rate () = 0.1
 
 nominal af_index k = k * af_array u32
 inl spherical_kms_dictionary_get forall t.
@@ -52,8 +52,11 @@ inl spherical_kms_dictionary_key_update forall t.
     inl input = normalize_l2 input
     inl dim_inner : int = $"!input.dims(0)"
     inl dim_keys : int = $"!keys.dims(1)"
+    inl min_vals : af_array t = $"af::array \v"
+    inl min_indices : af_array u32 = $"af::array \v"
+    $"af::min(!min_vals, !min_indices, !scores, 1)"
     inl dispersal : int = 7
-    inl neural_gas_factor : af_array t = $"af::exp(!scores / af::tile(!max_vals,1,!scores.dims(1)) * !dispersal - !dispersal)"
+    inl neural_gas_factor : af_array t = $"af::exp((!scores - af::tile(!min_vals,1,!scores.dims(1))) / af::tile(!max_vals-!min_vals,1,!scores.dims(1)) * !dispersal - !dispersal)"
     inl tiled_input : af_array t = $"af::tile(!input,1,!dim_keys)"
     inl keys_update : af_array t = $"!tiled_input - af::tile(af::sum(!tiled_input * !keys, 0), !dim_inner) * !keys"
     inl keys' : af_array t  = normalize_l2 $"!keys + !lr * af::tile(!neural_gas_factor,!keys.dims(0)) * !keys_update"
