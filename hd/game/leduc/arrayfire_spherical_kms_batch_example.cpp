@@ -24,7 +24,7 @@ void normalize_l2_inplace(af::array &keys) {
     keys = keys / af::tile(af::sqrt(af::sum(keys * keys, 0)), keys.dims(0));
 }
 
-void spherical_kms_dictionary_key_update(
+void neural_gas_spherical_kms_dictionary_key_update(
         const af::array& top_input,
         af::array& keys,
         float lr = 0.1
@@ -94,7 +94,7 @@ int main() {
         af::array input = af::array(4, 3, input_data);
         af_print(input);
 
-        spherical_kms_dictionary_key_update(input, keys);
+        neural_gas_spherical_kms_dictionary_key_update(input, keys);
 
         // // Compute the result
         // af::array result = spherical_kms_dictionary_get(input, keys, values);

@@ -13,12 +13,12 @@ inl spherical_kms_dictionary_get forall t.
         }) 
         (refs_out : stack_refs {
             indexed_values : af_array t
+            max_vals : af_array t
             max_indices : af_array u32
         }) : () = join
-    inl {keys values input} = *refs_in
-    inl {indexed_values max_indices} = *refs_out
+    inl { keys values input } = *refs_in
+    inl { indexed_values max_vals max_indices } = *refs_out
     inl temp : af_array t = $"af::matmul(af::transpose(!input), !keys)"
-    inl max_vals : af_array t = $"af::array \v"
     $"af::max(!max_vals, !max_indices, !temp, 1)"
     $"!indexed_values = af::lookup(!values, !max_indices, 1)"
 
@@ -28,6 +28,7 @@ inl spherical_kms_dictionary_key_update forall t.
         (lr : float)
         (refs_in : stack_refs {
             input : af_array t
+            max_vals : af_array u32
             max_indices : af_array u32
         }) 
         (refs_io : stack_refs {
@@ -96,6 +97,17 @@ inl clear forall k v. ((dict (exists t. {data = refs})) : dict k v) : () =
     matrix_clear refs.values
 
 // Gets an item from the dictionary.
+inl get_cluster_id forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : u32 =
+    inl input = serializers.key_to_array k
+    inl indexed_values : af_array t = $"af::array \v"
+    inl max_vals : af_array t = $"af::array \v"
+    inl max_indices : af_array u32 = $"af::array \v"
+    spherical_kms_dictionary_get 
+        (stack_refs { keys = refs.keys; values = refs.values; input })
+        (stack_refs { indexed_values max_vals max_indices })
+    scalar max_indices
+
+// Gets an item from the dictionary.
 inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k : k) : v * af_index k =
     inl input = serializers.key_to_array k
     inl indexed_values : af_array t = $"af::array \v"
@@ -103,10 +115,10 @@ inl get forall k v. ((dict (exists t. {serializers data = refs})) : dict k v) (k
     spherical_kms_dictionary_get 
         (stack_refs { keys = refs.keys; values = refs.values; input })
         (stack_refs { indexed_values max_indices })
-    spherical_kms_dictionary_key_update
-        learning_rate()
-        (stack_refs { input max_indices })
-        (stack_refs { keys = refs.keys })
+    // spherical_kms_dictionary_key_update
+    //     learning_rate()
+    //     (stack_refs { input max_indices })
+    //     (stack_refs { keys = refs.keys })
     serializers.array_to_value indexed_values, af_index (k, max_indices)
 
 // Returns the number of rows in a dictionary

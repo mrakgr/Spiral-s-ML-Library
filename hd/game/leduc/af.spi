@@ -22,5 +22,8 @@ inl to_array forall t{number}. (m : af_array t) : array t =
     $"!m.host(!arr);"
     arr
 
+inl scalar forall t. (max_indices : af_array t) =
+    $"!max_indices.scalar<`t>()"
+
 instance printable af_array t = fun s m =>
     $"af_print(!m)"

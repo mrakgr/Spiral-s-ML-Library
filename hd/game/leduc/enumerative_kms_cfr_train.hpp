@@ -19,12 +19,11 @@ typedef unsigned long long (* Fun0)(Tuple0);
 typedef bool (* Fun1)(Tuple0, Tuple0);
 struct Tuple1;
 struct StackRefs0;
-struct Tuple2;
 struct StackRefs1;
-struct StackRefs2;
 struct StackMut0;
+struct StackRefs2;
+struct Tuple2;
 struct StackRefs3;
-struct StackRefs4;
 struct Tuple3;
 struct Union4;
 struct Union3;
@@ -35,33 +34,33 @@ struct Tuple5;
 struct Union6;
 struct Tuple6;
 struct Union7;
+struct Union8;
 struct StackMut2;
+struct StackRefs4;
 struct StackRefs5;
 struct StackRefs6;
 struct StackRefs7;
-struct StackRefs8;
-struct StackRefs9;
-struct StackRefs10;
-struct Union8;
-float loop_1(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
+float loop_1(StackRefs2 & v0, StackRefs0 & v1, StackRefs0 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, StackMut1 & v6, Union5 v7);
 static_array<float,3> relu_4(static_array<float,3> v0);
 static_array<float,3> masking_normalize_5(static_array<float,3> v0, static_array<bool,3> v1);
 static_array<float,3> regret_match_3(static_array<float,3> v0, static_array<bool,3> v1);
-float method_2(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-void method_7(float * v0, static_array_list<Union0,32> v1);
-void method_8(StackRefs5 & v0, StackRefs6 & v1);
-void method_9(StackRefs7 & v0, StackRefs8 & v1);
-void method_10(StackRefs9 & v0, StackRefs10 & v1);
-float method_6(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-int tag_12(Union1 v0);
-bool is_pair_13(int v0, int v1);
-Tuple5 order_14(int v0, int v1);
-Union8 compare_hands_11(Union4 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
-float body_0(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
-float loop_16(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, StackMut1 & v6, Union5 v7);
-float method_17(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-float method_18(xso::rng & v0, StackRefs3 & v1, StackRefs4 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs2 & v10, StackMut0 & v11, StackMut1 & v12);
-float body_15(StackRefs3 & v0, StackRefs0 & v1, StackRefs2 & v2, xso::rng & v3, StackMut0 & v4, StackRefs4 & v5, Union3 v6);
+float method_2(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs0 & v10, StackMut0 & v11, StackMut1 & v12);
+float method_6(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs0 & v10, StackMut0 & v11, StackMut1 & v12);
+int tag_8(Union1 v0);
+bool is_pair_9(int v0, int v1);
+Tuple5 order_10(int v0, int v1);
+Union8 compare_hands_7(Union4 v0, bool v1, static_array<Union1,2> v2, int v3, static_array<int,2> v4, int v5);
+float body_0(StackRefs2 & v0, StackRefs0 & v1, StackRefs0 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, Union3 v6);
+float loop_12(StackRefs2 & v0, StackRefs0 & v1, StackRefs1 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, StackMut1 & v6, Union5 v7);
+float method_13(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs1 & v10, StackMut0 & v11, StackMut1 & v12);
+void method_15(float * v0, static_array_list<Union0,32> v1);
+void method_16(StackRefs4 & v0, StackRefs5 & v1);
+void method_17(StackRefs6 & v0, StackRefs7 & v1);
+float method_14(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs1 & v10, StackMut0 & v11, StackMut1 & v12);
+float body_11(StackRefs2 & v0, StackRefs0 & v1, StackRefs1 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, Union3 v6);
+void method_19(Union1 v0);
+void method_20(Union2 v0);
+void method_18(Union0 v0);
 int main();
 struct Union1_0 { // Jack
 };
@@ -312,37 +311,32 @@ struct StackRefs0 {
     __host__ __device__ StackRefs0() = default;
     __host__ __device__ StackRefs0(std::unordered_map<Tuple0, Tuple1, Fun0, Fun1> & t0) : v0(t0) {}
 };
-struct Tuple2 {
-    float v0;
-    float v1;
-    __host__ __device__ Tuple2() = default;
-    __host__ __device__ Tuple2(float t0, float t1) : v0(t0), v1(t1) {}
-};
 struct StackRefs1 {
-    std::unordered_map<Tuple0, static_array<Tuple2,3>, Fun0, Fun1> & v0;
-    __host__ __device__ StackRefs1() = default;
-    __host__ __device__ StackRefs1(std::unordered_map<Tuple0, static_array<Tuple2,3>, Fun0, Fun1> & t0) : v0(t0) {}
-};
-struct StackRefs2 {
     af::array & v0;
     af::array & v1;
-    __host__ __device__ StackRefs2() = default;
-    __host__ __device__ StackRefs2(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
+    __host__ __device__ StackRefs1() = default;
+    __host__ __device__ StackRefs1(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
 };
 struct StackMut0 {
     unsigned int v0;
     __host__ __device__ StackMut0() = default;
     __host__ __device__ StackMut0(unsigned int t0) : v0(t0) {}
 };
-struct StackRefs3 {
+struct StackRefs2 {
     static_array_list<Union0,32> & v0;
-    __host__ __device__ StackRefs3() = default;
-    __host__ __device__ StackRefs3(static_array_list<Union0,32> & t0) : v0(t0) {}
+    __host__ __device__ StackRefs2() = default;
+    __host__ __device__ StackRefs2(static_array_list<Union0,32> & t0) : v0(t0) {}
 };
-struct StackRefs4 {
+struct Tuple2 {
+    float v0;
+    float v1;
+    __host__ __device__ Tuple2() = default;
+    __host__ __device__ Tuple2(float t0, float t1) : v0(t0), v1(t1) {}
+};
+struct StackRefs3 {
     static_array<Tuple2,2> & v0;
-    __host__ __device__ StackRefs4() = default;
-    __host__ __device__ StackRefs4(static_array<Tuple2,2> & t0) : v0(t0) {}
+    __host__ __device__ StackRefs3() = default;
+    __host__ __device__ StackRefs3(static_array<Tuple2,2> & t0) : v0(t0) {}
 };
 struct Tuple3 {
     int v0;
@@ -787,46 +781,6 @@ struct Union7 {
         this->tag = 255;
     }
 };
-struct StackMut2 {
-    int v0;
-    __host__ __device__ StackMut2() = default;
-    __host__ __device__ StackMut2(int t0) : v0(t0) {}
-};
-struct StackRefs5 {
-    af::array & v0;
-    af::array & v1;
-    af::array & v2;
-    __host__ __device__ StackRefs5() = default;
-    __host__ __device__ StackRefs5(af::array & t0, af::array & t1, af::array & t2) : v0(t0), v1(t1), v2(t2) {}
-};
-struct StackRefs6 {
-    af::array & v0;
-    af::array & v1;
-    __host__ __device__ StackRefs6() = default;
-    __host__ __device__ StackRefs6(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
-};
-struct StackRefs7 {
-    af::array & v0;
-    af::array & v1;
-    __host__ __device__ StackRefs7() = default;
-    __host__ __device__ StackRefs7(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
-};
-struct StackRefs8 {
-    af::array & v0;
-    __host__ __device__ StackRefs8() = default;
-    __host__ __device__ StackRefs8(af::array & t0) : v0(t0) {}
-};
-struct StackRefs9 {
-    af::array & v0;
-    af::array & v1;
-    __host__ __device__ StackRefs9() = default;
-    __host__ __device__ StackRefs9(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
-};
-struct StackRefs10 {
-    af::array & v0;
-    __host__ __device__ StackRefs10() = default;
-    __host__ __device__ StackRefs10(af::array & t0) : v0(t0) {}
-};
 struct Union8_0 { // Eq
 };
 struct Union8_1 { // Gt
@@ -892,5 +846,34 @@ struct Union8 {
         }
         this->tag = 255;
     }
+};
+struct StackMut2 {
+    int v0;
+    __host__ __device__ StackMut2() = default;
+    __host__ __device__ StackMut2(int t0) : v0(t0) {}
+};
+struct StackRefs4 {
+    af::array & v0;
+    af::array & v1;
+    af::array & v2;
+    __host__ __device__ StackRefs4() = default;
+    __host__ __device__ StackRefs4(af::array & t0, af::array & t1, af::array & t2) : v0(t0), v1(t1), v2(t2) {}
+};
+struct StackRefs5 {
+    af::array & v0;
+    af::array & v1;
+    __host__ __device__ StackRefs5() = default;
+    __host__ __device__ StackRefs5(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
+};
+struct StackRefs6 {
+    af::array & v0;
+    af::array & v1;
+    __host__ __device__ StackRefs6() = default;
+    __host__ __device__ StackRefs6(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
+};
+struct StackRefs7 {
+    af::array & v0;
+    __host__ __device__ StackRefs7() = default;
+    __host__ __device__ StackRefs7(af::array & t0) : v0(t0) {}
 };
 #endif

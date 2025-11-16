@@ -35,17 +35,22 @@ void neural_gas_spherical_kms_dictionary_key_update(
     auto dim_inner = input.dims(0);
     auto dim_keys = keys.dims(1);
     assert (input.dims(1) == 1);
-    af::array temp = af::matmul(af::transpose(input), keys);
+    af::array scores = af::matmul(af::transpose(input), keys);
+    af_print(scores);
     
     // Get max indices along dimension 0 (rows)
     af::array max_vals, max_indices;
-    af::max(max_vals, max_indices, temp, 1);
+    af::max(max_vals, max_indices, scores, 1);
 
-    auto indexed_keys = af::lookup(keys, max_indices, 1);
-    af_print(indexed_keys);
-    auto indexed_keys_update = input - af::tile(af::sum(input * indexed_keys, 0), dim_inner) * indexed_keys;
-    af_print(indexed_keys_update);
-    keys(af::span, max_indices) = normalize_l2(indexed_keys + lr * indexed_keys_update);
+    int dispersal = 5;
+    auto neural_gas_factor = af::exp(scores / af::tile(max_vals,1,scores.dims(1)) * dispersal - dispersal);
+    af_print(neural_gas_factor);
+    
+    auto tiled_input = af::tile(input,1,dim_keys);
+    af_print(tiled_input);
+    auto keys_update = tiled_input - af::tile(af::sum(tiled_input * keys, 0), dim_inner) * keys;
+    af_print(keys_update);
+    keys = normalize_l2(keys + lr * af::tile(neural_gas_factor,keys.dims(0)) * keys_update);
     af_print(keys);
 }
 

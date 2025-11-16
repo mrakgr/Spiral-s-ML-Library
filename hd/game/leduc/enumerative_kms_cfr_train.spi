@@ -478,7 +478,7 @@ inl create_hd (rows : int) =
     kms.clear d
     d
 
-inl main() =
+inl train() =
     // loop.for' {from=0; nearTo=1} fun (_ : int) =>
     inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
     inl expected_values : stack_refs dict_ev = stack_refs (cached_dictm.create 512)
@@ -502,3 +502,34 @@ inl main() =
         } 100
     console.write_ln {reward_for_pl0}
     0i32
+
+inl debug() =
+    // loop.for' {from=0; nearTo=1} fun (_ : int) =>
+    inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
+    inl policy_2 : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
+    inl hd = create_hd 288
+    inl loop (config : config) (nearTo : int) =
+        inl train_loop = train_loop config
+        loop.for {from=0; nearTo} (fun (i : int) _ =>
+            if i % (max 1 (nearTo / 25)) = 0 then
+                console.write_ln {i nearTo}
+            train_loop ()
+            ) 0
+    inl _ =
+        loop {
+            is_chance_node_sampling = false
+            player_modes = [TrainEnumerative {policy}; TrainEnumerative {policy = policy_2}]
+        } 1
+    inl _ =
+        loop {
+            is_chance_node_sampling = false
+            player_modes = [TrainEnumerative {policy}; TrainEnumerativeHebbian hd]
+        } 10
+    cached_dictm.iter (fun k v =>
+        console.write k
+        console.write " => "
+        console.write_ln (kms.get_cluster_id hd k)
+        ) *policy_2
+    0i32
+
+inl main() = debug()
