@@ -40,6 +40,8 @@ struct StackRefs4;
 struct StackRefs5;
 struct StackRefs6;
 struct StackRefs7;
+struct StackRefs8;
+struct StackRefs9;
 float loop_1(StackRefs2 & v0, StackRefs0 & v1, StackRefs0 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, StackMut1 & v6, Union5 v7);
 static_array<float,3> relu_4(static_array<float,3> v0);
 static_array<float,3> masking_normalize_5(static_array<float,3> v0, static_array<bool,3> v1);
@@ -56,11 +58,12 @@ float method_13(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool
 void method_15(float * v0, static_array_list<Union0,32> v1);
 void method_16(StackRefs4 & v0, StackRefs5 & v1);
 void method_17(StackRefs6 & v0, StackRefs7 & v1);
+void method_18(StackRefs8 & v0, StackRefs9 & v1);
 float method_14(xso::rng & v0, StackRefs2 & v1, StackRefs3 & v2, Union4 v3, bool v4, static_array<Union1,2> v5, int v6, static_array<int,2> v7, int v8, StackRefs0 & v9, StackRefs1 & v10, StackMut0 & v11, StackMut1 & v12);
 float body_11(StackRefs2 & v0, StackRefs0 & v1, StackRefs1 & v2, xso::rng & v3, StackMut0 & v4, StackRefs3 & v5, Union3 v6);
-void method_19(Union1 v0);
-void method_20(Union2 v0);
-void method_18(Union0 v0);
+void method_20(Union1 v0);
+void method_21(Union2 v0);
+void method_19(Union0 v0);
 int main();
 struct Union1_0 { // Jack
 };
@@ -862,18 +865,33 @@ struct StackRefs4 {
 struct StackRefs5 {
     af::array & v0;
     af::array & v1;
+    af::array & v2;
+    af::array & v3;
     __host__ __device__ StackRefs5() = default;
-    __host__ __device__ StackRefs5(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
+    __host__ __device__ StackRefs5(af::array & t0, af::array & t1, af::array & t2, af::array & t3) : v0(t0), v1(t1), v2(t2), v3(t3) {}
 };
 struct StackRefs6 {
     af::array & v0;
     af::array & v1;
+    af::array & v2;
+    af::array & v3;
     __host__ __device__ StackRefs6() = default;
-    __host__ __device__ StackRefs6(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
+    __host__ __device__ StackRefs6(af::array & t0, af::array & t1, af::array & t2, af::array & t3) : v0(t0), v1(t1), v2(t2), v3(t3) {}
 };
 struct StackRefs7 {
     af::array & v0;
     __host__ __device__ StackRefs7() = default;
     __host__ __device__ StackRefs7(af::array & t0) : v0(t0) {}
+};
+struct StackRefs8 {
+    af::array & v0;
+    af::array & v1;
+    __host__ __device__ StackRefs8() = default;
+    __host__ __device__ StackRefs8(af::array & t0, af::array & t1) : v0(t0), v1(t1) {}
+};
+struct StackRefs9 {
+    af::array & v0;
+    __host__ __device__ StackRefs9() = default;
+    __host__ __device__ StackRefs9(af::array & t0) : v0(t0) {}
 };
 #endif

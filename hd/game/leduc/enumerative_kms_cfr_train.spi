@@ -456,6 +456,7 @@ inl create_hd (rows : int) =
                 key_to_array = fun x =>
                     inl ar : array float = arraym.init cols_keys (const 0)
                     kms_pickler.pickle ar p x 
+                    // assert (x = kms_pickler.unpickle ar p) "The round trip pickle needs to equal the original."
                     af.from_array ar cols_keys
                 value_to_array = fun x =>
                     inl ar : array float = arraym.init cols_values (const 0)
@@ -508,6 +509,7 @@ inl debug() =
     inl policy : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
     inl policy_2 : stack_refs dict_policy = stack_refs (cached_dictm.create 512)
     inl hd = create_hd 288
+    // kms.print_keys_matrix hd
     inl loop (config : config) (nearTo : int) =
         inl train_loop = train_loop config
         loop.for {from=0; nearTo} (fun (i : int) _ =>
@@ -519,17 +521,18 @@ inl debug() =
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainEnumerative {policy}; TrainEnumerative {policy = policy_2}]
-        } 1
+        } 10
     inl _ =
         loop {
             is_chance_node_sampling = false
             player_modes = [TrainEnumerative {policy}; TrainEnumerativeHebbian hd]
-        } 10
+        } 1
     cached_dictm.iter (fun k v =>
         console.write k
         console.write " => "
         console.write_ln (kms.get_cluster_id hd k)
         ) *policy_2
+    kms.print_keys_matrix hd
     0i32
 
 inl main() = debug()
