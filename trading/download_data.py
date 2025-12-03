@@ -6,7 +6,7 @@ from massive import RESTClient
 with open("api_key.json") as f:
     api_keys = json.load(f)
 
-client = RESTClient(api_keys["massive"])
+client = RESTClient(api_keys["massive_api_key"])
 
 aggs = []
 for a in client.list_aggs(
