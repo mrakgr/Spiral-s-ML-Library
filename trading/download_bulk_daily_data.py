@@ -32,11 +32,10 @@ s3 = boto3.client(
 
 bucket_name = 'flatfiles'
 
-# Calculate date range for past 2 years
-# Note: Many subscriptions have a 60-90 day delay for flat files
-# Adjust end_date to account for this
+# Calculate date range for past n years
+n = 5
 end_date = datetime.now()
-start_date = end_date - timedelta(weeks=52 * 5)  # 5 years before end_date
+start_date = end_date - timedelta(weeks=52 * n) # n years before end_date
 
 # Create output directory
 output_dir = Path("data/daily_aggregates")
