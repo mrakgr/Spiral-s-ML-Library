@@ -5,3 +5,4 @@ static/bundles/
 bin/
 build/
 cpp_libs/
+trading/api_key.json
