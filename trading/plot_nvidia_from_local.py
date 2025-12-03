@@ -97,15 +97,13 @@ df['volume'] = df['volume'] * df['adjustment_factor']
 
 print(f"✓ Applied {len(splits)} split adjustments")
 
-# Filter out rows with missing data (handles weekends and holidays)
-print("\nFiltering out missing data...")
-initial_rows = len(df)
-df = df.dropna(subset=['open', 'high', 'low', 'close', 'volume'])
-# Also filter out rows where all OHLC values are zero
-df = df[(df['open'] > 0) & (df['high'] > 0) & (df['low'] > 0) & (df['close'] > 0)]
-filtered_rows = initial_rows - len(df)
-if filtered_rows > 0:
-    print(f"✓ Filtered out {filtered_rows} rows with missing/invalid data")
+# Detect all gaps in the data (weekends and holidays)
+print("\nDetecting date gaps...")
+df['date_only'] = df['date'].dt.date
+all_dates = pd.date_range(start=df['date'].min(), end=df['date'].max(), freq='D')
+trading_dates = set(df['date_only'])
+gap_dates = [d.date() for d in all_dates if d.date() not in trading_dates]
+print(f"✓ Found {len(gap_dates)} non-trading days (weekends + holidays)")
 
 # Create interactive plot with plotly
 fig = make_subplots(
@@ -138,6 +136,14 @@ fig.add_trace(
         marker_color='rgba(0, 150, 255, 0.5)'
     ),
     row=2, col=1
+)
+
+# Remove gaps for weekends and holidays
+# Use 'values' to explicitly hide all non-trading days
+fig.update_xaxes(
+    rangebreaks=[
+        dict(values=gap_dates)  # Hide all non-trading days (weekends + holidays)
+    ]
 )
 
 # Update layout
