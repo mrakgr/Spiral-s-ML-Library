@@ -67,6 +67,46 @@ df = df.sort_values('date').reset_index(drop=True)
 print(f"\n✓ Extracted {len(df)} trading days for NVDA")
 print(f"Date range: {df['date'].min().date()} to {df['date'].max().date()}")
 
+# Apply split adjustments (flat files are NOT split-adjusted)
+# NVDA splits: 2006-04-07 (2:1), 2007-09-11 (3:2), 2021-07-20 (4:1), 2024-06-10 (10:1)
+print("\nApplying split adjustments...")
+
+splits = [
+    ('2006-04-07', 2.0),   # 1:2 split (2x)
+    ('2007-09-11', 1.5),   # 2:3 split (1.5x)
+    ('2021-07-20', 4.0),   # 1:4 split (4x)
+    ('2024-06-10', 10.0),  # 1:10 split (10x)
+]
+
+# Calculate cumulative adjustment factor going forward from each split
+df['adjustment_factor'] = 1.0
+
+for split_date, ratio in splits:
+    split_dt = pd.to_datetime(split_date)
+    # For dates BEFORE the split, multiply by the ratio
+    mask = df['date'] < split_dt
+    df.loc[mask, 'adjustment_factor'] *= ratio
+
+# Apply adjustment to price columns (divide) and volume (multiply by inverse)
+price_cols = ['open', 'high', 'low', 'close']
+for col in price_cols:
+    df[col] = df[col] / df['adjustment_factor']
+
+# Volume should be adjusted inversely (multiply by adjustment factor)
+df['volume'] = df['volume'] * df['adjustment_factor']
+
+print(f"✓ Applied {len(splits)} split adjustments")
+
+# Filter out rows with missing data (handles weekends and holidays)
+print("\nFiltering out missing data...")
+initial_rows = len(df)
+df = df.dropna(subset=['open', 'high', 'low', 'close', 'volume'])
+# Also filter out rows where all OHLC values are zero
+df = df[(df['open'] > 0) & (df['high'] > 0) & (df['low'] > 0) & (df['close'] > 0)]
+filtered_rows = initial_rows - len(df)
+if filtered_rows > 0:
+    print(f"✓ Filtered out {filtered_rows} rows with missing/invalid data")
+
 # Create interactive plot with plotly
 fig = make_subplots(
     rows=2, cols=1,
@@ -102,7 +142,7 @@ fig.add_trace(
 
 # Update layout
 fig.update_layout(
-    title='NVDA Stock Price and Volume',
+    title='NVDA Stock Price and Volume (Split-Adjusted)',
     yaxis_title='Price (USD)',
     yaxis2_title='Volume',
     xaxis2_title='Date',
