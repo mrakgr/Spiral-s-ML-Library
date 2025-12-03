@@ -6,3 +6,4 @@ bin/
 build/
 cpp_libs/
 trading/api_key.json
+trading/data/**

@@ -49,8 +49,14 @@ print(f"Output directory: {output_dir.absolute()}")
 current_date = start_date
 downloaded_files = []
 failed_dates = []
+skipped_files = []
 
 while current_date <= end_date:
+    # Skip weekends (Saturday=5, Sunday=6)
+    if current_date.weekday() >= 5:
+        current_date += timedelta(days=1)
+        continue
+    
     # Format: us_stocks_sip/day_aggs_v1/YYYY/MM/YYYY-MM-DD.csv.gz
     year = current_date.year
     month = f"{current_date.month:02d}"
@@ -58,6 +64,14 @@ while current_date <= end_date:
     
     s3_key = f"us_stocks_sip/day_aggs_v1/{year}/{month}/{date_str}.csv.gz"
     local_file = output_dir / f"{date_str}.csv.gz"
+    
+    # Check if file already exists
+    if local_file.exists():
+        print(f"⊙ {date_str}: Already downloaded, skipping")
+        downloaded_files.append(local_file)
+        skipped_files.append(date_str)
+        current_date += timedelta(days=1)
+        continue
     
     try:
         print(f"Downloading {date_str}...", end=" ")
@@ -72,36 +86,13 @@ while current_date <= end_date:
 
 print(f"\n{'='*60}")
 print(f"Download Summary:")
-print(f"  Total files downloaded: {len(downloaded_files)}")
+print(f"  Total files: {len(downloaded_files)}")
+print(f"  Already existed (skipped): {len(skipped_files)}")
+print(f"  Newly downloaded: {len(downloaded_files) - len(skipped_files)}")
 print(f"  Failed dates: {len(failed_dates)}")
 if failed_dates:
-    print(f"  Failed dates (likely weekends/holidays): {failed_dates[:10]}...")
-
-# Optional: Decompress and combine into a single DataFrame (for smaller datasets)
-combine_data = input("\nCombine all files into a single CSV? (y/n): ").lower() == 'y'
-
-if combine_data:
-    print("\nCombining all downloaded files...")
-    all_data = []
-    
-    for file_path in downloaded_files:
-        try:
-            with gzip.open(file_path, 'rt') as f:
-                df = pd.read_csv(f)
-                all_data.append(df)
-        except Exception as e:
-            print(f"Error reading {file_path}: {e}")
-    
-    if all_data:
-        combined_df = pd.concat(all_data, ignore_index=True)
-        output_csv = output_dir.parent / "combined_daily_data.csv"
-        combined_df.to_csv(output_csv, index=False)
-        print(f"Combined data saved to: {output_csv.absolute()}")
-        print(f"Total rows: {len(combined_df):,}")
-        print(f"Unique tickers: {combined_df['ticker'].nunique() if 'ticker' in combined_df.columns else 'N/A'}")
-        print(f"\nFirst few rows:")
-        print(combined_df.head())
-    else:
-        print("No data to combine.")
+    print(f"  Failed dates (likely holidays): {failed_dates[:10]}{'...' if len(failed_dates) > 10 else ''}")
 
 print("\n✓ Done!")
+print("\nTo combine all files into a single CSV, run:")
+print("  python combine_data.py")
