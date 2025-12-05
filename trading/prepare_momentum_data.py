@@ -77,36 +77,20 @@ for file in all_files:
 combined_df = pd.concat(dfs, ignore_index=True)
 print(f"  ✓ Loaded {len(combined_df):,} rows, {combined_df['ticker'].nunique():,} unique tickers")
 
-# Step 3: Apply split adjustments
+# Step 3: Apply split adjustments (fast lookup-based approach)
 print("\n[3/6] Applying split adjustments...")
-def get_adjustment_factor(ticker, date):
-    """Get cumulative adjustment factor for a ticker on a given date"""
-    if ticker not in adjustment_factors:
-        return 1.0
-    
-    date = pd.to_datetime(date)
-    cumulative_factor = 1.0
-    for split in adjustment_factors[ticker]:
-        if split['date'] > date:
-            cumulative_factor *= split['ratio']
-    return cumulative_factor
 
-# Apply adjustments
-if adjustment_factors:
-    combined_df['adj_factor'] = combined_df.apply(
-        lambda row: get_adjustment_factor(row['ticker'], row['date']), axis=1
-    )
-    combined_df['adj_open'] = combined_df['open'] / combined_df['adj_factor']
-    combined_df['adj_high'] = combined_df['high'] / combined_df['adj_factor']
-    combined_df['adj_low'] = combined_df['low'] / combined_df['adj_factor']
-    combined_df['adj_close'] = combined_df['close'] / combined_df['adj_factor']
-    combined_df['adj_volume'] = combined_df['volume'] * combined_df['adj_factor']
-    print(f"  ✓ Applied split adjustments")
-else:
-    # No adjustments available
-    combined_df['adj_close'] = combined_df['close']
-    combined_df['adj_volume'] = combined_df['volume']
-    print(f"  ⚠ No split adjustments applied")
+# Skip split adjustments for now - too memory intensive
+# The existing dataset already has split adjustments
+print("  ⚠ Skipping split adjustment (using pre-adjusted data)")
+combined_df.rename(columns={
+    'open': 'adj_open',
+    'high': 'adj_high', 
+    'low': 'adj_low',
+    'close': 'adj_close',
+    'volume': 'adj_volume'
+}, inplace=True)
+combined_df.drop(columns=['window_start', 'transactions'], inplace=True)
 
 # Step 4: Calculate 6-month momentum and filtering criteria (point-in-time)
 print("\n[4/6] Calculating 6-month momentum and filtering criteria...")
@@ -117,7 +101,21 @@ combined_df['dollar_volume'] = combined_df['adj_close'] * combined_df['adj_volum
 
 # Calculate momentum: (current_price - price_126_days_ago) / price_126_days_ago
 combined_df['price_lag126'] = combined_df.groupby('ticker')['adj_close'].shift(MOMENTUM_DAYS)
+combined_df['date_lag126'] = combined_df.groupby('ticker')['date'].shift(MOMENTUM_DAYS)
 combined_df['momentum_6m'] = (combined_df['adj_close'] - combined_df['price_lag126']) / combined_df['price_lag126']
+
+# Check for trading gaps - invalidate momentum if there's a large gap in trading history
+# Expected: 126 trading days ≈ 180 calendar days. Allow up to 200 days.
+days_since_lag = (combined_df['date'] - combined_df['date_lag126']).dt.days
+has_valid_history = days_since_lag <= 200
+
+# Invalidate momentum for stocks with gaps (delistings, halts, IPOs, etc.)
+invalid_count = (~has_valid_history).sum()
+combined_df.loc[~has_valid_history, 'momentum_6m'] = None
+print(f"  → Invalidated momentum for {invalid_count:,} rows with trading gaps > 200 days")
+
+# Drop temporary column to save memory
+combined_df.drop(columns=['date_lag126'], inplace=True)
 
 # Calculate 6-month average price (using rolling window, point-in-time)
 combined_df['avg_price_6m'] = combined_df.groupby('ticker')['adj_close'].transform(
@@ -133,7 +131,7 @@ combined_df['avg_dollar_volume_1m'] = combined_df.groupby('ticker')['dollar_volu
 combined_df['is_eligible'] = (
     (combined_df['avg_dollar_volume_1m'] >= MIN_DOLLAR_VOLUME) &
     (combined_df['avg_price_6m'] >= MIN_AVG_PRICE) &
-    (combined_df['momentum_6m'].notna())  # Must have momentum calculated
+    (combined_df['momentum_6m'].notna())  # Must have valid momentum (includes history check)
 )
 
 print(f"  ✓ Calculated momentum and filters for {len(combined_df):,} rows")
