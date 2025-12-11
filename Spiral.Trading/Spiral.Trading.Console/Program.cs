@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Spiral.Trading.Config;
 using Spiral.Trading.Data;
+using Spiral.Trading.Models;
 using Spiral.Trading.Storage;
+using EFCore.BulkExtensions;
 using System;
 using System.IO;
 using System.Linq;
@@ -33,14 +35,14 @@ namespace Spiral.Trading.ConsoleApp
                 throw new FileNotFoundException("API key file not found. Please ensure 'api_key.json' is in the current directory or the project root.", apiKeyPath);
             }
 
-            try 
+            try
             {
                 var (apiKey, s3Access, s3Secret) = ConfigLoader.LoadKeys(apiKeyPath);
-                
+
                 // Initialize Database
                 string dbPath = "data/trading.db";
                 Directory.CreateDirectory("data");
-                
+
                 using (var context = new TradingDbContext(dbPath))
                 {
                     await context.Database.EnsureCreatedAsync();
@@ -72,14 +74,14 @@ namespace Spiral.Trading.ConsoleApp
         static async Task RunBulkDownload(string accessKey, string secretKey)
         {
             var downloader = new PolygonS3DataDownloader(accessKey, secretKey);
-            
+
             // Hardcoded n=5 years from now, similar to Python script
             var endDate = DateTime.Now;
             var startDate = endDate.AddYears(-5);
-            
+
             // Assume running from project root
             string outputDir = "data/daily_aggregates";
-            
+
             Console.WriteLine($"Output Directory: {outputDir}");
 
             await downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, maxDegreeOfParallelism: 8);
@@ -100,7 +102,7 @@ namespace Spiral.Trading.ConsoleApp
         static async Task RunSplitDownload(string apiKey, string dbPath)
         {
             Console.WriteLine("Loading tickers from database...");
-            
+
             using var context = new TradingDbContext(dbPath);
             await context.Database.EnsureCreatedAsync();
 
@@ -118,30 +120,23 @@ namespace Spiral.Trading.ConsoleApp
 
             Console.WriteLine($"Loaded {validTickers.Count} unique tickers from database");
 
+            // Use higher parallelism with enabled retries
             var downloader = new PolygonSplitDownloader(apiKey);
-            var splits = await downloader.DownloadSplitsAsync(validTickers, maxDegreeOfParallelism: 20);
+            var splits = await downloader.DownloadSplitsAsync(validTickers, maxDegreeOfParallelism: 20000);
 
             Console.WriteLine($"\nFound {splits.Count} splits. Saving to database...");
 
-            // Batch insert using EF Core
-            var existingSplits = await context.Splits
-                .Select(s => new { s.Ticker, s.ExecutionDate })
-                .ToListAsync();
-                
-            var existingSet = existingSplits.Select(x => $"{x.Ticker}|{x.ExecutionDate}").ToHashSet();
-            
-            var newSplits = splits.Where(s => !existingSet.Contains($"{s.Ticker}|{s.ExecutionDate}")).ToList();
-            
-            if (newSplits.Any())
+            // Batch insert/upsert using BulkExtensions
+            // Upsert to avoid duplicates
+            var bulkConfig = new BulkConfig
             {
-                await context.Splits.AddRangeAsync(newSplits);
-                await context.SaveChangesAsync();
-                Console.WriteLine($"Saved {newSplits.Count} new splits.");
-            }
-            else
-            {
-                Console.WriteLine("No new splits to save.");
-            }
+                SetOutputIdentity = false,
+                UpdateByProperties = new List<string> { nameof(Split.Ticker), nameof(Split.ExecutionDate) }
+            };
+
+            await context.BulkInsertOrUpdateAsync(splits, bulkConfig);
+
+            Console.WriteLine($"Saved or updated {splits.Count} splits.");
         }
     }
 }

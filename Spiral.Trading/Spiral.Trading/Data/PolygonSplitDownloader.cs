@@ -22,66 +22,91 @@ namespace Spiral.Trading.Data
             _httpClient = httpClient ?? new HttpClient();
         }
 
-        public async Task<List<Split>> DownloadSplitsAsync(IEnumerable<string> tickers, int maxDegreeOfParallelism = 20)
+        public async Task<List<Split>> DownloadSplitsAsync(IEnumerable<string> tickers, int maxDegreeOfParallelism = 100)
         {
             var allSplits = new ConcurrentBag<Split>();
             var failedTickers = new ConcurrentBag<string>();
             var tickerList = tickers.ToList();
             int total = tickerList.Count;
             int processed = 0;
-            
+
             Console.WriteLine($"Starting split download for {total} tickers with parallelism {maxDegreeOfParallelism}...");
 
             var options = new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism };
 
+            // We use a manual retry loop or could use Polly. 
+            // Simple manual retry for 429 is sufficient here.
             await Parallel.ForEachAsync(tickerList, options, async (ticker, ct) =>
             {
-                try
+                int retries = 0;
+                TimeSpan delay = TimeSpan.FromMilliseconds(200);
+
+                while (retries < 5)
                 {
-                    // Date range hardcoded to match Python script logic or can be param.
-                    // Python script: start_date="2020-12-09", end_date=now
-                    // But usually we want all relevant history. Let's use a wide range.
-                    // Python script logic: execution_date.gte=2020-12-09
-                    // I will stick to a reasonable default but maybe this should be configurable.
-                    // For now, I'll match the Python script's "2020-12-09" start date as a default but maybe ask user?
-                    // Actually, let's use a more inclusive start date or today's date minus 10 years if not specified.
-                    // The Python script specifically targeted recent data. I'll use "2000-01-01" to be safe and get more history, 
-                    // or stick to the script. The script said "Date range for split data: 2020-12-09".
-                    // I'll stick to 2000-01-01 to ensure we get enough history for momentum lookbacks unless user wants exactly that.
-                    // Better yet, I'll define it as a constant for now.
-                    
-                    string startDate = "1990-01-01"; // Safe default for "all history"
-                    string url = $"https://api.polygon.io/v3/reference/splits?ticker={ticker}&execution_date.gte={startDate}&limit=1000&apiKey={_apiKey}";
-
-                    var response = await _httpClient.GetFromJsonAsync<PolygonSplitResponse>(url, ct);
-
-                    if (response?.Results != null)
+                    try
                     {
-                        foreach (var result in response.Results)
+                        string startDate = "1990-01-01";
+                        string url = $"https://api.polygon.io/v3/reference/splits?ticker={ticker}&execution_date.gte={startDate}&limit=1000&apiKey={_apiKey}";
+
+                        var response = await _httpClient.GetAsync(url, ct);
+
+                        if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                         {
-                            if (result.SplitFrom != 0) // Avoid divide by zero
+                            retries++;
+                            // Exponential backoff with jitter
+                            var jitter = Random.Shared.Next(10, 100);
+                            var currentDelay = delay.TotalMilliseconds + jitter;
+                            await Task.Delay((int)currentDelay, ct);
+                            delay = delay * 1.5; // Multiply delay
+                            continue; // Retry
+                        }
+
+                        response.EnsureSuccessStatusCode();
+
+                        var splitResponse = await response.Content.ReadFromJsonAsync<PolygonSplitResponse>(cancellationToken: ct);
+
+                        if (splitResponse?.Results != null)
+                        {
+                            foreach (var result in splitResponse.Results)
                             {
-                                allSplits.Add(new Split
+                                if (result.SplitFrom != 0)
                                 {
-                                    Ticker = ticker,
-                                    ExecutionDate = DateTime.Parse(result.ExecutionDate),
-                                    SplitFrom = result.SplitFrom,
-                                    SplitTo = result.SplitTo,
-                                    SplitRatio = result.SplitTo / result.SplitFrom
-                                });
+                                    allSplits.Add(new Split
+                                    {
+                                        Ticker = ticker,
+                                        ExecutionDate = DateTime.Parse(result.ExecutionDate),
+                                        SplitFrom = result.SplitFrom,
+                                        SplitTo = result.SplitTo,
+                                        SplitRatio = result.SplitTo / result.SplitFrom
+                                    });
+                                }
                             }
                         }
+                        break; // Success, exit loop
+                    }
+                    catch (Exception ex)
+                    {
+                        if (retries >= 4)
+                        {
+                            failedTickers.Add($"{ticker}: {ex.Message}");
+                        }
+                        else
+                        {
+                            // On other network errors, maybe retry? 
+                            // For now only retry on expected transient or 429.
+                            // If simple exception, maybe just log and move on to avoid stalling?
+                            // Let's retry on HttpRequestException too briefly
+                            retries++;
+                            await Task.Delay(500, ct);
+                            continue;
+                        }
+                        break;
                     }
                 }
-                catch (Exception ex)
-                {
-                    failedTickers.Add($"{ticker}: {ex.Message}");
-                }
-                finally
-                {
-                    int p = System.Threading.Interlocked.Increment(ref processed);
-                    if (p % 100 == 0) Console.WriteLine($"[{p}/{total}] processed...");
-                }
+
+                int p = System.Threading.Interlocked.Increment(ref processed);
+                if (p % 100 == 0) Console.Write(".");
+                if (p % 1000 == 0) Console.WriteLine($" [{p}/{total}]");
             });
 
             if (!failedTickers.IsEmpty)
