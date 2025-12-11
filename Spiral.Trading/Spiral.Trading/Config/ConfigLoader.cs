@@ -14,10 +14,10 @@ namespace Spiral.Trading.Config
 
             var json = File.ReadAllText(path);
             var obj = JObject.Parse(json);
-            
-            var polygonKey = obj["polygon_api_key"]?.ToString() ?? obj["massive_api_key"]?.ToString();
-            var s3Access = obj["massive_s3_access_key"]?.ToString();
-            var s3Secret = obj["massive_s3_secret_key"]?.ToString();
+
+            var polygonKey = obj["massive_api_key"]?.ToString() ?? throw new InvalidOperationException("massive_api_key not found");
+            var s3Access = obj["massive_s3_access_key"]?.ToString() ?? throw new InvalidOperationException("massive_s3_access_key not found");
+            var s3Secret = obj["massive_s3_secret_key"]?.ToString() ?? throw new InvalidOperationException("massive_s3_secret_key not found");
 
             return (polygonKey, s3Access, s3Secret);
         }

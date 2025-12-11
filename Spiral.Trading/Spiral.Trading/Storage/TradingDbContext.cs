@@ -6,6 +6,7 @@ namespace Spiral.Trading.Storage
     public class TradingDbContext : DbContext
     {
         public DbSet<DailyPrice> DailyPrices { get; set; }
+        public DbSet<ProcessedFile> ProcessedFiles { get; set; }
         public DbSet<Split> Splits { get; set; }
 
         private readonly string _dbPath;
@@ -29,10 +30,10 @@ namespace Spiral.Trading.Storage
             modelBuilder.Entity<DailyPrice>()
                 .HasIndex(d => new { d.Ticker, d.Date })
                 .IsUnique();
-            
+
             modelBuilder.Entity<DailyPrice>()
                 .HasIndex(d => d.Date);
-                
+
             modelBuilder.Entity<DailyPrice>()
                 .HasIndex(d => d.Ticker);
 
@@ -43,10 +44,10 @@ namespace Spiral.Trading.Storage
             modelBuilder.Entity<Split>()
                 .HasIndex(s => new { s.Ticker, s.ExecutionDate })
                 .IsUnique();
-                
+
             modelBuilder.Entity<Split>()
                 .HasIndex(s => s.Ticker);
-                
+
             modelBuilder.Entity<Split>()
                 .HasIndex(s => s.ExecutionDate);
         }

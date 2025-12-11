@@ -19,7 +19,7 @@ namespace Spiral.Trading.Data
         {
             _accessKey = accessKey;
             _secretKey = secretKey;
-            
+
             var config = new AmazonS3Config
             {
                 ServiceURL = "https://files.massive.com",
@@ -48,7 +48,7 @@ namespace Spiral.Trading.Data
 
             // Using Parallel.ForEachAsync to download in parallel
             var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism };
-            
+
             int total = dates.Count;
             int completed = 0;
 
@@ -64,7 +64,7 @@ namespace Spiral.Trading.Data
 
                 bool skipped = false;
                 bool success = false;
-                string error = null;
+                string? error = null;
 
                 if (File.Exists(localFilePath))
                 {
@@ -92,9 +92,9 @@ namespace Spiral.Trading.Data
                             success = true;
                             break; // Success, exit retry loop
                         }
-                        catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable || 
-                                                           ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests || 
-                                                           ex.ErrorCode == "TooManyRequests" || 
+                        catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable ||
+                                                           ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests ||
+                                                           ex.ErrorCode == "TooManyRequests" ||
                                                            ex.ErrorCode == "SlowDown")
                         {
                             if (attempt == maxRetries)
@@ -110,22 +110,22 @@ namespace Spiral.Trading.Data
                         }
                         catch (AmazonS3Exception ex)
                         {
-                             // Non-retriable S3 error (e.g. 404, 403)
-                             error = $"S3 Error: {ex.StatusCode} - {ex.Message}";
-                             break;
+                            // Non-retriable S3 error (e.g. 404, 403)
+                            error = $"S3 Error: {ex.StatusCode} - {ex.Message}";
+                            break;
                         }
                         catch (Exception ex)
                         {
-                             // Other errors
-                             error = ex.Message;
-                             break;
+                            // Other errors
+                            error = ex.Message;
+                            break;
                         }
                     }
                 }
 
                 // Thread-safe progress reporting
                 int c = System.Threading.Interlocked.Increment(ref completed);
-                
+
                 string status = skipped ? "Skipped" : (success ? "Downloaded" : "Failed");
                 string msg = $"[{c}/{total}] {dateStr}: {status}";
                 if (!string.IsNullOrEmpty(error)) msg += $" ({error})";

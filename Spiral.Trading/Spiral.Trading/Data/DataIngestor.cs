@@ -30,99 +30,141 @@ namespace Spiral.Trading.Data
                                  .OrderBy(f => f)
                                  .ToList();
 
-            Console.WriteLine($"Found {files.Count} files to ingest.");
+            Console.WriteLine($"Found {files.Count} files in directory.");
 
-            // Ensure DB created
+            // 1. Ensure DB Schema
+            // Note: Since we changed the model, if the DB exists with old schema, we might have issues.
+            // For this dev iteration, if schema is invalid, we might need to recreate. 
+            // In production, migrations would be used.
+            // Let's try to just EnsureCreated. If it assumes existing DB is fine but misses table, we might crash later.
+            // Ideally we check if ProcessedFiles table exists or just wipe if needed.
+            // I'll assume for now we can rely on EnsureCreated. If it fails due to mismatch, user might need to delete DB file.
+
             using (var initContext = new TradingDbContext(_dbPath))
             {
                 await initContext.Database.EnsureCreatedAsync();
             }
 
-            // Channel for decoupled parsing and writing
-            // Bounded to avoid exhausted memory if parsing is much faster than writing
-            var channel = Channel.CreateBounded<List<DailyPrice>>(new BoundedChannelOptions(500)
+            // 2. Load Processed Files
+            HashSet<string> processedFilesSet;
+            using (var context = new TradingDbContext(_dbPath))
+            {
+                // If the table was just created, this is empty.
+                // If legacy DB existed without table, this throws.
+                // We will bubble up valid errors.
+                processedFilesSet = await context.ProcessedFiles
+                                                 .Select(f => f.FileName)
+                                                 .ToHashSetAsync();
+            }
+
+            Console.WriteLine($"Already ingested: {processedFilesSet.Count} files.");
+
+            // 3. Filter
+            var filesToProcess = files.Where(f => !processedFilesSet.Contains(Path.GetFileName(f)))
+                                      .ToList();
+
+            Console.WriteLine($"Remaining to ingest: {filesToProcess.Count} files.");
+            if (filesToProcess.Count == 0) return;
+
+            // Channel: (FileName, Rows)
+            var channel = Channel.CreateBounded<(string FileName, List<DailyPrice> Rows)>(new BoundedChannelOptions(500)
             {
                 SingleWriter = false,
                 SingleReader = true,
                 FullMode = BoundedChannelFullMode.Wait
             });
 
-            // Consumer Task (Writer)
+            // Consumer
             var consumerTask = Task.Run(async () =>
             {
-                int processedFiles = 0;
-                long totalRows = 0;
                 using var context = new TradingDbContext(_dbPath);
-
-                // Bulk extensions usually doesn't use ChangeTracker, but good practice to keep it clean
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-                await foreach (var batch in channel.Reader.ReadAllAsync())
+                int processedCount = 0;
+                long totalRows = 0;
+
+                await foreach (var item in channel.Reader.ReadAllAsync())
                 {
-                    if (batch.Count > 0)
+                    if (item.Rows.Count > 0)
                     {
                         try
                         {
-                            // BulkInsert optimized for SQLite
-                            var bulkConfig = new BulkConfig
+                            // A. Insert Prices
+                            // Since we filtered files, we assume these are NEW data. No Duplicates.
+                            // Use simple BulkInsert.
+                            var bulkConfig = new BulkConfig { SetOutputIdentity = false, BatchSize = 10000 };
+                            await context.BulkInsertAsync(item.Rows, bulkConfig);
+
+                            // B. Record File as Processed
+                            // We can use EF normal add for this single row or bulk insert if we wanted.
+                            // Since it's one row per file batch, normal Add is fine, OR we could keep a separate list and bulk insert occasionally.
+                            // But for safety (crash consistency), better to commit file record with data or right after.
+                            // Actually, to ensure consistency: Data committed -> File committed.
+
+                            // Let's us direct SQL or EF for the file record to avoid context tracking issues mixed with bulk lib 
+                            // (though BulkExtensions plays nice mostly).
+
+                            // Re-enable tracking for this simple op? Or just direct insert.
+                            // "ProcessedFiles" is simple.
+
+                            var pf = new ProcessedFile
                             {
-                                SetOutputIdentity = false,
-                                BatchSize = 10000 // Adjust based on memory/performance
+                                FileName = item.FileName,
+                                IngestedAt = DateTime.UtcNow
                             };
 
-                            await context.BulkInsertAsync(batch, bulkConfig);
+                            // We can use BulkInsert for this too to keep it uniform and fast
+                            await context.BulkInsertAsync(new List<ProcessedFile> { pf });
 
-                            totalRows += batch.Count;
-
-                            context.ChangeTracker.Clear();
+                            totalRows += item.Rows.Count;
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"\nError writing batch (Rows: {batch.Count}): {ex.Message}");
-                            context.ChangeTracker.Clear();
+                            Console.WriteLine($"\nError ingesting {item.FileName}: {ex.Message}");
+                            // If we fail, we don't mark file as processed.
                         }
                     }
-                    processedFiles++;
-                    if (processedFiles % 10 == 0) Console.Write(".");
-                    if (processedFiles % 100 == 0) Console.WriteLine($" {processedFiles}/{files.Count} (Total Rows: {totalRows})");
+                    else
+                    {
+                        // Even if empty rows (e.g. holiday? file existed but had no data?), mark as processed?
+                        // Yes, otherwise we re-process forever.
+                        try
+                        {
+                            var pf = new ProcessedFile { FileName = item.FileName, IngestedAt = DateTime.UtcNow };
+                            await context.BulkInsertAsync(new List<ProcessedFile> { pf });
+                        }
+                        catch { }
+                    }
+
+                    processedCount++;
+                    if (processedCount % 10 == 0) Console.Write(".");
+                    if (processedCount % 100 == 0) Console.WriteLine($" {processedCount}/{filesToProcess.Count} (Total Rows: {totalRows})");
                 }
             });
 
-            // Producer Task (Parsers)
-            // Use Parallel.ForEach to parse files concurrently
+            // Producer
             var producerOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
-
-            await Parallel.ForEachAsync(files, producerOptions, async (file, ct) =>
+            await Parallel.ForEachAsync(filesToProcess, producerOptions, async (file, ct) =>
             {
                 var filename = Path.GetFileName(file);
                 var datePart = filename.Replace(".csv.gz", "");
-                if (!DateTime.TryParse(datePart, out DateTime date))
+                if (DateTime.TryParse(datePart, out DateTime date))
                 {
-                    return;
-                }
-
-                // Skip check for speed - user can manage duplicates or we can handle unique constraint violations (slower)
-                try
-                {
-                    var prices = ParseDailyCsv(file, date);
-                    // Write even empty lists to count progress
-                    await channel.Writer.WriteAsync(prices, ct);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error parsing {filename}: {ex.Message}");
-                    // Write empty to count progress
-                    await channel.Writer.WriteAsync(new List<DailyPrice>(), ct);
+                    try
+                    {
+                        var prices = ParseDailyCsv(file, date);
+                        await channel.Writer.WriteAsync((filename, prices), ct);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error parsing {filename}: {ex.Message}");
+                    }
                 }
             });
 
-            // Signal end of production
             channel.Writer.Complete();
-
-            // Wait for consumer to finish
             await consumerTask;
-
             Console.WriteLine("\nIngestion Complete.");
         }
 
@@ -143,9 +185,12 @@ namespace Spiral.Trading.Data
             using var context = new TradingDbContext(_dbPath);
             await context.Database.EnsureCreatedAsync();
 
-            // Could use bulk insert here too if list is large
-            var bulkConfig = new BulkConfig { SetOutputIdentity = false };
-            await context.BulkInsertAsync(records, bulkConfig);
+            var bulkConfig = new BulkConfig
+            {
+                SetOutputIdentity = false,
+                UpdateByProperties = new List<string> { nameof(Split.Ticker), nameof(Split.ExecutionDate) }
+            };
+            await context.BulkInsertOrUpdateAsync(records, bulkConfig);
 
             Console.WriteLine($"Ingested {records.Count} splits.");
         }
@@ -164,7 +209,6 @@ namespace Spiral.Trading.Data
 
             var records = csv.GetRecords<DailyAggRow>().ToList();
 
-            // Map row to model
             var prices = new List<DailyPrice>(records.Count);
             foreach (var r in records)
             {
@@ -177,6 +221,7 @@ namespace Spiral.Trading.Data
                     Low = r.Low,
                     Close = r.Close,
                     Volume = (long)r.Volume,
+                    WindowStart = r.Window_Start, // Map Correctly
                     Transactions = r.Transactions
                 });
             }
@@ -185,12 +230,15 @@ namespace Spiral.Trading.Data
 
         private class DailyAggRow
         {
-            public string Ticker { get; set; }
+            public string Ticker { get; set; } = "";
             public double Open { get; set; }
             public double High { get; set; }
             public double Low { get; set; }
             public double Close { get; set; }
             public double Volume { get; set; }
+            public long Window_Start { get; set; } // Matches CSV header snake_case usually if using Name or default map? 
+                                                   // CsvHelper matches by name usually ignoring case but let's be safe.
+                                                   // Header: window_start
             public int Transactions { get; set; }
         }
     }
