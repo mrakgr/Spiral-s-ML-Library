@@ -20,3 +20,5 @@ data/
 
 # Config
 api_key.json
+
+.fake
