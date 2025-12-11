@@ -73,25 +73,22 @@ namespace Spiral.Trading.ConsoleApp
             var endDate = DateTime.Now;
             var startDate = endDate.AddYears(-5);
             
-            // Go up one level from Spiral.Trading.Console to Spiral.Trading (repo root)
-            string rootDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../"));
-            string outputDir = Path.Combine(rootDir, "data/daily_aggregates");
+            // Assume running from project root
+            string outputDir = "data/daily_aggregates";
             
             Console.WriteLine($"Output Directory: {outputDir}");
 
-            await downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, maxDegreeOfParallelism: 50);
+            await downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, maxDegreeOfParallelism: 30);
         }
 
         static async Task RunSplitDownload(string apiKey, string dbPath)
         {
             // Load tickers
-            // Assuming we are in the root or close to it. The Python script used "data/all_tickers.txt"
-            // We'll search for it.
             string tickerPath = "data/all_tickers.txt";
             if (!File.Exists(tickerPath))
             {
-                // Try look in parent folders
-                tickerPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../../../../../trading/data/all_tickers.txt"));
+                // Fallback attempt or just error out if we strictly assume root
+                Console.WriteLine($"Warning: {tickerPath} not found in current directory.");
             }
 
             if (!File.Exists(tickerPath))

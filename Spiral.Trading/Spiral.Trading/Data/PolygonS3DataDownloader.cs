@@ -72,29 +72,54 @@ namespace Spiral.Trading.Data
                 }
                 else
                 {
-                    try
+                    int maxRetries = 5;
+                    for (int attempt = 1; attempt <= maxRetries; attempt++)
                     {
-                        var request = new GetObjectRequest
+                        try
                         {
-                            BucketName = _bucketName,
-                            Key = s3Key
-                        };
+                            var request = new GetObjectRequest
+                            {
+                                BucketName = _bucketName,
+                                Key = s3Key
+                            };
 
-                        using (var response = await _s3Client.GetObjectAsync(request, ct))
-                        using (var responseStream = response.ResponseStream)
-                        using (var fileStream = File.Create(localFilePath))
-                        {
-                            await responseStream.CopyToAsync(fileStream, ct);
+                            using (var response = await _s3Client.GetObjectAsync(request, ct))
+                            using (var responseStream = response.ResponseStream)
+                            using (var fileStream = File.Create(localFilePath))
+                            {
+                                await responseStream.CopyToAsync(fileStream, ct);
+                            }
+                            success = true;
+                            break; // Success, exit retry loop
                         }
-                        success = true;
-                    }
-                    catch (AmazonS3Exception ex)
-                    {
-                        error = $"S3 Error: {ex.StatusCode} - {ex.Message}";
-                    }
-                    catch (Exception ex)
-                    {
-                        error = ex.Message;
+                        catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable || 
+                                                           ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests || 
+                                                           ex.ErrorCode == "TooManyRequests" || 
+                                                           ex.ErrorCode == "SlowDown")
+                        {
+                            if (attempt == maxRetries)
+                            {
+                                error = $"S3 Error (MAX RETRIES): {ex.StatusCode} - {ex.Message}";
+                            }
+                            else
+                            {
+                                // Exponential backoff: 2s, 4s, 8s, 16s...
+                                int delay = (int)Math.Pow(2, attempt) * 1000;
+                                await Task.Delay(delay, ct);
+                            }
+                        }
+                        catch (AmazonS3Exception ex)
+                        {
+                             // Non-retriable S3 error (e.g. 404, 403)
+                             error = $"S3 Error: {ex.StatusCode} - {ex.Message}";
+                             break;
+                        }
+                        catch (Exception ex)
+                        {
+                             // Other errors
+                             error = ex.Message;
+                             break;
+                        }
                     }
                 }
 
