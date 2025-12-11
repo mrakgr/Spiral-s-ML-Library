@@ -9,7 +9,7 @@ namespace Spiral.Trading.Plotting
 {
     public class ChartGenerator
     {
-        public static void GenerateCandlestickChart(List<DailyPrice> prices, string ticker, string outputPath)
+        public static void GenerateCandlestickChart(List<DailyPrice> prices, string ticker, string outputPath, int width = 1200, int height = 800)
         {
             var chart = Chart.Plot(
                 new Candlestick
@@ -27,7 +27,9 @@ namespace Spiral.Trading.Plotting
             {
                 title = $"Daily Price Chart - {ticker}",
                 xaxis = new Xaxis { title = "Date" },
-                yaxis = new Yaxis { title = "Price" }
+                yaxis = new Yaxis { title = "Price" },
+                width = width,
+                height = height
             });
 
             // XPlot.Plotly usually generates a full HTML page or a div.
