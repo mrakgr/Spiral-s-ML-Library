@@ -15,15 +15,8 @@ using System.Threading.Tasks;
 
 namespace Spiral.Trading.Data
 {
-    public class DataIngestor
+    public class DataIngestor(string dbPath)
     {
-        private readonly string _dbPath;
-
-        public DataIngestor(string dbPath)
-        {
-            _dbPath = dbPath;
-        }
-
         public async Task IngestDailyAggregatesAsync(string dataDirectory)
         {
             var files = Directory.GetFiles(dataDirectory, "*.csv.gz")
@@ -40,14 +33,14 @@ namespace Spiral.Trading.Data
             // Ideally we check if ProcessedFiles table exists or just wipe if needed.
             // I'll assume for now we can rely on EnsureCreated. If it fails due to mismatch, user might need to delete DB file.
 
-            using (var initContext = new TradingDbContext(_dbPath))
+            using (var initContext = new TradingDbContext(dbPath))
             {
                 await initContext.Database.EnsureCreatedAsync();
             }
 
             // 2. Load Processed Files
             HashSet<string> processedFilesSet;
-            using (var context = new TradingDbContext(_dbPath))
+            using (var context = new TradingDbContext(dbPath))
             {
                 // If the table was just created, this is empty.
                 // If legacy DB existed without table, this throws.
@@ -77,16 +70,16 @@ namespace Spiral.Trading.Data
             // Consumer
             var consumerTask = Task.Run(async () =>
             {
-                using var context = new TradingDbContext(_dbPath);
+                using var context = new TradingDbContext(dbPath);
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
                 context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
                 int processedCount = 0;
                 long totalRows = 0;
 
-                await foreach (var item in channel.Reader.ReadAllAsync())
+                await foreach (var (FileName, Rows) in channel.Reader.ReadAllAsync())
                 {
-                    if (item.Rows.Count > 0)
+                    if (Rows.Count > 0)
                     {
                         try
                         {
@@ -94,7 +87,7 @@ namespace Spiral.Trading.Data
                             // Since we filtered files, we assume these are NEW data. No Duplicates.
                             // Use simple BulkInsert.
                             var bulkConfig = new BulkConfig { SetOutputIdentity = false, BatchSize = 10000 };
-                            await context.BulkInsertAsync(item.Rows, bulkConfig);
+                            await context.BulkInsertAsync(Rows, bulkConfig);
 
                             // B. Record File as Processed
                             // We can use EF normal add for this single row or bulk insert if we wanted.
@@ -110,18 +103,18 @@ namespace Spiral.Trading.Data
 
                             var pf = new ProcessedFile
                             {
-                                FileName = item.FileName,
+                                FileName = FileName,
                                 IngestedAt = DateTime.UtcNow
                             };
 
                             // We can use BulkInsert for this too to keep it uniform and fast
                             await context.BulkInsertAsync(new List<ProcessedFile> { pf });
 
-                            totalRows += item.Rows.Count;
+                            totalRows += Rows.Count;
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"\nError ingesting {item.FileName}: {ex.Message}");
+                            Console.WriteLine($"\nError ingesting {FileName}: {ex.Message}");
                             // If we fail, we don't mark file as processed.
                         }
                     }
@@ -131,7 +124,7 @@ namespace Spiral.Trading.Data
                         // Yes, otherwise we re-process forever.
                         try
                         {
-                            var pf = new ProcessedFile { FileName = item.FileName, IngestedAt = DateTime.UtcNow };
+                            var pf = new ProcessedFile { FileName = FileName, IngestedAt = DateTime.UtcNow };
                             await context.BulkInsertAsync(new List<ProcessedFile> { pf });
                         }
                         catch { }
@@ -182,7 +175,7 @@ namespace Spiral.Trading.Data
 
             var records = csv.GetRecords<Split>().ToList();
 
-            using var context = new TradingDbContext(_dbPath);
+            using var context = new TradingDbContext(dbPath);
             await context.Database.EnsureCreatedAsync();
 
             var bulkConfig = new BulkConfig
@@ -195,7 +188,47 @@ namespace Spiral.Trading.Data
             Console.WriteLine($"Ingested {records.Count} splits.");
         }
 
-        private List<DailyPrice> ParseDailyCsv(string filePath, DateTime date)
+        public async Task SyncSplitsFromPolygonAsync(string apiKey, int maxDegreeOfParallelism = 20000)
+        {
+            Console.WriteLine("Loading tickers from database...");
+
+            using var context = new TradingDbContext(dbPath);
+            await context.Database.EnsureCreatedAsync();
+
+            // query distinct tickers from DailyPrices
+            var validTickers = await context.DailyPrices
+                                            .Select(p => p.Ticker)
+                                            .Distinct()
+                                            .ToListAsync();
+
+            if (validTickers.Count == 0)
+            {
+                Console.WriteLine("No tickers found in database. Please run 'ingest-data' first.");
+                return;
+            }
+
+            Console.WriteLine($"Loaded {validTickers.Count} unique tickers from database");
+
+            // Use higher parallelism with enabled retries
+            var downloader = new PolygonSplitDownloader(apiKey);
+            var splits = await downloader.DownloadSplitsAsync(validTickers, maxDegreeOfParallelism: maxDegreeOfParallelism);
+
+            Console.WriteLine($"\nFound {splits.Count} splits. Saving to database...");
+
+            // Batch insert/upsert using BulkExtensions
+            // Upsert to avoid duplicates
+            var bulkConfig = new BulkConfig
+            {
+                SetOutputIdentity = false,
+                UpdateByProperties = new List<string> { nameof(Split.Ticker), nameof(Split.ExecutionDate) }
+            };
+
+            await context.BulkInsertOrUpdateAsync(splits, bulkConfig);
+
+            Console.WriteLine($"Saved or updated {splits.Count} splits.");
+        }
+
+        private static List<DailyPrice> ParseDailyCsv(string filePath, DateTime date)
         {
             using var fileStream = File.OpenRead(filePath);
             using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);

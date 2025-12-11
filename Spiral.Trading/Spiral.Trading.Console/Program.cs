@@ -1,13 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Spiral.Trading.Config;
 using Spiral.Trading.Data;
-using Spiral.Trading.Models;
 using Spiral.Trading.Storage;
-using EFCore.BulkExtensions;
 using System;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Spiral.Trading.ConsoleApp
@@ -101,42 +97,8 @@ namespace Spiral.Trading.ConsoleApp
 
         static async Task RunSplitDownload(string apiKey, string dbPath)
         {
-            Console.WriteLine("Loading tickers from database...");
-
-            using var context = new TradingDbContext(dbPath);
-            await context.Database.EnsureCreatedAsync();
-
-            // query distinct tickers from DailyPrices
-            var validTickers = await context.DailyPrices
-                                            .Select(p => p.Ticker)
-                                            .Distinct()
-                                            .ToListAsync();
-
-            if (!validTickers.Any())
-            {
-                Console.WriteLine("No tickers found in database. Please run 'ingest-data' first.");
-                return;
-            }
-
-            Console.WriteLine($"Loaded {validTickers.Count} unique tickers from database");
-
-            // Use higher parallelism with enabled retries
-            var downloader = new PolygonSplitDownloader(apiKey);
-            var splits = await downloader.DownloadSplitsAsync(validTickers, maxDegreeOfParallelism: 20000);
-
-            Console.WriteLine($"\nFound {splits.Count} splits. Saving to database...");
-
-            // Batch insert/upsert using BulkExtensions
-            // Upsert to avoid duplicates
-            var bulkConfig = new BulkConfig
-            {
-                SetOutputIdentity = false,
-                UpdateByProperties = new List<string> { nameof(Split.Ticker), nameof(Split.ExecutionDate) }
-            };
-
-            await context.BulkInsertOrUpdateAsync(splits, bulkConfig);
-
-            Console.WriteLine($"Saved or updated {splits.Count} splits.");
+            var ingestor = new DataIngestor(dbPath);
+            await ingestor.SyncSplitsFromPolygonAsync(apiKey, maxDegreeOfParallelism: 10000);
         }
     }
 }

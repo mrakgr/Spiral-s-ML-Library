@@ -3,22 +3,15 @@ using Spiral.Trading.Models;
 
 namespace Spiral.Trading.Storage
 {
-    public class TradingDbContext : DbContext
+    public class TradingDbContext(string dbPath = "data/trading.db") : DbContext
     {
-        public DbSet<DailyPrice> DailyPrices { get; set; }
-        public DbSet<ProcessedFile> ProcessedFiles { get; set; }
-        public DbSet<Split> Splits { get; set; }
-
-        private readonly string _dbPath;
-
-        public TradingDbContext(string dbPath = "data/trading.db")
-        {
-            _dbPath = dbPath;
-        }
+        public DbSet<DailyPrice> DailyPrices { get; set; } = null!;
+        public DbSet<ProcessedFile> ProcessedFiles { get; set; } = null!;
+        public DbSet<Split> Splits { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite($"Data Source={_dbPath}");
+            optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
