@@ -27,15 +27,9 @@ namespace Spiral.Trading.ConsoleApp
 
             // Load Configuration
             string apiKeyPath = Path.Combine(Environment.CurrentDirectory, "api_key.json");
-            // If running from bin/Debug/net9.0, we might need to look up
             if (!File.Exists(apiKeyPath))
             {
-                // Try to find it in the project root if running locally
-                apiKeyPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../../../../../trading/api_key.json"));
-                 if (!File.Exists(apiKeyPath))
-                {
-                    apiKeyPath = "api_key.json"; // fallback
-                }
+                throw new FileNotFoundException("API key file not found. Please ensure 'api_key.json' is in the current directory or the project root.", apiKeyPath);
             }
 
             try 
@@ -79,9 +73,13 @@ namespace Spiral.Trading.ConsoleApp
             var endDate = DateTime.Now;
             var startDate = endDate.AddYears(-5);
             
-            string outputDir = "data/daily_aggregates";
+            // Go up one level from Spiral.Trading.Console to Spiral.Trading (repo root)
+            string rootDir = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, "../"));
+            string outputDir = Path.Combine(rootDir, "data/daily_aggregates");
             
-            await downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir);
+            Console.WriteLine($"Output Directory: {outputDir}");
+
+            await downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, maxDegreeOfParallelism: 50);
         }
 
         static async Task RunSplitDownload(string apiKey, string dbPath)

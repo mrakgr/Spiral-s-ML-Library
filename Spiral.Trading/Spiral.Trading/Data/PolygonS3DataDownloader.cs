@@ -30,66 +30,84 @@ namespace Spiral.Trading.Data
             _s3Client = new AmazonS3Client(_accessKey, _secretKey, config);
         }
 
-        public async Task DownloadDailyAggregatesAsync(DateTime startDate, DateTime endDate, string outputDirectory)
+        public async Task DownloadDailyAggregatesAsync(DateTime startDate, DateTime endDate, string outputDirectory, int maxDegreeOfParallelism = 20)
         {
             Directory.CreateDirectory(outputDirectory);
             Console.WriteLine($"Downloading daily aggregate data from {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}");
 
+            var dates = new List<DateTime>();
             var currentDate = startDate;
             while (currentDate <= endDate)
             {
-                // Skip weekends
-                if (currentDate.DayOfWeek == DayOfWeek.Saturday || currentDate.DayOfWeek == DayOfWeek.Sunday)
+                if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
                 {
-                    currentDate = currentDate.AddDays(1);
-                    continue;
+                    dates.Add(currentDate);
                 }
+                currentDate = currentDate.AddDays(1);
+            }
 
-                string dateStr = currentDate.ToString("yyyy-MM-dd");
-                string year = currentDate.Year.ToString();
-                string month = currentDate.Month.ToString("00");
-                
+            // Using Parallel.ForEachAsync to download in parallel
+            var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism };
+            
+            int total = dates.Count;
+            int completed = 0;
+
+            await Parallel.ForEachAsync(dates, parallelOptions, async (date, ct) =>
+            {
+                string dateStr = date.ToString("yyyy-MM-dd");
+                string year = date.Year.ToString();
+                string month = date.Month.ToString("00");
+
                 // S3 Key format: us_stocks_sip/day_aggs_v1/YYYY/MM/YYYY-MM-DD.csv.gz
                 string s3Key = $"us_stocks_sip/day_aggs_v1/{year}/{month}/{dateStr}.csv.gz";
                 string localFilePath = Path.Combine(outputDirectory, $"{dateStr}.csv.gz");
 
+                bool skipped = false;
+                bool success = false;
+                string error = null;
+
                 if (File.Exists(localFilePath))
                 {
-                    Console.WriteLine($"\u2299 {dateStr}: Already downloaded, skipping");
+                    skipped = true;
                 }
                 else
                 {
                     try
                     {
-                        Console.Write($"Downloading {dateStr}... ");
                         var request = new GetObjectRequest
                         {
                             BucketName = _bucketName,
                             Key = s3Key
                         };
 
-                        using (var response = await _s3Client.GetObjectAsync(request))
+                        using (var response = await _s3Client.GetObjectAsync(request, ct))
                         using (var responseStream = response.ResponseStream)
                         using (var fileStream = File.Create(localFilePath))
                         {
-                            await responseStream.CopyToAsync(fileStream);
+                            await responseStream.CopyToAsync(fileStream, ct);
                         }
-                        Console.WriteLine("\u2713");
+                        success = true;
                     }
                     catch (AmazonS3Exception ex)
                     {
-                        Console.WriteLine($"\u2717 (S3 Error: {ex.Message})");
-                        // 404 means file not found, likely holiday or not ready
+                        error = $"S3 Error: {ex.StatusCode} - {ex.Message}";
                     }
                     catch (Exception ex)
                     {
-                         Console.WriteLine($"\u2717 (Error: {ex.Message})");
+                        error = ex.Message;
                     }
                 }
 
-                currentDate = currentDate.AddDays(1);
-            }
-            
+                // Thread-safe progress reporting
+                int c = System.Threading.Interlocked.Increment(ref completed);
+                
+                string status = skipped ? "Skipped" : (success ? "Downloaded" : "Failed");
+                string msg = $"[{c}/{total}] {dateStr}: {status}";
+                if (!string.IsNullOrEmpty(error)) msg += $" ({error})";
+
+                Console.WriteLine(msg);
+            });
+
             Console.WriteLine("\nDownload Complete.");
         }
     }
