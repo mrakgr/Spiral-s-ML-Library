@@ -29,37 +29,67 @@ namespace Spiral.Trading.Data
                                  .ToList();
 
             Console.WriteLine($"Found {files.Count} files to ingest.");
-            
+
             using var context = new TradingDbContext(_dbPath);
             await context.Database.EnsureCreatedAsync();
 
             int processed = 0;
-            foreach (var file in files)
+            int batchSize = 10;
+
+            for (int i = 0; i < files.Count; i += batchSize)
             {
-                var filename = Path.GetFileName(file);
-                var datePart = filename.Replace(".csv.gz", "");
-                if (!DateTime.TryParse(datePart, out DateTime date))
-                {
-                    Console.WriteLine($"Skipping {filename}: Cannot parse date.");
-                    continue;
-                }
+                var batchFiles = files.Skip(i).Take(batchSize).ToList();
+                using var transaction = await context.Database.BeginTransactionAsync();
 
                 try
                 {
-                    var prices = ParseDailyCsv(file, date);
-                    // Batch insert
-                    await context.DailyPrices.AddRangeAsync(prices);
+                    foreach (var file in batchFiles)
+                    {
+                        var filename = Path.GetFileName(file);
+                        var datePart = filename.Replace(".csv.gz", "");
+                        if (!DateTime.TryParse(datePart, out DateTime date))
+                        {
+                            Console.WriteLine($"Skipping {filename}: Cannot parse date.");
+                            continue;
+                        }
+
+                        // Check if data for this date already exists to avoid duplication errors
+                        // Optimization: Check simply if any record exists for this date, assume complete if so?
+                        // Or just try/catch unique violations per file? Checking count is safer.
+                        bool exists = await context.DailyPrices.AnyAsync(p => p.Date == date);
+                        if (exists)
+                        {
+                            // Console.WriteLine($"Skipping {filename}: Data for {date:yyyy-MM-dd} already exists.");
+                            continue;
+                        }
+
+                        try
+                        {
+                            var prices = ParseDailyCsv(file, date);
+                            await context.DailyPrices.AddRangeAsync(prices);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error parsing {filename}: {ex.Message}");
+                        }
+
+                        processed++;
+                        if (processed % 10 == 0) Console.Write(".");
+                        if (processed % 100 == 0) Console.WriteLine($" {processed}/{files.Count}");
+                    }
+
                     await context.SaveChangesAsync();
-                    
-                    processed++;
-                    if (processed % 10 == 0) Console.Write(".");
-                    if (processed % 100 == 0) Console.WriteLine($" {processed}/{files.Count}");
+                    await transaction.CommitAsync();
+
+                    // Detach entities to free memory
+                    context.ChangeTracker.Clear();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error processing {filename}: {ex.Message}");
-                    // Reset context state if needed or continue
-                    context.ChangeTracker.Clear();
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"\nError processing batch starting at index {i}: {ex.Message}");
+                    // Re-throw or continue? If we continue we might skip a chunk.
+                    // Let's log and continue to next batch.
                 }
             }
             Console.WriteLine("\nIngestion Complete.");
@@ -76,15 +106,15 @@ namespace Spiral.Trading.Data
             Console.WriteLine("Ingesting splits...");
             using var reader = new StreamReader(splitsFilePath);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            
+
             var records = csv.GetRecords<Split>().ToList();
-            
+
             using var context = new TradingDbContext(_dbPath);
             await context.Database.EnsureCreatedAsync();
-            
+
             await context.Splits.AddRangeAsync(records);
             await context.SaveChangesAsync();
-            
+
             Console.WriteLine($"Ingested {records.Count} splits.");
         }
 
@@ -101,7 +131,7 @@ namespace Spiral.Trading.Data
             });
 
             var records = csv.GetRecords<DailyAggRow>().ToList();
-            
+
             return records.Select(r => new DailyPrice
             {
                 Ticker = r.Ticker,

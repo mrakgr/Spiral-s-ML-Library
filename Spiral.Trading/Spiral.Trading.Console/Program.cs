@@ -19,6 +19,7 @@ namespace Spiral.Trading.ConsoleApp
                 Console.WriteLine("Usage: dotnet run -- [command]");
                 Console.WriteLine("Commands:");
                 Console.WriteLine("  download-bulk   Download daily aggregate files from S3 to disk");
+                Console.WriteLine("  ingest-data     Ingest downloaded CSV files into SQLite database");
                 Console.WriteLine("  download-splits Download stock splits from Polygon API to Database");
                 return;
             }
@@ -50,6 +51,9 @@ namespace Spiral.Trading.ConsoleApp
                     case "download-bulk":
                         await RunBulkDownload(s3Access, s3Secret);
                         break;
+                    case "ingest-data":
+                        await RunIngestData(dbPath);
+                        break;
                     case "download-splits":
                         await RunSplitDownload(apiKey, dbPath);
                         break;
@@ -78,46 +82,48 @@ namespace Spiral.Trading.ConsoleApp
             
             Console.WriteLine($"Output Directory: {outputDir}");
 
-            await downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, maxDegreeOfParallelism: 30);
+            await downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, maxDegreeOfParallelism: 8);
+        }
+
+        static async Task RunIngestData(string dbPath)
+        {
+            var ingestor = new DataIngestor(dbPath);
+            string dataDir = "data/daily_aggregates";
+            if (!Directory.Exists(dataDir))
+            {
+                Console.WriteLine($"Data directory not found: {dataDir}");
+                return;
+            }
+            await ingestor.IngestDailyAggregatesAsync(dataDir);
         }
 
         static async Task RunSplitDownload(string apiKey, string dbPath)
         {
-            // Load tickers
-            string tickerPath = "data/all_tickers.txt";
-            if (!File.Exists(tickerPath))
-            {
-                // Fallback attempt or just error out if we strictly assume root
-                Console.WriteLine($"Warning: {tickerPath} not found in current directory.");
-            }
+            Console.WriteLine("Loading tickers from database...");
+            
+            using var context = new TradingDbContext(dbPath);
+            await context.Database.EnsureCreatedAsync();
 
-            if (!File.Exists(tickerPath))
+            // query distinct tickers from DailyPrices
+            var validTickers = await context.DailyPrices
+                                            .Select(p => p.Ticker)
+                                            .Distinct()
+                                            .ToListAsync();
+
+            if (!validTickers.Any())
             {
-                Console.WriteLine($"Error: Ticker file not found at {tickerPath}");
+                Console.WriteLine("No tickers found in database. Please run 'ingest-data' first.");
                 return;
             }
 
-            Console.WriteLine("Loading tickers...");
-            var tickers = await File.ReadAllLinesAsync(tickerPath);
-            var validTickers = tickers.Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
-            Console.WriteLine($"Loaded {validTickers.Count} unique tickers");
+            Console.WriteLine($"Loaded {validTickers.Count} unique tickers from database");
 
             var downloader = new PolygonSplitDownloader(apiKey);
             var splits = await downloader.DownloadSplitsAsync(validTickers, maxDegreeOfParallelism: 20);
 
             Console.WriteLine($"\nFound {splits.Count} splits. Saving to database...");
 
-            using var context = new TradingDbContext(dbPath);
-            await context.Database.EnsureCreatedAsync(); // Ensure DB exists
-
             // Batch insert using EF Core
-            // Just add range and save changes. For massive amounts, bulk extensions are better but for splits (usually < 20k rows) this is fine.
-            // We need to handle potential duplicates if strict unique constraints are on.
-            // EF Core default behavior on duplicate key is exception. 
-            // We can check existence or clear table? Python script behavior was to load CSV.
-            // Let's filter out existing ones locally or just try insert.
-            // Best approach for idempotency: Get existing splits from DB, filter, insert new.
-            
             var existingSplits = await context.Splits
                 .Select(s => new { s.Ticker, s.ExecutionDate })
                 .ToListAsync();
