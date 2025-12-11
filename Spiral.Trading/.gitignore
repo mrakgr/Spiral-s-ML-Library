@@ -1,0 +1,22 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# VS Code
+.vscode/
+
+# Data
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Config
+api_key.json
