@@ -1,5 +1,6 @@
 using CsvHelper;
 using CsvHelper.Configuration;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Spiral.Trading.Models;
 using Spiral.Trading.Storage;
@@ -9,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Spiral.Trading.Data
@@ -30,68 +32,97 @@ namespace Spiral.Trading.Data
 
             Console.WriteLine($"Found {files.Count} files to ingest.");
 
-            using var context = new TradingDbContext(_dbPath);
-            await context.Database.EnsureCreatedAsync();
-
-            int processed = 0;
-            int batchSize = 10;
-
-            for (int i = 0; i < files.Count; i += batchSize)
+            // Ensure DB created
+            using (var initContext = new TradingDbContext(_dbPath))
             {
-                var batchFiles = files.Skip(i).Take(batchSize).ToList();
-                using var transaction = await context.Database.BeginTransactionAsync();
+                await initContext.Database.EnsureCreatedAsync();
+            }
 
-                try
+            // Channel for decoupled parsing and writing
+            // Bounded to avoid exhausted memory if parsing is much faster than writing
+            var channel = Channel.CreateBounded<List<DailyPrice>>(new BoundedChannelOptions(500)
+            {
+                SingleWriter = false,
+                SingleReader = true,
+                FullMode = BoundedChannelFullMode.Wait
+            });
+
+            // Consumer Task (Writer)
+            var consumerTask = Task.Run(async () =>
+            {
+                int processedFiles = 0;
+                long totalRows = 0;
+                using var context = new TradingDbContext(_dbPath);
+
+                // Bulk extensions usually doesn't use ChangeTracker, but good practice to keep it clean
+                context.ChangeTracker.AutoDetectChangesEnabled = false;
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+                await foreach (var batch in channel.Reader.ReadAllAsync())
                 {
-                    foreach (var file in batchFiles)
+                    if (batch.Count > 0)
                     {
-                        var filename = Path.GetFileName(file);
-                        var datePart = filename.Replace(".csv.gz", "");
-                        if (!DateTime.TryParse(datePart, out DateTime date))
-                        {
-                            Console.WriteLine($"Skipping {filename}: Cannot parse date.");
-                            continue;
-                        }
-
-                        // Check if data for this date already exists to avoid duplication errors
-                        // Optimization: Check simply if any record exists for this date, assume complete if so?
-                        // Or just try/catch unique violations per file? Checking count is safer.
-                        bool exists = await context.DailyPrices.AnyAsync(p => p.Date == date);
-                        if (exists)
-                        {
-                            // Console.WriteLine($"Skipping {filename}: Data for {date:yyyy-MM-dd} already exists.");
-                            continue;
-                        }
-
                         try
                         {
-                            var prices = ParseDailyCsv(file, date);
-                            await context.DailyPrices.AddRangeAsync(prices);
+                            // BulkInsert optimized for SQLite
+                            var bulkConfig = new BulkConfig
+                            {
+                                SetOutputIdentity = false,
+                                BatchSize = 10000 // Adjust based on memory/performance
+                            };
+
+                            await context.BulkInsertAsync(batch, bulkConfig);
+
+                            totalRows += batch.Count;
+
+                            context.ChangeTracker.Clear();
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine($"Error parsing {filename}: {ex.Message}");
+                            Console.WriteLine($"\nError writing batch (Rows: {batch.Count}): {ex.Message}");
+                            context.ChangeTracker.Clear();
                         }
-
-                        processed++;
-                        if (processed % 10 == 0) Console.Write(".");
-                        if (processed % 100 == 0) Console.WriteLine($" {processed}/{files.Count}");
                     }
+                    processedFiles++;
+                    if (processedFiles % 10 == 0) Console.Write(".");
+                    if (processedFiles % 100 == 0) Console.WriteLine($" {processedFiles}/{files.Count} (Total Rows: {totalRows})");
+                }
+            });
 
-                    await context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+            // Producer Task (Parsers)
+            // Use Parallel.ForEach to parse files concurrently
+            var producerOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
 
-                    // Detach entities to free memory
-                    context.ChangeTracker.Clear();
+            await Parallel.ForEachAsync(files, producerOptions, async (file, ct) =>
+            {
+                var filename = Path.GetFileName(file);
+                var datePart = filename.Replace(".csv.gz", "");
+                if (!DateTime.TryParse(datePart, out DateTime date))
+                {
+                    return;
+                }
+
+                // Skip check for speed - user can manage duplicates or we can handle unique constraint violations (slower)
+                try
+                {
+                    var prices = ParseDailyCsv(file, date);
+                    // Write even empty lists to count progress
+                    await channel.Writer.WriteAsync(prices, ct);
                 }
                 catch (Exception ex)
                 {
-                    await transaction.RollbackAsync();
-                    Console.WriteLine($"\nError processing batch starting at index {i}: {ex.Message}");
-                    // Re-throw or continue? If we continue we might skip a chunk.
-                    // Let's log and continue to next batch.
+                    Console.WriteLine($"Error parsing {filename}: {ex.Message}");
+                    // Write empty to count progress
+                    await channel.Writer.WriteAsync(new List<DailyPrice>(), ct);
                 }
-            }
+            });
+
+            // Signal end of production
+            channel.Writer.Complete();
+
+            // Wait for consumer to finish
+            await consumerTask;
+
             Console.WriteLine("\nIngestion Complete.");
         }
 
@@ -112,8 +143,9 @@ namespace Spiral.Trading.Data
             using var context = new TradingDbContext(_dbPath);
             await context.Database.EnsureCreatedAsync();
 
-            await context.Splits.AddRangeAsync(records);
-            await context.SaveChangesAsync();
+            // Could use bulk insert here too if list is large
+            var bulkConfig = new BulkConfig { SetOutputIdentity = false };
+            await context.BulkInsertAsync(records, bulkConfig);
 
             Console.WriteLine($"Ingested {records.Count} splits.");
         }
@@ -132,17 +164,23 @@ namespace Spiral.Trading.Data
 
             var records = csv.GetRecords<DailyAggRow>().ToList();
 
-            return records.Select(r => new DailyPrice
+            // Map row to model
+            var prices = new List<DailyPrice>(records.Count);
+            foreach (var r in records)
             {
-                Ticker = r.Ticker,
-                Date = date,
-                Open = r.Open,
-                High = r.High,
-                Low = r.Low,
-                Close = r.Close,
-                Volume = (long)r.Volume,
-                Transactions = r.Transactions
-            }).ToList();
+                prices.Add(new DailyPrice
+                {
+                    Ticker = r.Ticker,
+                    Date = date,
+                    Open = r.Open,
+                    High = r.High,
+                    Low = r.Low,
+                    Close = r.Close,
+                    Volume = (long)r.Volume,
+                    Transactions = r.Transactions
+                });
+            }
+            return prices;
         }
 
         private class DailyAggRow
