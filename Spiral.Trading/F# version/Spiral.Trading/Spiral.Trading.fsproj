@@ -11,12 +11,19 @@
     <Compile Include="S3Download.fs" />
     <Compile Include="SplitDownload.fs" />
     <Compile Include="CsvParsing.fs" />
+    <Compile Include="Database.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="sql/schema/*.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="4.0.14.2" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="FSharp.Data" Version="6.6.0" />
     <PackageReference Include="FSharp.SystemTextJson" Version="1.4.36" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.1" />
   </ItemGroup>
 
 </Project>
