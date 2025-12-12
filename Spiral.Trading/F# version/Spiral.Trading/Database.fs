@@ -29,9 +29,11 @@ let openConnection (dbPath: string) : SqliteConnection =
 let initializeSchema (connection: IDbConnection) : unit =
     let dailyPricesSql = loadEmbeddedSql "daily_prices.sql"
     let splitsSql = loadEmbeddedSql "splits.sql"
+    let processedFilesSql = loadEmbeddedSql "processed_files.sql"
 
     connection.Execute(dailyPricesSql) |> ignore
     connection.Execute(splitsSql) |> ignore
+    connection.Execute(processedFilesSql) |> ignore
 
 /// Apply PRAGMA optimizations for bulk loading
 let applyBulkLoadPragmas (connection: IDbConnection) : unit =
@@ -223,3 +225,34 @@ let getDateRange (connection: IDbConnection) : (DateTime * DateTime) option =
         None
     else
         Some (DateTime.Parse(minDate), DateTime.Parse(maxDate))
+
+// --- Processed Files Tracking ---
+
+/// Get set of already processed file names
+let getProcessedFiles (connection: IDbConnection) : Set<string> =
+    connection.Query<string>("SELECT file_name FROM processed_files")
+    |> Set.ofSeq
+
+/// Mark a file as processed
+let markFileProcessed (connection: IDbConnection) (fileName: string) : unit =
+    connection.Execute(
+        "INSERT OR IGNORE INTO processed_files (file_name, ingested_at) VALUES (@fileName, @ingestedAt)",
+        {| fileName = fileName; ingestedAt = DateTime.UtcNow.ToString("o") |}) |> ignore
+
+/// Mark multiple files as processed
+let markFilesProcessed (connection: IDbConnection) (fileNames: string seq) : unit =
+    let sqliteConn = connection :?> SqliteConnection
+    use transaction = sqliteConn.BeginTransaction()
+    use cmd = sqliteConn.CreateCommand()
+    cmd.Transaction <- transaction
+    cmd.CommandText <- "INSERT OR IGNORE INTO processed_files (file_name, ingested_at) VALUES (@fileName, @ingestedAt)"
+    let pFileName = cmd.Parameters.Add("@fileName", SqliteType.Text)
+    let pIngestedAt = cmd.Parameters.Add("@ingestedAt", SqliteType.Text)
+    let now = DateTime.UtcNow.ToString("o")
+    
+    for fileName in fileNames do
+        pFileName.Value <- fileName
+        pIngestedAt.Value <- now
+        cmd.ExecuteNonQuery() |> ignore
+    
+    transaction.Commit()

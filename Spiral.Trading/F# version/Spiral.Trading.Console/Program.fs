@@ -213,26 +213,35 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     use connection = openConnection dbPath
     initializeSchema connection
 
+    // Get already processed files
+    let processedFiles = getProcessedFiles connection
+    printfn "Already processed: %d files" processedFiles.Count
+
     printfn "Applying bulk load optimizations..."
     withBulkLoadOptimizations connection (fun () ->
         // Ingest daily prices from CSV files
         if Directory.Exists csvDir then
-            let files = Directory.GetFiles(csvDir, "*.csv.gz")
-            printfn "Found %d CSV files to ingest" files.Length
+            let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
+            let filesToProcess = 
+                allFiles 
+                |> Array.filter (fun f -> not (processedFiles.Contains(Path.GetFileName(f))))
+            
+            printfn "Found %d CSV files (%d new to ingest)" allFiles.Length filesToProcess.Length
 
             let mutable totalPrices = 0
             let mutable filesProcessed = 0
 
-            for filePath in files do
+            for filePath in filesToProcess do
                 let result, prices = parseGzipFileWithResult filePath
                 match result.Error with
                 | Some err ->
-                    printfn "  [%d/%d] %s: Error - %s" (filesProcessed + 1) files.Length result.FileName err
+                    printfn "  [%d/%d] %s: Error - %s" (filesProcessed + 1) filesToProcess.Length result.FileName err
                 | None ->
                     let inserted = upsertDailyPrices connection prices
+                    markFileProcessed connection result.FileName
                     totalPrices <- totalPrices + prices.Length
                     filesProcessed <- filesProcessed + 1
-                    printfn "  [%d/%d] %s: %d prices" filesProcessed files.Length result.FileName prices.Length
+                    printfn "  [%d/%d] %s: %d prices" filesProcessed filesToProcess.Length result.FileName prices.Length
 
             printfn ""
             printfn "Ingested %d daily prices from %d files" totalPrices filesProcessed

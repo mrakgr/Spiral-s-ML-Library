@@ -103,6 +103,34 @@ dotnet run --project Spiral.Trading.Console -- parse-csv -f data/daily_aggregate
 dotnet run --project Spiral.Trading.Console -- parse-csv -d /path/to/csv/files
 ```
 
+### Ingest Data
+
+Ingests downloaded CSV files and splits into a SQLite database.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- ingest-data [options]
+```
+
+**Options:**
+- `-d, --database <path>` - SQLite database path (default: data/trading.db)
+- `-c, --csv-dir <path>` - Directory containing .csv.gz files (default: data/daily_aggregates)
+- `-s, --splits-file <path>` - JSON file containing splits (default: data/splits.json)
+
+**Examples:**
+
+```bash
+# Ingest all data with defaults
+dotnet run --project Spiral.Trading.Console -- ingest-data
+
+# Ingest to a custom database
+dotnet run --project Spiral.Trading.Console -- ingest-data -d /path/to/custom.db
+```
+
+**Features:**
+- Tracks processed CSV files to avoid re-ingesting on subsequent runs
+- Uses prepared statements and bulk load optimizations for fast ingestion
+- Upserts splits (inserts new, updates existing) on each run
+
 ## Project Structure
 
 ```
@@ -112,11 +140,17 @@ F# version/
 │   ├── Config.fs                # Configuration loading
 │   ├── S3Download.fs            # S3 download functionality
 │   ├── SplitDownload.fs         # Splits API client
-│   └── CsvParsing.fs            # CSV parsing with FSharp.Data
+│   ├── CsvParsing.fs            # CSV parsing with FSharp.Data
+│   ├── Database.fs              # SQLite database operations
+│   └── sql/schema/              # SQL schema files
+│       ├── daily_prices.sql
+│       ├── splits.sql
+│       └── processed_files.sql
 ├── Spiral.Trading.Console/      # CLI application
 │   └── Program.fs
 ├── api_key.json                 # API credentials (not in git)
 └── data/                        # Downloaded data
     ├── daily_aggregates/        # CSV files
-    └── splits.json              # Splits data
+    ├── splits.json              # Splits data
+    └── trading.db               # SQLite database
 ```
