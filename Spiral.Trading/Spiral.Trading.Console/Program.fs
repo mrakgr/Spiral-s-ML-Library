@@ -82,7 +82,7 @@ let main argv =
                 let struct (apiKey, _, _) = loadKeys ()
                 ensureDb ()
                 let ingestor = DataIngestor(dbPath)
-                ingestor.SyncSplitsFromPolygonAsync(apiKey, 20000).GetAwaiter().GetResult()
+                ingestor.SyncSplitsFromPolygonBulkAsync(apiKey).GetAwaiter().GetResult()
 
             | Download_Bulk args ->
                 let struct (_, s3Access, s3Secret) = loadKeys ()

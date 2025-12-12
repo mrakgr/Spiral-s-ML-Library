@@ -28,7 +28,7 @@ help:
 	@echo "Available commands:"
 	@echo "  make build    - Build the solution"
 	@echo "  make ingest   - Run data ingestion (daily aggregates -> DB)"
-	@echo "  make splits   - Download stock splits for tickers in DB"
+	@echo "  make splits   - Download stock splits incrementally from latest date in DB"
 	@echo "  make bulk     - Run bulk download (S3 -> disk)"
 	@echo "  make all      - Run all tasks (build, bulk, ingest, splits)"
 	@echo "  make plot     - Generate chart for ticker (usage: make plot TICKER=NVDA)"

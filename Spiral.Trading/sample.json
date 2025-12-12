@@ -1,0 +1,879 @@
+{
+    "status": "OK",
+    "request_id": "e7385fa442de4968b6524cf7bbc78221",
+    "results": [
+        {
+            "id": "E0f5653c619604b99f1cb07e7a995b73f6ea613135f69c9356e436000fb66baa9",
+            "execution_date": "2026-03-30",
+            "split_from": 1,
+            "split_to": 5,
+            "ticker": "SGBKF",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E23e142b4acd0df26839d9f6ab333a5414630fe267343836048ec8f94e8747600",
+            "execution_date": "2026-01-08",
+            "split_from": 1,
+            "split_to": 4,
+            "ticker": "SFTBY",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E48e44b1448b773e7c07ddc880f3ff8323f5caf787d3d70a1920eb4d8d093cd1b",
+            "execution_date": "2026-01-06",
+            "split_from": 1,
+            "split_to": 10,
+            "ticker": "ITOCY",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E58b34a9989ace6064860bbc9aa1af3ccc25e5cf175e4860b96d7992fcfda609f",
+            "execution_date": "2026-01-05",
+            "split_from": 1,
+            "split_to": 1.125,
+            "ticker": "SLCJY",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E1be22d93add210e87cec8336ab8d37bdbca40fe4d1eb4b71b0562d79b2e6d8f1",
+            "execution_date": "2025-12-30",
+            "split_from": 8,
+            "split_to": 9,
+            "ticker": "SLCJF",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E557f0be1e36cd18048fb174008b033d565ec995d28f900d2c46deafb1a03f567",
+            "execution_date": "2025-12-29",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "MBUMF",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "Ec15e7aedd79c3bb24080f40386acf4760fffe75348325d9da417302f60e9849c",
+            "execution_date": "2025-12-24",
+            "split_from": 4,
+            "split_to": 1,
+            "ticker": "XTLB",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "E4340cf2bd91c23c66b70694ee933b4d925e3960682323cdbc99c92406beb4096",
+            "execution_date": "2025-12-24",
+            "split_from": 1,
+            "split_to": 1.5,
+            "ticker": "RADLY",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E1961d40baa5fe68e38dbb1b476fc877e6d24466738448f10316c260a4898b1ed",
+            "execution_date": "2025-12-23",
+            "split_from": 1,
+            "split_to": 3,
+            "ticker": "TPL",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E8773d620d1858a8e865ef5063bbe1a027ed60e2795b7a1b29ba4269287f355d7",
+            "execution_date": "2025-12-22",
+            "split_from": 50,
+            "split_to": 1,
+            "ticker": "VSA",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "Efe0ea5c3ab2c315ffce9c42178fe887bd452f345889184133766f29ff5e5ac37",
+            "execution_date": "2025-12-19",
+            "split_from": 1,
+            "split_to": 1.05,
+            "ticker": "MLGF",
+            "adjustment_type": "stock_dividend"
+        },
+        {
+            "id": "Ee186ea3f126d9f9e0613faefd46fe1cdccc94b09e87db7cd79532598bf7a8d70",
+            "execution_date": "2025-12-19",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "KLBAY",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E322f37f622ea54b32882887b2a788a14d9a777b75f37aed051a602fcdb847d7d",
+            "execution_date": "2025-12-18",
+            "split_from": 1,
+            "split_to": 5,
+            "ticker": "NOW",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E0f620208275e63fbe7855c3235eb6ec90eb6c049f5f1df42e4cd887eeb71d9ae",
+            "execution_date": "2025-12-16",
+            "split_from": 1,
+            "split_to": 10,
+            "ticker": "RCBC",
+            "adjustment_type": "stock_dividend"
+        },
+        {
+            "id": "E865c6959bf9b59d85559a8aa1acd330dbdb96293a407852876c87f7c95bffcd2",
+            "execution_date": "2025-12-16",
+            "split_from": 1,
+            "split_to": 1.0173,
+            "ticker": "IQST",
+            "adjustment_type": "stock_dividend"
+        },
+        {
+            "id": "E1d33bec36df15c331ebc2c7a12cbf63176a13e8d0c3c4107361fd76ebb8532ad",
+            "execution_date": "2025-12-16",
+            "split_from": 100,
+            "split_to": 110,
+            "ticker": "FNNCF",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "Ed014cba609b8e35edc3cfd86a819cf8971fe9706d2f09844ca1e5054f1b791c2",
+            "execution_date": "2025-12-16",
+            "split_from": 100,
+            "split_to": 110,
+            "ticker": "CNDCF",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E8fec97de01001c0181646fffeec9ed934ee6eb0c058de6a64d9b83dce929216b",
+            "execution_date": "2025-12-16",
+            "split_from": 10,
+            "split_to": 11,
+            "ticker": "CMGJY",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "Ed8bc6bb6fb83780d54f8f99b4656bc2eda8eef6e59841cbf4c5cb8b560f4db74",
+            "execution_date": "2025-12-16",
+            "split_from": 10,
+            "split_to": 11,
+            "ticker": "CMGGF",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "Ebb862e791d3bfd9cdaa1d7a4492595d8647d12edde0957d957c9d284f0d6d694",
+            "execution_date": "2025-12-16",
+            "split_from": 10,
+            "split_to": 11,
+            "ticker": "CIBEY",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "Eadc19b0a06655d2e6886119ce818fa67563b3b83b0b75e6317f0863b474ae896",
+            "execution_date": "2025-12-15",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "XBP",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "Ed1c085eeeab582e41a4d878bcaf9232ce3439200fde6269c62d8b55d0b0fbfec",
+            "execution_date": "2025-12-15",
+            "split_from": 1,
+            "split_to": 0.04,
+            "ticker": "RNLXY",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "Edb84773a9c35acf050687699d9dcd5aceb2125af1c35f067ca499af3468987f5",
+            "execution_date": "2025-12-15",
+            "split_from": 40,
+            "split_to": 1,
+            "ticker": "NVVE",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "E6b5ce554540f3a217a0a7fcff9a62c1538c73a0e3f941a3fcd0a169e9764bab3",
+            "execution_date": "2025-12-15",
+            "split_from": 1,
+            "split_to": 100,
+            "ticker": "INVMF",
+            "adjustment_type": "forward_split"
+        },
+        {
+            "id": "E81b460568a58b7f1ccd3f62565f11e0e0ea79dcdbbc76beee91efebf14b81519",
+            "execution_date": "2025-12-15",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "FRGT",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "Ed295c2552fa4a95d6a5886e52d974c564cd1297e11ad7c11a4168055b8bb9886",
+            "execution_date": "2025-12-15",
+            "split_from": 1,
+            "split_to": 1.025,
+            "ticker": "CYCU",
+            "adjustment_type": "stock_dividend"
+        },
+        {
+            "id": "E3504c8a3516876dd547c31b4d69030c1644cfa4433afbf5dc37ba1a57df7e6e7",
+            "execution_date": "2025-12-15",
+            "split_from": 40,
+            "split_to": 1,
+            "ticker": "CMND",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "Ed3cfaedce731b742c3eee13e9db4cdf4775e3306ec2c61d2e99fd7071eaeb365",
+            "execution_date": "2025-12-15",
+            "split_from": 8,
+            "split_to": 1,
+            "ticker": "BENF",
+            "adjustment_type": "reverse_split"
+        },
+        {
+            "id": "E655f4ec7b63e5d8d054459e18d8b513e42262d22c4c5db6999623b18a82d05c1",
+            "execution_date": "2025-12-12",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "BNAI",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "E39e4a58150cf6df8e937f4d04e85ab18abb4d18b27be7fa74ffecd11d92ffc94",
+            "execution_date": "2025-12-12",
+            "split_from": 50,
+            "split_to": 1,
+            "ticker": "AZI",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 50
+        },
+        {
+            "id": "Ef6a8eb034aec4e1c8dc380ec3bf9127dff020e98b618e77dd8d735e89a88b745",
+            "execution_date": "2025-12-12",
+            "split_from": 216,
+            "split_to": 1,
+            "ticker": "ARBK",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 216
+        },
+        {
+            "id": "E40a2de32f3a162d85ba072544cb767b4b2fffac3eeb48ea889934ca74afd5c0e",
+            "execution_date": "2025-12-11",
+            "split_from": 40,
+            "split_to": 1,
+            "ticker": "JZXN",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 40
+        },
+        {
+            "id": "E6823829db187735852f4c3d9d15e5b5c35b9ca4f44806d2ad08a50f23b9b4f26",
+            "execution_date": "2025-12-11",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "HUYTF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "E30f9f5f2e41403a93259f648e6c62048ad64ca8a88276dc49a5f4f35c83b1ee8",
+            "execution_date": "2025-12-11",
+            "split_from": 4,
+            "split_to": 1,
+            "ticker": "ESXMF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 4
+        },
+        {
+            "id": "E1d4fe19195b44fa9fa7dca2d213748ad145ec11696a6a961a88a5e00c4b4cdc7",
+            "execution_date": "2025-12-11",
+            "split_from": 35,
+            "split_to": 1,
+            "ticker": "BNKK",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 35
+        },
+        {
+            "id": "E60903e8dc8261599348cc21891c3d1893f39d32d023acf1a715dff6102a2cc58",
+            "execution_date": "2025-12-10",
+            "split_from": 3,
+            "split_to": 1,
+            "ticker": "SVRE",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 3
+        },
+        {
+            "id": "Ea47dcb7d51d688dc95ad9f1f1caa7716687f597ef31cbd3b0959db9889d8326b",
+            "execution_date": "2025-12-10",
+            "split_from": 4,
+            "split_to": 1,
+            "ticker": "SCZMF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 4
+        },
+        {
+            "id": "Ea47b805bf5586da7b010bf61842ede9c29e8d986ece428c6aa15d718bdf7133d",
+            "execution_date": "2025-12-10",
+            "split_from": 4,
+            "split_to": 1,
+            "ticker": "FNMCF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 4
+        },
+        {
+            "id": "E436f9868867f4fb3915291f2adda96380eec64a02de77dd191037d4ca47dace0",
+            "execution_date": "2025-12-10",
+            "split_from": 1,
+            "split_to": 2.6132999999999997,
+            "ticker": "FBBPF",
+            "adjustment_type": "stock_dividend",
+            "historical_adjustment_factor": 0.382658
+        },
+        {
+            "id": "E14ebe113b26ae3541bd899a5b470892da07e87ef250bfd2b4b2333f7797271ea",
+            "execution_date": "2025-12-09",
+            "split_from": 9,
+            "split_to": 8,
+            "ticker": "UNLYF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 1.125
+        },
+        {
+            "id": "Ea21c6300c23af3c06e84ae12aa387b3fca6a663ff9c7eb226544a7b5a032aaf7",
+            "execution_date": "2025-12-09",
+            "split_from": 9,
+            "split_to": 8,
+            "ticker": "UL",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 1.125
+        },
+        {
+            "id": "E76b3e99e667c08b52fdc26099962d279b74dc6da813a8563eb0d057413055aa8",
+            "execution_date": "2025-12-09",
+            "split_from": 8,
+            "split_to": 1,
+            "ticker": "SMCZ",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 8
+        },
+        {
+            "id": "E33bf002428f1a2cfa7079332ce0c2d591f1cfc08b1723c2bd54e0cb26010ff63",
+            "execution_date": "2025-12-09",
+            "split_from": 1,
+            "split_to": 3,
+            "ticker": "RKLX",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.333333
+        },
+        {
+            "id": "Ebd58a2746b1c42340873fea23d417a708c612beb2aa9134caca9a87f65c51297",
+            "execution_date": "2025-12-09",
+            "split_from": 1,
+            "split_to": 4,
+            "ticker": "RGTX",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.25
+        },
+        {
+            "id": "Ec034406a13e2e250eaab248312632448ebead2fb8e152b2347c3c464aa327b45",
+            "execution_date": "2025-12-09",
+            "split_from": 30,
+            "split_to": 1,
+            "ticker": "PSNYW",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 30
+        },
+        {
+            "id": "E30ee21098dd31b1c50f4668b571816993c32a9d05d5c2cb59eb37fa81a1bdf6b",
+            "execution_date": "2025-12-09",
+            "split_from": 30,
+            "split_to": 1,
+            "ticker": "PSNY",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 30
+        },
+        {
+            "id": "Eacc130a6e2ef73a06c7f29cceb37a59fb5f2dbbed6e7d03b1da7fb6061fda160",
+            "execution_date": "2025-12-09",
+            "split_from": 4,
+            "split_to": 1,
+            "ticker": "PLTZ",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 4
+        },
+        {
+            "id": "E99bcfb3492797eb6a11c6db5ee67c3c9d16e064396f89ef3aa391993f6a6fdfe",
+            "execution_date": "2025-12-09",
+            "split_from": 30,
+            "split_to": 1,
+            "ticker": "PLSAY",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 30
+        },
+        {
+            "id": "E38374b3f92159aa50cb12c710170b6391eecc5e1c3556d5bf5ca8f72a6cebaf8",
+            "execution_date": "2025-12-09",
+            "split_from": 8,
+            "split_to": 1,
+            "ticker": "NVOX",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 8
+        },
+        {
+            "id": "Ebda57dd9a55e8bcc84d652b830adceeb3da8cc0406d9d262cf566b8f4f1830ce",
+            "execution_date": "2025-12-09",
+            "split_from": 300,
+            "split_to": 1,
+            "ticker": "NRRWF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 300
+        },
+        {
+            "id": "E5f26d5e8fccd89abca59f88ca551f9a28b23209e5d1c6524f382ad28492999c6",
+            "execution_date": "2025-12-09",
+            "split_from": 4,
+            "split_to": 1,
+            "ticker": "MST",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 4
+        },
+        {
+            "id": "Ea7cd1a0ac2004685e14f0aeb873d22454f23c34ee3b63b9ab8a1401713b25583",
+            "execution_date": "2025-12-09",
+            "split_from": 6,
+            "split_to": 1,
+            "ticker": "IONZ",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 6
+        },
+        {
+            "id": "Ef3f21840c5e2992ed0d68bdc5f66406801d57d40dc0134a598f91338d503aa59",
+            "execution_date": "2025-12-09",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "IONX",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.5
+        },
+        {
+            "id": "E17d848a53641b5645b90d796abefb031c857752d75ce70d3dc190543ae1ecf27",
+            "execution_date": "2025-12-09",
+            "split_from": 15,
+            "split_to": 1,
+            "ticker": "HRZMF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 15
+        },
+        {
+            "id": "E5e91f883d3f655b7cb3226e6340a278df1d1682e5bc9fca36f0cada278bcedc7",
+            "execution_date": "2025-12-09",
+            "split_from": 1,
+            "split_to": 4,
+            "ticker": "HOOX",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.25
+        },
+        {
+            "id": "E168eb786a3cac54dead272ddc3bd806cd57ca2a5be4ac7848461a63be84a0070",
+            "execution_date": "2025-12-08",
+            "split_from": 12,
+            "split_to": 1,
+            "ticker": "WKHS",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 12
+        },
+        {
+            "id": "Ebbef9b1ee54c1dbc887a316d4b6f2e222f10717c967cf45f6398047e1c51ad80",
+            "execution_date": "2025-12-08",
+            "split_from": 2,
+            "split_to": 1,
+            "ticker": "SMRVF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 2
+        },
+        {
+            "id": "E71a17af9f8ce154938d9fde5bae44dc8416e1f035134fa55f39afbd91e473c1b",
+            "execution_date": "2025-12-08",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "PYPY",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "E2358e2fa55ddc4d7438d4d0648a199003aff043fd5f4bf03d9dd133466004bbc",
+            "execution_date": "2025-12-08",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "MSTY",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "E20f8d7cbb75d388a667b65264476d4d3e8cb1aa70f7e74f7e6784c6657b309de",
+            "execution_date": "2025-12-08",
+            "split_from": 100,
+            "split_to": 1,
+            "ticker": "DSHK",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 100
+        },
+        {
+            "id": "E3e04c9bd63118a50e620e1f26052cfa9b36e16354b47292c86faaf78b0b85031",
+            "execution_date": "2025-12-08",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "AMDY",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "Eb7ba3bc0bde1122560789c0eccd63b0c9ae73255713418a7c1e6776f6c2e508e",
+            "execution_date": "2025-12-05",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "XLY",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.5
+        },
+        {
+            "id": "E58883e135f46a1175a1d230c0dc628996b73068c675400bdbd3d2527e7e013af",
+            "execution_date": "2025-12-05",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "XLU",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.5
+        },
+        {
+            "id": "E203517a40d04145fcd1573836c49ea00e4509a297ac786d749d351e4eac52849",
+            "execution_date": "2025-12-05",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "XLK",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.5
+        },
+        {
+            "id": "E4d0bd04e060fdec7ec64eaea55a4fde1dc19876cb641b5fc37db6b5d06b11023",
+            "execution_date": "2025-12-05",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "XLE",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.5
+        },
+        {
+            "id": "E26b3a8ee36a9944a036f0fd55fcbfdb1486e6e1ba6211870134f9f2ed19d7d7a",
+            "execution_date": "2025-12-05",
+            "split_from": 1,
+            "split_to": 2,
+            "ticker": "XLB",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.5
+        },
+        {
+            "id": "Ecd7ce1356b1baf9356afdf80fe659fe27375cee1bd2070c209b0c6d4979a6a2a",
+            "execution_date": "2025-12-05",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "USREF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "E1bc43b0da2ca1313a46215ec713feeb807ab9ff840dce20993af79ded8c0a027",
+            "execution_date": "2025-12-05",
+            "split_from": 20,
+            "split_to": 1,
+            "ticker": "TGL",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 20
+        },
+        {
+            "id": "Ebb30fae17fa4c13a9e8be0e07d924b42018d14f2246b3072a7d41079e7825a17",
+            "execution_date": "2025-12-05",
+            "split_from": 100.28037,
+            "split_to": 101.28037,
+            "ticker": "SSEZF",
+            "adjustment_type": "stock_dividend",
+            "historical_adjustment_factor": 0.990126
+        },
+        {
+            "id": "E64599c6234eb8da78fc3fcd228316b95d8fa01bb205bc71ecf68012721b6a9e4",
+            "execution_date": "2025-12-05",
+            "split_from": 11,
+            "split_to": 1,
+            "ticker": "MTVA",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 11
+        },
+        {
+            "id": "E55f0810499e454b306389ac6a3bf23bfa00c74700f41c5ad74d87524d9983a58",
+            "execution_date": "2025-12-05",
+            "split_from": 1,
+            "split_to": 1.01439,
+            "ticker": "METCB",
+            "adjustment_type": "stock_dividend",
+            "historical_adjustment_factor": 0.985814
+        },
+        {
+            "id": "E2340d34bc92ec445f17e1f221e41cbc0c4ebd479b1d51925b655b6bacb4110b8",
+            "execution_date": "2025-12-05",
+            "split_from": 20,
+            "split_to": 1,
+            "ticker": "IMG",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 20
+        },
+        {
+            "id": "E154ad4dca2fc91e8e9b44baf498e0025a411249ab04f5e1bd5fef72576bb3f21",
+            "execution_date": "2025-12-05",
+            "split_from": 20,
+            "split_to": 1,
+            "ticker": "FWCTF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 20
+        },
+        {
+            "id": "E50edee1103064437e5572f999dd4f677c222c75cfa18f3f080dd7106658a96c2",
+            "execution_date": "2025-12-05",
+            "split_from": 100,
+            "split_to": 102.44731,
+            "ticker": "DTTLF",
+            "adjustment_type": "stock_dividend",
+            "historical_adjustment_factor": 0.976112
+        },
+        {
+            "id": "Ee2de85f22420ecfcbcbd1522795aacda7c6a1c223a0f43e72e19f752c072b036",
+            "execution_date": "2025-12-04",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "VCUFF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "E942684851fa26fea495abc481954c39ca1df18b1d52ba57cf484df01053f1c71",
+            "execution_date": "2025-12-04",
+            "split_from": 50,
+            "split_to": 1,
+            "ticker": "RLAB",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 50
+        },
+        {
+            "id": "E1f6d95af30bed0a5c598b945e4f20a58118c48ebd7f5a32229977964d7e2c79e",
+            "execution_date": "2025-12-04",
+            "split_from": 4,
+            "split_to": 1,
+            "ticker": "MOOOF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 4
+        },
+        {
+            "id": "E9fd059f9c823ec2dd5cf05fc2abe1e470bab933882a1bfe222a670b08a54c1bd",
+            "execution_date": "2025-12-04",
+            "split_from": 3,
+            "split_to": 1,
+            "ticker": "LOMEF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 3
+        },
+        {
+            "id": "E3abcd13706b48bd646ebf44c23744d99998a95dfadefba5d496440b14dd3d497",
+            "execution_date": "2025-12-04",
+            "split_from": 12,
+            "split_to": 1,
+            "ticker": "JUPGF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 12
+        },
+        {
+            "id": "E3997edb9cdb74ae1bc6b86bb2c05df3c5aacc00840a054af657d47b00d74d659",
+            "execution_date": "2025-12-04",
+            "split_from": 1,
+            "split_to": 1.4,
+            "ticker": "EGIEY",
+            "adjustment_type": "forward_split",
+            "historical_adjustment_factor": 0.714286
+        },
+        {
+            "id": "Ec1ed64f4216650fba29985813d2fcf65f245dd8d67b0108c365e559d33d13324",
+            "execution_date": "2025-12-03",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "STRO",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "E6afd82a3b39881d365c5fd8f67e4e32681160356ce8d608465d174eedb56dce9",
+            "execution_date": "2025-12-03",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "MSTU",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "Ee093ecf2092887f459c452587caf00a512b614c978eb4abc7edbb2b87991b057",
+            "execution_date": "2025-12-03",
+            "split_from": 30,
+            "split_to": 1,
+            "ticker": "IXRRF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 30
+        },
+        {
+            "id": "Ede4010292255959f8eb989eeeb6afe67efefe626bcc06297e8fc200f27ad7114",
+            "execution_date": "2025-12-02",
+            "split_from": 15,
+            "split_to": 1,
+            "ticker": "XHLD",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 15
+        },
+        {
+            "id": "E01cf6ec9e16c976742aa8e2fd63f17fd29cab86a5b9268c9b8f6365e104b9020",
+            "execution_date": "2025-12-02",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "UPSX",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "Ec2bb8daecda45af4e0b8fa37ad4aa747e8eb96f077d26118f94e090906c04d2e",
+            "execution_date": "2025-12-02",
+            "split_from": 1.5,
+            "split_to": 1,
+            "ticker": "TPNEF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 1.5
+        },
+        {
+            "id": "E612b27412d3716b9366198676ac5c01080ad3c8812ca96a062fdb3190ce0ae51",
+            "execution_date": "2025-12-02",
+            "split_from": 21087000,
+            "split_to": 1,
+            "ticker": "TOPCF",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 21087000
+        },
+        {
+            "id": "E83571f667b67269e89ab9025fc4237fdaea23dc42c5608b1580d960fcd6a4f6c",
+            "execution_date": "2025-12-02",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "TLRY",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "Efa15ce1e6f0ed4a5b13a2db9cb1d88a427aa236bc3b33930927c84abb8eb7104",
+            "execution_date": "2025-12-02",
+            "split_from": 8,
+            "split_to": 1,
+            "ticker": "SPHL",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 8
+        },
+        {
+            "id": "Ed0090f48b781a20f4beddb1c69c3ec73111bd8355fcfb9547a0e933b225ee83f",
+            "execution_date": "2025-12-02",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "SMU",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "Ef67de25f461e9b40fc76c78b995747f5208a33be20ede8170ea3f64b7971de16",
+            "execution_date": "2025-12-02",
+            "split_from": 30,
+            "split_to": 1,
+            "ticker": "RUBI",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 30
+        },
+        {
+            "id": "Ed85f8cf0750566a3713a524c67f5fa1679863dba958c5c57d122c02fa354a7b9",
+            "execution_date": "2025-12-02",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "QUBX",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "E9ec189797440148c28afb0b735241e51441636b2021abc1c09b105bdddbb5b98",
+            "execution_date": "2025-12-02",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "OARK",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "Eb4d05cd235ee3754c83b7388a1692a171d9fb814492e3cdfc6d4c855bb62aa93",
+            "execution_date": "2025-12-02",
+            "split_from": 7,
+            "split_to": 1,
+            "ticker": "HPP",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 7
+        },
+        {
+            "id": "Eb8c53a479918f878723cc23b450056a9cade0ad8597bf82ee1bbddb2f5c25e1f",
+            "execution_date": "2025-12-02",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "FIAT",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "E05aee52374488dbc8a620050775e4823a8f9695822a07b5c0f98720619b20dba",
+            "execution_date": "2025-12-02",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "DIPS",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "Ecdb17923699965d9b06578b7915a3aaf2d5dbaf6c0d41786a71839060f824964",
+            "execution_date": "2025-12-02",
+            "split_from": 5,
+            "split_to": 1,
+            "ticker": "CWVX",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 5
+        },
+        {
+            "id": "E66064cad42c6a5500882dee2d54e543aba3d75dd714abe4b3e9c7cbf5e32bb70",
+            "execution_date": "2025-12-02",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "CRSH",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "E96447c114b728eb016a49280cd920bfb7e852a747c9d40f032f58d520ccc6063",
+            "execution_date": "2025-12-02",
+            "split_from": 10,
+            "split_to": 1,
+            "ticker": "CONY",
+            "adjustment_type": "reverse_split",
+            "historical_adjustment_factor": 10
+        },
+        {
+            "id": "E4f128ecf0b519000b34666801f8e0ca4f2c0fc55c3cd100a9829f13250e9d496",
+            "execution_date": "2025-12-02",
+            "split_from": 1,
+            "split_to": 1.05,
+            "ticker": "CBSH",
+            "adjustment_type": "stock_dividend",
+            "historical_adjustment_factor": 0.952381
+        }
+    ],
+    "next_url": "https://api.massive.com/stocks/v1/splits?cursor=AAIBAAAEAAABZAACAQf7kJ8BDQRDQlNI"
+}

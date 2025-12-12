@@ -228,6 +228,51 @@ namespace Spiral.Trading.Data
             Console.WriteLine($"Saved or updated {splits.Count} splits.");
         }
 
+        public async Task SyncSplitsFromPolygonBulkAsync(string apiKey)
+        {
+            Console.WriteLine("Querying latest split date from database...");
+
+            using var context = new TradingDbContext(dbPath);
+            await context.Database.EnsureCreatedAsync();
+
+            // Get the latest split execution date from the database
+            var latestSplitDate = await context.Splits
+                                               .MaxAsync(s => (DateTime?)s.ExecutionDate);
+
+            // Default to 1990-01-01 if no splits exist
+            var startDate = latestSplitDate?.AddDays(1) ?? new DateTime(1990, 1, 1);
+            var endDate = DateTime.Now;
+
+            if (startDate > endDate)
+            {
+                Console.WriteLine($"Database is already up to date (latest split: {latestSplitDate:yyyy-MM-dd}).");
+                return;
+            }
+
+            Console.WriteLine($"Downloading splits from {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}...");
+
+            var downloader = new PolygonSplitDownloader(apiKey);
+            var splits = await downloader.DownloadAllSplitsAsync(startDate, endDate);
+
+            if (splits.Count == 0)
+            {
+                Console.WriteLine("No new splits found.");
+                return;
+            }
+
+            Console.WriteLine($"\nFound {splits.Count} splits. Saving to database...");
+
+            var bulkConfig = new BulkConfig
+            {
+                SetOutputIdentity = false,
+                UpdateByProperties = new List<string> { nameof(Split.Ticker), nameof(Split.ExecutionDate) }
+            };
+
+            await context.BulkInsertOrUpdateAsync(splits, bulkConfig);
+
+            Console.WriteLine($"Saved or updated {splits.Count} splits.");
+        }
+
         private static List<DailyPrice> ParseDailyCsv(string filePath, DateTime date)
         {
             using var fileStream = File.OpenRead(filePath);
