@@ -64,7 +64,9 @@ public class StockScreeningService
         ScreeningCriteria criteria)
     {
         var results = new List<StockInPlayResult>();
-        var sortedPrices = prices.OrderBy(p => p.Date).ToList();
+        var sortedPrices = 
+            prices.OrderBy(p => p.Date)
+                .ToList();
 
         foreach (var currentDay in sortedPrices)
         {
