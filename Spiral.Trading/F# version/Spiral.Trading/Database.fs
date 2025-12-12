@@ -7,6 +7,28 @@ open System.Reflection
 open Dapper
 open Microsoft.Data.Sqlite
 
+// Row types for Dapper mapping (matches SQLite column names)
+[<CLIMutable>]
+type DailyPriceRow = {
+    ticker: string
+    date: string
+    ``open``: float
+    high: float
+    low: float
+    close: float
+    volume: int64
+    transactions: int64
+}
+
+[<CLIMutable>]
+type SplitRow = {
+    ticker: string
+    execution_date: string
+    split_from: float
+    split_to: float
+    split_ratio: float
+}
+
 /// Load embedded SQL resource by name
 let private loadEmbeddedSql (resourceName: string) : string =
     let assembly = Assembly.GetExecutingAssembly()
@@ -225,6 +247,37 @@ let getDateRange (connection: IDbConnection) : (DateTime * DateTime) option =
         None
     else
         Some (DateTime.Parse(minDate), DateTime.Parse(maxDate))
+
+/// Get daily prices for a specific ticker, ordered by date
+let getDailyPricesByTicker (connection: IDbConnection) (ticker: string) : DailyPrice array =
+    connection.Query<DailyPriceRow>(
+        "SELECT ticker, date, open, high, low, close, volume, transactions FROM daily_prices WHERE ticker = @ticker ORDER BY date",
+        {| ticker = ticker |})
+    |> Seq.map (fun row -> {
+        Ticker = row.ticker
+        Date = DateTime.Parse(row.date)
+        Open = decimal row.``open``
+        High = decimal row.high
+        Low = decimal row.low
+        Close = decimal row.close
+        Volume = row.volume
+        Transactions = row.transactions
+    })
+    |> Seq.toArray
+
+/// Get splits for a specific ticker, ordered by execution date descending
+let getSplitsByTicker (connection: IDbConnection) (ticker: string) : Split array =
+    connection.Query<SplitRow>(
+        "SELECT ticker, execution_date, split_from, split_to, split_ratio FROM splits WHERE ticker = @ticker ORDER BY execution_date DESC",
+        {| ticker = ticker |})
+    |> Seq.map (fun row -> {
+        Ticker = row.ticker
+        ExecutionDate = DateTime.Parse(row.execution_date)
+        SplitFrom = row.split_from
+        SplitTo = row.split_to
+        SplitRatio = row.split_ratio
+    })
+    |> Seq.toArray
 
 // --- Processed Files Tracking ---
 

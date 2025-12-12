@@ -9,6 +9,7 @@ open Spiral.Trading.S3Download
 open Spiral.Trading.SplitDownload
 open Spiral.Trading.CsvParsing
 open Spiral.Trading.Database
+open Spiral.Trading.Plotting
 
 let private formatDate (d: DateTime) = d.ToString("yyyy-MM-dd")
 
@@ -56,11 +57,28 @@ type IngestDataArgs =
             | Csv_Dir _ -> "Directory containing .csv.gz files (default: data/daily_aggregates)"
             | Splits_File _ -> "JSON file containing splits (default: data/splits.json)"
 
+type PlotChartArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-o")>] Output of string
+    | [<AltCommandLine("-w")>] Width of int
+    | [<AltCommandLine("-h")>] Height of int
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Stock ticker symbol (required)"
+            | Database _ -> "SQLite database path (default: data/trading.db)"
+            | Output _ -> "Output HTML file path (default: data/{ticker}_chart.html)"
+            | Width _ -> "Chart width in pixels (default: 1200)"
+            | Height _ -> "Chart height in pixels (default: 900)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
     | [<CliPrefix(CliPrefix.None)>] Parse_Csv of ParseResults<ParseCsvArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
+    | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -69,6 +87,7 @@ type Arguments =
             | Download_Splits _ -> "Download stock splits from Massive API"
             | Parse_Csv _ -> "Parse downloaded CSV files and display summary"
             | Ingest_Data _ -> "Ingest downloaded data into SQLite database"
+            | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -271,6 +290,29 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     | None ->
         printfn "  Date range: (no data)"
 
+let private handlePlotChart (args: ParseResults<PlotChartArgs>) =
+    let ticker =
+        match args.TryGetResult PlotChartArgs.Ticker with
+        | Some t -> t.ToUpperInvariant()
+        | None -> failwith "Ticker is required. Use -t or --ticker to specify."
+
+    let dbPath =
+        args.TryGetResult PlotChartArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    let outputPath =
+        args.TryGetResult PlotChartArgs.Output
+        |> Option.defaultValue $"data/{ticker}_chart.html"
+
+    let width = args.GetResult(PlotChartArgs.Width, defaultValue = 1200)
+    let height = args.GetResult(PlotChartArgs.Height, defaultValue = 900)
+
+    printfn "Generating chart for %s" ticker
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+    printfn "Output: %s" (Path.GetFullPath outputPath)
+
+    Plotting.generateChart dbPath ticker outputPath width height
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -292,6 +334,8 @@ let main argv =
                 handleParseCsv args
             | Ingest_Data args ->
                 handleIngestData args
+            | Plot_Chart args ->
+                handlePlotChart args
 
         0
     with

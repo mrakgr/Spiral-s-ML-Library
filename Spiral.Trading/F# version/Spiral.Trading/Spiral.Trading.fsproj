@@ -12,6 +12,7 @@
     <Compile Include="SplitDownload.fs" />
     <Compile Include="CsvParsing.fs" />
     <Compile Include="Database.fs" />
+    <Compile Include="Plotting.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <PackageReference Include="FSharp.Data" Version="6.6.0" />
     <PackageReference Include="FSharp.SystemTextJson" Version="1.4.36" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.1" />
+    <PackageReference Include="XPlot.Plotly" Version="4.1.0" />
   </ItemGroup>
 
 </Project>
