@@ -29,30 +29,18 @@ type BulkDownloadArgs =
             | Start_Date _ -> "Start date (yyyy-MM-dd)"
             | End_Date _ -> "End date (yyyy-MM-dd)"
 
-type IngestDataArgs =
-    | [<Hidden>] IngestDataPlaceholder
-
-    interface IArgParserTemplate with
-        member _.Usage = ""
-
-type DownloadSplitsArgs =
-    | [<Hidden>] DownloadSplitsPlaceholder
-
-    interface IArgParserTemplate with
-        member _.Usage = ""
-
 type Arguments =
     | Download_Bulk of ParseResults<BulkDownloadArgs>
-    | Ingest_Data of ParseResults<IngestDataArgs>
-    | Download_Splits of ParseResults<DownloadSplitsArgs>
+    | Ingest_Data
+    | Download_Splits
     | Plot of ParseResults<PlotArgs>
 
     interface IArgParserTemplate with
         member s.Usage =
             match s with
             | Download_Bulk _ -> "Download daily aggregate files from S3 to disk."
-            | Ingest_Data _ -> "Ingest downloaded CSV files into SQLite database."
-            | Download_Splits _ -> "Download stock splits from Polygon API to Database."
+            | Ingest_Data -> "Ingest downloaded CSV files into SQLite database."
+            | Download_Splits -> "Download stock splits from Polygon API to Database."
             | Plot _ -> "Generate a candlestick chart for a ticker."
 
 [<EntryPoint>]
@@ -78,53 +66,54 @@ let main argv =
 
             ConfigLoader.LoadKeys(apiKeyPath)
 
-        match results.GetSubCommand() with
-        | Download_Bulk args ->
-            let struct (_, s3Access, s3Secret) = loadKeys ()
-            ensureDb ()
-            let downloader = PolygonS3DataDownloader(s3Access, s3Secret)
+        for result in results.GetAllResults() do
+            match result with
+            | Ingest_Data ->
+                ensureDb ()
+                let ingestor = DataIngestor(dbPath)
+                let dataDir = "data/daily_aggregates"
 
-            let endDate =
-                match args.TryGetResult(BulkDownloadArgs.End_Date) with
-                | Some d -> DateTime.Parse(d)
-                | None -> DateTime.Now
+                if not (Directory.Exists dataDir) then
+                    printfn "Data directory not found: %s" dataDir
+                else
+                    ingestor.IngestDailyAggregatesAsync(dataDir).GetAwaiter().GetResult()
 
-            let startDate =
-                match args.TryGetResult(BulkDownloadArgs.Start_Date) with
-                | Some d -> DateTime.Parse(d)
-                | None -> endDate.AddYears(-5)
+            | Download_Splits ->
+                let struct (apiKey, _, _) = loadKeys ()
+                ensureDb ()
+                let ingestor = DataIngestor(dbPath)
+                ingestor.SyncSplitsFromPolygonAsync(apiKey, 20000).GetAwaiter().GetResult()
 
-            let outputDir = "data/daily_aggregates"
-            printfn "Output Directory: %s" outputDir
+            | Download_Bulk args ->
+                let struct (_, s3Access, s3Secret) = loadKeys ()
+                ensureDb ()
+                let downloader = PolygonS3DataDownloader(s3Access, s3Secret)
 
-            downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, 8).GetAwaiter().GetResult()
+                let endDate =
+                    match args.TryGetResult End_Date with
+                    | Some d -> DateTime.Parse d
+                    | None -> DateTime.Now
 
-        | Ingest_Data _ ->
-            ensureDb ()
-            let ingestor = DataIngestor(dbPath)
-            let dataDir = "data/daily_aggregates"
+                let startDate =
+                    match args.TryGetResult Start_Date with
+                    | Some d -> DateTime.Parse d
+                    | None -> endDate.AddYears(-5)
 
-            if not (Directory.Exists dataDir) then
-                printfn "Data directory not found: %s" dataDir
-            else
-                ingestor.IngestDailyAggregatesAsync(dataDir).GetAwaiter().GetResult()
+                let outputDir = "data/daily_aggregates"
+                printfn "Output Directory: %s" outputDir
 
-        | Download_Splits _ ->
-            let struct (apiKey, _, _) = loadKeys ()
-            ensureDb ()
-            let ingestor = DataIngestor(dbPath)
-            ingestor.SyncSplitsFromPolygonAsync(apiKey, 20000).GetAwaiter().GetResult()
+                downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, 8).GetAwaiter().GetResult()
 
-        | Plot plotArgs ->
-            ensureDb ()
-            let ticker = plotArgs.GetResult(PlotArgs.Ticker)
-            let width = plotArgs.GetResult(PlotArgs.Width, defaultValue = 1600)
-            let height = plotArgs.GetResult(PlotArgs.Height, defaultValue = 900)
-            let outputPath = sprintf "%s_chart.html" ticker
+            | Plot plotArgs ->
+                ensureDb ()
+                let ticker = plotArgs.GetResult Ticker
+                let width = plotArgs.GetResult(Width, defaultValue = 1600)
+                let height = plotArgs.GetResult(Height, defaultValue = 900)
+                let outputPath = sprintf "%s_chart.html" ticker
 
-            printfn "Generating chart for %s..." ticker
-            StockChartService.GenerateChart(Path.GetFullPath(dbPath), ticker, outputPath, width, height)
-            printfn "Chart saved to %s" (Path.GetFullPath(outputPath))
+                printfn "Generating chart for %s..." ticker
+                StockChartService.GenerateChart(Path.GetFullPath dbPath, ticker, outputPath, width, height)
+                printfn "Chart saved to %s" (Path.GetFullPath outputPath)
 
         0
     with e ->
