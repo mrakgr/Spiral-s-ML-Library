@@ -29,18 +29,30 @@ type BulkDownloadArgs =
             | Start_Date _ -> "Start date (yyyy-MM-dd)"
             | End_Date _ -> "End date (yyyy-MM-dd)"
 
+type IngestDataArgs =
+    | [<Hidden>] IngestDataPlaceholder
+
+    interface IArgParserTemplate with
+        member _.Usage = ""
+
+type DownloadSplitsArgs =
+    | [<Hidden>] DownloadSplitsPlaceholder
+
+    interface IArgParserTemplate with
+        member _.Usage = ""
+
 type Arguments =
     | Download_Bulk of ParseResults<BulkDownloadArgs>
-    | Ingest_Data
-    | Download_Splits
+    | Ingest_Data of ParseResults<IngestDataArgs>
+    | Download_Splits of ParseResults<DownloadSplitsArgs>
     | Plot of ParseResults<PlotArgs>
 
     interface IArgParserTemplate with
         member s.Usage =
             match s with
             | Download_Bulk _ -> "Download daily aggregate files from S3 to disk."
-            | Ingest_Data -> "Ingest downloaded CSV files into SQLite database."
-            | Download_Splits -> "Download stock splits from Polygon API to Database."
+            | Ingest_Data _ -> "Ingest downloaded CSV files into SQLite database."
+            | Download_Splits _ -> "Download stock splits from Polygon API to Database."
             | Plot _ -> "Generate a candlestick chart for a ticker."
 
 [<EntryPoint>]
@@ -87,7 +99,7 @@ let main argv =
 
             downloader.DownloadDailyAggregatesAsync(startDate, endDate, outputDir, 8).GetAwaiter().GetResult()
 
-        | Ingest_Data ->
+        | Ingest_Data _ ->
             ensureDb ()
             let ingestor = DataIngestor(dbPath)
             let dataDir = "data/daily_aggregates"
@@ -97,7 +109,7 @@ let main argv =
             else
                 ingestor.IngestDailyAggregatesAsync(dataDir).GetAwaiter().GetResult()
 
-        | Download_Splits ->
+        | Download_Splits _ ->
             let struct (apiKey, _, _) = loadKeys ()
             ensureDb ()
             let ingestor = DataIngestor(dbPath)
