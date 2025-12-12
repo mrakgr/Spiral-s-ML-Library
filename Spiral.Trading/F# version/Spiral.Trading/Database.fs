@@ -124,40 +124,34 @@ let private buildMultiRowDailyPriceSql (batchSize: int) : string =
             transactions = excluded.transactions
     """ values
 
-/// Insert or update multiple daily price records using multi-row inserts
+/// Insert or update multiple daily price records
 let upsertDailyPrices (sqliteConn : SqliteConnection) (prices: DailyPrice array) : int =
-    if prices.Length = 0 then 0
-    else
-        let batchSize = 100 // 8 params * 100 = 800, under SQLite's 999 limit
-        use transaction = sqliteConn.BeginTransaction()
-        
-        let mutable count = 0
-        let mutable i = 0
-        
-        while i < prices.Length do
-            let remaining = prices.Length - i
-            let currentBatchSize = min batchSize remaining
-            
-            use cmd = sqliteConn.CreateCommand()
-            cmd.Transaction <- transaction
-            cmd.CommandText <- buildMultiRowDailyPriceSql currentBatchSize
-            
-            for j in 0 .. currentBatchSize - 1 do
-                let price = prices.[i + j]
-                cmd.Parameters.AddWithValue(sprintf "@t%d" j, price.Ticker) |> ignore
-                cmd.Parameters.AddWithValue(sprintf "@d%d" j, price.Date.ToString("yyyy-MM-dd")) |> ignore
-                cmd.Parameters.AddWithValue(sprintf "@o%d" j, float price.Open) |> ignore
-                cmd.Parameters.AddWithValue(sprintf "@h%d" j, float price.High) |> ignore
-                cmd.Parameters.AddWithValue(sprintf "@l%d" j, float price.Low) |> ignore
-                cmd.Parameters.AddWithValue(sprintf "@c%d" j, float price.Close) |> ignore
-                cmd.Parameters.AddWithValue(sprintf "@v%d" j, price.Volume) |> ignore
-                cmd.Parameters.AddWithValue(sprintf "@x%d" j, price.Transactions) |> ignore
-            
-            count <- count + cmd.ExecuteNonQuery()
-            i <- i + currentBatchSize
-
-        transaction.Commit()
-        count
+   use transaction = sqliteConn.BeginTransaction()
+   use cmd = sqliteConn.CreateCommand()
+   cmd.Transaction <- transaction
+   cmd.CommandText <- dailyPriceUpsertSql
+   let pTicker = cmd.Parameters.Add("@ticker", SqliteType.Text)
+   let pDate = cmd.Parameters.Add("@date", SqliteType.Text)
+   let pOpen = cmd.Parameters.Add("@open", SqliteType.Real)
+   let pHigh = cmd.Parameters.Add("@high", SqliteType.Real)
+   let pLow = cmd.Parameters.Add("@low", SqliteType.Real)
+   let pClose = cmd.Parameters.Add("@close", SqliteType.Real)
+   let pVolume = cmd.Parameters.Add("@volume", SqliteType.Integer)
+   let pTransactions = cmd.Parameters.Add("@transactions", SqliteType.Integer)
+   
+   let mutable count = 0
+   for price in prices do
+       pTicker.Value <- price.Ticker
+       pDate.Value <- price.Date.ToString("yyyy-MM-dd")
+       pOpen.Value <- float price.Open
+       pHigh.Value <- float price.High
+       pLow.Value <- float price.Low
+       pClose.Value <- float price.Close
+       pVolume.Value <- price.Volume
+       pTransactions.Value <- price.Transactions
+       count <- count + cmd.ExecuteNonQuery()
+   transaction.Commit()
+   count  
 
 /// Convert Split to Dapper DynamicParameters
 let private toSplitParams (split: Split) : DynamicParameters =
