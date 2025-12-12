@@ -34,7 +34,7 @@ dotnet run --project Spiral.Trading.Console -- download-bulk [options]
 **Options:**
 - `-s, --start-date <yyyy-MM-dd>` - Start date (default: 5 years ago)
 - `-e, --end-date <yyyy-MM-dd>` - End date (default: today)
-- `-p, --parallelism <int>` - Max parallel downloads (default: 8)
+- `-p, --parallelism <int>` - Max parallel downloads (default: 30)
 
 **Examples:**
 
@@ -78,6 +78,31 @@ dotnet run --project Spiral.Trading.Console -- download-splits -s 2024-01-01
 
 Output: `data/splits.json`
 
+### Parse CSV Files
+
+Parses downloaded CSV.gz files and displays summary information.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- parse-csv [options]
+```
+
+**Options:**
+- `-d, --directory <path>` - Directory containing .csv.gz files (default: data/daily_aggregates)
+- `-f, --file <path>` - Single .csv.gz file to parse
+
+**Examples:**
+
+```bash
+# Parse all files in default directory
+dotnet run --project Spiral.Trading.Console -- parse-csv
+
+# Parse a single file
+dotnet run --project Spiral.Trading.Console -- parse-csv -f data/daily_aggregates/2024-12-09.csv.gz
+
+# Parse files in custom directory
+dotnet run --project Spiral.Trading.Console -- parse-csv -d /path/to/csv/files
+```
+
 ## Project Structure
 
 ```
@@ -86,7 +111,8 @@ F# version/
 │   ├── Types.fs                 # Domain types
 │   ├── Config.fs                # Configuration loading
 │   ├── S3Download.fs            # S3 download functionality
-│   └── SplitDownload.fs         # Splits API client
+│   ├── SplitDownload.fs         # Splits API client
+│   └── CsvParsing.fs            # CSV parsing with FSharp.Data
 ├── Spiral.Trading.Console/      # CLI application
 │   └── Program.fs
 ├── api_key.json                 # API credentials (not in git)

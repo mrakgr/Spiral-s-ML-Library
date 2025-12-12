@@ -7,6 +7,7 @@ open Spiral.Trading
 open Spiral.Trading.Config
 open Spiral.Trading.S3Download
 open Spiral.Trading.SplitDownload
+open Spiral.Trading.CsvParsing
 
 let private formatDate (d: DateTime) = d.ToString("yyyy-MM-dd")
 
@@ -32,15 +33,27 @@ type DownloadSplitsArgs =
             | Start_Date _ -> "Start date (yyyy-MM-dd). Default: 5 years ago"
             | End_Date _ -> "End date (yyyy-MM-dd). Default: none (all future)"
 
+type ParseCsvArgs =
+    | [<AltCommandLine("-d")>] Directory of string
+    | [<AltCommandLine("-f")>] File of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Directory _ -> "Directory containing .csv.gz files (default: data/daily_aggregates)"
+            | File _ -> "Single .csv.gz file to parse"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
+    | [<CliPrefix(CliPrefix.None)>] Parse_Csv of ParseResults<ParseCsvArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
             match this with
             | Download_Bulk _ -> "Download daily aggregate files from Massive S3"
             | Download_Splits _ -> "Download stock splits from Massive API"
+            | Parse_Csv _ -> "Parse downloaded CSV files and display summary"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -121,6 +134,47 @@ let private handleDownloadSplits (config: MassiveConfig) (args: ParseResults<Dow
     | Error msg ->
         printfn "Error downloading splits: %s" msg
 
+let private handleParseCsv (args: ParseResults<ParseCsvArgs>) =
+    match args.TryGetResult ParseCsvArgs.File with
+    | Some filePath ->
+        // Parse single file
+        printfn "Parsing file: %s" filePath
+        let result, prices = parseGzipFileWithResult filePath
+
+        match result.Error with
+        | Some err ->
+            printfn "Error: %s" err
+        | None ->
+            printfn "Parsed %d price records" result.PriceCount
+
+            // Show sample
+            if not (Array.isEmpty prices) then
+                printfn ""
+                printfn "Sample records:"
+                prices
+                |> Array.take (min 5 prices.Length)
+                |> Array.iter (fun p ->
+                    printfn "  %s %s O:%M H:%M L:%M C:%M V:%d"
+                        p.Ticker (formatDate p.Date) p.Open p.High p.Low p.Close p.Volume)
+
+    | None ->
+        // Parse directory
+        let directory =
+            args.TryGetResult ParseCsvArgs.Directory
+            |> Option.defaultValue "data/daily_aggregates"
+
+        printfn "Parsing directory: %s" (Path.GetFullPath directory)
+        printfn ""
+
+        let results = parseDirectoryWithProgress directory consoleParseProgress
+
+        let totalFiles = results.Length
+        let totalRows = results |> Array.sumBy (fun (r, _) -> r.PriceCount)
+        let errors = results |> Array.filter (fun (r, _) -> r.Error.IsSome) |> Array.length
+
+        printfn ""
+        printfn "Parse complete: %d files, %d total rows, %d errors" totalFiles totalRows errors
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -129,12 +183,17 @@ let main argv =
         let results = parser.ParseCommandLine(inputs = argv, raiseOnUsage = true)
 
         let configPath = Path.Combine(Environment.CurrentDirectory, "api_key.json")
-        let config = loadConfigOrFail configPath
 
         for result in results.GetAllResults() do
             match result with
-            | Download_Bulk args -> handleDownloadBulk config args
-            | Download_Splits args -> handleDownloadSplits config args
+            | Download_Bulk args ->
+                let config = loadConfigOrFail configPath
+                handleDownloadBulk config args
+            | Download_Splits args ->
+                let config = loadConfigOrFail configPath
+                handleDownloadSplits config args
+            | Parse_Csv args ->
+                handleParseCsv args
 
         0
     with

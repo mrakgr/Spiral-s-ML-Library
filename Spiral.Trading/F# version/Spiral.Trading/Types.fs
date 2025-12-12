@@ -22,13 +22,12 @@ type Split = {
 type DailyPrice = {
     Ticker: string
     Date: DateTime
-    Open: float
-    High: float
-    Low: float
-    Close: float
+    Open: decimal
+    High: decimal
+    Low: decimal
+    Close: decimal
     Volume: int64
-    WindowStart: int64
-    Transactions: int
+    Transactions: int64
 }
 
 /// Result of a download operation for a single date
