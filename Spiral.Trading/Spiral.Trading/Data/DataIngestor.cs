@@ -188,44 +188,17 @@ namespace Spiral.Trading.Data
             Console.WriteLine($"Ingested {records.Count} splits.");
         }
 
-        public async Task SyncSplitsFromPolygonAsync(string apiKey, int maxDegreeOfParallelism = 20000)
+        public async Task ClearSplitsAsync()
         {
-            Console.WriteLine("Loading tickers from database...");
-
             using var context = new TradingDbContext(dbPath);
             await context.Database.EnsureCreatedAsync();
 
-            // query distinct tickers from DailyPrices
-            var validTickers = await context.DailyPrices
-                                            .Select(p => p.Ticker)
-                                            .Distinct()
-                                            .ToListAsync();
+            var count = await context.Splits.CountAsync();
+            Console.WriteLine($"Deleting {count} splits from database...");
 
-            if (validTickers.Count == 0)
-            {
-                Console.WriteLine("No tickers found in database. Please run 'ingest-data' first.");
-                return;
-            }
+            await context.Splits.ExecuteDeleteAsync();
 
-            Console.WriteLine($"Loaded {validTickers.Count} unique tickers from database");
-
-            // Use higher parallelism with enabled retries
-            var downloader = new PolygonSplitDownloader(apiKey);
-            var splits = await downloader.DownloadSplitsAsync(validTickers, maxDegreeOfParallelism: maxDegreeOfParallelism);
-
-            Console.WriteLine($"\nFound {splits.Count} splits. Saving to database...");
-
-            // Batch insert/upsert using BulkExtensions
-            // Upsert to avoid duplicates
-            var bulkConfig = new BulkConfig
-            {
-                SetOutputIdentity = false,
-                UpdateByProperties = new List<string> { nameof(Split.Ticker), nameof(Split.ExecutionDate) }
-            };
-
-            await context.BulkInsertOrUpdateAsync(splits, bulkConfig);
-
-            Console.WriteLine($"Saved or updated {splits.Count} splits.");
+            Console.WriteLine("Splits cleared.");
         }
 
         public async Task SyncSplitsFromPolygonBulkAsync(string apiKey)
@@ -239,8 +212,23 @@ namespace Spiral.Trading.Data
             var latestSplitDate = await context.Splits
                                                .MaxAsync(s => (DateTime?)s.ExecutionDate);
 
-            // Default to 1990-01-01 if no splits exist
-            var startDate = latestSplitDate?.AddDays(1) ?? new DateTime(1990, 1, 1);
+            DateTime startDate;
+            if (latestSplitDate.HasValue)
+            {
+                // If splits exist, start from day after latest split
+                startDate = latestSplitDate.Value.AddDays(1);
+            }
+            else
+            {
+                // If no splits exist, start from earliest price data in database
+                var earliestPriceDate = await context.DailyPrices
+                                                     .MinAsync(p => (DateTime?)p.Date);
+
+                // Default to 1990-01-01 if no price data exists either
+                startDate = earliestPriceDate ?? new DateTime(1990, 1, 1);
+                Console.WriteLine($"No splits found in database. Starting from earliest price data: {startDate:yyyy-MM-dd}");
+            }
+
             var endDate = DateTime.Now;
 
             if (startDate > endDate)

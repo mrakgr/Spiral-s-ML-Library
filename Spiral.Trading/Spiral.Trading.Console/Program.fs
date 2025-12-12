@@ -33,6 +33,7 @@ type Arguments =
     | Download_Bulk of ParseResults<BulkDownloadArgs>
     | Ingest_Data
     | Download_Splits
+    | Clear_Splits
     | Plot of ParseResults<PlotArgs>
 
     interface IArgParserTemplate with
@@ -41,6 +42,7 @@ type Arguments =
             | Download_Bulk _ -> "Download daily aggregate files from S3 to disk."
             | Ingest_Data -> "Ingest downloaded CSV files into SQLite database."
             | Download_Splits -> "Download stock splits from Polygon API to Database."
+            | Clear_Splits -> "Clear all splits from the database."
             | Plot _ -> "Generate a candlestick chart for a ticker."
 
 [<EntryPoint>]
@@ -83,6 +85,11 @@ let main argv =
                 ensureDb ()
                 let ingestor = DataIngestor(dbPath)
                 ingestor.SyncSplitsFromPolygonBulkAsync(apiKey).GetAwaiter().GetResult()
+
+            | Clear_Splits ->
+                ensureDb ()
+                let ingestor = DataIngestor(dbPath)
+                ingestor.ClearSplitsAsync().GetAwaiter().GetResult()
 
             | Download_Bulk args ->
                 let struct (_, s3Access, s3Secret) = loadKeys ()
