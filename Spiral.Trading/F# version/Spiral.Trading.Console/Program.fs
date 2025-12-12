@@ -59,7 +59,7 @@ let private handleDownloadBulk (config: MassiveConfig) (args: ParseResults<Downl
         |> Option.map DateTime.Parse
         |> Option.defaultValue (endDate.AddYears(-5))
 
-    let parallelism = args.GetResult(DownloadBulkArgs.Parallelism, defaultValue = 8)
+    let parallelism = args.GetResult(DownloadBulkArgs.Parallelism, defaultValue = 30)
     let outputDir = "data/daily_aggregates"
 
     printfn "Downloading daily aggregates from %s to %s" (formatDate startDate) (formatDate endDate)
