@@ -213,38 +213,42 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     use connection = openConnection dbPath
     initializeSchema connection
 
-    // Ingest daily prices from CSV files
-    if Directory.Exists csvDir then
-        let files = Directory.GetFiles(csvDir, "*.csv.gz")
-        printfn "Found %d CSV files to ingest" files.Length
+    printfn "Applying bulk load optimizations..."
+    withBulkLoadOptimizations connection (fun () ->
+        // Ingest daily prices from CSV files
+        if Directory.Exists csvDir then
+            let files = Directory.GetFiles(csvDir, "*.csv.gz")
+            printfn "Found %d CSV files to ingest" files.Length
 
-        let mutable totalPrices = 0
-        let mutable filesProcessed = 0
+            let mutable totalPrices = 0
+            let mutable filesProcessed = 0
 
-        for filePath in files do
-            let result, prices = parseGzipFileWithResult filePath
-            match result.Error with
-            | Some err ->
-                printfn "  [%d/%d] %s: Error - %s" (filesProcessed + 1) files.Length result.FileName err
-            | None ->
-                let inserted = upsertDailyPrices connection prices
-                totalPrices <- totalPrices + prices.Length
-                filesProcessed <- filesProcessed + 1
-                printfn "  [%d/%d] %s: %d prices" filesProcessed files.Length result.FileName prices.Length
+            for filePath in files do
+                let result, prices = parseGzipFileWithResult filePath
+                match result.Error with
+                | Some err ->
+                    printfn "  [%d/%d] %s: Error - %s" (filesProcessed + 1) files.Length result.FileName err
+                | None ->
+                    let inserted = upsertDailyPrices connection prices
+                    totalPrices <- totalPrices + prices.Length
+                    filesProcessed <- filesProcessed + 1
+                    printfn "  [%d/%d] %s: %d prices" filesProcessed files.Length result.FileName prices.Length
 
-        printfn ""
-        printfn "Ingested %d daily prices from %d files" totalPrices filesProcessed
-    else
-        printfn "CSV directory not found: %s" csvDir
+            printfn ""
+            printfn "Ingested %d daily prices from %d files" totalPrices filesProcessed
+        else
+            printfn "CSV directory not found: %s" csvDir
 
-    // Ingest splits from JSON file
-    if File.Exists splitsFile then
-        let json = File.ReadAllText splitsFile
-        let splits = System.Text.Json.JsonSerializer.Deserialize<Split array>(json)
-        let inserted = upsertSplits connection splits
-        printfn "Ingested %d splits" splits.Length
-    else
-        printfn "Splits file not found: %s" splitsFile
+        // Ingest splits from JSON file
+        if File.Exists splitsFile then
+            let json = File.ReadAllText splitsFile
+            let splits = System.Text.Json.JsonSerializer.Deserialize<Split array>(json)
+            let inserted = upsertSplits connection splits
+            printfn "Ingested %d splits" splits.Length
+        else
+            printfn "Splits file not found: %s" splitsFile
+    )
+    printfn "Indexes recreated."
 
     // Show summary
     printfn ""
