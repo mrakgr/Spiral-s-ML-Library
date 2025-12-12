@@ -63,10 +63,12 @@ let initializeSchema (connection: IDbConnection) : unit =
     let dailyPricesSql = loadEmbeddedSql "daily_prices.sql"
     let splitsSql = loadEmbeddedSql "splits.sql"
     let processedFilesSql = loadEmbeddedSql "processed_files.sql"
+    let splitAdjustedPricesSql = loadEmbeddedSql "split_adjusted_prices.sql"
 
     connection.Execute(dailyPricesSql) |> ignore
     connection.Execute(splitsSql) |> ignore
     connection.Execute(processedFilesSql) |> ignore
+    connection.Execute(splitAdjustedPricesSql) |> ignore
 
 /// Apply PRAGMA optimizations for bulk loading
 let applyBulkLoadPragmas (connection: IDbConnection) : unit =
@@ -290,40 +292,11 @@ let getSplitsByTicker (connection: IDbConnection) (ticker: string) : Split array
     })
     |> Seq.toArray
 
-/// Get split-adjusted daily prices for a specific ticker using SQL
+/// Get split-adjusted daily prices for a specific ticker using the split_adjusted_prices view
 let getSplitAdjustedPricesByTicker (connection: IDbConnection) (ticker: string) : SplitAdjustedPriceRow array =
-    let sql = """
-        WITH split_adjusted AS (
-            SELECT 
-                dp.ticker,
-                dp.date,
-                dp.open,
-                dp.high,
-                dp.low,
-                dp.close,
-                dp.volume,
-                COALESCE(
-                    (SELECT EXP(SUM(LOG(s.split_ratio)))
-                     FROM splits s
-                     WHERE s.ticker = dp.ticker
-                     AND s.execution_date > dp.date),
-                    1.0
-                ) AS adj_factor
-            FROM daily_prices dp
-            WHERE dp.ticker = @ticker
-        )
-        SELECT
-            ticker,
-            date,
-            open / adj_factor AS adj_open,
-            high / adj_factor AS adj_high,
-            low / adj_factor AS adj_low,
-            close / adj_factor AS adj_close,
-            CAST(volume * adj_factor AS INTEGER) AS adj_volume
-        FROM split_adjusted
-        ORDER BY date
-    """
-    connection.Query<SplitAdjustedPriceRow>(sql, {| ticker = ticker |})
+    connection.Query<SplitAdjustedPriceRow>(
+        "SELECT ticker, date, adj_open, adj_high, adj_low, adj_close, adj_volume FROM split_adjusted_prices WHERE ticker = @ticker ORDER BY date",
+        {| ticker = ticker |})
     |> Seq.toArray
 
 // --- Processed Files Tracking ---

@@ -130,6 +130,40 @@ dotnet run --project Spiral.Trading.Console -- ingest-data -d /path/to/custom.db
 - Tracks processed CSV files to avoid re-ingesting on subsequent runs
 - Uses prepared statements and bulk load optimizations for fast ingestion
 - Upserts splits (inserts new, updates existing) on each run
+- Creates a `split_adjusted_prices` SQL view for efficient split-adjusted queries
+
+### Plot Chart
+
+Generates an interactive candlestick chart with volume for a given ticker.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- plot-chart [options]
+```
+
+**Options:**
+- `-t, --ticker <symbol>` - Stock ticker symbol (required)
+- `-d, --database <path>` - SQLite database path (default: data/trading.db)
+- `-o, --output <path>` - Output HTML file path (default: data/{ticker}_chart.html)
+- `-w, --width <int>` - Chart width in pixels (default: 1200)
+- `-h, --height <int>` - Chart height in pixels (default: 900)
+
+**Examples:**
+
+```bash
+# Plot NVDA chart
+dotnet run --project Spiral.Trading.Console -- plot-chart -t NVDA
+
+# Plot with custom output path
+dotnet run --project Spiral.Trading.Console -- plot-chart -t AAPL -o charts/apple.html
+
+# Plot with custom dimensions
+dotnet run --project Spiral.Trading.Console -- plot-chart -t MSFT -w 1600 -h 1000
+```
+
+**Features:**
+- Split-adjusted prices calculated via SQL view
+- Interactive candlestick chart with volume bars
+- Output as standalone HTML file (uses Plotly.js)
 
 ## Project Structure
 
@@ -142,10 +176,12 @@ F# version/
 │   ├── SplitDownload.fs         # Splits API client
 │   ├── CsvParsing.fs            # CSV parsing with FSharp.Data
 │   ├── Database.fs              # SQLite database operations
+│   ├── Plotting.fs              # Chart generation with XPlot.Plotly
 │   └── sql/schema/              # SQL schema files
 │       ├── daily_prices.sql
 │       ├── splits.sql
-│       └── processed_files.sql
+│       ├── processed_files.sql
+│       └── split_adjusted_prices.sql
 ├── Spiral.Trading.Console/      # CLI application
 │   └── Program.fs
 ├── api_key.json                 # API credentials (not in git)
