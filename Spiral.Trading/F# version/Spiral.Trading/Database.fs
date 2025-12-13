@@ -183,6 +183,37 @@ let ingestDailyPricesFromCsvGz (connection: IDbConnection) (filePath: string) : 
     """
     connection.Execute(sql) |> int64
 
+/// Bulk ingest daily prices from multiple .csv.gz files at once using glob pattern
+let ingestDailyPricesFromGlob (connection: IDbConnection) (globPattern: string) : int64 =
+    let sql = $"""
+        INSERT INTO daily_prices (ticker, date, open, high, low, close, volume, transactions)
+        SELECT 
+            ticker,
+            (epoch_ms(0) + to_milliseconds(window_start / 1000000))::DATE as date,
+            open, high, low, close, volume, transactions
+        FROM read_csv('{globPattern}',
+            columns = {{
+                'ticker': 'VARCHAR',
+                'volume': 'BIGINT',
+                'open': 'DOUBLE',
+                'close': 'DOUBLE',
+                'high': 'DOUBLE',
+                'low': 'DOUBLE',
+                'window_start': 'BIGINT',
+                'transactions': 'BIGINT'
+            }},
+            header = true
+        )
+        ON CONFLICT(ticker, date) DO UPDATE SET
+            open = excluded.open,
+            high = excluded.high,
+            low = excluded.low,
+            close = excluded.close,
+            volume = excluded.volume,
+            transactions = excluded.transactions
+    """
+    connection.Execute(sql) |> int64
+
 /// Convert Split to Dapper DynamicParameters
 let private toSplitParams (split: Split) : DynamicParameters =
     let p = DynamicParameters()
@@ -252,12 +283,17 @@ let getTickers (connection: IDbConnection) : string array =
 
 /// Get date range for daily prices
 let getDateRange (connection: IDbConnection) : (DateTime * DateTime) option =
-    let minDate = connection.ExecuteScalar<string>("SELECT MIN(date) FROM daily_prices WHERE date IS NOT NULL")
-    let maxDate = connection.ExecuteScalar<string>("SELECT MAX(date) FROM daily_prices WHERE date IS NOT NULL")
-    if String.IsNullOrEmpty(minDate) || String.IsNullOrEmpty(maxDate) then
+    let minDate = connection.ExecuteScalar<obj>("SELECT MIN(date) FROM daily_prices WHERE date IS NOT NULL")
+    let maxDate = connection.ExecuteScalar<obj>("SELECT MAX(date) FROM daily_prices WHERE date IS NOT NULL")
+    if isNull minDate || isNull maxDate then
         None
     else
-        Some (DateTime.Parse(minDate), DateTime.Parse(maxDate))
+        let toDateTime (o: obj) =
+            match o with
+            | :? DateOnly as d -> d.ToDateTime(TimeOnly.MinValue)
+            | :? DateTime as d -> d
+            | _ -> Convert.ToDateTime(o)
+        Some (toDateTime minDate, toDateTime maxDate)
 
 /// Get daily prices for a specific ticker, ordered by date
 let getDailyPricesByTicker (connection: IDbConnection) (ticker: string) : DailyPrice array =

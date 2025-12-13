@@ -236,19 +236,24 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     let processedFiles = getProcessedFiles connection
     printfn "Already processed: %d files" processedFiles.Count
 
-    // Ingest daily prices from CSV files using DuckDB's native CSV reader
+    // Ingest daily prices from CSV files using DuckDB's native CSV reader with glob
     if Directory.Exists csvDir then
         let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
-        let newFileCount = allFiles.Length - processedFiles.Count
-        printfn "Found %d CSV files (%d new to ingest)" allFiles.Length newFileCount
+        printfn "Found %d CSV files" allFiles.Length
 
-        let progress completed total fileName rows =
-            printfn "  [%d/%d] %s: %d prices" completed total fileName rows
+        let globPattern = Path.Combine(csvDir, "*.csv.gz")
+        printfn "Bulk loading from: %s" globPattern
+        
+        let countBefore = getDailyPriceCount connection
+        let _ = ingestDailyPricesFromGlob connection globPattern
+        let countAfter = getDailyPriceCount connection
+        let totalPrices = countAfter - countBefore
 
-        let totalPrices = ingestDailyPricesFromDirectory connection csvDir progress
+        // Mark all files as processed
+        let fileNames = allFiles |> Array.map Path.GetFileName
+        markFilesProcessed connection fileNames
 
-        printfn ""
-        printfn "Ingested %d daily prices from %d files" totalPrices newFileCount
+        printfn "Ingested %d new daily prices (total: %d)" totalPrices countAfter
     else
         printfn "CSV directory not found: %s" csvDir
 
