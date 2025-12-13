@@ -78,10 +78,10 @@ let initializeSchema (connection: IDbConnection) : unit =
             connection.Execute(sql) |> ignore
     
     // Execute all table schemas first
-    executeSql "sql/schema/tables"
+    executeSql "sql.schema.tables"
     
     // Execute all view schemas
-    executeSql "sql/schema/views"
+    executeSql "sql.schema.views"
 
 /// Apply PRAGMA optimizations for bulk loading
 let applyBulkLoadPragmas (connection: IDbConnection) : unit =
@@ -324,3 +324,20 @@ let markFilesProcessed (connection: IDbConnection) (fileNames: string seq) : uni
         cmd.ExecuteNonQuery() |> ignore
     
     transaction.Commit()
+
+// --- DOM Indicator ---
+
+[<CLIMutable>]
+type DomIndicatorRow = {
+    date: string
+    avg_leader_return: float
+    avg_laggard_return: float
+    n_leaders: int64
+    n_laggards: int64
+    dom_contribution: float
+}
+
+/// Get DOM indicator data
+let getDomIndicator (connection: IDbConnection) : DomIndicatorRow array =
+    connection.Query<DomIndicatorRow>("SELECT * FROM dom_indicator ORDER BY date")
+    |> Seq.toArray

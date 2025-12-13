@@ -15,15 +15,17 @@ JOIN spy_dates s2
     ON s2.date = (
         SELECT MIN(date) 
         FROM spy_dates 
-        WHERE date >= DATE(s1.date, '-26 weeks')
-        -- The -25 weeks condition ensures we have at least 25 weeks of historical data.
+        -- 26 weeks = 182 days, 25 weeks = 175 days
+        WHERE date >= DATE(s1.date, '-182 days')
+        -- The -175 days condition ensures we have at least 25 weeks of historical data.
         -- This filters out the first ~6 months of the dataset where 26w lookback isn't possible.
         -- Safe assumption: US markets never close for more than 1 week consecutively.
-        AND date < DATE(s1.date, '-25 weeks')
+        AND date < DATE(s1.date, '-175 days')
     )
 JOIN spy_dates s3 
     ON s3.date = (
         SELECT MIN(date) 
         FROM spy_dates 
-        WHERE date >= DATE(s1.date, '-4 weeks')
+        -- 4 weeks = 28 days
+        WHERE date >= DATE(s1.date, '-28 days')
     );
