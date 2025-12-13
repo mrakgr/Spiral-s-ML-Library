@@ -1,6 +1,4 @@
-DROP TABLE IF EXISTS stock_momentum_ranking;
-DROP VIEW IF EXISTS stock_momentum_ranking;
-CREATE TABLE stock_momentum_ranking (
+CREATE TABLE IF NOT EXISTS stock_momentum_ranking (
     ticker TEXT NOT NULL,
     date TEXT NOT NULL,
     adj_close REAL,
@@ -11,5 +9,5 @@ CREATE TABLE stock_momentum_ranking (
     PRIMARY KEY (ticker, date)
 );
 
-CREATE INDEX idx_smr_date ON stock_momentum_ranking(date);
-CREATE INDEX idx_smr_momentum_rank ON stock_momentum_ranking(date, momentum_rank);
+CREATE INDEX IF NOT EXISTS idx_smr_date ON stock_momentum_ranking(date);
+CREATE INDEX IF NOT EXISTS idx_smr_momentum_rank ON stock_momentum_ranking(date, momentum_rank);
