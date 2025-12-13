@@ -2,6 +2,7 @@ module Spiral.Trading.Database
 
 open System
 open System.Data
+open System.Diagnostics
 open System.IO
 open System.Reflection
 open Dapper
@@ -344,6 +345,31 @@ let getDomIndicator (connection: IDbConnection) : DomIndicatorRow array =
 
 // --- Materialized Table Refresh ---
 
+let private refreshSplitAdjustmentFactorsSql = """
+    DELETE FROM split_adjustment_factors;
+    INSERT INTO split_adjustment_factors (ticker, date, adj_factor)
+    SELECT
+        dp.ticker,
+        dp.date,
+        COALESCE(
+            (SELECT EXP(SUM(LN(s.split_ratio)))
+             FROM splits s
+             WHERE s.ticker = dp.ticker
+             AND s.execution_date > dp.date),
+            1.0
+        ) AS adj_factor
+    FROM daily_prices dp;
+"""
+
+/// Refresh the split_adjustment_factors materialized table
+let refreshSplitAdjustmentFactors (connection: IDbConnection) : unit =
+    printfn "Refreshing split_adjustment_factors..."
+    let sw = Stopwatch.StartNew()
+    connection.Execute(refreshSplitAdjustmentFactorsSql) |> ignore
+    sw.Stop()
+    let count = connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM split_adjustment_factors")
+    printfn "  Inserted %d rows in %.2f seconds" count sw.Elapsed.TotalSeconds
+
 let private refreshStockDollarVolume4wSql = """
     DELETE FROM stock_dollar_volume_4w;
     INSERT INTO stock_dollar_volume_4w (ticker, date, total_dollar_volume, trading_days, avg_dollar_volume_4w)
@@ -405,20 +431,27 @@ let private refreshStockMomentumRankingSql = """
 /// Refresh the stock_dollar_volume_4w materialized table
 let refreshStockDollarVolume4w (connection: IDbConnection) : unit =
     printfn "Refreshing stock_dollar_volume_4w..."
+    let sw = Stopwatch.StartNew()
     connection.Execute(refreshStockDollarVolume4wSql) |> ignore
+    sw.Stop()
     let count = connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM stock_dollar_volume_4w")
-    printfn "  Inserted %d rows" count
+    printfn "  Inserted %d rows in %.2f seconds" count sw.Elapsed.TotalSeconds
 
 /// Refresh the stock_momentum_ranking materialized table
 let refreshStockMomentumRanking (connection: IDbConnection) : unit =
     printfn "Refreshing stock_momentum_ranking..."
+    let sw = Stopwatch.StartNew()
     connection.Execute(refreshStockMomentumRankingSql) |> ignore
+    sw.Stop()
     let count = connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM stock_momentum_ranking")
-    printfn "  Inserted %d rows" count
+    printfn "  Inserted %d rows in %.2f seconds" count sw.Elapsed.TotalSeconds
 
 /// Refresh all materialized tables in the correct order
 let refreshMaterializedTables (connection: IDbConnection) : unit =
     printfn "Refreshing materialized tables..."
+    let sw = Stopwatch.StartNew()
+    refreshSplitAdjustmentFactors connection
     refreshStockDollarVolume4w connection
     refreshStockMomentumRanking connection
-    printfn "Done."
+    sw.Stop()
+    printfn "Done. Total time: %.2f seconds" sw.Elapsed.TotalSeconds
