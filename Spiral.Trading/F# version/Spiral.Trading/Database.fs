@@ -341,3 +341,84 @@ type DomIndicatorRow = {
 let getDomIndicator (connection: IDbConnection) : DomIndicatorRow array =
     connection.Query<DomIndicatorRow>("SELECT * FROM dom_indicator ORDER BY date")
     |> Seq.toArray
+
+// --- Materialized Table Refresh ---
+
+let private refreshStockDollarVolume4wSql = """
+    DELETE FROM stock_dollar_volume_4w;
+    INSERT INTO stock_dollar_volume_4w (ticker, date, total_dollar_volume, trading_days, avg_dollar_volume_4w)
+    SELECT 
+        ticker,
+        date,
+        total_dollar_volume,
+        trading_days,
+        total_dollar_volume / trading_days AS avg_dollar_volume_4w
+    FROM (
+        SELECT 
+            p.ticker,
+            tc.current_date AS date,
+            (
+                SELECT SUM(p2.adj_close * p2.adj_volume)
+                FROM split_adjusted_prices p2
+                WHERE p2.ticker = p.ticker
+                AND p2.date >= tc.date_4w_ago
+                AND p2.date <= tc.current_date
+            ) AS total_dollar_volume,
+            (
+                SELECT COUNT(*)
+                FROM split_adjusted_prices p2
+                WHERE p2.ticker = p.ticker
+                AND p2.date >= tc.date_4w_ago
+                AND p2.date <= tc.current_date
+            ) AS trading_days
+        FROM split_adjusted_prices p
+        JOIN trading_calendar tc ON p.date = tc.current_date
+    );
+"""
+
+let private refreshStockMomentumRankingSql = """
+    DELETE FROM stock_momentum_ranking;
+    INSERT INTO stock_momentum_ranking (ticker, date, adj_close, momentum_26w, avg_dollar_volume_4w, momentum_rank, total_stocks)
+    SELECT 
+        ticker,
+        date,
+        adj_close,
+        momentum_26w,
+        avg_dollar_volume_4w,
+        RANK() OVER (PARTITION BY date ORDER BY momentum_26w DESC) AS momentum_rank,
+        COUNT(*) OVER (PARTITION BY date) AS total_stocks
+    FROM (
+        SELECT 
+            m.ticker,
+            m.date,
+            m.adj_close,
+            m.momentum_26w,
+            v.avg_dollar_volume_4w
+        FROM stock_momentum_26w m
+        JOIN stock_dollar_volume_4w v 
+            ON v.ticker = m.ticker 
+            AND v.date = m.date
+        WHERE v.avg_dollar_volume_4w >= 100000000
+    );
+"""
+
+/// Refresh the stock_dollar_volume_4w materialized table
+let refreshStockDollarVolume4w (connection: IDbConnection) : unit =
+    printfn "Refreshing stock_dollar_volume_4w..."
+    connection.Execute(refreshStockDollarVolume4wSql) |> ignore
+    let count = connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM stock_dollar_volume_4w")
+    printfn "  Inserted %d rows" count
+
+/// Refresh the stock_momentum_ranking materialized table
+let refreshStockMomentumRanking (connection: IDbConnection) : unit =
+    printfn "Refreshing stock_momentum_ranking..."
+    connection.Execute(refreshStockMomentumRankingSql) |> ignore
+    let count = connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM stock_momentum_ranking")
+    printfn "  Inserted %d rows" count
+
+/// Refresh all materialized tables in the correct order
+let refreshMaterializedTables (connection: IDbConnection) : unit =
+    printfn "Refreshing materialized tables..."
+    refreshStockDollarVolume4w connection
+    refreshStockMomentumRanking connection
+    printfn "Done."

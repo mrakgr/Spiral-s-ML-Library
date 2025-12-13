@@ -42,7 +42,7 @@ SELECT
     n_laggards,
     CASE 
         WHEN avg_leader_return > avg_laggard_return THEN avg_leader_return + avg_laggard_return
-        ELSE 0
+        ELSE 0.0
     END AS dom_contribution
 FROM leader_laggard_returns
 WHERE avg_leader_return IS NOT NULL 
