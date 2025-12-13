@@ -5,17 +5,17 @@ open System.Data
 open System.IO
 open System.Reflection
 open Dapper
-open Microsoft.Data.Sqlite
+open DuckDB.NET.Data
 
-// Row types for Dapper mapping (matches SQLite column names)
+// Row types for Dapper mapping (matches DuckDB column names)
 [<CLIMutable>]
 type DailyPriceRow = {
     ticker: string
     date: string
-    ``open``: float
-    high: float
-    low: float
-    close: float
+    ``open``: decimal
+    high: decimal
+    low: decimal
+    close: decimal
     volume: int64
     transactions: int64
 }
@@ -33,10 +33,10 @@ type SplitRow = {
 type SplitAdjustedPriceRow = {
     ticker: string
     date: string
-    adj_open: float
-    adj_high: float
-    adj_low: float
-    adj_close: float
+    adj_open: decimal
+    adj_high: decimal
+    adj_low: decimal
+    adj_close: decimal
     adj_volume: int64
 }
 
@@ -58,10 +58,10 @@ let private getEmbeddedSqlFromFolder (folderName: string) : string array =
     |> Array.filter (fun n -> n.Contains(folderName) && n.EndsWith(".sql"))
     |> Array.sort
 
-/// Create and open a SQLite connection
-let openConnection (dbPath: string) : SqliteConnection =
+/// Create and open a DuckDB connection
+let openConnection (dbPath: string) : DuckDBConnection =
     let connectionString = $"Data Source={dbPath}"
-    let connection = new SqliteConnection(connectionString)
+    let connection = new DuckDBConnection(connectionString)
     connection.Open()
     connection
 
@@ -83,49 +83,8 @@ let initializeSchema (connection: IDbConnection) : unit =
     // Execute all view schemas
     executeSql "sql.schema.views"
 
-/// Apply PRAGMA optimizations for bulk loading
-let applyBulkLoadPragmas (connection: IDbConnection) : unit =
-    connection.Execute("PRAGMA synchronous = OFF") |> ignore
-    connection.Execute("PRAGMA journal_mode = MEMORY") |> ignore
-    connection.Execute("PRAGMA temp_store = MEMORY") |> ignore
-    connection.Execute("PRAGMA cache_size = -64000") |> ignore // 64MB cache
-
-/// Restore default PRAGMA settings after bulk loading
-let restoreDefaultPragmas (connection: IDbConnection) : unit =
-    connection.Execute("PRAGMA synchronous = FULL") |> ignore
-    connection.Execute("PRAGMA journal_mode = DELETE") |> ignore
-    connection.Execute("PRAGMA temp_store = DEFAULT") |> ignore
-    connection.Execute("PRAGMA cache_size = -2000") |> ignore // Default ~2MB
-
-/// Drop all indexes for bulk loading performance
-let dropIndexes (connection: IDbConnection) : unit =
-    connection.Execute("DROP INDEX IF EXISTS idx_daily_prices_ticker") |> ignore
-    connection.Execute("DROP INDEX IF EXISTS idx_daily_prices_date") |> ignore
-    connection.Execute("DROP INDEX IF EXISTS idx_daily_prices_ticker_date") |> ignore
-    connection.Execute("DROP INDEX IF EXISTS idx_splits_ticker") |> ignore
-    connection.Execute("DROP INDEX IF EXISTS idx_splits_execution_date") |> ignore
-
-/// Recreate all indexes after bulk loading
-let recreateIndexes (connection: IDbConnection) : unit =
-    connection.Execute("CREATE INDEX IF NOT EXISTS idx_daily_prices_ticker ON daily_prices(ticker)") |> ignore
-    connection.Execute("CREATE INDEX IF NOT EXISTS idx_daily_prices_date ON daily_prices(date)") |> ignore
-    connection.Execute("CREATE INDEX IF NOT EXISTS idx_daily_prices_ticker_date ON daily_prices(ticker, date)") |> ignore
-    connection.Execute("CREATE INDEX IF NOT EXISTS idx_splits_ticker ON splits(ticker)") |> ignore
-    connection.Execute("CREATE INDEX IF NOT EXISTS idx_splits_execution_date ON splits(execution_date)") |> ignore
-
-/// Execute a bulk load operation with optimized settings
-let withBulkLoadOptimizations (connection: IDbConnection) (operation: unit -> 'a) : 'a =
-    applyBulkLoadPragmas connection
-    dropIndexes connection
-    try
-        let result = operation ()
-        recreateIndexes connection
-        restoreDefaultPragmas connection
-        result
-    with ex ->
-        recreateIndexes connection
-        restoreDefaultPragmas connection
-        reraise ()
+// Note: DuckDB is columnar and optimized for bulk loads by default.
+// No PRAGMA statements or index manipulation needed.
 
 /// Convert DailyPrice to Dapper DynamicParameters
 let private toDailyPriceParams (price: DailyPrice) : DynamicParameters =
@@ -142,7 +101,7 @@ let private toDailyPriceParams (price: DailyPrice) : DynamicParameters =
 
 let private dailyPriceUpsertSql = """
     INSERT INTO daily_prices (ticker, date, open, high, low, close, volume, transactions)
-    VALUES (@ticker, @date, @open, @high, @low, @close, @volume, @transactions)
+    VALUES ($ticker, $date, $open, $high, $low, $close, $volume, $transactions)
     ON CONFLICT(ticker, date) DO UPDATE SET
         open = excluded.open,
         high = excluded.high,
@@ -157,28 +116,36 @@ let upsertDailyPrice (connection: IDbConnection) (price: DailyPrice) : int =
     connection.Execute(dailyPriceUpsertSql, toDailyPriceParams price)
 
 /// Insert or update multiple daily price records
-let upsertDailyPrices (sqliteConn : SqliteConnection) (prices: DailyPrice array) : int =
-   use transaction = sqliteConn.BeginTransaction()
-   use cmd = sqliteConn.CreateCommand()
+let upsertDailyPrices (duckDbConn : DuckDBConnection) (prices: DailyPrice array) : int =
+   use transaction = duckDbConn.BeginTransaction()
+   use cmd = duckDbConn.CreateCommand()
    cmd.Transaction <- transaction
    cmd.CommandText <- dailyPriceUpsertSql
-   let pTicker = cmd.Parameters.Add("@ticker", SqliteType.Text)
-   let pDate = cmd.Parameters.Add("@date", SqliteType.Text)
-   let pOpen = cmd.Parameters.Add("@open", SqliteType.Real)
-   let pHigh = cmd.Parameters.Add("@high", SqliteType.Real)
-   let pLow = cmd.Parameters.Add("@low", SqliteType.Real)
-   let pClose = cmd.Parameters.Add("@close", SqliteType.Real)
-   let pVolume = cmd.Parameters.Add("@volume", SqliteType.Integer)
-   let pTransactions = cmd.Parameters.Add("@transactions", SqliteType.Integer)
-   
+   let pTicker = new DuckDBParameter("ticker", null)
+   let pDate = new DuckDBParameter("date", null)
+   let pOpen = new DuckDBParameter("open", null)
+   let pHigh = new DuckDBParameter("high", null)
+   let pLow = new DuckDBParameter("low", null)
+   let pClose = new DuckDBParameter("close", null)
+   let pVolume = new DuckDBParameter("volume", null)
+   let pTransactions = new DuckDBParameter("transactions", null)
+   cmd.Parameters.Add(pTicker) |> ignore
+   cmd.Parameters.Add(pDate) |> ignore
+   cmd.Parameters.Add(pOpen) |> ignore
+   cmd.Parameters.Add(pHigh) |> ignore
+   cmd.Parameters.Add(pLow) |> ignore
+   cmd.Parameters.Add(pClose) |> ignore
+   cmd.Parameters.Add(pVolume) |> ignore
+   cmd.Parameters.Add(pTransactions) |> ignore
+
    let mutable count = 0
    for price in prices do
        pTicker.Value <- price.Ticker
        pDate.Value <- price.Date.ToString("yyyy-MM-dd")
-       pOpen.Value <- float price.Open
-       pHigh.Value <- float price.High
-       pLow.Value <- float price.Low
-       pClose.Value <- float price.Close
+       pOpen.Value <- price.Open
+       pHigh.Value <- price.High
+       pLow.Value <- price.Low
+       pClose.Value <- price.Close
        pVolume.Value <- price.Volume
        pTransactions.Value <- price.Transactions
        count <- count + cmd.ExecuteNonQuery()
@@ -197,7 +164,7 @@ let private toSplitParams (split: Split) : DynamicParameters =
 
 let private splitUpsertSql = """
     INSERT INTO splits (ticker, execution_date, split_from, split_to, split_ratio)
-    VALUES (@ticker, @execution_date, @split_from, @split_to, @split_ratio)
+    VALUES ($ticker, $execution_date, $split_from, $split_to, $split_ratio)
     ON CONFLICT(ticker, execution_date) DO UPDATE SET
         split_from = excluded.split_from,
         split_to = excluded.split_to,
@@ -210,17 +177,22 @@ let upsertSplit (connection: IDbConnection) (split: Split) : int =
 
 /// Insert or update multiple split records using prepared statement
 let upsertSplits (connection: IDbConnection) (splits: Split array) : int =
-    let sqliteConn = connection :?> SqliteConnection
-    use transaction = sqliteConn.BeginTransaction()
-    use cmd = sqliteConn.CreateCommand()
+    let duckDbConn = connection :?> DuckDBConnection
+    use transaction = duckDbConn.BeginTransaction()
+    use cmd = duckDbConn.CreateCommand()
     cmd.Transaction <- transaction
     cmd.CommandText <- splitUpsertSql
 
-    let pTicker = cmd.Parameters.Add("@ticker", SqliteType.Text)
-    let pExecutionDate = cmd.Parameters.Add("@execution_date", SqliteType.Text)
-    let pSplitFrom = cmd.Parameters.Add("@split_from", SqliteType.Real)
-    let pSplitTo = cmd.Parameters.Add("@split_to", SqliteType.Real)
-    let pSplitRatio = cmd.Parameters.Add("@split_ratio", SqliteType.Real)
+    let pTicker = new DuckDBParameter("ticker", null)
+    let pExecutionDate = new DuckDBParameter("execution_date", null)
+    let pSplitFrom = new DuckDBParameter("split_from", null)
+    let pSplitTo = new DuckDBParameter("split_to", null)
+    let pSplitRatio = new DuckDBParameter("split_ratio", null)
+    cmd.Parameters.Add(pTicker) |> ignore
+    cmd.Parameters.Add(pExecutionDate) |> ignore
+    cmd.Parameters.Add(pSplitFrom) |> ignore
+    cmd.Parameters.Add(pSplitTo) |> ignore
+    cmd.Parameters.Add(pSplitRatio) |> ignore
 
     let mutable count = 0
     for split in splits do
@@ -264,10 +236,10 @@ let getDailyPricesByTicker (connection: IDbConnection) (ticker: string) : DailyP
     |> Seq.map (fun row -> {
         Ticker = row.ticker
         Date = DateTime.Parse(row.date)
-        Open = decimal row.``open``
-        High = decimal row.high
-        Low = decimal row.low
-        Close = decimal row.close
+        Open = row.``open``
+        High = row.high
+        Low = row.low
+        Close = row.close
         Volume = row.volume
         Transactions = row.transactions
     })
@@ -304,25 +276,27 @@ let getProcessedFiles (connection: IDbConnection) : Set<string> =
 /// Mark a file as processed
 let markFileProcessed (connection: IDbConnection) (fileName: string) : unit =
     connection.Execute(
-        "INSERT OR IGNORE INTO processed_files (file_name, ingested_at) VALUES (@fileName, @ingestedAt)",
+        "INSERT INTO processed_files (file_name, ingested_at) VALUES ($fileName, $ingestedAt) ON CONFLICT DO NOTHING",
         {| fileName = fileName; ingestedAt = DateTime.UtcNow.ToString("o") |}) |> ignore
 
 /// Mark multiple files as processed
 let markFilesProcessed (connection: IDbConnection) (fileNames: string seq) : unit =
-    let sqliteConn = connection :?> SqliteConnection
-    use transaction = sqliteConn.BeginTransaction()
-    use cmd = sqliteConn.CreateCommand()
+    let duckDbConn = connection :?> DuckDBConnection
+    use transaction = duckDbConn.BeginTransaction()
+    use cmd = duckDbConn.CreateCommand()
     cmd.Transaction <- transaction
-    cmd.CommandText <- "INSERT OR IGNORE INTO processed_files (file_name, ingested_at) VALUES (@fileName, @ingestedAt)"
-    let pFileName = cmd.Parameters.Add("@fileName", SqliteType.Text)
-    let pIngestedAt = cmd.Parameters.Add("@ingestedAt", SqliteType.Text)
+    cmd.CommandText <- "INSERT INTO processed_files (file_name, ingested_at) VALUES ($fileName, $ingestedAt) ON CONFLICT DO NOTHING"
+    let pFileName = new DuckDBParameter("fileName", null)
+    let pIngestedAt = new DuckDBParameter("ingestedAt", null)
+    cmd.Parameters.Add(pFileName) |> ignore
+    cmd.Parameters.Add(pIngestedAt) |> ignore
     let now = DateTime.UtcNow.ToString("o")
-    
+
     for fileName in fileNames do
         pFileName.Value <- fileName
         pIngestedAt.Value <- now
         cmd.ExecuteNonQuery() |> ignore
-    
+
     transaction.Commit()
 
 // --- DOM Indicator ---

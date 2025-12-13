@@ -236,47 +236,46 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     let processedFiles = getProcessedFiles connection
     printfn "Already processed: %d files" processedFiles.Count
 
-    printfn "Applying bulk load optimizations..."
-    withBulkLoadOptimizations connection (fun () ->
-        // Ingest daily prices from CSV files
-        if Directory.Exists csvDir then
-            let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
-            let filesToProcess = 
-                allFiles 
-                |> Array.filter (fun f -> not (processedFiles.Contains(Path.GetFileName(f))))
-            
-            printfn "Found %d CSV files (%d new to ingest)" allFiles.Length filesToProcess.Length
+    // DuckDB is optimized for bulk loads by default - no special setup needed
+    // Ingest daily prices from CSV files
+    if Directory.Exists csvDir then
+        let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
+        let filesToProcess =
+            allFiles
+            |> Array.filter (fun f -> not (processedFiles.Contains(Path.GetFileName(f))))
 
-            let mutable totalPrices = 0
-            let mutable filesProcessed = 0
+        printfn "Found %d CSV files (%d new to ingest)" allFiles.Length filesToProcess.Length
 
-            for filePath in filesToProcess do
-                let result, prices = parseGzipFileWithResult filePath
-                match result.Error with
-                | Some err ->
-                    printfn "  [%d/%d] %s: Error - %s" (filesProcessed + 1) filesToProcess.Length result.FileName err
-                | None ->
-                    let inserted = upsertDailyPrices connection prices
-                    markFileProcessed connection result.FileName
-                    totalPrices <- totalPrices + prices.Length
-                    filesProcessed <- filesProcessed + 1
-                    printfn "  [%d/%d] %s: %d prices" filesProcessed filesToProcess.Length result.FileName prices.Length
+        let mutable totalPrices = 0
+        let mutable filesProcessed = 0
 
-            printfn ""
-            printfn "Ingested %d daily prices from %d files" totalPrices filesProcessed
-        else
-            printfn "CSV directory not found: %s" csvDir
+        for filePath in filesToProcess do
+            let result, prices = parseGzipFileWithResult filePath
+            match result.Error with
+            | Some err ->
+                printfn "  [%d/%d] %s: Error - %s" (filesProcessed + 1) filesToProcess.Length result.FileName err
+            | None ->
+                let inserted = upsertDailyPrices connection prices
+                markFileProcessed connection result.FileName
+                totalPrices <- totalPrices + prices.Length
+                filesProcessed <- filesProcessed + 1
+                printfn "  [%d/%d] %s: %d prices" filesProcessed filesToProcess.Length result.FileName prices.Length
 
-        // Ingest splits from JSON file
-        if File.Exists splitsFile then
-            let json = File.ReadAllText splitsFile
-            let splits = System.Text.Json.JsonSerializer.Deserialize<Split array>(json)
-            let inserted = upsertSplits connection splits
-            printfn "Ingested %d splits" splits.Length
-        else
-            printfn "Splits file not found: %s" splitsFile
-    )
-    printfn "Indexes recreated."
+        printfn ""
+        printfn "Ingested %d daily prices from %d files" totalPrices filesProcessed
+    else
+        printfn "CSV directory not found: %s" csvDir
+
+    // Ingest splits from JSON file
+    if File.Exists splitsFile then
+        let json = File.ReadAllText splitsFile
+        let splits = System.Text.Json.JsonSerializer.Deserialize<Split array>(json)
+        let inserted = upsertSplits connection splits
+        printfn "Ingested %d splits" splits.Length
+    else
+        printfn "Splits file not found: %s" splitsFile
+
+    printfn "Data ingestion complete."
 
     // Show summary
     printfn ""

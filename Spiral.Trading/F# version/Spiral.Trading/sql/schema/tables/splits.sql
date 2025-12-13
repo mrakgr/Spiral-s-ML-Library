@@ -1,11 +1,11 @@
 -- Stock split information
 CREATE TABLE IF NOT EXISTS splits (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ticker TEXT NOT NULL,
-    execution_date TEXT NOT NULL,  -- ISO 8601 format (YYYY-MM-DD)
-    split_from REAL NOT NULL,
-    split_to REAL NOT NULL,
-    split_ratio REAL NOT NULL,
+    id INTEGER PRIMARY KEY,
+    ticker VARCHAR NOT NULL,
+    execution_date DATE NOT NULL,
+    split_from DOUBLE NOT NULL,
+    split_to DOUBLE NOT NULL,
+    split_ratio DOUBLE NOT NULL,
     UNIQUE(ticker, execution_date)
 );
 

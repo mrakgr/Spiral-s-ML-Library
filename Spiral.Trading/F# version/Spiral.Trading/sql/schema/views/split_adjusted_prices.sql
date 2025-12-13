@@ -36,5 +36,5 @@ SELECT
     high / adj_factor AS adj_high,
     low / adj_factor AS adj_low,
     close / adj_factor AS adj_close,
-    CAST(volume * adj_factor AS INTEGER) AS adj_volume
+    CAST(volume * adj_factor AS BIGINT) AS adj_volume
 FROM split_factors;
