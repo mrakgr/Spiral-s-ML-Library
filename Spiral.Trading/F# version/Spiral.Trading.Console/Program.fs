@@ -188,7 +188,7 @@ let private handleParseCsv (args: ParseResults<ParseCsvArgs>) =
                 prices
                 |> Array.take (min 5 prices.Length)
                 |> Array.iter (fun p ->
-                    printfn "  %s %s O:%M H:%M L:%M C:%M V:%d"
+                    printfn "  %s %s O:%.2f H:%.2f L:%.2f C:%.2f V:%d"
                         p.Ticker (formatDate p.Date) p.Open p.High p.Low p.Close p.Volume)
 
     | None ->

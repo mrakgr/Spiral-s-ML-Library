@@ -10,7 +10,7 @@ open FSharp.Data
 type DailyAggCsv = CsvProvider<
     "ticker,volume,open,close,high,low,window_start,transactions
 A,1547275,140.81,144.00,144.57,140.44,1733720400000000000,28350",
-    Schema="ticker,volume (int64),open (decimal),close (decimal),high (decimal),low (decimal),window_start (int64),transactions (int64)">
+    Schema="ticker,volume (int64),open (float),close (float),high (float),low (float),window_start (int64),transactions (int64)">
 
 /// Convert nanosecond Unix timestamp to DateTime
 let private nanosToDateTime (nanos: int64) : DateTime =

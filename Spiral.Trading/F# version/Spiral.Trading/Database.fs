@@ -12,10 +12,10 @@ open DuckDB.NET.Data
 type DailyPriceRow = {
     ticker: string
     date: string
-    ``open``: decimal
-    high: decimal
-    low: decimal
-    close: decimal
+    ``open``: float
+    high: float
+    low: float
+    close: float
     volume: int64
     transactions: int64
 }
@@ -33,10 +33,10 @@ type SplitRow = {
 type SplitAdjustedPriceRow = {
     ticker: string
     date: string
-    adj_open: decimal
-    adj_high: decimal
-    adj_low: decimal
-    adj_close: decimal
+    adj_open: float
+    adj_high: float
+    adj_low: float
+    adj_close: float
     adj_volume: int64
 }
 

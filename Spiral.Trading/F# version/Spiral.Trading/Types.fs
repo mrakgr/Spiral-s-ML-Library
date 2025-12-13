@@ -22,10 +22,10 @@ type Split = {
 type DailyPrice = {
     Ticker: string
     Date: DateTime
-    Open: decimal
-    High: decimal
-    Low: decimal
-    Close: decimal
+    Open: float
+    High: float
+    Low: float
+    Close: float
     Volume: int64
     Transactions: int64
 }

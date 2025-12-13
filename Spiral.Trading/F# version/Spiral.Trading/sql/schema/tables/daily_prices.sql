@@ -1,15 +1,14 @@
 -- Daily OHLCV price data
 CREATE TABLE IF NOT EXISTS daily_prices (
-    id INTEGER PRIMARY KEY,
     ticker VARCHAR NOT NULL,
     date DATE NOT NULL,
-    open DECIMAL(18, 4) NOT NULL,
-    high DECIMAL(18, 4) NOT NULL,
-    low DECIMAL(18, 4) NOT NULL,
-    close DECIMAL(18, 4) NOT NULL,
+    open DOUBLE NOT NULL,
+    high DOUBLE NOT NULL,
+    low DOUBLE NOT NULL,
+    close DOUBLE NOT NULL,
     volume BIGINT NOT NULL,
     transactions BIGINT NOT NULL,
-    UNIQUE(ticker, date)
+    PRIMARY KEY(ticker, date)
 );
 
 -- Index for efficient queries by ticker

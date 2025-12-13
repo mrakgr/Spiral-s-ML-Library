@@ -1,12 +1,11 @@
 -- Stock split information
 CREATE TABLE IF NOT EXISTS splits (
-    id INTEGER PRIMARY KEY,
     ticker VARCHAR NOT NULL,
     execution_date DATE NOT NULL,
     split_from DOUBLE NOT NULL,
     split_to DOUBLE NOT NULL,
     split_ratio DOUBLE NOT NULL,
-    UNIQUE(ticker, execution_date)
+    PRIMARY KEY(ticker, execution_date)
 );
 
 -- Index for efficient queries by ticker
