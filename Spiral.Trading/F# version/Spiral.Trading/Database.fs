@@ -115,7 +115,7 @@ let private dailyPriceUpsertSql = """
 let upsertDailyPrice (connection: IDbConnection) (price: DailyPrice) : int =
     connection.Execute(dailyPriceUpsertSql, toDailyPriceParams price)
 
-/// Insert or update multiple daily price records
+/// Insert or update multiple daily price records (legacy row-by-row method)
 let upsertDailyPrices (duckDbConn : DuckDBConnection) (prices: DailyPrice array) : int =
    use transaction = duckDbConn.BeginTransaction()
    use cmd = duckDbConn.CreateCommand()
@@ -150,7 +150,38 @@ let upsertDailyPrices (duckDbConn : DuckDBConnection) (prices: DailyPrice array)
        pTransactions.Value <- price.Transactions
        count <- count + cmd.ExecuteNonQuery()
    transaction.Commit()
-   count  
+   count
+
+/// Bulk ingest daily prices directly from a .csv.gz file using DuckDB's native CSV reader
+let ingestDailyPricesFromCsvGz (connection: IDbConnection) (filePath: string) : int64 =
+    let sql = $"""
+        INSERT INTO daily_prices (ticker, date, open, high, low, close, volume, transactions)
+        SELECT 
+            ticker,
+            (epoch_ms(0) + to_milliseconds(window_start / 1000000))::DATE as date,
+            open, high, low, close, volume, transactions
+        FROM read_csv('{filePath}',
+            columns = {{
+                'ticker': 'VARCHAR',
+                'volume': 'BIGINT',
+                'open': 'DOUBLE',
+                'close': 'DOUBLE',
+                'high': 'DOUBLE',
+                'low': 'DOUBLE',
+                'window_start': 'BIGINT',
+                'transactions': 'BIGINT'
+            }},
+            header = true
+        )
+        ON CONFLICT(ticker, date) DO UPDATE SET
+            open = excluded.open,
+            high = excluded.high,
+            low = excluded.low,
+            close = excluded.close,
+            volume = excluded.volume,
+            transactions = excluded.transactions
+    """
+    connection.Execute(sql) |> int64
 
 /// Convert Split to Dapper DynamicParameters
 let private toSplitParams (split: Split) : DynamicParameters =
@@ -298,6 +329,32 @@ let markFilesProcessed (connection: IDbConnection) (fileNames: string seq) : uni
         cmd.ExecuteNonQuery() |> ignore
 
     transaction.Commit()
+
+/// Bulk ingest daily prices from multiple .csv.gz files with progress reporting
+let ingestDailyPricesFromDirectory 
+    (connection: IDbConnection) 
+    (csvDir: string) 
+    (progress: int -> int -> string -> int64 -> unit) 
+    : int64 =
+    let processedFiles = getProcessedFiles connection
+    let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
+    let filesToProcess = 
+        allFiles 
+        |> Array.filter (fun f -> not (processedFiles.Contains(Path.GetFileName(f))))
+    
+    let mutable totalRows = 0L
+    let mutable filesProcessed = 0
+    let totalFiles = filesToProcess.Length
+    
+    for filePath in filesToProcess do
+        let fileName = Path.GetFileName(filePath)
+        let rowsInserted = ingestDailyPricesFromCsvGz connection filePath
+        markFileProcessed connection fileName
+        filesProcessed <- filesProcessed + 1
+        totalRows <- totalRows + rowsInserted
+        progress filesProcessed totalFiles fileName rowsInserted
+    
+    totalRows
 
 // --- DOM Indicator ---
 

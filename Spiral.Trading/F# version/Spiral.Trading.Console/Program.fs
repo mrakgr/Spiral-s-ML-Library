@@ -236,33 +236,19 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     let processedFiles = getProcessedFiles connection
     printfn "Already processed: %d files" processedFiles.Count
 
-    // DuckDB is optimized for bulk loads by default - no special setup needed
-    // Ingest daily prices from CSV files
+    // Ingest daily prices from CSV files using DuckDB's native CSV reader
     if Directory.Exists csvDir then
         let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
-        let filesToProcess =
-            allFiles
-            |> Array.filter (fun f -> not (processedFiles.Contains(Path.GetFileName(f))))
+        let newFileCount = allFiles.Length - processedFiles.Count
+        printfn "Found %d CSV files (%d new to ingest)" allFiles.Length newFileCount
 
-        printfn "Found %d CSV files (%d new to ingest)" allFiles.Length filesToProcess.Length
+        let progress completed total fileName rows =
+            printfn "  [%d/%d] %s: %d prices" completed total fileName rows
 
-        let mutable totalPrices = 0
-        let mutable filesProcessed = 0
-
-        for filePath in filesToProcess do
-            let result, prices = parseGzipFileWithResult filePath
-            match result.Error with
-            | Some err ->
-                printfn "  [%d/%d] %s: Error - %s" (filesProcessed + 1) filesToProcess.Length result.FileName err
-            | None ->
-                let inserted = upsertDailyPrices connection prices
-                markFileProcessed connection result.FileName
-                totalPrices <- totalPrices + prices.Length
-                filesProcessed <- filesProcessed + 1
-                printfn "  [%d/%d] %s: %d prices" filesProcessed filesToProcess.Length result.FileName prices.Length
+        let totalPrices = ingestDailyPricesFromDirectory connection csvDir progress
 
         printfn ""
-        printfn "Ingested %d daily prices from %d files" totalPrices filesProcessed
+        printfn "Ingested %d daily prices from %d files" totalPrices newFileCount
     else
         printfn "CSV directory not found: %s" csvDir
 
