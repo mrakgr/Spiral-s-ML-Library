@@ -244,25 +244,30 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
         let globPattern = Path.Combine(csvDir, "*.csv.gz")
         printfn "Bulk loading from: %s" globPattern
         
+        let sw = System.Diagnostics.Stopwatch.StartNew()
         let countBefore = getDailyPriceCount connection
         let _ = ingestDailyPricesFromGlob connection globPattern
         let countAfter = getDailyPriceCount connection
         let totalPrices = countAfter - countBefore
+        sw.Stop()
 
         // Mark all files as processed
         let fileNames = allFiles |> Array.map Path.GetFileName
         markFilesProcessed connection fileNames
 
-        printfn "Ingested %d new daily prices (total: %d)" totalPrices countAfter
+        let rowsPerSec = if sw.Elapsed.TotalSeconds > 0.0 then float countAfter / sw.Elapsed.TotalSeconds else 0.0
+        printfn "Ingested %d new daily prices (total: %d) in %.2fs (%.0f rows/sec)" totalPrices countAfter sw.Elapsed.TotalSeconds rowsPerSec
     else
         printfn "CSV directory not found: %s" csvDir
 
     // Ingest splits from JSON file
     if File.Exists splitsFile then
+        let sw = System.Diagnostics.Stopwatch.StartNew()
         let json = File.ReadAllText splitsFile
         let splits = System.Text.Json.JsonSerializer.Deserialize<Split array>(json)
         let inserted = upsertSplits connection splits
-        printfn "Ingested %d splits" splits.Length
+        sw.Stop()
+        printfn "Ingested %d splits in %.2fs" splits.Length sw.Elapsed.TotalSeconds
     else
         printfn "Splits file not found: %s" splitsFile
 

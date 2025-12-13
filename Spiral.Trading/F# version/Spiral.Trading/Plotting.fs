@@ -123,4 +123,4 @@ let generateDomChart (dbPath: string) (outputPath: string) (width: int) (height:
         let html = chart.GetHtml()
         File.WriteAllText(outputPath, html)
         printfn "DOM chart saved to %s" outputPath
-        printfn "Date range: %s to %s (%d days)" dates[0] dates[dates.Length - 1] dates.Length
+        printfn "Date range: %O to %O (%d days)" dates[0] dates[dates.Length - 1] dates.Length

@@ -11,7 +11,7 @@ open DuckDB.NET.Data
 [<CLIMutable>]
 type DailyPriceRow = {
     ticker: string
-    date: string
+    date: DateOnly
     ``open``: float
     high: float
     low: float
@@ -23,7 +23,7 @@ type DailyPriceRow = {
 [<CLIMutable>]
 type SplitRow = {
     ticker: string
-    execution_date: string
+    execution_date: DateOnly
     split_from: float
     split_to: float
     split_ratio: float
@@ -32,7 +32,7 @@ type SplitRow = {
 [<CLIMutable>]
 type SplitAdjustedPriceRow = {
     ticker: string
-    date: string
+    date: DateOnly
     adj_open: float
     adj_high: float
     adj_low: float
@@ -298,11 +298,11 @@ let getDateRange (connection: IDbConnection) : (DateTime * DateTime) option =
 /// Get daily prices for a specific ticker, ordered by date
 let getDailyPricesByTicker (connection: IDbConnection) (ticker: string) : DailyPrice array =
     connection.Query<DailyPriceRow>(
-        "SELECT ticker, date, open, high, low, close, volume, transactions FROM daily_prices WHERE ticker = @ticker ORDER BY date",
+        "SELECT ticker, date, open, high, low, close, volume, transactions FROM daily_prices WHERE ticker = $ticker ORDER BY date",
         {| ticker = ticker |})
     |> Seq.map (fun row -> {
         Ticker = row.ticker
-        Date = DateTime.Parse(row.date)
+        Date = row.date.ToDateTime(TimeOnly.MinValue)
         Open = row.``open``
         High = row.high
         Low = row.low
@@ -315,11 +315,11 @@ let getDailyPricesByTicker (connection: IDbConnection) (ticker: string) : DailyP
 /// Get splits for a specific ticker, ordered by execution date descending
 let getSplitsByTicker (connection: IDbConnection) (ticker: string) : Split array =
     connection.Query<SplitRow>(
-        "SELECT ticker, execution_date, split_from, split_to, split_ratio FROM splits WHERE ticker = @ticker ORDER BY execution_date DESC",
+        "SELECT ticker, execution_date, split_from, split_to, split_ratio FROM splits WHERE ticker = $ticker ORDER BY execution_date DESC",
         {| ticker = ticker |})
     |> Seq.map (fun row -> {
         Ticker = row.ticker
-        ExecutionDate = DateTime.Parse(row.execution_date)
+        ExecutionDate = row.execution_date.ToDateTime(TimeOnly.MinValue)
         SplitFrom = row.split_from
         SplitTo = row.split_to
         SplitRatio = row.split_ratio
@@ -329,7 +329,7 @@ let getSplitsByTicker (connection: IDbConnection) (ticker: string) : Split array
 /// Get split-adjusted daily prices for a specific ticker using the split_adjusted_prices view
 let getSplitAdjustedPricesByTicker (connection: IDbConnection) (ticker: string) : SplitAdjustedPriceRow array =
     connection.Query<SplitAdjustedPriceRow>(
-        "SELECT ticker, date, adj_open, adj_high, adj_low, adj_close, adj_volume FROM split_adjusted_prices WHERE ticker = @ticker ORDER BY date",
+        "SELECT ticker, date, adj_open, adj_high, adj_low, adj_close, adj_volume FROM split_adjusted_prices WHERE ticker = $ticker ORDER BY date",
         {| ticker = ticker |})
     |> Seq.toArray
 
@@ -396,7 +396,7 @@ let ingestDailyPricesFromDirectory
 
 [<CLIMutable>]
 type DomIndicatorRow = {
-    date: string
+    date: DateOnly
     avg_leader_return: float
     avg_laggard_return: float
     n_leaders: int64
