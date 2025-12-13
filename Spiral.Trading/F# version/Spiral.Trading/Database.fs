@@ -41,6 +41,12 @@ type SplitAdjustedPriceRow = {
     adj_volume: int64
 }
 
+[<CLIMutable>]
+type TickerDateRow = {
+    ticker: string
+    date: string
+}
+
 /// Load embedded SQL resource by name
 let private loadEmbeddedSql (resourceName: string) : string =
     let assembly = Assembly.GetExecutingAssembly()
@@ -345,31 +351,68 @@ let getDomIndicator (connection: IDbConnection) : DomIndicatorRow array =
 
 // --- Materialized Table Refresh ---
 
-let private refreshSplitAdjustmentFactorsSql = """
-    DELETE FROM split_adjustment_factors;
-    INSERT INTO split_adjustment_factors (ticker, date, adj_factor)
-    SELECT
-        dp.ticker,
-        dp.date,
-        COALESCE(
-            (SELECT EXP(SUM(LN(s.split_ratio)))
-             FROM s
-             WHERE s.execution_date > dp.date),
-            1.0
-        ) AS adj_factor
-    FROM daily_prices dp
-    LEFT JOIN splits s
-        ON s.ticker = dp.ticker;
-"""
-
-/// Refresh the split_adjustment_factors materialized table
+/// Refresh the split_adjustment_factors materialized table using hybrid SQL/F# approach
 let refreshSplitAdjustmentFactors (connection: IDbConnection) : unit =
     printfn "Refreshing split_adjustment_factors..."
     let sw = Stopwatch.StartNew()
-    connection.Execute(refreshSplitAdjustmentFactorsSql) |> ignore
+
+    // Apply bulk load optimizations
+    applyBulkLoadPragmas connection
+
+    // Step 1: Delete and insert all rows with adj_factor = 1.0 (fast, single SQL statement)
+    connection.Execute("DELETE FROM split_adjustment_factors") |> ignore
+    let insertCount = connection.Execute(
+        "INSERT INTO split_adjustment_factors (ticker, date, adj_factor) SELECT ticker, date, 1.0 FROM daily_prices")
+    printfn "  Inserted %d rows with default factor" insertCount
+
+    // Step 2: Load splits and compute non-trivial factors
+    let splitsByTicker =
+        connection.Query<SplitRow>("SELECT ticker, execution_date, split_ratio FROM splits")
+        |> Seq.groupBy (fun s -> s.ticker)
+        |> Seq.map (fun (ticker, splits) ->
+            ticker, splits |> Seq.map (fun s -> s.execution_date, s.split_ratio) |> Seq.toArray)
+        |> dict
+
+    // Step 3: Get dates for tickers with splits and update only those
+    let sqliteConn = connection :?> SqliteConnection
+    let tickersWithSplits = splitsByTicker.Keys |> Seq.toArray
+    printfn "  Updating factors for %d tickers with splits..." tickersWithSplits.Length
+
+    use transaction = sqliteConn.BeginTransaction()
+    use cmd = sqliteConn.CreateCommand()
+    cmd.Transaction <- transaction
+    cmd.CommandText <- "UPDATE split_adjustment_factors SET adj_factor = @adj_factor WHERE ticker = @ticker AND date = @date"
+    let pTicker = cmd.Parameters.Add("@ticker", SqliteType.Text)
+    let pDate = cmd.Parameters.Add("@date", SqliteType.Text)
+    let pAdjFactor = cmd.Parameters.Add("@adj_factor", SqliteType.Real)
+
+    let mutable updateCount = 0
+    for ticker in tickersWithSplits do
+        let splits = splitsByTicker.[ticker]
+        let dates = connection.Query<TickerDateRow>(
+            "SELECT ticker, date FROM daily_prices WHERE ticker = @ticker",
+            {| ticker = ticker |}) |> Seq.toArray
+
+        for row in dates do
+            let product =
+                splits
+                |> Array.filter (fun (execDate, _) -> execDate > row.date)
+                |> Array.fold (fun acc (_, ratio) -> acc * ratio) 1.0
+
+            if product <> 1.0 then
+                pTicker.Value <- row.ticker
+                pDate.Value <- row.date
+                pAdjFactor.Value <- product
+                cmd.ExecuteNonQuery() |> ignore
+                updateCount <- updateCount + 1
+
+    transaction.Commit()
+
+    // Restore default pragmas
+    restoreDefaultPragmas connection
+
     sw.Stop()
-    let count = connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM split_adjustment_factors")
-    printfn "  Inserted %d rows in %.2f seconds" count sw.Elapsed.TotalSeconds
+    printfn "  Updated %d rows with non-trivial factors in %.2f seconds" updateCount sw.Elapsed.TotalSeconds
 
 let private refreshStockDollarVolume4wSql = """
     DELETE FROM stock_dollar_volume_4w;
