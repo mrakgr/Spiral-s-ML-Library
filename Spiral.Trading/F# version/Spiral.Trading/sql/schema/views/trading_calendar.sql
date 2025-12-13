@@ -1,4 +1,5 @@
-CREATE VIEW IF NOT EXISTS trading_calendar AS
+DROP VIEW IF EXISTS trading_calendar;
+CREATE VIEW trading_calendar AS
 WITH spy_dates AS (
     SELECT date
     FROM daily_prices

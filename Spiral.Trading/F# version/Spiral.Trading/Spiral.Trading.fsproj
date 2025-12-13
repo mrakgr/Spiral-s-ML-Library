@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="sql/schema/*.sql" />
+    <EmbeddedResource Include="sql/schema/tables/*.sql" />
+    <EmbeddedResource Include="sql/schema/views/*.sql" />
   </ItemGroup>
 
   <ItemGroup>

@@ -51,6 +51,13 @@ let private loadEmbeddedSql (resourceName: string) : string =
     use reader = new StreamReader(stream)
     reader.ReadToEnd()
 
+/// Get all embedded SQL resources from a specific folder
+let private getEmbeddedSqlFromFolder (folderName: string) : string array =
+    let assembly = Assembly.GetExecutingAssembly()
+    assembly.GetManifestResourceNames()
+    |> Array.filter (fun n -> n.Contains(folderName) && n.EndsWith(".sql"))
+    |> Array.sort
+
 /// Create and open a SQLite connection
 let openConnection (dbPath: string) : SqliteConnection =
     let connectionString = $"Data Source={dbPath}"
@@ -60,15 +67,21 @@ let openConnection (dbPath: string) : SqliteConnection =
 
 /// Initialize the database schema
 let initializeSchema (connection: IDbConnection) : unit =
-    let dailyPricesSql = loadEmbeddedSql "daily_prices.sql"
-    let splitsSql = loadEmbeddedSql "splits.sql"
-    let processedFilesSql = loadEmbeddedSql "processed_files.sql"
-    let splitAdjustedPricesSql = loadEmbeddedSql "split_adjusted_prices.sql"
+    let assembly = Assembly.GetExecutingAssembly()
 
-    connection.Execute(dailyPricesSql) |> ignore
-    connection.Execute(splitsSql) |> ignore
-    connection.Execute(processedFilesSql) |> ignore
-    connection.Execute(splitAdjustedPricesSql) |> ignore
+    // Executes the sql.
+    let executeSql folderName =
+        for resourceName in getEmbeddedSqlFromFolder folderName do
+            use stream = assembly.GetManifestResourceStream(resourceName)
+            use reader = new StreamReader(stream)
+            let sql = reader.ReadToEnd()
+            connection.Execute(sql) |> ignore
+    
+    // Execute all table schemas first
+    executeSql "sql/schema/tables"
+    
+    // Execute all view schemas
+    executeSql "sql/schema/views"
 
 /// Apply PRAGMA optimizations for bulk loading
 let applyBulkLoadPragmas (connection: IDbConnection) : unit =
@@ -142,24 +155,6 @@ let private dailyPriceUpsertSql = """
 /// Insert or update a single daily price record
 let upsertDailyPrice (connection: IDbConnection) (price: DailyPrice) : int =
     connection.Execute(dailyPriceUpsertSql, toDailyPriceParams price)
-
-/// Build multi-row INSERT SQL for a batch of daily prices
-let private buildMultiRowDailyPriceSql (batchSize: int) : string =
-    let values = 
-        [| for i in 0 .. batchSize - 1 ->
-            sprintf "(@t%d, @d%d, @o%d, @h%d, @l%d, @c%d, @v%d, @x%d)" i i i i i i i i |]
-        |> String.concat ", "
-    sprintf """
-        INSERT INTO daily_prices (ticker, date, open, high, low, close, volume, transactions)
-        VALUES %s
-        ON CONFLICT(ticker, date) DO UPDATE SET
-            open = excluded.open,
-            high = excluded.high,
-            low = excluded.low,
-            close = excluded.close,
-            volume = excluded.volume,
-            transactions = excluded.transactions
-    """ values
 
 /// Insert or update multiple daily price records
 let upsertDailyPrices (sqliteConn : SqliteConnection) (prices: DailyPrice array) : int =

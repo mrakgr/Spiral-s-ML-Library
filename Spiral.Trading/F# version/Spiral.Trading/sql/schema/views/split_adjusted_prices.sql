@@ -1,7 +1,8 @@
 -- View for split-adjusted prices
 -- Uses EXP(SUM(LN(split_ratio))) to calculate cumulative split factor
 -- for all splits that occurred AFTER a given price date
-CREATE VIEW IF NOT EXISTS split_adjusted_prices AS
+DROP VIEW IF EXISTS split_adjusted_prices;
+CREATE VIEW split_adjusted_prices AS
 WITH split_factors AS (
     SELECT 
         dp.ticker,

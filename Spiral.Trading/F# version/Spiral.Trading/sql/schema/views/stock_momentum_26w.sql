@@ -1,4 +1,5 @@
-CREATE VIEW IF NOT EXISTS stock_momentum AS
+DROP VIEW IF EXISTS stock_momentum_26w;
+CREATE VIEW stock_momentum_26w AS
 SELECT 
     p.ticker,
     tc.current_date AS date,

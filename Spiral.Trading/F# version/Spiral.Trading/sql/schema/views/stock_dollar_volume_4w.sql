@@ -1,4 +1,5 @@
-CREATE VIEW IF NOT EXISTS stock_dollar_volume_4w AS
+DROP VIEW IF EXISTS stock_dollar_volume_4w;
+CREATE VIEW stock_dollar_volume_4w AS
 SELECT 
     p.ticker,
     tc.current_date AS date,
