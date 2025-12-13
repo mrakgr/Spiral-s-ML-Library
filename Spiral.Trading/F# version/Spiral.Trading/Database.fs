@@ -353,12 +353,13 @@ let private refreshSplitAdjustmentFactorsSql = """
         dp.date,
         COALESCE(
             (SELECT EXP(SUM(LN(s.split_ratio)))
-             FROM splits s
-             WHERE s.ticker = dp.ticker
-             AND s.execution_date > dp.date),
+             FROM s
+             WHERE s.execution_date > dp.date),
             1.0
         ) AS adj_factor
-    FROM daily_prices dp;
+    FROM daily_prices dp
+    LEFT JOIN splits s
+        ON s.ticker = dp.ticker;
 """
 
 /// Refresh the split_adjustment_factors materialized table
@@ -451,7 +452,7 @@ let refreshMaterializedTables (connection: IDbConnection) : unit =
     printfn "Refreshing materialized tables..."
     let sw = Stopwatch.StartNew()
     refreshSplitAdjustmentFactors connection
-    refreshStockDollarVolume4w connection
-    refreshStockMomentumRanking connection
+    // refreshStockDollarVolume4w connection
+    // refreshStockMomentumRanking connection
     sw.Stop()
     printfn "Done. Total time: %.2f seconds" sw.Elapsed.TotalSeconds
