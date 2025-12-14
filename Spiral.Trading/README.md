@@ -102,10 +102,30 @@ dotnet run --project Spiral.Trading.Console -- ingest-data -d /path/to/custom.db
 ```
 
 **Features:**
-- Tracks processed CSV files to avoid re-ingesting on subsequent runs
-- Uses prepared statements and bulk load optimizations for fast ingestion
+- Uses DuckDB's native CSV reader for fast bulk ingestion
 - Upserts splits (inserts new, updates existing) on each run
-- Creates a `split_adjusted_prices` SQL view for efficient split-adjusted queries
+- Materializes derived tables (split-adjusted prices, momentum rankings, etc.)
+
+### Refresh Views
+
+Refreshes only the SQL views without rematerializing the derived tables. Use this when you've modified view definitions but don't need to recompute the underlying materialized tables.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- refresh-views [options]
+```
+
+**Options:**
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
+
+**Examples:**
+
+```bash
+# Refresh views with default database
+dotnet run --project Spiral.Trading.Console -- refresh-views
+
+# Refresh views for a custom database
+dotnet run --project Spiral.Trading.Console -- refresh-views -d /path/to/custom.db
+```
 
 ### Plot Chart
 
@@ -202,27 +222,6 @@ dotnet run --project Spiral.Trading.Console -- stocks-in-play -s 2024-12-01 -e 2
 - Opening Gap: >= 5% from previous close
 - Ranked by composite score (RVOL + gap magnitude)
 - Top 10 stocks per day
-
-### Refresh Views
-
-Refreshes only the SQL views without rematerializing the derived tables. Use this when you've modified view definitions but don't need to recompute the underlying materialized tables.
-
-```bash
-dotnet run --project Spiral.Trading.Console -- refresh-views [options]
-```
-
-**Options:**
-- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
-
-**Examples:**
-
-```bash
-# Refresh views with default database
-dotnet run --project Spiral.Trading.Console -- refresh-views
-
-# Refresh views for a custom database
-dotnet run --project Spiral.Trading.Console -- refresh-views -d /path/to/custom.db
-```
 
 ## Project Structure
 

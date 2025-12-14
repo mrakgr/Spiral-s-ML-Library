@@ -393,14 +393,14 @@ let main argv =
                 handleDownloadSplits config args
             | Ingest_Data args ->
                 handleIngestData args
+            | Refresh_Views args ->
+                handleRefreshViews args
             | Plot_Chart args ->
                 handlePlotChart args
             | Plot_Dom args ->
                 handlePlotDom args
             | Stocks_In_Play args ->
                 handleStocksInPlay args
-            | Refresh_Views args ->
-                handleRefreshViews args
 
         0
     with
