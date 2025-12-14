@@ -237,7 +237,7 @@ let private splitUpsertSql = """
 let upsertSplit (connection: IDbConnection) (split: Split) : int =
     connection.Execute(splitUpsertSql, toSplitParams split)
 
-/// Insert or update multiple split records using prepared statement
+/// Insert or update multiple split records using prepared statement (legacy row-by-row method)
 let upsertSplits (connection: IDbConnection) (splits: Split array) : int =
     let duckDbConn = connection :?> DuckDBConnection
     use transaction = duckDbConn.BeginTransaction()
@@ -267,6 +267,33 @@ let upsertSplits (connection: IDbConnection) (splits: Split array) : int =
 
     transaction.Commit()
     count
+
+/// Bulk ingest splits directly from a CSV file using DuckDB's native CSV reader
+let ingestSplitsFromCsv (connection: IDbConnection) (filePath: string) : int64 =
+    let sql = $"""
+        INSERT INTO splits (ticker, execution_date, split_from, split_to, split_ratio)
+        SELECT 
+            ticker,
+            execution_date::DATE,
+            split_from,
+            split_to,
+            split_ratio
+        FROM read_csv('{filePath}',
+            columns = {{
+                'ticker': 'VARCHAR',
+                'execution_date': 'VARCHAR',
+                'split_from': 'DOUBLE',
+                'split_to': 'DOUBLE',
+                'split_ratio': 'DOUBLE'
+            }},
+            header = true
+        )
+        ON CONFLICT(ticker, execution_date) DO UPDATE SET
+            split_from = excluded.split_from,
+            split_to = excluded.split_to,
+            split_ratio = excluded.split_ratio
+    """
+    connection.Execute(sql) |> int64
 
 /// Get count of daily prices in database
 let getDailyPriceCount (connection: IDbConnection) : int64 =

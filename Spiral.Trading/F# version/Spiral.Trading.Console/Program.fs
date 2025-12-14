@@ -7,7 +7,6 @@ open Spiral.Trading
 open Spiral.Trading.Config
 open Spiral.Trading.S3Download
 open Spiral.Trading.SplitDownload
-open Spiral.Trading.CsvParsing
 open Spiral.Trading.Database
 open Spiral.Trading.Plotting
 
@@ -35,16 +34,6 @@ type DownloadSplitsArgs =
             | Start_Date _ -> "Start date (yyyy-MM-dd). Default: 5 years ago"
             | End_Date _ -> "End date (yyyy-MM-dd). Default: none (all future)"
 
-type ParseCsvArgs =
-    | [<AltCommandLine("-d")>] Directory of string
-    | [<AltCommandLine("-f")>] File of string
-
-    interface IArgParserTemplate with
-        member this.Usage =
-            match this with
-            | Directory _ -> "Directory containing .csv.gz files (default: data/daily_aggregates)"
-            | File _ -> "Single .csv.gz file to parse"
-
 type IngestDataArgs =
     | [<AltCommandLine("-d")>] Database of string
     | [<AltCommandLine("-c")>] Csv_Dir of string
@@ -53,9 +42,9 @@ type IngestDataArgs =
     interface IArgParserTemplate with
         member this.Usage =
             match this with
-            | Database _ -> "SQLite database path (default: data/trading.db)"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
             | Csv_Dir _ -> "Directory containing .csv.gz files (default: data/daily_aggregates)"
-            | Splits_File _ -> "JSON file containing splits (default: data/splits.json)"
+            | Splits_File _ -> "CSV file containing splits (default: data/splits.csv)"
 
 type PlotChartArgs =
     | [<AltCommandLine("-t")>] Ticker of string
@@ -76,7 +65,6 @@ type PlotChartArgs =
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
-    | [<CliPrefix(CliPrefix.None)>] Parse_Csv of ParseResults<ParseCsvArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
 
@@ -85,8 +73,7 @@ type Arguments =
             match this with
             | Download_Bulk _ -> "Download daily aggregate files from Massive S3"
             | Download_Splits _ -> "Download stock splits from Massive API"
-            | Parse_Csv _ -> "Parse downloaded CSV files and display summary"
-            | Ingest_Data _ -> "Ingest downloaded data into SQLite database"
+            | Ingest_Data _ -> "Ingest downloaded data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
 
 let private ensureDataDir () =
@@ -158,56 +145,17 @@ let private handleDownloadSplits (config: MassiveConfig) (args: ParseResults<Dow
         printfn ""
         printfn "Downloaded %d splits" splits.Length
 
-        // Save to JSON for now (we'll add DB storage later)
-        let outputPath = "data/splits.json"
-        let options = System.Text.Json.JsonSerializerOptions(WriteIndented = true)
-        let json = System.Text.Json.JsonSerializer.Serialize(splits, options)
-        File.WriteAllText(outputPath, json)
+        // Save to CSV for fast DuckDB ingestion
+        let outputPath = "data/splits.csv"
+        use writer = new StreamWriter(outputPath)
+        writer.WriteLine("ticker,execution_date,split_from,split_to,split_ratio")
+        for split in splits do
+            let dateStr = split.ExecutionDate.ToString("yyyy-MM-dd")
+            writer.WriteLine($"{split.Ticker},{dateStr},{split.SplitFrom},{split.SplitTo},{split.SplitRatio}")
         printfn "Saved splits to %s" (Path.GetFullPath outputPath)
 
     | Error msg ->
         printfn "Error downloading splits: %s" msg
-
-let private handleParseCsv (args: ParseResults<ParseCsvArgs>) =
-    match args.TryGetResult ParseCsvArgs.File with
-    | Some filePath ->
-        // Parse single file
-        printfn "Parsing file: %s" filePath
-        let result, prices = parseGzipFileWithResult filePath
-
-        match result.Error with
-        | Some err ->
-            printfn "Error: %s" err
-        | None ->
-            printfn "Parsed %d price records" result.PriceCount
-
-            // Show sample
-            if not (Array.isEmpty prices) then
-                printfn ""
-                printfn "Sample records:"
-                prices
-                |> Array.take (min 5 prices.Length)
-                |> Array.iter (fun p ->
-                    printfn "  %s %s O:%.2f H:%.2f L:%.2f C:%.2f V:%d"
-                        p.Ticker (formatDate p.Date) p.Open p.High p.Low p.Close p.Volume)
-
-    | None ->
-        // Parse directory
-        let directory =
-            args.TryGetResult ParseCsvArgs.Directory
-            |> Option.defaultValue "data/daily_aggregates"
-
-        printfn "Parsing directory: %s" (Path.GetFullPath directory)
-        printfn ""
-
-        let results = parseDirectoryWithProgress directory consoleParseProgress
-
-        let totalFiles = results.Length
-        let totalRows = results |> Array.sumBy (fun (r, _) -> r.PriceCount)
-        let errors = results |> Array.filter (fun (r, _) -> r.Error.IsSome) |> Array.length
-
-        printfn ""
-        printfn "Parse complete: %d files, %d total rows, %d errors" totalFiles totalRows errors
 
 let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     ensureDataDir ()
@@ -222,7 +170,7 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
 
     let splitsFile =
         args.TryGetResult IngestDataArgs.Splits_File
-        |> Option.defaultValue "data/splits.json"
+        |> Option.defaultValue "data/splits.csv"
 
     printfn "Database: %s" (Path.GetFullPath dbPath)
     printfn "CSV directory: %s" (Path.GetFullPath csvDir)
@@ -260,14 +208,15 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     else
         printfn "CSV directory not found: %s" csvDir
 
-    // Ingest splits from JSON file
+    // Ingest splits from CSV file using DuckDB's native CSV reader
     if File.Exists splitsFile then
         let sw = System.Diagnostics.Stopwatch.StartNew()
-        let json = File.ReadAllText splitsFile
-        let splits = System.Text.Json.JsonSerializer.Deserialize<Split array>(json)
-        let inserted = upsertSplits connection splits
+        let countBefore = getSplitCount connection
+        let _ = ingestSplitsFromCsv connection splitsFile
+        let countAfter = getSplitCount connection
+        let newSplits = countAfter - countBefore
         sw.Stop()
-        printfn "Ingested %d splits in %.2fs" splits.Length sw.Elapsed.TotalSeconds
+        printfn "Ingested %d new splits (total: %d) in %.2fs" newSplits countAfter sw.Elapsed.TotalSeconds
     else
         printfn "Splits file not found: %s" splitsFile
 
@@ -325,8 +274,6 @@ let main argv =
             | Download_Splits args ->
                 let config = loadConfigOrFail configPath
                 handleDownloadSplits config args
-            | Parse_Csv args ->
-                handleParseCsv args
             | Ingest_Data args ->
                 handleIngestData args
             | Plot_Chart args ->

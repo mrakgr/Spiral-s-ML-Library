@@ -10,7 +10,6 @@
     <Compile Include="Config.fs" />
     <Compile Include="S3Download.fs" />
     <Compile Include="SplitDownload.fs" />
-    <Compile Include="CsvParsing.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Plotting.fs" />
   </ItemGroup>
