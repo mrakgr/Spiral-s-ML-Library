@@ -119,16 +119,16 @@ Output: `data/intraday/{timespan}/{ticker}/{date}.json`
 
 ### Ingest Data
 
-Ingests downloaded CSV files and splits into a SQLite database.
+Ingests downloaded CSV files and splits into a DuckDB database.
 
 ```bash
 dotnet run --project Spiral.Trading.Console -- ingest-data [options]
 ```
 
 **Options:**
-- `-d, --database <path>` - SQLite database path (default: data/trading.db)
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
 - `-c, --csv-dir <path>` - Directory containing .csv.gz files (default: data/daily_aggregates)
-- `-s, --splits-file <path>` - JSON file containing splits (default: data/splits.json)
+- `-s, --splits-file <path>` - CSV file containing splits (default: data/splits.csv)
 
 **Examples:**
 
@@ -176,7 +176,7 @@ dotnet run --project Spiral.Trading.Console -- plot-chart [options]
 
 **Options:**
 - `-t, --ticker <symbol>` - Stock ticker symbol (required)
-- `-d, --database <path>` - SQLite database path (default: data/trading.db)
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
 - `-o, --output <path>` - Output HTML file path (default: data/{ticker}_chart.html)
 - `-w, --width <int>` - Chart width in pixels (default: 1200)
 - `-h, --height <int>` - Chart height in pixels (default: 900)
@@ -277,13 +277,13 @@ dotnet run --project Spiral.Trading.Console -- stocks-in-play -r 2 -g 0.03 -v 25
 ## Project Structure
 
 ```
-F# version/
+Spiral.Trading/
 ├── Spiral.Trading/              # Core library
 │   ├── Types.fs                 # Domain types
 │   ├── Config.fs                # Configuration loading
-│   ├── S3Download.fs            # S3 download functionality
+│   ├── S3Download.fs            # S3 bulk download (daily aggregates)
 │   ├── SplitDownload.fs         # Splits API client
-│   ├── CsvParsing.fs            # CSV parsing with FSharp.Data
+│   ├── IntradayDownload.fs      # Intraday API client (minute/second bars)
 │   ├── Database.fs              # DuckDB database operations
 │   ├── Plotting.fs              # Chart generation (candlestick, DOM)
 │   └── sql/schema/              # SQL schema files
@@ -296,7 +296,7 @@ F# version/
 │       │   ├── 03_stock_momentum_26w.sql
 │       │   ├── 04_stock_dollar_volume_4w.sql
 │       │   └── 05_stock_momentum_ranking.sql
-│       └── views/               # Views (fast to refresh)
+│       └── views/               # Views/macros (fast to refresh)
 │           ├── 06_stock_leaders.sql
 │           ├── 07_stock_laggards.sql
 │           ├── 08_dom_indicator.sql
@@ -305,7 +305,8 @@ F# version/
 │   └── Program.fs
 ├── api_key.json                 # API credentials (not in git)
 └── data/                        # Downloaded data
-    ├── daily_aggregates/        # CSV files
-    ├── splits.csv              # Splits data
-    └── trading.db               # SQLite database
+    ├── daily_aggregates/        # Daily OHLCV CSV files
+    ├── intraday/                # Intraday data (minute/second JSON)
+    ├── splits.csv               # Splits data
+    └── trading.db               # DuckDB database
 ```
