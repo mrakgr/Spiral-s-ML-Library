@@ -266,6 +266,44 @@ dotnet run --project Spiral.Trading.Console -- plot-dom -o charts/dom.html
 - Optional reference ticker overlay
 - Output as standalone HTML file (uses Plotly.js)
 
+### Plot Intraday Chart
+
+Generates an interactive intraday candlestick chart with volume and VWAP indicators.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- plot-intraday [options]
+```
+
+**Options:**
+- `-t, --ticker <symbol>` - Stock ticker symbol (required)
+- `-s, --date <yyyy-MM-dd>` - Date to plot (required)
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
+- `-o, --output <path>` - Output HTML file path (default: data/{ticker}_{date}_intraday.html)
+- `-w, --width <int>` - Chart width in pixels (default: 1200)
+- `-h, --height <int>` - Chart height in pixels (default: 900)
+- `--timespan <string>` - Aggregate timespan: 'minute' or 'second' (default: minute)
+
+**Examples:**
+
+```bash
+# Plot NVDA intraday chart for a specific date
+dotnet run --project Spiral.Trading.Console -- plot-intraday -t NVDA -s 2024-12-12
+
+# Plot second-level data
+dotnet run --project Spiral.Trading.Console -- plot-intraday -t AAPL -s 2024-12-12 --timespan second
+
+# Plot with custom output path
+dotnet run --project Spiral.Trading.Console -- plot-intraday -t MSFT -s 2024-12-12 -o charts/msft_intraday.html
+```
+
+**Features:**
+- Candlestick chart with OHLC prices
+- Volume bars at the bottom
+- Session VWAP (orange line) - cumulative volume-weighted average price, commonly used as institutional execution benchmark
+- Bar VWAP (purple dots) - individual bar VWAP values
+- Unified hover mode for easy data inspection
+- Output as standalone HTML file (uses Plotly.js)
+
 ### Stocks In Play
 
 Lists top stocks in play for a date range based on relative volume, opening gap, and liquidity.
