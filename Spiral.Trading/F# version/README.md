@@ -76,32 +76,7 @@ dotnet run --project Spiral.Trading.Console -- download-splits -s 2024-01-01 -e 
 dotnet run --project Spiral.Trading.Console -- download-splits -s 2024-01-01
 ```
 
-Output: `data/splits.json`
-
-### Parse CSV Files
-
-Parses downloaded CSV.gz files and displays summary information.
-
-```bash
-dotnet run --project Spiral.Trading.Console -- parse-csv [options]
-```
-
-**Options:**
-- `-d, --directory <path>` - Directory containing .csv.gz files (default: data/daily_aggregates)
-- `-f, --file <path>` - Single .csv.gz file to parse
-
-**Examples:**
-
-```bash
-# Parse all files in default directory
-dotnet run --project Spiral.Trading.Console -- parse-csv
-
-# Parse a single file
-dotnet run --project Spiral.Trading.Console -- parse-csv -f data/daily_aggregates/2024-12-09.csv.gz
-
-# Parse files in custom directory
-dotnet run --project Spiral.Trading.Console -- parse-csv -d /path/to/csv/files
-```
+Output: `data/splits.csv`
 
 ### Ingest Data
 
@@ -163,6 +138,39 @@ dotnet run --project Spiral.Trading.Console -- plot-chart -t MSFT -w 1600 -h 100
 **Features:**
 - Split-adjusted prices calculated via SQL view
 - Interactive candlestick chart with volume bars
+- Output as standalone HTML file (uses Plotly.js)
+
+### Plot DOM Chart
+
+Generates a DOM (Direction of Momentum) indicator chart.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- plot-dom [options]
+```
+
+**Options:**
+- `-t, --ticker <symbol>` - Reference ticker to plot against (default: SPY)
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
+- `-o, --output <path>` - Output HTML file path (default: data/dom_chart.html)
+- `-w, --width <int>` - Chart width in pixels (default: 1200)
+- `-h, --height <int>` - Chart height in pixels (default: 600)
+
+**Examples:**
+
+```bash
+# Plot DOM chart with default SPY reference
+dotnet run --project Spiral.Trading.Console -- plot-dom
+
+# Plot DOM chart against QQQ
+dotnet run --project Spiral.Trading.Console -- plot-dom -t QQQ
+
+# Plot with custom output path
+dotnet run --project Spiral.Trading.Console -- plot-dom -o charts/dom.html
+```
+
+**Features:**
+- Market breadth indicator visualization
+- Optional reference ticker overlay
 - Output as standalone HTML file (uses Plotly.js)
 
 ## Project Structure

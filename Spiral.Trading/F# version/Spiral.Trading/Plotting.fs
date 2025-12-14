@@ -61,10 +61,12 @@ let generateChart (dbPath: string) (ticker: string) (outputPath: string) (width:
         printfn "Found %d records for %s (split-adjusted via SQL)" prices.Length ticker
         generateCandlestickChart prices ticker outputPath width height
 
-/// Generate a DOM indicator chart against SPY
-let generateDomChart (dbPath: string) (outputPath: string) (width: int) (height: int) : unit =
+/// Generate a DOM indicator chart against a reference ticker
+let generateDomChart (dbPath: string) (ticker: string option) (outputPath: string) (width: int) (height: int) : unit =
     if not (File.Exists dbPath) then
         failwithf "Database not found at %s" dbPath
+    
+    let referenceTicker = ticker |> Option.defaultValue "SPY"
     
     use connection = Database.openConnection dbPath
     Database.initializeSchema connection
@@ -84,10 +86,10 @@ let generateDomChart (dbPath: string) (outputPath: string) (width: int) (height:
                 cumDom <- cumDom + d.dom_contribution * 100.0
                 cumDom)
         
-        // Get SPY prices for the same date range
-        let spyPrices = Database.getSplitAdjustedPricesByTicker connection "SPY"
+        // Get reference ticker prices for the same date range
+        let refPrices = Database.getSplitAdjustedPricesByTicker connection referenceTicker
         let domDateSet = Set.ofArray dates
-        let spyFiltered = spyPrices |> Array.filter (fun p -> domDateSet.Contains p.date)
+        let refFiltered = refPrices |> Array.filter (fun p -> domDateSet.Contains p.date)
         
         let domTrace =
             Scatter(
@@ -97,26 +99,26 @@ let generateDomChart (dbPath: string) (outputPath: string) (width: int) (height:
                 yaxis = "y"
             )
         
-        let spyTrace =
+        let refTrace =
             Scatter(
-                x = (spyFiltered |> Array.map (fun p -> p.date)),
-                y = (spyFiltered |> Array.map (fun p -> p.adj_close)),
-                name = "SPY",
+                x = (refFiltered |> Array.map (fun p -> p.date)),
+                y = (refFiltered |> Array.map (fun p -> p.adj_close)),
+                name = referenceTicker,
                 yaxis = "y2"
             )
         
         let layout =
             Layout(
-                title = "DOM Indicator vs SPY",
+                title = $"DOM Indicator vs {referenceTicker}",
                 xaxis = Xaxis(title = "Date"),
                 yaxis = Yaxis(title = "DOM (cumulative)", side = "left"),
-                yaxis2 = Yaxis(title = "SPY Price", side = "right", overlaying = "y"),
+                yaxis2 = Yaxis(title = $"{referenceTicker} Price", side = "right", overlaying = "y"),
                 width = width,
                 height = height
             )
         
         let chart =
-            [domTrace :> Trace; spyTrace :> Trace]
+            [domTrace :> Trace; refTrace :> Trace]
             |> Chart.Plot
             |> Chart.WithLayout layout
         

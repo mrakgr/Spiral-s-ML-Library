@@ -57,16 +57,33 @@ type PlotChartArgs =
         member this.Usage =
             match this with
             | Ticker _ -> "Stock ticker symbol (required)"
-            | Database _ -> "SQLite database path (default: data/trading.db)"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
             | Output _ -> "Output HTML file path (default: data/{ticker}_chart.html)"
             | Width _ -> "Chart width in pixels (default: 1200)"
             | Height _ -> "Chart height in pixels (default: 900)"
+
+type PlotDomArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-o")>] Output of string
+    | [<AltCommandLine("-w")>] Width of int
+    | [<AltCommandLine("-h")>] Height of int
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Reference ticker to plot against (default: SPY)"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Output _ -> "Output HTML file path (default: data/dom_chart.html)"
+            | Width _ -> "Chart width in pixels (default: 1200)"
+            | Height _ -> "Chart height in pixels (default: 600)"
 
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
+    | [<CliPrefix(CliPrefix.None)>] Plot_Dom of ParseResults<PlotDomArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -75,6 +92,7 @@ type Arguments =
             | Download_Splits _ -> "Download stock splits from Massive API"
             | Ingest_Data _ -> "Ingest downloaded data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
+            | Plot_Dom _ -> "Generate a DOM indicator chart"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -257,6 +275,27 @@ let private handlePlotChart (args: ParseResults<PlotChartArgs>) =
 
     Plotting.generateChart dbPath ticker outputPath width height
 
+let private handlePlotDom (args: ParseResults<PlotDomArgs>) =
+    let ticker = args.TryGetResult PlotDomArgs.Ticker |> Option.map (fun t -> t.ToUpperInvariant())
+
+    let dbPath =
+        args.TryGetResult PlotDomArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    let outputPath =
+        args.TryGetResult PlotDomArgs.Output
+        |> Option.defaultValue "data/dom_chart.html"
+
+    let width = args.GetResult(PlotDomArgs.Width, defaultValue = 1200)
+    let height = args.GetResult(PlotDomArgs.Height, defaultValue = 600)
+
+    let tickerStr = ticker |> Option.defaultValue "SPY"
+    printfn "Generating DOM chart against %s" tickerStr
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+    printfn "Output: %s" (Path.GetFullPath outputPath)
+
+    Plotting.generateDomChart dbPath ticker outputPath width height
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -278,6 +317,8 @@ let main argv =
                 handleIngestData args
             | Plot_Chart args ->
                 handlePlotChart args
+            | Plot_Dom args ->
+                handlePlotDom args
 
         0
     with
