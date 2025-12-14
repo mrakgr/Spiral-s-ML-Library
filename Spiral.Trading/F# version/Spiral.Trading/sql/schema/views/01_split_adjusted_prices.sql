@@ -1,8 +1,8 @@
--- View for split-adjusted prices
--- Uses EXP(SUM(LN(split_ratio))) to calculate cumulative split factor
--- for all splits that occurred AFTER a given price date
+-- Materialized table for split-adjusted prices
+-- Only stores adjusted values, not original OHLCV (available in daily_prices)
 DROP VIEW IF EXISTS split_adjusted_prices;
-CREATE VIEW split_adjusted_prices AS
+DROP TABLE IF EXISTS split_adjusted_prices;
+CREATE TABLE split_adjusted_prices AS
 WITH split_factors AS (
     SELECT 
         dp.ticker,
@@ -12,7 +12,6 @@ WITH split_factors AS (
         dp.low,
         dp.close,
         dp.volume,
-        dp.transactions,
         COALESCE(
             (SELECT EXP(SUM(LN(s.split_ratio)))
              FROM splits s
@@ -25,13 +24,6 @@ WITH split_factors AS (
 SELECT
     ticker,
     date,
-    open,
-    high,
-    low,
-    close,
-    volume,
-    transactions,
-    adj_factor,
     open / adj_factor AS adj_open,
     high / adj_factor AS adj_high,
     low / adj_factor AS adj_low,

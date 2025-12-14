@@ -65,7 +65,7 @@ let openConnection (dbPath: string) : DuckDBConnection =
     connection.Open()
     connection
 
-/// Initialize the database schema
+/// Initialize the base database schema (tables only)
 let initializeSchema (connection: IDbConnection) : unit =
     let assembly = Assembly.GetExecutingAssembly()
 
@@ -77,11 +77,19 @@ let initializeSchema (connection: IDbConnection) : unit =
             let sql = reader.ReadToEnd()
             connection.Execute(sql) |> ignore
     
-    // Execute all table schemas first
+    // Execute all table schemas (base tables only)
     executeSql "sql.schema.tables"
-    
-    // Execute all view schemas
-    executeSql "sql.schema.views"
+
+/// Materialize derived tables and views (call after data ingestion)
+let materializeViews (connection: IDbConnection) : unit =
+    let assembly = Assembly.GetExecutingAssembly()
+
+    // Execute all view/materialized table schemas in order
+    for resourceName in getEmbeddedSqlFromFolder "sql.schema.views" do
+        use stream = assembly.GetManifestResourceStream(resourceName)
+        use reader = new StreamReader(stream)
+        let sql = reader.ReadToEnd()
+        connection.Execute(sql) |> ignore
 
 // Note: DuckDB is columnar and optimized for bulk loads by default.
 // No PRAGMA statements or index manipulation needed.

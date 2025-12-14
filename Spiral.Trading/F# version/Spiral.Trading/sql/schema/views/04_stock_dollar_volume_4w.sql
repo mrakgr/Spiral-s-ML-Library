@@ -1,5 +1,8 @@
+-- Materialized table for 4-week average dollar volume
+-- Only stores ticker, date, and avg_dollar_volume_4w
 DROP VIEW IF EXISTS stock_dollar_volume_4w;
-CREATE VIEW stock_dollar_volume_4w AS
+DROP TABLE IF EXISTS stock_dollar_volume_4w;
+CREATE TABLE stock_dollar_volume_4w AS
 WITH volume_data AS (
     SELECT
         p.ticker,
@@ -24,7 +27,5 @@ WITH volume_data AS (
 SELECT
     ticker,
     date,
-    total_dollar_volume,
-    trading_days,
     total_dollar_volume / NULLIF(trading_days, 0) AS avg_dollar_volume_4w
 FROM volume_data;

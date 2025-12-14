@@ -1,11 +1,12 @@
+-- Materialized table for momentum ranking
+-- Only stores ticker, date, momentum_rank, and total_stocks
+-- (momentum_26w available in stock_momentum_26w, avg_dollar_volume_4w in stock_dollar_volume_4w)
 DROP VIEW IF EXISTS stock_momentum_ranking;
-CREATE VIEW stock_momentum_ranking AS
+DROP TABLE IF EXISTS stock_momentum_ranking;
+CREATE TABLE stock_momentum_ranking AS
 SELECT 
     m.ticker,
     m.date,
-    m.adj_close,
-    m.momentum_26w,
-    v.avg_dollar_volume_4w,
     RANK() OVER (PARTITION BY m.date ORDER BY m.momentum_26w DESC) AS momentum_rank,
     COUNT(*) OVER (PARTITION BY m.date) AS total_stocks
 FROM stock_momentum_26w m

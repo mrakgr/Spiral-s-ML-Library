@@ -1,24 +1,35 @@
+-- DOM (Direction of Momentum) indicator view
+-- Uses LAG to get previous day's rank without joining stock_momentum_ranking twice
 DROP VIEW IF EXISTS dom_indicator;
 CREATE VIEW dom_indicator AS
-WITH daily_returns AS (
+WITH ranked_with_prev AS (
     SELECT 
         r.ticker,
         r.date,
-        r.adj_close,
-        p_prev.adj_close AS adj_close_prev,
-        GREATEST(-0.50, LEAST(1.00, 
-            (r.adj_close - p_prev.adj_close) / p_prev.adj_close
-        )) AS daily_return,
-        r_prev.momentum_rank AS prev_momentum_rank,
-        r_prev.total_stocks AS prev_total_stocks
+        r.momentum_rank,
+        r.total_stocks,
+        LAG(r.momentum_rank) OVER (PARTITION BY r.ticker ORDER BY r.date) AS prev_momentum_rank,
+        LAG(r.total_stocks) OVER (PARTITION BY r.ticker ORDER BY r.date) AS prev_total_stocks
     FROM stock_momentum_ranking r
-    JOIN trading_calendar tc ON r.date = tc.current_date
+),
+daily_returns AS (
+    SELECT 
+        rp.ticker,
+        rp.date,
+        GREATEST(-0.50, LEAST(1.00, 
+            (p.adj_close - p_prev.adj_close) / p_prev.adj_close
+        )) AS daily_return,
+        rp.prev_momentum_rank,
+        rp.prev_total_stocks
+    FROM ranked_with_prev rp
+    JOIN trading_calendar tc ON rp.date = tc.current_date
+    JOIN split_adjusted_prices p 
+        ON p.ticker = rp.ticker 
+        AND p.date = rp.date
     JOIN split_adjusted_prices p_prev 
-        ON p_prev.ticker = r.ticker 
+        ON p_prev.ticker = rp.ticker 
         AND p_prev.date = tc.date_prev
-    JOIN stock_momentum_ranking r_prev
-        ON r_prev.ticker = r.ticker
-        AND r_prev.date = tc.date_prev
+    WHERE rp.prev_momentum_rank IS NOT NULL
 ),
 leader_laggard_returns AS (
     SELECT 

@@ -69,7 +69,6 @@ let generateDomChart (dbPath: string) (ticker: string option) (outputPath: strin
     let referenceTicker = ticker |> Option.defaultValue "SPY"
     
     use connection = Database.openConnection dbPath
-    Database.initializeSchema connection
     
     let domData = Database.getDomIndicator connection
     

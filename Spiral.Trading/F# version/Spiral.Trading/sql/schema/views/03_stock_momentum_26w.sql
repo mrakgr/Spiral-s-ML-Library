@@ -1,10 +1,11 @@
+-- Materialized table for 26-week momentum
+-- Only stores ticker, date, and momentum value (adj_close available in split_adjusted_prices)
 DROP VIEW IF EXISTS stock_momentum_26w;
-CREATE VIEW stock_momentum_26w AS
+DROP TABLE IF EXISTS stock_momentum_26w;
+CREATE TABLE stock_momentum_26w AS
 SELECT 
     p.ticker,
     tc.current_date AS date,
-    p.adj_close,
-    p_26w.adj_close AS adj_close_26w_ago,
     (p.adj_close - p_26w.adj_close) / p_26w.adj_close AS momentum_26w
 FROM split_adjusted_prices p
 JOIN trading_calendar tc ON p.date = tc.current_date

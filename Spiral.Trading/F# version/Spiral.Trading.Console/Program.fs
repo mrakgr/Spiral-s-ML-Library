@@ -240,6 +240,14 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
 
     printfn "Data ingestion complete."
 
+    // Materialize derived tables (split-adjusted prices, momentum, DOM indicator, etc.)
+    printfn ""
+    printfn "Materializing derived tables..."
+    let sw = System.Diagnostics.Stopwatch.StartNew()
+    materializeViews connection
+    sw.Stop()
+    printfn "Materialized derived tables in %.2fs" sw.Elapsed.TotalSeconds
+
     // Show summary
     printfn ""
     printfn "Database summary:"
