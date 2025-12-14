@@ -126,9 +126,24 @@ let generateDomChart (dbPath: string) (ticker: string option) (outputPath: strin
         printfn "DOM chart saved to %s" outputPath
         printfn "Date range: %O to %O (%d days)" dates[0] dates[dates.Length - 1] dates.Length
 
-/// Generate an intraday candlestick chart with volume and save as HTML
+/// Calculate cumulative session VWAP from bar-level VWAP and volume
+let private calculateSessionVwap (prices: Database.IntradayPriceRow array) : float array =
+    let mutable cumVwapVolume = 0.0
+    let mutable cumVolume = 0.0
+    prices |> Array.map (fun p ->
+        let barVwap = if p.vwap.HasValue then p.vwap.Value else (p.high + p.low + p.close) / 3.0
+        cumVwapVolume <- cumVwapVolume + barVwap * p.volume
+        cumVolume <- cumVolume + p.volume
+        if cumVolume > 0.0 then cumVwapVolume / cumVolume else barVwap
+    )
+
+/// Generate an intraday candlestick chart with volume and VWAP, save as HTML
 let generateIntradayCandlestickChart (prices: Database.IntradayPriceRow array) (ticker: string) (date: DateTime) (outputPath: string) (width: int) (height: int) : unit =
     let timestamps = prices |> Array.map (fun p -> p.timestamp)
+    let volumes = prices |> Array.map (fun p -> p.volume)
+    let barVwaps = prices |> Array.map (fun p -> 
+        if p.vwap.HasValue then p.vwap.Value else (p.high + p.low + p.close) / 3.0)
+    let sessionVwaps = calculateSessionVwap prices
     
     let candlestick =
         Candlestick(
@@ -143,10 +158,33 @@ let generateIntradayCandlestickChart (prices: Database.IntradayPriceRow array) (
     let volume =
         Bar(
             x = timestamps,
-            y = (prices |> Array.map (fun p -> p.volume)),
+            y = volumes,
             name = "Volume",
             marker = Marker(color = "rgba(100, 100, 200, 0.5)"),
-            yaxis = "y2"
+            yaxis = "y2",
+            hoverinfo = "y+x"
+        )
+    
+    // Session VWAP line (cumulative)
+    let sessionVwapTrace =
+        Scatter(
+            x = timestamps,
+            y = sessionVwaps,
+            name = "Session VWAP",
+            mode = "lines",
+            line = Line(color = "orange", width = 2.0),
+            hoverinfo = "y+x+name"
+        )
+    
+    // Bar VWAP as dots
+    let barVwapTrace =
+        Scatter(
+            x = timestamps,
+            y = barVwaps,
+            name = "Bar VWAP",
+            mode = "markers",
+            marker = Marker(color = "rgba(128, 0, 128, 0.4)", size = 4),
+            hoverinfo = "y+x+name"
         )
     
     let dateStr = date.ToString("yyyy-MM-dd")
@@ -157,11 +195,12 @@ let generateIntradayCandlestickChart (prices: Database.IntradayPriceRow array) (
             yaxis = Yaxis(title = "Price", domain = [| 0.3; 1.0 |]),
             yaxis2 = Yaxis(title = "Volume", domain = [| 0.0; 0.25 |]),
             width = width,
-            height = height
+            height = height,
+            hovermode = "x unified"
         )
     
     let chart =
-        [candlestick :> Trace; volume :> Trace]
+        [candlestick :> Trace; volume :> Trace; sessionVwapTrace :> Trace; barVwapTrace :> Trace]
         |> Chart.Plot
         |> Chart.WithLayout(layout)
     
