@@ -204,6 +204,6 @@ F# version/
 ├── api_key.json                 # API credentials (not in git)
 └── data/                        # Downloaded data
     ├── daily_aggregates/        # CSV files
-    ├── splits.json              # Splits data
+    ├── splits.csv              # Splits data
     └── trading.db               # SQLite database
 ```
