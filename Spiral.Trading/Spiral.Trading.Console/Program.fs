@@ -78,12 +78,34 @@ type PlotDomArgs =
             | Width _ -> "Chart width in pixels (default: 1200)"
             | Height _ -> "Chart height in pixels (default: 600)"
 
+type StocksInPlayArgs =
+    | [<AltCommandLine("-s")>] Start_Date of string
+    | [<AltCommandLine("-e")>] End_Date of string
+    | [<AltCommandLine("-d")>] Database of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Start_Date _ -> "Start date (yyyy-MM-dd). Default: 1 week ago"
+            | End_Date _ -> "End date (yyyy-MM-dd). Default: today"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+
+type RefreshViewsArgs =
+    | [<AltCommandLine("-d")>] Database of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Dom of ParseResults<PlotDomArgs>
+    | [<CliPrefix(CliPrefix.None)>] Stocks_In_Play of ParseResults<StocksInPlayArgs>
+    | [<CliPrefix(CliPrefix.None)>] Refresh_Views of ParseResults<RefreshViewsArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -93,6 +115,8 @@ type Arguments =
             | Ingest_Data _ -> "Ingest downloaded data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
             | Plot_Dom _ -> "Generate a DOM indicator chart"
+            | Stocks_In_Play _ -> "List top stocks in play for a date range"
+            | Refresh_Views _ -> "Refresh views only (fast, no table rematerialization)"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -198,10 +222,6 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     use connection = openConnection dbPath
     initializeSchema connection
 
-    // Get already processed files
-    let processedFiles = getProcessedFiles connection
-    printfn "Already processed: %d files" processedFiles.Count
-
     // Ingest daily prices from CSV files using DuckDB's native CSV reader with glob
     if Directory.Exists csvDir then
         let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
@@ -216,10 +236,6 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
         let countAfter = getDailyPriceCount connection
         let totalPrices = countAfter - countBefore
         sw.Stop()
-
-        // Mark all files as processed
-        let fileNames = allFiles |> Array.map Path.GetFileName
-        markFilesProcessed connection fileNames
 
         let rowsPerSec = if sw.Elapsed.TotalSeconds > 0.0 then float countAfter / sw.Elapsed.TotalSeconds else 0.0
         printfn "Ingested %d new daily prices (total: %d) in %.2fs (%.0f rows/sec)" totalPrices countAfter sw.Elapsed.TotalSeconds rowsPerSec
@@ -244,9 +260,16 @@ let private handleIngestData (args: ParseResults<IngestDataArgs>) =
     printfn ""
     printfn "Materializing derived tables..."
     let sw = System.Diagnostics.Stopwatch.StartNew()
-    materializeViews connection
+    materializeTables connection
     sw.Stop()
     printfn "Materialized derived tables in %.2fs" sw.Elapsed.TotalSeconds
+
+    // Refresh views
+    printfn "Refreshing views..."
+    let sw2 = System.Diagnostics.Stopwatch.StartNew()
+    refreshViews connection
+    sw2.Stop()
+    printfn "Refreshed views in %.2fs" sw2.Elapsed.TotalSeconds
 
     // Show summary
     printfn ""
@@ -304,6 +327,53 @@ let private handlePlotDom (args: ParseResults<PlotDomArgs>) =
 
     Plotting.generateDomChart dbPath ticker outputPath width height
 
+let private handleStocksInPlay (args: ParseResults<StocksInPlayArgs>) =
+    let endDate =
+        args.TryGetResult StocksInPlayArgs.End_Date
+        |> Option.map DateTime.Parse
+        |> Option.defaultValue DateTime.Now
+
+    let startDate =
+        args.TryGetResult StocksInPlayArgs.Start_Date
+        |> Option.map DateTime.Parse
+        |> Option.defaultValue (endDate.AddDays(-7))
+
+    let dbPath =
+        args.TryGetResult StocksInPlayArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    printfn "Stocks In Play from %s to %s" (formatDate startDate) (formatDate endDate)
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+    printfn ""
+
+    use connection = openConnection dbPath
+    let stocks = getStocksInPlay connection startDate endDate
+
+    if stocks.Length = 0 then
+        printfn "No stocks in play found for the given date range."
+    else
+        let mutable currentDate = DateOnly.MinValue
+        for stock in stocks do
+            if stock.date <> currentDate then
+                currentDate <- stock.date
+                printfn "=== %s ===" (currentDate.ToString("yyyy-MM-dd"))
+            printfn "  %2d. %-6s  Gap: %+6.2f%%  RVOL: %5.1fx  Score: %5.2f" 
+                stock.rank stock.ticker (stock.gap_pct * 100.0) stock.rvol stock.in_play_score
+
+let private handleRefreshViews (args: ParseResults<RefreshViewsArgs>) =
+    let dbPath =
+        args.TryGetResult RefreshViewsArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    printfn "Refreshing views..."
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+
+    use connection = openConnection dbPath
+    let sw = System.Diagnostics.Stopwatch.StartNew()
+    refreshViews connection
+    sw.Stop()
+    printfn "Refreshed views in %.2fs" sw.Elapsed.TotalSeconds
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -327,6 +397,10 @@ let main argv =
                 handlePlotChart args
             | Plot_Dom args ->
                 handlePlotDom args
+            | Stocks_In_Play args ->
+                handleStocksInPlay args
+            | Refresh_Views args ->
+                handleRefreshViews args
 
         0
     with

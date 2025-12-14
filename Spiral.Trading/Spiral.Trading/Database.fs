@@ -80,16 +80,26 @@ let initializeSchema (connection: IDbConnection) : unit =
     // Execute all table schemas (base tables only)
     executeSql "sql.schema.tables"
 
-/// Materialize derived tables and views (call after data ingestion)
-let materializeViews (connection: IDbConnection) : unit =
+let private executeSqlFromFolder (connection: IDbConnection) (folderName: string) : unit =
     let assembly = Assembly.GetExecutingAssembly()
-
-    // Execute all view/materialized table schemas in order
-    for resourceName in getEmbeddedSqlFromFolder "sql.schema.views" do
+    for resourceName in getEmbeddedSqlFromFolder folderName do
         use stream = assembly.GetManifestResourceStream(resourceName)
         use reader = new StreamReader(stream)
         let sql = reader.ReadToEnd()
         connection.Execute(sql) |> ignore
+
+/// Materialize derived tables (slow, call after data ingestion)
+let materializeTables (connection: IDbConnection) : unit =
+    executeSqlFromFolder connection "sql.schema.materialized"
+
+/// Refresh views only (fast, call when view definitions change)
+let refreshViews (connection: IDbConnection) : unit =
+    executeSqlFromFolder connection "sql.schema.views"
+
+/// Materialize all derived tables and views (call after data ingestion)
+let materializeAll (connection: IDbConnection) : unit =
+    materializeTables connection
+    refreshViews connection
 
 // Note: DuckDB is columnar and optimized for bulk loads by default.
 // No PRAGMA statements or index manipulation needed.
@@ -368,65 +378,6 @@ let getSplitAdjustedPricesByTicker (connection: IDbConnection) (ticker: string) 
         {| ticker = ticker |})
     |> Seq.toArray
 
-// --- Processed Files Tracking ---
-
-/// Get set of already processed file names
-let getProcessedFiles (connection: IDbConnection) : Set<string> =
-    connection.Query<string>("SELECT file_name FROM processed_files")
-    |> Set.ofSeq
-
-/// Mark a file as processed
-let markFileProcessed (connection: IDbConnection) (fileName: string) : unit =
-    connection.Execute(
-        "INSERT INTO processed_files (file_name, ingested_at) VALUES ($fileName, $ingestedAt) ON CONFLICT DO NOTHING",
-        {| fileName = fileName; ingestedAt = DateTime.UtcNow.ToString("o") |}) |> ignore
-
-/// Mark multiple files as processed
-let markFilesProcessed (connection: IDbConnection) (fileNames: string seq) : unit =
-    let duckDbConn = connection :?> DuckDBConnection
-    use transaction = duckDbConn.BeginTransaction()
-    use cmd = duckDbConn.CreateCommand()
-    cmd.Transaction <- transaction
-    cmd.CommandText <- "INSERT INTO processed_files (file_name, ingested_at) VALUES ($fileName, $ingestedAt) ON CONFLICT DO NOTHING"
-    let pFileName = new DuckDBParameter("fileName", null)
-    let pIngestedAt = new DuckDBParameter("ingestedAt", null)
-    cmd.Parameters.Add(pFileName) |> ignore
-    cmd.Parameters.Add(pIngestedAt) |> ignore
-    let now = DateTime.UtcNow.ToString("o")
-
-    for fileName in fileNames do
-        pFileName.Value <- fileName
-        pIngestedAt.Value <- now
-        cmd.ExecuteNonQuery() |> ignore
-
-    transaction.Commit()
-
-/// Bulk ingest daily prices from multiple .csv.gz files with progress reporting
-let ingestDailyPricesFromDirectory 
-    (connection: IDbConnection) 
-    (csvDir: string) 
-    (progress: int -> int -> string -> int64 -> unit) 
-    : int64 =
-    let processedFiles = getProcessedFiles connection
-    let allFiles = Directory.GetFiles(csvDir, "*.csv.gz")
-    let filesToProcess = 
-        allFiles 
-        |> Array.filter (fun f -> not (processedFiles.Contains(Path.GetFileName(f))))
-    
-    let mutable totalRows = 0L
-    let mutable filesProcessed = 0
-    let totalFiles = filesToProcess.Length
-    
-    for filePath in filesToProcess do
-        let fileName = Path.GetFileName(filePath)
-        let rowsInserted = ingestDailyPricesFromCsvGz connection filePath
-        markFileProcessed connection fileName
-        filesProcessed <- filesProcessed + 1
-        totalRows <- totalRows + rowsInserted
-        progress filesProcessed totalFiles fileName rowsInserted
-    
-    totalRows
-
 // --- DOM Indicator ---
 
 [<CLIMutable>]
@@ -442,4 +393,28 @@ type DomIndicatorRow = {
 /// Get DOM indicator data
 let getDomIndicator (connection: IDbConnection) : DomIndicatorRow array =
     connection.Query<DomIndicatorRow>("SELECT * FROM dom_indicator ORDER BY date")
+    |> Seq.toArray
+
+// --- Stocks In Play ---
+
+[<CLIMutable>]
+type StockInPlayRow = {
+    ticker: string
+    date: DateOnly
+    adj_open: float
+    adj_close: float
+    prev_close: float
+    gap_pct: float
+    range_pct: float
+    rvol: float
+    avg_dollar_volume_4w: float
+    in_play_score: float
+    rank: int64
+}
+
+/// Get stocks in play for a date range
+let getStocksInPlay (connection: IDbConnection) (startDate: DateTime) (endDate: DateTime) : StockInPlayRow array =
+    connection.Query<StockInPlayRow>(
+        "SELECT * FROM stocks_in_play WHERE date >= $startDate AND date <= $endDate ORDER BY date, rank",
+        {| startDate = startDate.ToString("yyyy-MM-dd"); endDate = endDate.ToString("yyyy-MM-dd") |})
     |> Seq.toArray

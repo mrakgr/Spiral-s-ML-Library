@@ -173,6 +173,57 @@ dotnet run --project Spiral.Trading.Console -- plot-dom -o charts/dom.html
 - Optional reference ticker overlay
 - Output as standalone HTML file (uses Plotly.js)
 
+### Stocks In Play
+
+Lists top stocks in play for a date range based on relative volume, opening gap, and liquidity.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- stocks-in-play [options]
+```
+
+**Options:**
+- `-s, --start-date <yyyy-MM-dd>` - Start date (default: 1 week ago)
+- `-e, --end-date <yyyy-MM-dd>` - End date (default: today)
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
+
+**Examples:**
+
+```bash
+# List stocks in play for the past week
+dotnet run --project Spiral.Trading.Console -- stocks-in-play
+
+# List stocks in play for a specific date range
+dotnet run --project Spiral.Trading.Console -- stocks-in-play -s 2024-12-01 -e 2024-12-11
+```
+
+**Criteria:**
+- Liquidity: $100M+ average daily dollar volume (4-week)
+- Relative Volume (RVOL): >= 3x normal volume
+- Opening Gap: >= 5% from previous close
+- Ranked by composite score (RVOL + gap magnitude)
+- Top 10 stocks per day
+
+### Refresh Views
+
+Refreshes only the SQL views without rematerializing the derived tables. Use this when you've modified view definitions but don't need to recompute the underlying materialized tables.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- refresh-views [options]
+```
+
+**Options:**
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
+
+**Examples:**
+
+```bash
+# Refresh views with default database
+dotnet run --project Spiral.Trading.Console -- refresh-views
+
+# Refresh views for a custom database
+dotnet run --project Spiral.Trading.Console -- refresh-views -d /path/to/custom.db
+```
+
 ## Project Structure
 
 ```
@@ -186,19 +237,20 @@ F# version/
 │   ├── Database.fs              # DuckDB database operations
 │   ├── Plotting.fs              # Chart generation (candlestick, DOM)
 │   └── sql/schema/              # SQL schema files
-│       ├── tables/
+│       ├── tables/              # Base tables
 │       │   ├── daily_prices.sql
-│       │   ├── splits.sql
-│       │   └── processed_files.sql
-│       └── views/
-│           ├── 01_split_adjusted_prices.sql
-│           ├── 02_trading_calendar.sql
-│           ├── 03_stock_momentum_26w.sql
-│           ├── 04_stock_dollar_volume_4w.sql
-│           ├── 05_stock_momentum_ranking.sql
+│       │   └── splits.sql
+│       ├── materialized/        # Materialized tables (slow to rebuild)
+│       │   ├── 01_split_adjusted_prices.sql
+│       │   ├── 02_trading_calendar.sql
+│       │   ├── 03_stock_momentum_26w.sql
+│       │   ├── 04_stock_dollar_volume_4w.sql
+│       │   └── 05_stock_momentum_ranking.sql
+│       └── views/               # Views (fast to refresh)
 │           ├── 06_stock_leaders.sql
 │           ├── 07_stock_laggards.sql
-│           └── 08_dom_indicator.sql
+│           ├── 08_dom_indicator.sql
+│           └── 09_stocks_in_play.sql
 ├── Spiral.Trading.Console/      # CLI application
 │   └── Program.fs
 ├── api_key.json                 # API credentials (not in git)
