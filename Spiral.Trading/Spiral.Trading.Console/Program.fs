@@ -145,6 +145,26 @@ type IngestIntradayArgs =
             | Input_Dir _ -> "Input directory for intraday data (default: data/intraday)"
             | Timespan _ -> "Filter by timespan: 'minute', 'second', or 'all' (default: all)"
 
+type PlotIntradayArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-s")>] Date of string
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-o")>] Output of string
+    | [<AltCommandLine("-w")>] Width of int
+    | [<AltCommandLine("-h")>] Height of int
+    | Timespan of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Stock ticker symbol (required)"
+            | Date _ -> "Date to plot (yyyy-MM-dd, required)"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Output _ -> "Output HTML file path (default: data/{ticker}_{date}_intraday.html)"
+            | Width _ -> "Chart width in pixels (default: 1200)"
+            | Height _ -> "Chart height in pixels (default: 900)"
+            | Timespan _ -> "Aggregate timespan: 'minute' or 'second' (default: minute)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
@@ -153,6 +173,7 @@ type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Ingest_Intraday of ParseResults<IngestIntradayArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Dom of ParseResults<PlotDomArgs>
+    | [<CliPrefix(CliPrefix.None)>] Plot_Intraday of ParseResults<PlotIntradayArgs>
     | [<CliPrefix(CliPrefix.None)>] Stocks_In_Play of ParseResults<StocksInPlayArgs>
     | [<CliPrefix(CliPrefix.None)>] Refresh_Views of ParseResults<RefreshViewsArgs>
 
@@ -166,6 +187,7 @@ type Arguments =
             | Ingest_Intraday _ -> "Ingest intraday data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
             | Plot_Dom _ -> "Generate a DOM indicator chart"
+            | Plot_Intraday _ -> "Generate an intraday candlestick chart for a ticker on a specific date"
             | Stocks_In_Play _ -> "List top stocks in play for a date range"
             | Refresh_Views _ -> "Refresh views only (fast, no table rematerialization)"
 
@@ -377,6 +399,40 @@ let private handlePlotDom (args: ParseResults<PlotDomArgs>) =
     printfn "Output: %s" (Path.GetFullPath outputPath)
 
     Plotting.generateDomChart dbPath ticker outputPath width height
+
+let private handlePlotIntraday (args: ParseResults<PlotIntradayArgs>) =
+    let ticker =
+        match args.TryGetResult PlotIntradayArgs.Ticker with
+        | Some t -> t.ToUpperInvariant()
+        | None -> failwith "Ticker is required. Use -t or --ticker to specify."
+
+    let date =
+        match args.TryGetResult PlotIntradayArgs.Date with
+        | Some d -> DateTime.Parse(d)
+        | None -> failwith "Date is required. Use -s or --date to specify (yyyy-MM-dd)."
+
+    let dbPath =
+        args.TryGetResult PlotIntradayArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    let timespan =
+        args.TryGetResult PlotIntradayArgs.Timespan
+        |> Option.defaultValue "minute"
+
+    let dateStr = date.ToString("yyyy-MM-dd")
+    let outputPath =
+        args.TryGetResult PlotIntradayArgs.Output
+        |> Option.defaultValue $"data/{ticker}_{dateStr}_intraday.html"
+
+    let width = args.GetResult(PlotIntradayArgs.Width, defaultValue = 1200)
+    let height = args.GetResult(PlotIntradayArgs.Height, defaultValue = 900)
+
+    printfn "Generating intraday chart for %s on %s" ticker dateStr
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+    printfn "Output: %s" (Path.GetFullPath outputPath)
+    printfn "Timespan: %s" timespan
+
+    Plotting.generateIntradayChart dbPath ticker date timespan outputPath width height
 
 let private handleStocksInPlay (args: ParseResults<StocksInPlayArgs>) =
     let endDate =
@@ -601,6 +657,8 @@ let main argv =
                 handlePlotChart args
             | Plot_Dom args ->
                 handlePlotDom args
+            | Plot_Intraday args ->
+                handlePlotIntraday args
             | Stocks_In_Play args ->
                 handleStocksInPlay args
 

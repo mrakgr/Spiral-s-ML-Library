@@ -437,14 +437,14 @@ let ingestIntradayMinuteFromGlob (connection: IDbConnection) (globPattern: strin
     let sql = $"""
         INSERT INTO intraday_prices_minute (ticker, timestamp, open, high, low, close, volume, vwap, transactions)
         SELECT
-            r.Ticker,
+            r.ticker,
             epoch_ms(bar.t),
             bar.o, bar.h, bar.l, bar.c,
             bar.v,
             bar.vw,
             bar.n
         FROM read_json('{globPattern}') r,
-        UNNEST(r.Results) AS bar
+        UNNEST(r.results) AS t(bar)
         WHERE bar.t IS NOT NULL
         ON CONFLICT(ticker, timestamp) DO UPDATE SET
             open = excluded.open,
@@ -462,14 +462,14 @@ let ingestIntradaySecondFromGlob (connection: IDbConnection) (globPattern: strin
     let sql = $"""
         INSERT INTO intraday_prices_second (ticker, timestamp, open, high, low, close, volume, vwap, transactions)
         SELECT
-            r.Ticker,
+            r.ticker,
             epoch_ms(bar.t),
             bar.o, bar.h, bar.l, bar.c,
             bar.v,
             bar.vw,
             bar.n
         FROM read_json('{globPattern}') r,
-        UNNEST(r.Results) AS bar
+        UNNEST(r.results) AS t(bar)
         WHERE bar.t IS NOT NULL
         ON CONFLICT(ticker, timestamp) DO UPDATE SET
             open = excluded.open,
@@ -489,3 +489,38 @@ let getIntradayMinuteCount (connection: IDbConnection) : int64 =
 /// Get count of second-level intraday prices in database
 let getIntradaySecondCount (connection: IDbConnection) : int64 =
     connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM intraday_prices_second")
+
+// --- Intraday Price Queries ---
+
+[<CLIMutable>]
+type IntradayPriceRow = {
+    ticker: string
+    timestamp: DateTime
+    ``open``: float
+    high: float
+    low: float
+    close: float
+    volume: float
+    vwap: Nullable<float>
+    transactions: Nullable<int>
+}
+
+/// Get minute-level intraday prices for a ticker on a specific date
+let getIntradayMinuteByTickerDate (connection: IDbConnection) (ticker: string) (date: DateTime) : IntradayPriceRow array =
+    connection.Query<IntradayPriceRow>(
+        """SELECT ticker, timestamp, open, high, low, close, volume, vwap, transactions 
+           FROM intraday_prices_minute 
+           WHERE ticker = $ticker AND CAST(timestamp AS DATE) = $date 
+           ORDER BY timestamp""",
+        {| ticker = ticker; date = date.ToString("yyyy-MM-dd") |})
+    |> Seq.toArray
+
+/// Get second-level intraday prices for a ticker on a specific date
+let getIntradaySecondByTickerDate (connection: IDbConnection) (ticker: string) (date: DateTime) : IntradayPriceRow array =
+    connection.Query<IntradayPriceRow>(
+        """SELECT ticker, timestamp, open, high, low, close, volume, vwap, transactions 
+           FROM intraday_prices_second 
+           WHERE ticker = $ticker AND CAST(timestamp AS DATE) = $date 
+           ORDER BY timestamp""",
+        {| ticker = ticker; date = date.ToString("yyyy-MM-dd") |})
+    |> Seq.toArray

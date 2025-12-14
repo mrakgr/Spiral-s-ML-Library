@@ -125,3 +125,64 @@ let generateDomChart (dbPath: string) (ticker: string option) (outputPath: strin
         File.WriteAllText(outputPath, html)
         printfn "DOM chart saved to %s" outputPath
         printfn "Date range: %O to %O (%d days)" dates[0] dates[dates.Length - 1] dates.Length
+
+/// Generate an intraday candlestick chart with volume and save as HTML
+let generateIntradayCandlestickChart (prices: Database.IntradayPriceRow array) (ticker: string) (date: DateTime) (outputPath: string) (width: int) (height: int) : unit =
+    let timestamps = prices |> Array.map (fun p -> p.timestamp)
+    
+    let candlestick =
+        Candlestick(
+            x = timestamps,
+            ``open`` = (prices |> Array.map (fun p -> p.``open``)),
+            high = (prices |> Array.map (fun p -> p.high)),
+            low = (prices |> Array.map (fun p -> p.low)),
+            close = (prices |> Array.map (fun p -> p.close)),
+            name = ticker
+        )
+    
+    let volume =
+        Bar(
+            x = timestamps,
+            y = (prices |> Array.map (fun p -> p.volume)),
+            name = "Volume",
+            marker = Marker(color = "rgba(100, 100, 200, 0.5)"),
+            yaxis = "y2"
+        )
+    
+    let dateStr = date.ToString("yyyy-MM-dd")
+    let layout =
+        Layout(
+            title = $"Intraday Chart - {ticker} ({dateStr})",
+            xaxis = Xaxis(title = "Time"),
+            yaxis = Yaxis(title = "Price", domain = [| 0.3; 1.0 |]),
+            yaxis2 = Yaxis(title = "Volume", domain = [| 0.0; 0.25 |]),
+            width = width,
+            height = height
+        )
+    
+    let chart =
+        [candlestick :> Trace; volume :> Trace]
+        |> Chart.Plot
+        |> Chart.WithLayout(layout)
+    
+    let html = chart.GetHtml()
+    File.WriteAllText(outputPath, html)
+    printfn "Chart saved to %s" outputPath
+
+/// Generate an intraday chart for a ticker on a specific date
+let generateIntradayChart (dbPath: string) (ticker: string) (date: DateTime) (timespan: string) (outputPath: string) (width: int) (height: int) : unit =
+    if not (File.Exists dbPath) then
+        failwithf "Database not found at %s" dbPath
+    
+    use connection = Database.openConnection dbPath
+    
+    let prices =
+        match timespan with
+        | "second" -> Database.getIntradaySecondByTickerDate connection ticker date
+        | _ -> Database.getIntradayMinuteByTickerDate connection ticker date
+    
+    if prices.Length = 0 then
+        printfn "No intraday data found for %s on %s" ticker (date.ToString("yyyy-MM-dd"))
+    else
+        printfn "Found %d %s bars for %s on %s" prices.Length timespan ticker (date.ToString("yyyy-MM-dd"))
+        generateIntradayCandlestickChart prices ticker date outputPath width height
