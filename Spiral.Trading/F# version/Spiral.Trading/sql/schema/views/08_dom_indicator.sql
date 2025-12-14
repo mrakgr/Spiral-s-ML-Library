@@ -6,7 +6,7 @@ WITH daily_returns AS (
         r.date,
         r.adj_close,
         p_prev.adj_close AS adj_close_prev,
-        GREATEST(-0.50, LEAST(2.00, 
+        GREATEST(-0.50, LEAST(1.00, 
             (r.adj_close - p_prev.adj_close) / p_prev.adj_close
         )) AS daily_return,
         r_prev.momentum_rank AS prev_momentum_rank,
