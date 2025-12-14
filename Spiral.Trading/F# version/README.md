@@ -183,13 +183,22 @@ F# version/
 │   ├── S3Download.fs            # S3 download functionality
 │   ├── SplitDownload.fs         # Splits API client
 │   ├── CsvParsing.fs            # CSV parsing with FSharp.Data
-│   ├── Database.fs              # SQLite database operations
-│   ├── Plotting.fs              # Chart generation with XPlot.Plotly
+│   ├── Database.fs              # DuckDB database operations
+│   ├── Plotting.fs              # Chart generation (candlestick, DOM)
 │   └── sql/schema/              # SQL schema files
-│       ├── daily_prices.sql
-│       ├── splits.sql
-│       ├── processed_files.sql
-│       └── split_adjusted_prices.sql
+│       ├── tables/
+│       │   ├── daily_prices.sql
+│       │   ├── splits.sql
+│       │   └── processed_files.sql
+│       └── views/
+│           ├── 01_split_adjusted_prices.sql
+│           ├── 02_trading_calendar.sql
+│           ├── 03_stock_momentum_26w.sql
+│           ├── 04_stock_dollar_volume_4w.sql
+│           ├── 05_stock_momentum_ranking.sql
+│           ├── 06_stock_leaders.sql
+│           ├── 07_stock_laggards.sql
+│           └── 08_dom_indicator.sql
 ├── Spiral.Trading.Console/      # CLI application
 │   └── Program.fs
 ├── api_key.json                 # API credentials (not in git)
