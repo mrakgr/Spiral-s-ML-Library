@@ -1,6 +1,5 @@
 -- Materialized table for trading calendar
 -- Pre-computes date lookups for 26w and 4w ago
-DROP VIEW IF EXISTS trading_calendar;
 DROP TABLE IF EXISTS trading_calendar;
 CREATE TABLE trading_calendar AS
 WITH spy_dates AS (

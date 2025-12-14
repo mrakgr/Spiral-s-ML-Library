@@ -1,6 +1,5 @@
 -- Materialized table for 4-week average dollar volume
 -- Only stores ticker, date, and avg_dollar_volume_4w
-DROP VIEW IF EXISTS stock_dollar_volume_4w;
 DROP TABLE IF EXISTS stock_dollar_volume_4w;
 CREATE TABLE stock_dollar_volume_4w AS
 WITH volume_data AS (

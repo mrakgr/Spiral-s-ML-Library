@@ -1,7 +1,6 @@
 -- Materialized table for momentum ranking
 -- Only stores ticker, date, momentum_rank, and total_stocks
 -- (momentum_26w available in stock_momentum_26w, avg_dollar_volume_4w in stock_dollar_volume_4w)
-DROP VIEW IF EXISTS stock_momentum_ranking;
 DROP TABLE IF EXISTS stock_momentum_ranking;
 CREATE TABLE stock_momentum_ranking AS
 SELECT 

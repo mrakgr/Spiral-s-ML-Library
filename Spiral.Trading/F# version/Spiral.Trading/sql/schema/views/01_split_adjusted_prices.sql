@@ -1,6 +1,5 @@
 -- Materialized table for split-adjusted prices
 -- Only stores adjusted values, not original OHLCV (available in daily_prices)
-DROP VIEW IF EXISTS split_adjusted_prices;
 DROP TABLE IF EXISTS split_adjusted_prices;
 CREATE TABLE split_adjusted_prices AS
 WITH split_factors AS (
