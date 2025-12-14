@@ -82,6 +82,9 @@ type StocksInPlayArgs =
     | [<AltCommandLine("-s")>] Start_Date of string
     | [<AltCommandLine("-e")>] End_Date of string
     | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-r")>] Min_Rvol of float
+    | [<AltCommandLine("-g")>] Min_Gap_Pct of float
+    | [<AltCommandLine("-v")>] Min_Dollar_Volume of float
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -89,6 +92,9 @@ type StocksInPlayArgs =
             | Start_Date _ -> "Start date (yyyy-MM-dd). Default: 1 week ago"
             | End_Date _ -> "End date (yyyy-MM-dd). Default: today"
             | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Min_Rvol _ -> "Minimum relative volume (default: 3)"
+            | Min_Gap_Pct _ -> "Minimum gap percentage as decimal, e.g. 0.05 for 5% (default: 0.05)"
+            | Min_Dollar_Volume _ -> "Minimum avg dollar volume in millions (default: 100)"
 
 type RefreshViewsArgs =
     | [<AltCommandLine("-d")>] Database of string
@@ -342,12 +348,17 @@ let private handleStocksInPlay (args: ParseResults<StocksInPlayArgs>) =
         args.TryGetResult StocksInPlayArgs.Database
         |> Option.defaultValue "data/trading.db"
 
+    let minRvol = args.GetResult(StocksInPlayArgs.Min_Rvol, defaultValue = 3.0)
+    let minGapPct = args.GetResult(StocksInPlayArgs.Min_Gap_Pct, defaultValue = 0.05)
+    let minDollarVolume = args.GetResult(StocksInPlayArgs.Min_Dollar_Volume, defaultValue = 100.0) * 1_000_000.0
+
     printfn "Stocks In Play from %s to %s" (formatDate startDate) (formatDate endDate)
+    printfn "Filters: RVOL >= %.1fx, Gap >= %.1f%%, Avg Dollar Volume >= $%.0fM" minRvol (minGapPct * 100.0) (minDollarVolume / 1_000_000.0)
     printfn "Database: %s" (Path.GetFullPath dbPath)
     printfn ""
 
     use connection = openConnection dbPath
-    let stocks = getStocksInPlay connection startDate endDate
+    let stocks = getStocksInPlay connection startDate endDate minRvol minGapPct minDollarVolume
 
     if stocks.Length = 0 then
         printfn "No stocks in play found for the given date range."
@@ -357,7 +368,7 @@ let private handleStocksInPlay (args: ParseResults<StocksInPlayArgs>) =
             if stock.date <> currentDate then
                 currentDate <- stock.date
                 printfn "=== %s ===" (currentDate.ToString("yyyy-MM-dd"))
-            printfn "  %2d. %-6s  Gap: %+6.2f%%  RVOL: %5.1fx  Score: %5.2f" 
+            printfn "  %2d. %-6s  Gap: %+6.2f%%  RVOL: %5.1fx  Score: %5.2f"
                 stock.rank stock.ticker (stock.gap_pct * 100.0) stock.rvol stock.in_play_score
 
 let private handleRefreshViews (args: ParseResults<RefreshViewsArgs>) =

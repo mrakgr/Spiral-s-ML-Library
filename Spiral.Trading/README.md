@@ -205,18 +205,30 @@ dotnet run --project Spiral.Trading.Console -- stocks-in-play [options]
 - `-s, --start-date <yyyy-MM-dd>` - Start date (default: 1 week ago)
 - `-e, --end-date <yyyy-MM-dd>` - End date (default: today)
 - `-d, --database <path>` - DuckDB database path (default: data/trading.db)
+- `-r, --min-rvol <float>` - Minimum relative volume (default: 3)
+- `-g, --min-gap-pct <float>` - Minimum gap percentage as decimal (default: 0.05 for 5%)
+- `-v, --min-dollar-volume <float>` - Minimum avg dollar volume in millions (default: 100)
 
 **Examples:**
 
 ```bash
-# List stocks in play for the past week
+# List stocks in play for the past week (default filters)
 dotnet run --project Spiral.Trading.Console -- stocks-in-play
 
 # List stocks in play for a specific date range
 dotnet run --project Spiral.Trading.Console -- stocks-in-play -s 2024-12-01 -e 2024-12-11
+
+# Find stocks with higher volatility (5x RVOL, 10% gap)
+dotnet run --project Spiral.Trading.Console -- stocks-in-play -r 5 -g 0.10
+
+# Include smaller-cap stocks ($50M+ avg volume instead of $100M)
+dotnet run --project Spiral.Trading.Console -- stocks-in-play -v 50
+
+# Combine all filters: aggressive settings for small caps
+dotnet run --project Spiral.Trading.Console -- stocks-in-play -r 2 -g 0.03 -v 25
 ```
 
-**Criteria:**
+**Default Criteria:**
 - Liquidity: $100M+ average daily dollar volume (4-week)
 - Relative Volume (RVOL): >= 3x normal volume
 - Opening Gap: >= 5% from previous close

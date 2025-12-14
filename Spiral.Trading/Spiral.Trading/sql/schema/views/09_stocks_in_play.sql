@@ -1,8 +1,13 @@
 -- Stocks In Play: Top 10 stocks per day based on relative volume, gap, and liquidity
-DROP VIEW IF EXISTS stocks_in_play;
-CREATE VIEW stocks_in_play AS
+-- Table macro with parameterized filters for rvol, gap_pct, and minimum dollar volume
+DROP MACRO IF EXISTS stocks_in_play;
+CREATE MACRO stocks_in_play(
+    min_rvol := 3,
+    min_gap_pct := 0.05,
+    min_avg_dollar_volume := 100000000
+) AS TABLE
 WITH daily_metrics AS (
-    SELECT 
+    SELECT
         p.ticker,
         p.date,
         p.adj_open,
@@ -22,25 +27,25 @@ WITH daily_metrics AS (
         (p.adj_close * p.adj_volume) / NULLIF(v.avg_dollar_volume_4w, 0) AS rvol
     FROM split_adjusted_prices p
     JOIN trading_calendar tc ON p.date = tc.current_date
-    JOIN split_adjusted_prices p_prev 
-        ON p_prev.ticker = p.ticker 
+    JOIN split_adjusted_prices p_prev
+        ON p_prev.ticker = p.ticker
         AND p_prev.date = tc.date_prev
-    JOIN stock_dollar_volume_4w v 
-        ON v.ticker = p.ticker 
+    JOIN stock_dollar_volume_4w v
+        ON v.ticker = p.ticker
         AND v.date = p.date
-    WHERE v.avg_dollar_volume_4w >= 100000000  -- $100M liquidity filter
+    WHERE v.avg_dollar_volume_4w >= min_avg_dollar_volume
 ),
 ranked AS (
-    SELECT 
+    SELECT
         *,
         -- Composite score: weight RVOL and absolute gap
         (rvol * 0.5 + ABS(gap_pct) * 100 * 0.5) AS in_play_score,
         ROW_NUMBER() OVER (PARTITION BY date ORDER BY in_play_score DESC) AS rank
     FROM daily_metrics
-    WHERE rvol >= 3  -- At least 3x normal volume
-      AND ABS(gap_pct) >= 0.05  -- At least 5% gap
+    WHERE rvol >= min_rvol
+      AND ABS(gap_pct) >= min_gap_pct
 )
-SELECT 
+SELECT
     ticker,
     date,
     adj_open,

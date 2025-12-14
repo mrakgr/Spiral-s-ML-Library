@@ -412,9 +412,20 @@ type StockInPlayRow = {
     rank: int64
 }
 
-/// Get stocks in play for a date range
-let getStocksInPlay (connection: IDbConnection) (startDate: DateTime) (endDate: DateTime) : StockInPlayRow array =
+/// Get stocks in play for a date range with customizable filters
+let getStocksInPlay
+    (connection: IDbConnection)
+    (startDate: DateTime)
+    (endDate: DateTime)
+    (minRvol: float)
+    (minGapPct: float)
+    (minAvgDollarVolume: float)
+    : StockInPlayRow array =
     connection.Query<StockInPlayRow>(
-        "SELECT * FROM stocks_in_play WHERE date >= $startDate AND date <= $endDate ORDER BY date, rank",
-        {| startDate = startDate.ToString("yyyy-MM-dd"); endDate = endDate.ToString("yyyy-MM-dd") |})
+        "SELECT * FROM stocks_in_play(min_rvol := $minRvol, min_gap_pct := $minGapPct, min_avg_dollar_volume := $minAvgDollarVolume) WHERE date >= $startDate AND date <= $endDate ORDER BY date, rank",
+        {| startDate = startDate.ToString("yyyy-MM-dd")
+           endDate = endDate.ToString("yyyy-MM-dd")
+           minRvol = minRvol
+           minGapPct = minGapPct
+           minAvgDollarVolume = minAvgDollarVolume |})
     |> Seq.toArray
