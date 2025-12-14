@@ -145,6 +145,40 @@ dotnet run --project Spiral.Trading.Console -- ingest-data -d /path/to/custom.db
 - Upserts splits (inserts new, updates existing) on each run
 - Materializes derived tables (split-adjusted prices, momentum rankings, etc.)
 
+### Ingest Intraday Data
+
+Ingests downloaded intraday JSON files into the DuckDB database.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- ingest-intraday [options]
+```
+
+**Options:**
+- `-d, --database <path>` - DuckDB database path (default: data/trading.db)
+- `-i, --input-dir <path>` - Input directory for intraday data (default: data/intraday)
+- `--timespan <string>` - Filter by timespan: 'minute', 'second', or 'all' (default: all)
+
+**Examples:**
+
+```bash
+# Ingest all intraday data (minute and second)
+dotnet run --project Spiral.Trading.Console -- ingest-intraday
+
+# Ingest only minute data
+dotnet run --project Spiral.Trading.Console -- ingest-intraday --timespan minute
+
+# Ingest only second data
+dotnet run --project Spiral.Trading.Console -- ingest-intraday --timespan second
+
+# Ingest from a custom directory
+dotnet run --project Spiral.Trading.Console -- ingest-intraday -i /path/to/intraday
+```
+
+**Features:**
+- Uses DuckDB's native JSON reader with glob patterns for fast bulk ingestion
+- Separate tables for minute (`intraday_prices_minute`) and second (`intraday_prices_second`) data
+- Upserts on conflict (updates existing bars)
+
 ### Refresh Views
 
 Refreshes only the SQL views without rematerializing the derived tables. Use this when you've modified view definitions but don't need to recompute the underlying materialized tables.

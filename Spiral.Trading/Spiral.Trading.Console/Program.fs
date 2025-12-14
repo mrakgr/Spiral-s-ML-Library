@@ -133,11 +133,24 @@ type DownloadIntradayArgs =
             | Min_Gap_Pct _ -> "Min gap % filter for SIP lookup (default: 0.05)"
             | Min_Dollar_Volume _ -> "Min avg dollar volume in millions for SIP lookup (default: 100)"
 
+type IngestIntradayArgs =
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-i")>] Input_Dir of string
+    | Timespan of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Input_Dir _ -> "Input directory for intraday data (default: data/intraday)"
+            | Timespan _ -> "Filter by timespan: 'minute', 'second', or 'all' (default: all)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Intraday of ParseResults<DownloadIntradayArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
+    | [<CliPrefix(CliPrefix.None)>] Ingest_Intraday of ParseResults<IngestIntradayArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Dom of ParseResults<PlotDomArgs>
     | [<CliPrefix(CliPrefix.None)>] Stocks_In_Play of ParseResults<StocksInPlayArgs>
@@ -149,7 +162,8 @@ type Arguments =
             | Download_Bulk _ -> "Download daily aggregate files from Massive S3"
             | Download_Splits _ -> "Download stock splits from Massive API"
             | Download_Intraday _ -> "Download intraday (minute/second) data for tickers"
-            | Ingest_Data _ -> "Ingest downloaded data into DuckDB database"
+            | Ingest_Data _ -> "Ingest daily data into DuckDB database"
+            | Ingest_Intraday _ -> "Ingest intraday data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
             | Plot_Dom _ -> "Generate a DOM indicator chart"
             | Stocks_In_Play _ -> "List top stocks in play for a date range"
@@ -499,6 +513,64 @@ let private handleDownloadIntraday (config: MassiveConfig) (args: ParseResults<D
         printfn ""
         printfn "Download complete: %d downloaded, %d skipped, %d failed" downloaded skipped failed
 
+let private handleIngestIntraday (args: ParseResults<IngestIntradayArgs>) =
+    let dbPath =
+        args.TryGetResult IngestIntradayArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    let inputDir =
+        args.TryGetResult IngestIntradayArgs.Input_Dir
+        |> Option.defaultValue "data/intraday"
+
+    let timespan =
+        args.TryGetResult IngestIntradayArgs.Timespan
+        |> Option.defaultValue "all"
+
+    printfn "Ingesting intraday data..."
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+    printfn "Input directory: %s" (Path.GetFullPath inputDir)
+    printfn "Timespan filter: %s" timespan
+    printfn ""
+
+    use connection = openConnection dbPath
+    initializeSchema connection
+
+    let ingestTimespan timespanName tableName ingestFn countFn =
+        let dir = Path.Combine(inputDir, timespanName)
+        if Directory.Exists dir then
+            let globPattern = Path.Combine(dir, "*", "*.json")
+            let fileCount =
+                if Directory.Exists dir then
+                    Directory.GetDirectories(dir)
+                    |> Array.sumBy (fun d -> Directory.GetFiles(d, "*.json").Length)
+                else 0
+
+            if fileCount > 0 then
+                printfn "Found %d %s JSON files" fileCount timespanName
+                let sw = System.Diagnostics.Stopwatch.StartNew()
+                let countBefore = countFn connection
+                let _ = ingestFn connection globPattern
+                let countAfter = countFn connection
+                let newRows = countAfter - countBefore
+                sw.Stop()
+                printfn "Ingested %d new %s bars (total: %d) in %.2fs" newRows timespanName countAfter sw.Elapsed.TotalSeconds
+            else
+                printfn "No %s JSON files found in %s" timespanName dir
+        else
+            printfn "Directory not found: %s" dir
+
+    match timespan with
+    | "minute" ->
+        ingestTimespan "minute" "intraday_prices_minute" ingestIntradayMinuteFromGlob getIntradayMinuteCount
+    | "second" ->
+        ingestTimespan "second" "intraday_prices_second" ingestIntradaySecondFromGlob getIntradaySecondCount
+    | "all" | _ ->
+        ingestTimespan "minute" "intraday_prices_minute" ingestIntradayMinuteFromGlob getIntradayMinuteCount
+        ingestTimespan "second" "intraday_prices_second" ingestIntradaySecondFromGlob getIntradaySecondCount
+
+    printfn ""
+    printfn "Intraday ingestion complete."
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -521,6 +593,8 @@ let main argv =
                 handleDownloadIntraday config args
             | Ingest_Data args ->
                 handleIngestData args
+            | Ingest_Intraday args ->
+                handleIngestIntraday args
             | Refresh_Views args ->
                 handleRefreshViews args
             | Plot_Chart args ->

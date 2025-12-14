@@ -429,3 +429,63 @@ let getStocksInPlay
            minGapPct = minGapPct
            minAvgDollarVolume = minAvgDollarVolume |})
     |> Seq.toArray
+
+// --- Intraday Prices ---
+
+/// Bulk ingest minute-level intraday prices from JSON files using glob pattern
+let ingestIntradayMinuteFromGlob (connection: IDbConnection) (globPattern: string) : int64 =
+    let sql = $"""
+        INSERT INTO intraday_prices_minute (ticker, timestamp, open, high, low, close, volume, vwap, transactions)
+        SELECT
+            r.Ticker,
+            epoch_ms(bar.t),
+            bar.o, bar.h, bar.l, bar.c,
+            bar.v,
+            bar.vw,
+            bar.n
+        FROM read_json('{globPattern}') r,
+        UNNEST(r.Results) AS bar
+        WHERE bar.t IS NOT NULL
+        ON CONFLICT(ticker, timestamp) DO UPDATE SET
+            open = excluded.open,
+            high = excluded.high,
+            low = excluded.low,
+            close = excluded.close,
+            volume = excluded.volume,
+            vwap = excluded.vwap,
+            transactions = excluded.transactions
+    """
+    connection.Execute(sql) |> int64
+
+/// Bulk ingest second-level intraday prices from JSON files using glob pattern
+let ingestIntradaySecondFromGlob (connection: IDbConnection) (globPattern: string) : int64 =
+    let sql = $"""
+        INSERT INTO intraday_prices_second (ticker, timestamp, open, high, low, close, volume, vwap, transactions)
+        SELECT
+            r.Ticker,
+            epoch_ms(bar.t),
+            bar.o, bar.h, bar.l, bar.c,
+            bar.v,
+            bar.vw,
+            bar.n
+        FROM read_json('{globPattern}') r,
+        UNNEST(r.Results) AS bar
+        WHERE bar.t IS NOT NULL
+        ON CONFLICT(ticker, timestamp) DO UPDATE SET
+            open = excluded.open,
+            high = excluded.high,
+            low = excluded.low,
+            close = excluded.close,
+            volume = excluded.volume,
+            vwap = excluded.vwap,
+            transactions = excluded.transactions
+    """
+    connection.Execute(sql) |> int64
+
+/// Get count of minute-level intraday prices in database
+let getIntradayMinuteCount (connection: IDbConnection) : int64 =
+    connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM intraday_prices_minute")
+
+/// Get count of second-level intraday prices in database
+let getIntradaySecondCount (connection: IDbConnection) : int64 =
+    connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM intraday_prices_second")
