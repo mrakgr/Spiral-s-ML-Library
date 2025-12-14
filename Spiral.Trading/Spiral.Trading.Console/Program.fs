@@ -7,6 +7,7 @@ open Spiral.Trading
 open Spiral.Trading.Config
 open Spiral.Trading.S3Download
 open Spiral.Trading.SplitDownload
+open Spiral.Trading.IntradayDownload
 open Spiral.Trading.Database
 open Spiral.Trading.Plotting
 
@@ -104,9 +105,38 @@ type RefreshViewsArgs =
             match this with
             | Database _ -> "DuckDB database path (default: data/trading.db)"
 
+type DownloadIntradayArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-s")>] Start_Date of string
+    | [<AltCommandLine("-e")>] End_Date of string
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-o")>] Output_Dir of string
+    | [<AltCommandLine("-p")>] Parallelism of int
+    | Timespan of string
+    | From_Sip
+    | [<AltCommandLine("-r")>] Min_Rvol of float
+    | [<AltCommandLine("-g")>] Min_Gap_Pct of float
+    | [<AltCommandLine("-v")>] Min_Dollar_Volume of float
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Stock ticker symbol (use with --start-date)"
+            | Start_Date _ -> "Start date (yyyy-MM-dd). Default: 1 week ago"
+            | End_Date _ -> "End date (yyyy-MM-dd). Default: today"
+            | Database _ -> "DuckDB database path for SIP lookup (default: data/trading.db)"
+            | Output_Dir _ -> "Output directory for downloaded data (default: data/intraday)"
+            | Parallelism _ -> "Max parallel downloads (default: 5)"
+            | Timespan _ -> "Aggregate timespan: 'minute' or 'second' (default: minute)"
+            | From_Sip -> "Download intraday data for stocks in play from the database"
+            | Min_Rvol _ -> "Min RVOL filter for SIP lookup (default: 3)"
+            | Min_Gap_Pct _ -> "Min gap % filter for SIP lookup (default: 0.05)"
+            | Min_Dollar_Volume _ -> "Min avg dollar volume in millions for SIP lookup (default: 100)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
+    | [<CliPrefix(CliPrefix.None)>] Download_Intraday of ParseResults<DownloadIntradayArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Dom of ParseResults<PlotDomArgs>
@@ -118,6 +148,7 @@ type Arguments =
             match this with
             | Download_Bulk _ -> "Download daily aggregate files from Massive S3"
             | Download_Splits _ -> "Download stock splits from Massive API"
+            | Download_Intraday _ -> "Download intraday (minute/second) data for tickers"
             | Ingest_Data _ -> "Ingest downloaded data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
             | Plot_Dom _ -> "Generate a DOM indicator chart"
@@ -152,7 +183,7 @@ let private handleDownloadBulk (config: MassiveConfig) (args: ParseResults<Downl
     use cts = new CancellationTokenSource()
 
     let results =
-        downloadDailyAggregates client startDate endDate outputDir parallelism (Some consoleProgress) cts.Token
+        downloadDailyAggregates client startDate endDate outputDir parallelism (Some S3Download.consoleProgress) cts.Token
         |> Async.RunSynchronously
 
     let downloaded = results |> List.filter (function Downloaded _ -> true | _ -> false) |> List.length
@@ -385,6 +416,89 @@ let private handleRefreshViews (args: ParseResults<RefreshViewsArgs>) =
     sw.Stop()
     printfn "Refreshed views in %.2fs" sw.Elapsed.TotalSeconds
 
+let private handleDownloadIntraday (config: MassiveConfig) (args: ParseResults<DownloadIntradayArgs>) =
+    let endDate =
+        args.TryGetResult DownloadIntradayArgs.End_Date
+        |> Option.map DateTime.Parse
+        |> Option.defaultValue DateTime.Now
+
+    let startDate =
+        args.TryGetResult DownloadIntradayArgs.Start_Date
+        |> Option.map DateTime.Parse
+        |> Option.defaultValue (endDate.AddDays(-7))
+
+    let outputDir =
+        args.TryGetResult DownloadIntradayArgs.Output_Dir
+        |> Option.defaultValue "data/intraday"
+
+    let parallelism = args.GetResult(DownloadIntradayArgs.Parallelism, defaultValue = 5)
+
+    let timespan =
+        match args.TryGetResult DownloadIntradayArgs.Timespan with
+        | Some "second" -> AggregateTimespan.Second
+        | Some "minute" | Some _ | None -> AggregateTimespan.Minute
+
+    let timespanStr = timespan.ToApiString()
+
+    // Determine ticker/date pairs to download
+    let tickerDates =
+        match args.TryGetResult DownloadIntradayArgs.Ticker with
+        | Some ticker ->
+            // Single ticker mode: download for date range
+            let ticker = ticker.ToUpperInvariant()
+            let days = getTradingDays startDate endDate
+            days |> List.map (fun d -> (ticker, d))
+
+        | None when args.Contains DownloadIntradayArgs.From_Sip ->
+            // From SIP mode: query database for stocks in play
+            let dbPath =
+                args.TryGetResult DownloadIntradayArgs.Database
+                |> Option.defaultValue "data/trading.db"
+
+            let minRvol = args.GetResult(DownloadIntradayArgs.Min_Rvol, defaultValue = 3.0)
+            let minGapPct = args.GetResult(DownloadIntradayArgs.Min_Gap_Pct, defaultValue = 0.05)
+            let minDollarVolume = args.GetResult(DownloadIntradayArgs.Min_Dollar_Volume, defaultValue = 100.0) * 1_000_000.0
+
+            printfn "Querying stocks in play from database..."
+            printfn "Database: %s" (Path.GetFullPath dbPath)
+            printfn "SIP Filters: RVOL >= %.1fx, Gap >= %.1f%%, Avg Dollar Volume >= $%.0fM" minRvol (minGapPct * 100.0) (minDollarVolume / 1_000_000.0)
+
+            use connection = openConnection dbPath
+            let stocks = getStocksInPlay connection startDate endDate minRvol minGapPct minDollarVolume
+
+            stocks
+            |> Array.map (fun s -> (s.ticker, s.date.ToDateTime(TimeOnly.MinValue)))
+            |> Array.toList
+
+        | None ->
+            failwith "Either --ticker or --from-sip is required"
+
+    if tickerDates.IsEmpty then
+        printfn "No ticker/date pairs to download."
+    else
+        printfn ""
+        printfn "Downloading %s aggregates for %d ticker/date pairs" timespanStr tickerDates.Length
+        printfn "Date range: %s to %s" (formatDate startDate) (formatDate endDate)
+        printfn "Output directory: %s" (Path.GetFullPath outputDir)
+        printfn "Parallelism: %d" parallelism
+        printfn ""
+
+        Directory.CreateDirectory(outputDir) |> ignore
+
+        use httpClient = new HttpClient()
+        use cts = new CancellationTokenSource()
+
+        let results =
+            downloadIntradayBatch httpClient config.ApiKey outputDir tickerDates timespan parallelism (Some IntradayDownload.consoleProgress) cts.Token
+            |> Async.RunSynchronously
+
+        let downloaded = results |> List.filter (function IntradayDownloaded _ -> true | _ -> false) |> List.length
+        let skipped = results |> List.filter (function IntradaySkipped _ -> true | _ -> false) |> List.length
+        let failed = results |> List.filter (function IntradayFailed _ -> true | _ -> false) |> List.length
+
+        printfn ""
+        printfn "Download complete: %d downloaded, %d skipped, %d failed" downloaded skipped failed
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -402,6 +516,9 @@ let main argv =
             | Download_Splits args ->
                 let config = loadConfigOrFail configPath
                 handleDownloadSplits config args
+            | Download_Intraday args ->
+                let config = loadConfigOrFail configPath
+                handleDownloadIntraday config args
             | Ingest_Data args ->
                 handleIngestData args
             | Refresh_Views args ->

@@ -78,6 +78,45 @@ dotnet run --project Spiral.Trading.Console -- download-splits -s 2024-01-01
 
 Output: `data/splits.csv`
 
+### Download Intraday Data
+
+Downloads intraday (minute or second) aggregate bars for specific tickers via the Polygon REST API. Can download for individual tickers or automatically fetch data for all stocks in play.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- download-intraday [options]
+```
+
+**Options:**
+- `-t, --ticker <symbol>` - Stock ticker symbol (use with date range)
+- `-s, --start-date <yyyy-MM-dd>` - Start date (default: 1 week ago)
+- `-e, --end-date <yyyy-MM-dd>` - End date (default: today)
+- `-d, --database <path>` - DuckDB database path for SIP lookup (default: data/trading.db)
+- `-o, --output-dir <path>` - Output directory (default: data/intraday)
+- `-p, --parallelism <int>` - Max parallel downloads (default: 5)
+- `--timespan <string>` - Aggregate timespan: 'minute' or 'second' (default: minute)
+- `--from-sip` - Download for all stocks in play from database
+- `-r, --min-rvol <float>` - Min RVOL filter for SIP (default: 3)
+- `-g, --min-gap-pct <float>` - Min gap % for SIP (default: 0.05)
+- `-v, --min-dollar-volume <float>` - Min avg dollar volume in millions for SIP (default: 100)
+
+**Examples:**
+
+```bash
+# Download minute data for a specific ticker
+dotnet run --project Spiral.Trading.Console -- download-intraday -t NVDA -s 2024-12-01 -e 2024-12-11
+
+# Download second aggregates for a ticker
+dotnet run --project Spiral.Trading.Console -- download-intraday -t AAPL -s 2024-12-10 --timespan second
+
+# Download minute data for all stocks in play (from database)
+dotnet run --project Spiral.Trading.Console -- download-intraday --from-sip -s 2024-12-01 -e 2024-12-11
+
+# Download for SIPs with custom filters
+dotnet run --project Spiral.Trading.Console -- download-intraday --from-sip -r 5 -g 0.10 -s 2024-12-01
+```
+
+Output: `data/intraday/{timespan}/{ticker}/{date}.json`
+
 ### Ingest Data
 
 Ingests downloaded CSV files and splits into a SQLite database.
