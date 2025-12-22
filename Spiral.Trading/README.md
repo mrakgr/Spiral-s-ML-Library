@@ -89,7 +89,7 @@ dotnet run --project Spiral.Trading.Console -- download-intraday [options]
 **Options:**
 - `-t, --ticker <symbol>` - Stock ticker symbol (use with date range)
 - `-s, --start-date <yyyy-MM-dd>` - Start date (default: 1 week ago)
-- `-e, --end-date <yyyy-MM-dd>` - End date (default: today)
+- `-e, --end-date <yyyy-MM-dd>` - End date. If omitted with -t, only start date is downloaded
 - `-d, --database <path>` - DuckDB database path for SIP lookup (default: data/trading.db)
 - `-o, --output-dir <path>` - Output directory (default: data/intraday)
 - `-p, --parallelism <int>` - Max parallel downloads (default: 5)
@@ -116,6 +116,36 @@ dotnet run --project Spiral.Trading.Console -- download-intraday --from-sip -r 5
 ```
 
 Output: `data/intraday/{timespan}/{ticker}/{date}.json`
+
+### Download Trades Data
+
+Downloads tick-level trades data for a specific ticker via the Polygon REST API. Each trade record includes price, size, exchange, conditions, and precise timestamps.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- download-trades [options]
+```
+
+**Options:**
+- `-t, --ticker <symbol>` - Stock ticker symbol (required)
+- `-s, --start-date <yyyy-MM-dd>` - Start date (required)
+- `-e, --end-date <yyyy-MM-dd>` - End date. If omitted, only start date is downloaded
+- `-o, --output-dir <path>` - Output directory (default: data/trades)
+- `-p, --parallelism <int>` - Max parallel downloads (default: 5)
+
+**Examples:**
+
+```bash
+# Download trades for a single day
+dotnet run --project Spiral.Trading.Console -- download-trades -t NVDA -s 2024-12-20
+
+# Download trades for a date range
+dotnet run --project Spiral.Trading.Console -- download-trades -t NVDA -s 2024-12-15 -e 2024-12-20
+
+# Download with custom output directory
+dotnet run --project Spiral.Trading.Console -- download-trades -t AAPL -s 2024-12-20 -o data/my_trades
+```
+
+Output: `data/trades/{ticker}/{date}.json`
 
 ### Ingest Data
 

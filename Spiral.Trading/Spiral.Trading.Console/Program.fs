@@ -8,6 +8,7 @@ open Spiral.Trading.Config
 open Spiral.Trading.S3Download
 open Spiral.Trading.SplitDownload
 open Spiral.Trading.IntradayDownload
+open Spiral.Trading.TradesDownload
 open Spiral.Trading.Database
 open Spiral.Trading.Plotting
 
@@ -133,6 +134,22 @@ type DownloadIntradayArgs =
             | Min_Gap_Pct _ -> "Min gap % filter for SIP lookup (default: 0.05)"
             | Min_Dollar_Volume _ -> "Min avg dollar volume in millions for SIP lookup (default: 100)"
 
+type DownloadTradesArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-s")>] Start_Date of string
+    | [<AltCommandLine("-e")>] End_Date of string
+    | [<AltCommandLine("-o")>] Output_Dir of string
+    | [<AltCommandLine("-p")>] Parallelism of int
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Stock ticker symbol (required)"
+            | Start_Date _ -> "Start date (yyyy-MM-dd, required)"
+            | End_Date _ -> "End date (yyyy-MM-dd). If omitted, only start date is downloaded"
+            | Output_Dir _ -> "Output directory for downloaded data (default: data/trades)"
+            | Parallelism _ -> "Max parallel downloads (default: 5)"
+
 type IngestIntradayArgs =
     | [<AltCommandLine("-d")>] Database of string
     | [<AltCommandLine("-i")>] Input_Dir of string
@@ -169,6 +186,7 @@ type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Intraday of ParseResults<DownloadIntradayArgs>
+    | [<CliPrefix(CliPrefix.None)>] Download_Trades of ParseResults<DownloadTradesArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Intraday of ParseResults<IngestIntradayArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
@@ -183,6 +201,7 @@ type Arguments =
             | Download_Bulk _ -> "Download daily aggregate files from Massive S3"
             | Download_Splits _ -> "Download stock splits from Massive API"
             | Download_Intraday _ -> "Download intraday (minute/second) data for tickers"
+            | Download_Trades _ -> "Download tick-level trades data for a ticker"
             | Ingest_Data _ -> "Ingest daily data into DuckDB database"
             | Ingest_Intraday _ -> "Ingest intraday data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
@@ -487,15 +506,16 @@ let private handleRefreshViews (args: ParseResults<RefreshViewsArgs>) =
     printfn "Refreshed views in %.2fs" sw.Elapsed.TotalSeconds
 
 let private handleDownloadIntraday (config: MassiveConfig) (args: ParseResults<DownloadIntradayArgs>) =
-    let endDate =
-        args.TryGetResult DownloadIntradayArgs.End_Date
-        |> Option.map DateTime.Parse
-        |> Option.defaultValue DateTime.Now
+    let startDateOpt = args.TryGetResult DownloadIntradayArgs.Start_Date |> Option.map DateTime.Parse
+    let endDateOpt = args.TryGetResult DownloadIntradayArgs.End_Date |> Option.map DateTime.Parse
 
-    let startDate =
-        args.TryGetResult DownloadIntradayArgs.Start_Date
-        |> Option.map DateTime.Parse
-        |> Option.defaultValue (endDate.AddDays(-7))
+    // If end date is omitted, use start date (single day download)
+    let (startDate, endDate) =
+        match startDateOpt, endDateOpt with
+        | Some s, Some e -> (s, e)
+        | Some s, None -> (s, s)
+        | None, Some e -> (e.AddDays(-7), e)
+        | None, None -> let now = DateTime.Now in (now.AddDays(-7), now)
 
     let outputDir =
         args.TryGetResult DownloadIntradayArgs.Output_Dir
@@ -565,6 +585,57 @@ let private handleDownloadIntraday (config: MassiveConfig) (args: ParseResults<D
         let downloaded = results |> List.filter (function IntradayDownloaded _ -> true | _ -> false) |> List.length
         let skipped = results |> List.filter (function IntradaySkipped _ -> true | _ -> false) |> List.length
         let failed = results |> List.filter (function IntradayFailed _ -> true | _ -> false) |> List.length
+
+        printfn ""
+        printfn "Download complete: %d downloaded, %d skipped, %d failed" downloaded skipped failed
+
+let private handleDownloadTrades (config: MassiveConfig) (args: ParseResults<DownloadTradesArgs>) =
+    let ticker =
+        match args.TryGetResult DownloadTradesArgs.Ticker with
+        | Some t -> t.ToUpperInvariant()
+        | None -> failwith "Ticker is required. Use -t or --ticker to specify."
+
+    let startDate =
+        match args.TryGetResult DownloadTradesArgs.Start_Date with
+        | Some d -> DateTime.Parse(d)
+        | None -> failwith "Start date is required. Use -s or --start-date to specify."
+
+    // If end date is omitted, use start date (single day download)
+    let endDate =
+        args.TryGetResult DownloadTradesArgs.End_Date
+        |> Option.map DateTime.Parse
+        |> Option.defaultValue startDate
+
+    let outputDir =
+        args.TryGetResult DownloadTradesArgs.Output_Dir
+        |> Option.defaultValue "data/trades"
+
+    let parallelism = args.GetResult(DownloadTradesArgs.Parallelism, defaultValue = 5)
+
+    let days = getTradingDays startDate endDate
+    let tickerDates = days |> List.map (fun d -> (ticker, d))
+
+    if tickerDates.IsEmpty then
+        printfn "No trading days in the specified range."
+    else
+        printfn "Downloading trades for %s" ticker
+        printfn "Date range: %s to %s (%d days)" (formatDate startDate) (formatDate endDate) tickerDates.Length
+        printfn "Output directory: %s" (Path.GetFullPath outputDir)
+        printfn "Parallelism: %d" parallelism
+        printfn ""
+
+        Directory.CreateDirectory(outputDir) |> ignore
+
+        use httpClient = new HttpClient()
+        use cts = new CancellationTokenSource()
+
+        let results =
+            downloadTradesBatch httpClient config.ApiKey outputDir tickerDates parallelism (Some TradesDownload.consoleProgress) cts.Token
+            |> Async.RunSynchronously
+
+        let downloaded = results |> List.filter (function TradesDownloaded _ -> true | _ -> false) |> List.length
+        let skipped = results |> List.filter (function TradesSkipped _ -> true | _ -> false) |> List.length
+        let failed = results |> List.filter (function TradesFailed _ -> true | _ -> false) |> List.length
 
         printfn ""
         printfn "Download complete: %d downloaded, %d skipped, %d failed" downloaded skipped failed
@@ -647,6 +718,9 @@ let main argv =
             | Download_Intraday args ->
                 let config = loadConfigOrFail configPath
                 handleDownloadIntraday config args
+            | Download_Trades args ->
+                let config = loadConfigOrFail configPath
+                handleDownloadTrades config args
             | Ingest_Data args ->
                 handleIngestData args
             | Ingest_Intraday args ->

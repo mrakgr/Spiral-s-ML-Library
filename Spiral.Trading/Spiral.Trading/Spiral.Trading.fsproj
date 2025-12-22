@@ -11,6 +11,7 @@
     <Compile Include="S3Download.fs" />
     <Compile Include="SplitDownload.fs" />
     <Compile Include="IntradayDownload.fs" />
+    <Compile Include="TradesDownload.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Plotting.fs" />
   </ItemGroup>
