@@ -75,8 +75,8 @@ let private downloadSingleDay
                     | :? AmazonS3Exception as ex
                         when (ex.StatusCode = HttpStatusCode.ServiceUnavailable
                               || ex.StatusCode = HttpStatusCode.TooManyRequests
-                              || ex.ErrorCode = "TooManyRequests"
-                              || ex.ErrorCode = "SlowDown")
+                              || ex.ErrorCode.Contains "TooManyRequests"
+                              || ex.ErrorCode.Contains "SlowDown")
                               && attempt < maxRetries ->
                         // Exponential backoff: 2s, 4s, 8s, 16s...
                         let delay = pown 2 attempt * 1000

@@ -23,7 +23,7 @@ type DownloadBulkArgs =
             match this with
             | Start_Date _ -> "Start date (yyyy-MM-dd). Default: 5 years ago"
             | End_Date _ -> "End date (yyyy-MM-dd). Default: today"
-            | Parallelism _ -> "Max parallel downloads. Default: 8"
+            | Parallelism _ -> "Max parallel downloads. Default: 10"
 
 type DownloadSplitsArgs =
     | [<AltCommandLine("-s")>] Start_Date of string
@@ -208,7 +208,7 @@ let private handleDownloadBulk (config: MassiveConfig) (args: ParseResults<Downl
         |> Option.map DateTime.Parse
         |> Option.defaultValue (endDate.AddYears(-5))
 
-    let parallelism = args.GetResult(DownloadBulkArgs.Parallelism, defaultValue = 30)
+    let parallelism = args.GetResult(DownloadBulkArgs.Parallelism, defaultValue = 10)
     let outputDir = "data/daily_aggregates"
 
     printfn "Downloading daily aggregates from %s to %s" (formatDate startDate) (formatDate endDate)

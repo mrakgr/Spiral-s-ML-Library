@@ -34,7 +34,7 @@ dotnet run --project Spiral.Trading.Console -- download-bulk [options]
 **Options:**
 - `-s, --start-date <yyyy-MM-dd>` - Start date (default: 5 years ago)
 - `-e, --end-date <yyyy-MM-dd>` - End date (default: today)
-- `-p, --parallelism <int>` - Max parallel downloads (default: 30)
+- `-p, --parallelism <int>` - Max parallel downloads (default: 10)
 
 **Examples:**
 
