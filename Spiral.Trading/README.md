@@ -376,6 +376,44 @@ dotnet run --project Spiral.Trading.Console -- stocks-in-play -r 2 -g 0.03 -v 25
 - Ranked by composite score (RVOL + gap magnitude)
 - Top 10 stocks per day
 
+### List Conditions
+
+Lists trade and quote condition codes from the Polygon API. These codes appear in the `conditions` field of trades data and indicate special circumstances like extended hours trades, odd lots, or intermarket sweeps.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- list-conditions [options]
+```
+
+**Options:**
+- `-a, --asset-class <string>` - Asset class filter: stocks, options, crypto, fx (default: stocks)
+- `-d, --data-type <string>` - Data type filter: trade, quote (default: trade)
+
+**Examples:**
+
+```bash
+# List all stock trade conditions (default)
+dotnet run --project Spiral.Trading.Console -- list-conditions
+
+# List quote conditions for stocks
+dotnet run --project Spiral.Trading.Console -- list-conditions -d quote
+
+# List trade conditions for options
+dotnet run --project Spiral.Trading.Console -- list-conditions -a options
+```
+
+**Output columns:**
+- **ID** - Condition code number (appears in trades data `conditions` field)
+- **Name** - Human-readable description
+- **Type** - Category (sale_condition, trade_thru_exempt, etc.)
+- **CTA/UTP** - Exchange-specific codes
+- **Hi/Lo, Op/Cl, Volume** - Whether trades with this condition update high/low, open/close, and volume calculations
+
+**Common conditions:**
+- **37 (Odd Lot Trade)** - Trades < 100 shares, excluded from hi/lo and open/close
+- **12 (Form T/Extended Hours)** - Pre-market and after-hours trades
+- **14 (Intermarket Sweep)** - Large orders swept across multiple exchanges
+- **41 (Trade Thru Exempt)** - Exempt from trade-through rules
+
 ## Project Structure
 
 ```
@@ -386,6 +424,8 @@ Spiral.Trading/
 │   ├── S3Download.fs            # S3 bulk download (daily aggregates)
 │   ├── SplitDownload.fs         # Splits API client
 │   ├── IntradayDownload.fs      # Intraday API client (minute/second bars)
+│   ├── TradesDownload.fs        # Trades API client (tick-level data)
+│   ├── Conditions.fs            # Trade condition codes API client
 │   ├── Database.fs              # DuckDB database operations
 │   ├── Plotting.fs              # Chart generation (candlestick, DOM)
 │   └── sql/schema/              # SQL schema files
@@ -409,6 +449,7 @@ Spiral.Trading/
 └── data/                        # Downloaded data
     ├── daily_aggregates/        # Daily OHLCV CSV files
     ├── intraday/                # Intraday data (minute/second JSON)
+    ├── trades/                  # Tick-level trades data (JSON)
     ├── splits.csv               # Splits data
     └── trading.db               # DuckDB database
 ```
