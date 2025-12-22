@@ -121,8 +121,8 @@ let fetchConditions
 /// Print conditions in a readable table format
 let printConditionsTable (conditions: Condition[]) =
     printfn ""
-    printfn "%-4s %-35s %-10s %-6s %-6s %-8s %-8s %-8s" "ID" "Name" "Type" "CTA" "UTP" "Hi/Lo" "Op/Cl" "Volume"
-    printfn "%s" (String.replicate 95 "-")
+    printfn "%-4s  %-35s  %-32s  %-4s  %-4s  %-5s  %-5s  %-6s" "ID" "Name" "Type" "CTA" "UTP" "Hi/Lo" "Op/Cl" "Volume"
+    printfn "%s" (String.replicate 110 "-")
 
     for c in conditions |> Array.sortBy (fun c -> c.Id) do
         let cta = c.SipMapping |> Option.bind (fun s -> s.CTA) |> Option.defaultValue "-"
@@ -137,7 +137,7 @@ let printConditionsTable (conditions: Condition[]) =
             | None -> "-", "-", "-"
 
         let name = if c.Name.Length > 35 then c.Name.Substring(0, 32) + "..." else c.Name
-        printfn "%-4d %-35s %-10s %-6s %-6s %-8s %-8s %-8s" c.Id name c.Type cta utp hiLo opCl vol
+        printfn "%-4d  %-35s  %-32s  %-4s  %-4s  %-5s  %-5s  %-6s" c.Id name c.Type cta utp hiLo opCl vol
 
     printfn ""
     printfn "Total: %d conditions" conditions.Length
