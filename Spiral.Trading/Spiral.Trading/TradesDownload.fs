@@ -70,6 +70,12 @@ let private jsonOptions =
     options.PropertyNameCaseInsensitive <- true
     options
 
+let private jsonOptionsPretty =
+    let options = JsonSerializerOptions()
+    options.PropertyNameCaseInsensitive <- true
+    options.WriteIndented <- true
+    options
+
 /// Generate output file path for trades data
 let private getOutputPath (outputDir: string) (ticker: string) (date: DateTime) : string =
     let dateStr = date.ToString("yyyy-MM-dd")
@@ -147,6 +153,7 @@ let downloadAndSaveTrades
     (outputDir: string)
     (ticker: string)
     (date: DateTime)
+    (prettyPrint: bool)
     (ct: CancellationToken)
     : Async<TradesDownloadResult> =
     async {
@@ -164,7 +171,8 @@ let downloadAndSaveTrades
                 let tradeCount = trades.Length
 
                 // Save as JSON array
-                let json = JsonSerializer.Serialize(trades, jsonOptions)
+                let serializerOptions = if prettyPrint then jsonOptionsPretty else jsonOptions
+                let json = JsonSerializer.Serialize(trades, serializerOptions)
                 do! File.WriteAllTextAsync(outputPath, json, ct) |> Async.AwaitTask
 
                 return TradesDownloaded(ticker, date, tradeCount)
@@ -179,6 +187,7 @@ let downloadTradesBatch
     (apiKey: string)
     (outputDir: string)
     (tickerDates: (string * DateTime) list)
+    (prettyPrint: bool)
     (maxParallelism: int)
     (progress: TradesProgressCallback option)
     (ct: CancellationToken)
@@ -199,7 +208,7 @@ let downloadTradesBatch
             async {
                 do! semaphore.WaitAsync(ct) |> Async.AwaitTask
                 try
-                    let! result = downloadAndSaveTrades httpClient apiKey outputDir ticker date ct
+                    let! result = downloadAndSaveTrades httpClient apiKey outputDir ticker date prettyPrint ct
                     reportProgress result
                     return result
                 finally

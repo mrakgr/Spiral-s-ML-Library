@@ -140,6 +140,7 @@ type DownloadTradesArgs =
     | [<AltCommandLine("-e")>] End_Date of string
     | [<AltCommandLine("-o")>] Output_Dir of string
     | [<AltCommandLine("-p")>] Parallelism of int
+    | Pretty
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -149,6 +150,7 @@ type DownloadTradesArgs =
             | End_Date _ -> "End date (yyyy-MM-dd). If omitted, only start date is downloaded"
             | Output_Dir _ -> "Output directory for downloaded data (default: data/trades)"
             | Parallelism _ -> "Max parallel downloads (default: 5)"
+            | Pretty -> "Output JSON with indentation (pretty print)"
 
 type IngestIntradayArgs =
     | [<AltCommandLine("-d")>] Database of string
@@ -611,6 +613,7 @@ let private handleDownloadTrades (config: MassiveConfig) (args: ParseResults<Dow
         |> Option.defaultValue "data/trades"
 
     let parallelism = args.GetResult(DownloadTradesArgs.Parallelism, defaultValue = 5)
+    let prettyPrint = args.Contains DownloadTradesArgs.Pretty
 
     let days = getTradingDays startDate endDate
     let tickerDates = days |> List.map (fun d -> (ticker, d))
@@ -622,6 +625,7 @@ let private handleDownloadTrades (config: MassiveConfig) (args: ParseResults<Dow
         printfn "Date range: %s to %s (%d days)" (formatDate startDate) (formatDate endDate) tickerDates.Length
         printfn "Output directory: %s" (Path.GetFullPath outputDir)
         printfn "Parallelism: %d" parallelism
+        if prettyPrint then printfn "Pretty print: enabled"
         printfn ""
 
         Directory.CreateDirectory(outputDir) |> ignore
@@ -630,7 +634,7 @@ let private handleDownloadTrades (config: MassiveConfig) (args: ParseResults<Dow
         use cts = new CancellationTokenSource()
 
         let results =
-            downloadTradesBatch httpClient config.ApiKey outputDir tickerDates parallelism (Some TradesDownload.consoleProgress) cts.Token
+            downloadTradesBatch httpClient config.ApiKey outputDir tickerDates prettyPrint parallelism (Some TradesDownload.consoleProgress) cts.Token
             |> Async.RunSynchronously
 
         let downloaded = results |> List.filter (function TradesDownloaded _ -> true | _ -> false) |> List.length
