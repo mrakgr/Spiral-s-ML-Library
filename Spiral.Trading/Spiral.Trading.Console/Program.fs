@@ -9,6 +9,7 @@ open Spiral.Trading.S3Download
 open Spiral.Trading.SplitDownload
 open Spiral.Trading.IntradayDownload
 open Spiral.Trading.TradesDownload
+open Spiral.Trading.Conditions
 open Spiral.Trading.Database
 open Spiral.Trading.Plotting
 
@@ -184,6 +185,16 @@ type PlotIntradayArgs =
             | Height _ -> "Chart height in pixels (default: 900)"
             | Timespan _ -> "Aggregate timespan: 'minute' or 'second' (default: minute)"
 
+type ListConditionsArgs =
+    | [<AltCommandLine("-a")>] Asset_Class of string
+    | [<AltCommandLine("-d")>] Data_Type of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Asset_Class _ -> "Asset class filter: stocks, options, crypto, fx (default: stocks)"
+            | Data_Type _ -> "Data type filter: trade, quote (default: trade)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
@@ -196,6 +207,7 @@ type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Plot_Intraday of ParseResults<PlotIntradayArgs>
     | [<CliPrefix(CliPrefix.None)>] Stocks_In_Play of ParseResults<StocksInPlayArgs>
     | [<CliPrefix(CliPrefix.None)>] Refresh_Views of ParseResults<RefreshViewsArgs>
+    | [<CliPrefix(CliPrefix.None)>] List_Conditions of ParseResults<ListConditionsArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -211,6 +223,7 @@ type Arguments =
             | Plot_Intraday _ -> "Generate an intraday candlestick chart for a ticker on a specific date"
             | Stocks_In_Play _ -> "List top stocks in play for a date range"
             | Refresh_Views _ -> "Refresh views only (fast, no table rematerialization)"
+            | List_Conditions _ -> "List trade/quote condition codes from the API"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -702,6 +715,34 @@ let private handleIngestIntraday (args: ParseResults<IngestIntradayArgs>) =
     printfn ""
     printfn "Intraday ingestion complete."
 
+let private handleListConditions (config: MassiveConfig) (args: ParseResults<ListConditionsArgs>) =
+    let assetClass =
+        args.TryGetResult ListConditionsArgs.Asset_Class
+        |> Option.defaultValue "stocks"
+        |> Some
+
+    let dataType =
+        args.TryGetResult ListConditionsArgs.Data_Type
+        |> Option.defaultValue "trade"
+        |> Some
+
+    printfn "Fetching condition codes..."
+    printfn "Asset class: %s" (assetClass |> Option.defaultValue "all")
+    printfn "Data type: %s" (dataType |> Option.defaultValue "all")
+
+    use httpClient = new HttpClient()
+    use cts = new CancellationTokenSource()
+
+    let result =
+        fetchConditions httpClient config.ApiKey assetClass dataType cts.Token
+        |> Async.RunSynchronously
+
+    match result with
+    | Ok conditions ->
+        printConditionsTable conditions
+    | Error msg ->
+        printfn "Error fetching conditions: %s" msg
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -739,6 +780,9 @@ let main argv =
                 handlePlotIntraday args
             | Stocks_In_Play args ->
                 handleStocksInPlay args
+            | List_Conditions args ->
+                let config = loadConfigOrFail configPath
+                handleListConditions config args
 
         0
     with
