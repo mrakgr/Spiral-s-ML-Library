@@ -12,8 +12,8 @@ SELECT
     s_4w.date AS date_4w_ago
 FROM spy_dates s1
 ASOF JOIN spy_dates s_prev 
-    ON s1.date > s_prev.date
+    ON s_prev.date < s1.date 
 ASOF JOIN spy_dates s_26w 
-    ON s1.date - INTERVAL '182 days' <= s_26w.date
+    ON s_26w.date <= s1.date - INTERVAL '182 days'
 ASOF JOIN spy_dates s_4w 
-    ON s1.date - INTERVAL '28 days' <= s_4w.date;
+    ON s_4w.date <= s1.date - INTERVAL '28 days';
