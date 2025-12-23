@@ -1,28 +1,19 @@
 -- Materialized table for trading calendar
--- Pre-computes date lookups for 26w and 4w ago
+-- Pre-computes date lookups for previous day, 26w and 4w ago using ASOF JOIN
 DROP TABLE IF EXISTS trading_calendar;
 CREATE TABLE trading_calendar AS
 WITH spy_dates AS (
-    SELECT date
-    FROM daily_prices
-    WHERE ticker = 'SPY'
+    SELECT date FROM daily_prices WHERE ticker = 'SPY'
 )
 SELECT
     s1.date AS current_date,
-    (SELECT MAX(date) FROM spy_dates WHERE date < s1.date) AS date_prev,
-    s2.date AS date_26w_ago,
-    s3.date AS date_4w_ago
+    s_prev.date AS date_prev,
+    s_26w.date AS date_26w_ago,
+    s_4w.date AS date_4w_ago
 FROM spy_dates s1
-JOIN spy_dates s2
-    ON s2.date = (
-        SELECT MIN(date)
-        FROM spy_dates
-        WHERE date >= s1.date - INTERVAL '182 days'
-        AND date < s1.date - INTERVAL '175 days'
-    )
-JOIN spy_dates s3
-    ON s3.date = (
-        SELECT MIN(date)
-        FROM spy_dates
-        WHERE date >= s1.date - INTERVAL '28 days'
-    );
+ASOF JOIN spy_dates s_prev 
+    ON s1.date > s_prev.date
+ASOF JOIN spy_dates s_26w 
+    ON s1.date - INTERVAL '182 days' <= s_26w.date
+ASOF JOIN spy_dates s_4w 
+    ON s1.date - INTERVAL '28 days' <= s_4w.date;
