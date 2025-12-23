@@ -12,6 +12,7 @@
     <Compile Include="SplitDownload.fs" />
     <Compile Include="IntradayDownload.fs" />
     <Compile Include="TradesDownload.fs" />
+    <Compile Include="QuotesDownload.fs" />
     <Compile Include="Conditions.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Plotting.fs" />

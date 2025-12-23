@@ -147,6 +147,37 @@ dotnet run --project Spiral.Trading.Console -- download-trades -t AAPL -s 2024-1
 
 Output: `data/trades/{ticker}/{date}.json`
 
+### Download Quotes Data
+
+Downloads NBBO (National Best Bid and Offer) quotes data for a specific ticker via the Polygon REST API. Each quote record includes bid/ask prices, sizes, exchanges, and timestamps.
+
+```bash
+dotnet run --project Spiral.Trading.Console -- download-quotes [options]
+```
+
+**Options:**
+- `-t, --ticker <symbol>` - Stock ticker symbol (required)
+- `-s, --start-date <yyyy-MM-dd>` - Start date (required)
+- `-e, --end-date <yyyy-MM-dd>` - End date. If omitted, only start date is downloaded
+- `-o, --output-dir <path>` - Output directory (default: data/quotes)
+- `-p, --parallelism <int>` - Max parallel downloads (default: 5)
+- `--pretty` - Output JSON with indentation (pretty print)
+
+**Examples:**
+
+```bash
+# Download quotes for a single day
+dotnet run --project Spiral.Trading.Console -- download-quotes -t NVDA -s 2024-12-20
+
+# Download quotes for a date range
+dotnet run --project Spiral.Trading.Console -- download-quotes -t NVDA -s 2024-12-15 -e 2024-12-20
+
+# Download with pretty-printed JSON
+dotnet run --project Spiral.Trading.Console -- download-quotes -t AAPL -s 2024-12-20 --pretty
+```
+
+Output: `data/quotes/{ticker}/{date}.json`
+
 ### Ingest Data
 
 Ingests downloaded CSV files and splits into a DuckDB database.
@@ -425,6 +456,7 @@ Spiral.Trading/
 │   ├── SplitDownload.fs         # Splits API client
 │   ├── IntradayDownload.fs      # Intraday API client (minute/second bars)
 │   ├── TradesDownload.fs        # Trades API client (tick-level data)
+│   ├── QuotesDownload.fs        # Quotes API client (NBBO data)
 │   ├── Conditions.fs            # Trade condition codes API client
 │   ├── Database.fs              # DuckDB database operations
 │   ├── Plotting.fs              # Chart generation (candlestick, DOM)
@@ -450,6 +482,7 @@ Spiral.Trading/
     ├── daily_aggregates/        # Daily OHLCV CSV files
     ├── intraday/                # Intraday data (minute/second JSON)
     ├── trades/                  # Tick-level trades data (JSON)
+    ├── quotes/                  # NBBO quotes data (JSON)
     ├── splits.csv               # Splits data
     └── trading.db               # DuckDB database
 ```
