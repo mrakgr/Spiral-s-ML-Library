@@ -524,3 +524,75 @@ let getIntradaySecondByTickerDate (connection: IDbConnection) (ticker: string) (
            ORDER BY timestamp""",
         {| ticker = ticker; date = date.ToString("yyyy-MM-dd") |})
     |> Seq.toArray
+
+// --- Trades ---
+
+/// Bulk ingest trades from JSON files using glob pattern
+/// Extracts ticker from file path (expects data/trades/{ticker}/{date}.json)
+let ingestTradesFromGlob (connection: IDbConnection) (globPattern: string) : int64 =
+    let sql = $"""
+        INSERT INTO trades (ticker, sip_timestamp, participant_timestamp, sequence_number, price, size, exchange, conditions, tape)
+        SELECT
+            split_part(filename, '/', -2) as ticker,
+            sip_timestamp,
+            participant_timestamp,
+            sequence_number,
+            price,
+            size,
+            exchange,
+            conditions,
+            tape
+        FROM read_json('{globPattern}', filename=true)
+        ON CONFLICT(ticker, sip_timestamp, sequence_number) DO UPDATE SET
+            participant_timestamp = excluded.participant_timestamp,
+            price = excluded.price,
+            size = excluded.size,
+            exchange = excluded.exchange,
+            conditions = excluded.conditions,
+            tape = excluded.tape
+    """
+    connection.Execute(sql) |> int64
+
+/// Get count of trades in database
+let getTradesCount (connection: IDbConnection) : int64 =
+    connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM trades")
+
+// --- Quotes ---
+
+/// Bulk ingest quotes from JSON files using glob pattern
+/// Extracts ticker from file path (expects data/quotes/{ticker}/{date}.json)
+let ingestQuotesFromGlob (connection: IDbConnection) (globPattern: string) : int64 =
+    let sql = $"""
+        INSERT INTO quotes (ticker, sip_timestamp, participant_timestamp, sequence_number, bid_price, bid_size, bid_exchange, ask_price, ask_size, ask_exchange, conditions, indicators, tape)
+        SELECT
+            split_part(filename, '/', -2) as ticker,
+            sip_timestamp,
+            participant_timestamp,
+            sequence_number,
+            bid_price,
+            bid_size,
+            bid_exchange,
+            ask_price,
+            ask_size,
+            ask_exchange,
+            conditions,
+            indicators,
+            tape
+        FROM read_json('{globPattern}', filename=true)
+        ON CONFLICT(ticker, sip_timestamp, sequence_number) DO UPDATE SET
+            participant_timestamp = excluded.participant_timestamp,
+            bid_price = excluded.bid_price,
+            bid_size = excluded.bid_size,
+            bid_exchange = excluded.bid_exchange,
+            ask_price = excluded.ask_price,
+            ask_size = excluded.ask_size,
+            ask_exchange = excluded.ask_exchange,
+            conditions = excluded.conditions,
+            indicators = excluded.indicators,
+            tape = excluded.tape
+    """
+    connection.Execute(sql) |> int64
+
+/// Get count of quotes in database
+let getQuotesCount (connection: IDbConnection) : int64 =
+    connection.ExecuteScalar<int64>("SELECT COUNT(*) FROM quotes")

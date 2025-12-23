@@ -184,6 +184,26 @@ type IngestIntradayArgs =
             | Input_Dir _ -> "Input directory for intraday data (default: data/intraday)"
             | Timespan _ -> "Filter by timespan: 'minute', 'second', or 'all' (default: all)"
 
+type IngestTradesArgs =
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-i")>] Input_Dir of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Input_Dir _ -> "Input directory for trades data (default: data/trades)"
+
+type IngestQuotesArgs =
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-i")>] Input_Dir of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Input_Dir _ -> "Input directory for quotes data (default: data/quotes)"
+
 type PlotIntradayArgs =
     | [<AltCommandLine("-t")>] Ticker of string
     | [<AltCommandLine("-s")>] Date of string
@@ -222,6 +242,8 @@ type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Quotes of ParseResults<DownloadQuotesArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Data of ParseResults<IngestDataArgs>
     | [<CliPrefix(CliPrefix.None)>] Ingest_Intraday of ParseResults<IngestIntradayArgs>
+    | [<CliPrefix(CliPrefix.None)>] Ingest_Trades of ParseResults<IngestTradesArgs>
+    | [<CliPrefix(CliPrefix.None)>] Ingest_Quotes of ParseResults<IngestQuotesArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Chart of ParseResults<PlotChartArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Dom of ParseResults<PlotDomArgs>
     | [<CliPrefix(CliPrefix.None)>] Plot_Intraday of ParseResults<PlotIntradayArgs>
@@ -239,6 +261,8 @@ type Arguments =
             | Download_Quotes _ -> "Download NBBO quotes data for a ticker"
             | Ingest_Data _ -> "Ingest daily data into DuckDB database"
             | Ingest_Intraday _ -> "Ingest intraday data into DuckDB database"
+            | Ingest_Trades _ -> "Ingest trades data into DuckDB database"
+            | Ingest_Quotes _ -> "Ingest quotes data into DuckDB database"
             | Plot_Chart _ -> "Generate a candlestick chart for a ticker"
             | Plot_Dom _ -> "Generate a DOM indicator chart"
             | Plot_Intraday _ -> "Generate an intraday candlestick chart for a ticker on a specific date"
@@ -788,6 +812,74 @@ let private handleIngestIntraday (args: ParseResults<IngestIntradayArgs>) =
     printfn ""
     printfn "Intraday ingestion complete."
 
+let private handleIngestTrades (args: ParseResults<IngestTradesArgs>) =
+    let dbPath =
+        args.TryGetResult IngestTradesArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    let inputDir =
+        args.TryGetResult IngestTradesArgs.Input_Dir
+        |> Option.defaultValue "data/trades"
+
+    printfn "Ingesting trades data..."
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+    printfn "Input directory: %s" (Path.GetFullPath inputDir)
+    printfn ""
+
+    use connection = openConnection dbPath
+    initializeSchema connection
+
+    if Directory.Exists inputDir then
+        let globPattern = Path.Combine(inputDir, "*/*.json")
+        let countBefore = getTradesCount connection
+        printfn "Trades before: %d" countBefore
+
+        let inserted = ingestTradesFromGlob connection globPattern
+        printfn "Rows processed: %d" inserted
+
+        let countAfter = getTradesCount connection
+        printfn "Trades after: %d" countAfter
+        printfn "New trades added: %d" (countAfter - countBefore)
+    else
+        printfn "Directory not found: %s" inputDir
+
+    printfn ""
+    printfn "Trades ingestion complete."
+
+let private handleIngestQuotes (args: ParseResults<IngestQuotesArgs>) =
+    let dbPath =
+        args.TryGetResult IngestQuotesArgs.Database
+        |> Option.defaultValue "data/trading.db"
+
+    let inputDir =
+        args.TryGetResult IngestQuotesArgs.Input_Dir
+        |> Option.defaultValue "data/quotes"
+
+    printfn "Ingesting quotes data..."
+    printfn "Database: %s" (Path.GetFullPath dbPath)
+    printfn "Input directory: %s" (Path.GetFullPath inputDir)
+    printfn ""
+
+    use connection = openConnection dbPath
+    initializeSchema connection
+
+    if Directory.Exists inputDir then
+        let globPattern = Path.Combine(inputDir, "*/*.json")
+        let countBefore = getQuotesCount connection
+        printfn "Quotes before: %d" countBefore
+
+        let inserted = ingestQuotesFromGlob connection globPattern
+        printfn "Rows processed: %d" inserted
+
+        let countAfter = getQuotesCount connection
+        printfn "Quotes after: %d" countAfter
+        printfn "New quotes added: %d" (countAfter - countBefore)
+    else
+        printfn "Directory not found: %s" inputDir
+
+    printfn ""
+    printfn "Quotes ingestion complete."
+
 let private handleListConditions (config: MassiveConfig) (args: ParseResults<ListConditionsArgs>) =
     let assetClass =
         args.TryGetResult ListConditionsArgs.Asset_Class
@@ -846,6 +938,10 @@ let main argv =
                 handleIngestData args
             | Ingest_Intraday args ->
                 handleIngestIntraday args
+            | Ingest_Trades args ->
+                handleIngestTrades args
+            | Ingest_Quotes args ->
+                handleIngestQuotes args
             | Refresh_Views args ->
                 handleRefreshViews args
             | Plot_Chart args ->
