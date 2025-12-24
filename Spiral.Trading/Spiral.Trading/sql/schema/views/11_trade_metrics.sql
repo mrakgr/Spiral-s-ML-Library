@@ -6,6 +6,11 @@
 -- Filters by participant_timestamp to only include trades that occurred within window
 -- Join with trades_with_quotes on id to get full trade info
 
+-- Helper macro: check if participant_timestamp falls within window
+DROP MACRO IF EXISTS in_window;
+CREATE MACRO in_window(participant_ts, current_sip_ts, window_secs) AS 
+    participant_ts >= current_sip_ts - COALESCE(window_secs, 86400) * INTERVAL 1 SECOND;
+
 DROP MACRO TABLE IF EXISTS trade_metrics;
 CREATE MACRO trade_metrics(window_seconds) AS TABLE
 WITH windowed AS (
@@ -24,34 +29,34 @@ WITH windowed AS (
 SELECT 
     id,
     
-    -- Running VWAP (only trades with participant_timestamp in window)
-    SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
+    -- Running VWAP
+    SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) 
         THEN price * size ELSE 0 END) OVER w 
-    / NULLIF(SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
+    / NULLIF(SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) 
         THEN size ELSE 0 END) OVER w, 0) AS vwap,
     
-    -- Running VWSTD: sqrt(VWAP(price²) - VWAP(price)²)
+    -- Running VWSTD
     SQRT(GREATEST(0,
-        SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
+        SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) 
             THEN price * price * size ELSE 0 END) OVER w 
-        / NULLIF(SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
+        / NULLIF(SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) 
             THEN size ELSE 0 END) OVER w, 0)
         - POWER(
-            SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
+            SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) 
                 THEN price * size ELSE 0 END) OVER w 
-            / NULLIF(SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
+            / NULLIF(SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) 
                 THEN size ELSE 0 END) OVER w, 0)
         , 2)
     )) AS vwstd,
     
-    -- Volume by side (filtered)
-    SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
-        AND side = 'BUY' THEN size ELSE 0 END) OVER w AS ask_volume,
-    SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
-        AND side = 'SELL' THEN size ELSE 0 END) OVER w AS bid_volume,
-    SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
-        AND side = 'MID' THEN size ELSE 0 END) OVER w AS mid_volume,
-    SUM(CASE WHEN participant_timestamp >= current_sip_ts - COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND 
+    -- Volume by side
+    SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) AND side = 'BUY' 
+        THEN size ELSE 0 END) OVER w AS ask_volume,
+    SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) AND side = 'SELL' 
+        THEN size ELSE 0 END) OVER w AS bid_volume,
+    SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) AND side = 'MID' 
+        THEN size ELSE 0 END) OVER w AS mid_volume,
+    SUM(CASE WHEN in_window(participant_timestamp, current_sip_ts, window_seconds) 
         THEN size ELSE 0 END) OVER w AS total_volume
 
 FROM windowed
