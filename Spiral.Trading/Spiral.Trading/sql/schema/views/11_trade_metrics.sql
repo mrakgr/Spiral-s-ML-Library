@@ -2,6 +2,7 @@
 -- window_seconds: number of seconds for rolling window, or NULL for full session
 -- Returns trade id with VWAP, VWSTD, and volume breakdown by side
 -- Partitions by session_date to isolate sessions
+-- Orders by sip_timestamp (when trade is visible) for realistic simulation
 -- Join with trades_with_quotes on id to get full trade info
 
 DROP MACRO TABLE IF EXISTS trade_metrics;
@@ -27,7 +28,7 @@ SELECT
 FROM trades_with_quotes
 WINDOW w AS (
     PARTITION BY ticker, session_date
-    ORDER BY participant_timestamp
+    ORDER BY sip_timestamp
     RANGE BETWEEN 
         COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND PRECEDING 
         AND CURRENT ROW
