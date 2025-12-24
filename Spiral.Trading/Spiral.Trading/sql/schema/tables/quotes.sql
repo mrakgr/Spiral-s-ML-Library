@@ -18,6 +18,5 @@ CREATE TABLE IF NOT EXISTS quotes (
     tape INTEGER
 );
 
-CREATE INDEX IF NOT EXISTS idx_quotes_ticker_trade_date ON quotes(ticker, trade_date);
-CREATE INDEX IF NOT EXISTS idx_quotes_ticker_sip_timestamp ON quotes(ticker, sip_timestamp);
-CREATE INDEX IF NOT EXISTS idx_quotes_ticker_participant_timestamp ON quotes(ticker, participant_timestamp);
+CREATE INDEX IF NOT EXISTS idx_quotes_ticker ON quotes(ticker);
+CREATE INDEX IF NOT EXISTS idx_quotes_trade_date ON quotes(trade_date);
