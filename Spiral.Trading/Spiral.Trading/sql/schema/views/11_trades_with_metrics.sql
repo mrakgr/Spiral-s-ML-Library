@@ -1,13 +1,13 @@
 -- Macro for computing trade metrics with configurable time window
 -- window_seconds: number of seconds for rolling window, or NULL for full session
 -- Returns trades with VWAP, VWSTD, and volume breakdown by side
--- Partitions by trade_date to isolate sessions
+-- Partitions by session_date to isolate sessions
 
 DROP MACRO TABLE IF EXISTS trades_with_metrics;
 CREATE MACRO trades_with_metrics(window_seconds) AS TABLE
 SELECT 
     ticker,
-    trade_date,
+    session_date,
     sip_timestamp,
     participant_timestamp,
     sequence_number,
@@ -39,7 +39,7 @@ SELECT
 
 FROM trades_with_quotes
 WINDOW w AS (
-    PARTITION BY ticker, trade_date
+    PARTITION BY ticker, session_date
     ORDER BY participant_timestamp
     RANGE BETWEEN 
         COALESCE(window_seconds, 86400) * INTERVAL 1 SECOND PRECEDING 

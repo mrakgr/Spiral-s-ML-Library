@@ -531,10 +531,10 @@ let getIntradaySecondByTickerDate (connection: IDbConnection) (ticker: string) (
 /// Extracts ticker from file path (expects data/trades/{ticker}/{date}.json)
 let ingestTradesFromGlob (connection: IDbConnection) (globPattern: string) : int64 =
     let sql = $"""
-        INSERT INTO trades (ticker, trade_date, sip_timestamp, participant_timestamp, sequence_number, price, size, exchange, conditions, tape)
+        INSERT INTO trades (ticker, session_date, sip_timestamp, participant_timestamp, sequence_number, price, size, exchange, conditions, tape)
         SELECT
             split_part(filename, '/', -2) as ticker,
-            CAST((make_timestamp_ns(participant_timestamp) AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS DATE) as trade_date,
+            CAST((make_timestamp_ns(participant_timestamp) AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS DATE) as session_date,
             make_timestamp_ns(sip_timestamp),
             make_timestamp_ns(participant_timestamp),
             sequence_number,
@@ -557,10 +557,10 @@ let getTradesCount (connection: IDbConnection) : int64 =
 /// Extracts ticker from file path (expects data/quotes/{ticker}/{date}.json)
 let ingestQuotesFromGlob (connection: IDbConnection) (globPattern: string) : int64 =
     let sql = $"""
-        INSERT INTO quotes (ticker, trade_date, sip_timestamp, participant_timestamp, sequence_number, bid_price, bid_size, bid_exchange, ask_price, ask_size, ask_exchange, conditions, indicators, tape)
+        INSERT INTO quotes (ticker, session_date, sip_timestamp, participant_timestamp, sequence_number, bid_price, bid_size, bid_exchange, ask_price, ask_size, ask_exchange, conditions, indicators, tape)
         SELECT
             split_part(filename, '/', -2) as ticker,
-            CAST((make_timestamp_ns(participant_timestamp) AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS DATE) as trade_date,
+            CAST((make_timestamp_ns(participant_timestamp) AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS DATE) as session_date,
             make_timestamp_ns(sip_timestamp),
             make_timestamp_ns(participant_timestamp),
             sequence_number,

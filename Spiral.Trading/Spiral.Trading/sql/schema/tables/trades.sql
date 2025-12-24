@@ -1,11 +1,11 @@
 -- Trades table for tick-level trade data
 -- Timestamps are in UTC (nanosecond precision)
--- trade_date is the session date in Eastern time
+-- session_date is the trading session date in Eastern time
 CREATE SEQUENCE IF NOT EXISTS trades_id_seq;
 CREATE TABLE IF NOT EXISTS trades (
     id BIGINT PRIMARY KEY DEFAULT nextval('trades_id_seq'),
     ticker VARCHAR NOT NULL,
-    trade_date DATE NOT NULL,
+    session_date DATE NOT NULL,
     sip_timestamp TIMESTAMP_NS NOT NULL,
     participant_timestamp TIMESTAMP_NS NOT NULL,
     sequence_number BIGINT NOT NULL,
@@ -17,4 +17,4 @@ CREATE TABLE IF NOT EXISTS trades (
 );
 
 CREATE INDEX IF NOT EXISTS idx_trades_ticker ON trades(ticker);
-CREATE INDEX IF NOT EXISTS idx_trades_trade_date ON trades(trade_date);
+CREATE INDEX IF NOT EXISTS idx_trades_session_date ON trades(session_date);
