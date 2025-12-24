@@ -11,6 +11,7 @@ open Spiral.Trading.IntradayDownload
 open Spiral.Trading.TradesDownload
 open Spiral.Trading.QuotesDownload
 open Spiral.Trading.Conditions
+open Spiral.Trading.TradeMetrics
 open Spiral.Trading.Database
 open Spiral.Trading.Plotting
 
@@ -234,6 +235,22 @@ type ListConditionsArgs =
             | Asset_Class _ -> "Asset class filter: stocks, options, crypto, fx (default: stocks)"
             | Data_Type _ -> "Data type filter: trade, quote (default: trade)"
 
+type ComputeMetricsArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-s")>] Session_Date of string
+    | [<AltCommandLine("-w")>] Window of float
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-l")>] Limit of int
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Stock ticker symbol (required)"
+            | Session_Date _ -> "Session date (yyyy-MM-dd, required)"
+            | Window _ -> "Window size in seconds (default: 60)"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Limit _ -> "Limit output rows (default: show all)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
@@ -250,6 +267,7 @@ type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Stocks_In_Play of ParseResults<StocksInPlayArgs>
     | [<CliPrefix(CliPrefix.None)>] Refresh_Views of ParseResults<RefreshViewsArgs>
     | [<CliPrefix(CliPrefix.None)>] List_Conditions of ParseResults<ListConditionsArgs>
+    | [<CliPrefix(CliPrefix.None)>] Compute_Metrics of ParseResults<ComputeMetricsArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -269,6 +287,7 @@ type Arguments =
             | Stocks_In_Play _ -> "List top stocks in play for a date range"
             | Refresh_Views _ -> "Refresh views only (fast, no table rematerialization)"
             | List_Conditions _ -> "List trade/quote condition codes from the API"
+            | Compute_Metrics _ -> "Compute trade metrics (VWAP, VWSTD, volume) for a session"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -908,6 +927,47 @@ let private handleListConditions (config: MassiveConfig) (args: ParseResults<Lis
     | Error msg ->
         printfn "Error fetching conditions: %s" msg
 
+let private handleComputeMetrics (args: ParseResults<ComputeMetricsArgs>) =
+    let ticker = args.GetResult ComputeMetricsArgs.Ticker
+    let sessionDateStr = args.GetResult ComputeMetricsArgs.Session_Date
+    let sessionDate = DateOnly.Parse(sessionDateStr)
+    let windowSeconds = args.GetResult(ComputeMetricsArgs.Window, defaultValue = 60.0)
+    let dbPath = args.GetResult(ComputeMetricsArgs.Database, defaultValue = "data/trading.db")
+    let limit = args.TryGetResult ComputeMetricsArgs.Limit
+
+    printfn "Computing trade metrics..."
+    printfn "Ticker: %s" ticker
+    printfn "Session: %s" sessionDateStr
+    printfn "Window: %.0f seconds" windowSeconds
+    printfn "Database: %s" dbPath
+    printfn ""
+
+    use connection = openConnection dbPath
+    
+    let stopwatch = System.Diagnostics.Stopwatch.StartNew()
+    let trades = TradeMetrics.loadTrades connection ticker sessionDate
+    let loadTime = stopwatch.ElapsedMilliseconds
+    
+    stopwatch.Restart()
+    let metrics = TradeMetrics.computeMetrics trades windowSeconds
+    let computeTime = stopwatch.ElapsedMilliseconds
+    
+    printfn "Loaded %d trades in %dms" trades.Length loadTime
+    printfn "Computed metrics in %dms" computeTime
+    printfn ""
+    
+    let displayMetrics = 
+        match limit with
+        | Some n -> metrics |> Array.truncate n
+        | None -> metrics
+    
+    printfn "%-12s %-12s %-12s %-12s %-12s %-12s %-12s" "ID" "VWAP" "VWSTD" "AskVol" "BidVol" "MidVol" "TotalVol"
+    printfn "%s" (String.replicate 84 "-")
+    
+    for m in displayMetrics do
+        printfn "%-12d %-12.4f %-12.4f %-12.0f %-12.0f %-12.0f %-12.0f" 
+            m.Id m.Vwap m.Vwstd m.AskVolume m.BidVolume m.MidVolume m.TotalVolume
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -955,6 +1015,8 @@ let main argv =
             | List_Conditions args ->
                 let config = loadConfigOrFail configPath
                 handleListConditions config args
+            | Compute_Metrics args ->
+                handleComputeMetrics args
 
         0
     with
