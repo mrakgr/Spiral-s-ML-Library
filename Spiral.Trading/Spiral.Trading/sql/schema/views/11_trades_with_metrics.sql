@@ -8,8 +8,8 @@ CREATE MACRO trades_with_metrics(window_seconds) AS TABLE
 WITH trades_base AS (
     SELECT 
         t.*,
-        (epoch_ms(t.participant_timestamp // 1000000) AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS ts_et,
-        CAST((epoch_ms(t.participant_timestamp // 1000000) AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS DATE) AS trade_date
+        (t.participant_timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS ts_et,
+        CAST((t.participant_timestamp AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York') AS DATE) AS trade_date
     FROM trades_with_quotes t
 )
 SELECT 

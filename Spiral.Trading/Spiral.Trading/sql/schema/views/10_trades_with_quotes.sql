@@ -5,6 +5,7 @@ CREATE TYPE IF NOT EXISTS trade_side AS ENUM ('BUY', 'SELL', 'MID');
 DROP VIEW IF EXISTS trades_with_quotes;
 CREATE VIEW trades_with_quotes AS
 SELECT 
+    t.id,
     t.ticker,
     t.sip_timestamp,
     t.participant_timestamp,
@@ -26,4 +27,6 @@ SELECT
 FROM trades t
 ASOF JOIN quotes q 
     ON t.ticker = q.ticker 
+    -- DuckDb preserves the insertion order: https://duckdb.org/docs/stable/sql/dialect/order_preservation
+    -- Also the data from Massive is ordered by the sequence_number. That's good enough to tiebreak the timestamp collisions automaticaly.
     AND t.participant_timestamp >= q.sip_timestamp;

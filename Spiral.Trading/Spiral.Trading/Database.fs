@@ -534,8 +534,8 @@ let ingestTradesFromGlob (connection: IDbConnection) (globPattern: string) : int
         INSERT INTO trades (ticker, sip_timestamp, participant_timestamp, sequence_number, price, size, exchange, conditions, tape)
         SELECT
             split_part(filename, '/', -2) as ticker,
-            sip_timestamp,
-            participant_timestamp,
+            make_timestamp_ns(sip_timestamp),
+            make_timestamp_ns(participant_timestamp),
             sequence_number,
             price,
             size,
@@ -543,13 +543,6 @@ let ingestTradesFromGlob (connection: IDbConnection) (globPattern: string) : int
             conditions,
             tape
         FROM read_json('{globPattern}', filename=true)
-        ON CONFLICT(ticker, sip_timestamp, sequence_number) DO UPDATE SET
-            participant_timestamp = excluded.participant_timestamp,
-            price = excluded.price,
-            size = excluded.size,
-            exchange = excluded.exchange,
-            conditions = excluded.conditions,
-            tape = excluded.tape
     """
     connection.Execute(sql) |> int64
 
@@ -566,8 +559,8 @@ let ingestQuotesFromGlob (connection: IDbConnection) (globPattern: string) : int
         INSERT INTO quotes (ticker, sip_timestamp, participant_timestamp, sequence_number, bid_price, bid_size, bid_exchange, ask_price, ask_size, ask_exchange, conditions, indicators, tape)
         SELECT
             split_part(filename, '/', -2) as ticker,
-            sip_timestamp,
-            participant_timestamp,
+            make_timestamp_ns(sip_timestamp),
+            make_timestamp_ns(participant_timestamp),
             sequence_number,
             bid_price,
             bid_size,
@@ -579,17 +572,6 @@ let ingestQuotesFromGlob (connection: IDbConnection) (globPattern: string) : int
             indicators,
             tape
         FROM read_json('{globPattern}', filename=true)
-        ON CONFLICT(ticker, sip_timestamp, sequence_number) DO UPDATE SET
-            participant_timestamp = excluded.participant_timestamp,
-            bid_price = excluded.bid_price,
-            bid_size = excluded.bid_size,
-            bid_exchange = excluded.bid_exchange,
-            ask_price = excluded.ask_price,
-            ask_size = excluded.ask_size,
-            ask_exchange = excluded.ask_exchange,
-            conditions = excluded.conditions,
-            indicators = excluded.indicators,
-            tape = excluded.tape
     """
     connection.Execute(sql) |> int64
 
