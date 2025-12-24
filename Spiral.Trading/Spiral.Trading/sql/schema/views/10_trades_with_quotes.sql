@@ -1,5 +1,6 @@
 -- View for trades with matched quotes and computed side
 -- Uses ASOF JOIN on quote.sip_timestamp <= trade.participant_timestamp
+-- Joins on trade_date to ensure we only match within the same session
 CREATE TYPE IF NOT EXISTS trade_side AS ENUM ('BUY', 'SELL', 'MID');
 
 DROP VIEW IF EXISTS trades_with_quotes;
@@ -7,6 +8,7 @@ CREATE VIEW trades_with_quotes AS
 SELECT 
     t.id,
     t.ticker,
+    t.trade_date,
     t.sip_timestamp,
     t.participant_timestamp,
     t.sequence_number,
@@ -27,6 +29,5 @@ SELECT
 FROM trades t
 ASOF JOIN quotes q 
     ON t.ticker = q.ticker 
-    -- DuckDb preserves the insertion order: https://duckdb.org/docs/stable/sql/dialect/order_preservation
-    -- Also the data from Massive is ordered by the sequence_number. That's good enough to tiebreak the timestamp collisions automaticaly.
+    AND t.trade_date = q.trade_date
     AND t.participant_timestamp >= q.sip_timestamp;
