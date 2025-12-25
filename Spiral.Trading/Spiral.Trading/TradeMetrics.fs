@@ -147,3 +147,54 @@ let computeForSession
     (windowSeconds: float) : TradeMetrics[] =
     let trades = loadTrades connection ticker sessionDate
     computeMetrics trades windowSeconds
+
+/// Export trades with multi-window metrics to CSV
+/// Windows are 2^n seconds where n is in [-1, 6] (0.5s, 1s, 2s, 4s, 8s, 16s, 32s, 64s)
+let exportToCsv (connection: IDbConnection) (ticker: string) (sessionDate: DateOnly) (outputPath: string) =
+    let trades = loadTrades connection ticker sessionDate
+    if trades.Length = 0 then
+        printfn "No trades found for %s on %s" ticker (sessionDate.ToString())
+    else
+        // Window sizes: 2^n for n in [-1, 6]
+        let windowSizes = [| 0.5; 1.0; 2.0; 4.0; 8.0; 16.0; 32.0; 64.0 |]
+        
+        // Compute metrics for each window size
+        let allMetrics = windowSizes |> Array.map (fun w -> computeMetrics trades w)
+        
+        use writer = new System.IO.StreamWriter(outputPath)
+        
+        // Write header
+        let baseHeaders = "id,sip_timestamp,participant_timestamp,price,size,side,bid_price,ask_price,spread"
+        let windowHeaders = 
+            windowSizes 
+            |> Array.map (fun w -> 
+                let label = if w < 1.0 then "0.5s" else sprintf "%.0fs" w
+                sprintf "vwap_%s,vwstd_%s,ask_pct_%s,bid_pct_%s,mid_pct_%s,vol_%s" label label label label label label)
+            |> String.concat ","
+        writer.WriteLine(baseHeaders + "," + windowHeaders)
+        
+        // Write data rows
+        for i = 0 to trades.Length - 1 do
+            let t = trades[i]
+            let spread = t.ask_price - t.bid_price
+            
+            let baseCols = sprintf "%d,%s,%s,%.4f,%.0f,%s,%.4f,%.4f,%.4f"
+                            t.id
+                            (t.sip_timestamp.ToString("yyyy-MM-dd HH:mm:ss.ffffff"))
+                            (t.participant_timestamp.ToString("yyyy-MM-dd HH:mm:ss.ffffff"))
+                            t.price t.size t.side
+                            t.bid_price t.ask_price spread
+            
+            let windowCols =
+                allMetrics
+                |> Array.map (fun metrics ->
+                    let m = metrics[i]
+                    let askPct = if m.TotalVolume > 0.0 then 100.0 * m.AskVolume / m.TotalVolume else 0.0
+                    let bidPct = if m.TotalVolume > 0.0 then 100.0 * m.BidVolume / m.TotalVolume else 0.0
+                    let midPct = if m.TotalVolume > 0.0 then 100.0 * m.MidVolume / m.TotalVolume else 0.0
+                    sprintf "%.4f,%.4f,%.1f,%.1f,%.1f,%.0f" m.Vwap m.Vwstd askPct bidPct midPct m.TotalVolume)
+                |> String.concat ","
+            
+            writer.WriteLine(baseCols + "," + windowCols)
+        
+        printfn "Exported %d trades to %s" trades.Length outputPath

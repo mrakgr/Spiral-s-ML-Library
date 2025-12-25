@@ -251,6 +251,20 @@ type ComputeMetricsArgs =
             | Database _ -> "DuckDB database path (default: data/trading.db)"
             | Limit _ -> "Limit output rows (default: show all)"
 
+type ExportMetricsArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-s")>] Session_Date of string
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-o")>] Output of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Stock ticker symbol (required)"
+            | Session_Date _ -> "Session date (yyyy-MM-dd, required)"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Output _ -> "Output CSV file path (default: data/{ticker}_{date}_metrics.csv)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
@@ -268,6 +282,7 @@ type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Refresh_Views of ParseResults<RefreshViewsArgs>
     | [<CliPrefix(CliPrefix.None)>] List_Conditions of ParseResults<ListConditionsArgs>
     | [<CliPrefix(CliPrefix.None)>] Compute_Metrics of ParseResults<ComputeMetricsArgs>
+    | [<CliPrefix(CliPrefix.None)>] Export_Metrics of ParseResults<ExportMetricsArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -288,6 +303,7 @@ type Arguments =
             | Refresh_Views _ -> "Refresh views only (fast, no table rematerialization)"
             | List_Conditions _ -> "List trade/quote condition codes from the API"
             | Compute_Metrics _ -> "Compute trade metrics (VWAP, VWSTD, volume) for a session"
+            | Export_Metrics _ -> "Export trades with multi-window metrics to CSV"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -968,6 +984,25 @@ let private handleComputeMetrics (args: ParseResults<ComputeMetricsArgs>) =
         printfn "%-12d %-12.4f %-12.4f %-12.0f %-12.0f %-12.0f %-12.0f" 
             m.Id m.Vwap m.Vwstd m.AskVolume m.BidVolume m.MidVolume m.TotalVolume
 
+let private handleExportMetrics (args: ParseResults<ExportMetricsArgs>) =
+    let ticker = args.GetResult ExportMetricsArgs.Ticker
+    let sessionDateStr = args.GetResult ExportMetricsArgs.Session_Date
+    let sessionDate = DateOnly.Parse(sessionDateStr)
+    let dbPath = args.GetResult(ExportMetricsArgs.Database, defaultValue = "data/trading.db")
+    let outputPath = 
+        args.TryGetResult ExportMetricsArgs.Output
+        |> Option.defaultValue (sprintf "data/%s_%s_metrics.csv" ticker sessionDateStr)
+
+    printfn "Exporting trade metrics..."
+    printfn "Ticker: %s" ticker
+    printfn "Session: %s" sessionDateStr
+    printfn "Database: %s" dbPath
+    printfn "Output: %s" outputPath
+    printfn ""
+
+    use connection = openConnection dbPath
+    TradeMetrics.exportToCsv connection ticker sessionDate outputPath
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -1017,6 +1052,8 @@ let main argv =
                 handleListConditions config args
             | Compute_Metrics args ->
                 handleComputeMetrics args
+            | Export_Metrics args ->
+                handleExportMetrics args
 
         0
     with
