@@ -105,37 +105,21 @@ let computeMetrics (trades: TradeWithQuote[]) (windowSeconds: float) : TradeMetr
         let results = Array.zeroCreate<TradeMetrics> trades.Length
         let state = RunningState.create ()
         
-        // Queue of (index, trade) for trades in current sip_timestamp window
-        let sipWindow = Queue<int * TradeWithQuote>()
-        // Queue of indices for trades whose participant_timestamp is in window (subset of sipWindow)
-        let participantIndices = Queue<int>()
+        // Priority queue keyed by participant_timestamp (min-heap)
+        let pq = PriorityQueue<int, DateTime>()
         
         for i = 0 to trades.Length - 1 do
             let trade = trades[i]
             let windowStart = trade.sip_timestamp - window
             
-            // Add current trade to sip window
-            sipWindow.Enqueue((i, trade))
-            
-            // Add to running state if participant_timestamp is in window
-            if trade.participant_timestamp >= windowStart then
-                RunningState.add state trade
-                participantIndices.Enqueue(i)
-            
-            // Remove trades that fall outside sip_timestamp window
-            while sipWindow.Count > 0 && (fst (sipWindow.Peek())).Equals(i) = false && 
-                  trades[fst (sipWindow.Peek())].sip_timestamp < windowStart do
-                let (idx, oldTrade) = sipWindow.Dequeue()
-                // Check if this trade was in participant window and remove from state
-                if participantIndices.Count > 0 && participantIndices.Peek() = idx then
-                    participantIndices.Dequeue() |> ignore
-                    RunningState.remove state oldTrade
-            
-            // Also remove from participant state if participant_timestamp now outside window
-            while participantIndices.Count > 0 && 
-                  trades[participantIndices.Peek()].participant_timestamp < windowStart do
-                let idx = participantIndices.Dequeue()
+            // Remove trades whose participant_timestamp is outside the window
+            while pq.Count > 0 && trades[pq.Peek()].participant_timestamp < windowStart do
+                let idx = pq.Dequeue()
                 RunningState.remove state trades[idx]
+            
+            // Add current trade to state and priority queue
+            RunningState.add state trade
+            pq.Enqueue(i, trade.participant_timestamp)
             
             results[i] <- RunningState.toMetrics state trade.id
         
