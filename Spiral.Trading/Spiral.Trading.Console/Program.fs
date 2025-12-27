@@ -265,6 +265,20 @@ type ExportMetricsArgs =
             | Database _ -> "DuckDB database path (default: data/trading.db)"
             | Output _ -> "Output CSV file path (default: data/{ticker}_{date}_metrics.csv)"
 
+type ExportSimplifiedArgs =
+    | [<AltCommandLine("-t")>] Ticker of string
+    | [<AltCommandLine("-s")>] Session_Date of string
+    | [<AltCommandLine("-d")>] Database of string
+    | [<AltCommandLine("-o")>] Output of string
+
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Ticker _ -> "Stock ticker symbol (required)"
+            | Session_Date _ -> "Session date (yyyy-MM-dd, required)"
+            | Database _ -> "DuckDB database path (default: data/trading.db)"
+            | Output _ -> "Output CSV file path (default: data/{ticker}_{date}_simple.csv)"
+
 type Arguments =
     | [<CliPrefix(CliPrefix.None)>] Download_Bulk of ParseResults<DownloadBulkArgs>
     | [<CliPrefix(CliPrefix.None)>] Download_Splits of ParseResults<DownloadSplitsArgs>
@@ -283,6 +297,7 @@ type Arguments =
     | [<CliPrefix(CliPrefix.None)>] List_Conditions of ParseResults<ListConditionsArgs>
     | [<CliPrefix(CliPrefix.None)>] Compute_Metrics of ParseResults<ComputeMetricsArgs>
     | [<CliPrefix(CliPrefix.None)>] Export_Metrics of ParseResults<ExportMetricsArgs>
+    | [<CliPrefix(CliPrefix.None)>] Export_Simplified of ParseResults<ExportSimplifiedArgs>
 
     interface IArgParserTemplate with
         member this.Usage =
@@ -304,6 +319,7 @@ type Arguments =
             | List_Conditions _ -> "List trade/quote condition codes from the API"
             | Compute_Metrics _ -> "Compute trade metrics (VWAP, VWSTD, volume) for a session"
             | Export_Metrics _ -> "Export trades with multi-window metrics to CSV"
+            | Export_Simplified _ -> "Export simplified trade table for human reading"
 
 let private ensureDataDir () =
     Directory.CreateDirectory("data") |> ignore
@@ -1003,6 +1019,25 @@ let private handleExportMetrics (args: ParseResults<ExportMetricsArgs>) =
     use connection = openConnection dbPath
     TradeMetrics.exportToCsv connection ticker sessionDate outputPath
 
+let private handleExportSimplified (args: ParseResults<ExportSimplifiedArgs>) =
+    let ticker = args.GetResult ExportSimplifiedArgs.Ticker
+    let sessionDateStr = args.GetResult ExportSimplifiedArgs.Session_Date
+    let sessionDate = DateOnly.Parse(sessionDateStr)
+    let dbPath = args.GetResult(ExportSimplifiedArgs.Database, defaultValue = "data/trading.db")
+    let outputPath = 
+        args.TryGetResult ExportSimplifiedArgs.Output
+        |> Option.defaultValue (sprintf "data/%s_%s_simple.csv" ticker sessionDateStr)
+
+    printfn "Exporting simplified trade table..."
+    printfn "Ticker: %s" ticker
+    printfn "Session: %s" sessionDateStr
+    printfn "Database: %s" dbPath
+    printfn "Output: %s" outputPath
+    printfn ""
+
+    use connection = openConnection dbPath
+    TradeMetrics.exportSimplified connection ticker sessionDate outputPath
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Arguments>(programName = "Spiral.Trading")
@@ -1054,6 +1089,8 @@ let main argv =
                 handleComputeMetrics args
             | Export_Metrics args ->
                 handleExportMetrics args
+            | Export_Simplified args ->
+                handleExportSimplified args
 
         0
     with

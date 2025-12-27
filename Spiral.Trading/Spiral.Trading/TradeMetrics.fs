@@ -198,3 +198,49 @@ let exportToCsv (connection: IDbConnection) (ticker: string) (sessionDate: DateO
             writer.WriteLine(baseCols + "," + windowCols)
         
         printfn "Exported %d trades to %s" trades.Length outputPath
+
+/// Export simplified trade table for human reading
+/// Sorted by participant_timestamp, 12 essential columns
+let exportSimplified (connection: IDbConnection) (ticker: string) (sessionDate: DateOnly) (outputPath: string) =
+    let trades = loadTrades connection ticker sessionDate
+    if trades.Length = 0 then
+        printfn "No trades found for %s on %s" ticker (sessionDate.ToString())
+    else
+        // Sort by participant_timestamp
+        let sortedTrades = trades |> Array.sortBy (fun t -> t.participant_timestamp)
+        
+        // Compute 4s window metrics
+        let metrics = computeMetrics sortedTrades 4.0
+        
+        use writer = new System.IO.StreamWriter(outputPath)
+        
+        // Write header
+        writer.WriteLine("participant_timestamp,time_gap,price,size,side,bid_price,ask_price,vwap_4s,vwstd_4s,vol_4s,vol_delta_pct_4s,mid_pct_4s")
+        
+        // Write data rows
+        for i = 0 to sortedTrades.Length - 1 do
+            let t = sortedTrades[i]
+            let m = metrics[i]
+            
+            // Time gap from previous trade
+            let timeGap = 
+                if i = 0 then 0.0
+                else (t.participant_timestamp - sortedTrades[i-1].participant_timestamp).TotalSeconds
+            
+            // Volume percentages
+            let askPct = if m.TotalVolume > 0.0 then 100.0 * m.AskVolume / m.TotalVolume else 0.0
+            let bidPct = if m.TotalVolume > 0.0 then 100.0 * m.BidVolume / m.TotalVolume else 0.0
+            let midPct = if m.TotalVolume > 0.0 then 100.0 * m.MidVolume / m.TotalVolume else 0.0
+            let volDeltaPct = askPct - bidPct
+            
+            let row = sprintf "%s,%.3f,%.4f,%.0f,%s,%.4f,%.4f,%.4f,%.4f,%.0f,%.1f,%.1f"
+                        (t.participant_timestamp.ToString("HH:mm:ss.ffffff"))
+                        timeGap
+                        t.price t.size t.side
+                        t.bid_price t.ask_price
+                        m.Vwap m.Vwstd m.TotalVolume
+                        volDeltaPct midPct
+            
+            writer.WriteLine(row)
+        
+        printfn "Exported %d trades to %s" sortedTrades.Length outputPath
