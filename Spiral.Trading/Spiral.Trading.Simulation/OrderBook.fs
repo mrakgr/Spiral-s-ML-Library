@@ -1,6 +1,7 @@
 module Spiral.Trading.Simulation.OrderBook
 
 open System
+open MathNet.Numerics.Distributions
 
 type Side = Bid | Ask
 
@@ -25,22 +26,17 @@ type OrderBookParams = {
     SizeSigma: float       // Log-normal sigma for size
 }
 
-module Distributions =
-    /// Sample from exponential distribution
-    let sampleExponential (lambda: float) (rng: Random) : float =
-        -log(1.0 - rng.NextDouble()) / lambda
-    
-    /// Sample from log-normal distribution
-    let sampleLogNormal (mu: float) (sigma: float) (rng: Random) : float =
-        let u1 = rng.NextDouble()
-        let u2 = rng.NextDouble()
-        // Box-Muller transform for standard normal
-        let z = sqrt(-2.0 * log(u1)) * cos(2.0 * Math.PI * u2)
-        exp(mu + sigma * z)
+/// Stochastic rounding: rounds up or down probabilistically based on fractional part
+let stochasticRound (rng: Random) (x: float) : float =
+    let floor = Math.Floor(x)
+    let frac = x - floor
+    if rng.NextDouble() < frac then floor + 1.0 else floor
 
-/// Snap a price to the nearest tick
-let snapToTick (tickSize: float) (price: float) : float =
-    round(price / tickSize) * tickSize
+/// Snap a price to tick size using stochastic rounding
+let snapToTick (rng: Random) (tickSize: float) (price: float) : float =
+    let ticks = price / tickSize
+    let roundedTicks = stochasticRound rng ticks
+    roundedTicks * tickSize
 
 /// Generate order book levels for one side
 let generateSideLevels 
@@ -53,16 +49,20 @@ let generateSideLevels
     (side: Side) 
     (rng: Random) : Level[] =
     
+    // Create MathNet distributions
+    let expDist = Exponential(lambda, rng)
+    let logNormalDist = LogNormal(sizeMu, sizeSigma, rng)
+    
     // Sample distances and create levels
     let levels = 
         Array.init levelCount (fun _ ->
-            let distance = Distributions.sampleExponential lambda rng
-            let size = Distributions.sampleLogNormal sizeMu sizeSigma rng
+            let distance = expDist.Sample()
+            let size = logNormalDist.Sample()
             let rawPrice = 
                 match side with
                 | Bid -> midpoint - distance
                 | Ask -> midpoint + distance
-            let price = snapToTick tickSize rawPrice
+            let price = snapToTick rng tickSize rawPrice
             { Price = price; Size = size }
         )
     
