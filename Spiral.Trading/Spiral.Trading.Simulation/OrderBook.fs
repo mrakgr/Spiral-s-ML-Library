@@ -57,7 +57,7 @@ let snapToTick (rng: Random) (tickSize: float) (price: float) : float =
 let generateSideLevels 
     (midpoint: float) 
     (tickSize: float) 
-    (lambda: float) 
+    (meanDistance: float) 
     (baseSizeMean: float)
     (baseSizeStdDev: float)
     (sizeDistanceCorr: float)
@@ -66,6 +66,7 @@ let generateSideLevels
     (rng: Random) : Level[] =
     
     // Create exponential distribution for distances
+    let lambda = ParamConversion.distanceToLambda meanDistance
     let expDist = Exponential(lambda, rng)
     
     // Coefficient of variation (kept constant as distance changes)
@@ -79,7 +80,7 @@ let generateSideLevels
             // Scale size mean linearly with distance, keep CV constant
             let scaledMean = baseSizeMean * (1.0 + sizeDistanceCorr * distance)
             let scaledStdDev = scaledMean * cv
-            let (mu, sigma) = ParamConversion.sizeToLogNormalParams scaledMean scaledStdDev
+            let mu, sigma = ParamConversion.sizeToLogNormalParams scaledMean scaledStdDev
             let size = LogNormal.Sample(rng, mu, sigma)
             
             let rawPrice = 
@@ -104,16 +105,13 @@ let generateSideLevels
 
 /// Generate a complete order book
 let generate (config: OrderBookParams) (rng: Random) : OrderBook =
-    let bidLambda = ParamConversion.distanceToLambda config.BidMeanDistance
-    let askLambda = ParamConversion.distanceToLambda config.AskMeanDistance
-    
     let bids = generateSideLevels 
-                config.Midpoint config.TickSize bidLambda 
+                config.Midpoint config.TickSize config.BidMeanDistance 
                 config.SizeMean config.SizeStdDev config.SizeDistanceCorrelation
                 config.LevelCount Bid rng
     
     let asks = generateSideLevels 
-                (config.Midpoint + config.TickSize) config.TickSize askLambda 
+                (config.Midpoint + config.TickSize) config.TickSize config.AskMeanDistance 
                 config.SizeMean config.SizeStdDev config.SizeDistanceCorrelation
                 config.LevelCount Ask rng
     
