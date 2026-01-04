@@ -22,8 +22,9 @@ type OrderBookParams = {
     BidMeanDistance: float     // Mean distance from midpoint for bids
     AskMeanDistance: float     // Mean distance from midpoint for asks
     LevelCount: int            // Number of levels to generate per side
-    SizeMean: float            // Mean order size
-    SizeStdDev: float          // Standard deviation of order size
+    SizeMean: float            // Mean order size (at midpoint)
+    SizeStdDev: float          // Standard deviation of order size (at midpoint)
+    SizeDistanceCorrelation: float  // Size scaling per unit distance (0 = no correlation, 1 = doubles at 1 unit away)
 }
 
 module ParamConversion =
@@ -57,21 +58,30 @@ let generateSideLevels
     (midpoint: float) 
     (tickSize: float) 
     (lambda: float) 
-    (sizeMu: float) 
-    (sizeSigma: float) 
+    (baseSizeMean: float)
+    (baseSizeStdDev: float)
+    (sizeDistanceCorr: float)
     (levelCount: int) 
     (side: Side) 
     (rng: Random) : Level[] =
     
-    // Create MathNet distributions
+    // Create exponential distribution for distances
     let expDist = Exponential(lambda, rng)
-    let logNormalDist = LogNormal(sizeMu, sizeSigma, rng)
+    
+    // Coefficient of variation (kept constant as distance changes)
+    let cv = baseSizeStdDev / baseSizeMean
     
     // Sample distances and create levels
     let levels = 
         Array.init levelCount (fun _ ->
             let distance = expDist.Sample()
-            let size = logNormalDist.Sample()
+            
+            // Scale size mean linearly with distance, keep CV constant
+            let scaledMean = baseSizeMean * (1.0 + sizeDistanceCorr * distance)
+            let scaledStdDev = scaledMean * cv
+            let (mu, sigma) = ParamConversion.sizeToLogNormalParams scaledMean scaledStdDev
+            let size = LogNormal.Sample(rng, mu, sigma)
+            
             let rawPrice = 
                 match side with
                 | Bid -> midpoint - distance
@@ -96,17 +106,16 @@ let generateSideLevels
 let generate (config: OrderBookParams) (rng: Random) : OrderBook =
     let bidLambda = ParamConversion.distanceToLambda config.BidMeanDistance
     let askLambda = ParamConversion.distanceToLambda config.AskMeanDistance
-    let (sizeMu, sizeSigma) = ParamConversion.sizeToLogNormalParams config.SizeMean config.SizeStdDev
     
     let bids = generateSideLevels 
                 config.Midpoint config.TickSize bidLambda 
-                sizeMu sizeSigma config.LevelCount 
-                Bid rng
+                config.SizeMean config.SizeStdDev config.SizeDistanceCorrelation
+                config.LevelCount Bid rng
     
     let asks = generateSideLevels 
                 (config.Midpoint + config.TickSize) config.TickSize askLambda 
-                sizeMu sizeSigma config.LevelCount 
-                Ask rng
+                config.SizeMean config.SizeStdDev config.SizeDistanceCorrelation
+                config.LevelCount Ask rng
     
     { Midpoint = config.Midpoint; Bids = bids; Asks = asks }
 

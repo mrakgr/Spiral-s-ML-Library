@@ -13,6 +13,7 @@ let main argv =
         LevelCount = 20
         SizeMean = 200.0          // Mean order size of 200 shares
         SizeStdDev = 150.0        // Std dev of 150 shares
+        SizeDistanceCorrelation = 0.5  // Size increases 50% per $1 distance
     }
 
     let book = generate config rng
