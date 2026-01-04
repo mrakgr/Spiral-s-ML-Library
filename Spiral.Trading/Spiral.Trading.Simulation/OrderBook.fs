@@ -54,16 +54,15 @@ let generateSideLevels
     let logNormalDist = LogNormal(sizeMu, sizeSigma, rng)
     
     // Sample distances and create levels
-    // Offset by half tick to ensure bid < midpoint < ask (no crossing)
-    let halfTick = tickSize / 2.0
+    // Offset ask by one tick to ensure bid <= midpoint < ask (no crossing)
     let levels = 
         Array.init levelCount (fun _ ->
             let distance = expDist.Sample()
             let size = logNormalDist.Sample()
             let rawPrice = 
                 match side with
-                | Bid -> midpoint - halfTick - distance
-                | Ask -> midpoint + halfTick + distance
+                | Bid -> midpoint - distance
+                | Ask -> midpoint + tickSize + distance
             let price = snapToTick rng tickSize rawPrice
             { Price = price; Size = size }
         )
