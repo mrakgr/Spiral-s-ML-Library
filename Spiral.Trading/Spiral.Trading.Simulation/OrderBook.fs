@@ -18,13 +18,27 @@ type OrderBook = {
 
 type OrderBookParams = {
     Midpoint: float
-    TickSize: float        // e.g., 0.01
-    BidLambda: float       // Exponential rate for bid side
-    AskLambda: float       // Exponential rate for ask side
-    LevelCount: int        // Number of levels to generate per side
-    SizeMu: float          // Log-normal mu for size
-    SizeSigma: float       // Log-normal sigma for size
+    TickSize: float            // e.g., 0.01
+    BidMeanDistance: float     // Mean distance from midpoint for bids
+    AskMeanDistance: float     // Mean distance from midpoint for asks
+    LevelCount: int            // Number of levels to generate per side
+    SizeMean: float            // Mean order size
+    SizeStdDev: float          // Standard deviation of order size
 }
+
+module ParamConversion =
+    /// Convert mean distance to exponential lambda
+    let distanceToLambda (meanDistance: float) : float =
+        1.0 / meanDistance
+    
+    /// Convert mean and std dev to log-normal mu and sigma
+    /// For log-normal: mean = exp(mu + sigma²/2), variance = (exp(sigma²) - 1) * exp(2*mu + sigma²)
+    let sizeToLogNormalParams (mean: float) (stdDev: float) : float * float =
+        let variance = stdDev * stdDev
+        let sigma2 = log(1.0 + variance / (mean * mean))
+        let sigma = sqrt(sigma2)
+        let mu = log(mean) - sigma2 / 2.0
+        (mu, sigma)
 
 /// Stochastic rounding: rounds up or down probabilistically based on fractional part
 let stochasticRound (rng: Random) (x: float) : float =
@@ -80,14 +94,18 @@ let generateSideLevels
 
 /// Generate a complete order book
 let generate (config: OrderBookParams) (rng: Random) : OrderBook =
+    let bidLambda = ParamConversion.distanceToLambda config.BidMeanDistance
+    let askLambda = ParamConversion.distanceToLambda config.AskMeanDistance
+    let (sizeMu, sizeSigma) = ParamConversion.sizeToLogNormalParams config.SizeMean config.SizeStdDev
+    
     let bids = generateSideLevels 
-                config.Midpoint config.TickSize config.BidLambda 
-                config.SizeMu config.SizeSigma config.LevelCount 
+                config.Midpoint config.TickSize bidLambda 
+                sizeMu sizeSigma config.LevelCount 
                 Bid rng
     
     let asks = generateSideLevels 
-                (config.Midpoint + config.TickSize) config.TickSize config.AskLambda 
-                config.SizeMu config.SizeSigma config.LevelCount 
+                (config.Midpoint + config.TickSize) config.TickSize askLambda 
+                sizeMu sizeSigma config.LevelCount 
                 Ask rng
     
     { Midpoint = config.Midpoint; Bids = bids; Asks = asks }

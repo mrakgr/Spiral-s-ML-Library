@@ -8,11 +8,11 @@ let main argv =
     let config = {
         Midpoint = 100.0
         TickSize = 0.01
-        BidLambda = 2.0
-        AskLambda = 1.5
+        BidMeanDistance = 0.50    // Mean $0.50 away from midpoint
+        AskMeanDistance = 0.67    // Mean $0.67 away from midpoint (wider asks)
         LevelCount = 20
-        SizeMu = 5.0
-        SizeSigma = 1.0
+        SizeMean = 200.0          // Mean order size of 200 shares
+        SizeStdDev = 150.0        // Std dev of 150 shares
     }
 
     let book = generate config rng
