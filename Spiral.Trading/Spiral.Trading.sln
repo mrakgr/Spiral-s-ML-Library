@@ -7,6 +7,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Spiral.Trading", "Spiral.Tr
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Spiral.Trading.Console", "Spiral.Trading.Console\Spiral.Trading.Console.fsproj", "{7475BD3C-C224-4AB0-8CA8-6E4AC819017E}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Spiral.Trading.Simulation", "Spiral.Trading.Simulation\Spiral.Trading.Simulation.fsproj", "{A6143F0F-D66A-4E8F-A936-30B518B462B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{7475BD3C-C224-4AB0-8CA8-6E4AC819017E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7475BD3C-C224-4AB0-8CA8-6E4AC819017E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7475BD3C-C224-4AB0-8CA8-6E4AC819017E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6143F0F-D66A-4E8F-A936-30B518B462B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6143F0F-D66A-4E8F-A936-30B518B462B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6143F0F-D66A-4E8F-A936-30B518B462B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6143F0F-D66A-4E8F-A936-30B518B462B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
