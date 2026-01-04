@@ -54,7 +54,6 @@ let generateSideLevels
     let logNormalDist = LogNormal(sizeMu, sizeSigma, rng)
     
     // Sample distances and create levels
-    // Offset ask by one tick to ensure bid <= midpoint < ask (no crossing)
     let levels = 
         Array.init levelCount (fun _ ->
             let distance = expDist.Sample()
@@ -62,7 +61,7 @@ let generateSideLevels
             let rawPrice = 
                 match side with
                 | Bid -> midpoint - distance
-                | Ask -> midpoint + tickSize + distance
+                | Ask -> midpoint + distance
             let price = snapToTick rng tickSize rawPrice
             { Price = price; Size = size }
         )
@@ -87,7 +86,7 @@ let generate (config: OrderBookParams) (rng: Random) : OrderBook =
                 Bid rng
     
     let asks = generateSideLevels 
-                config.Midpoint config.TickSize config.AskLambda 
+                (config.Midpoint + config.TickSize) config.TickSize config.AskLambda 
                 config.SizeMu config.SizeSigma config.LevelCount 
                 Ask rng
     
