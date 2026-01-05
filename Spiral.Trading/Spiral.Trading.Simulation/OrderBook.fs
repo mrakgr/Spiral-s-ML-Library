@@ -17,21 +17,21 @@ type OrderBook = {
     Asks: Level[]  // Sorted ascending (best ask first)
 }
 
-type SizeParams = {
+type LimitParams = {
+    Limit: float           // Best bid or best ask
     SizeMean: float        // Mean order size
     SizeStdDev: float      // Standard deviation of order size
 }
 
-type DistributionParams = {
+type DistanceParams = {
     DistanceMean: float    // Mean distance from limit
     DistanceStdDev: float  // Std dev of distance from limit
-    Size: SizeParams
 }
 
 type SideParams = {
-    Limit: float           // Best bid or best ask
     LevelCount: int        // Number of levels to generate
-    Distribution: DistributionParams
+    LevelParams: LimitParams
+    DistanceParams: DistanceParams
 }
 
 type OrderBookParams = {
@@ -77,12 +77,13 @@ let generateSideLevels
     (side: Side) 
     (rng: Random) : Level[] =
     
-    let dist = sideParams.Distribution
+    let limitParams = sideParams.LevelParams
+    let distParams = sideParams.DistanceParams
     
     // Create distributions
-    let (shape, rate) = ParamConversion.distanceToGammaParams dist.DistanceMean dist.DistanceStdDev
+    let (shape, rate) = ParamConversion.distanceToGammaParams distParams.DistanceMean distParams.DistanceStdDev
     let distDist = Gamma(shape, rate, rng)
-    let (mu, sigma) = ParamConversion.sizeToLogNormalParams dist.Size.SizeMean dist.Size.SizeStdDev
+    let (mu, sigma) = ParamConversion.sizeToLogNormalParams limitParams.SizeMean limitParams.SizeStdDev
     let sizeDist = LogNormal(mu, sigma, rng)
     
     // Sample distances and create levels (always include one at distance 0)
@@ -94,8 +95,8 @@ let generateSideLevels
             
             let rawPrice = 
                 match side with
-                | Bid -> sideParams.Limit - distance
-                | Ask -> sideParams.Limit + distance
+                | Bid -> limitParams.Limit - distance
+                | Ask -> limitParams.Limit + distance
             let price = snapToTick rng tickSize rawPrice
             
             { Price = price; Size = size }
@@ -119,14 +120,13 @@ let generate (config: OrderBookParams) (rng: Random) : OrderBook =
     let bids = generateSideLevels config.Bid config.TickSize Bid rng
     let asks = generateSideLevels config.Ask config.TickSize Ask rng
     
-    { BestBid = config.Bid.Limit; BestAsk = config.Ask.Limit; Bids = bids; Asks = asks }
+    { BestBid = config.Bid.LevelParams.Limit; BestAsk = config.Ask.LevelParams.Limit; Bids = bids; Asks = asks }
 
 /// Generate just the BBO (best bid/offer) levels
-let generateBBO (bidSize: SizeParams) (askSize: SizeParams) (tickSize: float) (bestBid: float) (bestAsk: float) (rng: Random) : Level * Level =
-    let bidDist = { DistanceMean = 1.0; DistanceStdDev = 1.0; Size = bidSize }
-    let askDist = { DistanceMean = 1.0; DistanceStdDev = 1.0; Size = askSize }
-    let bidParams = { Limit = bestBid; LevelCount = 1; Distribution = bidDist }
-    let askParams = { Limit = bestAsk; LevelCount = 1; Distribution = askDist }
+let generateBBO (bidLimit: LimitParams) (askLimit: LimitParams) (tickSize: float) (rng: Random) : Level * Level =
+    let distParams = { DistanceMean = 1.0; DistanceStdDev = 1.0 }
+    let bidParams = { LevelCount = 1; LevelParams = bidLimit; DistanceParams = distParams }
+    let askParams = { LevelCount = 1; LevelParams = askLimit; DistanceParams = distParams }
     let bid = (generateSideLevels bidParams tickSize Bid rng).[0]
     let ask = (generateSideLevels askParams tickSize Ask rng).[0]
     (bid, ask)

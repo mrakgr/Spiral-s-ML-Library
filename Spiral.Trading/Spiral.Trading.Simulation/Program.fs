@@ -5,13 +5,13 @@ open Spiral.Trading.Simulation.OrderBook
 let main argv =
     let rng = Random(42)
 
-    let size = { SizeMean = 200.0; SizeStdDev = 150.0 }
-    let dist = { DistanceMean = 0.10; DistanceStdDev = 0.15; Size = size }
+    let limitParams = { Limit = 99.95; SizeMean = 200.0; SizeStdDev = 150.0 }
+    let distParams = { DistanceMean = 0.10; DistanceStdDev = 0.15 }
 
     let config = {
         TickSize = 0.01
-        Bid = { Limit = 99.95; LevelCount = 20; Distribution = dist }
-        Ask = { Limit = 100.00; LevelCount = 20; Distribution = dist }
+        Bid = { LevelCount = 20; LevelParams = { limitParams with Limit = 99.95 }; DistanceParams = distParams }
+        Ask = { LevelCount = 20; LevelParams = { limitParams with Limit = 100.00 }; DistanceParams = distParams }
     }
 
     let book = generate config rng
