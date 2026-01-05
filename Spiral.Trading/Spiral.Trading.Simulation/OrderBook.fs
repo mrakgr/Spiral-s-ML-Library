@@ -7,7 +7,7 @@ type Side = Bid | Ask
 
 type Level = {
     Price: float
-    Size: float
+    Size: int
 }
 
 type OrderBook = {
@@ -62,7 +62,7 @@ let snapToTick (rng: Random) (tickSize: float) (price: float) : float =
 
 /// Generate order book levels for one side
 let generateSideLevels 
-    (limit: float)           // Best bid or best ask (hard limit)
+    (limit: float)           // Best bid or best ask
     (tickSize: float) 
     (distanceMean: float) 
     (distanceStdDev: float)
@@ -78,11 +78,12 @@ let generateSideLevels
     let (mu, sigma) = ParamConversion.sizeToLogNormalParams sizeMean sizeStdDev
     let sizeDist = LogNormal(mu, sigma, rng)
     
-    // Sample distances and create levels
+    // Sample distances and create levels (always include one at distance 0)
     let levels = 
-        Array.init levelCount (fun _ ->
-            let distance = distDist.Sample()
-            let size = sizeDist.Sample()
+        Array.init levelCount (fun i ->
+            let distance = if i = 0 then 0.0 else distDist.Sample()
+            let rawSize = sizeDist.Sample()
+            let size = stochasticRound rng rawSize |> int
             
             let rawPrice = 
                 match side with
@@ -90,21 +91,16 @@ let generateSideLevels
                 | Ask -> limit + distance
             let price = snapToTick rng tickSize rawPrice
             
-            // Clamp to limit
-            let clampedPrice = 
-                match side with
-                | Bid -> min price limit
-                | Ask -> max price limit
-            
-            { Price = clampedPrice; Size = size }
+            { Price = price; Size = size }
         )
     
-    // Group by price and sum sizes
+    // Group by price and sum sizes, filter out zero-size levels
     let aggregated = 
         levels
         |> Array.groupBy (fun l -> l.Price)
         |> Array.map (fun (price, lvls) -> 
             { Price = price; Size = lvls |> Array.sumBy (fun l -> l.Size) })
+        |> Array.filter (fun l -> l.Size > 0)
     
     // Sort appropriately
     match side with
@@ -137,13 +133,13 @@ let print (book: OrderBook) : unit =
     
     // Print asks in reverse (highest first for visual)
     for level in book.Asks |> Array.rev do
-        printfn "%-12.2f %10.0f" level.Price level.Size
+        printfn "%-12.2f %10d" level.Price level.Size
     
     printfn "%s" (String.replicate 24 "=")
     
     // Print bids
     for level in book.Bids do
-        printfn "%-12.2f %10.0f" level.Price level.Size
+        printfn "%-12.2f %10d" level.Price level.Size
     
     printfn "%s" (String.replicate 24 "-")
     printfn "%-12s %10s" "BIDS" ""
