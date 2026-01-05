@@ -111,6 +111,12 @@ let generate (config: OrderBookParams) (rng: Random) : OrderBook =
     
     { BestBid = config.Bid.Limit; BestAsk = config.Ask.Limit; Bids = bids; Asks = asks }
 
+/// Generate just the BBO (best bid/offer) level for one side
+let generateBBO (sideParams: SideParams) (tickSize: float) (side: Side) (rng: Random) : Level =
+    let bboParams = { sideParams with LevelCount = 1 }
+    let levels = generateSideLevels bboParams tickSize side rng
+    levels.[0]
+
 /// Pretty print an order book
 let print (book: OrderBook) : unit =
     printfn "Order Book (Best Bid: %.2f, Best Ask: %.2f)" book.BestBid book.BestAsk
