@@ -5,12 +5,8 @@ open Spiral.Trading.Simulation.OrderBook
 let main argv =
     let rng = Random(42)
 
-    let dist = {
-        DistanceMean = 0.10
-        DistanceStdDev = 0.15
-        SizeMean = 200.0
-        SizeStdDev = 150.0
-    }
+    let size = { SizeMean = 200.0; SizeStdDev = 150.0 }
+    let dist = { DistanceMean = 0.10; DistanceStdDev = 0.15; Size = size }
 
     let config = {
         TickSize = 0.01
