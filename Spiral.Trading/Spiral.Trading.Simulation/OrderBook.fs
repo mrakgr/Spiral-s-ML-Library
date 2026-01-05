@@ -11,25 +11,33 @@ type Level = {
 }
 
 type OrderBook = {
-    Midpoint: float
+    BestBid: float
+    BestAsk: float
     Bids: Level[]  // Sorted descending (best bid first)
     Asks: Level[]  // Sorted ascending (best ask first)
 }
 
 type OrderBookParams = {
-    Midpoint: float
+    BestBid: float             // Hard limit for bids (can't exceed this)
+    BestAsk: float             // Hard limit for asks (can't go below this)
     TickSize: float            // e.g., 0.01
-    BidMeanDistance: float     // Mean distance from midpoint for bids
-    AskMeanDistance: float     // Mean distance from midpoint for asks
+    BidDistanceMean: float     // Mean distance from best bid for bid levels
+    BidDistanceStdDev: float   // Std dev of distance from best bid
+    AskDistanceMean: float     // Mean distance from best ask for ask levels
+    AskDistanceStdDev: float   // Std dev of distance from best ask
     LevelCount: int            // Number of levels to generate per side
     SizeMean: float            // Mean order size
     SizeStdDev: float          // Standard deviation of order size
 }
 
 module ParamConversion =
-    /// Convert mean distance to exponential lambda
-    let distanceToLambda (meanDistance: float) : float =
-        1.0 / meanDistance
+    /// Convert mean and std dev to gamma shape and rate
+    /// For gamma: mean = shape/rate, variance = shape/rate²
+    let distanceToGammaParams (mean: float) (stdDev: float) : float * float =
+        let variance = stdDev * stdDev
+        let shape = (mean * mean) / variance
+        let rate = mean / variance
+        (shape, rate)
     
     /// Convert mean and std dev to log-normal mu and sigma
     /// For log-normal: mean = exp(mu + sigma²/2), variance = (exp(sigma²) - 1) * exp(2*mu + sigma²)
@@ -54,9 +62,10 @@ let snapToTick (rng: Random) (tickSize: float) (price: float) : float =
 
 /// Generate order book levels for one side
 let generateSideLevels 
-    (midpoint: float) 
+    (limit: float)           // Best bid or best ask (hard limit)
     (tickSize: float) 
-    (meanDistance: float) 
+    (distanceMean: float) 
+    (distanceStdDev: float)
     (sizeMean: float)
     (sizeStdDev: float)
     (levelCount: int) 
@@ -64,23 +73,30 @@ let generateSideLevels
     (rng: Random) : Level[] =
     
     // Create distributions
-    let lambda = ParamConversion.distanceToLambda meanDistance
-    let expDist = Exponential(lambda, rng)
+    let (shape, rate) = ParamConversion.distanceToGammaParams distanceMean distanceStdDev
+    let distDist = Gamma(shape, rate, rng)
     let (mu, sigma) = ParamConversion.sizeToLogNormalParams sizeMean sizeStdDev
     let sizeDist = LogNormal(mu, sigma, rng)
     
     // Sample distances and create levels
     let levels = 
         Array.init levelCount (fun _ ->
-            let distance = expDist.Sample()
+            let distance = distDist.Sample()
             let size = sizeDist.Sample()
             
             let rawPrice = 
                 match side with
-                | Bid -> midpoint - distance
-                | Ask -> midpoint + distance
+                | Bid -> limit - distance
+                | Ask -> limit + distance
             let price = snapToTick rng tickSize rawPrice
-            { Price = price; Size = size }
+            
+            // Clamp to limit
+            let clampedPrice = 
+                match side with
+                | Bid -> min price limit
+                | Ask -> max price limit
+            
+            { Price = clampedPrice; Size = size }
         )
     
     // Group by price and sum sizes
@@ -98,20 +114,22 @@ let generateSideLevels
 /// Generate a complete order book
 let generate (config: OrderBookParams) (rng: Random) : OrderBook =
     let bids = generateSideLevels 
-                config.Midpoint config.TickSize config.BidMeanDistance 
+                config.BestBid config.TickSize 
+                config.BidDistanceMean config.BidDistanceStdDev
                 config.SizeMean config.SizeStdDev
                 config.LevelCount Bid rng
     
     let asks = generateSideLevels 
-                (config.Midpoint + config.TickSize) config.TickSize config.AskMeanDistance 
+                config.BestAsk config.TickSize 
+                config.AskDistanceMean config.AskDistanceStdDev
                 config.SizeMean config.SizeStdDev
                 config.LevelCount Ask rng
     
-    { Midpoint = config.Midpoint; Bids = bids; Asks = asks }
+    { BestBid = config.BestBid; BestAsk = config.BestAsk; Bids = bids; Asks = asks }
 
 /// Pretty print an order book
 let print (book: OrderBook) : unit =
-    printfn "Order Book (Midpoint: %.2f)" book.Midpoint
+    printfn "Order Book (Best Bid: %.2f, Best Ask: %.2f)" book.BestBid book.BestAsk
     printfn ""
     printfn "%-12s %10s" "ASKS" ""
     printfn "%-12s %10s" "Price" "Size"

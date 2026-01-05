@@ -6,13 +6,16 @@ let main argv =
     let rng = Random(42)
 
     let config = {
-        Midpoint = 100.0
+        BestBid = 99.95
+        BestAsk = 100.00
         TickSize = 0.01
-        BidMeanDistance = 0.50    // Mean $0.50 away from midpoint
-        AskMeanDistance = 0.67    // Mean $0.67 away from midpoint (wider asks)
+        BidDistanceMean = 0.10     // Mean $0.10 away from best bid
+        BidDistanceStdDev = 0.15   // Std dev of distance
+        AskDistanceMean = 0.10     // Mean $0.10 away from best ask
+        AskDistanceStdDev = 0.15   // Std dev of distance
         LevelCount = 20
-        SizeMean = 200.0          // Mean order size of 200 shares
-        SizeStdDev = 150.0        // Std dev of 150 shares
+        SizeMean = 200.0           // Mean order size of 200 shares
+        SizeStdDev = 150.0         // Std dev of 150 shares
     }
 
     let book = generate config rng
