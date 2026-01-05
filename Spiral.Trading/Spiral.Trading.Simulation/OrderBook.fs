@@ -118,7 +118,8 @@ let generate (config: OrderBookParams) (rng: Random) : OrderBook =
     { BestBid = config.Bid.Limit; BestAsk = config.Ask.Limit; Bids = bids; Asks = asks }
 
 /// Generate just the BBO (best bid/offer) levels
-let generateBBO (dist: DistributionParams) (tickSize: float) (bestBid: float) (bestAsk: float) (rng: Random) : Level * Level =
+let generateBBO (sizeMean: float) (sizeStdDev: float) (tickSize: float) (bestBid: float) (bestAsk: float) (rng: Random) : Level * Level =
+    let dist = { DistanceMean = 1.0; DistanceStdDev = 1.0; SizeMean = sizeMean; SizeStdDev = sizeStdDev }
     let bidParams = { Limit = bestBid; LevelCount = 1; Distribution = dist }
     let askParams = { Limit = bestAsk; LevelCount = 1; Distribution = dist }
     let bid = (generateSideLevels bidParams tickSize Bid rng).[0]
