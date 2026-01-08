@@ -60,8 +60,9 @@ module Hazard =
     /// Convert desired mean/stdDev to log-normal mu/sigma parameters
     let logNormalParams (mean: float) (stdDev: float) : float * float =
         let variance = stdDev * stdDev
-        let mu = log(mean * mean / sqrt(variance + mean * mean))
-        let sigma = sqrt(log(1.0 + variance / (mean * mean)))
+        let sigma2 = log(1.0 + variance / (mean * mean))
+        let sigma = sqrt(sigma2)
+        let mu = log(mean) - sigma2 / 2.0
         (mu, sigma)
 
 /// Selection probabilities for trends based on day session
