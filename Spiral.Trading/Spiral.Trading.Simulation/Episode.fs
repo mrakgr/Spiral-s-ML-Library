@@ -8,12 +8,26 @@ type DaySession =
     | Mid
     | Close
 
+type Trend =
+    | StrongUptrend
+    | MidUptrend
+    | WeakUptrend
+    | Consolidation
+    | WeakDowntrend
+    | MidDowntrend
+    | StrongDowntrend
+
 type DaySessionParams = {
     DayLengthMinutes: int
     MorningEndMean: float
     MorningEndStdDev: float
     CloseStartMean: float
     CloseStartStdDev: float
+}
+
+type TrendParams = {
+    DurationMean: float
+    DurationStdDev: float
 }
 
 module Hazard =
@@ -36,6 +50,50 @@ module Hazard =
     let normalCdf (mean: float) (stdDev: float) : float -> float =
         let dist = Normal(mean, stdDev)
         dist.CumulativeDistribution
+
+/// Selection probabilities for trends based on day session
+let getTrendSelectionWeights (session: DaySession) : Map<Trend, float> =
+    match session with
+    | Morning | Close ->
+        Map.ofList [
+            StrongUptrend, 0.15
+            MidUptrend, 0.15
+            WeakUptrend, 0.10
+            Consolidation, 0.20
+            WeakDowntrend, 0.10
+            MidDowntrend, 0.15
+            StrongDowntrend, 0.15
+        ]
+    | Mid ->
+        Map.ofList [
+            StrongUptrend, 0.02
+            MidUptrend, 0.08
+            WeakUptrend, 0.15
+            Consolidation, 0.50
+            WeakDowntrend, 0.15
+            MidDowntrend, 0.08
+            StrongDowntrend, 0.02
+        ]
+
+/// Duration parameters for each trend type
+let getTrendDurationParams (trend: Trend) : TrendParams =
+    match trend with
+    | StrongUptrend | StrongDowntrend -> { DurationMean = 5.0; DurationStdDev = 2.0 }
+    | MidUptrend | MidDowntrend -> { DurationMean = 15.0; DurationStdDev = 5.0 }
+    | WeakUptrend | WeakDowntrend -> { DurationMean = 30.0; DurationStdDev = 10.0 }
+    | Consolidation -> { DurationMean = 20.0; DurationStdDev = 10.0 }
+
+/// Sample a trend based on selection weights
+let sampleTrend (weights: Map<Trend, float>) (rng: Random) : Trend =
+    let totalWeight = weights |> Map.fold (fun acc _ w -> acc + w) 0.0
+    let r = rng.NextDouble() * totalWeight
+    let mutable cumulative = 0.0
+    let mutable result = Consolidation
+    for kvp in weights do
+        cumulative <- cumulative + kvp.Value
+        if r < cumulative && result = Consolidation then
+            result <- kvp.Key
+    result
 
 /// Simulate a full trading day, returning the session state at each minute
 let simulateDay (config: DaySessionParams) (rng: Random) : DaySession[] =
@@ -62,6 +120,33 @@ let simulateDay (config: DaySessionParams) (rng: Random) : DaySession[] =
     
     result
 
+/// Simulate subepisodes (trends) for a day given the session structure
+let simulateTrends (sessions: DaySession[]) (rng: Random) : Trend[] =
+    let result = Array.zeroCreate sessions.Length
+    let mutable currentTrend = Consolidation
+    let mutable trendElapsed = 0
+    let mutable trendCdf = Hazard.normalCdf 20.0 10.0  // default
+    
+    for t in 0 .. sessions.Length - 1 do
+        let session = sessions.[t]
+        
+        // Check if current trend should end
+        let stopProb = Hazard.stoppingProbability trendCdf trendElapsed
+        let shouldStop = rng.NextDouble() < stopProb
+        
+        if shouldStop || t = 0 then
+            // Select new trend based on current session
+            let weights = getTrendSelectionWeights session
+            currentTrend <- sampleTrend weights rng
+            let durationParams = getTrendDurationParams currentTrend
+            trendCdf <- Hazard.normalCdf durationParams.DurationMean durationParams.DurationStdDev
+            trendElapsed <- 0
+        
+        result.[t] <- currentTrend
+        trendElapsed <- trendElapsed + 1
+    
+    result
+
 /// Default parameters for a typical trading day
 let defaultDayParams : DaySessionParams = {
     DayLengthMinutes = 390  // 6.5 hours
@@ -70,6 +155,23 @@ let defaultDayParams : DaySessionParams = {
     CloseStartMean = 330.0  // 1 hour before close
     CloseStartStdDev = 20.0
 }
+
+/// Group consecutive elements and return (element, count) pairs
+let groupConsecutive (arr: 'a[]) : ('a * int) list =
+    if arr.Length = 0 then []
+    else
+        let mutable result = []
+        let mutable current = arr.[0]
+        let mutable count = 1
+        for i in 1 .. arr.Length - 1 do
+            if arr.[i] = current then
+                count <- count + 1
+            else
+                result <- (current, count) :: result
+                current <- arr.[i]
+                count <- 1
+        result <- (current, count) :: result
+        List.rev result
 
 /// Print a summary of the day simulation
 let printDaySummary (sessions: DaySession[]) : unit =
@@ -83,7 +185,25 @@ let printDaySummary (sessions: DaySession[]) : unit =
         |> Array.tryFindIndex (fun s -> s = Close)
         |> Option.defaultValue sessions.Length
     
-    printfn "Day Simulation Summary:"
-    printfn "  Morning: 0 - %d minutes" (morningEnd - 1)
-    printfn "  Mid:     %d - %d minutes" morningEnd (closeStart - 1)
-    printfn "  Close:   %d - %d minutes" closeStart (sessions.Length - 1)
+    printfn "Day Session Summary:"
+    printfn "  Morning: 0 - %d minutes (%d min)" (morningEnd - 1) morningEnd
+    printfn "  Mid:     %d - %d minutes (%d min)" morningEnd (closeStart - 1) (closeStart - morningEnd)
+    printfn "  Close:   %d - %d minutes (%d min)" closeStart (sessions.Length - 1) (sessions.Length - closeStart)
+
+/// Print trend summary with consecutive grouping
+let printTrendSummary (trends: Trend[]) : unit =
+    let groups = groupConsecutive trends
+    printfn "Trend Summary (%d episodes):" groups.Length
+    let mutable startTime = 0
+    for (trend, count) in groups do
+        let trendName = 
+            match trend with
+            | StrongUptrend -> "StrongUp"
+            | MidUptrend -> "MidUp"
+            | WeakUptrend -> "WeakUp"
+            | Consolidation -> "Consol"
+            | WeakDowntrend -> "WeakDown"
+            | MidDowntrend -> "MidDown"
+            | StrongDowntrend -> "StrongDown"
+        printfn "  %3d-%3d: %-10s (%d min)" startTime (startTime + count - 1) trendName count
+        startTime <- startTime + count

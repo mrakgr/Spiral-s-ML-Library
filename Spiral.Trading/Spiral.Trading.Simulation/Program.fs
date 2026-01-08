@@ -52,7 +52,10 @@ let runSimulateDay (args: ParseResults<SimulateDayArgs>) =
     for i in 1 .. runs do
         if runs > 1 then printfn "=== Day %d ===" i
         let sessions = simulateDay defaultDayParams rng
+        let trends = simulateTrends sessions rng
         printDaySummary sessions
+        printfn ""
+        printTrendSummary trends
         if runs > 1 then printfn ""
 
 [<EntryPoint>]
