@@ -83,20 +83,9 @@ let getTrendDurationParams (trend: Trend) : TrendParams =
     | WeakUptrend | WeakDowntrend -> { DurationMean = 30.0; DurationStdDev = 10.0 }
     | Consolidation -> { DurationMean = 20.0; DurationStdDev = 10.0 }
 
-/// All trend types in order for categorical sampling
-let allTrends = [|
-    StrongUptrend
-    MidUptrend
-    WeakUptrend
-    Consolidation
-    WeakDowntrend
-    MidDowntrend
-    StrongDowntrend
-|]
-
 /// Sample a trend based on selection weights using MathNet Categorical distribution
 let sampleTrend (weights: Map<Trend, float>) (rng: Random) : Trend =
-    let probs = allTrends |> Array.map (fun t -> Map.tryFind t weights |> Option.defaultValue 0.0)
+    let allTrends, probs = weights |> Map.toArray |> Array.unzip
     let dist = Categorical(probs, rng)
     allTrends.[dist.Sample()]
 
