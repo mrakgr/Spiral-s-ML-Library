@@ -51,6 +51,19 @@ module Hazard =
         let dist = Normal(mean, stdDev)
         dist.CumulativeDistribution
 
+    /// Build CDF for log-normal distribution
+    /// Parameters are mean and stdDev of the underlying normal (mu, sigma)
+    let logNormalCdf (mu: float) (sigma: float) : float -> float =
+        let dist = LogNormal(mu, sigma)
+        dist.CumulativeDistribution
+
+    /// Convert desired mean/stdDev to log-normal mu/sigma parameters
+    let logNormalParams (mean: float) (stdDev: float) : float * float =
+        let variance = stdDev * stdDev
+        let mu = log(mean * mean / sqrt(variance + mean * mean))
+        let sigma = sqrt(log(1.0 + variance / (mean * mean)))
+        (mu, sigma)
+
 /// Selection probabilities for trends based on day session
 let getTrendSelectionWeights (session: DaySession) : Map<Trend, float> =
     match session with
@@ -119,7 +132,7 @@ let simulateTrends (sessions: DaySession[]) (rng: Random) : Trend[] =
     let result = Array.zeroCreate sessions.Length
     let mutable currentTrend = Consolidation
     let mutable trendElapsed = 0
-    let mutable trendCdf = Hazard.normalCdf 20.0 10.0  // default
+    let mutable trendCdf = Hazard.logNormalCdf 3.0 0.5  // default
     
     for t in 0 .. sessions.Length - 1 do
         let session = sessions.[t]
@@ -133,7 +146,8 @@ let simulateTrends (sessions: DaySession[]) (rng: Random) : Trend[] =
             let weights = getTrendSelectionWeights session
             currentTrend <- sampleTrend weights rng
             let durationParams = getTrendDurationParams currentTrend
-            trendCdf <- Hazard.normalCdf durationParams.DurationMean durationParams.DurationStdDev
+            let mu, sigma = Hazard.logNormalParams durationParams.DurationMean durationParams.DurationStdDev
+            trendCdf <- Hazard.logNormalCdf mu sigma
             trendElapsed <- 0
         
         result.[t] <- currentTrend
