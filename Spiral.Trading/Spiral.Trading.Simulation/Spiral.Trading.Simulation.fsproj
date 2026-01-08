@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <Compile Include="OrderBook.fs" />
+    <Compile Include="Episode.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Argu" Version="6.2.5" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
   </ItemGroup>
 
