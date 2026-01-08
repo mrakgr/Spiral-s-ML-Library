@@ -83,17 +83,22 @@ let getTrendDurationParams (trend: Trend) : TrendParams =
     | WeakUptrend | WeakDowntrend -> { DurationMean = 30.0; DurationStdDev = 10.0 }
     | Consolidation -> { DurationMean = 20.0; DurationStdDev = 10.0 }
 
-/// Sample a trend based on selection weights
+/// All trend types in order for categorical sampling
+let allTrends = [|
+    StrongUptrend
+    MidUptrend
+    WeakUptrend
+    Consolidation
+    WeakDowntrend
+    MidDowntrend
+    StrongDowntrend
+|]
+
+/// Sample a trend based on selection weights using MathNet Categorical distribution
 let sampleTrend (weights: Map<Trend, float>) (rng: Random) : Trend =
-    let totalWeight = weights |> Map.fold (fun acc _ w -> acc + w) 0.0
-    let r = rng.NextDouble() * totalWeight
-    let mutable cumulative = 0.0
-    let mutable result = Consolidation
-    for kvp in weights do
-        cumulative <- cumulative + kvp.Value
-        if r < cumulative && result = Consolidation then
-            result <- kvp.Key
-    result
+    let probs = allTrends |> Array.map (fun t -> Map.tryFind t weights |> Option.defaultValue 0.0)
+    let dist = Categorical(probs, rng)
+    allTrends.[dist.Sample()]
 
 /// Simulate a full trading day, returning the session state at each minute
 let simulateDay (config: DaySessionParams) (rng: Random) : DaySession[] =
