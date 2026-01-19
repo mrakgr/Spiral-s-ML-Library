@@ -2,117 +2,407 @@ module Spiral.Trading.Simulation.EpisodeMCMC
 
 open System
 open MathNet.Numerics.Distributions
-open Spiral.Trading.Simulation.Episode
 
-type SessionState = (DaySession * int)[]
+// =============================================================================
+// Core Types
+// =============================================================================
 
-type SessionParams = {
-    Mean: float
-    StdDev: float
+/// Generic episode with a label and duration
+type Episode<'label> = {
+    Label: 'label
+    Duration: float
 }
 
-type MCMCConfig = {
-    MorningParams: SessionParams
-    MidParams: SessionParams
-    CloseParams: SessionParams
-    MinSessionLength: int
-    MaxDelta: int
-    Iterations: int
+/// Day session types
+type DaySession =
+    | Morning
+    | Mid
+    | Close
+
+/// Trend types within sessions
+type Trend =
+    | StrongUptrend
+    | MidUptrend
+    | WeakUptrend
+    | Consolidation
+    | WeakDowntrend
+    | MidDowntrend
+    | StrongDowntrend
+
+// =============================================================================
+// Generic MCMC Module
+// =============================================================================
+
+module MCMC =
+    type Config = {
+        Iterations: int
+    }
+
+    let defaultConfig = { Iterations = 10000 }
+
+    /// Run Metropolis-Hastings MCMC sampler
+    /// Returns a single sample from the posterior after running for the specified iterations
+    let run
+        (config: Config)
+        (logLikelihood: 'state -> float)
+        (propose: Random -> 'state -> 'state option)
+        (initial: 'state)
+        (rng: Random)
+        : 'state =
+
+        let mutable current = initial
+        let mutable currentLL = logLikelihood current
+
+        for _ in 1 .. config.Iterations do
+            match propose rng current with
+            | Some proposed ->
+                let proposedLL = logLikelihood proposed
+                let logAcceptRatio = proposedLL - currentLL
+
+                if log(rng.NextDouble()) < logAcceptRatio then
+                    current <- proposed
+                    currentLL <- proposedLL
+            | None ->
+                () // Invalid move, reject
+
+        current
+
+// =============================================================================
+// Distribution Utilities
+// =============================================================================
+
+module Distribution =
+    /// Convert mean/stdDev to log-normal mu/sigma parameters
+    let logNormalParams (mean: float) (stdDev: float) : float * float =
+        let variance = stdDev * stdDev
+        let sigma2 = log(1.0 + variance / (mean * mean))
+        let sigma = sqrt(sigma2)
+        let mu = log(mean) - sigma2 / 2.0
+        (mu, sigma)
+
+    /// Compute log-likelihood under log-normal distribution
+    let logNormalLogLikelihood (mean: float) (stdDev: float) (value: float) : float =
+        if value <= 0.0 then
+            Double.NegativeInfinity
+        else
+            let (mu, sigma) = logNormalParams mean stdDev
+            let dist = LogNormal(mu, sigma)
+            dist.DensityLn(value)
+
+// =============================================================================
+// Session Level (Day -> Sessions)
+// =============================================================================
+
+module SessionLevel =
+    type Params = {
+        Mean: float
+        StdDev: float
+    }
+
+    type Config = {
+        MorningParams: Params
+        MidParams: Params
+        CloseParams: Params
+        MinDuration: float
+        MaxDelta: float
+    }
+
+    let defaultConfig = {
+        MorningParams = { Mean = 60.0; StdDev = 20.0 }
+        MidParams = { Mean = 270.0; StdDev = 40.0 }
+        CloseParams = { Mean = 60.0; StdDev = 20.0 }
+        MinDuration = 1.0
+        MaxDelta = 10.0
+    }
+
+    /// State for session-level MCMC: array of (session, duration) pairs
+    type State = Episode<DaySession>[]
+
+    let private getParams (config: Config) (session: DaySession) : Params =
+        match session with
+        | Morning -> config.MorningParams
+        | Mid -> config.MidParams
+        | Close -> config.CloseParams
+
+    /// Compute log-likelihood for a session state
+    let logLikelihood (config: Config) (state: State) : float =
+        state
+        |> Array.sumBy (fun ep ->
+            let p = getParams config ep.Label
+            Distribution.logNormalLogLikelihood p.Mean p.StdDev ep.Duration)
+
+    /// Propose a move by transferring duration between adjacent sessions
+    let propose (config: Config) (rng: Random) (state: State) : State option =
+        // Pick which boundary to adjust (0 = Morning/Mid, 1 = Mid/Close)
+        let boundaryIdx = rng.Next(2)
+        let idx1 = boundaryIdx
+        let idx2 = boundaryIdx + 1
+
+        // Pick random delta from -MaxDelta to +MaxDelta (excluding 0)
+        let delta =
+            let d = rng.NextDouble() * config.MaxDelta
+            let d = if d < 1.0 then 1.0 else d  // Ensure minimum movement
+            if rng.NextDouble() < 0.5 then -d else d
+
+        let ep1 = state.[idx1]
+        let ep2 = state.[idx2]
+
+        let newDur1 = ep1.Duration + delta
+        let newDur2 = ep2.Duration - delta
+
+        // Check validity
+        if newDur1 >= config.MinDuration && newDur2 >= config.MinDuration then
+            let newState = Array.copy state
+            newState.[idx1] <- { ep1 with Duration = newDur1 }
+            newState.[idx2] <- { ep2 with Duration = newDur2 }
+            Some newState
+        else
+            None
+
+    /// Create initial state for a given total duration
+    let initialState (totalDuration: float) : State =
+        // Default split: 60/270/60 ratio scaled to total duration
+        let ratio = totalDuration / 390.0
+        [|
+            { Label = Morning; Duration = 60.0 * ratio }
+            { Label = Mid; Duration = 270.0 * ratio }
+            { Label = Close; Duration = 60.0 * ratio }
+        |]
+
+    /// Sample session subdivision for a day
+    let sample
+        (config: Config)
+        (mcmcConfig: MCMC.Config)
+        (rng: Random)
+        (dayDuration: float)
+        : State =
+
+        let initial = initialState dayDuration
+        MCMC.run mcmcConfig (logLikelihood config) (propose config) initial rng
+
+// =============================================================================
+// Trend Level (Session -> Trends)
+// =============================================================================
+
+module TrendLevel =
+    type Params = {
+        DurationMean: float
+        DurationStdDev: float
+    }
+
+    type Config = {
+        /// Selection weights for each trend type, keyed by parent session
+        SelectionWeights: Map<DaySession, Map<Trend, float>>
+        /// Duration parameters for each trend type
+        DurationParams: Map<Trend, Params>
+        MinDuration: float
+        MaxDelta: float
+        MinTrends: int
+    }
+
+    let private defaultSelectionWeights : Map<DaySession, Map<Trend, float>> =
+        let morningCloseWeights = Map.ofList [
+            StrongUptrend, 0.15
+            MidUptrend, 0.15
+            WeakUptrend, 0.10
+            Consolidation, 0.20
+            WeakDowntrend, 0.10
+            MidDowntrend, 0.15
+            StrongDowntrend, 0.15
+        ]
+        let midWeights = Map.ofList [
+            StrongUptrend, 0.02
+            MidUptrend, 0.08
+            WeakUptrend, 0.15
+            Consolidation, 0.50
+            WeakDowntrend, 0.15
+            MidDowntrend, 0.08
+            StrongDowntrend, 0.02
+        ]
+        Map.ofList [
+            Morning, morningCloseWeights
+            Mid, midWeights
+            Close, morningCloseWeights
+        ]
+
+    let private defaultDurationParams : Map<Trend, Params> =
+        Map.ofList [
+            StrongUptrend, { DurationMean = 5.0; DurationStdDev = 2.0 }
+            MidUptrend, { DurationMean = 15.0; DurationStdDev = 5.0 }
+            WeakUptrend, { DurationMean = 30.0; DurationStdDev = 10.0 }
+            Consolidation, { DurationMean = 20.0; DurationStdDev = 10.0 }
+            WeakDowntrend, { DurationMean = 30.0; DurationStdDev = 10.0 }
+            MidDowntrend, { DurationMean = 15.0; DurationStdDev = 5.0 }
+            StrongDowntrend, { DurationMean = 5.0; DurationStdDev = 2.0 }
+        ]
+
+    let defaultConfig = {
+        SelectionWeights = defaultSelectionWeights
+        DurationParams = defaultDurationParams
+        MinDuration = 1.0
+        MaxDelta = 5.0
+        MinTrends = 1
+    }
+
+    /// State for trend-level MCMC
+    type State = Episode<Trend>[]
+
+    /// Sample a trend type based on selection weights
+    let sampleTrendType (weights: Map<Trend, float>) (rng: Random) : Trend =
+        let trends, probs = weights |> Map.toArray |> Array.unzip
+        let dist = Categorical(probs, rng)
+        trends.[dist.Sample()]
+
+    /// Compute log-likelihood for a trend state
+    let logLikelihood (config: Config) (parentSession: DaySession) (state: State) : float =
+        let weights = config.SelectionWeights.[parentSession]
+        state
+        |> Array.sumBy (fun ep ->
+            // Log-likelihood of selecting this trend type
+            let selectionLL = log(weights.[ep.Label])
+            // Log-likelihood of this duration
+            let durationParams = config.DurationParams.[ep.Label]
+            let durationLL = Distribution.logNormalLogLikelihood durationParams.DurationMean durationParams.DurationStdDev ep.Duration
+            selectionLL + durationLL)
+
+    /// Propose a move: either adjust boundary or change trend type
+    let propose (config: Config) (parentSession: DaySession) (rng: Random) (state: State) : State option =
+        if state.Length < 2 then
+            None
+        else
+            let moveType = rng.NextDouble()
+
+            if moveType < 0.7 then
+                // Adjust boundary between adjacent trends
+                let boundaryIdx = rng.Next(state.Length - 1)
+                let idx1 = boundaryIdx
+                let idx2 = boundaryIdx + 1
+
+                let delta =
+                    let d = rng.NextDouble() * config.MaxDelta
+                    let d = if d < 0.5 then 0.5 else d
+                    if rng.NextDouble() < 0.5 then -d else d
+
+                let ep1 = state.[idx1]
+                let ep2 = state.[idx2]
+
+                let newDur1 = ep1.Duration + delta
+                let newDur2 = ep2.Duration - delta
+
+                if newDur1 >= config.MinDuration && newDur2 >= config.MinDuration then
+                    let newState = Array.copy state
+                    newState.[idx1] <- { ep1 with Duration = newDur1 }
+                    newState.[idx2] <- { ep2 with Duration = newDur2 }
+                    Some newState
+                else
+                    None
+            else
+                // Change a trend type
+                let idx = rng.Next(state.Length)
+                let ep = state.[idx]
+                let weights = config.SelectionWeights.[parentSession]
+                let newTrend = sampleTrendType weights rng
+
+                let newState = Array.copy state
+                newState.[idx] <- { ep with Label = newTrend }
+                Some newState
+
+    /// Create initial state for a given session duration
+    let initialState (config: Config) (parentSession: DaySession) (rng: Random) (sessionDuration: float) : State =
+        // Estimate number of trends based on average duration
+        let avgDuration =
+            config.DurationParams
+            |> Map.toSeq
+            |> Seq.averageBy (fun (_, p) -> p.DurationMean)
+
+        let numTrends = max config.MinTrends (int (sessionDuration / avgDuration))
+        let durationPerTrend = sessionDuration / float numTrends
+
+        let weights = config.SelectionWeights.[parentSession]
+
+        [| for _ in 1 .. numTrends ->
+            { Label = sampleTrendType weights rng
+              Duration = durationPerTrend } |]
+
+    /// Sample trend subdivision for a session
+    let sample
+        (config: Config)
+        (mcmcConfig: MCMC.Config)
+        (rng: Random)
+        (parentSession: DaySession)
+        (sessionDuration: float)
+        : State =
+
+        let initial = initialState config parentSession rng sessionDuration
+        let ll = logLikelihood config parentSession
+        let prop = propose config parentSession
+        MCMC.run mcmcConfig ll prop initial rng
+
+// =============================================================================
+// Composition: Full Day Generation
+// =============================================================================
+
+/// Result of generating a full day of episodes
+type DayResult = {
+    Sessions: Episode<DaySession>[]
+    Trends: Map<int, Episode<Trend>[]>  // Keyed by session index
 }
 
-let defaultMCMCConfig = {
-    MorningParams = { Mean = 60.0; StdDev = 20.0 }
-    MidParams = { Mean = 270.0; StdDev = 40.0 }
-    CloseParams = { Mean = 60.0; StdDev = 20.0 }
-    MinSessionLength = 1
-    MaxDelta = 10
-    Iterations = 10000
-}
+/// Generate a complete day with sessions and trends
+let generateDay
+    (sessionConfig: SessionLevel.Config)
+    (trendConfig: TrendLevel.Config)
+    (mcmcConfig: MCMC.Config)
+    (rng: Random)
+    (dayDuration: float)
+    : DayResult =
 
-/// Convert mean/stdDev to log-normal mu/sigma parameters
-let logNormalParams (mean: float) (stdDev: float) : float * float =
-    let variance = stdDev * stdDev
-    let sigma2 = log(1.0 + variance / (mean * mean))
-    let sigma = sqrt(sigma2)
-    let mu = log(mean) - sigma2 / 2.0
-    (mu, sigma)
+    // Level 1: Sample sessions
+    let sessions = SessionLevel.sample sessionConfig mcmcConfig rng dayDuration
 
-/// Compute log-likelihood of a duration under log-normal distribution
-let logLikelihoodSession (sessionParams: SessionParams) (duration: int) : float =
-    let (mu, sigma) = logNormalParams sessionParams.Mean sessionParams.StdDev
-    let dist = LogNormal(mu, sigma)
-    dist.DensityLn(float duration)
+    // Level 2: Sample trends for each session
+    let trends =
+        sessions
+        |> Array.mapi (fun i session ->
+            let trendEpisodes = TrendLevel.sample trendConfig mcmcConfig rng session.Label session.Duration
+            (i, trendEpisodes))
+        |> Map.ofArray
 
-/// Compute total log-likelihood of a session state
-let logLikelihood (config: MCMCConfig) (state: SessionState) : float =
-    state
-    |> Array.sumBy (fun (session, duration) ->
-        let sp =
-            match session with
-            | Morning -> config.MorningParams
-            | Mid -> config.MidParams
-            | Close -> config.CloseParams
-        logLikelihoodSession sp duration)
+    { Sessions = sessions; Trends = trends }
 
-/// Propose a new state by moving duration between adjacent sessions
-let proposeMove (config: MCMCConfig) (state: SessionState) (rng: Random) : SessionState option =
-    // Pick which boundary to adjust (0 = Morning/Mid, 1 = Mid/Close)
-    let boundaryIdx = rng.Next(2)
-    let idx1 = boundaryIdx
-    let idx2 = boundaryIdx + 1
-    
-    // Pick random delta from -MaxDelta to +MaxDelta (excluding 0)
-    let delta = 
-        let d = rng.Next(1, config.MaxDelta + 1)
-        if rng.NextDouble() < 0.5 then -d else d
-    
-    let (session1, dur1) = state.[idx1]
-    let (session2, dur2) = state.[idx2]
-    
-    let newDur1 = dur1 + delta
-    let newDur2 = dur2 - delta
-    
-    // Check validity
-    if newDur1 >= config.MinSessionLength && newDur2 >= config.MinSessionLength then
-        let newState = Array.copy state
-        newState.[idx1] <- (session1, newDur1)
-        newState.[idx2] <- (session2, newDur2)
-        Some newState
-    else
-        None
+// =============================================================================
+// Display Utilities
+// =============================================================================
 
-/// Run Metropolis-Hastings MCMC
-let runMCMC (config: MCMCConfig) (initial: SessionState) (rng: Random) : SessionState =
-    let mutable current = initial
-    let mutable currentLL = logLikelihood config current
-    
-    for _ in 1 .. config.Iterations do
-        match proposeMove config current rng with
-        | Some proposed ->
-            let proposedLL = logLikelihood config proposed
-            let logAcceptRatio = proposedLL - currentLL
-            
-            if log(rng.NextDouble()) < logAcceptRatio then
-                current <- proposed
-                currentLL <- proposedLL
-        | None ->
-            () // Invalid move, reject
-    
-    current
+let printEpisodes (label: string) (episodes: Episode<'a>[]) (showLabel: 'a -> string) : unit =
+    let total = episodes |> Array.sumBy (fun e -> e.Duration)
+    printfn "%s (total %.1f):" label total
+    let mutable t = 0.0
+    for ep in episodes do
+        printfn "  %6.1f - %6.1f: %-12s (%.1f)" t (t + ep.Duration) (showLabel ep.Label) ep.Duration
+        t <- t + ep.Duration
 
-/// Create the initial state
-let initialState () : SessionState =
-    [| (Morning, 60); (Mid, 270); (Close, 60) |]
+let showSession (s: DaySession) : string =
+    match s with
+    | Morning -> "Morning"
+    | Mid -> "Mid"
+    | Close -> "Close"
 
-/// Print session state
-let printState (state: SessionState) : unit =
-    printfn "Session State (total %d min):" (state |> Array.sumBy snd)
-    let mutable t = 0
-    for (session, duration) in state do
-        let name = 
-            match session with
-            | Morning -> "Morning"
-            | Mid -> "Mid"
-            | Close -> "Close"
-        printfn "  %3d-%3d: %-8s (%d min)" t (t + duration - 1) name duration
-        t <- t + duration
+let showTrend (t: Trend) : string =
+    match t with
+    | StrongUptrend -> "StrongUp"
+    | MidUptrend -> "MidUp"
+    | WeakUptrend -> "WeakUp"
+    | Consolidation -> "Consol"
+    | WeakDowntrend -> "WeakDown"
+    | MidDowntrend -> "MidDown"
+    | StrongDowntrend -> "StrongDown"
+
+let printDayResult (result: DayResult) : unit =
+    printEpisodes "Sessions" result.Sessions showSession
+    printfn ""
+    for i in 0 .. result.Sessions.Length - 1 do
+        let session = result.Sessions.[i]
+        let trends = result.Trends.[i]
+        printEpisodes (sprintf "%s Trends" (showSession session.Label)) trends showTrend
+        printfn ""
