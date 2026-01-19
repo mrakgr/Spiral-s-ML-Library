@@ -308,20 +308,36 @@ module TrendLevel =
 
     /// Create initial state for a given session duration
     let initialState (config: Config) (parentSession: DaySession) (rng: Random) (sessionDuration: float) : State =
-        // Estimate number of trends based on average duration
-        let avgDuration =
-            config.DurationParams
-            |> Map.toSeq
-            |> Seq.averageBy (fun (_, p) -> p.DurationMean)
-
-        let numTrends = max config.MinTrends (int (sessionDuration / avgDuration))
-        let durationPerTrend = sessionDuration / float numTrends
-
         let weights = config.SelectionWeights.[parentSession]
 
-        [| for _ in 1 .. numTrends ->
-            { Label = sampleTrendType weights rng
-              Duration = durationPerTrend } |]
+        // Compute weighted expected duration based on selection probabilities
+        let expectedDuration =
+            weights
+            |> Map.toSeq
+            |> Seq.sumBy (fun (trend, weight) ->
+                let p = config.DurationParams.[trend]
+                weight * p.DurationMean)
+
+        // Sample number of trends with some randomness
+        let expectedNumTrends = sessionDuration / expectedDuration
+        let numTrends =
+            let baseCount = max config.MinTrends (int (round expectedNumTrends))
+            let variation = rng.Next(-2, 3) // -2 to +2
+            max config.MinTrends (baseCount + variation)
+
+        // Generate trends with sampled types and durations from their distributions
+        let trends =
+            [| for _ in 1 .. numTrends ->
+                let trend = sampleTrendType weights rng
+                let p = config.DurationParams.[trend]
+                let mu, sigma = Distribution.logNormalParams p.DurationMean p.DurationStdDev
+                let duration = LogNormal(mu, sigma, rng).Sample()
+                { Label = trend; Duration = duration } |]
+
+        // Scale durations to sum exactly to sessionDuration
+        let total = trends |> Array.sumBy (fun t -> t.Duration)
+        let scale = sessionDuration / total
+        trends |> Array.map (fun t -> { t with Duration = t.Duration * scale })
 
     /// Sample trend subdivision for a session
     let sample
