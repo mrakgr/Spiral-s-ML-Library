@@ -133,10 +133,9 @@ module SessionLevel =
 
     /// Propose a move by transferring duration between adjacent sessions
     let propose (config: Config) (rng: Random) (state: State) : State option =
-        // Pick which boundary to adjust (0 = Morning/Mid, 1 = Mid/Close)
-        let boundaryIdx = rng.Next(2)
-        let idx1 = boundaryIdx
-        let idx2 = boundaryIdx + 1
+        // Pick two sessions to transfer duration between
+        let idx1 = rng.Next(3)
+        let idx2 = (idx1 + 1 + rng.Next(2)) % 3
 
         // Pick random delta from -MaxDelta to +MaxDelta (excluding 0)
         let delta =
