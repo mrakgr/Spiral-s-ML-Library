@@ -272,10 +272,10 @@ module TrendLevel =
             let moveType = rng.NextDouble()
 
             if moveType < 0.7 then
-                // Adjust boundary between adjacent trends
-                let boundaryIdx = rng.Next(state.Length - 1)
-                let idx1 = boundaryIdx
-                let idx2 = boundaryIdx + 1
+                // Pick two trends to transfer duration between
+                let n = state.Length
+                let idx1 = rng.Next(n)
+                let idx2 = (idx1 + 1 + rng.Next(n - 1)) % n
 
                 let delta =
                     let d = rng.NextDouble() * config.MaxDelta
