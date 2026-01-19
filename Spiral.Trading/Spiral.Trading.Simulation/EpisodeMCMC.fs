@@ -296,11 +296,11 @@ module TrendLevel =
                 else
                     None
             else
-                // Change a trend type
+                // Change a trend type (sample uniformly for symmetric proposal)
                 let idx = rng.Next(state.Length)
                 let ep = state.[idx]
-                let weights = config.SelectionWeights.[parentSession]
-                let newTrend = sampleTrendType weights rng
+                let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
+                let newTrend = allTrends.[rng.Next(allTrends.Length)]
 
                 let newState = Array.copy state
                 newState.[idx] <- { ep with Label = newTrend }
