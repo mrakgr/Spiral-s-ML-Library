@@ -266,11 +266,10 @@ module TrendLevel =
         if state.Length < 2 then
             None
         else
-            let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
-
             if rng.NextDouble() < 0.7 then
                 Some (MCMC.transferDuration rng config.MaxDelta state)
             else
+                let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
                 Some (MCMC.changeLabel rng allTrends state)
 
     /// Create initial state for a given session duration
