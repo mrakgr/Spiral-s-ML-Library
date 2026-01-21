@@ -32,13 +32,13 @@ let stochasticRound (rng: Random) (x: float) : int =
 /// Get price generation parameters for a trend type
 let getTrendPriceParams (trend: Trend) : TrendPriceParams =
     match trend with
-    | StrongUptrend ->   { DriftPerSecond = 0.003;  VolatilityPerSecond = 0.005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
-    | MidUptrend ->      { DriftPerSecond = 0.0015; VolatilityPerSecond = 0.004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
-    | WeakUptrend ->     { DriftPerSecond = 0.0007; VolatilityPerSecond = 0.003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
-    | Consolidation ->   { DriftPerSecond = 0.0;    VolatilityPerSecond = 0.002; IntraBarPointsMean = 20.0; IntraBarPointsStdDev = 10.0 }
-    | WeakDowntrend ->   { DriftPerSecond = -0.0007; VolatilityPerSecond = 0.003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
-    | MidDowntrend ->    { DriftPerSecond = -0.0015; VolatilityPerSecond = 0.004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
-    | StrongDowntrend -> { DriftPerSecond = -0.003;  VolatilityPerSecond = 0.005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
+    | StrongUptrend ->   { DriftPerSecond = 0.00003;  VolatilityPerSecond = 0.00005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
+    | MidUptrend ->      { DriftPerSecond = 0.000015; VolatilityPerSecond = 0.00004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
+    | WeakUptrend ->     { DriftPerSecond = 0.000007; VolatilityPerSecond = 0.00003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
+    | Consolidation ->   { DriftPerSecond = 0.0;      VolatilityPerSecond = 0.00002; IntraBarPointsMean = 20.0; IntraBarPointsStdDev = 10.0 }
+    | WeakDowntrend ->   { DriftPerSecond = -0.000007; VolatilityPerSecond = 0.00003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
+    | MidDowntrend ->    { DriftPerSecond = -0.000015; VolatilityPerSecond = 0.00004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
+    | StrongDowntrend -> { DriftPerSecond = -0.00003;  VolatilityPerSecond = 0.00005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
 
 type TrendBarResult = {
     TrendBars : Bar[]
@@ -60,7 +60,7 @@ let generateTrendBars
     let p = getTrendPriceParams trend
     let durationSeconds = durationMinutes * 60.0
     // Volatility should be relative to price.
-    let normal = Normal(startMean * p.DriftPerSecond, startMean * p.VolatilityPerSecond, rng)
+    let normal = Normal(startMean * p.DriftPerSecond, abs(startMean) * p.VolatilityPerSecond, rng)
     let pointsDist = LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
     
     let bars = Array.zeroCreate (int durationSeconds)
@@ -103,17 +103,21 @@ let generateTrendBars
 let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[] =
     let allBars = ResizeArray<Bar>()
     let mutable time = 0.0
-    let mutable price = startPrice
+    let mutable mean = startPrice
+    let mutable lastClose = startPrice
+    let mutable durationRemaining = 0.0
     
     for i in 0 .. result.Sessions.Length - 1 do
         let session = result.Sessions.[i]
         let trends = result.Trends.[i]
         for trend in trends do
-            let bars = generateTrendBars rng time price session.Label trend.Label (trend.Duration + DurationRemaining)
-            if bars.Length > 0 then
-                allBars.AddRange(bars)
-                time <- bars.[bars.Length - 1].Time + 1.0
-                price <- bars.[bars.Length - 1].Close
+            let r = generateTrendBars rng time mean lastClose session.Label trend.Label (trend.Duration + durationRemaining)
+            if r.TrendBars.Length > 0 then
+                allBars.AddRange(r.TrendBars)
+                time <- r.TrendBars.[r.TrendBars.Length - 1].Time + 1.0
+                lastClose <- r.TrendBars.[r.TrendBars.Length - 1].Close
+            mean <- r.LatestMean
+            durationRemaining <- r.DurationRemaining
     
     allBars.ToArray()
 
