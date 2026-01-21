@@ -68,6 +68,12 @@ module MCMC =
         newState.[idx] <- { state.[idx] with Label = newLabel }
         newState
 
+    /// Sample a label from weighted options
+    let sampleWeighted (rng: Random) (weights: seq<'a * float>) : 'a =
+        let labels, probs = weights |> Seq.toArray |> Array.unzip
+        let dist = Categorical(probs, rng)
+        labels.[dist.Sample()]
+
     /// Run Metropolis-Hastings MCMC sampler
     /// Returns a single sample from the posterior after running for the specified iterations
     let run
@@ -245,9 +251,7 @@ module TrendLevel =
 
     /// Sample a trend type based on selection weights
     let sampleTrendType (weights: Map<Trend, float>) (rng: Random) : Trend =
-        let trends, probs = weights |> Map.toArray |> Array.unzip
-        let dist = Categorical(probs, rng)
-        trends.[dist.Sample()]
+        MCMC.sampleWeighted rng (Map.toSeq weights)
 
     /// Compute log-likelihood for a trend state
     let logLikelihood (config: Config) (parentSession: DaySession) (state: State) : float =
