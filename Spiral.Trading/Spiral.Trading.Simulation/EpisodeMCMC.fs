@@ -59,6 +59,15 @@ module MCMC =
         newState.[idx2] <- { state.[idx2] with Duration = state.[idx2].Duration - delta }
         newState
 
+    /// Change the label of a random episode to a uniformly sampled label from the given array
+    let changeLabel (rng: Random) (allLabels: 'a[]) (state: Episode<'a>[]) : Episode<'a>[] =
+        let idx = rng.Next(state.Length)
+        let newLabel = allLabels.[rng.Next(allLabels.Length)]
+
+        let newState = Array.copy state
+        newState.[idx] <- { state.[idx] with Label = newLabel }
+        newState
+
     /// Run Metropolis-Hastings MCMC sampler
     /// Returns a single sample from the posterior after running for the specified iterations
     let run
@@ -257,20 +266,12 @@ module TrendLevel =
         if state.Length < 2 then
             None
         else
-            let moveType = rng.NextDouble()
+            let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
 
-            if moveType < 0.7 then
+            if rng.NextDouble() < 0.7 then
                 Some (MCMC.transferDuration rng config.MaxDelta state)
             else
-                // Change a trend type (sample uniformly for symmetric proposal)
-                let idx = rng.Next(state.Length)
-                let ep = state.[idx]
-                let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
-                let newTrend = allTrends.[rng.Next(allTrends.Length)]
-
-                let newState = Array.copy state
-                newState.[idx] <- { ep with Label = newTrend }
-                Some newState
+                Some (MCMC.changeLabel rng allTrends state)
 
     /// Create initial state for a given session duration
     let initialState (config: Config) (parentSession: DaySession) (rng: Random) (sessionDuration: float) : State =
