@@ -11,6 +11,8 @@ type Bar = {
     High: float
     Low: float
     Close: float
+    Session: DaySession
+    Trend: Trend
 }
 
 /// Parameters for price generation within a trend
@@ -35,6 +37,7 @@ let generateTrendBars
     (rng: Random)
     (startTime: float)
     (startPrice: float)
+    (session: DaySession)
     (trend: Trend)
     (durationMinutes: float)
     : Bar[] =
@@ -64,6 +67,8 @@ let generateTrendBars
             High = high
             Low = low
             Close = closePrice
+            Session = session
+            Trend = trend
         }
     
     bars
@@ -74,9 +79,11 @@ let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[
     let mutable time = 0.0
     let mutable price = startPrice
     
-    for sessionTrends in result.Trends do
-        for trend in sessionTrends do
-            let bars = generateTrendBars rng time price trend.Label trend.Duration
+    for i in 0 .. result.Sessions.Length - 1 do
+        let session = result.Sessions.[i]
+        let trends = result.Trends.[i]
+        for trend in trends do
+            let bars = generateTrendBars rng time price session.Label trend.Label trend.Duration
             if bars.Length > 0 then
                 allBars.AddRange(bars)
                 time <- bars.[bars.Length - 1].Time + 1.0
@@ -106,7 +113,8 @@ let printBarsSummary (bars: Bar[]) : unit =
 /// Export bars to CSV file
 let exportToCsv (path: string) (bars: Bar[]) : unit =
     use writer = new System.IO.StreamWriter(path)
-    writer.WriteLine("Time,Open,High,Low,Close")
+    writer.WriteLine("Time,Open,High,Low,Close,Session,Trend")
     for bar in bars do
-        writer.WriteLine(sprintf "%.0f,%.6f,%.6f,%.6f,%.6f" bar.Time bar.Open bar.High bar.Low bar.Close)
+        writer.WriteLine(sprintf "%.0f,%.6f,%.6f,%.6f,%.6f,%A,%A" 
+            bar.Time bar.Open bar.High bar.Low bar.Close bar.Session bar.Trend)
     printfn "Exported %d bars to %s" bars.Length path
