@@ -267,7 +267,6 @@ module TrendLevel =
 
     /// Propose a move: transfer duration, change label, or swap
     let propose (config: Config) (parentSession: DaySession) (rng: Random) (state: State) : State option =
-
         let transferDuration () = MCMC.transferDuration rng config.MaxDelta state
         let changeLabel () = 
             let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
