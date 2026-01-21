@@ -32,71 +32,72 @@ let stochasticRound (rng: Random) (x: float) : int =
 /// Get price generation parameters for a trend type
 let getTrendPriceParams (trend: Trend) : TrendPriceParams =
     match trend with
-    | StrongUptrend ->   { DriftPerSecond = 0.003;  VolatilityPerSecond = 0.005; IntraBarPointsMean = 5.0; IntraBarPointsStdDev = 2.0 }
-    | MidUptrend ->      { DriftPerSecond = 0.0015; VolatilityPerSecond = 0.004; IntraBarPointsMean = 4.0; IntraBarPointsStdDev = 2.0 }
-    | WeakUptrend ->     { DriftPerSecond = 0.0007; VolatilityPerSecond = 0.003; IntraBarPointsMean = 3.0; IntraBarPointsStdDev = 1.5 }
-    | Consolidation ->   { DriftPerSecond = 0.0;    VolatilityPerSecond = 0.002; IntraBarPointsMean = 2.0; IntraBarPointsStdDev = 1.0 }
-    | WeakDowntrend ->   { DriftPerSecond = -0.0007; VolatilityPerSecond = 0.003; IntraBarPointsMean = 3.0; IntraBarPointsStdDev = 1.5 }
-    | MidDowntrend ->    { DriftPerSecond = -0.0015; VolatilityPerSecond = 0.004; IntraBarPointsMean = 4.0; IntraBarPointsStdDev = 2.0 }
-    | StrongDowntrend -> { DriftPerSecond = -0.003;  VolatilityPerSecond = 0.005; IntraBarPointsMean = 5.0; IntraBarPointsStdDev = 2.0 }
+    | StrongUptrend ->   { DriftPerSecond = 0.003;  VolatilityPerSecond = 0.005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
+    | MidUptrend ->      { DriftPerSecond = 0.0015; VolatilityPerSecond = 0.004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
+    | WeakUptrend ->     { DriftPerSecond = 0.0007; VolatilityPerSecond = 0.003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
+    | Consolidation ->   { DriftPerSecond = 0.0;    VolatilityPerSecond = 0.002; IntraBarPointsMean = 20.0; IntraBarPointsStdDev = 10.0 }
+    | WeakDowntrend ->   { DriftPerSecond = -0.0007; VolatilityPerSecond = 0.003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
+    | MidDowntrend ->    { DriftPerSecond = -0.0015; VolatilityPerSecond = 0.004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
+    | StrongDowntrend -> { DriftPerSecond = -0.003;  VolatilityPerSecond = 0.005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
+
+type TrendBarResult = {
+    TrendBars : Bar[]
+    LatestMean : float
+    DurationRemaining : float
+}
 
 /// Generate price bars for a single trend episode
 let generateTrendBars
     (rng: Random)
     (startTime: float)
-    (startPrice: float)
+    (startMean: float)
+    (lastClose : float)
     (session: DaySession)
     (trend: Trend)
     (durationMinutes: float)
-    : Bar[] =
+    : TrendBarResult =
     
     let p = getTrendPriceParams trend
-    let durationSeconds = int (durationMinutes * 60.0)
-    let normal = Normal(0.0, 1.0, rng)
+    let durationSeconds = durationMinutes * 60.0
+    // Volatility should be relative to price.
+    let normal = Normal(startMean * p.DriftPerSecond, startMean * p.VolatilityPerSecond, rng)
     let pointsDist = LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
     
-    let bars = Array.zeroCreate durationSeconds
-    let mutable price = startPrice
-    
-    for i in 0 .. durationSeconds - 1 do
-        let openPrice = price
-        
+    let bars = Array.zeroCreate (int durationSeconds)
+    let mutable volumeProfileMean = startMean
+    let mutable _open = lastClose
+    for i in 0 .. int durationSeconds - 1 do
         // Sample number of intra-bar price points
         let numPoints = stochasticRound rng (pointsDist.Sample())
+        // Sample a new price bar volume profile mean.
+        volumeProfileMean <- volumeProfileMean + normal.Sample()
         
-        if numPoints = 0 then
-            // No intra-bar movement
-            bars.[i] <- {
-                Time = startTime + float i
-                Open = openPrice
-                High = openPrice
-                Low = openPrice
-                Close = openPrice
-                Session = session
-                Trend = trend
-            }
-        else
-            // Sample price points and track high/low
-            let mutable high = openPrice
-            let mutable low = openPrice
-            
-            for _ in 1 .. numPoints do
-                let change = p.DriftPerSecond + normal.Sample() * p.VolatilityPerSecond
-                price <- price + change
-                high <- max high price
-                low <- min low price
-            
-            bars.[i] <- {
-                Time = startTime + float i
-                Open = openPrice
-                High = high
-                Low = low
-                Close = price
-                Session = session
-                Trend = trend
-            }
+        // Sample price points and track high/low
+        let mutable close = _open
+        let mutable high = _open
+        let mutable low = _open
+        
+        for _ in 1 .. numPoints do
+            close <- volumeProfileMean + normal.Sample()
+            high <- max high close
+            low <- min low close
+        
+        bars.[i] <- {
+            Time = startTime + float i
+            Open = _open
+            High = high
+            Low = low
+            Close = close
+            Session = session
+            Trend = trend
+        }
+        _open <- close
     
-    bars
+    {
+        TrendBars = bars
+        LatestMean = volumeProfileMean
+        DurationRemaining = durationSeconds - float (int durationSeconds)
+    }
 
 /// Generate price bars for a full day from DayResult
 let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[] =
@@ -108,7 +109,7 @@ let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[
         let session = result.Sessions.[i]
         let trends = result.Trends.[i]
         for trend in trends do
-            let bars = generateTrendBars rng time price session.Label trend.Label trend.Duration
+            let bars = generateTrendBars rng time price session.Label trend.Label (trend.Duration + DurationRemaining)
             if bars.Length > 0 then
                 allBars.AddRange(bars)
                 time <- bars.[bars.Length - 1].Time + 1.0
