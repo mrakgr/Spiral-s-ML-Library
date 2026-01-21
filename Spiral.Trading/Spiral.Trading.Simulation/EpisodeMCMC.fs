@@ -120,11 +120,11 @@ module Distribution =
 
     /// Compute log-likelihood for a value under the given distribution
     let logLikelihood (dist: Params) (value: float) : float =
-        if value <= 0.0 then
-            Double.NegativeInfinity
-        else
-            match dist with
-            | LogNormal (mean, stdDev) ->
+        match dist with
+        | LogNormal (mean, stdDev) ->
+            if value <= 0.0 then
+                Double.NegativeInfinity
+            else
                 let (mu, sigma) = logNormalParams mean stdDev
                 let d = MathNet.Numerics.Distributions.LogNormal(mu, sigma)
                 d.DensityLn(value)
