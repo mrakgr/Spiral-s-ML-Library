@@ -273,8 +273,8 @@ module TrendLevel =
             MCMC.changeLabel rng allTrends state
 
         let proposals = [
-            if state.Length >= 2 then yield (transferDuration, 0.7)
-            yield (changeLabel, 0.3)
+            transferDuration, if state.Length >= 2 then 0.7 else 0.0
+            changeLabel, 0.3
         ]
 
         let move = MCMC.sampleWeighted rng proposals
