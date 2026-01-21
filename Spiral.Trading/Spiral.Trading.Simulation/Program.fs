@@ -27,12 +27,14 @@ type GeneratePricesArgs =
     | [<AltCommandLine("-s")>] Seed of int
     | [<AltCommandLine("-i")>] Iterations of int
     | [<AltCommandLine("-p")>] Start_Price of float
+    | [<AltCommandLine("-o")>] Output of string
     interface IArgParserTemplate with
         member this.Usage =
             match this with
             | Seed _ -> "Random seed for generation"
             | Iterations _ -> "MCMC iterations per level"
             | Start_Price _ -> "Starting price (default: 100.0)"
+            | Output _ -> "Output CSV file path"
 
 type BacktestArgs =
     | [<AltCommandLine("-s")>] Seed of int
@@ -100,6 +102,7 @@ let runGeneratePrices (args: ParseResults<GeneratePricesArgs>) =
     let seed = args.GetResult(GeneratePricesArgs.Seed, 42)
     let iterations = args.GetResult(GeneratePricesArgs.Iterations, 10000)
     let startPrice = args.GetResult(GeneratePricesArgs.Start_Price, 100.0)
+    let outputPath = args.TryGetResult(GeneratePricesArgs.Output)
     let rng = Random(seed)
 
     let mcmcConfig = { MCMC.Iterations = iterations }
@@ -114,6 +117,10 @@ let runGeneratePrices (args: ParseResults<GeneratePricesArgs>) =
 
     let bars = generateDayBars rng startPrice result
     printBarsSummary bars
+    
+    match outputPath with
+    | Some path -> exportToCsv path bars
+    | None -> ()
 
 let runBacktest (args: ParseResults<BacktestArgs>) =
     let seed = args.GetResult(BacktestArgs.Seed, 42)

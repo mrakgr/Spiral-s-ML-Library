@@ -102,3 +102,11 @@ let printBarsSummary (bars: Bar[]) : unit =
         printfn "  High:  %.4f" high
         printfn "  Low:   %.4f" low
         printfn "  Return: %.2f%%" returnPct
+
+/// Export bars to CSV file
+let exportToCsv (path: string) (bars: Bar[]) : unit =
+    use writer = new System.IO.StreamWriter(path)
+    writer.WriteLine("Time,Open,High,Low,Close")
+    for bar in bars do
+        writer.WriteLine(sprintf "%.0f,%.6f,%.6f,%.6f,%.6f" bar.Time bar.Open bar.High bar.Low bar.Close)
+    printfn "Exported %d bars to %s" bars.Length path
