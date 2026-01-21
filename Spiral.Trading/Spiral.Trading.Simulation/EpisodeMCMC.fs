@@ -106,6 +106,10 @@ module MCMC =
 // =============================================================================
 
 module Distribution =
+    /// Distribution specification for positive values
+    type Params =
+        | LogNormal of mean: float * stdDev: float
+
     /// Convert mean/stdDev to log-normal mu/sigma parameters
     let logNormalParams (mean: float) (stdDev: float) : float * float =
         let variance = stdDev * stdDev
@@ -114,43 +118,47 @@ module Distribution =
         let mu = log(mean) - sigma2 / 2.0
         (mu, sigma)
 
-    /// Compute log-likelihood under log-normal distribution
-    let logNormalLogLikelihood (mean: float) (stdDev: float) (value: float) : float =
+    /// Compute log-likelihood for a value under the given distribution
+    let logLikelihood (dist: Params) (value: float) : float =
         if value <= 0.0 then
             Double.NegativeInfinity
         else
+            match dist with
+            | LogNormal (mean, stdDev) ->
+                let (mu, sigma) = logNormalParams mean stdDev
+                let d = MathNet.Numerics.Distributions.LogNormal(mu, sigma)
+                d.DensityLn(value)
+
+    /// Sample a value from the given distribution
+    let sample (rng: Random) (dist: Params) : float =
+        match dist with
+        | LogNormal (mean, stdDev) ->
             let (mu, sigma) = logNormalParams mean stdDev
-            let dist = LogNormal(mu, sigma)
-            dist.DensityLn(value)
+            MathNet.Numerics.Distributions.LogNormal(mu, sigma, rng).Sample()
 
 // =============================================================================
 // Session Level (Day -> Sessions)
 // =============================================================================
 
 module SessionLevel =
-    type Params = {
-        Mean: float
-        StdDev: float
-    }
-
     type Config = {
-        MorningParams: Params
-        MidParams: Params
-        CloseParams: Params
+        MorningParams: Distribution.Params
+        MidParams: Distribution.Params
+        CloseParams: Distribution.Params
         MaxDelta: float
     }
 
     let defaultConfig = {
-        MorningParams = { Mean = 60.0; StdDev = 20.0 }
-        MidParams = { Mean = 270.0; StdDev = 40.0 }
-        CloseParams = { Mean = 60.0; StdDev = 20.0 }
+        MorningParams = Distribution.LogNormal (60.0, 20.0)
+        MidParams = Distribution.LogNormal (270.0, 40.0)
+        CloseParams = Distribution.LogNormal (60.0, 20.0)
         MaxDelta = 10.0
     }
 
     /// State for session-level MCMC: array of (session, duration) pairs
     type State = Episode<DaySession>[]
 
-    let private getParams (config: Config) (session: DaySession) : Params =
+    let private getParams (config: Config) (session: DaySession) : Distribution.Params =
         match session with
         | Morning -> config.MorningParams
         | Mid -> config.MidParams
@@ -161,7 +169,7 @@ module SessionLevel =
         state
         |> Array.sumBy (fun ep ->
             let p = getParams config ep.Label
-            Distribution.logNormalLogLikelihood p.Mean p.StdDev ep.Duration)
+            Distribution.logLikelihood p ep.Duration)
 
     /// Propose a move by transferring duration between two sessions
     let propose (config: Config) (rng: Random) (state: State) : State option =
@@ -193,14 +201,9 @@ module SessionLevel =
 // =============================================================================
 
 module TrendLevel =
-    type Params = {
-        DurationMean: float
-        DurationStdDev: float
-    }
-
     type Config = {
         SelectionWeights: Map<DaySession, Map<Trend, float>>
-        DurationParams: Map<Trend, Params>
+        DurationParams: Map<Trend, Distribution.Params>
         MaxDelta: float
     }
 
@@ -229,15 +232,15 @@ module TrendLevel =
             Close, morningCloseWeights
         ]
 
-    let private defaultDurationParams : Map<Trend, Params> =
+    let private defaultDurationParams : Map<Trend, Distribution.Params> =
         Map.ofList [
-            StrongUptrend, { DurationMean = 5.0; DurationStdDev = 2.0 }
-            MidUptrend, { DurationMean = 15.0; DurationStdDev = 5.0 }
-            WeakUptrend, { DurationMean = 30.0; DurationStdDev = 10.0 }
-            Consolidation, { DurationMean = 20.0; DurationStdDev = 10.0 }
-            WeakDowntrend, { DurationMean = 30.0; DurationStdDev = 10.0 }
-            MidDowntrend, { DurationMean = 15.0; DurationStdDev = 5.0 }
-            StrongDowntrend, { DurationMean = 5.0; DurationStdDev = 2.0 }
+            StrongUptrend, Distribution.LogNormal (5.0, 2.0)
+            MidUptrend, Distribution.LogNormal (15.0, 5.0)
+            WeakUptrend, Distribution.LogNormal (30.0, 10.0)
+            Consolidation, Distribution.LogNormal (20.0, 10.0)
+            WeakDowntrend, Distribution.LogNormal (30.0, 10.0)
+            MidDowntrend, Distribution.LogNormal (15.0, 5.0)
+            StrongDowntrend, Distribution.LogNormal (5.0, 2.0)
         ]
 
     let defaultConfig = {
@@ -258,11 +261,9 @@ module TrendLevel =
         let weights = config.SelectionWeights.[parentSession]
         state
         |> Array.sumBy (fun ep ->
-            // Log-likelihood of selecting this trend type
             let selectionLL = log(weights.[ep.Label])
-            // Log-likelihood of this duration
             let durationParams = config.DurationParams.[ep.Label]
-            let durationLL = Distribution.logNormalLogLikelihood durationParams.DurationMean durationParams.DurationStdDev ep.Duration
+            let durationLL = Distribution.logLikelihood durationParams ep.Duration
             selectionLL + durationLL)
 
     /// Propose a move: transfer duration, change label, or swap
@@ -291,8 +292,7 @@ module TrendLevel =
             else
                 let trend = sampleTrendType weights rng
                 let p = config.DurationParams.[trend]
-                let mu, sigma = Distribution.logNormalParams p.DurationMean p.DurationStdDev
-                let duration = LogNormal(mu, sigma, rng).Sample()
+                let duration = Distribution.sample rng p
                 sampleTrends ({ Label = trend; Duration = duration } :: acc) (total + duration)
 
         let trends = sampleTrends [] 0.0 |> List.toArray
