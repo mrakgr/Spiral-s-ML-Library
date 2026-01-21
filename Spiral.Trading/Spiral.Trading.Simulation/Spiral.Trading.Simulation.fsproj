@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="OrderBook.fs" />
     <Compile Include="EpisodeMCMC.fs" />
+    <Compile Include="PriceGeneration.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
