@@ -265,16 +265,20 @@ module TrendLevel =
             let durationLL = Distribution.logNormalLogLikelihood durationParams.DurationMean durationParams.DurationStdDev ep.Duration
             selectionLL + durationLL)
 
-    /// Propose a move: either adjust boundary or change trend type
+    /// Propose a move: transfer duration, change label, or swap
     let propose (config: Config) (parentSession: DaySession) (rng: Random) (state: State) : State option =
-        if state.Length < 2 then
-            None
-        else
-            if rng.NextDouble() < 0.7 then
-                Some (MCMC.transferDuration rng config.MaxDelta state)
-            else
-                let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
-                Some (MCMC.changeLabel rng allTrends state)
+        let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
+
+        let transferDuration () = MCMC.transferDuration rng config.MaxDelta state
+        let changeLabel () = MCMC.changeLabel rng allTrends state
+
+        let proposals = [
+            if state.Length >= 2 then yield (transferDuration, 0.7)
+            yield (changeLabel, 0.3)
+        ]
+
+        let move = MCMC.sampleWeighted rng proposals
+        Some (move ())
 
     /// Create initial state for a given session duration
     let initialState (config: Config) (parentSession: DaySession) (rng: Random) (sessionDuration: float) : State =
