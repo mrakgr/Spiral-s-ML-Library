@@ -40,6 +40,25 @@ module MCMC =
 
     let defaultConfig = { Iterations = 10000 }
 
+    /// Pick two distinct random indices from 0 to n-1
+    let pickTwoDistinctIndices (rng: Random) (n: int) : int * int =
+        let idx1 = rng.Next(n)
+        let idx2 = (idx1 + 1 + rng.Next(n - 1)) % n
+        (idx1, idx2)
+
+    /// Transfer duration between two episodes in a state array
+    let transferDuration (rng: Random) (maxDelta: float) (state: Episode<'a>[]) : Episode<'a>[] =
+        let (idx1, idx2) = pickTwoDistinctIndices rng state.Length
+
+        let delta =
+            let d = rng.NextDouble() * maxDelta
+            if rng.NextDouble() < 0.5 then -d else d
+
+        let newState = Array.copy state
+        newState.[idx1] <- { state.[idx1] with Duration = state.[idx1].Duration + delta }
+        newState.[idx2] <- { state.[idx2] with Duration = state.[idx2].Duration - delta }
+        newState
+
     /// Run Metropolis-Hastings MCMC sampler
     /// Returns a single sample from the posterior after running for the specified iterations
     let run
@@ -103,7 +122,6 @@ module SessionLevel =
         MorningParams: Params
         MidParams: Params
         CloseParams: Params
-        MinDuration: float
         MaxDelta: float
     }
 
@@ -111,7 +129,6 @@ module SessionLevel =
         MorningParams = { Mean = 60.0; StdDev = 20.0 }
         MidParams = { Mean = 270.0; StdDev = 40.0 }
         CloseParams = { Mean = 60.0; StdDev = 20.0 }
-        MinDuration = 1.0
         MaxDelta = 10.0
     }
 
@@ -131,32 +148,9 @@ module SessionLevel =
             let p = getParams config ep.Label
             Distribution.logNormalLogLikelihood p.Mean p.StdDev ep.Duration)
 
-    /// Propose a move by transferring duration between adjacent sessions
+    /// Propose a move by transferring duration between two sessions
     let propose (config: Config) (rng: Random) (state: State) : State option =
-        // Pick two sessions to transfer duration between
-        let idx1 = rng.Next(3)
-        let idx2 = (idx1 + 1 + rng.Next(2)) % 3
-
-        // Pick random delta from -MaxDelta to +MaxDelta (excluding 0)
-        let delta =
-            let d = rng.NextDouble() * config.MaxDelta
-            let d = if d < 1.0 then 1.0 else d  // Ensure minimum movement
-            if rng.NextDouble() < 0.5 then -d else d
-
-        let ep1 = state.[idx1]
-        let ep2 = state.[idx2]
-
-        let newDur1 = ep1.Duration + delta
-        let newDur2 = ep2.Duration - delta
-
-        // Check validity
-        if newDur1 >= config.MinDuration && newDur2 >= config.MinDuration then
-            let newState = Array.copy state
-            newState.[idx1] <- { ep1 with Duration = newDur1 }
-            newState.[idx2] <- { ep2 with Duration = newDur2 }
-            Some newState
-        else
-            None
+        Some (MCMC.transferDuration rng config.MaxDelta state)
 
     /// Create initial state for a given total duration
     let initialState (totalDuration: float) : State =
@@ -190,13 +184,9 @@ module TrendLevel =
     }
 
     type Config = {
-        /// Selection weights for each trend type, keyed by parent session
         SelectionWeights: Map<DaySession, Map<Trend, float>>
-        /// Duration parameters for each trend type
         DurationParams: Map<Trend, Params>
-        MinDuration: float
         MaxDelta: float
-        MinTrends: int
     }
 
     let private defaultSelectionWeights : Map<DaySession, Map<Trend, float>> =
@@ -238,9 +228,7 @@ module TrendLevel =
     let defaultConfig = {
         SelectionWeights = defaultSelectionWeights
         DurationParams = defaultDurationParams
-        MinDuration = 1.0
         MaxDelta = 5.0
-        MinTrends = 1
     }
 
     /// State for trend-level MCMC
@@ -272,29 +260,7 @@ module TrendLevel =
             let moveType = rng.NextDouble()
 
             if moveType < 0.7 then
-                // Pick two trends to transfer duration between
-                let n = state.Length
-                let idx1 = rng.Next(n)
-                let idx2 = (idx1 + 1 + rng.Next(n - 1)) % n
-
-                let delta =
-                    let d = rng.NextDouble() * config.MaxDelta
-                    let d = if d < 0.5 then 0.5 else d
-                    if rng.NextDouble() < 0.5 then -d else d
-
-                let ep1 = state.[idx1]
-                let ep2 = state.[idx2]
-
-                let newDur1 = ep1.Duration + delta
-                let newDur2 = ep2.Duration - delta
-
-                if newDur1 >= config.MinDuration && newDur2 >= config.MinDuration then
-                    let newState = Array.copy state
-                    newState.[idx1] <- { ep1 with Duration = newDur1 }
-                    newState.[idx2] <- { ep2 with Duration = newDur2 }
-                    Some newState
-                else
-                    None
+                Some (MCMC.transferDuration rng config.MaxDelta state)
             else
                 // Change a trend type (sample uniformly for symmetric proposal)
                 let idx = rng.Next(state.Length)
@@ -386,11 +352,7 @@ let printEpisodes (label: string) (episodes: Episode<'a>[]) (showLabel: 'a -> st
         printfn "  %6.1f - %6.1f: %-12s (%.1f)" t (t + ep.Duration) (showLabel ep.Label) ep.Duration
         t <- t + ep.Duration
 
-let showSession (s: DaySession) : string =
-    match s with
-    | Morning -> "Morning"
-    | Mid -> "Mid"
-    | Close -> "Close"
+let showSession (s: DaySession) : string = sprintf "%A" s
 
 let showTrend (t: Trend) : string =
     match t with
