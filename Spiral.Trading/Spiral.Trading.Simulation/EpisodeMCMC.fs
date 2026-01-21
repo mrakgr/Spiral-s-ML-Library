@@ -323,7 +323,7 @@ module TrendLevel =
 /// Result of generating a full day of episodes
 type DayResult = {
     Sessions: Episode<DaySession>[]
-    Trends: Map<int, Episode<Trend>[]>  // Keyed by session index
+    Trends: Episode<Trend>[][]
 }
 
 /// Generate a complete day with sessions and trends
@@ -341,10 +341,8 @@ let generateDay
     // Level 2: Sample trends for each session
     let trends =
         sessions
-        |> Array.mapi (fun i session ->
-            let trendEpisodes = TrendLevel.sample trendConfig mcmcConfig rng session.Label session.Duration
-            (i, trendEpisodes))
-        |> Map.ofArray
+        |> Array.map (fun session ->
+            TrendLevel.sample trendConfig mcmcConfig rng session.Label session.Duration)
 
     { Sessions = sessions; Trends = trends }
 
