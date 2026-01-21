@@ -177,12 +177,10 @@ module SessionLevel =
 
     /// Create initial state for a given total duration
     let initialState (totalDuration: float) : State =
-        // Default split: 60/270/60 ratio scaled to total duration
-        let ratio = totalDuration / 390.0
         [|
-            { Label = Morning; Duration = 60.0 * ratio }
-            { Label = Mid; Duration = 270.0 * ratio }
-            { Label = Close; Duration = 60.0 * ratio }
+            { Label = Morning; Duration = 60.0 }
+            { Label = Mid; Duration = 270.0 }
+            { Label = Close; Duration = 60.0 }
         |]
 
     /// Sample session subdivision for a day
