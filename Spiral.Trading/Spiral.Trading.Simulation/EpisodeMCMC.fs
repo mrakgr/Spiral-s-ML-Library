@@ -266,7 +266,7 @@ module TrendLevel =
             selectionLL + durationLL)
 
     /// Propose a move: transfer duration, change label, or swap
-    let propose (config: Config) (parentSession: DaySession) (rng: Random) (state: State) : State option =
+    let propose (config: Config) (rng: Random) (state: State) : State option =
         let transferDuration () = MCMC.transferDuration rng config.MaxDelta state
         let changeLabel () = 
             let allTrends = config.DurationParams |> Map.keys |> Seq.toArray
@@ -313,7 +313,7 @@ module TrendLevel =
 
         let initial = initialState config parentSession rng sessionDuration
         let ll = logLikelihood config parentSession
-        let prop = propose config parentSession
+        let prop = propose config
         MCMC.run mcmcConfig ll prop initial rng
 
 // =============================================================================
