@@ -32,8 +32,16 @@ dotnet run -- generate-day [-s seed] [-n runs] [-i iterations]
 Generate 1-second price bars from episode structure:
 
 ```bash
-dotnet run -- generate-prices [-s seed] [-i iterations] [-p start_price]
+dotnet run -- generate-prices [-s seed] [-i iterations] [-p start_price] [-o output.csv]
 ```
+
+Export to CSV for analysis:
+
+```bash
+dotnet run -- generate-prices -o prices.csv
+```
+
+The CSV includes columns: `Time,Open,High,Low,Close,Session,Trend`
 
 ### Run MA Crossover Backtest
 
