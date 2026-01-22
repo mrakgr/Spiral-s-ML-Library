@@ -32,13 +32,13 @@ let stochasticRound (rng: Random) (x: float) : int =
 /// Get price generation parameters for a trend type
 let getTrendPriceParams (trend: Trend) : TrendPriceParams =
     match trend with
-    | StrongUptrend ->   { DriftPerSecond = 0.00003;  VolatilityPerSecond = 0.00005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
-    | MidUptrend ->      { DriftPerSecond = 0.000015; VolatilityPerSecond = 0.00004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
-    | WeakUptrend ->     { DriftPerSecond = 0.000007; VolatilityPerSecond = 0.00003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
-    | Consolidation ->   { DriftPerSecond = 0.0;      VolatilityPerSecond = 0.00002; IntraBarPointsMean = 20.0; IntraBarPointsStdDev = 10.0 }
-    | WeakDowntrend ->   { DriftPerSecond = -0.000007; VolatilityPerSecond = 0.00003; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
-    | MidDowntrend ->    { DriftPerSecond = -0.000015; VolatilityPerSecond = 0.00004; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
-    | StrongDowntrend -> { DriftPerSecond = -0.00003;  VolatilityPerSecond = 0.00005; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
+    | StrongUptrend ->   { DriftPerSecond = 30e-6 ;  VolatilityPerSecond = 100e-6; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
+    | MidUptrend ->      { DriftPerSecond = 15e-6;   VolatilityPerSecond = 80e-6; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
+    | WeakUptrend ->     { DriftPerSecond = 7e-6;    VolatilityPerSecond = 60e-6; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
+    | Consolidation ->   { DriftPerSecond = 0.0;     VolatilityPerSecond = 40e-6; IntraBarPointsMean = 20.0; IntraBarPointsStdDev = 10.0 }
+    | WeakDowntrend ->   { DriftPerSecond = -7e-6;   VolatilityPerSecond = 60e-6; IntraBarPointsMean = 30.0; IntraBarPointsStdDev = 15.0 }
+    | MidDowntrend ->    { DriftPerSecond = -15e-6;  VolatilityPerSecond = 80e-6; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
+    | StrongDowntrend -> { DriftPerSecond = -30e-6;  VolatilityPerSecond = 100e-6; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
 
 type TrendBarResult = {
     TrendBars : Bar[]
