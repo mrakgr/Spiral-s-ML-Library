@@ -4,6 +4,7 @@ open Spiral.Trading.Simulation.OrderBook
 open Spiral.Trading.Simulation.EpisodeMCMC
 open Spiral.Trading.Simulation.PriceGeneration
 open Spiral.Trading.Simulation.MovingAverage
+open Spiral.Trading.Simulation.DatasetGeneration
 
 type OrderBookArgs =
     | [<AltCommandLine("-s")>] Seed of int
@@ -49,11 +50,25 @@ type BacktestArgs =
             | Fast _ -> "Fast MA period (default: 10)"
             | Slow _ -> "Slow MA period (default: 30)"
 
+type GenerateDatasetArgs =
+    | [<AltCommandLine("-s")>] Seed of int
+    | [<AltCommandLine("-n")>] Num_Days of int
+    | [<AltCommandLine("-o")>] Output of string
+    | [<AltCommandLine("-i")>] Iterations of int
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Seed _ -> "Random seed for generation"
+            | Num_Days _ -> "Number of days to generate"
+            | Output _ -> "Output parquet file path"
+            | Iterations _ -> "MCMC iterations per level"
+
 type Command =
     | [<CliPrefix(CliPrefix.None)>] Order_Book of ParseResults<OrderBookArgs>
     | [<CliPrefix(CliPrefix.None)>] Generate_Day of ParseResults<GenerateDayArgs>
     | [<CliPrefix(CliPrefix.None)>] Generate_Prices of ParseResults<GeneratePricesArgs>
     | [<CliPrefix(CliPrefix.None)>] Backtest of ParseResults<BacktestArgs>
+    | [<CliPrefix(CliPrefix.None)>] Generate_Dataset of ParseResults<GenerateDatasetArgs>
     interface IArgParserTemplate with
         member this.Usage =
             match this with
@@ -61,6 +76,7 @@ type Command =
             | Generate_Day _ -> "Generate a full day with sessions and trends using MCMC"
             | Generate_Prices _ -> "Generate 1-second price bars from episode structure"
             | Backtest _ -> "Run MA crossover backtest on generated prices"
+            | Generate_Dataset _ -> "Generate training/test dataset in parquet format"
 
 let runOrderBook (args: ParseResults<OrderBookArgs>) =
     let seed = args.GetResult(OrderBookArgs.Seed, 42)
@@ -142,6 +158,19 @@ let runBacktest (args: ParseResults<BacktestArgs>) =
     let btResult = backtest bars fast slow
     printResult btResult fast slow
 
+let runGenerateDataset (args: ParseResults<GenerateDatasetArgs>) =
+    let seed = args.GetResult(GenerateDatasetArgs.Seed, 42)
+    let numDays = args.GetResult(GenerateDatasetArgs.Num_Days, 10000)
+    let output = args.GetResult(GenerateDatasetArgs.Output, "data/train.parquet")
+    let iterations = args.GetResult(GenerateDatasetArgs.Iterations, 10000)
+    let rng = Random(seed)
+
+    let mcmcConfig = { MCMC.Iterations = iterations }
+    let sessionConfig = SessionLevel.defaultConfig
+    let trendConfig = TrendLevel.defaultConfig
+
+    generateDataset rng numDays output mcmcConfig sessionConfig trendConfig 100.0
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Command>(programName = "Spiral.Trading.Simulation")
@@ -154,6 +183,7 @@ let main argv =
         | Generate_Day args -> runGenerateDay args
         | Generate_Prices args -> runGeneratePrices args
         | Backtest args -> runBacktest args
+        | Generate_Dataset args -> runGenerateDataset args
 
         0
     with
