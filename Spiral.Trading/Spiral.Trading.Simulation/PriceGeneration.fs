@@ -40,87 +40,65 @@ let getTrendPriceParams (trend: Trend) : TrendPriceParams =
     | MidDowntrend ->    { DriftPerSecond = -15e-6;  VolatilityPerSecond = 80e-6; IntraBarPointsMean = 40.0; IntraBarPointsStdDev = 20.0 }
     | StrongDowntrend -> { DriftPerSecond = -30e-6;  VolatilityPerSecond = 100e-6; IntraBarPointsMean = 50.0; IntraBarPointsStdDev = 20.0 }
 
-type TrendBarResult = {
-    TrendBars : Bar[]
-    LatestMean : float
-    DurationRemaining : float
+type TrendState = {
+    Session: DaySession
+    Trend: Trend
+    mutable DurationRemaining: float  // in seconds
 }
 
-/// Generate price bars for a single trend episode
-let generateTrendBars
-    (rng: Random)
-    (startTime: float)
-    (startMean: float)
-    (lastClose : float)
-    (session: DaySession)
-    (trend: Trend)
-    (durationMinutes: float)
-    : TrendBarResult =
+/// Generate price bars for a full day from DayResult
+let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[] =
+    let totalSeconds = 390 * 60
+    let bars = Array.zeroCreate totalSeconds
     
-    let p = getTrendPriceParams trend
-    let durationSeconds = durationMinutes * 60.0
-    // Volatility should be relative to price.
-    let normal = Normal(startMean * p.DriftPerSecond, abs startMean * p.VolatilityPerSecond, rng)
-    let pointsDist = LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
+    // Build queue of (session, trend, duration in seconds)
+    let queue = Collections.Generic.Queue<TrendState>()
+    for i in 0 .. result.Sessions.Length - 1 do
+        let session = result.Sessions.[i]
+        for trend in result.Trends.[i] do
+            queue.Enqueue({ Session = session.Label; Trend = trend.Label; DurationRemaining = trend.Duration * 60.0 })
     
-    let bars = Array.zeroCreate (int durationSeconds)
-    let mutable volumeProfileMean = startMean
-    let mutable _open = lastClose
-    for i in 0 .. int durationSeconds - 1 do
-        // Sample number of intra-bar price points
+    let mutable mean = startPrice
+    let mutable _open = startPrice
+    let mutable current = queue.Dequeue()
+    let mutable p = getTrendPriceParams current.Trend
+    let mutable normal = Normal(mean * p.DriftPerSecond, abs mean * p.VolatilityPerSecond, rng)
+    let mutable pointsDist = LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
+    
+    for i in 0 .. totalSeconds - 1 do
+        // Sample bar
         let numPoints = stochasticRound rng (pointsDist.Sample())
-        // Sample a new price bar volume profile mean.
-        volumeProfileMean <- volumeProfileMean + normal.Sample()
+        mean <- mean + normal.Sample()
         
-        // Sample price points and track high/low
         let mutable close = _open
         let mutable high = _open
         let mutable low = _open
         
         for _ in 1 .. numPoints do
-            close <- volumeProfileMean + normal.Sample()
+            close <- mean + normal.Sample()
             high <- max high close
             low <- min low close
         
         bars.[i] <- {
-            Time = startTime + float i
+            Time = float i
             Open = _open
             High = high
             Low = low
             Close = close
-            Session = session
-            Trend = trend
+            Session = current.Session
+            Trend = current.Trend
         }
         _open <- close
+        
+        // Decrement duration and possibly switch to next trend
+        current.DurationRemaining <- current.DurationRemaining - 1.0
+        if current.DurationRemaining <= 0.0 && queue.Count > 0 then
+            current <- queue.Dequeue()
+            p <- getTrendPriceParams current.Trend
+            normal <- Normal(mean * p.DriftPerSecond, abs mean * p.VolatilityPerSecond, rng)
+            pointsDist <- LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
     
-    {
-        TrendBars = bars
-        LatestMean = volumeProfileMean
-        DurationRemaining = durationSeconds - float (int durationSeconds)
-    }
-
-/// Generate price bars for a full day from DayResult
-let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[] =
-    let allBars = ResizeArray<Bar>()
-    let mutable time = 0.0
-    let mutable mean = startPrice
-    let mutable lastClose = startPrice
-    let mutable durationRemainingSeconds = 0.0
-    
-    for i in 0 .. result.Sessions.Length - 1 do
-        let session = result.Sessions.[i]
-        let trends = result.Trends.[i]
-        for trend in trends do
-            let totalSeconds = trend.Duration * 60.0 + durationRemainingSeconds
-            let r = generateTrendBars rng time mean lastClose session.Label trend.Label (totalSeconds / 60.0)
-            if r.TrendBars.Length > 0 then
-                allBars.AddRange(r.TrendBars)
-                time <- r.TrendBars.[r.TrendBars.Length - 1].Time + 1.0
-                lastClose <- r.TrendBars.[r.TrendBars.Length - 1].Close
-            mean <- r.LatestMean
-            durationRemainingSeconds <- r.DurationRemaining
-    
-    allBars.ToArray()
+    bars
 
 /// Print summary statistics for generated bars
 let printBarsSummary (bars: Bar[]) : unit =
