@@ -163,13 +163,12 @@ let runGenerateDataset (args: ParseResults<GenerateDatasetArgs>) =
     let numDays = args.GetResult(GenerateDatasetArgs.Num_Days, 10000)
     let output = args.GetResult(GenerateDatasetArgs.Output, "data/train.parquet")
     let iterations = args.GetResult(GenerateDatasetArgs.Iterations, 10000)
-    let rng = Random(seed)
 
     let mcmcConfig = { MCMC.Iterations = iterations }
     let sessionConfig = SessionLevel.defaultConfig
     let trendConfig = TrendLevel.defaultConfig
 
-    generateDataset rng numDays output mcmcConfig sessionConfig trendConfig 100.0
+    generateDataset seed numDays output mcmcConfig sessionConfig trendConfig 100.0
 
 [<EntryPoint>]
 let main argv =
