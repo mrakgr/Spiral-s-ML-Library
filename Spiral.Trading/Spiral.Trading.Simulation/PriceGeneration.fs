@@ -46,6 +46,20 @@ type TrendState = {
     mutable DurationRemaining: float  // in seconds
 }
 
+type TrendDistributions = {
+    Params: TrendPriceParams
+    Normal: Normal
+    PointsDist: LogNormal
+}
+
+let createTrendDistributions (rng: Random) (mean: float) (trend: Trend) : TrendDistributions =
+    let p = getTrendPriceParams trend
+    {
+        Params = p
+        Normal = Normal(mean * p.DriftPerSecond, abs mean * p.VolatilityPerSecond, rng)
+        PointsDist = LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
+    }
+
 /// Generate price bars for a full day from DayResult
 let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[] =
     let totalSeconds = 390 * 60
@@ -61,21 +75,19 @@ let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[
     let mutable mean = startPrice
     let mutable _open = startPrice
     let mutable current = queue.Dequeue()
-    let mutable p = getTrendPriceParams current.Trend
-    let mutable normal = Normal(mean * p.DriftPerSecond, abs mean * p.VolatilityPerSecond, rng)
-    let mutable pointsDist = LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
+    let mutable dist = createTrendDistributions rng mean current.Trend
     
     for i in 0 .. totalSeconds - 1 do
         // Sample bar
-        let numPoints = stochasticRound rng (pointsDist.Sample())
-        mean <- mean + normal.Sample()
+        let numPoints = stochasticRound rng (dist.PointsDist.Sample())
+        mean <- mean + dist.Normal.Sample()
         
         let mutable close = _open
         let mutable high = _open
         let mutable low = _open
         
         for _ in 1 .. numPoints do
-            close <- mean + normal.Sample()
+            close <- mean + dist.Normal.Sample()
             high <- max high close
             low <- min low close
         
@@ -94,9 +106,7 @@ let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[
         current.DurationRemaining <- current.DurationRemaining - 1.0
         if current.DurationRemaining <= 0.0 && queue.Count > 0 then
             current <- queue.Dequeue()
-            p <- getTrendPriceParams current.Trend
-            normal <- Normal(mean * p.DriftPerSecond, abs mean * p.VolatilityPerSecond, rng)
-            pointsDist <- LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
+            dist <- createTrendDistributions rng mean current.Trend
     
     bars
 
