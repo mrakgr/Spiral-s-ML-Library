@@ -38,7 +38,7 @@ dotnet run -- generate-prices [-s seed] [-i iterations] [-p start_price] [-o out
 Export to CSV for analysis:
 
 ```bash
-dotnet run -- generate-prices -o prices.csv
+dotnet run -- generate-prices -o ../data/test_prices.csv
 ```
 
 The CSV includes columns: `Time,Open,High,Low,Close,Session,Trend`
