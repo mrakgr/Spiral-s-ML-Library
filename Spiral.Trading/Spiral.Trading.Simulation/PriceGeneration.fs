@@ -60,7 +60,7 @@ let generateTrendBars
     let p = getTrendPriceParams trend
     let durationSeconds = durationMinutes * 60.0
     // Volatility should be relative to price.
-    let normal = Normal(startMean * p.DriftPerSecond, abs(startMean) * p.VolatilityPerSecond, rng)
+    let normal = Normal(startMean * p.DriftPerSecond, abs startMean * p.VolatilityPerSecond, rng)
     let pointsDist = LogNormal.WithMeanVariance(p.IntraBarPointsMean, p.IntraBarPointsStdDev * p.IntraBarPointsStdDev, rng)
     
     let bars = Array.zeroCreate (int durationSeconds)
@@ -105,19 +105,20 @@ let generateDayBars (rng: Random) (startPrice: float) (result: DayResult) : Bar[
     let mutable time = 0.0
     let mutable mean = startPrice
     let mutable lastClose = startPrice
-    let mutable durationRemaining = 0.0
+    let mutable durationRemainingSeconds = 0.0
     
     for i in 0 .. result.Sessions.Length - 1 do
         let session = result.Sessions.[i]
         let trends = result.Trends.[i]
         for trend in trends do
-            let r = generateTrendBars rng time mean lastClose session.Label trend.Label (trend.Duration + durationRemaining)
+            let totalSeconds = trend.Duration * 60.0 + durationRemainingSeconds
+            let r = generateTrendBars rng time mean lastClose session.Label trend.Label (totalSeconds / 60.0)
             if r.TrendBars.Length > 0 then
                 allBars.AddRange(r.TrendBars)
                 time <- r.TrendBars.[r.TrendBars.Length - 1].Time + 1.0
                 lastClose <- r.TrendBars.[r.TrendBars.Length - 1].Close
             mean <- r.LatestMean
-            durationRemaining <- r.DurationRemaining
+            durationRemainingSeconds <- r.DurationRemaining
     
     allBars.ToArray()
 
