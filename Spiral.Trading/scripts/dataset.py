@@ -1,7 +1,7 @@
 """PyTorch Dataset for loading trading simulation data from Parquet."""
 
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, Sampler
 import pyarrow.parquet as pq
 import numpy as np
 
@@ -35,6 +35,10 @@ class TradingDataset(Dataset):
         assert actual_rows == expected_rows, \
             f"Expected {expected_rows} rows ({self.num_row_groups} days × {self.bars_per_day} bars), got {actual_rows}"
         
+        # Cache for row group data
+        self._cached_row_group = -1
+        self._cached_data = None
+        
     def __len__(self) -> int:
         return self.num_row_groups * self.windows_per_day
     
@@ -44,30 +48,70 @@ class TradingDataset(Dataset):
         offset = idx % self.windows_per_day
         return row_group, offset
     
+    def _load_row_group(self, row_group: int):
+        """Load and cache a row group as numpy arrays."""
+        if self._cached_row_group != row_group:
+            df = self.pf.read_row_group(row_group).to_pandas()
+            self._cached_data = {
+                'open': df['open'].values,
+                'high': df['high'].values,
+                'low': df['low'].values,
+                'close': df['close'].values,
+                'session': df['session'].values,
+                'trend': df['trend'].values,
+            }
+            self._cached_row_group = row_group
+    
     def __getitem__(self, idx: int) -> dict:
         row_group, offset = self._get_row_group_and_offset(idx)
         
-        # Load the row group (cached by PyArrow)
-        df = self.pf.read_row_group(row_group).to_pandas()
+        # Load row group (cached)
+        self._load_row_group(row_group)
+        data = self._cached_data
         
         # Extract window
-        window = df.iloc[offset:offset + self.window_size]
+        end = offset + self.window_size
+        first_open = data['open'][offset]
         
-        # Features: OHLC as returns (percentage change from first open)
-        first_open = window['open'].iloc[0]
         features = np.stack([
-            (window['open'].values - first_open) / first_open,
-            (window['high'].values - first_open) / first_open,
-            (window['low'].values - first_open) / first_open,
-            (window['close'].values - first_open) / first_open,
+            (data['open'][offset:end] - first_open) / first_open,
+            (data['high'][offset:end] - first_open) / first_open,
+            (data['low'][offset:end] - first_open) / first_open,
+            (data['close'][offset:end] - first_open) / first_open,
         ], axis=1).astype(np.float32)
         
         # Labels: use the label at the end of the window
-        session = window['session'].iloc[-1]
-        trend = window['trend'].iloc[-1]
+        session = data['session'][end - 1]
+        trend = data['trend'][end - 1]
         
         return {
-            'features': torch.from_numpy(features),  # (window_size, 4)
+            'features': torch.from_numpy(features),
             'session': torch.tensor(session, dtype=torch.long),
             'trend': torch.tensor(trend, dtype=torch.long),
         }
+
+
+class RowGroupSampler(Sampler):
+    """
+    Sampler that shuffles row groups but iterates sequentially within each.
+    This makes caching effective while still providing randomization.
+    """
+    
+    def __init__(self, dataset: TradingDataset, shuffle: bool = True):
+        self.dataset = dataset
+        self.shuffle = shuffle
+        self.num_row_groups = dataset.num_row_groups
+        self.windows_per_day = dataset.windows_per_day
+    
+    def __iter__(self):
+        row_groups = list(range(self.num_row_groups))
+        if self.shuffle:
+            np.random.shuffle(row_groups)
+        
+        for rg in row_groups:
+            base = rg * self.windows_per_day
+            for offset in range(self.windows_per_day):
+                yield base + offset
+    
+    def __len__(self):
+        return len(self.dataset)
