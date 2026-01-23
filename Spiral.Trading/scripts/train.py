@@ -103,6 +103,14 @@ def main():
     
     # Model
     model = TradingLSTM().to(device)
+    
+    # Load existing weights if available
+    import os
+    resume_path = 'data/model.pt'
+    if os.path.exists(resume_path):
+        print(f"Resuming from {resume_path}")
+        model.load_state_dict(torch.load(resume_path))
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     
     print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
