@@ -15,19 +15,21 @@ class TradingDataset(Dataset):
     Labels: session (0-2) and trend (0-6)
     """
     
-    def __init__(self, parquet_path: str, window_size: int = 60):
+    def __init__(self, parquet_path: str, window_size: int = 60, stride: int = 1):
         """
         Args:
             parquet_path: Path to parquet file
             window_size: Number of bars per sample
+            stride: Step size between windows (1 = every bar, 5 = every 5th bar)
         """
         self.parquet_path = parquet_path
         self.window_size = window_size
+        self.stride = stride
         self.pf = pq.ParquetFile(parquet_path)
         
         self.num_row_groups = self.pf.metadata.num_row_groups
         self.bars_per_day = 23400  # 390 minutes * 60 seconds
-        self.windows_per_day = self.bars_per_day - window_size + 1
+        self.windows_per_day = (self.bars_per_day - window_size) // stride + 1
         
         # Verify row group size matches expected bars per day
         expected_rows = self.num_row_groups * self.bars_per_day
@@ -45,7 +47,8 @@ class TradingDataset(Dataset):
     def _get_row_group_and_offset(self, idx: int) -> tuple[int, int]:
         """Convert global index to (row_group, offset within row group)."""
         row_group = idx // self.windows_per_day
-        offset = idx % self.windows_per_day
+        window_idx = idx % self.windows_per_day
+        offset = window_idx * self.stride
         return row_group, offset
     
     def _load_row_group(self, row_group: int):

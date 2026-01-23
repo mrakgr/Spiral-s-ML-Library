@@ -12,30 +12,26 @@ def train_epoch(model, loader, optimizer, device):
     """Train for one epoch."""
     model.train()
     total_loss = 0
-    session_correct = 0
     trend_correct = 0
     total = 0
     
-    session_criterion = nn.CrossEntropyLoss()
     trend_criterion = nn.CrossEntropyLoss()
     
     for batch_idx, batch in enumerate(loader):
         features = batch['features'].to(device)
-        session_labels = batch['session'].to(device)
         trend_labels = batch['trend'].to(device)
         
         optimizer.zero_grad()
         session_logits, trend_logits = model(features)
         
-        session_loss = session_criterion(session_logits, session_labels)
-        trend_loss = trend_criterion(trend_logits, trend_labels)
-        loss = session_loss + trend_loss
+        # Only train on trend prediction for now
+        # Session prediction requires deeper context (1m/5m aggregates)
+        loss = trend_criterion(trend_logits, trend_labels)
         
         loss.backward()
         optimizer.step()
         
         total_loss += loss.item()
-        session_correct += (session_logits.argmax(1) == session_labels).sum().item()
         trend_correct += (trend_logits.argmax(1) == trend_labels).sum().item()
         total += features.size(0)
         
@@ -44,7 +40,6 @@ def train_epoch(model, loader, optimizer, device):
     
     return {
         'loss': total_loss / len(loader),
-        'session_acc': session_correct / total,
         'trend_acc': trend_correct / total,
     }
 
@@ -54,32 +49,25 @@ def evaluate(model, loader, device):
     """Evaluate model on a dataset."""
     model.eval()
     total_loss = 0
-    session_correct = 0
     trend_correct = 0
     total = 0
     
-    session_criterion = nn.CrossEntropyLoss()
     trend_criterion = nn.CrossEntropyLoss()
     
     for batch in loader:
         features = batch['features'].to(device)
-        session_labels = batch['session'].to(device)
         trend_labels = batch['trend'].to(device)
         
         session_logits, trend_logits = model(features)
         
-        session_loss = session_criterion(session_logits, session_labels)
-        trend_loss = trend_criterion(trend_logits, trend_labels)
-        loss = session_loss + trend_loss
+        loss = trend_criterion(trend_logits, trend_labels)
         
         total_loss += loss.item()
-        session_correct += (session_logits.argmax(1) == session_labels).sum().item()
         trend_correct += (trend_logits.argmax(1) == trend_labels).sum().item()
         total += features.size(0)
     
     return {
         'loss': total_loss / len(loader),
-        'session_acc': session_correct / total,
         'trend_acc': trend_correct / total,
     }
 
@@ -89,8 +77,9 @@ def main():
     train_path = 'data/train.parquet'
     test_path = 'data/test.parquet'
     window_size = 60
-    batch_size = 256
-    num_epochs = 3
+    stride = 5
+    batch_size = 1024
+    num_epochs = 1
     learning_rate = 1e-3
     num_workers = 4
     
@@ -99,8 +88,8 @@ def main():
     
     # Data
     print("Loading datasets...")
-    train_dataset = TradingDataset(train_path, window_size=window_size)
-    test_dataset = TradingDataset(test_path, window_size=window_size)
+    train_dataset = TradingDataset(train_path, window_size=window_size, stride=stride)
+    test_dataset = TradingDataset(test_path, window_size=window_size, stride=stride)
     
     print(f"Train samples: {len(train_dataset):,}")
     print(f"Test samples: {len(test_dataset):,}")
@@ -125,12 +114,10 @@ def main():
         
         train_metrics = train_epoch(model, train_loader, optimizer, device)
         print(f"Train - Loss: {train_metrics['loss']:.4f}, "
-              f"Session Acc: {train_metrics['session_acc']:.4f}, "
               f"Trend Acc: {train_metrics['trend_acc']:.4f}")
         
         test_metrics = evaluate(model, test_loader, device)
         print(f"Test  - Loss: {test_metrics['loss']:.4f}, "
-              f"Session Acc: {test_metrics['session_acc']:.4f}, "
               f"Trend Acc: {test_metrics['trend_acc']:.4f}")
         print()
     
