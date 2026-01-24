@@ -1,0 +1,78 @@
+// Just exploring the Bayes rule in Spiral.
+// https://claude.ai/share/6f6cdbed-405d-4fe8-b8ae-2f8fe3e56949
+
+
+open corebase
+
+nominal dist a = {}
+nominal random a = {}
+
+inl sample forall a. (x : dist a) : random a = failwith "" // draw a value
+inl density forall a. (x : dist a) (a : a) : float = failwith "" // evaluate pdf/pmf at a point
+inl expect forall a. (x : dist a) (f : a -> float) : float = failwith "" // expected value of a function
+inl condition forall a. (x : dist a) (f : a -> bool) : dist a = failwith "" // filter/condition on a predicate
+
+open monad
+instance (>>=) dist = fun a f => failwith ""
+instance on_succ dist = fun a => failwith ""
+
+inl reweight forall a. (a : dist a) (f : a -> float) : dist a = failwith "" // similar to condition with floats
+
+inl bayes forall a b. (prior : dist a) (likelihood : a -> dist b) (observed : b) : dist a = 
+    reweight prior (fun a => density (likelihood a) observed)
+    
+inl die () : dist int = failwith ""
+inl twoDie () : dist (int * int) =
+    die () >>= fun a =>
+    die () >>= fun b =>
+    on_succ (a,b)
+
+inl conditioned () = condition twoDie() (fun a,b => a = 1 || b = 1)
+
+// > Bayes would come in if we had a different setup, like: "There are two dice, one fair and one loaded. Someone picked one at random and rolled a 1. What's the probability they picked the loaded die?"
+// How would you express this example using the functions we've built?
+
+union die = Fair | Loaded
+
+inl uniform forall a. (l : list a) : dist a = failwith ""
+inl weighted forall a. (l : list (a * float)) : dist a = failwith ""
+
+// Prior
+inl pickDie() = uniform [Fair; Loaded] // 50/50
+
+// Likelihood
+inl roll (x : die) : dist int =
+    match x with
+    | Fair => uniform (listm.init 20 ((+) 1)) // each face has prob 1/20
+    | Loaded => weighted ((1, 0.5) :: listm.init 19 (fun i => i+2, 0.5 / 19)) // 50% chance of rolling 1, rest split evenly
+
+inl joint () : dist (die * int) =
+    pickDie() >>= fun d =>
+    roll d >>= fun r =>
+    on_succ (d, r)
+
+inl posterior () = bayes pickDie() roll 1
+
+// Now someone tells us the roll was 1. We want P(Loaded | roll = 1).
+
+// Using Bayes:
+
+// ```
+// posterior : Dist DieType
+// posterior = bayes pickDie roll 1
+//           = reweight pickDie (λd → density (roll d) 1)
+// ```
+
+// Let's compute it manually:
+
+// - `density (roll Fair) 1 = 1/20`
+// - `density (roll Loaded) 1 = 1/2`
+
+// So we reweight:
+
+// - Fair: 0.5 × (1/20) = 1/40
+// - Loaded: 0.5 × (1/2) = 1/4 = 10/40
+
+// Normalizing: Fair gets 1/11, Loaded gets 10/11.
+
+// The loaded die is much more likely given we saw a 1. That's Bayes inverting the causal direction — we observed the effect (the roll) and inferred the cause (which die).

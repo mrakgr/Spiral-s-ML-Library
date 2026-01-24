@@ -238,6 +238,9 @@ modules:
             test3_kernel
             test3_run
 
+        bayes/
+            test0
+            
     cpp_cuda/
         test0
         test1
