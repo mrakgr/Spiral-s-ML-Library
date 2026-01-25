@@ -26,6 +26,28 @@ let trendToInt (t: Trend) : int =
     | MidDowntrend -> 5
     | StrongDowntrend -> 6
 
+let computePartials (opens: float[]) (highs: float[]) (lows: float[]) (closes: float[]) (periodSeconds: int) =
+    let n = opens.Length
+    let partialOpens = Array.zeroCreate<float> n
+    let partialHighs = Array.zeroCreate<float> n
+    let partialLows = Array.zeroCreate<float> n
+    let partialCloses = Array.zeroCreate<float> n
+    
+    for i in 0 .. n - 1 do
+        let barStart = (i / periodSeconds) * periodSeconds
+        partialOpens.[i] <- opens.[barStart]
+        partialCloses.[i] <- closes.[i]
+        // Compute high/low from barStart to i
+        let mutable high = highs.[barStart]
+        let mutable low = lows.[barStart]
+        for j in barStart + 1 .. i do
+            if highs.[j] > high then high <- highs.[j]
+            if lows.[j] < low then low <- lows.[j]
+        partialHighs.[i] <- high
+        partialLows.[i] <- low
+    
+    (partialOpens, partialHighs, partialLows, partialCloses)
+
 type DayData = {
     DayId: int
     DayIds: int[]
@@ -36,6 +58,16 @@ type DayData = {
     Closes: float[]
     Sessions: int[]
     Trends: int[]
+    // 1-minute partials (same length as 1s data - 23400 entries)
+    Opens1mPartial: float[]
+    Highs1mPartial: float[]
+    Lows1mPartial: float[]
+    Closes1mPartial: float[]
+    // 5-minute partials (same length as 1s data - 23400 entries)
+    Opens5mPartial: float[]
+    Highs5mPartial: float[]
+    Lows5mPartial: float[]
+    Closes5mPartial: float[]
 }
 
 let generateSingleDay 
@@ -71,8 +103,20 @@ let generateSingleDay
         sessions.[i] <- sessionToInt bars.[i].Session
         trends.[i] <- trendToInt bars.[i].Trend
     
+    // Compute 1-minute partials (60 seconds per bar)
+    let (opens1mPartial, highs1mPartial, lows1mPartial, closes1mPartial) = 
+        computePartials opens highs lows closes 60
+    
+    // Compute 5-minute partials (300 seconds per bar)
+    let (opens5mPartial, highs5mPartial, lows5mPartial, closes5mPartial) = 
+        computePartials opens highs lows closes 300
+    
     { DayId = dayId; DayIds = dayIds; Times = times; Opens = opens
-      Highs = highs; Lows = lows; Closes = closes; Sessions = sessions; Trends = trends }
+      Highs = highs; Lows = lows; Closes = closes; Sessions = sessions; Trends = trends
+      Opens1mPartial = opens1mPartial; Highs1mPartial = highs1mPartial
+      Lows1mPartial = lows1mPartial; Closes1mPartial = closes1mPartial
+      Opens5mPartial = opens5mPartial; Highs5mPartial = highs5mPartial
+      Lows5mPartial = lows5mPartial; Closes5mPartial = closes5mPartial }
 
 let writerTask 
     (schema: ParquetSchema)
@@ -102,6 +146,14 @@ let writerTask
                 do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[5], data.Closes))
                 do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[6], data.Sessions))
                 do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[7], data.Trends))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[8], data.Opens1mPartial))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[9], data.Highs1mPartial))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[10], data.Lows1mPartial))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[11], data.Closes1mPartial))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[12], data.Opens5mPartial))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[13], data.Highs5mPartial))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[14], data.Lows5mPartial))
+                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[15], data.Closes5mPartial))
                 
                 daysWritten <- daysWritten + 1
                 if daysWritten % 500 = 0 then
@@ -158,7 +210,15 @@ let generateDataset
         DataField<float>("low"),
         DataField<float>("close"),
         DataField<int>("session"),
-        DataField<int>("trend")
+        DataField<int>("trend"),
+        DataField<float>("open_1m_partial"),
+        DataField<float>("high_1m_partial"),
+        DataField<float>("low_1m_partial"),
+        DataField<float>("close_1m_partial"),
+        DataField<float>("open_5m_partial"),
+        DataField<float>("high_5m_partial"),
+        DataField<float>("low_5m_partial"),
+        DataField<float>("close_5m_partial")
     )
     
     let channel = Channel.CreateBounded<DayData>(BoundedChannelOptions(numWorkers * 2))
