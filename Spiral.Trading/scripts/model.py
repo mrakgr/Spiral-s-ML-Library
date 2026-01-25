@@ -1,12 +1,13 @@
-"""LSTM model for trading session/trend classification."""
+"""Transformer model for trading trend classification using x-transformers."""
 
 import torch
 import torch.nn as nn
+from x_transformers import ContinuousTransformerWrapper, Encoder
 
 
-class TradingLSTM(nn.Module):
+class TradingTransformer(nn.Module):
     """
-    LSTM classifier with dual heads for session and trend prediction.
+    Transformer classifier for trend prediction.
     
     Input: (batch, seq_len, 4) - OHLC returns
     Output: session logits (batch, 3), trend logits (batch, 7)
@@ -15,26 +16,29 @@ class TradingLSTM(nn.Module):
     def __init__(
         self,
         input_size: int = 4,
-        hidden_size: int = 128,
+        d_model: int = 64,
+        nhead: int = 4,
         num_layers: int = 2,
-        dropout: float = 0.2,
         num_sessions: int = 3,
         num_trends: int = 7,
+        max_seq_len: int = 60,
     ):
         super().__init__()
         
-        self.lstm = nn.LSTM(
-            input_size=input_size,
-            hidden_size=hidden_size,
-            num_layers=num_layers,
-            batch_first=True,
-            dropout=dropout if num_layers > 1 else 0,
-            bidirectional=False,
+        self.transformer = ContinuousTransformerWrapper(
+            dim_in=input_size,
+            dim_out=d_model,
+            max_seq_len=max_seq_len,
+            attn_layers=Encoder(
+                dim=d_model,
+                depth=num_layers,
+                heads=nhead,
+                rotary_pos_emb = True  # turns on rotary positional embeddings
+            )
         )
         
-        self.dropout = nn.Dropout(dropout)
-        self.session_head = nn.Linear(hidden_size, num_sessions)
-        self.trend_head = nn.Linear(hidden_size, num_trends)
+        self.session_head = nn.Linear(d_model, num_sessions)
+        self.trend_head = nn.Linear(d_model, num_trends)
     
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
@@ -44,15 +48,14 @@ class TradingLSTM(nn.Module):
             session_logits: (batch, 3)
             trend_logits: (batch, 7)
         """
-        # LSTM forward
-        lstm_out, (h_n, c_n) = self.lstm(x)
+        x = self.transformer(x)  # (batch, seq_len, d_model)
+        last_hidden = x[:, -1, :]  # (batch, d_model)
         
-        # Use last hidden state
-        last_hidden = lstm_out[:, -1, :]  # (batch, hidden_size)
-        last_hidden = self.dropout(last_hidden)
-        
-        # Classification heads
         session_logits = self.session_head(last_hidden)
         trend_logits = self.trend_head(last_hidden)
         
         return session_logits, trend_logits
+
+
+# Alias for backward compatibility
+TradingLSTM = TradingTransformer
