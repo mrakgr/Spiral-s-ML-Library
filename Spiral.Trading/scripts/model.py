@@ -7,9 +7,12 @@ from x_transformers import ContinuousTransformerWrapper, Encoder
 
 class TradingTransformer(nn.Module):
     """
-    Transformer classifier for trend prediction.
+    Multi-timeframe Transformer classifier for trend prediction.
     
-    Input: (batch, seq_len, 4) - OHLC returns
+    Inputs:
+        features_1s: (batch, 60, 4) - 1-second OHLC
+        features_1m: (batch, 60, 4) - 1-minute OHLC  
+        features_5m: (batch, 79, 4) - 5-minute OHLC
     Output: session logits (batch, 3), trend logits (batch, 7)
     """
     
@@ -21,38 +24,68 @@ class TradingTransformer(nn.Module):
         num_layers: int = 2,
         num_sessions: int = 3,
         num_trends: int = 7,
-        max_seq_len: int = 60,
     ):
         super().__init__()
         
-        self.transformer = ContinuousTransformerWrapper(
+        # Separate transformer for each timeframe
+        self.transformer_1s = ContinuousTransformerWrapper(
             dim_in=input_size,
             dim_out=d_model,
-            max_seq_len=max_seq_len,
+            max_seq_len=60,
             attn_layers=Encoder(
                 dim=d_model,
                 depth=num_layers,
                 heads=nhead,
-                rotary_pos_emb = True  # turns on rotary positional embeddings
+                rotary_pos_emb=True
             )
         )
         
-        self.session_head = nn.Linear(d_model, num_sessions)
-        self.trend_head = nn.Linear(d_model, num_trends)
+        self.transformer_1m = ContinuousTransformerWrapper(
+            dim_in=input_size,
+            dim_out=d_model,
+            max_seq_len=60,
+            attn_layers=Encoder(
+                dim=d_model,
+                depth=num_layers,
+                heads=nhead,
+                rotary_pos_emb=True
+            )
+        )
+        
+        self.transformer_5m = ContinuousTransformerWrapper(
+            dim_in=input_size,
+            dim_out=d_model,
+            max_seq_len=79,
+            attn_layers=Encoder(
+                dim=d_model,
+                depth=num_layers,
+                heads=nhead,
+                rotary_pos_emb=True
+            )
+        )
+        
+        # Classification heads on concatenated representations
+        self.session_head = nn.Linear(d_model * 3, num_sessions)
+        self.trend_head = nn.Linear(d_model * 3, num_trends)
     
-    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x_1s: torch.Tensor, x_1m: torch.Tensor, x_5m: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
-            x: (batch, seq_len, 4) OHLC features
+            x_1s: (batch, 60, 4) 1-second OHLC features
+            x_1m: (batch, 391, 4) 1-minute OHLC features
+            x_5m: (batch, 79, 4) 5-minute OHLC features
         Returns:
             session_logits: (batch, 3)
             trend_logits: (batch, 7)
         """
-        x = self.transformer(x)  # (batch, seq_len, d_model)
-        last_hidden = x[:, -1, :]  # (batch, d_model)
+        h_1s = self.transformer_1s(x_1s)[:, -1, :]  # (batch, d_model)
+        h_1m = self.transformer_1m(x_1m)[:, -1, :]  # (batch, d_model)
+        h_5m = self.transformer_5m(x_5m)[:, -1, :]  # (batch, d_model)
         
-        session_logits = self.session_head(last_hidden)
-        trend_logits = self.trend_head(last_hidden)
+        combined = torch.cat([h_1s, h_1m, h_5m], dim=1)  # (batch, d_model * 3)
+        
+        session_logits = self.session_head(combined)
+        trend_logits = self.trend_head(combined)
         
         return session_logits, trend_logits
 

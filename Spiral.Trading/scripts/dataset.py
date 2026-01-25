@@ -62,6 +62,14 @@ class TradingDataset(Dataset):
                 'close': df['close'].values,
                 'session': df['session'].values,
                 'trend': df['trend'].values,
+                'open_1m_partial': df['open_1m_partial'].values,
+                'high_1m_partial': df['high_1m_partial'].values,
+                'low_1m_partial': df['low_1m_partial'].values,
+                'close_1m_partial': df['close_1m_partial'].values,
+                'open_5m_partial': df['open_5m_partial'].values,
+                'high_5m_partial': df['high_5m_partial'].values,
+                'low_5m_partial': df['low_5m_partial'].values,
+                'close_5m_partial': df['close_5m_partial'].values,
             }
             self._cached_row_group = row_group
     
@@ -72,23 +80,59 @@ class TradingDataset(Dataset):
         self._load_row_group(row_group)
         data = self._cached_data
         
-        # Extract window
+        # Current position (end of window)
         end = offset + self.window_size
-        first_open = data['open'][offset]
+        pos = end - 1  # 0-indexed position we're predicting at
         
-        features = np.stack([
+        # 1s features: last 60 seconds
+        first_open = data['open'][offset]
+        features_1s = np.stack([
             (data['open'][offset:end] - first_open) / first_open,
             (data['high'][offset:end] - first_open) / first_open,
             (data['low'][offset:end] - first_open) / first_open,
             (data['close'][offset:end] - first_open) / first_open,
-        ], axis=1).astype(np.float32)
+        ], axis=1).astype(np.float32)  # (60, 4)
+        
+        # 1m bars: completed bars + current partial
+        # Completed 1m bars end at indices 59, 119, 179, ...
+        all_1m_indices = np.arange(59, pos + 1, 60)
+        all_1m_indices = np.append(all_1m_indices, pos)  # Add current partial
+        
+        # 5m bars: completed bars + current partial  
+        # Completed 5m bars end at indices 299, 599, 899, ...
+        all_5m_indices = np.arange(299, pos + 1, 300)
+        all_5m_indices = np.append(all_5m_indices, pos)  # Add current partial
+        
+        # Build 1m features (last 60 bars)
+        max_1m_bars = 60
+        features_1m = np.zeros((max_1m_bars, 4), dtype=np.float32)
+        n_1m = min(len(all_1m_indices), max_1m_bars)
+        indices_1m = all_1m_indices[-n_1m:]
+        start_1m = max_1m_bars - n_1m
+        features_1m[start_1m:, 0] = (data['open_1m_partial'][indices_1m] - first_open) / first_open
+        features_1m[start_1m:, 1] = (data['high_1m_partial'][indices_1m] - first_open) / first_open
+        features_1m[start_1m:, 2] = (data['low_1m_partial'][indices_1m] - first_open) / first_open
+        features_1m[start_1m:, 3] = (data['close_1m_partial'][indices_1m] - first_open) / first_open
+        
+        # Build 5m features (max 78 bars per day + 1 partial)
+        max_5m_bars = 79
+        features_5m = np.zeros((max_5m_bars, 4), dtype=np.float32)
+        n_5m = min(len(all_5m_indices), max_5m_bars)
+        indices_5m = all_5m_indices[-n_5m:]
+        start_5m = max_5m_bars - n_5m
+        features_5m[start_5m:, 0] = (data['open_5m_partial'][indices_5m] - first_open) / first_open
+        features_5m[start_5m:, 1] = (data['high_5m_partial'][indices_5m] - first_open) / first_open
+        features_5m[start_5m:, 2] = (data['low_5m_partial'][indices_5m] - first_open) / first_open
+        features_5m[start_5m:, 3] = (data['close_5m_partial'][indices_5m] - first_open) / first_open
         
         # Labels: use the label at the end of the window
-        session = data['session'][end - 1]
-        trend = data['trend'][end - 1]
+        session = data['session'][pos]
+        trend = data['trend'][pos]
         
         return {
-            'features': torch.from_numpy(features),
+            'features_1s': torch.from_numpy(features_1s),   # (60, 4)
+            'features_1m': torch.from_numpy(features_1m),   # (391, 4)
+            'features_5m': torch.from_numpy(features_5m),   # (79, 4)
             'session': torch.tensor(session, dtype=torch.long),
             'trend': torch.tensor(trend, dtype=torch.long),
         }

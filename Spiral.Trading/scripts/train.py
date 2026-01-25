@@ -18,14 +18,14 @@ def train_epoch(model, loader, optimizer, device):
     trend_criterion = nn.CrossEntropyLoss()
     
     for batch_idx, batch in enumerate(loader):
-        features = batch['features'].to(device)
+        features_1s = batch['features_1s'].to(device)
+        features_1m = batch['features_1m'].to(device)
+        features_5m = batch['features_5m'].to(device)
         trend_labels = batch['trend'].to(device)
         
         optimizer.zero_grad()
-        session_logits, trend_logits = model(features)
+        session_logits, trend_logits = model(features_1s, features_1m, features_5m)
         
-        # Only train on trend prediction for now
-        # Session prediction requires deeper context (1m/5m aggregates)
         loss = trend_criterion(trend_logits, trend_labels)
         
         loss.backward()
@@ -33,7 +33,7 @@ def train_epoch(model, loader, optimizer, device):
         
         total_loss += loss.item()
         trend_correct += (trend_logits.argmax(1) == trend_labels).sum().item()
-        total += features.size(0)
+        total += features_1s.size(0)
         
         if batch_idx % 100 == 0:
             print(f"  Batch {batch_idx}: loss={loss.item():.4f}")
@@ -55,16 +55,18 @@ def evaluate(model, loader, device):
     trend_criterion = nn.CrossEntropyLoss()
     
     for batch in loader:
-        features = batch['features'].to(device)
+        features_1s = batch['features_1s'].to(device)
+        features_1m = batch['features_1m'].to(device)
+        features_5m = batch['features_5m'].to(device)
         trend_labels = batch['trend'].to(device)
         
-        session_logits, trend_logits = model(features)
+        session_logits, trend_logits = model(features_1s, features_1m, features_5m)
         
         loss = trend_criterion(trend_logits, trend_labels)
         
         total_loss += loss.item()
         trend_correct += (trend_logits.argmax(1) == trend_labels).sum().item()
-        total += features.size(0)
+        total += features_1s.size(0)
     
     return {
         'loss': total_loss / len(loader),
@@ -78,10 +80,10 @@ def main():
     test_path = 'data/test.parquet'
     window_size = 60
     stride = 5
-    batch_size = 1024
+    batch_size = 128
     num_epochs = 1
     learning_rate = 1e-3
-    num_workers = 4
+    num_workers = 0
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
