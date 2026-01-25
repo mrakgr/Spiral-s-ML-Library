@@ -96,12 +96,14 @@ class TradingDataset(Dataset):
         # 1m bars: completed bars + current partial
         # Completed 1m bars end at indices 59, 119, 179, ...
         all_1m_indices = np.arange(59, pos + 1, 60)
-        all_1m_indices = np.append(all_1m_indices, pos)  # Add current partial
+        if len(all_1m_indices) == 0 or all_1m_indices[-1] != pos:
+            all_1m_indices = np.append(all_1m_indices, pos)
         
         # 5m bars: completed bars + current partial  
         # Completed 5m bars end at indices 299, 599, 899, ...
         all_5m_indices = np.arange(299, pos + 1, 300)
-        all_5m_indices = np.append(all_5m_indices, pos)  # Add current partial
+        if len(all_5m_indices) == 0 or all_5m_indices[-1] != pos:
+            all_5m_indices = np.append(all_5m_indices, pos)
         
         # Build 1m features (last 60 bars)
         max_1m_bars = 60
