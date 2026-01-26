@@ -133,8 +133,8 @@ class TradingDataset(Dataset):
         
         return {
             'features_1s': torch.from_numpy(features_1s),   # (60, 4)
-            'features_1m': torch.from_numpy(features_1m),   # (391, 4)
-            'features_5m': torch.from_numpy(features_5m),   # (79, 4)
+            'features_1m': torch.from_numpy(features_1m),   # (60, 4)
+            'features_5m': torch.from_numpy(features_5m),   # (78, 4)
             'session': torch.tensor(session, dtype=torch.long),
             'trend': torch.tensor(trend, dtype=torch.long),
         }
