@@ -116,8 +116,8 @@ class TradingDataset(Dataset):
         features_1m[start_1m:, 2] = (data['low_1m_partial'][indices_1m] - first_open) / first_open
         features_1m[start_1m:, 3] = (data['close_1m_partial'][indices_1m] - first_open) / first_open
         
-        # Build 5m features (max 78 bars per day + 1 partial)
-        max_5m_bars = 79
+        # Build 5m features (max 78 bars per day)
+        max_5m_bars = 78
         features_5m = np.zeros((max_5m_bars, 4), dtype=np.float32)
         n_5m = min(len(all_5m_indices), max_5m_bars)
         indices_5m = all_5m_indices[-n_5m:]

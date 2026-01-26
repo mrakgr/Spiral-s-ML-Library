@@ -12,7 +12,7 @@ class TradingTransformer(nn.Module):
     Inputs:
         features_1s: (batch, 60, 4) - 1-second OHLC
         features_1m: (batch, 60, 4) - 1-minute OHLC  
-        features_5m: (batch, 79, 4) - 5-minute OHLC
+        features_5m: (batch, 78, 4) - 5-minute OHLC
     Output: session logits (batch, 3), trend logits (batch, 7)
     """
     
@@ -55,7 +55,7 @@ class TradingTransformer(nn.Module):
         self.transformer_5m = ContinuousTransformerWrapper(
             dim_in=input_size,
             dim_out=d_model,
-            max_seq_len=79,
+            max_seq_len=78,
             attn_layers=Encoder(
                 dim=d_model,
                 depth=num_layers,
