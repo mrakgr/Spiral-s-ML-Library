@@ -27,7 +27,7 @@ class TradingTransformerV2(nn.Module):
         total_patches = 60 + 60 + 78  # 198
         
         self.embed = nn.Linear(input_channels, hidden_dim)
-        self.pos_embed = nn.Embedding(total_patches, hidden_dim)
+        self.pos_embed = nn.Parameter(torch.randn(total_patches, hidden_dim))
         
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=hidden_dim,
@@ -43,8 +43,7 @@ class TradingTransformerV2(nn.Module):
     
     def forward(self, x_1s, x_1m, x_5m):
         x = torch.cat([x_1s, x_1m, x_5m], dim=1)  # (batch, 198, 4)
-        x = self.embed(x)  # (batch, 198, hidden)
-        x = x + self.pos_embed(torch.arange(198, device=x.device))
+        x = self.embed(x) + self.pos_embed  # (batch, 198, hidden)
         x = self.transformer(x)
         x = self.norm(x.mean(dim=1))
         return self.session_head(x), self.trend_head(x)
