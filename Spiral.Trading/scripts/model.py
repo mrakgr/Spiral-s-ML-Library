@@ -72,8 +72,8 @@ class TradingTransformer(nn.Module):
         """
         Args:
             x_1s: (batch, 60, 4) 1-second OHLC features
-            x_1m: (batch, 391, 4) 1-minute OHLC features
-            x_5m: (batch, 79, 4) 5-minute OHLC features
+            x_1m: (batch, 60, 4) 1-minute OHLC features
+            x_5m: (batch, 78, 4) 5-minute OHLC features
         Returns:
             session_logits: (batch, 3)
             trend_logits: (batch, 7)
