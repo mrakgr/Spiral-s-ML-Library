@@ -50,8 +50,10 @@ class TradingMixerV2(nn.Module):
     def __init__(
         self,
         input_channels: int = 4,
-        hidden_dim: int = 64,
-        num_layers: int = 2,
+        hidden_dim: int = 128,
+        token_dim: int = 256,
+        channel_dim: int = 256,
+        num_layers: int = 4,
         num_sessions: int = 3,
         num_trends: int = 7,
     ):
@@ -61,7 +63,7 @@ class TradingMixerV2(nn.Module):
         self.embed = nn.Linear(input_channels, hidden_dim)
         
         self.mixer = nn.Sequential(*[
-            MixerBlock(total_patches, hidden_dim, hidden_dim * 2, hidden_dim * 2)
+            MixerBlock(total_patches, hidden_dim, token_dim, channel_dim)
             for _ in range(num_layers)
         ])
         
