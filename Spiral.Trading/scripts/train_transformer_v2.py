@@ -1,52 +1,50 @@
 #!/usr/bin/env python3
-"""Transformer v2 - unified cross-timeframe processing with learned position embeddings."""
+"""Transformer v2 - unified cross-timeframe processing with x-transformers and rotary embeddings."""
 
 import torch
 import torch.nn as nn
 import numpy as np
 from torch.utils.data import DataLoader
 from dataset import TradingDataset, RowGroupSampler
+from x_transformers import ContinuousTransformerWrapper, Encoder
 
 
 class TradingTransformerV2(nn.Module):
     """
     Unified Transformer - concatenates all timeframes and processes together.
     Total patches: 60 (1s) + 60 (1m) + 78 (5m) = 198
-    Uses learned absolute position embeddings instead of rotary.
+    Uses x-transformers with rotary position embeddings.
     """
     def __init__(
         self,
         input_channels: int = 4,
-        hidden_dim: int = 64,
+        d_model: int = 64,
         nhead: int = 4,
         num_layers: int = 2,
         num_sessions: int = 3,
         num_trends: int = 7,
     ):
         super().__init__()
-        total_patches = 60 + 60 + 78  # 198
         
-        self.embed = nn.Linear(input_channels, hidden_dim)
-        self.pos_embed = nn.Parameter(torch.randn(total_patches, hidden_dim))
-        
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=hidden_dim,
-            nhead=nhead,
-            dim_feedforward=hidden_dim * 4,
-            batch_first=True,
+        self.transformer = ContinuousTransformerWrapper(
+            dim_in=input_channels,
+            dim_out=d_model,
+            max_seq_len=198,
+            attn_layers=Encoder(
+                dim=d_model,
+                depth=num_layers,
+                heads=nhead,
+                rotary_pos_emb=True
+            )
         )
-        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
         
-        self.norm = nn.LayerNorm(hidden_dim)
-        self.session_head = nn.Linear(hidden_dim, num_sessions)
-        self.trend_head = nn.Linear(hidden_dim, num_trends)
+        self.session_head = nn.Linear(d_model, num_sessions)
+        self.trend_head = nn.Linear(d_model, num_trends)
     
     def forward(self, x_1s, x_1m, x_5m):
         x = torch.cat([x_1s, x_1m, x_5m], dim=1)  # (batch, 198, 4)
-        x = self.embed(x) + self.pos_embed  # (batch, 198, hidden)
-        x = self.transformer(x)
-        x = self.norm(x.mean(dim=1))
-        return self.session_head(x), self.trend_head(x)
+        h = self.transformer(x)[:, -1, :]  # (batch, d_model)
+        return self.session_head(h), self.trend_head(h)
 
 
 def train_epoch(model, loader, optimizer, device):
