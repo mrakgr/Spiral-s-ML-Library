@@ -54,6 +54,51 @@ def get_features(window_df):
     return features
 
 
+def build_features(df, i, window_size=60):
+    """Build multi-timeframe features for a single prediction."""
+    end = i + window_size
+    pos = end - 1
+    first_open = df['open'].iloc[i]
+    
+    # 1s features
+    f_1s = np.stack([
+        (df['open'].iloc[i:end].values - first_open) / first_open,
+        (df['high'].iloc[i:end].values - first_open) / first_open,
+        (df['low'].iloc[i:end].values - first_open) / first_open,
+        (df['close'].iloc[i:end].values - first_open) / first_open,
+    ], axis=1).astype(np.float32)
+    
+    # 1m features
+    all_1m = np.arange(59, pos + 1, 60)
+    if len(all_1m) == 0 or all_1m[-1] != pos:
+        all_1m = np.append(all_1m, pos)
+    
+    f_1m = np.zeros((60, 4), dtype=np.float32)
+    n_1m = min(len(all_1m), 60)
+    idx_1m = all_1m[-n_1m:]
+    start_1m = 60 - n_1m
+    f_1m[start_1m:, 0] = (df['open_1m_partial'].iloc[idx_1m].values - first_open) / first_open
+    f_1m[start_1m:, 1] = (df['high_1m_partial'].iloc[idx_1m].values - first_open) / first_open
+    f_1m[start_1m:, 2] = (df['low_1m_partial'].iloc[idx_1m].values - first_open) / first_open
+    f_1m[start_1m:, 3] = (df['close_1m_partial'].iloc[idx_1m].values - first_open) / first_open
+    
+    # 5m features
+    all_5m = np.arange(299, pos + 1, 300)
+    if len(all_5m) == 0 or all_5m[-1] != pos:
+        all_5m = np.append(all_5m, pos)
+    
+    f_5m = np.zeros((78, 4), dtype=np.float32)
+    n_5m = min(len(all_5m), 78)
+    idx_5m = all_5m[-n_5m:]
+    start_5m = 78 - n_5m
+    f_5m[start_5m:, 0] = (df['open_5m_partial'].iloc[idx_5m].values - first_open) / first_open
+    f_5m[start_5m:, 1] = (df['high_5m_partial'].iloc[idx_5m].values - first_open) / first_open
+    f_5m[start_5m:, 2] = (df['low_5m_partial'].iloc[idx_5m].values - first_open) / first_open
+    f_5m[start_5m:, 3] = (df['close_5m_partial'].iloc[idx_5m].values - first_open) / first_open
+    
+    return f_1s, f_1m, f_5m
+
+
 class TradingSystem:
     """Trading system with 90% confidence threshold and hysteresis."""
     
@@ -92,11 +137,13 @@ def backtest_day(model, device, df, window_size=60, stride=5):
     model.eval()
     with torch.no_grad():
         for i in range(0, len(prices) - window_size, stride):
-            window = df.iloc[i:i + window_size]
-            features = get_features(window)
-            features_t = torch.from_numpy(features).unsqueeze(0).to(device)
+            f_1s, f_1m, f_5m = build_features(df, i, window_size)
             
-            _, trend_logits = model(features_t)
+            x_1s = torch.from_numpy(f_1s).unsqueeze(0).to(device)
+            x_1m = torch.from_numpy(f_1m).unsqueeze(0).to(device)
+            x_5m = torch.from_numpy(f_5m).unsqueeze(0).to(device)
+            
+            _, trend_logits = model(x_1s, x_1m, x_5m)
             probs = torch.softmax(trend_logits, dim=1).cpu().numpy()[0]
             
             position = system.update(probs)
