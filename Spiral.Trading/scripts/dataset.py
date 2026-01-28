@@ -15,21 +15,23 @@ class TradingDataset(Dataset):
     Labels: session (0-2) and trend (0-6)
     """
     
-    def __init__(self, parquet_path: str, window_size: int = 60, stride: int = 1):
+    def __init__(self, parquet_path: str, window_size: int = 60, stride: int = 1, start_index: int = 0):
         """
         Args:
             parquet_path: Path to parquet file
             window_size: Number of bars per sample
             stride: Step size between windows (1 = every bar, 5 = every 5th bar)
+            start_index: First position to sample from (0 = start of day with padding)
         """
         self.parquet_path = parquet_path
         self.window_size = window_size
         self.stride = stride
+        self.start_index = start_index
         self.pf = pq.ParquetFile(parquet_path)
         
         self.num_row_groups = self.pf.metadata.num_row_groups
         self.bars_per_day = 23400  # 390 minutes * 60 seconds
-        self.windows_per_day = (self.bars_per_day - window_size) // stride + 1
+        self.windows_per_day = (self.bars_per_day - start_index) // stride
         
         # Verify row group size matches expected bars per day
         expected_rows = self.num_row_groups * self.bars_per_day
@@ -45,11 +47,11 @@ class TradingDataset(Dataset):
         return self.num_row_groups * self.windows_per_day
     
     def _get_row_group_and_offset(self, idx: int) -> tuple[int, int]:
-        """Convert global index to (row_group, offset within row group)."""
+        """Convert global index to (row_group, position within row group)."""
         row_group = idx // self.windows_per_day
         window_idx = idx % self.windows_per_day
-        offset = window_idx * self.stride
-        return row_group, offset
+        pos = self.start_index + window_idx * self.stride
+        return row_group, pos
     
     def _load_row_group(self, row_group: int):
         """Load and cache a row group as numpy arrays."""
@@ -74,24 +76,21 @@ class TradingDataset(Dataset):
             self._cached_row_group = row_group
     
     def __getitem__(self, idx: int) -> dict:
-        row_group, offset = self._get_row_group_and_offset(idx)
+        row_group, pos = self._get_row_group_and_offset(idx)
         
-        # Load row group (cached)
         self._load_row_group(row_group)
         data = self._cached_data
         
-        # Current position (end of window)
-        end = offset + self.window_size
-        pos = end - 1  # 0-indexed position we're predicting at
+        # Build 1s features with padding if needed
+        features_1s = np.zeros((self.window_size, 3), dtype=np.float32)
+        available = min(pos + 1, self.window_size)
+        start_idx = max(0, pos + 1 - self.window_size)
+        start_pad = self.window_size - available
         
-        # 1s features: last 60 seconds
-        first_open = data['open'][offset]
-        features_1s = np.stack([
-            (data['open'][offset:end] - first_open) / first_open,
-            (data['high'][offset:end] - first_open) / first_open,
-            (data['low'][offset:end] - first_open) / first_open,
-            (data['close'][offset:end] - first_open) / first_open,
-        ], axis=1).astype(np.float32)  # (60, 4)
+        opens_1s = data['open'][start_idx:pos + 1]
+        features_1s[start_pad:, 0] = (data['high'][start_idx:pos + 1] - opens_1s) / opens_1s
+        features_1s[start_pad:, 1] = (data['low'][start_idx:pos + 1] - opens_1s) / opens_1s
+        features_1s[start_pad:, 2] = (data['close'][start_idx:pos + 1] - opens_1s) / opens_1s
         
         # 1m bars: completed bars + current partial
         # Completed 1m bars end at indices 59, 119, 179, ...
@@ -105,36 +104,36 @@ class TradingDataset(Dataset):
         if len(all_5m_indices) == 0 or all_5m_indices[-1] != pos:
             all_5m_indices = np.append(all_5m_indices, pos)
         
-        # Build 1m features (last 60 bars)
+        # Build 1m features (bar-relative, last 60 bars)
         max_1m_bars = 60
-        features_1m = np.zeros((max_1m_bars, 4), dtype=np.float32)
+        features_1m = np.zeros((max_1m_bars, 3), dtype=np.float32)
         n_1m = min(len(all_1m_indices), max_1m_bars)
         indices_1m = all_1m_indices[-n_1m:]
         start_1m = max_1m_bars - n_1m
-        features_1m[start_1m:, 0] = (data['open_1m_partial'][indices_1m] - first_open) / first_open
-        features_1m[start_1m:, 1] = (data['high_1m_partial'][indices_1m] - first_open) / first_open
-        features_1m[start_1m:, 2] = (data['low_1m_partial'][indices_1m] - first_open) / first_open
-        features_1m[start_1m:, 3] = (data['close_1m_partial'][indices_1m] - first_open) / first_open
+        opens_1m = data['open_1m_partial'][indices_1m]
+        features_1m[start_1m:, 0] = (data['high_1m_partial'][indices_1m] - opens_1m) / opens_1m
+        features_1m[start_1m:, 1] = (data['low_1m_partial'][indices_1m] - opens_1m) / opens_1m
+        features_1m[start_1m:, 2] = (data['close_1m_partial'][indices_1m] - opens_1m) / opens_1m
         
-        # Build 5m features (max 78 bars per day)
+        # Build 5m features (bar-relative, max 78 bars per day)
         max_5m_bars = 78
-        features_5m = np.zeros((max_5m_bars, 4), dtype=np.float32)
+        features_5m = np.zeros((max_5m_bars, 3), dtype=np.float32)
         n_5m = min(len(all_5m_indices), max_5m_bars)
         indices_5m = all_5m_indices[-n_5m:]
         start_5m = max_5m_bars - n_5m
-        features_5m[start_5m:, 0] = (data['open_5m_partial'][indices_5m] - first_open) / first_open
-        features_5m[start_5m:, 1] = (data['high_5m_partial'][indices_5m] - first_open) / first_open
-        features_5m[start_5m:, 2] = (data['low_5m_partial'][indices_5m] - first_open) / first_open
-        features_5m[start_5m:, 3] = (data['close_5m_partial'][indices_5m] - first_open) / first_open
+        opens_5m = data['open_5m_partial'][indices_5m]
+        features_5m[start_5m:, 0] = (data['high_5m_partial'][indices_5m] - opens_5m) / opens_5m
+        features_5m[start_5m:, 1] = (data['low_5m_partial'][indices_5m] - opens_5m) / opens_5m
+        features_5m[start_5m:, 2] = (data['close_5m_partial'][indices_5m] - opens_5m) / opens_5m
         
         # Labels: use the label at the end of the window
         session = data['session'][pos]
         trend = data['trend'][pos]
         
         return {
-            'features_1s': torch.from_numpy(features_1s),   # (60, 4)
-            'features_1m': torch.from_numpy(features_1m),   # (60, 4)
-            'features_5m': torch.from_numpy(features_5m),   # (78, 4)
+            'features_1s': torch.from_numpy(features_1s),   # (60, 3)
+            'features_1m': torch.from_numpy(features_1m),   # (60, 3)
+            'features_5m': torch.from_numpy(features_5m),   # (78, 3)
             'session': torch.tensor(session, dtype=torch.long),
             'trend': torch.tensor(trend, dtype=torch.long),
         }
