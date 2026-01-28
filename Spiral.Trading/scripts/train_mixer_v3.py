@@ -60,6 +60,11 @@ class TradingMixerV3(nn.Module):
         super().__init__()
         total_patches = 60 + 60 + 78  # 198
         
+        # Input scaling (1/std for each channel: H-O, L-O, C-O)
+        self.register_buffer('scale_1s', torch.tensor([1/0.000095, 1/0.000095, 1/0.000105]))
+        self.register_buffer('scale_1m', torch.tensor([1/0.000473, 1/0.000479, 1/0.000710]))
+        self.register_buffer('scale_5m', torch.tensor([1/0.001471, 1/0.001481, 1/0.002093]))
+        
         self.embed = nn.Linear(input_channels, hidden_dim)
         
         self.mixer = nn.Sequential(*[
@@ -72,6 +77,11 @@ class TradingMixerV3(nn.Module):
         self.trend_head = nn.Linear(hidden_dim, num_trends)
     
     def forward(self, x_1s, x_1m, x_5m):
+        # Scale inputs to unit variance
+        x_1s = x_1s * self.scale_1s
+        x_1m = x_1m * self.scale_1m
+        x_5m = x_5m * self.scale_5m
+        
         x = torch.cat([x_1s, x_1m, x_5m], dim=1)
         x = self.embed(x)
         x = self.mixer(x)
