@@ -7,9 +7,6 @@ import numpy as np
 from torch.utils.data import DataLoader
 from dataset import TradingDataset, RowGroupSampler
 
-# Import the v3 dataset from transformer_v3
-from train_transformer_v3 import TradingDatasetV3
-
 
 class MLPBlock(nn.Module):
     def __init__(self, dim, hidden_dim):
@@ -147,8 +144,8 @@ def main():
     print(f"Using device: {device}")
     
     print("Loading datasets...")
-    train_ds = TradingDatasetV3('data/train.parquet', window_size=60, stride=5)
-    test_ds = TradingDatasetV3('data/test.parquet', window_size=60, stride=5)
+    train_ds = TradingDataset('data/train.parquet', window_size=60, stride=5)
+    test_ds = TradingDataset('data/test.parquet', window_size=60, stride=5)
     print(f"Train: {len(train_ds):,}, Test: {len(test_ds):,}")
     
     train_loader = DataLoader(
