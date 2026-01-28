@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Backtest for MLP-Mixer v3 with bar-relative normalization."""
+"""Architecture-agnostic backtest script for trading models."""
 
+import argparse
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from train_mixer_v3 import TradingMixerV3
 from dataset import TradingDataset
 
 TREND_POSITION = {0: 1, 1: 1, 2: 1, 3: 0, 4: -1, 5: -1, 6: -1}
-TREND_NAMES = ['StrongUp', 'MidUp', 'WeakUp', 'Consolidation', 'WeakDown', 'MidDown', 'StrongDown']
 
 
 class TradingSystem:
@@ -26,12 +25,11 @@ class TradingSystem:
         return self.position
 
 
-def load_model(path='data/mixer_v3_model.pt'):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = TradingMixerV3().to(device)
-    model.load_state_dict(torch.load(path))
+def load_model(model_class, weights_path, device):
+    model = model_class().to(device)
+    model.load_state_dict(torch.load(weights_path, map_location=device))
     model.eval()
-    return model, device
+    return model
 
 
 def backtest_day(model, device, dataset, row_group):
@@ -43,7 +41,7 @@ def backtest_day(model, device, dataset, row_group):
     
     model.eval()
     with torch.no_grad():
-        for pos in range(0, len(prices)):
+        for pos in range(len(prices)):
             sample = dataset.get_features_for(row_group, pos)
             x_1s = sample['features_1s'].unsqueeze(0).to(device)
             x_1m = sample['features_1m'].unsqueeze(0).to(device)
@@ -74,24 +72,20 @@ def plot_backtest(result, day_idx, save_path):
     prices = result['prices']
     positions = result['positions']
     pnls = result['pnls']
-    times = np.arange(len(prices)) / 60  # Convert to minutes
-    
+    times = np.arange(len(prices)) / 60
+
     fig, axes = plt.subplots(3, 1, figsize=(16, 10), sharex=True)
-    
-    # Plot 1: Price with position overlay
+
     ax1 = axes[0]
     ax1.plot(times, prices, 'k-', linewidth=0.5, alpha=0.7)
-    long_mask = positions == 1
-    short_mask = positions == -1
-    ax1.fill_between(times, prices.min(), prices.max(), where=long_mask, 
+    ax1.fill_between(times, prices.min(), prices.max(), where=positions == 1,
                      alpha=0.3, color='green', label='Long')
-    ax1.fill_between(times, prices.min(), prices.max(), where=short_mask,
+    ax1.fill_between(times, prices.min(), prices.max(), where=positions == -1,
                      alpha=0.3, color='red', label='Short')
     ax1.set_ylabel('Price')
     ax1.set_title(f'Day {day_idx}: Price with Position Overlay (PnL={result["final_pnl"]:.2f}, Trades={result["num_trades"]})')
     ax1.legend(loc='upper left')
-    
-    # Plot 2: Position over time
+
     ax2 = axes[1]
     ax2.step(times, positions, where='post', linewidth=1)
     ax2.axhline(0, color='gray', linestyle='--', alpha=0.5)
@@ -99,8 +93,7 @@ def plot_backtest(result, day_idx, save_path):
     ax2.set_yticks([-1, 0, 1])
     ax2.set_yticklabels(['Short', 'Flat', 'Long'])
     ax2.set_title('Position Changes')
-    
-    # Plot 3: Cumulative PnL
+
     ax3 = axes[2]
     ax3.plot(times, pnls, 'b-', linewidth=1)
     ax3.axhline(0, color='gray', linestyle='--', alpha=0.5)
@@ -109,21 +102,26 @@ def plot_backtest(result, day_idx, save_path):
     ax3.set_xlabel('Time (minutes)')
     ax3.set_ylabel('Cumulative PnL')
     ax3.set_title('Cumulative PnL')
-    
+
     plt.tight_layout()
     plt.savefig(save_path, dpi=150)
     print(f"Saved backtest chart to {save_path}")
     plt.close()
 
 
-def main():
-    print("Loading model...")
-    model, device = load_model()
+def run_backtest(model_class, weights_path, model_name, day_indices=None):
+    if day_indices is None:
+        day_indices = [0, 50, 100, 200, 500]
+    
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f"Using device: {device}")
+    
+    print(f"Loading {model_name} model from {weights_path}...")
+    model = load_model(model_class, weights_path, device)
     
     print("Loading test data...")
     dataset = TradingDataset('data/test.parquet')
     
-    day_indices = [0, 50, 100, 200, 500]
     all_pnls, all_trades = [], []
     
     for day_idx in day_indices:
@@ -131,13 +129,38 @@ def main():
         print(f"Day {day_idx}: PnL={result['final_pnl']:.2f}, Trades={result['num_trades']}")
         all_pnls.append(result['final_pnl'])
         all_trades.append(result['num_trades'])
-        plot_backtest(result, day_idx, f'data/backtest_mixer_v3_day{day_idx}.png')
+        plot_backtest(result, day_idx, f'data/backtest_{model_name}_day{day_idx}.png')
     
     print(f"\nSummary over {len(day_indices)} days:")
     print(f"  Total PnL: {sum(all_pnls):.2f}")
     print(f"  Avg PnL/day: {np.mean(all_pnls):.2f}")
     print(f"  Avg trades/day: {np.mean(all_trades):.1f}")
+    
+    return {'pnls': all_pnls, 'trades': all_trades}
 
 
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description='Backtest trading models')
+    parser.add_argument('--model', type=str, required=True, choices=['mixer', 'gmlp'],
+                        help='Model architecture to backtest')
+    parser.add_argument('--weights', type=str, help='Path to model weights (optional)')
+    parser.add_argument('--days', type=int, nargs='+', default=[0, 50, 100, 200, 500],
+                        help='Day indices to backtest')
+    args = parser.parse_args()
+    
+    if args.model == 'mixer':
+        from train_mixer_v3 import TradingMixerV3
+        model_class = TradingMixerV3
+        weights_path = args.weights or 'data/mixer_v3_model.pt'
+        model_name = 'mixer_v3'
+    elif args.model == 'gmlp':
+        from train_gmlp import TradingGMLP
+        model_class = TradingGMLP
+        weights_path = args.weights or 'data/gmlp_model.pt'
+        model_name = 'gmlp'
+    
+    run_backtest(model_class, weights_path, model_name, args.days)
+
+
+if __name__ == '__main__':
     main()
