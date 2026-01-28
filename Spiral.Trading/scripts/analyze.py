@@ -108,7 +108,11 @@ def plot_confusion_matrix(preds, labels, save_path='data/confusion_matrix.png'):
 
 
 def plot_price_with_predictions(dataset, model, device, day_idx=0, stride=60, save_path='data/price_chart.png'):
-    """Plot price chart with model predictions overlaid."""
+    """Plot price chart with model predictions overlaid.
+    
+    Args:
+        stride: Prediction stride for visualization (default 60 = 1 per minute for cleaner charts)
+    """
     dataset._load_row_group(day_idx)
     data = dataset._cached_data
     
