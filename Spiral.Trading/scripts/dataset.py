@@ -74,10 +74,9 @@ class TradingDataset(Dataset):
                 'close_5m_partial': df['close_5m_partial'].values,
             }
             self._cached_row_group = row_group
-    
-    def __getitem__(self, idx: int) -> dict:
-        row_group, pos = self._get_row_group_and_offset(idx)
-        
+
+    def get_features_for(self,row_group : int, pos : int) -> dict:
+        assert 0 <= pos < self.bars_per_day, f"pos {pos} out of range [0, {self.bars_per_day})"
         self._load_row_group(row_group)
         data = self._cached_data
         
@@ -137,7 +136,10 @@ class TradingDataset(Dataset):
             'session': torch.tensor(session, dtype=torch.long),
             'trend': torch.tensor(trend, dtype=torch.long),
         }
-
+    
+    def __getitem__(self, idx: int) -> dict:
+        row_group, pos = self._get_row_group_and_offset(idx)
+        return self.get_features_for(row_group,pos)
 
 class RowGroupSampler(Sampler):
     """
