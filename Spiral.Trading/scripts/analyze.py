@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from dataset import TradingDataset, RowGroupSampler
-from model import TradingLSTM
 
 TREND_NAMES = [
     'StrongUptrend',
@@ -19,12 +18,22 @@ TREND_NAMES = [
 ]
 
 
-def load_model(path='data/model.pt'):
+def load_mixer_model(path='data/mixer_v3_model.pt'):
+    from train_mixer_v3 import TradingMixerV3
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = TradingLSTM().to(device)
+    model = TradingMixerV3().to(device)
     model.load_state_dict(torch.load(path))
     model.eval()
     return model, device
+
+
+def predict_batch(model, batch, device):
+    """Model-agnostic batch prediction. Returns trend logits."""
+    x_1s = batch['features_1s'].to(device)
+    x_1m = batch['features_1m'].to(device)
+    x_5m = batch['features_5m'].to(device)
+    _, trend_logits = model(x_1s, x_1m, x_5m)
+    return trend_logits
 
 
 def get_predictions(model, loader, device, max_batches=None):
@@ -38,10 +47,8 @@ def get_predictions(model, loader, device, max_batches=None):
             if max_batches and i >= max_batches:
                 break
             
-            features = batch['features'].to(device)
             trend_labels = batch['trend']
-            
-            _, trend_logits = model(features)
+            trend_logits = predict_batch(model, batch, device)
             probs = torch.softmax(trend_logits, dim=1)
             preds = trend_logits.argmax(1)
             
@@ -100,18 +107,13 @@ def plot_confusion_matrix(preds, labels, save_path='data/confusion_matrix.png'):
     return cm, cm_normalized
 
 
-def plot_price_with_predictions(dataset, model, device, day_idx=0, save_path='data/price_chart.png'):
+def plot_price_with_predictions(dataset, model, device, day_idx=0, stride=60, save_path='data/price_chart.png'):
     """Plot price chart with model predictions overlaid."""
-    # Load one day of data
-    pf = dataset.pf
-    df = pf.read_row_group(day_idx).to_pandas()
+    dataset._load_row_group(day_idx)
+    data = dataset._cached_data
     
-    # Get predictions for this day
-    window_size = dataset.window_size
-    stride = dataset.stride
-    
-    prices = df['close'].values
-    true_trends = df['trend'].values
+    prices = data['close']
+    true_trends = data['trend']
     times = np.arange(len(prices)) / 60  # Convert to minutes
     
     # Get model predictions at each stride point
@@ -121,23 +123,17 @@ def plot_price_with_predictions(dataset, model, device, day_idx=0, save_path='da
     
     model.eval()
     with torch.no_grad():
-        for i in range(0, len(prices) - window_size, stride):
-            window = df.iloc[i:i + window_size]
-            first_open = window['open'].iloc[0]
+        for pos in range(0, len(prices), stride):
+            sample = dataset.get_features_for(day_idx, pos)
+            x_1s = sample['features_1s'].unsqueeze(0).to(device)
+            x_1m = sample['features_1m'].unsqueeze(0).to(device)
+            x_5m = sample['features_5m'].unsqueeze(0).to(device)
             
-            features = np.stack([
-                (window['open'].values - first_open) / first_open,
-                (window['high'].values - first_open) / first_open,
-                (window['low'].values - first_open) / first_open,
-                (window['close'].values - first_open) / first_open,
-            ], axis=1).astype(np.float32)
-            
-            features_t = torch.from_numpy(features).unsqueeze(0).to(device)
-            _, trend_logits = model(features_t)
+            _, trend_logits = model(x_1s, x_1m, x_5m)
             probs = torch.softmax(trend_logits, dim=1).cpu().numpy()[0]
             pred = trend_logits.argmax(1).item()
             
-            pred_times.append((i + window_size) / 60)  # End of window in minutes
+            pred_times.append(pos / 60)
             pred_trends.append(pred)
             pred_probs.append(probs)
     
@@ -191,7 +187,7 @@ def plot_price_with_predictions(dataset, model, device, day_idx=0, save_path='da
 
 def main():
     print("Loading model...")
-    model, device = load_model()
+    model, device = load_mixer_model()
     
     print("Loading test dataset...")
     test_dataset = TradingDataset('data/test.parquet', window_size=60, stride=5)
@@ -217,7 +213,7 @@ def main():
     print("\nGenerating price charts for 3 sample days...")
     for day_idx in [0, 100, 500]:
         save_path = f'data/price_chart_day{day_idx}.png'
-        plot_price_with_predictions(test_dataset, model, device, day_idx, save_path)
+        plot_price_with_predictions(test_dataset, model, device, day_idx, stride=60, save_path=save_path)
 
 
 if __name__ == "__main__":
