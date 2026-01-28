@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """MLP-Mixer v3 - bar-relative normalization for better pattern matching."""
 
+import time
 import torch
 import torch.nn as nn
-import numpy as np
 from torch.utils.data import DataLoader
 from dataset import TradingDataset, RowGroupSampler
 
@@ -90,6 +90,7 @@ def train_epoch(model, loader, optimizer, device):
     model.train()
     total_loss, correct, total = 0, 0, 0
     criterion = nn.CrossEntropyLoss()
+    start_time = time.time()
     
     for batch_idx, batch in enumerate(loader):
         x_1s = batch['features_1s'].to(device)
@@ -108,9 +109,12 @@ def train_epoch(model, loader, optimizer, device):
         total += x_1s.size(0)
         
         if batch_idx % 100 == 0:
-            print(f"  Batch {batch_idx}: loss={loss.item():.4f}")
+            elapsed = time.time() - start_time
+            samples_per_sec = total / elapsed if elapsed > 0 else 0
+            print(f"  Batch {batch_idx}: loss={loss.item():.4f}, {samples_per_sec:.0f} samples/sec")
     
-    return {'loss': total_loss / len(loader), 'acc': correct / total}
+    elapsed = time.time() - start_time
+    return {'loss': total_loss / len(loader), 'acc': correct / total, 'time': elapsed}
 
 
 @torch.no_grad()
@@ -118,6 +122,7 @@ def evaluate(model, loader, device):
     model.eval()
     total_loss, correct, total = 0, 0, 0
     criterion = nn.CrossEntropyLoss()
+    start_time = time.time()
     
     for batch in loader:
         x_1s = batch['features_1s'].to(device)
@@ -132,7 +137,8 @@ def evaluate(model, loader, device):
         correct += (trend_logits.argmax(1) == labels).sum().item()
         total += x_1s.size(0)
     
-    return {'loss': total_loss / len(loader), 'acc': correct / total}
+    elapsed = time.time() - start_time
+    return {'loss': total_loss / len(loader), 'acc': correct / total, 'time': elapsed}
 
 
 def main():
@@ -161,16 +167,19 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     print(f"Parameters: {sum(p.numel() for p in model.parameters()):,}")
     
+    total_start = time.time()
     for epoch in range(num_epochs):
         print(f"\n=== Epoch {epoch + 1}/{num_epochs} ===")
         train_metrics = train_epoch(model, train_loader, optimizer, device)
-        print(f"Train - Loss: {train_metrics['loss']:.4f}, Acc: {train_metrics['acc']:.4f}")
+        print(f"Train - Loss: {train_metrics['loss']:.4f}, Acc: {train_metrics['acc']:.4f}, Time: {train_metrics['time']:.1f}s")
         
         test_metrics = evaluate(model, test_loader, device)
-        print(f"Test  - Loss: {test_metrics['loss']:.4f}, Acc: {test_metrics['acc']:.4f}")
+        print(f"Test  - Loss: {test_metrics['loss']:.4f}, Acc: {test_metrics['acc']:.4f}, Time: {test_metrics['time']:.1f}s")
     
+    total_time = time.time() - total_start
+    print(f"\nTotal training time: {total_time:.1f}s")
     torch.save(model.state_dict(), 'data/mixer_v3_model.pt')
-    print("\nSaved model to data/mixer_v3_model.pt")
+    print("Saved model to data/mixer_v3_model.pt")
 
 
 if __name__ == '__main__':
