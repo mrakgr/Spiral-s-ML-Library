@@ -32,7 +32,7 @@ def load_model(path='data/mixer_v3_model.pt'):
     return model, device
 
 
-def backtest_day(model, device, dataset, row_group, stride=5):
+def backtest_day(model, device, dataset, row_group):
     system = TradingSystem(entry_threshold=0.90)
     dataset._load_row_group(row_group)
     prices = dataset._cached_data['close']
@@ -41,7 +41,7 @@ def backtest_day(model, device, dataset, row_group, stride=5):
     
     model.eval()
     with torch.no_grad():
-        for pos in range(0, len(prices), stride):
+        for pos in range(0, len(prices)):
             sample = dataset.get_features_for(row_group, pos)
             x_1s = sample['features_1s'].unsqueeze(0).to(device)
             x_1m = sample['features_1m'].unsqueeze(0).to(device)
@@ -52,8 +52,8 @@ def backtest_day(model, device, dataset, row_group, stride=5):
             position = system.update(probs)
             positions.append(position)
             
-            if pos + stride < len(prices):
-                price_change = prices[pos + stride] - prices[pos]
+            if pos + 1 < len(prices):
+                price_change = prices[pos + 1] - prices[pos]
                 cumulative_pnl += position * price_change
             pnls.append(cumulative_pnl)
     
@@ -68,7 +68,7 @@ def main():
     model, device = load_model()
     
     print("Loading test data...")
-    dataset = TradingDataset('data/test.parquet', window_size=60, stride=5)
+    dataset = TradingDataset('data/test.parquet')
     
     day_indices = [0, 50, 100, 200, 500]
     all_pnls, all_trades = [], []
