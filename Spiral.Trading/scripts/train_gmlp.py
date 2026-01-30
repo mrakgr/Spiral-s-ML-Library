@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from dataset import TradingDataset, RowGroupSampler
+from tdigest_wrapper import PicklableTDigest
 
 
 class SpatialGatingUnit(nn.Module):
@@ -53,11 +54,16 @@ class TradingGMLP(nn.Module):
         num_layers: int = 4,
         num_sessions: int = 3,
         num_trends: int = 7,
+        tdigests: dict[str, PicklableTDigest] | None = None,
     ):
         super().__init__()
         total_patches = 60 + 60 + 78  # 198
+        self.device = None  # Will be set on first forward pass
         
-        # Input scaling (1/std for each channel: H-O, L-O, C-O)
+        # T-digest normalizers (stored for pickling with model)
+        self.tdigests = tdigests
+        
+        # Fallback: Input scaling (1/std for each channel: H-O, L-O, C-O)
         self.register_buffer('scale_1s', torch.tensor([1/0.000095, 1/0.000095, 1/0.000105]))
         self.register_buffer('scale_1m', torch.tensor([1/0.000473, 1/0.000479, 1/0.000710]))
         self.register_buffer('scale_5m', torch.tensor([1/0.001471, 1/0.001481, 1/0.002093]))
@@ -73,11 +79,28 @@ class TradingGMLP(nn.Module):
         self.session_head = nn.Linear(hidden_dim, num_sessions)
         self.trend_head = nn.Linear(hidden_dim, num_trends)
     
+    def _normalize_and_transfer(self, x: torch.Tensor, key: str, scale: torch.Tensor) -> torch.Tensor:
+        """Normalize with t-digest (CPU) then transfer to device."""
+        if self.tdigests and key in self.tdigests:
+            # T-digest normalization on CPU (numpy)
+            shape = x.shape
+            x_np = x.cpu().numpy().reshape(-1)
+            x_np = self.tdigests[key].normalize(x_np)
+            x = torch.from_numpy(x_np.reshape(shape)).float()
+        else:
+            # Fallback to simple scaling
+            x = x * scale.cpu()
+        return x.to(self.device)
+    
     def forward(self, x_1s, x_1m, x_5m):
-        # Scale inputs to unit variance
-        x_1s = x_1s * self.scale_1s
-        x_1m = x_1m * self.scale_1m
-        x_5m = x_5m * self.scale_5m
+        # Set device from model parameters on first call
+        if self.device is None:
+            self.device = next(self.parameters()).device
+        
+        # Normalize and transfer to device
+        x_1s = self._normalize_and_transfer(x_1s, '1s', self.scale_1s)
+        x_1m = self._normalize_and_transfer(x_1m, '1m', self.scale_1m)
+        x_5m = self._normalize_and_transfer(x_5m, '5m', self.scale_5m)
         
         x = torch.cat([x_1s, x_1m, x_5m], dim=1)
         x = self.embed(x)
@@ -93,9 +116,9 @@ def train_epoch(model, loader, optimizer, device):
     start_time = time.time()
     
     for batch_idx, batch in enumerate(loader):
-        x_1s = batch['features_1s'].to(device)
-        x_1m = batch['features_1m'].to(device)
-        x_5m = batch['features_5m'].to(device)
+        x_1s = batch['features_1s']
+        x_1m = batch['features_1m']
+        x_5m = batch['features_5m']
         labels = batch['trend'].to(device)
         
         optimizer.zero_grad()
@@ -125,9 +148,9 @@ def evaluate(model, loader, device):
     start_time = time.time()
     
     for batch in loader:
-        x_1s = batch['features_1s'].to(device)
-        x_1m = batch['features_1m'].to(device)
-        x_5m = batch['features_5m'].to(device)
+        x_1s = batch['features_1s']
+        x_1m = batch['features_1m']
+        x_5m = batch['features_5m']
         labels = batch['trend'].to(device)
         
         _, trend_logits = model(x_1s, x_1m, x_5m)
