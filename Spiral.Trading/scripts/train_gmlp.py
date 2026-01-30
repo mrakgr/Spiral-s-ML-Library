@@ -63,11 +63,6 @@ class TradingGMLP(nn.Module):
         # T-digest normalizers (stored for pickling with model)
         self.tdigests = tdigests
         
-        # Fallback: Input scaling (1/std for each channel: H-O, L-O, C-O)
-        self.register_buffer('scale_1s', torch.tensor([1/0.000095, 1/0.000095, 1/0.000105]))
-        self.register_buffer('scale_1m', torch.tensor([1/0.000473, 1/0.000479, 1/0.000710]))
-        self.register_buffer('scale_5m', torch.tensor([1/0.001471, 1/0.001481, 1/0.002093]))
-        
         self.embed = nn.Linear(input_channels, hidden_dim)
         
         self.blocks = nn.Sequential(*[
@@ -79,17 +74,13 @@ class TradingGMLP(nn.Module):
         self.session_head = nn.Linear(hidden_dim, num_sessions)
         self.trend_head = nn.Linear(hidden_dim, num_trends)
     
-    def _normalize_and_transfer(self, x: torch.Tensor, key: str, scale: torch.Tensor) -> torch.Tensor:
+    def _normalize_and_transfer(self, x: torch.Tensor, key: str) -> torch.Tensor:
         """Normalize with t-digest (CPU) then transfer to device."""
         if self.tdigests and key in self.tdigests:
-            # T-digest normalization on CPU (numpy)
             shape = x.shape
             x_np = x.cpu().numpy().reshape(-1)
             x_np = self.tdigests[key].normalize(x_np)
             x = torch.from_numpy(x_np.reshape(shape)).float()
-        else:
-            # Fallback to simple scaling
-            x = x * scale.cpu()
         return x.to(self.device)
     
     def forward(self, x_1s, x_1m, x_5m):
@@ -98,9 +89,9 @@ class TradingGMLP(nn.Module):
             self.device = next(self.parameters()).device
         
         # Normalize and transfer to device
-        x_1s = self._normalize_and_transfer(x_1s, '1s', self.scale_1s)
-        x_1m = self._normalize_and_transfer(x_1m, '1m', self.scale_1m)
-        x_5m = self._normalize_and_transfer(x_5m, '5m', self.scale_5m)
+        x_1s = self._normalize_and_transfer(x_1s, '1s')
+        x_1m = self._normalize_and_transfer(x_1m, '1m')
+        x_5m = self._normalize_and_transfer(x_5m, '5m')
         
         x = torch.cat([x_1s, x_1m, x_5m], dim=1)
         x = self.embed(x)
