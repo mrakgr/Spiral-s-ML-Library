@@ -2,9 +2,11 @@
 """gMLP - Gated MLP with Spatial Gating Unit for trading classification."""
 
 import time
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from pytdigest import TDigest
 from dataset import TradingDataset, RowGroupSampler
 from tdigest_wrapper import PicklableTDigest
 
@@ -156,6 +158,32 @@ def evaluate(model, loader, device):
     return {'loss': total_loss / len(loader), 'acc': correct / total, 'time': elapsed}
 
 
+def compute_tdigests(dataset: TradingDataset, compression: int = 1024) -> dict[str, PicklableTDigest]:
+    """Compute t-digests for each feature set by iterating over the dataset."""
+    print("Computing t-digests from training data...")
+    td_1s = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
+    td_1m = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
+    td_5m = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
+    
+    for i in range(len(dataset)):
+        sample = dataset[i]
+        td_1s.update(sample['features_1s'].numpy().flatten().astype(np.float64))
+        td_1m.update(sample['features_1m'].numpy().flatten().astype(np.float64))
+        td_5m.update(sample['features_5m'].numpy().flatten().astype(np.float64))
+        if (i + 1) % 10000 == 0:
+            print(f"  Processed {i + 1:,} / {len(dataset):,} samples")
+    
+    td_1s.force_merge()
+    td_1m.force_merge()
+    td_5m.force_merge()
+    print(f"  Done. Weights: 1s={td_1s.weight:.0f}, 1m={td_1m.weight:.0f}, 5m={td_5m.weight:.0f}")
+    return {
+        '1s': PicklableTDigest(td_1s),
+        '1m': PicklableTDigest(td_1m),
+        '5m': PicklableTDigest(td_5m),
+    }
+
+
 def main():
     batch_size = 256
     num_epochs = 1
@@ -169,6 +197,8 @@ def main():
     test_ds = TradingDataset('data/test.parquet', window_size=60, stride=5)
     print(f"Train: {len(train_ds):,}, Test: {len(test_ds):,}")
     
+    tdigests = compute_tdigests(train_ds)
+    
     train_loader = DataLoader(
         train_ds, batch_size=batch_size,
         sampler=RowGroupSampler(train_ds, shuffle=True), num_workers=0
@@ -178,7 +208,7 @@ def main():
         sampler=RowGroupSampler(test_ds, shuffle=False), num_workers=0
     )
     
-    model = TradingGMLP().to(device)
+    model = TradingGMLP(tdigests=tdigests).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     print(f"Parameters: {sum(p.numel() for p in model.parameters()):,}")
     
