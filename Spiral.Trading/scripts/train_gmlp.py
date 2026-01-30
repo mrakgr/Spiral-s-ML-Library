@@ -76,11 +76,12 @@ class TradingGMLP(nn.Module):
     
     def _normalize_and_transfer(self, x: torch.Tensor, key: str) -> torch.Tensor:
         """Normalize with t-digest (CPU) then transfer to device."""
-        if self.tdigests and key in self.tdigests:
-            shape = x.shape
-            x_np = x.cpu().numpy().reshape(-1)
-            x_np = self.tdigests[key].normalize(x_np)
-            x = torch.from_numpy(x_np.reshape(shape)).float()
+        assert x.is_cpu, "Input must be on CPU for t-digest normalization"
+        assert self.tdigests and key in self.tdigests, f"Missing t-digest for key '{key}'"
+        shape = x.shape
+        x_np = x.numpy().reshape(-1)
+        x_np = self.tdigests[key].normalize(x_np)
+        x = torch.from_numpy(x_np.reshape(shape)).float()
         return x.to(self.device)
     
     def forward(self, x_1s, x_1m, x_5m):
