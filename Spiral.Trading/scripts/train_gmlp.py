@@ -81,7 +81,7 @@ class TradingGMLP(nn.Module):
         assert x.is_cpu, "Input must be on CPU for t-digest normalization"
         assert self.tdigests and key in self.tdigests, f"Missing t-digest for key '{key}'"
         shape = x.shape
-        x_np = x.numpy().reshape(-1)
+        x_np = x.numpy().reshape(-1).astype(np.float64)
         x_np = self.tdigests[key].normalize(x_np)
         x = torch.from_numpy(x_np.reshape(shape)).float()
         return x.to(self.device)
@@ -158,20 +158,21 @@ def evaluate(model, loader, device):
     return {'loss': total_loss / len(loader), 'acc': correct / total, 'time': elapsed}
 
 
-def compute_tdigests(dataset: TradingDataset, compression: int = 1024) -> dict[str, PicklableTDigest]:
-    """Compute t-digests for each feature set by iterating over the dataset."""
-    print("Computing t-digests from training data...")
+def compute_tdigests(dataset: TradingDataset, compression: int = 1024, num_samples: int = 10000) -> dict[str, PicklableTDigest]:
+    """Compute t-digests for each feature set by sampling from the dataset."""
+    print(f"Computing t-digests from {num_samples:,} samples...")
     td_1s = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
     td_1m = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
     td_5m = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
     
-    for i in range(len(dataset)):
-        sample = dataset[i]
+    indices = np.random.choice(len(dataset), size=min(num_samples, len(dataset)), replace=False)
+    for i, idx in enumerate(indices):
+        sample = dataset[idx]
         td_1s.update(sample['features_1s'].numpy().flatten().astype(np.float64))
         td_1m.update(sample['features_1m'].numpy().flatten().astype(np.float64))
         td_5m.update(sample['features_5m'].numpy().flatten().astype(np.float64))
-        if (i + 1) % 10000 == 0:
-            print(f"  Processed {i + 1:,} / {len(dataset):,} samples")
+        if (i + 1) % 5000 == 0:
+            print(f"  Processed {i + 1:,} / {num_samples:,} samples")
     
     td_1s.force_merge()
     td_1m.force_merge()
@@ -193,8 +194,8 @@ def main():
     print(f"Using device: {device}")
     
     print("Loading datasets...")
-    train_ds = TradingDataset('data/train.parquet', window_size=60, stride=5)
-    test_ds = TradingDataset('data/test.parquet', window_size=60, stride=5)
+    train_ds = TradingDataset('data/train.parquet', window_size=60, stride=500)  # 1/100th of data
+    test_ds = TradingDataset('data/test.parquet', window_size=60, stride=500)
     print(f"Train: {len(train_ds):,}, Test: {len(test_ds):,}")
     
     tdigests = compute_tdigests(train_ds)
