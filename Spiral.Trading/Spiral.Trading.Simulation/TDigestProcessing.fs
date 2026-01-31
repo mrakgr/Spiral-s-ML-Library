@@ -167,6 +167,38 @@ let applyCdf (td: MergingDigest) (values: float[]) =
         result.[i] <- td.Cdf(values.[i]) * 2.0 - 1.0
     result
 
+type CdfLookupTable = {
+    Min: float
+    Max: float
+    Step: float
+    Values: float[]
+}
+
+let createCdfLookup (td: MergingDigest) (numBuckets: int) =
+    let min = td.GetMin()
+    let max = td.GetMax()
+    let step = (max - min) / float (numBuckets - 1)
+    let values = Array.init numBuckets (fun i ->
+        let x = min + float i * step
+        td.Cdf(x) * 2.0 - 1.0
+    )
+    { Min = min; Max = max; Step = step; Values = values }
+
+let lookupValue (lookup: CdfLookupTable) (v: float) =
+    let maxIdx = lookup.Values.Length - 1
+    if v <= lookup.Min then
+        lookup.Values.[0]
+    elif v >= lookup.Max then
+        lookup.Values.[maxIdx]
+    else
+        let idx = (v - lookup.Min) / lookup.Step
+        let lo = int idx
+        let hi = min (lo + 1) maxIdx
+        let t = idx - float lo
+        lookup.Values.[lo] * (1.0 - t) + lookup.Values.[hi] * t
+
+let applyCdfWithLookup (lookup: CdfLookupTable) (values: float[]) = Array.map (lookupValue lookup) values
+
 type private TransformedRowGroup = {
     Index: int
     DayIds: int[]
@@ -188,20 +220,20 @@ type private TransformedRowGroup = {
     CdfClose5m: float[]
 }
 
-let private applyTransform (td: MergingDigest) (data: RowGroupData) =
+let private applyTransform (lookup: CdfLookupTable) (data: RowGroupData) =
     { Index = data.Index
       DayIds = data.DayIds; Times = data.Times
       Opens = data.Opens; Highs = data.Highs; Lows = data.Lows; Closes = data.Closes
       Sessions = data.Sessions; Trends = data.Trends
-      CdfHigh1s = applyCdf td data.Deltas.DeltaHigh1s
-      CdfLow1s = applyCdf td data.Deltas.DeltaLow1s
-      CdfClose1s = applyCdf td data.Deltas.DeltaClose1s
-      CdfHigh1m = applyCdf td data.Deltas.DeltaHigh1m
-      CdfLow1m = applyCdf td data.Deltas.DeltaLow1m
-      CdfClose1m = applyCdf td data.Deltas.DeltaClose1m
-      CdfHigh5m = applyCdf td data.Deltas.DeltaHigh5m
-      CdfLow5m = applyCdf td data.Deltas.DeltaLow5m
-      CdfClose5m = applyCdf td data.Deltas.DeltaClose5m }
+      CdfHigh1s = applyCdfWithLookup lookup data.Deltas.DeltaHigh1s
+      CdfLow1s = applyCdfWithLookup lookup data.Deltas.DeltaLow1s
+      CdfClose1s = applyCdfWithLookup lookup data.Deltas.DeltaClose1s
+      CdfHigh1m = applyCdfWithLookup lookup data.Deltas.DeltaHigh1m
+      CdfLow1m = applyCdfWithLookup lookup data.Deltas.DeltaLow1m
+      CdfClose1m = applyCdfWithLookup lookup data.Deltas.DeltaClose1m
+      CdfHigh5m = applyCdfWithLookup lookup data.Deltas.DeltaHigh5m
+      CdfLow5m = applyCdfWithLookup lookup data.Deltas.DeltaLow5m
+      CdfClose5m = applyCdfWithLookup lookup data.Deltas.DeltaClose5m }
 
 let private writeRowGroup (outSchema: ParquetSchema) (writer: ParquetWriter) (d: TransformedRowGroup) = task {
     use rowGroup = writer.CreateRowGroup()
@@ -244,6 +276,8 @@ let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: str
     
     printfn "  Using %d workers for %d row groups..." numWorkers rowGroupCount
     
+    let lookupPriceDeltas = createCdfLookup tds.PriceDeltas (1 <<< 17) // 128k buckets
+    
     let readChannel = Channel.CreateBounded<RowGroupData>(BoundedChannelOptions(numWorkers * 2))
     let writeChannel = Channel.CreateBounded<TransformedRowGroup>(BoundedChannelOptions(numWorkers * 2))
     let mutable processed = 0
@@ -260,7 +294,7 @@ let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: str
         for _ in 0 .. numWorkers - 1 ->
             task {
                 for data in readChannel.Reader.ReadAllAsync() do
-                    let transformed = applyTransform tds.PriceDeltas data
+                    let transformed = applyTransform lookupPriceDeltas data
                     do! writeChannel.Writer.WriteAsync(transformed)
                     let count = Interlocked.Increment(&processed)
                     if count % 100 = 0 then
