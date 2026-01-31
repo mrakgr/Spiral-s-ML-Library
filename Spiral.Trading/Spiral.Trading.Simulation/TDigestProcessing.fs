@@ -18,56 +18,61 @@ let createTDigests (compression: float) =
 
 let defaultCompression = 4096.0 // 2^12
 
-let buildTDigestsFromParquet (inputPath: string) (compression: float) = task {
+let private processRowGroup (inputPath: string) (compression: float) (rgIndex: int) =
+    let td = MergingDigest(compression)
+    use stream = File.OpenRead(inputPath)
+    use reader = ParquetReader.CreateAsync(stream).Result
+    use rowGroupReader = reader.OpenRowGroupReader(rgIndex)
+    
+    let deltaHigh1s = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[8]).Result).Data :?> float[]
+    let deltaLow1s = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[9]).Result).Data :?> float[]
+    let deltaClose1s = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[10]).Result).Data :?> float[]
+    let deltaHigh1m = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[11]).Result).Data :?> float[]
+    let deltaLow1m = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[12]).Result).Data :?> float[]
+    let deltaClose1m = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[13]).Result).Data :?> float[]
+    let deltaHigh5m = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[14]).Result).Data :?> float[]
+    let deltaLow5m = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[15]).Result).Data :?> float[]
+    let deltaClose5m = (rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[16]).Result).Data :?> float[]
+    
+    for i in 0 .. deltaHigh1s.Length - 1 do
+        td.Add(deltaHigh1s.[i])
+        td.Add(deltaLow1s.[i])
+        td.Add(deltaClose1s.[i])
+        td.Add(deltaHigh1m.[i])
+        td.Add(deltaLow1m.[i])
+        td.Add(deltaClose1m.[i])
+        td.Add(deltaHigh5m.[i])
+        td.Add(deltaLow5m.[i])
+        td.Add(deltaClose5m.[i])
+    td
+
+let buildTDigestsFromParquet (inputPath: string) (compression: float) =
     printfn "Building t-digests from %s..." inputPath
     
-    let tds = createTDigests compression
     use stream = File.OpenRead(inputPath)
-    let! reader = ParquetReader.CreateAsync(stream)
-    use reader = reader
+    use reader = ParquetReader.CreateAsync(stream).Result
+    let rowGroupCount = reader.RowGroupCount
     
-    let mutable rowGroupsProcessed = 0
-    for rgIndex in 0 .. reader.RowGroupCount - 1 do
-        use rowGroupReader = reader.OpenRowGroupReader(rgIndex)
-        
-        let! deltaHigh1sCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[8])
-        let! deltaLow1sCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[9])
-        let! deltaClose1sCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[10])
-        let! deltaHigh1mCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[11])
-        let! deltaLow1mCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[12])
-        let! deltaClose1mCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[13])
-        let! deltaHigh5mCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[14])
-        let! deltaLow5mCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[15])
-        let! deltaClose5mCol = rowGroupReader.ReadColumnAsync(reader.Schema.DataFields.[16])
-        
-        let deltaHigh1s = deltaHigh1sCol.Data :?> float[]
-        let deltaLow1s = deltaLow1sCol.Data :?> float[]
-        let deltaClose1s = deltaClose1sCol.Data :?> float[]
-        let deltaHigh1m = deltaHigh1mCol.Data :?> float[]
-        let deltaLow1m = deltaLow1mCol.Data :?> float[]
-        let deltaClose1m = deltaClose1mCol.Data :?> float[]
-        let deltaHigh5m = deltaHigh5mCol.Data :?> float[]
-        let deltaLow5m = deltaLow5mCol.Data :?> float[]
-        let deltaClose5m = deltaClose5mCol.Data :?> float[]
-        
-        for i in 0 .. deltaHigh1s.Length - 1 do
-            tds.PriceDeltas.Add(deltaHigh1s.[i])
-            tds.PriceDeltas.Add(deltaLow1s.[i])
-            tds.PriceDeltas.Add(deltaClose1s.[i])
-            tds.PriceDeltas.Add(deltaHigh1m.[i])
-            tds.PriceDeltas.Add(deltaLow1m.[i])
-            tds.PriceDeltas.Add(deltaClose1m.[i])
-            tds.PriceDeltas.Add(deltaHigh5m.[i])
-            tds.PriceDeltas.Add(deltaLow5m.[i])
-            tds.PriceDeltas.Add(deltaClose5m.[i])
-        
-        rowGroupsProcessed <- rowGroupsProcessed + 1
-        if rowGroupsProcessed % 500 = 0 then
-            printfn "  Processed %d row groups" rowGroupsProcessed
+    let numWorkers = Environment.ProcessorCount
+    printfn "  Using %d workers for %d row groups..." numWorkers rowGroupCount
     
-    printfn "Done. Processed %d row groups" rowGroupsProcessed
-    return tds
-}
+    let digests = Array.zeroCreate<MergingDigest> rowGroupCount
+    let options = ParallelOptions(MaxDegreeOfParallelism = numWorkers)
+    let mutable processed = 0
+    
+    Parallel.For(0, rowGroupCount, options, fun rgIndex ->
+        digests.[rgIndex] <- processRowGroup inputPath compression rgIndex
+        let count = Threading.Interlocked.Increment(&processed)
+        if count % 100 = 0 then
+            printfn "  Processed %d / %d row groups" count rowGroupCount
+    ) |> ignore
+    
+    printfn "  Merging %d t-digests..." digests.Length
+    let merged = MergingDigest(compression)
+    merged.Add(digests |> Seq.cast<Digest>)
+    
+    printfn "Done. Processed %d row groups" rowGroupCount
+    { PriceDeltas = merged }
 
 let saveTDigests (tds: TDigests) (outputPath: string) =
     use stream = File.Create(outputPath)

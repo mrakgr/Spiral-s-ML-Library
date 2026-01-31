@@ -68,12 +68,14 @@ type PreprocessArgs =
     | [<AltCommandLine("-i")>] Input of string
     | [<AltCommandLine("-o")>] Output of string
     | [<AltCommandLine("-t")>] Tdigest of string
+    | [<AltCommandLine("-c")>] Compression of float
     interface IArgParserTemplate with
         member this.Usage =
             match this with
             | Input _ -> "Input raw parquet file path"
             | Output _ -> "Output CDF-transformed parquet file path"
             | Tdigest _ -> "Use existing t-digest file (default: build from input)"
+            | Compression _ -> "T-digest compression factor (default: 4096)"
 
 type Command =
     | [<CliPrefix(CliPrefix.None)>] Order_Book of ParseResults<OrderBookArgs>
@@ -188,6 +190,7 @@ let runPreprocess (args: ParseResults<PreprocessArgs>) =
     let input = args.GetResult(PreprocessArgs.Input)
     let output = args.GetResult(PreprocessArgs.Output)
     let tdigestPath = args.TryGetResult(PreprocessArgs.Tdigest)
+    let compression = args.GetResult(PreprocessArgs.Compression, defaultCompression)
     
     let tds = 
         match tdigestPath with
@@ -196,7 +199,7 @@ let runPreprocess (args: ParseResults<PreprocessArgs>) =
             loadTDigests path
         | None ->
             let path = input + ".tdigests"
-            let tds = (buildTDigestsFromParquet input defaultCompression).Result
+            let tds = buildTDigestsFromParquet input compression
             saveTDigests tds path
             tds
     

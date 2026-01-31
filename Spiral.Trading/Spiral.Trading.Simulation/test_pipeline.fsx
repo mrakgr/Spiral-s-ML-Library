@@ -34,7 +34,7 @@ printfn ""
 
 // Step 2: Build t-digests
 printfn "Step 2: Building t-digests from raw data (compression=%.0f)..." defaultCompression
-let tds = (buildTDigestsFromParquet rawPath defaultCompression).Result
+let tds = buildTDigestsFromParquet rawPath defaultCompression
 printfn ""
 
 // Print some stats
