@@ -9,6 +9,7 @@ open Parquet
 open Parquet.Schema
 open Parquet.Data
 open TDigest
+open FSharp.Control
 
 type TDigests = {
     PriceDeltas: MergingDigest
@@ -130,19 +131,11 @@ let buildTDigestsFromParquet (inputPath: string) (compression: float) = task {
         for _ in 0 .. numWorkers - 1 ->
             task {
                 let td = MergingDigest(compression)
-                let reader = channel.Reader
-                let mutable hasMore = true
-                while hasMore do
-                    let! canRead = reader.WaitToReadAsync()
-                    if canRead then
-                        let mutable deltas = Unchecked.defaultof<DeltaArrays>
-                        while reader.TryRead(&deltas) do
-                            addDeltasToDigest td deltas
-                            let count = Interlocked.Increment(&processed)
-                            if count % 100 = 0 then
-                                printfn "  Processed %d / %d row groups" count rowGroupCount
-                    else
-                        hasMore <- false
+                for deltas in channel.Reader.ReadAllAsync() do
+                    addDeltasToDigest td deltas
+                    let count = Interlocked.Increment(&processed)
+                    if count % 100 = 0 then
+                        printfn "  Processed %d / %d row groups" count rowGroupCount
                 return td
             }
     |]
@@ -268,20 +261,12 @@ let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: str
     let workers = [|
         for _ in 0 .. numWorkers - 1 ->
             task {
-                let channelReader = readChannel.Reader
-                let mutable hasMore = true
-                while hasMore do
-                    let! canRead = channelReader.WaitToReadAsync()
-                    if canRead then
-                        let mutable data = Unchecked.defaultof<RowGroupData>
-                        while channelReader.TryRead(&data) do
-                            let transformed = applyTransform tds.PriceDeltas data
-                            do! writeChannel.Writer.WriteAsync(transformed)
-                            let count = Interlocked.Increment(&processed)
-                            if count % 100 = 0 then
-                                printfn "  Transformed %d / %d row groups" count rowGroupCount
-                    else
-                        hasMore <- false
+                for data in readChannel.Reader.ReadAllAsync() do
+                    let transformed = applyTransform tds.PriceDeltas data
+                    do! writeChannel.Writer.WriteAsync(transformed)
+                    let count = Interlocked.Increment(&processed)
+                    if count % 100 = 0 then
+                        printfn "  Transformed %d / %d row groups" count rowGroupCount
             }
     |]
     
@@ -295,22 +280,14 @@ let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: str
     use writer = writer
     let pending = Collections.Generic.Dictionary<int, TransformedRowGroup>()
     let mutable nextToWrite = 0
-    let channelReader = writeChannel.Reader
     
-    let mutable hasMore = true
-    while hasMore do
-        let! canRead = channelReader.WaitToReadAsync()
-        if canRead then
-            let mutable data = Unchecked.defaultof<TransformedRowGroup>
-            while channelReader.TryRead(&data) do
-                pending.[data.Index] <- data
-                while pending.ContainsKey(nextToWrite) do
-                    let d = pending.[nextToWrite]
-                    pending.Remove(nextToWrite) |> ignore
-                    do! writeRowGroup outSchema writer d
-                    nextToWrite <- nextToWrite + 1
-        else
-            hasMore <- false
+    for data in writeChannel.Reader.ReadAllAsync() do
+        pending.[data.Index] <- data
+        while pending.ContainsKey(nextToWrite) do
+            let d = pending.[nextToWrite]
+            pending.Remove(nextToWrite) |> ignore
+            do! writeRowGroup outSchema writer d
+            nextToWrite <- nextToWrite + 1
     
     do! producer
     do! workersDone

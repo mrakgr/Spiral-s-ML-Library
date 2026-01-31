@@ -1,6 +1,7 @@
 #r "nuget: Parquet.Net"
 #r "nuget: T-Digest"
 #r "nuget: MathNet.Numerics"
+#r "nuget: FSharp.Control.TaskSeq"
 
 #load "EpisodeMCMC.fs"
 #load "PriceGeneration.fs"
