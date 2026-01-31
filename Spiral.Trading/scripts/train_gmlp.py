@@ -141,8 +141,8 @@ def main():
     print(f"Using device: {device}")
     
     print("Loading datasets...")
-    train_ds = TradingDataset('data/train.parquet', window_size=60, stride=500)
-    test_ds = TradingDataset('data/test.parquet', window_size=60, stride=500)
+    train_ds = TradingDataset('data/train.parquet', window_size=60, stride=5)
+    test_ds = TradingDataset('data/test.parquet', window_size=60, stride=5)
     print(f"Train: {len(train_ds):,}, Test: {len(test_ds):,}")
     
     train_loader = DataLoader(
