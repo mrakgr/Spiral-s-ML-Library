@@ -199,7 +199,7 @@ let runPreprocess (args: ParseResults<PreprocessArgs>) =
             loadTDigests path
         | None ->
             let path = input + ".tdigests"
-            let tds = buildTDigestsFromParquet input compression
+            let tds = (buildTDigestsFromParquet input compression).Result
             saveTDigests tds path
             tds
     
