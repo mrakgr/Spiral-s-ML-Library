@@ -9,6 +9,7 @@ open Parquet.Schema
 open Parquet.Data
 open Spiral.Trading.Simulation.EpisodeMCMC
 open Spiral.Trading.Simulation.PriceGeneration
+open FSharp.Control
 
 let sessionToInt (s: DaySession) : int =
     match s with
@@ -168,39 +169,31 @@ let writerTask
     let! writer = ParquetWriter.CreateAsync(schema, stream)
     use writer = writer
     
-    let reader = channel.Reader
     let mutable daysWritten = 0
     
-    let mutable hasMore = true
-    while hasMore do
-        let! canRead = reader.WaitToReadAsync()
-        if canRead then
-            let mutable data = Unchecked.defaultof<DayData>
-            while reader.TryRead(&data) do
-                use rowGroup = writer.CreateRowGroup()
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[0], data.DayIds))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[1], data.Times))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[2], data.Opens))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[3], data.Highs))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[4], data.Lows))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[5], data.Closes))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[6], data.Sessions))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[7], data.Trends))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[8], data.DeltaHigh1s))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[9], data.DeltaLow1s))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[10], data.DeltaClose1s))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[11], data.DeltaHigh1m))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[12], data.DeltaLow1m))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[13], data.DeltaClose1m))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[14], data.DeltaHigh5m))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[15], data.DeltaLow5m))
-                do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[16], data.DeltaClose5m))
-                
-                daysWritten <- daysWritten + 1
-                if daysWritten % 500 = 0 then
-                    printfn "  Written %d / %d days" daysWritten numDays
-        else
-            hasMore <- false
+    for data in channel.Reader.ReadAllAsync() do
+        use rowGroup = writer.CreateRowGroup()
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[0], data.DayIds))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[1], data.Times))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[2], data.Opens))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[3], data.Highs))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[4], data.Lows))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[5], data.Closes))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[6], data.Sessions))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[7], data.Trends))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[8], data.DeltaHigh1s))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[9], data.DeltaLow1s))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[10], data.DeltaClose1s))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[11], data.DeltaHigh1m))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[12], data.DeltaLow1m))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[13], data.DeltaClose1m))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[14], data.DeltaHigh5m))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[15], data.DeltaLow5m))
+        do! rowGroup.WriteColumnAsync(DataColumn(schema.DataFields.[16], data.DeltaClose5m))
+        
+        daysWritten <- daysWritten + 1
+        if daysWritten % 500 = 0 then
+            printfn "  Written %d / %d days" daysWritten numDays
 }
 
 let generatorTask
