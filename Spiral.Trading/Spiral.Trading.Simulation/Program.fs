@@ -69,6 +69,7 @@ type PreprocessArgs =
     | [<AltCommandLine("-o")>] Output of string
     | [<AltCommandLine("-t")>] Tdigest of string
     | [<AltCommandLine("-c")>] Compression of float
+    | [<AltCommandLine("-w")>] Workers of int
     interface IArgParserTemplate with
         member this.Usage =
             match this with
@@ -76,6 +77,7 @@ type PreprocessArgs =
             | Output _ -> "Output CDF-transformed parquet file path"
             | Tdigest _ -> "Use existing t-digest file (default: build from input)"
             | Compression _ -> "T-digest compression factor (default: 4096)"
+            | Workers _ -> "Number of worker threads (default: CPU count)"
 
 type Command =
     | [<CliPrefix(CliPrefix.None)>] Order_Book of ParseResults<OrderBookArgs>
@@ -191,6 +193,7 @@ let runPreprocess (args: ParseResults<PreprocessArgs>) =
     let output = args.GetResult(PreprocessArgs.Output)
     let tdigestPath = args.TryGetResult(PreprocessArgs.Tdigest)
     let compression = args.GetResult(PreprocessArgs.Compression, defaultCompression)
+    let numWorkers = args.GetResult(PreprocessArgs.Workers, Environment.ProcessorCount)
     
     let tds = 
         match tdigestPath with
@@ -199,11 +202,11 @@ let runPreprocess (args: ParseResults<PreprocessArgs>) =
             loadTDigests path
         | None ->
             let path = input + ".tdigests"
-            let tds = (buildTDigestsFromParquet input compression).Result
+            let tds = (buildTDigestsFromParquet input compression numWorkers).Result
             saveTDigests tds path
             tds
     
-    (transformParquetWithCdf input tds output).Wait()
+    (transformParquetWithCdf input tds output numWorkers).Wait()
 
 [<EntryPoint>]
 let main argv =

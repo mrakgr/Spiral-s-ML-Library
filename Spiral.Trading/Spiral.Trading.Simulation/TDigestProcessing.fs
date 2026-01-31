@@ -104,7 +104,7 @@ let private readRowGroupData (rowGroupReader: ParquetRowGroupReader) (schema: Pa
     }
 }
 
-let buildTDigestsFromParquet (inputPath: string) (compression: float) = task {
+let buildTDigestsFromParquet (inputPath: string) (compression: float) (numWorkers: int) = task {
     printfn "Building t-digests from %s..." inputPath
     
     use stream = File.OpenRead(inputPath)
@@ -113,7 +113,6 @@ let buildTDigestsFromParquet (inputPath: string) (compression: float) = task {
     let rowGroupCount = reader.RowGroupCount
     let schema = reader.Schema
     
-    let numWorkers = Environment.ProcessorCount
     printfn "  Using %d workers for %d row groups..." numWorkers rowGroupCount
     
     let channel = Channel.CreateBounded<DeltaArrays>(BoundedChannelOptions(numWorkers * 2))
@@ -225,7 +224,7 @@ let private writeRowGroup (outSchema: ParquetSchema) (writer: ParquetWriter) (d:
     do! rowGroup.WriteColumnAsync(DataColumn(outSchema.DataFields.[16], d.CdfClose5m))
 }
 
-let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: string) = task {
+let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: string) (numWorkers: int) = task {
     printfn "Transforming %s with CDF..." inputPath
     
     let outSchema = ParquetSchema(
@@ -243,7 +242,6 @@ let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: str
     let rowGroupCount = reader.RowGroupCount
     let inSchema = reader.Schema
     
-    let numWorkers = Environment.ProcessorCount
     printfn "  Using %d workers for %d row groups..." numWorkers rowGroupCount
     
     let readChannel = Channel.CreateBounded<RowGroupData>(BoundedChannelOptions(numWorkers * 2))
