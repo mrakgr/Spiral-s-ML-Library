@@ -64,14 +64,15 @@ class TradingDataset(Dataset):
                 'close': df['close'].values,
                 'session': df['session'].values,
                 'trend': df['trend'].values,
-                'open_1m_partial': df['open_1m_partial'].values,
-                'high_1m_partial': df['high_1m_partial'].values,
-                'low_1m_partial': df['low_1m_partial'].values,
-                'close_1m_partial': df['close_1m_partial'].values,
-                'open_5m_partial': df['open_5m_partial'].values,
-                'high_5m_partial': df['high_5m_partial'].values,
-                'low_5m_partial': df['low_5m_partial'].values,
-                'close_5m_partial': df['close_5m_partial'].values,
+                'cdf_high_1s': df['cdf_high_1s'].values,
+                'cdf_low_1s': df['cdf_low_1s'].values,
+                'cdf_close_1s': df['cdf_close_1s'].values,
+                'cdf_high_1m': df['cdf_high_1m'].values,
+                'cdf_low_1m': df['cdf_low_1m'].values,
+                'cdf_close_1m': df['cdf_close_1m'].values,
+                'cdf_high_5m': df['cdf_high_5m'].values,
+                'cdf_low_5m': df['cdf_low_5m'].values,
+                'cdf_close_5m': df['cdf_close_5m'].values,
             }
             self._cached_row_group = row_group
 
@@ -80,50 +81,45 @@ class TradingDataset(Dataset):
         self._load_row_group(row_group)
         data = self._cached_data
         
-        # Build 1s features with padding if needed
+        # Build 1s features with padding if needed (already CDF-normalized)
         features_1s = np.zeros((self.window_size, 3), dtype=np.float32)
         available = min(pos + 1, self.window_size)
         start_idx = max(0, pos + 1 - self.window_size)
         start_pad = self.window_size - available
         
-        opens_1s = data['open'][start_idx:pos + 1]
-        features_1s[start_pad:, 0] = (data['high'][start_idx:pos + 1] - opens_1s) / opens_1s
-        features_1s[start_pad:, 1] = (data['low'][start_idx:pos + 1] - opens_1s) / opens_1s
-        features_1s[start_pad:, 2] = (data['close'][start_idx:pos + 1] - opens_1s) / opens_1s
+        features_1s[start_pad:, 0] = data['cdf_high_1s'][start_idx:pos + 1]
+        features_1s[start_pad:, 1] = data['cdf_low_1s'][start_idx:pos + 1]
+        features_1s[start_pad:, 2] = data['cdf_close_1s'][start_idx:pos + 1]
         
         # 1m bars: completed bars + current partial
-        # Completed 1m bars end at indices 59, 119, 179, ...
         all_1m_indices = np.arange(59, pos + 1, 60)
         if len(all_1m_indices) == 0 or all_1m_indices[-1] != pos:
             all_1m_indices = np.append(all_1m_indices, pos)
         
         # 5m bars: completed bars + current partial  
-        # Completed 5m bars end at indices 299, 599, 899, ...
         all_5m_indices = np.arange(299, pos + 1, 300)
         if len(all_5m_indices) == 0 or all_5m_indices[-1] != pos:
             all_5m_indices = np.append(all_5m_indices, pos)
         
-        # Build 1m features (bar-relative, last 60 bars)
+        # Build 1m features (already CDF-normalized, last 60 bars)
         max_1m_bars = 60
         features_1m = np.zeros((max_1m_bars, 3), dtype=np.float32)
         n_1m = min(len(all_1m_indices), max_1m_bars)
         indices_1m = all_1m_indices[-n_1m:]
         start_1m = max_1m_bars - n_1m
-        opens_1m = data['open_1m_partial'][indices_1m]
-        features_1m[start_1m:, 0] = (data['high_1m_partial'][indices_1m] - opens_1m) / opens_1m
-        features_1m[start_1m:, 1] = (data['low_1m_partial'][indices_1m] - opens_1m) / opens_1m
-        features_1m[start_1m:, 2] = (data['close_1m_partial'][indices_1m] - opens_1m) / opens_1m
+        features_1m[start_1m:, 0] = data['cdf_high_1m'][indices_1m]
+        features_1m[start_1m:, 1] = data['cdf_low_1m'][indices_1m]
+        features_1m[start_1m:, 2] = data['cdf_close_1m'][indices_1m]
         
-        # Build 5m features (bar-relative, max 78 bars per day)
+        # Build 5m features (already CDF-normalized, max 78 bars per day)
         max_5m_bars = 78
         features_5m = np.zeros((max_5m_bars, 3), dtype=np.float32)
         n_5m = min(len(all_5m_indices), max_5m_bars)
         indices_5m = all_5m_indices[-n_5m:]
         start_5m = max_5m_bars - n_5m
-        opens_5m = data['open_5m_partial'][indices_5m]
-        features_5m[start_5m:, 0] = (data['high_5m_partial'][indices_5m] - opens_5m) / opens_5m
-        features_5m[start_5m:, 1] = (data['low_5m_partial'][indices_5m] - opens_5m) / opens_5m
-        features_5m[start_5m:, 2] = (data['close_5m_partial'][indices_5m] - opens_5m) / opens_5m
+        features_5m[start_5m:, 0] = data['cdf_high_5m'][indices_5m]
+        features_5m[start_5m:, 1] = data['cdf_low_5m'][indices_5m]
+        features_5m[start_5m:, 2] = data['cdf_close_5m'][indices_5m]
         
         # Labels: use the label at the end of the window
         session = data['session'][pos]

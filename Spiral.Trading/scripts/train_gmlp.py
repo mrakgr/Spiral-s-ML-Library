@@ -6,9 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from pytdigest import TDigest
 from dataset import TradingDataset, RowGroupSampler
-from tdigest_wrapper import PicklableTDigest
 
 
 class SpatialGatingUnit(nn.Module):
@@ -47,7 +45,7 @@ class GMLPBlock(nn.Module):
 
 
 class TradingGMLP(nn.Module):
-    """gMLP for trading classification with bar-relative features."""
+    """gMLP for trading classification with pre-normalized features."""
     def __init__(
         self,
         input_channels: int = 3,
@@ -56,14 +54,9 @@ class TradingGMLP(nn.Module):
         num_layers: int = 4,
         num_sessions: int = 3,
         num_trends: int = 7,
-        tdigests: dict[str, PicklableTDigest] | None = None,
     ):
         super().__init__()
         total_patches = 60 + 60 + 78  # 198
-        self.device = None  # Will be set on first forward pass
-        
-        # T-digest normalizers (stored for pickling with model)
-        self.tdigests = tdigests
         
         self.embed = nn.Linear(input_channels, hidden_dim)
         
@@ -76,26 +69,7 @@ class TradingGMLP(nn.Module):
         self.session_head = nn.Linear(hidden_dim, num_sessions)
         self.trend_head = nn.Linear(hidden_dim, num_trends)
     
-    def _normalize_and_transfer(self, x: torch.Tensor, key: str) -> torch.Tensor:
-        """Normalize with t-digest (CPU) then transfer to device."""
-        assert x.is_cpu, "Input must be on CPU for t-digest normalization"
-        assert self.tdigests and key in self.tdigests, f"Missing t-digest for key '{key}'"
-        shape = x.shape
-        x_np = x.numpy().reshape(-1).astype(np.float64)
-        x_np = self.tdigests[key].normalize(x_np)
-        x = torch.from_numpy(x_np.reshape(shape)).float()
-        return x.to(self.device)
-    
     def forward(self, x_1s, x_1m, x_5m):
-        # Set device from model parameters on first call
-        if self.device is None:
-            self.device = next(self.parameters()).device
-        
-        # Normalize and transfer to device
-        x_1s = self._normalize_and_transfer(x_1s, '1s')
-        x_1m = self._normalize_and_transfer(x_1m, '1m')
-        x_5m = self._normalize_and_transfer(x_5m, '5m')
-        
         x = torch.cat([x_1s, x_1m, x_5m], dim=1)
         x = self.embed(x)
         x = self.blocks(x)
@@ -110,9 +84,9 @@ def train_epoch(model, loader, optimizer, device):
     start_time = time.time()
     
     for batch_idx, batch in enumerate(loader):
-        x_1s = batch['features_1s']
-        x_1m = batch['features_1m']
-        x_5m = batch['features_5m']
+        x_1s = batch['features_1s'].to(device)
+        x_1m = batch['features_1m'].to(device)
+        x_5m = batch['features_5m'].to(device)
         labels = batch['trend'].to(device)
         
         optimizer.zero_grad()
@@ -142,9 +116,9 @@ def evaluate(model, loader, device):
     start_time = time.time()
     
     for batch in loader:
-        x_1s = batch['features_1s']
-        x_1m = batch['features_1m']
-        x_5m = batch['features_5m']
+        x_1s = batch['features_1s'].to(device)
+        x_1m = batch['features_1m'].to(device)
+        x_5m = batch['features_5m'].to(device)
         labels = batch['trend'].to(device)
         
         _, trend_logits = model(x_1s, x_1m, x_5m)
@@ -158,33 +132,6 @@ def evaluate(model, loader, device):
     return {'loss': total_loss / len(loader), 'acc': correct / total, 'time': elapsed}
 
 
-def compute_tdigests(dataset: TradingDataset, compression: int = 1024, num_samples: int = 10000) -> dict[str, PicklableTDigest]:
-    """Compute t-digests for each feature set by sampling from the dataset."""
-    print(f"Computing t-digests from {num_samples:,} samples...")
-    td_1s = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
-    td_1m = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
-    td_5m = TDigest.compute(np.array([], dtype=np.float64), compression=compression)
-    
-    indices = np.random.choice(len(dataset), size=min(num_samples, len(dataset)), replace=False)
-    for i, idx in enumerate(indices):
-        sample = dataset[idx]
-        td_1s.update(sample['features_1s'].numpy().flatten().astype(np.float64))
-        td_1m.update(sample['features_1m'].numpy().flatten().astype(np.float64))
-        td_5m.update(sample['features_5m'].numpy().flatten().astype(np.float64))
-        if (i + 1) % 5000 == 0:
-            print(f"  Processed {i + 1:,} / {num_samples:,} samples")
-    
-    td_1s.force_merge()
-    td_1m.force_merge()
-    td_5m.force_merge()
-    print(f"  Done. Weights: 1s={td_1s.weight:.0f}, 1m={td_1m.weight:.0f}, 5m={td_5m.weight:.0f}")
-    return {
-        '1s': PicklableTDigest(td_1s),
-        '1m': PicklableTDigest(td_1m),
-        '5m': PicklableTDigest(td_5m),
-    }
-
-
 def main():
     batch_size = 256
     num_epochs = 1
@@ -194,11 +141,9 @@ def main():
     print(f"Using device: {device}")
     
     print("Loading datasets...")
-    train_ds = TradingDataset('data/train.parquet', window_size=60, stride=500)  # 1/100th of data
+    train_ds = TradingDataset('data/train.parquet', window_size=60, stride=500)
     test_ds = TradingDataset('data/test.parquet', window_size=60, stride=500)
     print(f"Train: {len(train_ds):,}, Test: {len(test_ds):,}")
-    
-    tdigests = compute_tdigests(train_ds)
     
     train_loader = DataLoader(
         train_ds, batch_size=batch_size,
@@ -209,7 +154,7 @@ def main():
         sampler=RowGroupSampler(test_ds, shuffle=False), num_workers=0
     )
     
-    model = TradingGMLP(tdigests=tdigests).to(device)
+    model = TradingGMLP().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     print(f"Parameters: {sum(p.numel() for p in model.parameters()):,}")
     
