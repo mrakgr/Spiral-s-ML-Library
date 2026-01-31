@@ -5,6 +5,7 @@ open Spiral.Trading.Simulation.EpisodeMCMC
 open Spiral.Trading.Simulation.PriceGeneration
 open Spiral.Trading.Simulation.MovingAverage
 open Spiral.Trading.Simulation.DatasetGeneration
+open Spiral.Trading.Simulation.TDigestProcessing
 
 type OrderBookArgs =
     | [<AltCommandLine("-s")>] Seed of int
@@ -63,12 +64,24 @@ type GenerateDatasetArgs =
             | Output _ -> "Output parquet file path"
             | Iterations _ -> "MCMC iterations per level"
 
+type PreprocessArgs =
+    | [<AltCommandLine("-i")>] Input of string
+    | [<AltCommandLine("-o")>] Output of string
+    | [<AltCommandLine("-t")>] Tdigest of string
+    interface IArgParserTemplate with
+        member this.Usage =
+            match this with
+            | Input _ -> "Input raw parquet file path"
+            | Output _ -> "Output CDF-transformed parquet file path"
+            | Tdigest _ -> "Use existing t-digest file (default: build from input)"
+
 type Command =
     | [<CliPrefix(CliPrefix.None)>] Order_Book of ParseResults<OrderBookArgs>
     | [<CliPrefix(CliPrefix.None)>] Generate_Day of ParseResults<GenerateDayArgs>
     | [<CliPrefix(CliPrefix.None)>] Generate_Prices of ParseResults<GeneratePricesArgs>
     | [<CliPrefix(CliPrefix.None)>] Backtest of ParseResults<BacktestArgs>
     | [<CliPrefix(CliPrefix.None)>] Generate_Dataset of ParseResults<GenerateDatasetArgs>
+    | [<CliPrefix(CliPrefix.None)>] Preprocess of ParseResults<PreprocessArgs>
     interface IArgParserTemplate with
         member this.Usage =
             match this with
@@ -77,6 +90,7 @@ type Command =
             | Generate_Prices _ -> "Generate 1-second price bars from episode structure"
             | Backtest _ -> "Run MA crossover backtest on generated prices"
             | Generate_Dataset _ -> "Generate training/test dataset in parquet format"
+            | Preprocess _ -> "Apply t-digest CDF transform to raw dataset"
 
 let runOrderBook (args: ParseResults<OrderBookArgs>) =
     let seed = args.GetResult(OrderBookArgs.Seed, 42)
@@ -170,6 +184,24 @@ let runGenerateDataset (args: ParseResults<GenerateDatasetArgs>) =
 
     generateDataset seed numDays output mcmcConfig sessionConfig trendConfig 100.0
 
+let runPreprocess (args: ParseResults<PreprocessArgs>) =
+    let input = args.GetResult(PreprocessArgs.Input)
+    let output = args.GetResult(PreprocessArgs.Output)
+    let tdigestPath = args.TryGetResult(PreprocessArgs.Tdigest)
+    
+    let tds = 
+        match tdigestPath with
+        | Some path ->
+            printfn "Loading t-digests from %s..." path
+            loadTDigests path
+        | None ->
+            let path = input + ".tdigests"
+            let tds = (buildTDigestsFromParquet input defaultCompression).Result
+            saveTDigests tds path
+            tds
+    
+    (transformParquetWithCdf input tds output).Wait()
+
 [<EntryPoint>]
 let main argv =
     let parser = ArgumentParser.Create<Command>(programName = "Spiral.Trading.Simulation")
@@ -183,6 +215,7 @@ let main argv =
         | Generate_Prices args -> runGeneratePrices args
         | Backtest args -> runBacktest args
         | Generate_Dataset args -> runGenerateDataset args
+        | Preprocess args -> runPreprocess args
 
         0
     with
