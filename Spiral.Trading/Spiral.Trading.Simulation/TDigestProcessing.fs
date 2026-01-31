@@ -120,7 +120,7 @@ let buildTDigestsFromParquet (inputPath: string) (compression: float) = task {
     
     let producer = task {
         for rgIndex in 0 .. rowGroupCount - 1 do
-            let rowGroupReader = reader.OpenRowGroupReader(rgIndex)
+            use rowGroupReader = reader.OpenRowGroupReader(rgIndex)
             let! deltas = readDeltaArrays rowGroupReader schema
             do! channel.Writer.WriteAsync(deltas)
         channel.Writer.Complete()
@@ -259,7 +259,7 @@ let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: str
     
     let producer = task {
         for rgIndex in 0 .. rowGroupCount - 1 do
-            let rowGroupReader = reader.OpenRowGroupReader(rgIndex)
+            use rowGroupReader = reader.OpenRowGroupReader(rgIndex)
             let! data = readRowGroupData rowGroupReader inSchema rgIndex
             do! readChannel.Writer.WriteAsync(data)
         readChannel.Writer.Complete()
@@ -286,7 +286,7 @@ let transformParquetWithCdf (inputPath: string) (tds: TDigests) (outputPath: str
     |]
     
     let workersDone = task {
-        do! Task.WhenAll(workers |> Array.map (fun t -> t :> Task))
+        let! _ = Task.WhenAll(workers)
         writeChannel.Writer.Complete()
     }
     
