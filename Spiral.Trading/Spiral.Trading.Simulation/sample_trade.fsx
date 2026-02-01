@@ -11,6 +11,7 @@ let sampleTradeCount (rng: Random) (rate: float) (dispersionExp: float) (duratio
     let p = Math.Pow(2.0, -dispersionExp)
     let r = rate * duration * p / (1.0 - p)
     // Use Gamma-Poisson mixture (equivalent to NegativeBinomial, but O(1))
+    // See issue for why we're not sampling from it directly: https://github.com/mathnet/mathnet-numerics/issues/320
     let lambda = Gamma(r, (1.0 - p) / p, rng).Sample()
     Poisson(lambda, rng).Sample()
 
