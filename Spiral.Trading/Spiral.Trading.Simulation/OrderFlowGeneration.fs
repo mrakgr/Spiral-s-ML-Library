@@ -75,9 +75,9 @@ let sampleTradeCount (rng: Random) (rate: float) (dispersionExp: float) (duratio
 
 /// Stochastic rounding: rounds up or down probabilistically based on fractional part
 let stochasticRound (rng: Random) (x: float) : int =
-    let floor = int (Math.Floor(x))
-    let frac = x - float floor
-    if rng.NextDouble() < frac then floor + 1 else floor
+    let floor = Math.Floor(x)
+    let frac = x - floor
+    int (if rng.NextDouble() < frac then floor + 1.0 else floor)
 
 /// Sample trade size from Pareto distribution
 let sampleSize (rng: Random) (sizeParams: SizeParams) : int =
