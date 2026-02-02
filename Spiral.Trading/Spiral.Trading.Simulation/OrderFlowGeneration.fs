@@ -73,10 +73,16 @@ let sampleTradeCount (rng: Random) (rate: float) (dispersionExp: float) (duratio
     let lambda = Gamma(r, (1.0 - p) / p, rng).Sample()
     Poisson(lambda, rng).Sample()
 
+/// Stochastic rounding: rounds up or down probabilistically based on fractional part
+let stochasticRound (rng: Random) (x: float) : int =
+    let floor = int (Math.Floor(x))
+    let frac = x - float floor
+    if rng.NextDouble() < frac then floor + 1 else floor
+
 /// Sample trade size from Pareto distribution
 let sampleSize (rng: Random) (sizeParams: SizeParams) : int =
     let pareto = Pareto(sizeParams.MinSize, sizeParams.Alpha, rng)
-    max 1 (int (pareto.Sample()))
+    stochasticRound rng (pareto.Sample())
 
 /// Generate uniformly distributed timestamps within an interval
 let generateTimestamps (rng: Random) (startTime: float) (duration: float) (count: int) : float[] =
