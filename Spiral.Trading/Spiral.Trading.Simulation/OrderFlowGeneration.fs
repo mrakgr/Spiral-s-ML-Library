@@ -12,10 +12,10 @@ type Trade = {
     Trend: Trend
 }
 
-/// Parameters for order flow generation within a trend
+/// Parameters for order flow generation within a trend (LogNormal model)
 type OrderFlowParams = {
-    TradeRatePerSecond: float    // Mean trades per second
-    DispersionExp: float         // 0 = Poisson-like, 1 = 2x variance, etc.
+    MedianTradesPerSecond: float  // Typical trade rate (50th percentile)
+    MeanTradesPerSecond: float    // Average trade rate (>= Median due to right skew)
 }
 
 /// Parameters for price generation (GBM)
@@ -34,13 +34,13 @@ type ActivityParams = {
 /// Get order flow parameters for a trend type
 let getOrderFlowParams (trend: Trend) : OrderFlowParams =
     match trend with
-    | StrongUptrend ->   { TradeRatePerSecond = 50.0; DispersionExp = 1.0 }
-    | MidUptrend ->      { TradeRatePerSecond = 40.0; DispersionExp = 1.0 }
-    | WeakUptrend ->     { TradeRatePerSecond = 25.0; DispersionExp = 1.0 }
-    | Consolidation ->   { TradeRatePerSecond = 10.0; DispersionExp = 1.0 }
-    | WeakDowntrend ->   { TradeRatePerSecond = 25.0; DispersionExp = 1.0 }
-    | MidDowntrend ->    { TradeRatePerSecond = 40.0; DispersionExp = 1.0 }
-    | StrongDowntrend -> { TradeRatePerSecond = 50.0; DispersionExp = 1.0 }
+    | StrongUptrend ->   { MedianTradesPerSecond = 50.0; MeanTradesPerSecond = 60.0 }
+    | MidUptrend ->      { MedianTradesPerSecond = 40.0; MeanTradesPerSecond = 48.0 }
+    | WeakUptrend ->     { MedianTradesPerSecond = 25.0; MeanTradesPerSecond = 28.0 }
+    | Consolidation ->   { MedianTradesPerSecond = 10.0; MeanTradesPerSecond = 11.0 }
+    | WeakDowntrend ->   { MedianTradesPerSecond = 25.0; MeanTradesPerSecond = 28.0 }
+    | MidDowntrend ->    { MedianTradesPerSecond = 40.0; MeanTradesPerSecond = 48.0 }
+    | StrongDowntrend -> { MedianTradesPerSecond = 50.0; MeanTradesPerSecond = 60.0 }
 
 /// Get price parameters for a trend type (drift and volatility as fractions)
 let getPriceParams (trend: Trend) : PriceParams =
@@ -65,27 +65,18 @@ let getActivityParams (trend: Trend) : ActivityParams =
     | MidDowntrend ->    { MedianSize = 100.0; MeanSize = 150.0 }
     | StrongDowntrend -> { MedianSize = 100.0; MeanSize = 200.0 }
 
-/// Sample trade count using Gamma-Poisson mixture (equivalent to NegativeBinomial)
-let sampleTradeCount (rng: Random) (rate: float) (dispersionExp: float) (duration: float) =
-    let mean = rate * duration
-    // When dispersionExp is very small, use Poisson directly (variance = mean)
-    if dispersionExp < 0.01 then
-        Poisson(mean, rng).Sample()
-    else
-        let p = Math.Pow(2.0, -dispersionExp)
-        let r = mean * p / (1.0 - p)
-        // Use Gamma-Poisson mixture (equivalent to NegativeBinomial, but O(1))
-        // See: https://github.com/mathnet/mathnet-numerics/issues/320
-        // MathNet Gamma uses rate parameterization: Gamma(shape, rate) with mean = shape/rate
-        let gammaRate = p / (1.0 - p)
-        let lambda = Gamma(r, gammaRate, rng).Sample()
-        Poisson(lambda, rng).Sample()
-
 /// Stochastic rounding: rounds up or down probabilistically based on fractional part
 let stochasticRound (rng: Random) (x: float) : int =
     let floor = Math.Floor(x)
     let frac = x - floor
     int (if rng.NextDouble() < frac then floor + 1.0 else floor)
+
+/// Sample trade count using LogNormal distribution
+let sampleTradeCount (rng: Random) (orderFlowParams: OrderFlowParams) (duration: float) =
+    let mu = log(orderFlowParams.MedianTradesPerSecond)
+    let sigma = sqrt(2.0 * log(orderFlowParams.MeanTradesPerSecond / orderFlowParams.MedianTradesPerSecond))
+    let count = LogNormal(mu, sigma, rng).Sample() * duration
+    max 1 (stochasticRound rng count)
 
 /// Convert median/mean parameterization to LogNormal mu/sigma
 let activityMuSigma (activityParams: ActivityParams) : float * float =
@@ -158,7 +149,7 @@ let generateEpisodeTrades (rng: Random) (startPrice: float) (episode: Episode<Tr
     let priceParams = getPriceParams episode.Label
     let activityParams = getActivityParams episode.Label
     
-    let tradeCount = sampleTradeCount rng orderFlowParams.TradeRatePerSecond orderFlowParams.DispersionExp durationSeconds
+    let tradeCount = sampleTradeCount rng orderFlowParams durationSeconds
     let timestamps = generateTimestamps rng 0.0 durationSeconds tradeCount
     let pricesAndSizes, endPrice = generatePricesAndSizes rng priceParams activityParams startPrice timestamps
     
