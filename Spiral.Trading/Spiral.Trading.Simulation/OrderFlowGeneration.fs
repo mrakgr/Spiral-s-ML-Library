@@ -67,12 +67,19 @@ let getActivityParams (trend: Trend) : ActivityParams =
 
 /// Sample trade count using Gamma-Poisson mixture (equivalent to NegativeBinomial)
 let sampleTradeCount (rng: Random) (rate: float) (dispersionExp: float) (duration: float) =
-    let p = Math.Pow(2.0, -dispersionExp)
-    let r = rate * duration * p / (1.0 - p)
-    // Use Gamma-Poisson mixture (equivalent to NegativeBinomial, but O(1))
-    // See: https://github.com/mathnet/mathnet-numerics/issues/320
-    let lambda = Gamma(r, (1.0 - p) / p, rng).Sample()
-    Poisson(lambda, rng).Sample()
+    let mean = rate * duration
+    // When dispersionExp is very small, use Poisson directly (variance = mean)
+    if dispersionExp < 0.01 then
+        Poisson(mean, rng).Sample()
+    else
+        let p = Math.Pow(2.0, -dispersionExp)
+        let r = mean * p / (1.0 - p)
+        // Use Gamma-Poisson mixture (equivalent to NegativeBinomial, but O(1))
+        // See: https://github.com/mathnet/mathnet-numerics/issues/320
+        // MathNet Gamma uses rate parameterization: Gamma(shape, rate) with mean = shape/rate
+        let gammaRate = p / (1.0 - p)
+        let lambda = Gamma(r, gammaRate, rng).Sample()
+        Poisson(lambda, rng).Sample()
 
 /// Stochastic rounding: rounds up or down probabilistically based on fractional part
 let stochasticRound (rng: Random) (x: float) : int =
