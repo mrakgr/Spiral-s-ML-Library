@@ -24,10 +24,10 @@ type PriceParams = {
     VolatilityPerSecond: float   // Std dev of price change per second (as fraction)
 }
 
-/// Parameters for trade size generation (Pareto)
-type SizeParams = {
-    MinSize: float               // Scale parameter (minimum trade size)
-    Alpha: float                 // Shape parameter (lower = heavier tail)
+/// Parameters for trade size generation (LogNormal activity model)
+type ActivityParams = {
+    BaseSize: float              // Mean trade size (E[size] = BaseSize)
+    Sigma: float                 // LogNormal sigma (dispersion of activity)
 }
 
 /// Get order flow parameters for a trend type
@@ -52,17 +52,17 @@ let getPriceParams (trend: Trend) : PriceParams =
     | MidDowntrend ->    { DriftPerSecond = -15e-6; VolatilityPerSecond = 80e-6 }
     | StrongDowntrend -> { DriftPerSecond = -30e-6; VolatilityPerSecond = 100e-6 }
 
-/// Get size parameters for a trend type (Pareto distribution)
-/// Stronger trends have lower alpha (heavier tail, larger average sizes)
-let getSizeParams (trend: Trend) : SizeParams =
+/// Get activity parameters for a trend type (LogNormal activity model)
+/// Stronger trends have higher sigma (more variable activity, larger occasional trades)
+let getActivityParams (trend: Trend) : ActivityParams =
     match trend with
-    | StrongUptrend ->   { MinSize = 1.0; Alpha = 1.5 }
-    | MidUptrend ->      { MinSize = 1.0; Alpha = 1.8 }
-    | WeakUptrend ->     { MinSize = 1.0; Alpha = 2.0 }
-    | Consolidation ->   { MinSize = 1.0; Alpha = 2.5 }
-    | WeakDowntrend ->   { MinSize = 1.0; Alpha = 2.0 }
-    | MidDowntrend ->    { MinSize = 1.0; Alpha = 1.8 }
-    | StrongDowntrend -> { MinSize = 1.0; Alpha = 1.5 }
+    | StrongUptrend ->   { BaseSize = 100.0; Sigma = 1.2 }
+    | MidUptrend ->      { BaseSize = 100.0; Sigma = 1.0 }
+    | WeakUptrend ->     { BaseSize = 100.0; Sigma = 0.8 }
+    | Consolidation ->   { BaseSize = 100.0; Sigma = 0.6 }
+    | WeakDowntrend ->   { BaseSize = 100.0; Sigma = 0.8 }
+    | MidDowntrend ->    { BaseSize = 100.0; Sigma = 1.0 }
+    | StrongDowntrend -> { BaseSize = 100.0; Sigma = 1.2 }
 
 /// Sample trade count using Gamma-Poisson mixture (equivalent to NegativeBinomial)
 let sampleTradeCount (rng: Random) (rate: float) (dispersionExp: float) (duration: float) =
@@ -79,10 +79,18 @@ let stochasticRound (rng: Random) (x: float) : int =
     let frac = x - floor
     int (if rng.NextDouble() < frac then floor + 1.0 else floor)
 
-/// Sample trade size from Pareto distribution
-let sampleSize (rng: Random) (sizeParams: SizeParams) : int =
-    let pareto = Pareto(sizeParams.MinSize, sizeParams.Alpha, rng)
-    stochasticRound rng (pareto.Sample())
+/// Correction factor so E[correction * sqrt(activity)] = 1
+let getVolatilityCorrection (sigma: float) : float =
+    exp(sigma * sigma / 8.0)
+
+/// Sample activity from LogNormal with E[activity] = 1
+let sampleActivity (rng: Random) (sigma: float) : float =
+    let mu = -sigma * sigma / 2.0
+    LogNormal(mu, sigma, rng).Sample()
+
+/// Sample trade size from activity
+let sampleSize (rng: Random) (baseSize: float) (activity: float) : int =
+    max 1 (stochasticRound rng (baseSize * activity))
 
 /// Generate uniformly distributed timestamps within an interval
 let generateTimestamps (rng: Random) (startTime: float) (duration: float) (count: int) : float[] =
@@ -90,28 +98,41 @@ let generateTimestamps (rng: Random) (startTime: float) (duration: float) (count
     Array.sortInPlace timestamps
     timestamps
 
-/// Generate prices at trade timestamps using Geometric Brownian Motion
-/// Returns array of prices and the final price for chaining
-let generatePrices (rng: Random) (priceParams: PriceParams) (startPrice: float) (timestamps: float[]) : float[] * float =
+/// Generate correlated prices and sizes at trade timestamps using GBM with activity scaling
+/// Returns array of (price, size) pairs and the final price for chaining
+let generatePricesAndSizes 
+    (rng: Random) 
+    (priceParams: PriceParams) 
+    (activityParams: ActivityParams)
+    (startPrice: float) 
+    (timestamps: float[]) 
+    : (float * int)[] * float =
+    
     if timestamps.Length = 0 then
         [||], startPrice
     else
-        let prices = Array.zeroCreate timestamps.Length
+        let correction = getVolatilityCorrection activityParams.Sigma
         let normal = Normal(0.0, 1.0, rng)
+        let results = Array.zeroCreate timestamps.Length
         let mutable price = startPrice
         let mutable prevTime = 0.0
         
         for i in 0 .. timestamps.Length - 1 do
             let dt = timestamps.[i] - prevTime
+            let activity = sampleActivity rng activityParams.Sigma
+            let size = sampleSize rng activityParams.BaseSize activity
+            
             let drift = priceParams.DriftPerSecond
-            let vol = priceParams.VolatilityPerSecond
-            // GBM: S(t+dt) = S(t) * exp((mu - sigma^2/2)*dt + sigma*sqrt(dt)*Z)
+            let baseVol = priceParams.VolatilityPerSecond
+            let scaledVol = baseVol * correction * sqrt(activity)
+            
+            // GBM with activity-scaled volatility
             let z = normal.Sample()
-            price <- price * exp((drift - vol * vol / 2.0) * dt + vol * sqrt(dt) * z)
-            prices.[i] <- price
+            price <- price * exp((drift - scaledVol * scaledVol / 2.0) * dt + scaledVol * sqrt(dt) * z)
+            results.[i] <- (price, size)
             prevTime <- timestamps.[i]
         
-        prices, price
+        results, price
 
 /// Generate trades for a single trend episode
 /// Returns trades and the ending price for chaining to next episode
@@ -119,18 +140,20 @@ let generateEpisodeTrades (rng: Random) (startPrice: float) (episode: Episode<Tr
     let durationSeconds = episode.Duration * 60.0
     let orderFlowParams = getOrderFlowParams episode.Label
     let priceParams = getPriceParams episode.Label
-    let sizeParams = getSizeParams episode.Label
+    let activityParams = getActivityParams episode.Label
     
     let tradeCount = sampleTradeCount rng orderFlowParams.TradeRatePerSecond orderFlowParams.DispersionExp durationSeconds
     let timestamps = generateTimestamps rng 0.0 durationSeconds tradeCount
-    let prices, endPrice = generatePrices rng priceParams startPrice timestamps
+    let pricesAndSizes, endPrice = generatePricesAndSizes rng priceParams activityParams startPrice timestamps
     
-    let trades = Array.init tradeCount (fun i -> {
-        Time = timestamps.[i]
-        Price = prices.[i]
-        Size = sampleSize rng sizeParams
-        Trend = episode.Label
-    })
+    let trades = Array.init tradeCount (fun i -> 
+        let price, size = pricesAndSizes.[i]
+        {
+            Time = timestamps.[i]
+            Price = price
+            Size = size
+            Trend = episode.Label
+        })
     
     trades, endPrice
 
