@@ -88,13 +88,21 @@ let activityMuSigma (activityParams: ActivityParams) : float * float =
 let getVolatilityCorrection (sigma: float) : float =
     exp(sigma * sigma / 8.0)
 
-/// Sample activity from LogNormal (returns raw size, not normalized)
-let sampleActivity (rng: Random) (mu: float) (sigma: float) : float =
-    LogNormal(mu, sigma, rng).Sample()
-
-/// Sample trade size (stochastic rounding of activity sample)
-let sampleSize (rng: Random) (activity: float) : int =
+/// Sochastic rounding of activity sample
+let roundSize (rng: Random) (activity: float) : int =
     max 1 (stochasticRound rng activity)
+
+/// Sample size and the activity factor from LogNormal
+let sampleSizeAndActivity (rng: Random) (mu: float) (sigma: float) (mean : float) =
+    let rec loop() =
+        let rawSize = LogNormal(mu, sigma, rng).Sample()
+        let size = rawSize |> stochasticRound rng
+        if size > 0 then // Accept the sample
+            // Normalize activity for volatility scaling (so E[activity] ~ 1)
+            let activity = rawSize / mean
+            size, activity
+        else loop() // Reject the sample
+    loop()
 
 /// Generate uniformly distributed timestamps within an interval
 let generateTimestamps (rng: Random) (startTime: float) (duration: float) (count: int) : float[] =
@@ -124,11 +132,7 @@ let generatePricesAndSizes
         
         for i in 0 .. timestamps.Length - 1 do
             let dt = timestamps.[i] - prevTime
-            let rawSize = sampleActivity rng mu sigma
-            let size = sampleSize rng rawSize
-            // Normalize activity for volatility scaling (so E[sqrt(activity)] ~ 1)
-            let activity = rawSize / activityParams.MeanSize
-            
+            let size, activity = sampleSizeAndActivity rng mu sigma activityParams.MeanSize          
             let drift = priceParams.DriftPerSecond
             let baseVol = priceParams.VolatilityPerSecond
             let scaledVol = baseVol * correction * sqrt(activity)
