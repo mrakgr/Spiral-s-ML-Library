@@ -25,9 +25,10 @@ type PriceParams = {
 }
 
 /// Parameters for trade size generation (LogNormal activity model)
+/// Parameterized by median and mean for intuitive interpretation
 type ActivityParams = {
-    BaseSize: float              // Mean trade size (E[size] = BaseSize)
-    Sigma: float                 // LogNormal sigma (dispersion of activity)
+    MedianSize: float            // Typical trade size (50th percentile)
+    MeanSize: float              // Average trade size (>= MedianSize due to right skew)
 }
 
 /// Get order flow parameters for a trend type
@@ -53,16 +54,16 @@ let getPriceParams (trend: Trend) : PriceParams =
     | StrongDowntrend -> { DriftPerSecond = -30e-6; VolatilityPerSecond = 100e-6 }
 
 /// Get activity parameters for a trend type (LogNormal activity model)
-/// Stronger trends have higher sigma (more variable activity, larger occasional trades)
+/// Stronger trends have higher mean/median ratio (more large trades)
 let getActivityParams (trend: Trend) : ActivityParams =
     match trend with
-    | StrongUptrend ->   { BaseSize = 100.0; Sigma = 1.2 }
-    | MidUptrend ->      { BaseSize = 100.0; Sigma = 1.0 }
-    | WeakUptrend ->     { BaseSize = 100.0; Sigma = 0.8 }
-    | Consolidation ->   { BaseSize = 100.0; Sigma = 0.6 }
-    | WeakDowntrend ->   { BaseSize = 100.0; Sigma = 0.8 }
-    | MidDowntrend ->    { BaseSize = 100.0; Sigma = 1.0 }
-    | StrongDowntrend -> { BaseSize = 100.0; Sigma = 1.2 }
+    | StrongUptrend ->   { MedianSize = 100.0; MeanSize = 200.0 }
+    | MidUptrend ->      { MedianSize = 100.0; MeanSize = 150.0 }
+    | WeakUptrend ->     { MedianSize = 100.0; MeanSize = 120.0 }
+    | Consolidation ->   { MedianSize = 100.0; MeanSize = 110.0 }
+    | WeakDowntrend ->   { MedianSize = 100.0; MeanSize = 120.0 }
+    | MidDowntrend ->    { MedianSize = 100.0; MeanSize = 150.0 }
+    | StrongDowntrend -> { MedianSize = 100.0; MeanSize = 200.0 }
 
 /// Sample trade count using Gamma-Poisson mixture (equivalent to NegativeBinomial)
 let sampleTradeCount (rng: Random) (rate: float) (dispersionExp: float) (duration: float) =
@@ -79,18 +80,23 @@ let stochasticRound (rng: Random) (x: float) : int =
     let frac = x - floor
     int (if rng.NextDouble() < frac then floor + 1.0 else floor)
 
+/// Convert median/mean parameterization to LogNormal mu/sigma
+let activityMuSigma (activityParams: ActivityParams) : float * float =
+    let mu = log(activityParams.MedianSize)
+    let sigma = sqrt(2.0 * log(activityParams.MeanSize / activityParams.MedianSize))
+    (mu, sigma)
+
 /// Correction factor so E[correction * sqrt(activity)] = 1
 let getVolatilityCorrection (sigma: float) : float =
     exp(sigma * sigma / 8.0)
 
-/// Sample activity from LogNormal with E[activity] = 1
-let sampleActivity (rng: Random) (sigma: float) : float =
-    let mu = -sigma * sigma / 2.0
+/// Sample activity from LogNormal (returns raw size, not normalized)
+let sampleActivity (rng: Random) (mu: float) (sigma: float) : float =
     LogNormal(mu, sigma, rng).Sample()
 
-/// Sample trade size from activity
-let sampleSize (rng: Random) (baseSize: float) (activity: float) : int =
-    max 1 (stochasticRound rng (baseSize * activity))
+/// Sample trade size (stochastic rounding of activity sample)
+let sampleSize (rng: Random) (activity: float) : int =
+    max 1 (stochasticRound rng activity)
 
 /// Generate uniformly distributed timestamps within an interval
 let generateTimestamps (rng: Random) (startTime: float) (duration: float) (count: int) : float[] =
@@ -111,7 +117,8 @@ let generatePricesAndSizes
     if timestamps.Length = 0 then
         [||], startPrice
     else
-        let correction = getVolatilityCorrection activityParams.Sigma
+        let mu, sigma = activityMuSigma activityParams
+        let correction = getVolatilityCorrection sigma
         let normal = Normal(0.0, 1.0, rng)
         let results = Array.zeroCreate timestamps.Length
         let mutable price = startPrice
@@ -119,8 +126,10 @@ let generatePricesAndSizes
         
         for i in 0 .. timestamps.Length - 1 do
             let dt = timestamps.[i] - prevTime
-            let activity = sampleActivity rng activityParams.Sigma
-            let size = sampleSize rng activityParams.BaseSize activity
+            let rawSize = sampleActivity rng mu sigma
+            let size = sampleSize rng rawSize
+            // Normalize activity for volatility scaling (so E[sqrt(activity)] ~ 1)
+            let activity = rawSize / activityParams.MeanSize
             
             let drift = priceParams.DriftPerSecond
             let baseVol = priceParams.VolatilityPerSecond

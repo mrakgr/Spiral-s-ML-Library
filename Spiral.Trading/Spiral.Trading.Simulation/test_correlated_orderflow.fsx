@@ -21,7 +21,9 @@ printfn "Start: %.4f, End: %.4f, Return: %.2f%%" startPrice endPrice ((endPrice 
 printfn ""
 
 let sizes = trades |> Array.map (fun t -> float t.Size)
-printfn "Size stats: Mean=%.1f, Max=%.0f" (Array.average sizes) (Array.max sizes)
+let sortedSizes = Array.sort sizes
+let medianSize = sortedSizes.[sortedSizes.Length / 2]
+printfn "Size stats: Median=%.1f, Mean=%.1f, Max=%.0f" medianSize (Array.average sizes) (Array.max sizes)
 printfn ""
 
 // Check correlation
