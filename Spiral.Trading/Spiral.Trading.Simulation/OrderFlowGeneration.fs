@@ -46,17 +46,17 @@ let getOrderFlowParams (trend: Trend) : OrderFlowParams =
 let defaultBaselineVol = 0.01 / sqrt(1_000_000.0)
 
 /// Get baseline drift for a trend type (per sqrt-share, same scaling as volatility)
-/// StrongUptrend: 0.1% per sqrt(1M) shares
+/// Scaled to produce visible but reasonable trends
 let getBaselineDrift (trend: Trend) : float =
     let driftPerSqrtMillion =
         match trend with
-        | StrongUptrend   ->  0.001
-        | MidUptrend      ->  0.0006
-        | WeakUptrend     ->  0.0003
+        | StrongUptrend   ->  0.000125
+        | MidUptrend      ->  0.000075
+        | WeakUptrend     ->  0.0000375
         | Consolidation   ->  0.0
-        | WeakDowntrend   -> -0.0003
-        | MidDowntrend    -> -0.0006
-        | StrongDowntrend -> -0.001
+        | WeakDowntrend   -> -0.0000375
+        | MidDowntrend    -> -0.000075
+        | StrongDowntrend -> -0.000125
     driftPerSqrtMillion / sqrt(1_000_000.0)
 
 /// Get price parameters for a trend type
