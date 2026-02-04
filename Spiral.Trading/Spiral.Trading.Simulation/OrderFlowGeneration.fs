@@ -46,13 +46,13 @@ let getOrderFlowParams (trend: Trend) : OrderFlowParams =
 /// These match the original time-based model values
 let getPriceParams (trend: Trend) : PriceParams =
     match trend with
-    | StrongUptrend ->   { DriftPerSecond = 30e-6;  VolatilityPerSecond = 100e-6 }
-    | MidUptrend ->      { DriftPerSecond = 15e-6;  VolatilityPerSecond = 80e-6 }
-    | WeakUptrend ->     { DriftPerSecond = 7e-6;   VolatilityPerSecond = 60e-6 }
-    | Consolidation ->   { DriftPerSecond = 0.0;    VolatilityPerSecond = 40e-6 }
-    | WeakDowntrend ->   { DriftPerSecond = -7e-6;  VolatilityPerSecond = 60e-6 }
-    | MidDowntrend ->    { DriftPerSecond = -15e-6; VolatilityPerSecond = 80e-6 }
-    | StrongDowntrend -> { DriftPerSecond = -30e-6; VolatilityPerSecond = 100e-6 }
+    | StrongUptrend ->   { DriftPerSecond = 30e-6;  VolatilityPerSecond = 300e-6 }
+    | MidUptrend ->      { DriftPerSecond = 15e-6;  VolatilityPerSecond = 240e-6 }
+    | WeakUptrend ->     { DriftPerSecond = 7e-6;   VolatilityPerSecond = 180e-6 }
+    | Consolidation ->   { DriftPerSecond = 0.0;    VolatilityPerSecond = 120e-6 }
+    | WeakDowntrend ->   { DriftPerSecond = -7e-6;  VolatilityPerSecond = 180e-6 }
+    | MidDowntrend ->    { DriftPerSecond = -15e-6; VolatilityPerSecond = 240e-6 }
+    | StrongDowntrend -> { DriftPerSecond = -30e-6; VolatilityPerSecond = 300e-6 }
 
 /// Get activity parameters for a trend type (LogNormal activity model)
 /// Stronger trends have higher mean/median ratio (more large trades)
@@ -99,7 +99,11 @@ let generateTimestamps (rng: Random) (startTime: float) (duration: float) (count
     Array.sortInPlace timestamps
     timestamps
 
-/// Generate prices and sizes using volume-based GBM with time-normalized params
+/// Correction factor so E[correction * sqrt(size/meanSize)] = 1 for LogNormal
+let getActivityCorrection (sigma: float) : float =
+    exp(sigma * sigma / 8.0)
+
+/// Generate prices and sizes using volume-based GBM with activity scaling
 /// Returns array of (price, size) pairs and the final price for chaining
 let generatePricesAndSizes 
     (rng: Random) 
@@ -114,22 +118,23 @@ let generatePricesAndSizes
         [||], startPrice
     else
         let mu, sigma = activityMuSigma activityParams
+        let correction = getActivityCorrection sigma
         let normal = Normal(0.0, 1.0, rng)
         let results = Array.zeroCreate count
         let mutable price = startPrice
         
-        // Normalization factor: per-second -> per-trade
-        // Divide by (mean trades/sec * sqrt(mean size))
-        let normFactor = orderFlowParams.MeanTradesPerSecond * sqrt(activityParams.MeanSize)
-        let baseVol = priceParams.VolatilityPerSecond / normFactor
-        let baseDrift = priceParams.DriftPerSecond / normFactor
+        let expectedDt = 1.0 / orderFlowParams.MeanTradesPerSecond
+        let expectedSqrtSize = sqrt(activityParams.MeanSize)
+        let drift = priceParams.DriftPerSecond
+        let vol = priceParams.VolatilityPerSecond
         
         for i in 0 .. count - 1 do
             let size = sampleSize rng mu sigma
-            let vol = baseVol * sqrt(float size)
-            let drift = baseDrift * sqrt(float size)
+            let sizeNorm = correction * sqrt(float size) / expectedSqrtSize
+            let scaledDrift = drift * sizeNorm
+            let scaledVol = vol * sizeNorm
             let z = normal.Sample()
-            price <- price * exp(drift - vol * vol / 2.0 + vol * z)
+            price <- price * exp((scaledDrift - scaledVol * scaledVol / 2.0) * expectedDt + scaledVol * sqrt(expectedDt) * z)
             results.[i] <- (price, size)
         
         results, price
