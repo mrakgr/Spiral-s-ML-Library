@@ -18,10 +18,10 @@ type OrderFlowParams = {
     MeanTradesPerSecond: float    // Average trade rate (>= Median due to right skew)
 }
 
-/// Parameters for price generation (GBM)
+/// Parameters for price generation (volume-based GBM)
 type PriceParams = {
-    DriftPerSecond: float        // Expected price change per second (as fraction)
-    VolatilityPerSecond: float   // Std dev of price change per second (as fraction)
+    BaselineVol: float     // Volatility per sqrt-share (e.g., 1% per sqrt(1M) shares)
+    BaselineDrift: float   // Drift per sqrt-share (e.g., 0.1% per sqrt(1M) shares)
 }
 
 /// Parameters for trade size generation (LogNormal activity model)
@@ -42,16 +42,26 @@ let getOrderFlowParams (trend: Trend) : OrderFlowParams =
     | MidDowntrend ->    { MedianTradesPerSecond = 40.0; MeanTradesPerSecond = 48.0 }
     | StrongDowntrend -> { MedianTradesPerSecond = 50.0; MeanTradesPerSecond = 60.0 }
 
-/// Get price parameters for a trend type (drift and volatility as fractions)
+/// Default baseline volatility: 1% per sqrt(1,000,000) shares
+let defaultBaselineVol = 0.01 / sqrt(1_000_000.0)
+
+/// Get baseline drift for a trend type (per sqrt-share, same scaling as volatility)
+/// StrongUptrend: 0.1% per sqrt(1M) shares
+let getBaselineDrift (trend: Trend) : float =
+    let driftPerSqrtMillion =
+        match trend with
+        | StrongUptrend   ->  0.001
+        | MidUptrend      ->  0.0006
+        | WeakUptrend     ->  0.0003
+        | Consolidation   ->  0.0
+        | WeakDowntrend   -> -0.0003
+        | MidDowntrend    -> -0.0006
+        | StrongDowntrend -> -0.001
+    driftPerSqrtMillion / sqrt(1_000_000.0)
+
+/// Get price parameters for a trend type
 let getPriceParams (trend: Trend) : PriceParams =
-    match trend with
-    | StrongUptrend ->   { DriftPerSecond = 30e-6;  VolatilityPerSecond = 100e-6 }
-    | MidUptrend ->      { DriftPerSecond = 15e-6;  VolatilityPerSecond = 80e-6 }
-    | WeakUptrend ->     { DriftPerSecond = 7e-6;   VolatilityPerSecond = 60e-6 }
-    | Consolidation ->   { DriftPerSecond = 0.0;    VolatilityPerSecond = 40e-6 }
-    | WeakDowntrend ->   { DriftPerSecond = -7e-6;  VolatilityPerSecond = 60e-6 }
-    | MidDowntrend ->    { DriftPerSecond = -15e-6; VolatilityPerSecond = 80e-6 }
-    | StrongDowntrend -> { DriftPerSecond = -30e-6; VolatilityPerSecond = 100e-6 }
+    { BaselineVol = defaultBaselineVol; BaselineDrift = getBaselineDrift trend }
 
 /// Get activity parameters for a trend type (LogNormal activity model)
 /// Stronger trends have higher mean/median ratio (more large trades)
@@ -84,24 +94,12 @@ let activityMuSigma (activityParams: ActivityParams) : float * float =
     let sigma = sqrt(2.0 * log(activityParams.MeanSize / activityParams.MedianSize))
     (mu, sigma)
 
-/// Correction factor so E[correction * sqrt(activity)] = 1
-let getVolatilityCorrection (sigma: float) : float =
-    exp(sigma * sigma / 8.0)
-
-/// Sochastic rounding of activity sample
-let roundSize (rng: Random) (activity: float) : int =
-    max 1 (stochasticRound rng activity)
-
-/// Sample size and the activity factor from LogNormal
-let sampleSizeAndActivity (rng: Random) (mu: float) (sigma: float) (mean : float) =
+/// Sample size from LogNormal distribution
+let sampleSize (rng: Random) (mu: float) (sigma: float) : int =
     let rec loop() =
         let rawSize = LogNormal(mu, sigma, rng).Sample()
         let size = rawSize |> stochasticRound rng
-        if size > 0 then // Accept the sample
-            // Normalize activity for volatility scaling (so E[activity] ~ 1)
-            let activity = rawSize / mean
-            size, activity
-        else loop() // Reject the sample
+        if size > 0 then size else loop()
     loop()
 
 /// Generate uniformly distributed timestamps within an interval
@@ -110,38 +108,31 @@ let generateTimestamps (rng: Random) (startTime: float) (duration: float) (count
     Array.sortInPlace timestamps
     timestamps
 
-/// Generate correlated prices and sizes at trade timestamps using GBM with activity scaling
+/// Generate prices and sizes using volume-based GBM (no time dependency)
 /// Returns array of (price, size) pairs and the final price for chaining
 let generatePricesAndSizes 
     (rng: Random) 
     (priceParams: PriceParams) 
     (activityParams: ActivityParams)
     (startPrice: float) 
-    (timestamps: float[]) 
+    (count: int) 
     : (float * int)[] * float =
     
-    if timestamps.Length = 0 then
+    if count = 0 then
         [||], startPrice
     else
         let mu, sigma = activityMuSigma activityParams
-        let correction = getVolatilityCorrection sigma
         let normal = Normal(0.0, 1.0, rng)
-        let results = Array.zeroCreate timestamps.Length
+        let results = Array.zeroCreate count
         let mutable price = startPrice
-        let mutable prevTime = 0.0
         
-        for i in 0 .. timestamps.Length - 1 do
-            let dt = timestamps.[i] - prevTime
-            let size, activity = sampleSizeAndActivity rng mu sigma activityParams.MeanSize          
-            let drift = priceParams.DriftPerSecond
-            let baseVol = priceParams.VolatilityPerSecond
-            let scaledVol = baseVol * correction * sqrt(activity)
-            
-            // GBM with activity-scaled volatility
+        for i in 0 .. count - 1 do
+            let size = sampleSize rng mu sigma
+            let vol = priceParams.BaselineVol * sqrt(float size)
+            let drift = priceParams.BaselineDrift * sqrt(float size)
             let z = normal.Sample()
-            price <- price * exp((drift - scaledVol * scaledVol / 2.0) * dt + scaledVol * sqrt(dt) * z)
+            price <- price * exp(drift - vol * vol / 2.0 + vol * z)
             results.[i] <- (price, size)
-            prevTime <- timestamps.[i]
         
         results, price
 
@@ -155,7 +146,7 @@ let generateEpisodeTrades (rng: Random) (startPrice: float) (episode: Episode<Tr
     
     let tradeCount = sampleTradeCount rng orderFlowParams durationSeconds
     let timestamps = generateTimestamps rng 0.0 durationSeconds tradeCount
-    let pricesAndSizes, endPrice = generatePricesAndSizes rng priceParams activityParams startPrice timestamps
+    let pricesAndSizes, endPrice = generatePricesAndSizes rng priceParams activityParams startPrice tradeCount
     
     let trades = Array.init tradeCount (fun i -> 
         let price, size = pricesAndSizes.[i]
