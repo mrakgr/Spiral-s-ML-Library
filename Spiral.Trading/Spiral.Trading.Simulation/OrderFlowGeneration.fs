@@ -121,9 +121,10 @@ let generatePricesAndSizes
         let correction = getActivityCorrection sigma
         let normal = Normal(0.0, 1.0, rng)
         let results = Array.zeroCreate count
-        let mutable price = startPrice
+        let mutable logPrice = log(startPrice)
         
         let expectedDt = 1.0 / orderFlowParams.MeanTradesPerSecond
+        let sqrtExpectedDt = sqrt(expectedDt)
         let expectedSqrtSize = sqrt(activityParams.MeanSize)
         let drift = priceParams.DriftPerSecond
         let vol = priceParams.VolatilityPerSecond
@@ -134,10 +135,10 @@ let generatePricesAndSizes
             let scaledDrift = drift * sizeNorm
             let scaledVol = vol * sizeNorm
             let z = normal.Sample()
-            price <- price * exp((scaledDrift - scaledVol * scaledVol / 2.0) * expectedDt + scaledVol * sqrt(expectedDt) * z)
-            results.[i] <- (price, size)
+            logPrice <- logPrice + (scaledDrift - scaledVol * scaledVol / 2.0) * expectedDt + scaledVol * sqrtExpectedDt * z
+            results.[i] <- (exp(logPrice), size)
         
-        results, price
+        results, exp(logPrice)
 
 /// Generate trades for a single trend episode
 /// Returns trades and the ending price for chaining to next episode
